@@ -19,8 +19,18 @@ div.org-dashboard {
     }
   }
 
-  &.showing-qsg div.page {
-    width: calc(100% - #{$qsg_width});
+  &.showing-qsg {
+    overflow: hidden;
+    height: 100%;
+
+    div.page {
+      width: calc(100% - #{$qsg_width});
+
+      div.org-dashboard-container div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container div.board-container{
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    }
   }
 
   div.page{

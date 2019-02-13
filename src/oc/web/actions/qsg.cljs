@@ -11,7 +11,8 @@
 
 ;; Server dialog
 
-(def qsg-checklist-allowed-props [:show-guide?
+(def qsg-checklist-allowed-props [:should-show-qsg?
+                                  :show-guide?
                                   :invited?
                                   :add-post?
                                   :add-reminder?
@@ -19,7 +20,8 @@
                                   :section-dialog-seen?
                                   :slack-dismissed?
                                   :start-fresh-dismissed?
-                                  :guide-dismissed?])
+                                  :guide-dismissed?
+                                  :tooltip-shown?])
 
 (defn update-qsg-checklist []
   (let [qsg-data (:qsg @dis/app-state)
@@ -52,20 +54,29 @@
 
 ;; QSG view actions
 
+(defn first-user-qsg []
+  (dis/dispatch! [:input [:qsg :should-show-qsg?] true])
+  (update-qsg-checklist))
+
 (defn reset-qsg []
   (dis/dispatch! [:qsg-reset]))
 
 (defn turn-on-show-guide []
-  (dis/dispatch! [:show-qsg-view true])
-  (update-qsg-checklist))
+  (when (:should-show-qsg? (:qsg @dis/app-state))
+    (dis/dispatch! [:show-qsg-view true])
+    (update-qsg-checklist)))
 
 (defn show-qsg-view []
-  (dis/dispatch! [:show-qsg-view]))
+  (dis/dispatch! [:show-qsg-view])
+  (update-qsg-checklist))
 
 (defn dismiss-qsg-view []
   (dis/dispatch! [:dismiss-qsg-view])
   (update-qsg-checklist)
-  (show-qsg-tooltip))
+  (when-not (:tooltip-shown? (:qsg @dis/app-state))
+    (show-qsg-tooltip)
+    (dis/dispatch! [:qsg :tooltip-shown?] true)
+    (update-qsg-checklist)))
 
 (defn dismiss-slack []
   (dis/dispatch! [:input [:qsg :slack-dismissed?] true])
@@ -140,22 +151,4 @@
 
 (defn finish-add-section-trail []
   (dis/dispatch! [:qsg-add-section :add-section?])
-  (update-qsg-checklist))
-
-;; Configure section
-
-(defn start-configure-section-trail []
-  (let [current-board (keyword (router/current-board-slug))
-        step (if (or (= current-board :all-posts)
-                     (= current-board :must-see)
-                     (= current-board (keyword utils/default-drafts-board-slug)))
-               :configure-section-1
-               :configure-section-2)]
-    (dis/dispatch! [:qsg-configure-section step])))
-
-(defn next-configure-section-trail []
-  (dis/dispatch! [:qsg-configure-section]))
-
-(defn finish-configure-section-trail []
-  (dis/dispatch! [:qsg-configure-section :section-dialog-seen?])
   (update-qsg-checklist))

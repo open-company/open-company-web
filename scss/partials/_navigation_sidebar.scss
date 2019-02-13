@@ -558,10 +558,6 @@ div.left-navigation-sidebar {
         }
       }
 
-      &.qsg-configure-section-1 {
-        position: relative;
-      }
-
       &.hover-item {
         @include default-item();
         * {

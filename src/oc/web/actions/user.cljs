@@ -375,7 +375,7 @@
                  #(if org-editing
                     (do
                       (org-actions/create-or-update-org org-editing)
-                      (qsg-actions/turn-on-show-guide))
+                      (qsg-actions/first-user-qsg))
                     (utils/after 2000
                       (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))

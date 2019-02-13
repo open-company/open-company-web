@@ -51,18 +51,6 @@ div.qsg-breadcrumb {
     top: -8px;
   }
 
-  &.configure-section-1 {
-    animation: leftSwing .8s infinite linear;
-    left: 16px;
-    top: -1px;
-  }
-
-  &.configure-section-2 {
-    animation: rightSwing .8s infinite linear;
-    right: -24px;
-    top: 2px;
-  }
-
   &.appear {
     opacity: 1;
   }

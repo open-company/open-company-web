@@ -123,8 +123,7 @@
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
                :overflow (when (or (= (:step qsg-data) :invite-team-1)
                                    (= (:step qsg-data) :create-reminder-1)
-                                   (= (:step qsg-data) :add-section-1)
-                                   (= (:step qsg-data) :configure-section-1))
+                                   (= (:step qsg-data) :add-section-1))
                            "visible")}}
       [:div.mobile-board-name-container
         {:on-click #(nav-actions/mobile-nav-sidebar)}
@@ -197,22 +196,15 @@
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (= (router/current-board-slug) (:slug board))
-                        board-change-data (get change-data (:uuid board))
-                        show-qsg-breadcrumb? (and (= (:step qsg-data) :configure-section-1)
-                                                  (= (:slug board) (:slug (first sorted-boards))))]]
+                        board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected (and (not is-all-posts)
-                                                              is-current-board)
-                                          :qsg-configure-section-1 show-qsg-breadcrumb?})
+                                                              is-current-board)})
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(do
-                              (when show-qsg-breadcrumb?
-                                (qsg-actions/next-configure-section-trail))
                               (nav-actions/nav-to-url! % board-url))}
-                (when show-qsg-breadcrumb?
-                  (qsg-breadcrumb qsg-data))
                 (when (= (:access board) "public")
                   [:div.public
                     {:class (when is-current-board "selected")}])

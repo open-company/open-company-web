@@ -32,6 +32,7 @@
   (-> db
     (assoc-in [:qsg :visible] true)
     (assoc-in [:qsg :show-guide?] persist?)
+    (assoc-in [:qsg :should-show-qsg?] false)
     (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg db)))))
 
 (defmethod dispatcher/action :dismiss-qsg-view
@@ -197,32 +198,6 @@
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
 
-;; Configure section
-
-(defn- configure-section-next-step [cur-step]
-  (case cur-step
-    nil?
-    :configure-section-1
-
-    :configure-section-1
-    :configure-section-2
-
-    (:configure-section-2 :reset)
-    nil
-    ;; default
-    cur-step))
-
-(defmethod dispatcher/action :qsg-configure-section
-  [db [_ force-step]]
-  (let [cur-step (:step (:qsg db))
-        next-step (or force-step
-                      (configure-section-next-step cur-step))
-        next-db (if (= force-step :section-dialog-seen?)
-                  (assoc-in db [:qsg :section-dialog-seen?] true)
-                  db)
-        next-qsg (assoc-in next-db [:qsg :step] next-step)]
-    (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
-
 ;; QSG store specific reducers
 (defmethod reducer :default [db payload]
   ;; ignore state changes not specific to reactions
@@ -237,6 +212,10 @@
                       (and (:show-guide? qsg-checklist)
                            (not (:guide-dismissed? qsg-checklist))))]
     (assoc qsg-checklist :visible qsg-visible)))
+
+(defmethod reducer :team-loaded
+  [db [_ team-data]]
+  (assoc-in db [:qsg :has-slack-team?] (pos? (:slack-orgs team-data))))
 
 (defmethod reducer :user-data
   [db [_ user-data]]
