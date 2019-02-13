@@ -3,7 +3,8 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.qsg :as qsg-actions]))
+            [oc.web.actions.qsg :as qsg-actions]
+            [oc.web.actions.user :as user-actions]))
 
 (rum/defcs qsg < rum/reactive
                  (drv/drv :qsg)
@@ -31,13 +32,16 @@
              (when (:verify-email-done qsg-data)
                "your ")
              "email"
-             (when-not (:verify-email-done qsg-data)
+             (when (and (not (:verify-email-done qsg-data))
+                       (:can-resend-verification? qsg-data))
                " ("))
-            (when-not (:verify-email-done qsg-data)
+            (when (and (not (:verify-email-done qsg-data))
+                       (:can-resend-verification? qsg-data))
               [:button.mlb-reset.resend-email-bt
-                {:on-click #()}
+                {:on-click #(user-actions/resend-verification-email)}
                 "resend?"])
-            (when-not (:verify-email-done qsg-data)
+            (when (and (not (:verify-email-done qsg-data))
+                       (:can-resend-verification? qsg-data))
               ")")]
           [:button.mlb-reset.qsg-list-item.add-profile-photo-bt
             {:on-click #(qsg-actions/start-profile-photo-trail)

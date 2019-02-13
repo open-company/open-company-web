@@ -323,7 +323,6 @@
     (handle-missing-link "create-org" create-org-link callback {:org-data org-data})))
 
 (defn delete-samples [delete-samples-link callback]
-  (js/console.log "DBG delete-samples-link" delete-samples-link)
   (if delete-samples-link
     (storage-http (method-for-link delete-samples-link) (relative-href delete-samples-link)
      {:headers (headers-for-link delete-samples-link)}
@@ -631,6 +630,13 @@
         (callback status)))
     (handle-missing-link "password-reset" reset-link callback
      {:email email})))
+
+(defn resend-verification-email [resend-link callback]
+  (if resend-link
+    (auth-http (method-for-link resend-link) (relative-href resend-link)
+     {:headers (headers-for-link resend-link)}
+     (fn [{:keys [status success body]}]
+      (callback success)))))
 
 ;; Interactions
 

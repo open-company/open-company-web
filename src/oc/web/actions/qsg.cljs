@@ -42,6 +42,14 @@
       (activity-actions/delete-samples))
     (dis/dispatch! [:input [:qsg :sample-content?] false])))
 
+;; QSG tooltip
+
+(defn show-qsg-tooltip []
+  (dis/dispatch! [:input [:qsg :show-qsg-tooltip?] true]))
+
+(defn dismiss-qsg-tooltip []
+  (dis/dispatch! [:input [:qsg :show-qsg-tooltip?] false]))
+
 ;; QSG view actions
 
 (defn reset-qsg []
@@ -56,7 +64,8 @@
 
 (defn dismiss-qsg-view []
   (dis/dispatch! [:dismiss-qsg-view])
-  (update-qsg-checklist))
+  (update-qsg-checklist)
+  (show-qsg-tooltip))
 
 (defn dismiss-slack []
   (dis/dispatch! [:input [:qsg :slack-dismissed?] true])

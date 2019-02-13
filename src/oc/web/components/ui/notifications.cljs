@@ -73,7 +73,7 @@
                                                            :org-settings-saved :invitation-resent
                                                            :cancel-invitation :member-removed-from-team
                                                            :reminder-created :reminder-updated
-                                                           :reminder-deleted}))
+                                                           :reminder-deleted :resend-verification-ok}))
                               :dismiss-button dismiss-bt})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)

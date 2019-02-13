@@ -249,10 +249,12 @@
 
         overall-progress (progress-percentage updated-qsg-data)
         slack-dismissed? (or (:slack-dismissed? updated-qsg-data)
-                             (jwt/team-has-bot? (:team-id (dispatcher/org-data))))]
+                             (jwt/team-has-bot? (:team-id (dispatcher/org-data))))
+        resend-verification-email-link (utils/link-for (:links user-data) "resend-verification" "POST")]
     (-> db
       (update-in [:qsg] merge updated-qsg-data)
       (assoc-in [:qsg :slack-dismissed?] slack-dismissed?)
+      (assoc-in [:qsg :can-resend-verification?] resend-verification-email-link)
       (assoc-in [:qsg :overall-progress] overall-progress))))
 
 (defmethod reducer :org-loaded

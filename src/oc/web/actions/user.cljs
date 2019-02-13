@@ -407,6 +407,20 @@
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
 
+(defn resend-verification-email []
+  (let [user-data (dis/current-user-data)
+        resend-link (utils/link-for (:links user-data) "resend-verification" "POST")]
+    (when resend-link
+      (api/resend-verification-email resend-link
+       (fn [success]
+         (notification-actions/show-notification
+          {:title (if success "Verification email re-sent!" "An error occurred")
+           :description (when-not success "Please try again.")
+           :expire 5
+           :primary-bt-title "OK"
+           :primary-bt-dismiss true
+           :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
+
 ;; Initial loading
 
 (defn initial-loading [& [force-refresh]]

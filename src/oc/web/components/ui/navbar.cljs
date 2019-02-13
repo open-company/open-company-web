@@ -148,7 +148,23 @@
                                        (qsg-actions/next-profile-photo-trail))
                                      (when (= (:step qsg-data) :company-logo-1)
                                        (qsg-actions/next-company-logo-trail))
-                                     (swap! (::expanded-user-menu s) not))})]
+                                     (swap! (::expanded-user-menu s) not))})
+                      (when (:show-qsg-tooltip? qsg-data)
+                        [:div.qsg-tooltip-container.group
+                          [:div.qsg-tooltip-top-arrow]
+                          [:button.mlb-reset.qsg-tooltip-dismiss
+                            {:on-click #(qsg-actions/dismiss-qsg-tooltip)}]
+                          [:div.qsg-tooltips
+                            [:div.qsg-tooltip-title
+                              (str
+                               "Quickstart guide"
+                               (when (> (:overall-progress qsg-data) 95)
+                                 " complete!"))]
+                            [:div.qsg-tooltip
+                              "You can find the quickstart guide here anytime."]
+                            [:button.mlb-reset.qsg-tooltip-bt
+                              {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
+                              "Ok, got it"]]])]
                     (when @(::expanded-user-menu s)
                       (menu/menu))]]
                 (login-button)))]]]
