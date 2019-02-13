@@ -19,7 +19,6 @@
                                   :add-section?
                                   :section-dialog-seen?
                                   :slack-dismissed?
-                                  :start-fresh-dismissed?
                                   :guide-dismissed?
                                   :tooltip-shown?])
 
@@ -36,13 +35,6 @@
            (dis/dispatch! [:user-profile-update/failed])
            (when success
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
-
-(defn delete-samples []
-  (let [org-data (dis/org-data)
-        delete-samples-link (utils/link-for (:links org-data) "delete-samples")]
-    (when delete-samples-link
-      (activity-actions/delete-samples))
-    (dis/dispatch! [:input [:qsg :sample-content?] false])))
 
 ;; QSG tooltip
 
@@ -75,15 +67,11 @@
   (update-qsg-checklist)
   (when-not (:tooltip-shown? (:qsg @dis/app-state))
     (show-qsg-tooltip)
-    (dis/dispatch! [:qsg :tooltip-shown?] true)
+    (dis/dispatch! [:input [:qsg :tooltip-shown?] true])
     (update-qsg-checklist)))
 
 (defn dismiss-slack []
   (dis/dispatch! [:input [:qsg :slack-dismissed?] true])
-  (update-qsg-checklist))
-
-(defn dismiss-start-fresh []
-  (dis/dispatch! [:input [:qsg :start-fresh-dismissed?] true])
   (update-qsg-checklist))
 
 (defn slack-click []

@@ -87,9 +87,7 @@
             "Invite your team"]]]
 
       [:div.qsg-bottom
-        {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)
-                                  :remove-sample-dismissed (or (not (:sample-content? qsg-data))
-                                                               (:start-fresh-dismissed? qsg-data))})}
+        {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)})}
         (when-not (:slack-dismissed? qsg-data)
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
@@ -106,17 +104,6 @@
               (if (:has-slack-team? qsg-data)
                 "Enable Carrot bot"
                 "Sign in with Slack")]])
-        (when (and (:sample-content? qsg-data)
-                   (not (:start-fresh-dismissed? qsg-data)))
-          [:div.qsg-start-fresh-section
-            [:div.qsg-start-fresh-title
-              "Ready to start fresh?"]
-            [:button.mlb-reset.qsg-start-fresh-dismiss
-              {:on-click #(qsg-actions/dismiss-start-fresh)}]
-            [:button.mlb-reset.qsg-start-fresh-bt
-              {:on-click #(qsg-actions/delete-samples)}
-              [:span.qsg-trash-icon]
-              "Delete all sample content"]])
         [:button.mlb-reset.qsg-dismiss
           {:on-click #(qsg-actions/dismiss-qsg-view)}
           "Dismiss quickstart guide"]]]))

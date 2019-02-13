@@ -242,5 +242,4 @@
         delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")
         next-db (update-in db [:qsg] merge {:company-logo-done company-logo-done?})]
     (-> next-db
-      (assoc-in [:qsg :sample-content?] (boolean delete-samples-link))
       (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg next-db))))))
