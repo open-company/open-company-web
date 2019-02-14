@@ -213,10 +213,6 @@
                            (not (:guide-dismissed? qsg-checklist))))]
     (assoc qsg-checklist :visible qsg-visible)))
 
-(defmethod reducer :team-loaded
-  [db [_ team-data]]
-  (assoc-in db [:qsg :has-slack-team?] (pos? (:slack-orgs team-data))))
-
 (defmethod reducer :user-data
   [db [_ user-data]]
   (let [old-qsg-data (:qsg db)

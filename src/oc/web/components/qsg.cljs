@@ -9,6 +9,8 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]))
 
+(def digest-sample-url "https://invis.io/G2QFA3Y8UZP")
+
 (rum/defcs qsg < rum/reactive
                  (drv/drv :qsg)
                  {:did-mount (fn [s]
@@ -39,16 +41,15 @@
              :class (when (:add-post? qsg-data)
                       "done")}
             "Create a post"]
-          [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
-            {:on-click #(qsg-actions/start-create-reminder-trail)
-             :class (when (:add-reminder? qsg-data)
-                      "done")}
-            "Create a reminder"]
           [:button.mlb-reset.qsg-list-item.qsg-add-section-bt
             {:on-click #(qsg-actions/start-add-section-trail)
              :class (when (:add-section? qsg-data)
                       "done")}
-            "Create a section"]]
+            "Add a section"]
+          [:a.qsg-list-item.qsg-digest-sample-bt
+            {:href digest-sample-url
+             :target "_bank"}
+            "See a sample digest"]]
         [:div.qsg-buttons-list-title
           "Setup"]
         [:div.qsg-buttons-list
@@ -84,26 +85,37 @@
             {:on-click #(qsg-actions/start-invite-team-trail)
              :class (when (:invited? qsg-data)
                       "done")}
-            "Invite your team"]]]
+            "Invite your team"]
+          [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
+            {:on-click #(qsg-actions/start-create-reminder-trail)
+             :class (when (:add-reminder? qsg-data)
+                      "done")}
+            "Create a reminder"]]]
 
       [:div.qsg-bottom
-        {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)})}
+        {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)
+                                  :digest-sample-dismissed (:digest-sample-dismissed? qsg-data)})}
+        (when-not (:digest-sample-dismissed? qsg-data)
+          [:div.qsg-digest-sample-section
+            [:div.qsg-digest-sample-title
+              "Your morning digest keeps everyone aligned"]
+            [:button.mlb-reset.qsg-digest-sample-dismiss
+              {:on-click #(qsg-actions/dismiss-digest-sample)}]
+            [:a.qsg-digest-sample-bt
+              {:target "_blank"
+               :href digest-sample-url}
+              [:span.qsg-digest-sample-icon]
+              "Send sample digest"]])
         (when-not (:slack-dismissed? qsg-data)
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
-              (if (:has-slack-team? qsg-data)
-                "Carrot bot for Slack"
-                "Using Slack?")]
+              "Using Slack? Share posts with your team"]
             [:button.mlb-reset.qsg-using-slack-dismiss
               {:on-click #(qsg-actions/dismiss-slack)}]
-            [:div.qsg-using-slack-desc
-              "View and comment on posts directly from Slack."]
             [:button.mlb-reset.qsg-using-slack-bt
               {:on-click #(qsg-actions/slack-click)}
               [:span.qsg-slack-icon]
-              (if (:has-slack-team? qsg-data)
-                "Enable Carrot bot"
-                "Sign in with Slack")]])
+              "Add to Slack"]])
         [:button.mlb-reset.qsg-dismiss
           {:on-click #(qsg-actions/dismiss-qsg-view)}
           "Dismiss quickstart guide"]]]))

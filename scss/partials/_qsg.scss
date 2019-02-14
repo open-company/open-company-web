@@ -138,6 +138,7 @@ div.qsg-container {
         padding: 0 0 0 24px;
         text-align: left;
         opacity: 1;
+        display: block;
 
         &:before {
           content: "";
@@ -192,10 +193,14 @@ div.qsg-container {
     left: 0;
     right: 0;
     width: 100%;
-    height: 188px;
+    height: 272px;
     padding: 16px 16px;
 
-    &.slack-dismissed {
+    &.slack-dismissed, &.digest-sample-dismissed {
+      height: 172px;
+    }
+
+    &.slack-dismissed.digest-sample-dismissed {
       height: 72px;
     }
 
@@ -203,6 +208,7 @@ div.qsg-container {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding: 16px 0;
       position: relative;
+      height: 100px;
 
       div.qsg-using-slack-title {
         @include avenir_H();
@@ -222,18 +228,10 @@ div.qsg-container {
         background-position: center;
       }
 
-      div.qsg-using-slack-desc {
-        @include avenir_R();
-        font-size: 14px;
-        line-height: 16px;
-        color: white;
-        margin-top: 4px;
-      }
-
       button.qsg-using-slack-bt {
         margin-top: 8px;
         color: $carrot_green;
-        padding: 0 0 0 14px;
+        padding: 0 0 0 19px;
         @include avenir_H();
         font-size: 14px;
         line-height: 16px;
@@ -242,12 +240,69 @@ div.qsg-container {
         span.qsg-slack-icon {
           position: absolute;
           left: 0;
-          top: 2px;
-          width: 10px;
-          height: 10px;
+          top: 0;
+          width: 12px;
+          height: 12px;
           display: block;
           background-image: cdnUrl("/img/ML/qsg_slack_green_icon.svg");
-          background-size: 10px 10px;
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }
+    }
+
+    div.qsg-digest-sample-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 0;
+      position: relative;
+      height: 100px;
+
+      div.qsg-digest-sample-title {
+        @include avenir_H();
+        font-size: 14px;
+        color: white;
+        max-width: 94%;
+      }
+
+      button.mlb-reset.qsg-digest-sample-dismiss {
+        position: absolute;
+        right: -7px;
+        top: 9px;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/qsg_dismiss_slack.svg");
+        background-size: 10px 10px;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      a.qsg-digest-sample-bt {
+        margin: 8px 0 0 0;
+        color: $carrot_green;
+        padding: 0 0 0 19px;
+        @include avenir_H();
+        font-size: 14px;
+        line-height: 16px;
+        position: relative;
+        display: block;
+        text-decoration: none;
+        opacity: 0.9;
+
+        &:hover {
+          text-decoration: none;
+          opacity: 1;
+        }
+
+        span.qsg-digest-sample-icon {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 13px;
+          height: 12px;
+          display: block;
+          background-image: cdnUrl("/img/ML/qsg_plain_green_icon.svg");
+          background-size: 13px 12px;
           background-position: center;
           background-repeat: no-repeat;
         }
@@ -267,6 +322,19 @@ div.qsg-container {
       opacity: 1;
       margin: 0;
       padding: 4px 0 0;
+    }
+  }
+
+  @media screen and (max-height: 690px){
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100vh;
+
+    div.qsg-bottom {
+      position: relative;
+      bottom: unset;
+      left: unset;
+      right: unset;
     }
   }
 }

@@ -19,6 +19,7 @@
                                   :add-section?
                                   :section-dialog-seen?
                                   :slack-dismissed?
+                                  :digest-sample-dismissed?
                                   :guide-dismissed?
                                   :tooltip-shown?])
 
@@ -82,6 +83,10 @@
              (not (jwt/team-has-bot? (:team-id org-data))))
       (org-actions/bot-auth team-data cur-user-data (router/get-token))
       (team-actions/slack-team-add cur-user-data (router/get-token)))))
+
+(defn dismiss-digest-sample []
+  (dis/dispatch! [:input [:qsg :digest-sample-dismissed?] true])
+  (update-qsg-checklist))
 
 ;; Profile photo
 
