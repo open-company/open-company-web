@@ -25,12 +25,9 @@ div.org-dashboard {
 
     div.page {
       width: calc(100% - #{$qsg_width});
-
-      div.org-dashboard-container div.org-dashboard-inner {
-        overflow-x: hidden;
-        overflow-y: auto;
-        max-height: 100vh;
-      }
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 100vh;
     }
   }
 
