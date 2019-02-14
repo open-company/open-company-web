@@ -15,6 +15,7 @@
                  (drv/drv :qsg)
                  {:did-mount (fn [s]
                    (.add (.-classList (sel1 [:body])) "showing-qsg")
+                   (js/OCYTVideoInit)
                    s)
                   :will-unmount (fn [s]
                    (,remove (.-classList (sel1 [:body])) "showing-qsg")
@@ -46,9 +47,10 @@
              :class (when (:add-section? qsg-data)
                       "done")}
             "Add a section"]
-          [:a.qsg-list-item.qsg-digest-sample-bt
-            {:href digest-sample-url
-             :target "_bank"}
+          [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
+            {:on-click #(qsg-actions/see-digest-sample)
+             :class (when (:see-digest-sample? qsg-data)
+                      "done")}
             "See a sample digest"]]
         [:div.qsg-buttons-list-title
           "Setup"]
@@ -90,22 +92,21 @@
             {:on-click #(qsg-actions/start-create-reminder-trail)
              :class (when (:add-reminder? qsg-data)
                       "done")}
-            "Create a reminder"]]]
+            "Check out reminders"]]]
 
       [:div.qsg-bottom
         {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)
-                                  :digest-sample-dismissed (:digest-sample-dismissed? qsg-data)})}
-        (when-not (:digest-sample-dismissed? qsg-data)
-          [:div.qsg-digest-sample-section
-            [:div.qsg-digest-sample-title
-              "Your morning digest keeps everyone aligned"]
-            [:button.mlb-reset.qsg-digest-sample-dismiss
-              {:on-click #(qsg-actions/dismiss-digest-sample)}]
-            [:a.qsg-digest-sample-bt
-              {:target "_blank"
-               :href digest-sample-url}
-              [:span.qsg-digest-sample-icon]
-              "Send sample digest"]])
+                                  :carrot-video-dismissed (:carrot-video-dismissed? qsg-data)})}
+        (when-not (:carrot-video-dismissed? qsg-data)
+          [:div.qsg-carrot-video-section
+            [:div.qsg-carrot-video-title
+              "Carrot in 60 seconds"]
+            [:button.mlb-reset.qsg-carrot-video-dismiss
+              {:on-click #(qsg-actions/dismiss-carrot-video)}]
+            [:button.mlb-reset.qsg-carrot-video-bt
+              {:on-click #(qsg-actions/watch-carrot-video)}
+              [:span.qsg-youtube-icon]
+              "Play video"]])
         (when-not (:slack-dismissed? qsg-data)
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title

@@ -1,7 +1,8 @@
 (ns oc.web.components.ui.shared-misc
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.actions.qsg :as qsg-actions]))
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
@@ -339,3 +340,16 @@
             [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
               {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
                :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])
+
+(defn video-lightbox []
+  (let [dismiss-cb (fn [e]
+                     (js/OCStaticHideAnimationLightbox e)
+                     (qsg-actions/finish-digest-sample-trail))]
+    [:div.animation-lightbox-container
+      {:on-click dismiss-cb}
+      [:div.animation-lightbox
+        [:div#youtube-player
+        [:button.settings-modal-close.mlb-reset
+          {;:onClick "OCStaticHideAnimationLightbox(event);"
+           :on-mouse-down dismiss-cb
+           :on-touch-start dismiss-cb}]]]]))

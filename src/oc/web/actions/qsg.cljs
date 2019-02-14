@@ -17,9 +17,9 @@
                                   :add-post?
                                   :add-reminder?
                                   :add-section?
+                                  :see-digest-sample?
                                   :slack-dismissed?
-                                  :digest-sample-dismissed?
-                                  :guide-dismissed?
+                                  :carrot-video-dismissed?
                                   :tooltip-shown?])
 
 (defn update-qsg-checklist []
@@ -59,7 +59,7 @@
     (update-qsg-checklist)))
 
 (defn show-qsg-view []
-  (dis/dispatch! [:show-qsg-view])
+  (dis/dispatch! [:show-qsg-view true])
   (update-qsg-checklist))
 
 (defn dismiss-qsg-view []
@@ -83,9 +83,25 @@
       (org-actions/bot-auth team-data cur-user-data (router/get-token))
       (team-actions/slack-team-add cur-user-data (router/get-token)))))
 
-(defn dismiss-digest-sample []
-  (dis/dispatch! [:input [:qsg :digest-sample-dismissed?] true])
+
+
+;; Carrot 60 seconds video
+
+(defn dismiss-carrot-video []
+  (dis/dispatch! [:input [:qsg :carrot-video-dismissed?] true])
   (update-qsg-checklist))
+
+(defn watch-carrot-video []
+  (js/OCStaticShowAnimationLightbox))
+
+;; Sample digest
+
+(defn finish-digest-sample-trail []
+  (dis/dispatch! [:qsg-digest-sample-done])
+  (update-qsg-checklist))
+
+(defn see-digest-sample []
+  (js/OCStaticShowAnimationLightbox))
 
 ;; Profile photo
 
@@ -144,3 +160,6 @@
 (defn finish-add-section-trail []
   (dis/dispatch! [:qsg-add-section :add-section?])
   (update-qsg-checklist))
+
+(defn dismiss-section-settings-tooltip []
+  (dis/dispatch! [:input [:qsg :show-section-settings-tooltip] false]))

@@ -218,16 +218,32 @@
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
                       "Public"])
-                  ;; Settings button
                   (when should-show-settings-bt
-                    [:button.mlb-reset.board-settings-bt
-                      {:data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (str (:name board-data) " settings")
-                       :on-click #(do
-                                    (dis/dispatch! [:input [:show-section-editor] true]))}])]
+                    [:div.board-settings-container
+                      ;; Settings button
+                      [:button.mlb-reset.board-settings-bt
+                        {:data-toggle (when-not is-mobile? "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title (str (:name board-data) " settings")
+                         :on-click #(do
+                                      (when (:show-section-settings-tooltip qsg-data)
+                                        (qsg-actions/dismiss-section-settings-tooltip))
+                                      (dis/dispatch! [:input [:show-section-editor] true]))}]
+                    (when (:show-section-settings-tooltip qsg-data)
+                      [:div.section-settings-tooltip-container.group
+                        [:div.section-settings-tooltip-top-arrow]
+                        [:button.mlb-reset.section-settings-tooltip-dismiss
+                          {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
+                        [:div.section-settings-tooltips
+                          [:div.section-settings-tooltip-title
+                            "Configuring a section"]
+                            [:div.section-settings-tooltip
+                              "Sections can be modified at any point by clicking the settings cog."]
+                            [:button.mlb-reset.section-settings-bt
+                              {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
+                              "Ok, got it"]]])])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group

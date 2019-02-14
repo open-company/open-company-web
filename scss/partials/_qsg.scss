@@ -7,32 +7,11 @@ div.qsg-container {
   background-color: $deep_navy;
   z-index: #{$navbar_zindex + 2000};
   padding: 0;
-
-  // &:before {
-  //   content: "";
-  //   position: absolute;
-  //   top: 0;
-  //   left: 0;
-  //   width: #{$qsg_width};
-  //   height: 430px;
-  //   @include image-2x("/img/ML/qsg_top");
-  //   background-position: center top;
-  //   background-repeat: no-repeat;
-  //   background-size: #{$qsg_width} 720px;
-  // }
-
-  // &:after {
-  //   content: "";
-  //   position: absolute;
-  //   bottom: 0;
-  //   left: 0;
-  //   width: #{$qsg_width};
-  //   height: 230px;
-  //   @include image-2x("/img/ML/qsg_bottom");
-  //   background-position: center bottom;
-  //   background-repeat: no-repeat;
-  //   background-size: #{$qsg_width} 720px;
-  // }
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 
   @include tablet() {
     display: none;
@@ -82,6 +61,7 @@ div.qsg-container {
   }
 
   div.qsg-top {
+    width: 100%;
     padding: 17px 16px;
 
     div.qsg-top-title {
@@ -139,6 +119,11 @@ div.qsg-container {
         text-align: left;
         opacity: 1;
         display: block;
+        text-decoration: none;
+
+        &:visited, &:hover {
+          text-decoration: none;          
+        }
 
         &:before {
           content: "";
@@ -188,27 +173,61 @@ div.qsg-container {
   }
 
   div.qsg-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
     width: 100%;
-    height: 272px;
     padding: 16px 16px;
+    margin-top: auto;
 
-    &.slack-dismissed, &.digest-sample-dismissed {
-      height: 172px;
-    }
+    div.qsg-carrot-video-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 0;
+      position: relative;
 
-    &.slack-dismissed.digest-sample-dismissed {
-      height: 72px;
+      div.qsg-carrot-video-title {
+        @include avenir_H();
+        font-size: 14px;
+        color: white;
+      }
+
+      button.qsg-carrot-video-dismiss {
+        position: absolute;
+        right: -7px;
+        top: 9px;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/qsg_dismiss_slack.svg");
+        background-size: 10px 10px;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      button.qsg-carrot-video-bt {
+        margin-top: 8px;
+        color: $carrot_green;
+        padding: 0 0 0 19px;
+        @include avenir_H();
+        font-size: 14px;
+        line-height: 16px;
+        position: relative;
+
+        span.qsg-youtube-icon {
+          position: absolute;
+          left: 0;
+          top: 2px;
+          width: 14px;
+          height: 11px;
+          display: block;
+          background-image: cdnUrl("/img/ML/qsg_youtube_icon.svg");
+          background-size: 14px 11px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+      }
     }
 
     div.qsg-using-slack-section {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding: 16px 0;
       position: relative;
-      height: 100px;
 
       div.qsg-using-slack-title {
         @include avenir_H();
@@ -252,63 +271,6 @@ div.qsg-container {
       }
     }
 
-    div.qsg-digest-sample-section {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 16px 0;
-      position: relative;
-      height: 100px;
-
-      div.qsg-digest-sample-title {
-        @include avenir_H();
-        font-size: 14px;
-        color: white;
-        max-width: 94%;
-      }
-
-      button.mlb-reset.qsg-digest-sample-dismiss {
-        position: absolute;
-        right: -7px;
-        top: 9px;
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/qsg_dismiss_slack.svg");
-        background-size: 10px 10px;
-        background-repeat: no-repeat;
-        background-position: center;
-      }
-
-      a.qsg-digest-sample-bt {
-        margin: 8px 0 0 0;
-        color: $carrot_green;
-        padding: 0 0 0 19px;
-        @include avenir_H();
-        font-size: 14px;
-        line-height: 16px;
-        position: relative;
-        display: block;
-        text-decoration: none;
-        opacity: 0.9;
-
-        &:hover {
-          text-decoration: none;
-          opacity: 1;
-        }
-
-        span.qsg-digest-sample-icon {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 13px;
-          height: 12px;
-          display: block;
-          background-image: cdnUrl("/img/ML/qsg_plain_green_icon.svg");
-          background-size: 13px 12px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-      }
-    }
-
     button.qsg-dismiss {
       height: 40px;
       width: 100%;
@@ -322,19 +284,6 @@ div.qsg-container {
       opacity: 1;
       margin: 0;
       padding: 4px 0 0;
-    }
-  }
-
-  @media screen and (max-height: 690px){
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100vh;
-
-    div.qsg-bottom {
-      position: relative;
-      bottom: unset;
-      left: unset;
-      right: unset;
     }
   }
 }

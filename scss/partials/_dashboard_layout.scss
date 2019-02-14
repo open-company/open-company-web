@@ -302,49 +302,124 @@ div.dashboard-layout {
             }
           }
 
-          button.board-settings-bt {
-            background-image: cdnUrl("/img/ML/section_settings_gear.svg");
-            background-size: 16px 16px;
-            background-repeat: no-repeat;
-            background-position: 16px center;
-            background-color: transparent;
-            border-radius: 10px;
-            width: 40px;
-            height: 40px;
-            opacity: 0.8;
-            padding: 0 0 0 16px;
-            margin: 0 0 0 16px;
+          div.board-settings-container {
             float: left;
             position: relative;
 
-            &:before {
-              content: "";
-              position: absolute;
-              left: 0;
-              top: 12px;
-              width: 1px;
-              height: 16px;
-              background-color: $light_ui_grey;
+            button.board-settings-bt {
+              background-image: cdnUrl("/img/ML/section_settings_gear.svg");
+              background-size: 16px 16px;
+              background-repeat: no-repeat;
+              background-position: 16px center;
+              background-color: transparent;
+              border-radius: 10px;
+              width: 40px;
+              height: 40px;
+              opacity: 0.8;
+              padding: 0 0 0 16px;
+              margin: 0 0 0 16px;
+              position: relative;
+
+              &:before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 12px;
+                width: 1px;
+                height: 16px;
+                background-color: $light_ui_grey;
+
+                @include mobile(){
+                  display: none;
+                }
+              }
 
               @include mobile(){
+                margin-right: -30px;
+                margin-left: 8px;
+                padding: 0px;
+                float: unset;
+                width: 20px;
+                height: 20px;
+
+                // Remove to show settings button on mobile
                 display: none;
+              }
+
+              &:hover {
+                opacity: 1;
               }
             }
 
-            @include mobile(){
-              margin-right: -30px;
-              margin-left: 8px;
-              padding: 0px;
-              float: unset;
-              width: 20px;
-              height: 20px;
+            div.section-settings-tooltip-container {
+              border: 1px solid rgba($carrot_gold, 0.5);
+              background-color: #FDF6E4;
+              box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+              width: 300px;
+              border-radius: 6px;
+              padding: 24px 20px;
+              margin: 0 0 0 12px;
+              position: absolute;
+              left: 52px;
+              top: -26px;
+              text-align: center;
+              z-index: 5;
 
-              // Remove to show settings button on mobile
-              display: none;
-            }
+              div.section-settings-tooltip-top-arrow {
+                position: absolute;
+                top: 38px;
+                left: -18px;
+                width: 24px;
+                height: 12px;
+                transform: rotate(-90deg);
+                background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
+                background-position: center;
+                background-size: 24px 12px;
+                background-repeat: no-repeat;
+              }
 
-            &:hover {
-              opacity: 1;
+              button.section-settings-tooltip-dismiss {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 32px;
+                height: 32px;
+                background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
+                background-size: 8px 8px;
+                background-position: center;
+                background-repeat: no-repeat;
+              }
+
+              div.section-settings-tooltips {
+
+                div.section-settings-tooltip-title {
+                  @include PTSerif();
+                  font-size: 18px;
+                  color: $deep_navy;
+                  line-height: 18px;
+                }
+
+                div.section-settings-tooltip {
+                  @include avenir_R();
+                  font-size: 16px;
+                  color: $deep_navy;
+                  line-height: 20px;
+                  margin-top: 4px;
+                }
+
+                button.section-settings-bt {
+                  width: auto;
+                  margin-top: 16px;
+                  height: 32px;
+                  width: 96px;
+                  background-color: transparent;
+                  border-radius: 6px;
+                  color: white;
+                  background-color: $carrot_green;
+                  @include avenir_H();
+                  font-size: 16px;
+                }
+              }
             }
           }
 

@@ -21,11 +21,11 @@
 ;; Utils
 
 (defn- progress-percentage [qsg-data]
-  (let [done-values (vals (select-keys qsg-data [:verify-email-done :profile-photo-done :company-logo-done
-                                                 :invited? :add-post? :add-reminder?
-                                                 :add-section?]))
+  (let [all-keys [:verify-email-done :profile-photo-done :company-logo-done
+                  :invited? :add-post? :add-reminder? :add-section? :see-digest-sample?]
+        done-values (vals (select-keys qsg-data all-keys))
         truty-values (filterv #(boolean %) done-values)]
-    (* (/ (count truty-values) 8) 100)))
+    (* (/ (count truty-values) (count all-keys)) 100)))
 
 (defmethod dispatcher/action :show-qsg-view
   [db [_ persist?]]
@@ -37,9 +37,7 @@
 
 (defmethod dispatcher/action :dismiss-qsg-view
   [db [_]]
-  (-> db
-    (assoc-in [:qsg :visible] false)
-    (assoc-in [:qsg :guide-dismissed?] true)))
+  (assoc-in db [:qsg :visible] false))
 
 (defmethod dispatcher/action :qsg-reset
   [db [_]]
@@ -193,10 +191,23 @@
         next-step (or force-step
                       (add-section-next-step cur-step))
         next-db (if (= force-step :add-section?)
-                  (assoc-in db [:qsg :add-section?] true)
+                  (-> db
+                    (assoc-in [:qsg :add-section?] true)
+                    (assoc-in [:qsg :show-section-settings-tooltip] true))
                   db)
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
+
+;; Digest sample
+
+(defmethod dispatcher/action :qsg-digest-sample-done
+  [db [_]]
+  (let [qsg-data (:qsg db)
+        next-qsg (assoc qsg-data :see-digest-sample? true)
+        with-percentage (assoc next-qsg :overall-progress (progress-percentage next-qsg))]
+    (assoc-in db [:qsg] with-percentage)))
+
+;; Reducer
 
 ;; QSG store specific reducers
 (defmethod reducer :default [db payload]
@@ -209,8 +220,7 @@
   (let [qsg-checklist (:qsg-checklist user-data)
         qsg-visible (if (contains? current-qsg :visible)
                       (:visible current-qsg)
-                      (and (:show-guide? qsg-checklist)
-                           (not (:guide-dismissed? qsg-checklist))))]
+                      (:show-guide? qsg-checklist))]
     (assoc qsg-checklist :visible qsg-visible)))
 
 (defmethod reducer :user-data
