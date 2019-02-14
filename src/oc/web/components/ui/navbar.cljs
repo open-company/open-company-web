@@ -149,7 +149,7 @@
                                      (when (= (:step qsg-data) :company-logo-1)
                                        (qsg-actions/next-company-logo-trail))
                                      (swap! (::expanded-user-menu s) not))})
-                      (when true;(:show-qsg-tooltip? qsg-data)
+                      (when (:show-qsg-tooltip? qsg-data)
                         [:div.qsg-tooltip-container.group
                           [:div.qsg-tooltip-top-arrow]
                           [:button.mlb-reset.qsg-tooltip-dismiss
