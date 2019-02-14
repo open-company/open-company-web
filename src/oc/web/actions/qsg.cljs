@@ -17,7 +17,6 @@
                                   :add-post?
                                   :add-reminder?
                                   :add-section?
-                                  :section-dialog-seen?
                                   :slack-dismissed?
                                   :digest-sample-dismissed?
                                   :guide-dismissed?

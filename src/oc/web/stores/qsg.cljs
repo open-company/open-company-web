@@ -23,7 +23,7 @@
 (defn- progress-percentage [qsg-data]
   (let [done-values (vals (select-keys qsg-data [:verify-email-done :profile-photo-done :company-logo-done
                                                  :invited? :add-post? :add-reminder?
-                                                 :add-section? :section-dialog-seen?]))
+                                                 :add-section?]))
         truty-values (filterv #(boolean %) done-values)]
     (* (/ (count truty-values) 8) 100)))
 
