@@ -5,7 +5,6 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.reminder :as reminder-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -195,7 +194,6 @@
                                  (not (get reminder-data (:occurrence-label reminder-data))))]
           [:button.mlb-reset.save-bt
             {:on-click #(when-not save-disabled?
-                          (qsg-actions/finish-create-reminder-trail)
                           (reminder-actions/save-reminder reminder-data)
                           (nav-actions/show-reminders))
              :class (when save-disabled? "disabled")}

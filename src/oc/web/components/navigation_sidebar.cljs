@@ -226,6 +226,7 @@
         (when show-reminders?
           [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
+                          (qsg-actions/finish-create-reminder-trail)
                           (nav-actions/show-reminders)
                           (utils/after 500 utils/remove-tooltips))
              :title "Set reminders to update your team on time"
