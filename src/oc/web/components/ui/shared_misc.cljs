@@ -348,8 +348,8 @@
     [:div.animation-lightbox-container
       {:on-click dismiss-cb}
       [:div.animation-lightbox
-        [:div#youtube-player
+        [:div#youtube-player]
         [:button.settings-modal-close.mlb-reset
           {;:onClick "OCStaticHideAnimationLightbox(event);"
            :on-mouse-down dismiss-cb
-           :on-touch-start dismiss-cb}]]]]))
+           :on-touch-start dismiss-cb}]]]))

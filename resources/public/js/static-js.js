@@ -326,13 +326,17 @@ function OCStaticHidePHBanner(){
 }
 
 var OCYTVideoPlayer = null,
-OCYTVideoFinished = false;
+OCYTVideoFinished = false,
+OCUTVScriptAdded = false;
 
 function OCYTVideoInit() {
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  if (!OCUTVScriptAdded) {
+    OCUTVScriptAdded = true;
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
 }
 
 function onYouTubeIframeAPIReady() {
