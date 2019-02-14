@@ -179,6 +179,7 @@
             updated-cmail-data @(drv/get-ref s :cmail-data)
             section-editing @(drv/get-ref s :section-editing)]
         (qsg-actions/finish-create-post-trail)
+        (qsg-actions/turn-on-show-guide)
         (remove-autosave s)
         (if published?
           (do
