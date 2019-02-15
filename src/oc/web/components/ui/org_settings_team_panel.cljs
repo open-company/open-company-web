@@ -136,7 +136,7 @@
                                                          (:email user)
                                                          (select-keys
                                                           roster-user
-                                                          [:email :first-name :last-name :slack-id :slack-org-id]))]
+                                                          [:email :avatar-url :first-name :last-name :slack-id :slack-org-id]))]
                                       (dis/dispatch! [:input [:invite-users]
                                                        [{:user inviting-user
                                                          :type invitation-type
