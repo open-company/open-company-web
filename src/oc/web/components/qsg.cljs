@@ -54,7 +54,11 @@
           ;    :class (when (:see-digest-sample? qsg-data)
           ;             "done")}
           ;   "See a sample digest"]
-            ]
+          [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
+            {:on-click #(qsg-actions/start-create-reminder-trail)
+             :class (when (:add-reminder? qsg-data)
+                      "done")}
+            "Check out reminders"]]
         [:div.qsg-buttons-list-title
           "Setup"]
         [:div.qsg-buttons-list
@@ -90,12 +94,7 @@
             {:on-click #(qsg-actions/start-invite-team-trail)
              :class (when (:invited? qsg-data)
                       "done")}
-            "Invite your team"]
-          [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
-            {:on-click #(qsg-actions/start-create-reminder-trail)
-             :class (when (:add-reminder? qsg-data)
-                      "done")}
-            "Check out reminders"]]]
+            "Invite your team"]]]
 
       [:div.qsg-bottom
         {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)
