@@ -151,7 +151,8 @@
         [:div.oc-menu-item.whats-new
           "What’s New"]]
       (when (and (not is-mobile?)
-                 (jwt/jwt))
+                 (jwt/jwt)
+                 (= user-role :admin))
         [:a
           {:on-click show-qsg-click}
           [:div.oc-menu-item.show-qsg

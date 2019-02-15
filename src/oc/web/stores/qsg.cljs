@@ -22,16 +22,9 @@
 
 (def admin-keys [:verify-email-done :profile-photo-done :company-logo-done
                  :invited? :add-post? :add-reminder? :add-section?])
-(def author-keys [:verify-email-done :profile-photo-done
-                  :invited? :add-post? :add-reminder? :add-section?])
-(def viewer-keys [:verify-email-done :profile-photo-done])
 
 (defn- progress-percentage [qsg-data]
-  (let [role (:user-role qsg-data)
-        all-keys (case role
-                  :admin admin-keys
-                  :author author-keys
-                  viewer-keys)
+  (let [all-keys admin-keys
                   ;; :see-digest-sample?]
         done-values (vals (select-keys qsg-data all-keys))
         truty-values (filterv #(boolean %) done-values)]
@@ -47,7 +40,9 @@
 
 (defmethod dispatcher/action :dismiss-qsg-view
   [db [_]]
-  (assoc-in db [:qsg :visible] false))
+  (-> db
+    (assoc-in [:qsg :visible] false)
+    (assoc-in [:qsg :guide-dismissed?] true)))
 
 (defmethod dispatcher/action :qsg-reset
   [db [_]]
@@ -230,7 +225,8 @@
   (let [qsg-checklist (:qsg-checklist user-data)
         qsg-visible (if (contains? current-qsg :visible)
                       (:visible current-qsg)
-                      (:show-guide? qsg-checklist))]
+                      (and (:show-guide? qsg-checklist)
+                           (not (:guide-dismissed? qsg-checklist))))]
     (assoc qsg-checklist :visible qsg-visible)))
 
 (defmethod reducer :user-data
@@ -254,16 +250,7 @@
 
 (defmethod reducer :org-loaded
   [db [_ org-data]]
-  (let [is-admin? (jwt/is-admin? (:team-id org-data))
-        is-author? (and (not is-admin?)
-                        ((set (:authors org-data)) (jwt/user-id)))
-        user-role (cond
-                   is-admin? :admin
-                   is-author? :author
-                   :else :viewer)
-        company-logo-done? (not (s/blank? (:logo-url org-data)))
+  (let [company-logo-done? (not (s/blank? (:logo-url org-data)))
         delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")
         next-db (update-in db [:qsg] merge {:company-logo-done company-logo-done?})]
-    (-> next-db
-      (assoc-in [:qsg :user-role] user-role)
-      (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg next-db))))))
+    (assoc-in next-db [:qsg :overall-progress] (progress-percentage (:qsg next-db)))))

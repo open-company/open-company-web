@@ -20,6 +20,7 @@
                                   :see-digest-sample?
                                   :slack-dismissed?
                                   :carrot-video-dismissed?
+                                  :guide-dismissed?
                                   :tooltip-shown?])
 
 (defn update-qsg-checklist []
