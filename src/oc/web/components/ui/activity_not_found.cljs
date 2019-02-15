@@ -22,7 +22,7 @@
                              {:auth-source "email"}))))
         login-action #(when login-enabled
                         (.preventDefault %)
-                        (user-actions/save-login-redirect)
+                        (user-actions/maybe-save-login-redirect)
                         (user-actions/login-with-email @(::email s) @(::pswd s)))
         login-with-email-error (drv/react s :login-with-email-error)]
     [:div.activity-not-found-container
@@ -35,13 +35,14 @@
             [:div.login-title
               "Please log in to continue"]
             [:div.login-description
-              "You need to be logged in to view this post"]
+              "You need to be logged in to view a post."]
             [:button.mlb-reset.signup-with-slack
               {:on-touch-start identity
                :on-click #(do
                            (.preventDefault %)
                            (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                  {:auth-source "slack"})]
+                             (user-actions/maybe-save-login-redirect)
                              (user-actions/login-with-slack auth-link)))}
               [:div.signup-with-slack-content
                 [:div.slack-icon
@@ -53,6 +54,7 @@
                            (.preventDefault %)
                            (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                                 {:auth-source "google"})]
+                             (user-actions/maybe-save-login-redirect)
                              (user-actions/login-with-google auth-link)))}
               [:div.signup-with-google-content
                 [:div.google-icon

@@ -58,7 +58,8 @@
             [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
-            [oc.web.components.ui.notifications :refer (notifications)]))
+            [oc.web.components.ui.notifications :refer (notifications)]
+            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]))
 
 (enable-console-print!)
 
@@ -494,6 +495,19 @@
         (router/redirect! urls/home))
       (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
+    (defroute login-wall-route urls/login-wall {:keys [query-params] :as params}
+      (timbre/info "Routing login-wall-route" urls/login-wall)
+      ; Email wall is shown only to not logged in users
+      (when (jwt/jwt)
+        (router/redirect-404!))
+      (simple-handler activity-not-found "login-wall" target params true))
+
+    (defroute login-wall-slash-route (str urls/login-wall "/") {:keys [query-params] :as params}
+      (timbre/info "Routing login-wall-slash-route" (str urls/login-wall "/"))
+      (when (jwt/jwt)
+        (router/redirect-404!))
+      (simple-handler activity-not-found "login-wall" target params true))
+
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
       (home-handler target params))
@@ -593,7 +607,9 @@
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
       ;; render component
-      (router/redirect-404!))
+      (if (jwt/jwt)
+        (router/redirect-404!)
+        (router/redirect! (str urls/login-wall "?login-redirect=" (js/encodeURIComponent (router/get-token))))))
 
     (def route-dispatch!
       (secretary/uri-dispatcher [_loading_route
@@ -622,6 +638,9 @@
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route
+                                 ;; Login wall
+                                 login-wall-route
+                                 login-wall-slash-route
                                  ;; Marketing site components
                                  about-route
                                  slack-route

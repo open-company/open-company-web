@@ -13,9 +13,11 @@
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
@@ -58,7 +60,7 @@
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
       (when should-404?
-        (router/redirect-404!))
+        (routing-actions/maybe-404))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
@@ -400,7 +402,9 @@
   (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
-  (send-item-read (:uuid activity-data)))
+  (send-item-read (:uuid activity-data))
+  ;; Show the first post added tooltip if needed
+  (nux-actions/show-post-added-tooltip (:uuid activity-data)))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -421,7 +425,8 @@
       (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
-    (send-item-read (:uuid saved-activity-data))))
+    (send-item-read (:uuid saved-activity-data))
+    (nux-actions/show-post-added-tooltip (:uuid saved-activity-data))))
 
 (defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
@@ -507,14 +512,14 @@
   (cond
 
    (some #{status} [401 404])
-   (router/redirect-404!)
+   (routing-actions/maybe-404)
 
    ;; The id token will have a current activity id, shared urls will not.
    ;; if the ids don't match return a 404
    (and (some? (router/current-activity-id))
         (not= (:uuid activity-data)
               (router/current-activity-id)))
-   (router/redirect-404!)
+   (routing-actions/maybe-404)
 
    (and secure-uuid
         (jwt/jwt)
@@ -575,7 +580,7 @@
   (when-let [info (jwt/get-id-token-contents)]
     (when (not= (:secure-uuid info)
                 (router/current-secure-activity-id))
-      (router/redirect-404!)))
+      (routing-actions/maybe-404)))
   (let [org-slug (router/current-org-slug)]
     (api/get-auth-settings (fn [body]
       (when body
