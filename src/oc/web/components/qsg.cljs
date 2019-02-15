@@ -47,11 +47,13 @@
              :class (when (:add-section? qsg-data)
                       "done")}
             "Add a section"]
-          [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
-            {:on-click #(qsg-actions/see-digest-sample)
-             :class (when (:see-digest-sample? qsg-data)
-                      "done")}
-            "See a sample digest"]]
+          ;; FIXME comment out until we have a video for digest sample
+          ; [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
+          ;   {:on-click #(qsg-actions/see-digest-sample)
+          ;    :class (when (:see-digest-sample? qsg-data)
+          ;             "done")}
+          ;   "See a sample digest"]
+            ]
         [:div.qsg-buttons-list-title
           "Setup"]
         [:div.qsg-buttons-list

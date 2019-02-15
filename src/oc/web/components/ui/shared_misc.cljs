@@ -1,8 +1,7 @@
 (ns oc.web.components.ui.shared-misc
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]
-            [oc.web.actions.qsg :as qsg-actions]))
+            [oc.web.lib.utils :as utils]))
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
@@ -343,8 +342,7 @@
 
 (defn video-lightbox []
   (let [dismiss-cb (fn [e]
-                     (js/OCStaticHideAnimationLightbox e)
-                     (qsg-actions/finish-digest-sample-trail))]
+                     (js/OCStaticHideAnimationLightbox e))]
     [:div.animation-lightbox-container
       {:on-click dismiss-cb}
       [:div.animation-lightbox
