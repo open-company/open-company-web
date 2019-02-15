@@ -101,8 +101,12 @@
   (dis/dispatch! [:qsg-digest-sample-done])
   (update-qsg-checklist))
 
+(defn dismiss-digest-sample []
+  (dis/dispatch! [:input [:qsg :qsg-show-sample-digest-view] false])
+  (finish-digest-sample-trail))
+
 (defn see-digest-sample []
-  (js/OCStaticShowAnimationLightbox))
+  (dis/dispatch! [:input [:qsg :qsg-show-sample-digest-view] true]))
 
 ;; Profile photo
 

@@ -47,13 +47,11 @@
              :class (when (:add-section? qsg-data)
                       "done")}
             "Add a section"]
-          ;; FIXME comment out until we have a video for digest sample
-          ;; NB: also show this section for :viewers, now is shown only for :admin and :author
-          ; [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
-          ;   {:on-click #(qsg-actions/see-digest-sample)
-          ;    :class (when (:see-digest-sample? qsg-data)
-          ;             "done")}
-          ;   "See a sample digest"]
+          [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
+            {:on-click #(qsg-actions/see-digest-sample)
+             :class (when (:see-digest-sample? qsg-data)
+                      "done")}
+            "See a sample digest"]
           [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
             {:on-click #(qsg-actions/start-create-reminder-trail)
              :class (when (:add-reminder? qsg-data)

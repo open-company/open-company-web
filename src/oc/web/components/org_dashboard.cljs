@@ -29,6 +29,7 @@
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
+            [oc.web.components.qsg-digest-sample :refer (qsg-digest-sample)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -167,7 +168,8 @@
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
                                   :activity-removed show-activity-removed
-                                  :showing-qsg (:visible qsg-data)})}
+                                  :showing-qsg (:visible qsg-data)
+                                  :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
@@ -254,7 +256,9 @@
                               (not mobile-menu-open)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
-                 (dashboard-layout))]]])
+                 (dashboard-layout))]]
+            (when (:qsg-show-sample-digest-view qsg-data)
+              (qsg-digest-sample))])
         (when (:visible qsg-data)
           [:div.qsg-main-container
             (qsg)
