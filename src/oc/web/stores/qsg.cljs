@@ -20,10 +20,18 @@
 
 ;; Utils
 
+(def admin-keys [:verify-email-done :profile-photo-done :company-logo-done
+                 :invited? :add-post? :add-reminder? :add-section?])
+(def author-keys [:verify-email-done :profile-photo-done
+                  :invited? :add-post? :add-reminder? :add-section?])
+(def viewer-keys [:verify-email-done :profile-photo-done])
+
 (defn- progress-percentage [qsg-data]
-  (let [all-keys [:verify-email-done :profile-photo-done :company-logo-done
-                  :invited? :add-post? :add-reminder? :add-section?]
-                  ;; FIXME comment out until we have a video for digest sample
+  (let [role (:user-role qsg-data)
+        all-keys (case role
+                  :admin admin-keys
+                  :author author-keys
+                  viewer-keys)
                   ;; :see-digest-sample?]
         done-values (vals (select-keys qsg-data all-keys))
         truty-values (filterv #(boolean %) done-values)]
@@ -246,8 +254,16 @@
 
 (defmethod reducer :org-loaded
   [db [_ org-data]]
-  (let [company-logo-done? (not (s/blank? (:logo-url org-data)))
+  (let [is-admin? (jwt/is-admin? (:team-id org-data))
+        is-author? (and (not is-admin?)
+                        ((set (:authors org-data)) (jwt/user-id)))
+        user-role (cond
+                   is-admin? :admin
+                   is-author? :author
+                   :else :viewer)
+        company-logo-done? (not (s/blank? (:logo-url org-data)))
         delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")
         next-db (update-in db [:qsg] merge {:company-logo-done company-logo-done?})]
     (-> next-db
+      (assoc-in [:qsg :user-role] user-role)
       (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg next-db))))))

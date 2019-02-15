@@ -21,7 +21,10 @@
                    (,remove (.-classList (sel1 [:body])) "showing-qsg")
                    s)}
   [s]
-  (let [qsg-data (drv/react s :qsg)]
+  (let [qsg-data (drv/react s :qsg)
+        user-role (:user-role qsg)
+        slack-dismissed? (or (:slack-dismissed? qsg-data)
+                             (not= user-role :admin))]
     [:div.qsg-container
       [:div.qsg-header
         [:span.qsg-lifevest]
@@ -34,26 +37,31 @@
         [:div.qsg-progress-bar
           [:div.qsg-progress-bar-inner
             {:style {:width (str (or (:overall-progress qsg-data) 0) "%")}}]]
-        [:div.qsg-buttons-list-title
-          "Explore"]
-        [:div.qsg-buttons-list
-          [:button.mlb-reset.qsg-list-item.qsg-create-post-bt
-            {:on-click #(qsg-actions/start-create-post-trail)
-             :class (when (:add-post? qsg-data)
-                      "done")}
-            "Create a post"]
-          [:button.mlb-reset.qsg-list-item.qsg-add-section-bt
-            {:on-click #(qsg-actions/start-add-section-trail)
-             :class (when (:add-section? qsg-data)
-                      "done")}
-            "Add a section"]
-          ;; FIXME comment out until we have a video for digest sample
-          ; [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
-          ;   {:on-click #(qsg-actions/see-digest-sample)
-          ;    :class (when (:see-digest-sample? qsg-data)
-          ;             "done")}
-          ;   "See a sample digest"]
-            ]
+        (when (or (= user-role :admin)
+                  (= user-role :author))
+          [:div.qsg-buttons-list-title
+            "Explore"])
+        (when (or (= user-role :admin)
+                  (= user-role :author))
+          [:div.qsg-buttons-list
+            [:button.mlb-reset.qsg-list-item.qsg-create-post-bt
+              {:on-click #(qsg-actions/start-create-post-trail)
+               :class (when (:add-post? qsg-data)
+                        "done")}
+              "Create a post"]
+            [:button.mlb-reset.qsg-list-item.qsg-add-section-bt
+              {:on-click #(qsg-actions/start-add-section-trail)
+               :class (when (:add-section? qsg-data)
+                        "done")}
+              "Add a section"]
+            ;; FIXME comment out until we have a video for digest sample
+            ;; NB: also show this section for :viewers, now is shown only for :admin and :author
+            ; [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
+            ;   {:on-click #(qsg-actions/see-digest-sample)
+            ;    :class (when (:see-digest-sample? qsg-data)
+            ;             "done")}
+            ;   "See a sample digest"]
+              ])
         [:div.qsg-buttons-list-title
           "Setup"]
         [:div.qsg-buttons-list
@@ -80,24 +88,29 @@
              :class (when (:profile-photo-done qsg-data)
                       "done")}
             "Add a profile photo"]
-          [:button.mlb-reset.qsg-list-item.add-company-logo-bt
-            {:on-click #(qsg-actions/start-company-logo-trail)
-             :class (when (:company-logo-done qsg-data)
-                      "done")}
-            "Add a company logo"]
-          [:button.mlb-reset.qsg-list-item.qsg-invite-team-bt
-            {:on-click #(qsg-actions/start-invite-team-trail)
-             :class (when (:invited? qsg-data)
-                      "done")}
-            "Invite your team"]
-          [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
-            {:on-click #(qsg-actions/start-create-reminder-trail)
-             :class (when (:add-reminder? qsg-data)
-                      "done")}
-            "Check out reminders"]]]
+          (when (= user-role :admin)
+            [:button.mlb-reset.qsg-list-item.add-company-logo-bt
+              {:on-click #(qsg-actions/start-company-logo-trail)
+               :class (when (:company-logo-done qsg-data)
+                        "done")}
+              "Add a company logo"])
+          (when (or (= user-role :admin)
+                    (= user-role :author))
+            [:button.mlb-reset.qsg-list-item.qsg-invite-team-bt
+              {:on-click #(qsg-actions/start-invite-team-trail)
+               :class (when (:invited? qsg-data)
+                        "done")}
+              "Invite your team"])
+          (when (or (= user-role :admin)
+                    (= user-role :author))
+            [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
+              {:on-click #(qsg-actions/start-create-reminder-trail)
+               :class (when (:add-reminder? qsg-data)
+                        "done")}
+              "Check out reminders"])]]
 
       [:div.qsg-bottom
-        {:class (utils/class-set {:slack-dismissed (:slack-dismissed? qsg-data)
+        {:class (utils/class-set {:slack-dismissed slack-dismissed?
                                   :carrot-video-dismissed (:carrot-video-dismissed? qsg-data)})}
         (when-not (:carrot-video-dismissed? qsg-data)
           [:div.qsg-carrot-video-section
@@ -109,7 +122,7 @@
               {:on-click #(qsg-actions/watch-carrot-video)}
               [:span.qsg-youtube-icon]
               "Play video"]])
-        (when-not (:slack-dismissed? qsg-data)
+        (when-not slack-dismissed?
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
               "Using Slack? Share posts with your team"]
