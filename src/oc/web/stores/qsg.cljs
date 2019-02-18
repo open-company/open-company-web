@@ -239,8 +239,8 @@
                                                     (s/starts-with? (:avatar-url user-data) "http"))})
 
         overall-progress (progress-percentage updated-qsg-data)
-        slack-dismissed? (or (:slack-dismissed? updated-qsg-data)
-                             (jwt/team-has-bot? (:team-id (dispatcher/org-data))))
+        slack-dismissed? (boolean (or (:slack-dismissed? updated-qsg-data)
+                                      (jwt/team-has-bot? (:team-id (dispatcher/org-data)))))
         resend-verification-email-link (utils/link-for (:links user-data) "resend-verification" "POST")]
     (-> db
       (update-in [:qsg] merge updated-qsg-data)
