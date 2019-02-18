@@ -1,3 +1,7 @@
+body.showing-qsg div.fullscreen-page {
+  width: calc(100% - 220px) !important;
+}
+
 div.qsg-container {
   position: fixed;
   right: 0;
