@@ -35,6 +35,7 @@
   (-> db
     (assoc-in [:qsg :visible] true)
     (assoc-in [:qsg :show-guide?] persist?)
+    (assoc-in [:qsg :guide-dismissed?] (if persist? false (:guide-dismissed? (:qsg db))))
     (assoc-in [:qsg :should-show-qsg?] false)
     (assoc-in [:qsg :overall-progress] (progress-percentage (:qsg db)))))
 
@@ -239,13 +240,16 @@
                                                     (s/starts-with? (:avatar-url user-data) "http"))})
 
         overall-progress (progress-percentage updated-qsg-data)
+        has-slack-user? (pos? (count (:slack-users user-data)))
         slack-dismissed? (boolean (or (:slack-dismissed? updated-qsg-data)
-                                      (jwt/team-has-bot? (:team-id (dispatcher/org-data)))))
+                                      (and has-slack-user?
+                                           (jwt/team-has-bot? (:team-id (dispatcher/org-data))))))
         resend-verification-email-link (utils/link-for (:links user-data) "resend-verification" "POST")]
     (-> db
       (update-in [:qsg] merge updated-qsg-data)
       (assoc-in [:qsg :slack-dismissed?] slack-dismissed?)
       (assoc-in [:qsg :can-resend-verification?] resend-verification-email-link)
+      (assoc-in [:qsg :has-slack-user?] has-slack-user?)
       (assoc-in [:qsg :overall-progress] overall-progress))))
 
 (defmethod reducer :org-loaded
