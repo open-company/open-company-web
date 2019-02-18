@@ -22,7 +22,6 @@ div.dashboard-layout {
     margin: 0 auto;
     width: auto;
     width: 100%;
-    position: relative;
     max-width: 952px;
 
     @include mobile(){
@@ -648,7 +647,6 @@ div.dashboard-layout {
     }
 
     div.new-post-floating-dropdown-container {
-      position: relative;
       position: absolute;
       position: fixed;
       bottom: 24px;
