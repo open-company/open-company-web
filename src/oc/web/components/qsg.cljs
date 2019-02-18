@@ -30,7 +30,9 @@
           {:on-click #(qsg-actions/dismiss-qsg-view)}]]
       [:div.qsg-top
         [:div.qsg-top-title
-          "Keep your team informed - let’s get started"]
+          (if (> (:overall-progress qsg-data) 99)
+            "You completed the quickstart - you’re ready to go!"
+            "Keep your team informed - let’s get started!")]
         [:div.qsg-progress-bar
           [:div.qsg-progress-bar-inner
             {:style {:width (str (or (:overall-progress qsg-data) 0) "%")}}]]
@@ -110,7 +112,7 @@
         (when-not (:slack-dismissed? qsg-data)
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
-              "Using Slack? Share posts with your team"]
+              "Using Slack? Carrit and Slack work together."]
             [:button.mlb-reset.qsg-using-slack-dismiss
               {:on-click #(qsg-actions/dismiss-slack)}]
             [:button.mlb-reset.qsg-using-slack-bt

@@ -237,13 +237,11 @@
                         [:button.mlb-reset.section-settings-tooltip-dismiss
                           {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
                         [:div.section-settings-tooltips
-                          [:div.section-settings-tooltip-title
-                            "Configuring a section"]
-                            [:div.section-settings-tooltip
-                              "Sections can be modified at any point by clicking the settings cog."]
-                            [:button.mlb-reset.section-settings-bt
-                              {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
-                              "Ok, got it"]]])])]
+                          [:div.section-settings-tooltip
+                            "You can make changes to a section at any time."]
+                          [:button.mlb-reset.section-settings-bt
+                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
+                            "OK, got it"]]])])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group

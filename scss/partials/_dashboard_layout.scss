@@ -392,19 +392,11 @@ div.dashboard-layout {
 
               div.section-settings-tooltips {
 
-                div.section-settings-tooltip-title {
-                  @include PTSerif();
-                  font-size: 18px;
-                  color: $deep_navy;
-                  line-height: 18px;
-                }
-
                 div.section-settings-tooltip {
                   @include avenir_R();
                   font-size: 16px;
                   color: $deep_navy;
                   line-height: 20px;
-                  margin-top: 4px;
                 }
 
                 button.section-settings-bt {
