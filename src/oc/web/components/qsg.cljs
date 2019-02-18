@@ -112,7 +112,7 @@
         (when-not (:slack-dismissed? qsg-data)
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
-              (if (:has-slack-team? qsg-data)
+              (if (:has-slack-user? qsg-data)
                 "Receive digests in Slack. Share posts to Slack."
                 "Using Slack? Carrot and Slack work together.")]
             [:button.mlb-reset.qsg-using-slack-dismiss
@@ -120,7 +120,7 @@
             [:button.mlb-reset.qsg-using-slack-bt
               {:on-click #(qsg-actions/slack-click)}
               [:span.qsg-slack-icon]
-              (if (:has-slack-team? qsg-data)
+              (if (:has-slack-user? qsg-data)
                 "Enable the Carrot Bot"
                 "Add to Slack")]])
         [:button.mlb-reset.qsg-dismiss
