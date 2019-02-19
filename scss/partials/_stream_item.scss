@@ -622,6 +622,8 @@ div.stream-item {
             @include mobile(){
               bottom: unset;
               right: unset;
+              top: unset;
+              left: unset;
             }
           }
         }
