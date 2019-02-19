@@ -335,11 +335,15 @@
         team-data (dis/team-data team-id)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
         redirect (or redirect-to (router/get-token))
+        with-add-team (js/encodeURIComponent
+                        (if (> (.indexOf redirect "?") -1)
+                          (str redirect "&add=team")
+                          (str redirect "?add=team")))
         fixed-add-slack-team-link (utils/slack-link-with-state
                                    (:href add-slack-team-link)
                                    (:user-id current-user-data)
                                    team-id
-                                   (str redirect "%26add=team"))]
+                                   with-add-team)]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 
