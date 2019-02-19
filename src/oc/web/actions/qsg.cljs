@@ -78,13 +78,11 @@
 (defn slack-click []
   (let [org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
+        qsg-data (:qsg @dis/app-state)
         cur-user-data (dis/current-user-data)]
-    (if (and (:has-slack-org team-data)
-             (not (jwt/team-has-bot? (:team-id org-data))))
+    (if (:has-slack-user? qsg-data)
       (org-actions/bot-auth team-data cur-user-data (router/get-token))
       (team-actions/slack-team-add cur-user-data (router/get-token)))))
-
-
 
 ;; Carrot 60 seconds video
 
