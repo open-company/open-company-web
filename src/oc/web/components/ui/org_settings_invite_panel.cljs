@@ -4,10 +4,12 @@
             [cuerdas.core :as s]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -119,17 +121,24 @@
              :class (utils/class-set {:active (= "email" @(::inviting-from s))})}
             "Email"]
           (let [has-slack-org? (:has-slack-org team-data)
-                slack-enabled? (:can-slack-invite team-data)]
-            [:div.org-settings-panel-choice
-              {:on-click #(when slack-enabled?
-                            (user-type-did-change s invite-users "slack"))
-               :data-toggle (when-not slack-enabled? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title "In Settings, enable the Carrot Bot for Slack."
-               :class (utils/class-set {:disabled (not slack-enabled?)
-                                        :active (= "slack" @(::inviting-from s))})}
-              "Slack"])]
+                slack-enabled? (:can-slack-invite team-data)
+                has-slack-user? (pos? (count (:slack-users cur-user-data)))]
+            (if slack-enabled?
+              [:div.org-settings-panel-choice
+                {:on-click #(user-type-did-change s invite-users "slack")
+                 :class (utils/class-set {:disabled (not slack-enabled?)
+                                          :active (= "slack" @(::inviting-from s))})}
+                "Slack"]
+              [:div.org-settings-panel-slack-fallback
+                [:span.slack-copy
+                  "Want to invite your team via Slack? "]
+                (let [redirect-to (js/encodeURIComponent
+                                   (str (router/get-token) "?org-settings=invite"))]
+                  [:button.mlb-reset.add-slack-team
+                    {:on-click #(if has-slack-user?
+                                  (org-actions/bot-auth team-data cur-user-data redirect-to)
+                                  (team-actions/slack-team-add cur-user-data redirect-to))}
+                    "Add a Slack team"])]))]
         ;; Panel rows
         [:div.org-settings-invite-table-container.org-settings-panel-row
           ;; Team table
