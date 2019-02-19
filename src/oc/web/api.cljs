@@ -518,6 +518,7 @@
                                json-params
                                {:slack-id (:slack-id invited-user)
                                 :slack-org-id (:slack-org-id invited-user)
+                                :avatar-url (:avatar-url invited-user)
                                 :email (:email invited-user)})
                               (assoc json-params :email invited-user))
           with-company-name (merge with-invited-user {:org-name (:name org-data)
