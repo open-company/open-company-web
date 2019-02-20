@@ -35,15 +35,14 @@
               [:div.qsg-digest-sample-header
                 [:span.slack-logo]]
               [:img.qsg-digest-sample-image
-                {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_slack.png")
-                 :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]]
+                {:src (utils/cdn "/img/ML/qsg_sample_digest_slack.png")
+                 :srcSet (str (utils/cdn "/img/ML/qsg_sample_digest_slack@2x.png") " 2x")}]]
             [:div.qsg-digest-sample-carion-item.second-item
               [:div.qsg-digest-sample-header
                 [:span.email-logo]]
               [:img.qsg-digest-sample-image
-                {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
-                 :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]
-            [:button.mlb-reset.qsg-digest-sample-carion-prev-bt
-              {:on-click #(reset! (::show-second-image s) false)}]
-            [:button.mlb-reset.qsg-digest-sample-carion-next-bt
-              {:on-click #(reset! (::show-second-image s) true)}]]]]]))
+                {:src (utils/cdn "/img/ML/qsg_sample_digest_email.png")
+                 :srcSet (str (utils/cdn "/img/ML/qsg_sample_digest_email@2x.png") " 2x")}]]
+            [:button.mlb-reset.qsg-digest-sample-carion-bt
+              {:on-click #(swap! (::show-second-image s) not)
+               :class (when-not @(::show-second-image s) "next-bt")}]]]]]))
