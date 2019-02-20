@@ -6,8 +6,9 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.team :as team-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -91,14 +92,27 @@
                    (let [sending @(::sending s)]
                      (when (pos? sending)
                        (let [invite-drv @(drv/get-ref s :invite-data)
-                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))]
+                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))
+                             error-invites (filter :error (:invite-users invite-drv))]
                          (reset! (::sending s) (count no-error-invites))
                          (when (zero? (count no-error-invites))
                            (utils/after 1000
                              (fn []
-                               (reset! (::send-bt-cta s) "Sent")
                                (reset! (::sending s) 0)
-                               (utils/after 2500 #(reset! (::send-bt-cta s) "Send"))))))))
+                               (if (zero? (count error-invites))
+                                 (do
+                                   (reset! (::send-bt-cta s) "Sent")
+                                   (utils/after 2500 #(reset! (::send-bt-cta s) "Send"))
+                                   (notification-actions/show-notification {:title (str "Invite"
+                                                                                    (when (> (count no-error-invites) 1)
+                                                                                      "s")
+                                                                                    " sent.")
+                                                                            :primary-bt-title "OK"
+                                                                            :primary-bt-dismiss true
+                                                                            :expire 10
+                                                                            :primary-bt-inline true
+                                                                            :id :invites-sent}))
+                                 (reset! (::send-bt-cta s) "Send"))))))))
                    s)
      :did-update (fn [s]
                    (setup-initial-rows s)
