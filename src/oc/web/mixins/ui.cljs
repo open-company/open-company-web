@@ -186,7 +186,7 @@
                          (when       ;; element is the initially visible body
                                 (and (.contains (.-classList el) "to-truncate")
                                      ;; but item is not truncated
-                                     (not (.contains (.-classList el) "wrt-truncated"))
+                                     (not (.contains (.-classList el) "ddd-truncated"))
                                      ;; and the element is visible in the viewport
                                      (au/is-element-visible? el))
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
