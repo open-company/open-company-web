@@ -204,13 +204,15 @@
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.thumbnail-container.group
-          {:on-click #(when (and ;; it's truncated
-                                 truncated?
-                                 ;; it's not already expanded
-                                 (not expanded?)
-                                 ;; click is not on a Ziggeo video to play it inline
-                                 (not (utils/event-inside? % (rum/ref-node s :ziggeo-player))))
-                       (expand s true))}
+          {:on-click #(if is-drafts-board
+                        (activity-actions/activity-edit activity-data)
+                        (when (and ;; it's truncated
+                                   truncated?
+                                   ;; it's not already expanded
+                                   (not expanded?)
+                                   ;; click is not on a Ziggeo video to play it inline
+                                   (not (utils/event-inside? % (rum/ref-node s :ziggeo-player))))
+                          (expand s true)))}
           (if has-video
             [:div.group
              {:key (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))
