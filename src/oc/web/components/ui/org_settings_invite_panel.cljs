@@ -138,7 +138,9 @@
                     {:on-click #(if has-slack-user?
                                   (org-actions/bot-auth team-data cur-user-data redirect-to)
                                   (team-actions/slack-team-add cur-user-data redirect-to))}
-                    "Add a Slack team"])]))]
+                    (if has-slack-user?
+                      "Enable Carrot Bot"
+                      "Add a Slack team")])]))]
         ;; Panel rows
         [:div.org-settings-invite-table-container.org-settings-panel-row
           ;; Team table
