@@ -95,14 +95,14 @@
                                  comments-data @(drv/get-ref s :comments-data)]
                              (comment-actions/get-comments-if-needed activity-data comments-data)
                              (when @(::should-scroll-to-comments s)
-                               (utils/after 180
-                                #(let [actual-comments-count (count (au/get-comments activity-data comments-data))
-                                       dom-node (rum/dom-node s)]
-                                  ;; Commet out the scroll to comments for the moment
-                                  ; (utils/scroll-to-y
-                                  ;  (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions")))) 30 (when (zero? actual-comments-count) 40)))
-                                  (when (zero? actual-comments-count)
-                                    (.focus (.find (js/$ dom-node) "div.add-comment")))))
+                               (let [actual-comments-count (count (au/get-comments activity-data comments-data))
+                                     dom-node (rum/dom-node s)]
+                                 ;; Commet out the scroll to comments for the moment
+                                 (utils/scroll-to-y
+                                  (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions"))))66)
+                                  100)
+                                 (when (zero? actual-comments-count)
+                                   (.focus (.find (js/$ dom-node) "div.add-comment"))))
                                (reset! (::should-scroll-to-comments s) false)))
                            s)}
   [s activity-data read-data]
