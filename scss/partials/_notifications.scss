@@ -125,6 +125,10 @@ div.notifications {
       @include avenir_H();
       font-size: 14px;
       color: white;
+
+      @include mobile() {
+        margin-top: 2px;
+      }
     }
 
     button.notification-dismiss-bt {

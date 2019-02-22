@@ -236,7 +236,8 @@
                        (not show-section-add)
                        (not show-section-editor)
                        (not show-cmail)
-                       (not wrt-activity-data)))
+                       (not wrt-activity-data)
+                       (not show-reminders)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
