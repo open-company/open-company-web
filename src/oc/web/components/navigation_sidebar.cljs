@@ -225,7 +225,7 @@
             {:on-click #(do
                           (nav-actions/show-invite)
                           (utils/after 500 utils/remove-tooltips))
-             :title "Invite everyone with email or Slack"
+             :title "Invite teammates with email or Slack"
              :data-toggle (when-not is-mobile? "tooltip")
              :data-placement "top"
              :data-container "body"
