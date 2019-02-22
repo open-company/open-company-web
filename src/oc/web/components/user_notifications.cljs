@@ -47,30 +47,38 @@
           (if (empty? user-notifications-data)
             [:div.user-notifications-tray-empty
               (all-caught-up)]
-            (for [n user-notifications-data]
+            (for [n user-notifications-data
+                  :let [entry-uuid (:uuid n)
+                        board-slug (:board-slug n)
+                        reminder? (:reminder? n)
+                        reminder (when reminder?
+                                   (:reminder n))
+                        notification-type (when reminder?
+                                            (:notification-type reminder))
+                        ;; Base string for the key of the React child
+                        children-key-base (str "user-notification-" (:created-at n) "-")
+                        ;; add a unique part to the key to make sure the childrens are rendered
+                        children-key (str children-key-base
+                                      (or entry-uuid
+                                          (if reminder?
+                                            (:uuid reminder)
+                                            (rand 1000))))]]
               [:div.user-notification.group
                 {:class (utils/class-set {:unread (:unread n)})
                  :on-click (fn [e]
-                             (let [entry-uuid (:uuid n)
-                                   board-slug (:board-slug n)
-                                   reminder? (:reminder? n)
-                                   reminder (when reminder?
-                                             (:reminder n))
-                                   notification-type (when reminder?
-                                                       (:notification-type reminder))]
-                               (cond
-                                 (and reminder?
-                                      (= notification-type "reminder-alert"))
-                                 (ui-compose @(drv/get-ref s :show-add-post-tooltip))
-                                 (and reminder?
-                                      (= notification-type "reminder-notification"))
-                                 (nav-actions/show-reminders)
-                                 (and entry-uuid
-                                      board-slug
-                                      (not (utils/event-inside? e (rum/ref-node s :read-bt))))
-                                 (router/nav! (oc-urls/entry board-slug entry-uuid)))
-                               (user-actions/hide-mobile-user-notifications)))
-                 :key (str "user-notification-" (:created-at n))}
+                             (cond
+                               (and reminder?
+                                    (= notification-type "reminder-alert"))
+                               (ui-compose @(drv/get-ref s :show-add-post-tooltip))
+                               (and reminder?
+                                    (= notification-type "reminder-notification"))
+                               (nav-actions/show-reminders)
+                               (and entry-uuid
+                                    board-slug
+                                    (not (utils/event-inside? e (rum/ref-node s :read-bt))))
+                               (router/nav! (oc-urls/entry board-slug entry-uuid)))
+                             (user-actions/hide-mobile-user-notifications))
+                 :key children-key}
                 (user-avatar-image (:author n))
                 [:div.user-notification-title
                   (:title n)]
