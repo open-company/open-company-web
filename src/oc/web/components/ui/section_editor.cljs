@@ -49,7 +49,7 @@
 
 (def private-access
   [:div.access-item.private-access
-    "Only team members you invite"])
+    "Team members you invite"])
 
 (def team-access
   [:div.access-item.team-access
