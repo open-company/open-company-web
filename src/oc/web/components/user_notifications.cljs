@@ -59,10 +59,12 @@
                         children-key-base (str "user-notification-" (:created-at n) "-")
                         ;; add a unique part to the key to make sure the childrens are rendered
                         children-key (str children-key-base
-                                      (or entry-uuid
-                                          (if reminder?
-                                            (:uuid reminder)
-                                            (rand 1000))))]]
+                                      (if (seq entry-uuid)
+                                        entry-uuid
+                                        (if (and reminder?
+                                                 (seq (:uuid reminder)))
+                                          (:uuid reminder)
+                                          (rand 1000))))]]
               [:div.user-notification.group
                 {:class (utils/class-set {:unread (:unread n)})
                  :on-click (fn [e]
