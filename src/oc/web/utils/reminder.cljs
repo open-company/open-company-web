@@ -1,5 +1,6 @@
 (ns oc.web.utils.reminder
   (:require [clojure.set :refer (rename-keys)]
+            [clojure.string :as s]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
@@ -40,6 +41,20 @@
    :monthly :period-occurrence
    :quarterly :period-occurrence})
 
+(defn- short-assignee-name [assignee]
+  (if (and (not (s/blank? (:first-name assignee)))
+           (not (s/blank? (:last-name assignee))))
+    (str (:first-name assignee) " " (first (:last-name assignee)) ".")
+    (let [splitted-name (s/split (:name assignee) #"\s")
+          has-last-name? (not (s/blank? (get splitted-name 1)))]
+      (str (first splitted-name)
+        (when has-last-name?
+          " ")
+        (when has-last-name?
+          (first (second splitted-name)))
+        (when has-last-name?
+          ".")))))
+
 (defn parse-reminder
   "Given the map of a reminder denormalize it with the assignee and author map."
   [reminder-data]
@@ -56,7 +71,8 @@
         occurrence-value-kw (keyword occurrence-value)
         occurrence-value (get-in occurrence-values [frequency-kw occurrence-value-kw])
         assignee-map (:assignee reminder-data)
-        assignee-name (or (:name assignee-map) (utils/name-or-email assignee-map))]
+        assignee-name (or (:name assignee-map) (utils/name-or-email assignee-map))
+        short-assignee (short-assignee-name assignee-map)]
     (-> with-parsed-date
       ;; The freuqncy keyword
       (assoc :frequency frequency-kw)
@@ -67,7 +83,8 @@
       ;; The value of the occurrence field like it is visualized, not the keyword for it
       (assoc :occurrence-value occurrence-value)
       ;; Make sure assignee has the :name key for sorting
-      (assoc-in [:assignee :name] assignee-name))))
+      (assoc-in [:assignee :name] assignee-name)
+      (assoc-in [:assignee :short-name] short-assignee))))
 
 (defn parse-reminders [reminders-data]
   (let [parsed-reminders (vec (map parse-reminder (:items reminders-data)))]
