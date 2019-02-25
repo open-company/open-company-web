@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -73,14 +74,6 @@
   ;    (.tooltip "hide")
   ;    (.tooltip "fixTitle")))
   )
-
-(defn compose [s]
-  (utils/remove-tooltips)
-  (activity-actions/activity-edit)
-  ;; If the add post tooltip is visible
-  (when @(drv/get-ref s :show-add-post-tooltip)
-    ;; Dismiss it and bring up the invite people tooltip
-    (utils/after 1000 nux-actions/dismiss-add-post-tooltip)))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -229,7 +222,7 @@
                     (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
                       [:button.mlb-reset.mlb-default.add-to-board-top-button.group
                         {:ref :top-compose-button
-                         :on-click #(when can-compose (compose s))
+                         :on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
                          :class (when-not can-compose "disabled")
                          :title (when show-tooltip? "You are a view-only user.")
                          :data-viewer (if show-tooltip? "enable" "disable")
@@ -293,7 +286,7 @@
                           (when (and is-admin-or-author
                                      (not is-second-user))
                             [:button.mlb-reset.add-post-bt
-                              {:on-click #(when can-compose (compose s))}
+                              {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                               [:span.add-post-bt-pen]
                               "Create your first post"])]
                       [:div.add-post-tooltip-box
@@ -339,5 +332,5 @@
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :on-click #(compose s)}
+                       :on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
                       [:div.add-to-board-plus]]]))])]]))
