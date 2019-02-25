@@ -171,10 +171,6 @@
                   [:button.mlb-reset.stream-comment-reaction
                     {:class (utils/class-set {:reacted (:reacted reaction-data)
                                               :can-react (:can-react comment-data)})
-                     :title "Agree with this comment"
-                     :data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-contaner "body"
                      :on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
                                  reaction-data (not (:reacted reaction-data)))}
                       (when (or (pos? (:count reaction-data))
