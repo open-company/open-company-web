@@ -272,9 +272,9 @@
   []
   (set-env! :source-paths #{"src" "test"})
   (comp
-    (check/with-yagni)
-    (check/with-eastwood)
-    (check/with-kibit)
-    (check/with-bikeshed :options {:verbose true
-                                   :max-line-length 120})
+    (check/with-yagni "-t")
+    (check/with-eastwood "-t")
+    (check/with-kibit "-t")
+    (check/with-bikeshed "-t" :options {:verbose true
+                                        :max-line-length 120})
     (check/throw-on-errors)))
