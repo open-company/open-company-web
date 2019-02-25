@@ -15,6 +15,10 @@ div.stream-item {
     border-radius: 0;
   }
 
+  &.draft {
+    cursor: pointer;
+  }
+
   &.show-menu {
     div.stream-item-header {
       div.more-menu {
