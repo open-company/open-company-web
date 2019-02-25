@@ -135,17 +135,17 @@
               [:div.medium-row.group
                 [:div.fields
                   [:div.checkbox-row.group
-                    {:on-click #(reset! (::url-audience s) :all)}
-                    [:div.checkbox
-                      {:class (when (= @(::url-audience s) :all)
-                                "selected")}]
-                    [:div.checkbox-label [:span.bold "Public link"] " for anyone to see"]]
-                  [:div.checkbox-row.group
                     {:on-click #(reset! (::url-audience s) :team)}
                     [:div.checkbox
                       {:class (when (= @(::url-audience s) :team)
                                 "selected")}]
-                    [:div.checkbox-label "Private link that " [:span.bold "requires login"]]]]]
+                    [:div.checkbox-label "Private link that " [:span.bold "requires login"]]]
+                  [:div.checkbox-row.group
+                    {:on-click #(reset! (::url-audience s) :all)}
+                    [:div.checkbox
+                      {:class (when (= @(::url-audience s) :all)
+                                "selected")}]
+                    [:div.checkbox-label [:span.bold "Public link"] " for anyone to see"]]]]
               [:div.medium-row.url-field-row.group
                 (let [url-protocol (str "http" (when ls/jwt-cookie-secure "s") "://")
                       secure-url (oc-urls/secure-activity (router/current-org-slug) secure-uuid)
