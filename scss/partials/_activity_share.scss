@@ -293,6 +293,7 @@ div.activity-share-modal-container {
 
       @include mobile() {
         padding: 0px 24px;
+        min-height: calc(100vh - 56px);
       }
 
       div.url-audience-description {
