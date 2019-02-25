@@ -6,8 +6,9 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.team :as team-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -78,6 +79,7 @@
     (rum/local (int (rand 10000)) ::rand)
     (rum/local "Send" ::send-bt-cta)
     (rum/local 0 ::sending)
+    (rum/local 0 ::initial-sending)
     {:will-mount (fn [s]
                    (setup-initial-rows s)
                    (nux-actions/dismiss-post-added-tooltip)
@@ -88,17 +90,33 @@
                         (.tooltip "hide"))
                      s)
      :will-update (fn [s]
-                   (let [sending @(::sending s)]
-                     (when (pos? sending)
+                   (let [sending (::sending s)
+                         initial-sending (::initial-sending s)]
+                     (when (pos? @sending)
                        (let [invite-drv @(drv/get-ref s :invite-data)
-                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))]
-                         (reset! (::sending s) (count no-error-invites))
+                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))
+                             error-invites (filter :error (:invite-users invite-drv))
+                             hold-initial-sending @initial-sending]
+                         (reset! sending (count no-error-invites))
                          (when (zero? (count no-error-invites))
                            (utils/after 1000
                              (fn []
-                               (reset! (::send-bt-cta s) "Sent")
-                               (reset! (::sending s) 0)
-                               (utils/after 2500 #(reset! (::send-bt-cta s) "Send"))))))))
+                               (reset! sending 0)
+                               (reset! initial-sending 0)
+                               (if (zero? (count error-invites))
+                                 (do
+                                   (reset! (::send-bt-cta s) "Sent")
+                                   (utils/after 2500 #(reset! (::send-bt-cta s) "Send"))
+                                   (notification-actions/show-notification {:title (str "Invite"
+                                                                                    (when (> hold-initial-sending 1)
+                                                                                      "s")
+                                                                                    " sent.")
+                                                                            :primary-bt-title "OK"
+                                                                            :primary-bt-dismiss true
+                                                                            :expire 10
+                                                                            :primary-bt-inline true
+                                                                            :id :invites-sent}))
+                                 (reset! (::send-bt-cta s) "Send"))))))))
                    s)
      :did-update (fn [s]
                    (setup-initial-rows s)
@@ -229,8 +247,9 @@
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
-          {:on-click #(do
-                        (reset! (::sending s) (count (filterv valid-user? invite-users)))
+          {:on-click #(let [valid-count (count (filterv valid-user? invite-users))]
+                        (reset! (::sending s) valid-count)
+                        (reset! (::initial-sending s) valid-count)
                         (reset! (::send-bt-cta s) "Sending")
                         (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
