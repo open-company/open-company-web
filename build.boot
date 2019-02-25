@@ -7,7 +7,7 @@
     ;; NB: Do not upgrade boot-cljs-test to 0.3.1 since it breaks travis CI.
     ;; More info https://travis-ci.org/open-company/open-company-web/builds/239524353
     [crisptrutski/boot-cljs-test "0.3.4" :scope "test"]
-    [tolitius/boot-check "0.1.9" :scope "test"]
+    [tolitius/boot-check "0.1.12" :scope "test"]
 
     ;; Clojure/ClojureScript
     ;; NB: Need to change Clojure version in boot.properties in sync with this
@@ -276,4 +276,5 @@
     (check/with-eastwood)
     (check/with-kibit)
     (check/with-bikeshed :options {:verbose true
-                                   :max-line-length 120})))
+                                   :max-line-length 120})
+    (check/throw-on-errors)))

@@ -32,7 +32,7 @@
      (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
      s)}
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
-  (let [fixed-items (map #(if (not (contains? % :label))
+  (let [fixed-items (map #(if-not (contains? % :label)
                             (assoc % :label (:value %))
                             %) items)]
     [:div.dropdown-list-container

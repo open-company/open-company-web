@@ -121,7 +121,7 @@
 
 (defn sort-fn [reminder-a reminder-b]
   (let [assignee-compare (compare (:name (:assignee reminder-a)) (:name (:assignee reminder-b)))]
-    (if (= assignee-compare 0)
+    (if (zero? assignee-compare)
       (compare (:headline reminder-a) (:headline reminder-b))
       assignee-compare)))
 
