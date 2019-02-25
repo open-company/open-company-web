@@ -354,7 +354,7 @@
      (entry-save edit-key edited-data section-editing create-update-entry-cb))
 
   ([edit-key edited-data section-editing entry-save-cb]
-     (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+     (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
            fixed-edit-key (or edit-key :entry-editing)]
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
