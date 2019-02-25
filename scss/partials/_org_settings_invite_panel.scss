@@ -2,21 +2,26 @@ div.org-settings div.org-settings-inner {
   div.org-settings-panel.org-settings-invite-panel {
     div.org-settings-panel-row.invite-from {
       margin-bottom: 16px;
+      height: 24px;
 
       div.invite-from-label {
         float: left;
         @include avenir_M();
         font-size: 15px;
         color: $ui_grey;
+        line-height: 24px;
+        height: 24px;
       }
 
       div.org-settings-panel-choice {
         float: left;
-        margin-left: 16px;
+        margin-left: 8px;
         cursor: pointer;
         @include avenir_H();
         font-size: 15px;
         color: $ui_grey;
+        height: 24px;
+        line-height: 24px;
 
         &.disabled {
           opacity: 0.3;
@@ -24,6 +29,37 @@ div.org-settings div.org-settings-inner {
 
         &:not(.disabled).active {
           color: $carrot_orange;
+        }
+      }
+
+      div.org-settings-panel-slack-fallback {
+        height: 24px;
+        float: left;
+        margin-left: 16px;
+        padding-left: 16px;
+        border-left: 1px solid $ultra_light_grey;
+        margin-top: 0;
+
+        span.slack-copy {
+          @include avenir_R();
+          font-size: 13px;
+          color: $deep_navy;
+          line-height: 24px;
+          margin-top: 0;
+          display: block;
+          float: left;
+        }
+
+        button.add-slack-team {
+          @include avenir_R();
+          font-size: 13px;
+          color: $deep_navy;
+          line-height: 24px;
+          color: $carrot_green;
+          margin-top: 0;
+          display: block;
+          float: left;
+          padding: 0 0 0 8px;
         }
       }
     }
