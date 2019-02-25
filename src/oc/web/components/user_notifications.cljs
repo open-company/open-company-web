@@ -57,7 +57,7 @@
                                             (:notification-type reminder))
                         ;; Base string for the key of the React child
                         children-key-base (str "user-notification-" (:created-at n) "-")
-                        ;; add a unique part to the key to make sure the childrens are rendered
+                        ;; add a unique part to the key to make sure the children are rendered
                         children-key (str children-key-base
                                       (if (seq entry-uuid)
                                         entry-uuid
