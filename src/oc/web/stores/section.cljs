@@ -71,7 +71,7 @@
         org-slug (:org (:router-path db))]
     (reduce
       #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))
-             new-key (into [] (conj posts-key :new))]
+             new-key (vec (conj posts-key :new))]
           (assoc-in %1 new-key (au/post-new? %2 changes)))
       db
       (vals posts-data))))
@@ -198,7 +198,7 @@
 (defn update-unseen-add [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
         old-unseen (or (:unseen old-container-change-data) [])
-        next-unseen (into [] (seq (conj old-unseen item-id)))
+        next-unseen (vec (seq (conj old-unseen item-id)))
         next-container-change-data (if old-container-change-data
                                      (assoc old-container-change-data :unseen next-unseen)
                                      {:container-id container-id
