@@ -18,34 +18,96 @@ div.more-menu {
   }
 
   button.more-menu-bt {
-    width: 32px;
     height: 32px;
     display: inline;
-    background-image: cdnUrl("/img/ML/more_menu_icon.svg");
-    background-size: 32px 32px;
-    background-position: center;
+    background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
+    background-size: 12px 3px;
+    background-position: left center;
+    padding: 0 0 0 24px;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
+
+    span.more-menu-bt-copy {
+      @include avenir_R();
+      font-size: 14px;
+      color: $deep_navy;
+    }
+
+    @include mobile() {
+      width: 32px;
+    }
 
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
+      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_active.svg");
+      opacity: 1;
+
+      span.more-menu-bt-copy {
+        color: $carrot_green;
+      }
+    }
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/more_menu_icon.svg");
+      background-size: 32px 32px;
+      background-position: center;
+      padding: 0;
+      opacity: 1;
+
+      span.more-menu-bt-copy {
+        display: none;
+      }
+
+      &:hover, &:active, &:focus {
+        background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
+      }      
     }
   }
 
   button.more-menu-share-bt {
-    width: 32px;
     height: 32px;
     display: inline;
-    background-image: cdnUrl("/img/ML/share_menu_icon.svg");
-    background-size: 32px 32px;
-    background-position: center;
+    background-image: cdnUrl("/img/ML/more_menu_share_arrow.svg");
+    background-size: 16px 14px;
+    background-position: left center;
+    padding: 0 0 0 24px;
     background-repeat: no-repeat;
-    margin-left: 7px;
+    margin-left: 16px;
     display: inline-block;
-    opacity: 1;
+    opacity: 0.5;
+
+    span.more-menu-bt-copy {
+      @include avenir_R();
+      font-size: 14px;
+      color: $deep_navy;
+    }
+
+    @include mobile() {
+      width: 32px;
+    }
 
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");
+      background-image: cdnUrl("/img/ML/more_menu_share_arrow_active.svg");
+      opacity: 1;
+
+      span.more-menu-bt-copy {
+        color: $carrot_green;
+      }
+    }
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/share_menu_icon.svg");
+      background-size: 32px 32px;
+      background-position: center;
+      padding: 0;
+      opacity: 1;
+
+      span.more-menu-bt-copy {
+        display: none;
+      }
+
+      &:hover, &:active, &:focus {
+        background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");
+      }      
     }
   }
 

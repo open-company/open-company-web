@@ -66,8 +66,6 @@
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
                                     :add-a-comment (not (pos? comments-count))
                                     utils/hide-class true})}
-          (if (responsive/is-tablet-or-mobile?)
-            (comment-summary-string comments-authors)
-            (if (pos? comments-count)
-              (str comments-count " comment" (when (not= comments-count 1) "s"))
-              [:span.add-a-comment "Add a comment"]))]])))
+          (if (pos? comments-count)
+            (str comments-count " comment" (when (not= comments-count 1) "s"))
+            [:span.add-a-comment "Add a comment"])]])))

@@ -69,7 +69,6 @@
                          (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::more-menu-open)
-                         (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
@@ -145,10 +144,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)
                                 :single-post-view single-post-view
-                                :show-menu (or @(::hovering-tile s)
-                                               @(::more-menu-open s))})
-       :on-mouse-enter #(reset! (::hovering-tile s) true)
-       :on-mouse-leave #(reset! (::hovering-tile s) false)
+                                :show-menu @(::more-menu-open s)})
+       :on-mouse-leave #(reset! (::more-menu-open s) false)
        ;; click on the whole tile only for draft editing
        :on-click #(when (and is-drafts-board
                              (not is-mobile?))
@@ -196,13 +193,11 @@
                       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                       "Ok, got it"]]])])]
         (when (and is-published?
-                   (or @(::hovering-tile s)
-                       @(::more-menu-open s)
-                       is-mobile?))
+                   is-mobile?)
           (more-menu activity-data dom-element-id
            {:will-open #(reset! (::more-menu-open s) true)
             :will-close #(reset! (::more-menu-open s) false)
-            :external-share (not is-mobile?)}))]
+            :external-share false}))]
       [:div.must-see-tag.mobile-only "Must see"]
       [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
@@ -280,43 +275,32 @@
                 [:button.mlb-reset.delete-draft-bt
                   {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
                   "Delete draft"]]]
-            [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"}
-              [:button.mlb-reset.expand-button
-                {:class (when expanded? "expanded")
-                 :ref :expand-button
-                 :on-click #(expand s (not expanded?))}
-                (if expanded?
-                  "Show less"
-                  "Show more")]
-              [:div.stream-item-comments-summary
-                {:on-click #(expand s true true)}
-                (comments-summary activity-data true)]
-              (when-not is-mobile?
-                (reactions activity-data))
-              (if is-mobile?
-                (if expanded?
-                  (reactions activity-data)
-                  [:div.mobile-summary.group
-                    {:on-click #(expand s true)}
-                    [:div.group
-                      [:div.mobile-comments-summary.group
-                        [:div.mobile-comments-summary-icon]
-                        [:span
-                          (if (zero? (count comments-data))
-                            "Add a comment"
-                            (count comments-data))]]
-                      (let [max-reaction (first (sort-by :count (:reactions activity-data)))]
-                        (when (pos? (:count max-reaction))
-                          [:div.mobile-summary-reaction
-                            [:span.reaction
-                              (:reaction max-reaction)]
-                            [:span.count
-                              (:count max-reaction)]]))]
-                    (when (pos? (count (:attachments activity-data)))
-                      [:div.mobile-summary-attachments
-                        [:span.attachments-icon]
-                        [:span.attachments-count (count (:attachments activity-data))]])]))])]
+            [:div.stream-item-footers
+              [:div.stream-item-footer.group
+                {:ref "stream-item-reactions"}
+                [:div.stream-item-comments-summary
+                  {:on-click #(expand s true true)}
+                  (comments-summary activity-data true)]
+                (reactions activity-data)
+                (when (and (not expanded?)
+                           (pos? (count (:attachments activity-data))))
+                  [:div.mobile-summary-attachments
+                    [:span.attachments-icon]
+                    [:span.attachments-count (count (:attachments activity-data))]])]
+              [:div.stream-item-show-more-footer.group
+                [:button.mlb-reset.expand-button
+                  {:class (when expanded? "expanded")
+                   :ref :expand-button
+                   :on-click #(expand s (not expanded?))}
+                  (if expanded?
+                    "Collapse"
+                    "View post")]
+                (when (and is-published?
+                           (not is-mobile?))
+                  (more-menu activity-data dom-element-id
+                   {:will-open #(reset! (::more-menu-open s) true)
+                    :will-close #(reset! (::more-menu-open s) false)
+                    :external-share true}))]])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right

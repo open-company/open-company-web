@@ -89,7 +89,8 @@
              :data-placement (or tooltip-position "top")
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title "More"}])
+             :title "More"}
+            [:span.more-menu-bt-copy "More"]])
         (cond
           @(::move-activity s)
           (activity-move {:boards-list (vals editable-boards)
@@ -146,4 +147,5 @@
              :data-toggle "tooltip"
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title "Share"}])])))
+             :title "Share"}
+            [:span.more-menu-bt-copy "Share"]])])))
