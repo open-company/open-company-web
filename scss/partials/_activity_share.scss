@@ -57,13 +57,14 @@ div.activity-share-modal-container {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      text-align: center;
+      text-align: left;
 
       @include mobile() {
         width: 100%;
         height: 56px;
         box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
         padding: 20px 24px;
+        text-align: center;
       }
 
       button.mobile-modal-close-bt {
@@ -88,6 +89,10 @@ div.activity-share-modal-container {
       height: 1px;
       background-color: rgba($carrot_light_gray, 0.2);
 
+      &.no-tabs {
+        margin-top: 8px;
+      }
+
       @include mobile(){
         margin: 0px 24px;
       }
@@ -111,8 +116,8 @@ div.activity-share-modal-container {
 
     div.activity-share-medium-selector-container {
       width: 100%;
-      height: 33px;
-      margin-top: 24px;
+      height: 32px;
+      margin-top: 11px;
 
       @include mobile() {
         padding: 0px 24px;
@@ -120,17 +125,16 @@ div.activity-share-modal-container {
 
       div.activity-share-medium-selector {
         height: 33px;
-        @include avenir_H();
+        @include avenir_B();
         font-size: 13px;
-        line-height: 18px;
+        line-height: 24px;
         text-align: left;
         color: $ui_grey;
         float: left;
         cursor: pointer;
-        margin: 0px 16px;
-        padding-bottom: 12px;
+        margin: 0 16px 0 0;
+        padding-bottom: 9px;
         text-transform: uppercase;
-        margin-top: 1px;
 
         &:first-child {
           margin-left: 0px;
@@ -177,7 +181,7 @@ div.activity-share-modal-container {
             float: right;
           }
 
-          div.email-medium, div.slack-medium {
+          div.slack-medium {
 
             div.medium-row {
               min-height: 40px;
@@ -186,7 +190,7 @@ div.activity-share-modal-container {
               div.fields.error {
                 position: relative;
 
-                & > input, & > textarea, & > div.email-field, & > div.slack-channels-dropdown input {
+                & > input, & > textarea, & > div.slack-channels-dropdown input {
                   border: 1px solid $carrot_orange !important;
                 }
 
@@ -216,54 +220,6 @@ div.activity-share-modal-container {
               div.fields {
                 margin-top: 8px;
 
-                div.email-field {
-                  width: 100%;
-                  min-height: 40px;
-                  border-radius: 4px;
-                  background-color: white;
-                  @include avenir_M();
-                  font-size: 14px;
-                  color: $oc_gray_7;
-                  padding: 0rem 0.8rem 0.4rem;
-                  outline: none;
-                  border: 1px solid $carrot_light_gray_1;
-                  box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
-
-                  &:empty {
-                    padding: 0.4rem 0.8rem;
-                  }
-
-                  div.email-item {
-                    margin-right: .4rem;
-                    margin-top: .4rem;
-                    margin-bottom: 0px;
-                    display: inline-block;
-                    border-radius: 3px;
-                    height: 26px;
-
-                    span.email-item {
-                      padding: .25rem .4rem;
-                      display: inline-block;
-                    }
-                  }
-
-                  input {
-                    border: none;
-                    box-shadow: none;
-                    padding: 0px;
-                    margin: 0px;
-                    outline: none;
-                    background-color: transparent;
-                    @include avenir_M();
-                    font-size: 14px;
-                    color: $oc_gray_7;
-                    height: 26px;
-                    width: auto;
-                    max-width: 100%;
-                    margin-top: 0.4rem;
-                  }
-                }
-
                 textarea {
                   width: 100%;
                   min-height: 77px;
@@ -274,8 +230,7 @@ div.activity-share-modal-container {
                   color: $oc_gray_7;
                   padding: 0.4rem 0.8rem;
                   outline: none;
-                  border: 1px solid $carrot_light_gray_1;
-                  box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                  border: 1px solid $medium_light_grey;
                 }
 
                 input {
@@ -288,8 +243,7 @@ div.activity-share-modal-container {
                   color: $oc_gray_7;
                   padding: 0.4rem 0.8rem;
                   outline: none;
-                  border: 1px solid $carrot_light_gray_1;
-                  box-shadow: 0px 4px 6px 0px rgba(#000000, 0.07);
+                  border: 1px solid $medium_light_grey;
                 }
               }
             }
@@ -299,7 +253,7 @@ div.activity-share-modal-container {
 
       div.share-footer{
         button {
-          height: 48px;
+          height: 32px;
           padding: .2em 1.8em;
 
           &:disabled, &.disabled {
@@ -307,31 +261,27 @@ div.activity-share-modal-container {
           }
         }
 
-        div.left-buttons {
-          float: left;
-          height: 48px;
-          margin-top: 24px;
-
-          button {
-            @include avenir_H();
-            font-size: 14px;
-            color: #8B8F95;
-          }
-        }
-
         div.right-buttons {
           float: right;
-          height: 48px;
-          margin-top: 24px;
+          height: 32px;
+          margin-top: 16px;
 
           button {
+            margin: 0;
+            padding: 0;
             @include avenir_H();
-            font-size: 16px;
+            font-size: 14px;
+            margin-left: 16px;
+
+            &.ml-link-black {
+              color: $ui_grey;
+            }
 
             &.share-button {
+              width: 72px;
               background-color: $carrot_green;
               color: white;
-              border-radius: 100px;
+              border-radius: 6px;
             }
           }
         }
@@ -345,35 +295,6 @@ div.activity-share-modal-container {
         padding: 0px 24px;
       }
 
-      select.url-audience {
-        height: 40px;
-        width: 100%;
-        border: 1px solid rgba($carrot_light_gray_1, 0.5);
-        @include avenir_M();
-        font-size: 15px;
-        color: $deep_navy;
-        margin-top: 8px;
-        padding: 0px 12px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        -o-appearance: none;
-        display: block;
-        position: relative;
-      }
-
-      div.chevron {
-        width: 8px;
-        height: 5px;
-        background-image: cdnUrl("/img/ML/section_access_chevron.svg");
-        background-size: 8px 5px;
-        background-position: center;
-        background-repeat: no-repeat;
-        pointer-events: none;
-        float: right;
-        margin-top: -22px;
-        margin-right: 12px;
-      }
-
       div.url-audience-description {
         @include avenir_M();
         font-size: 12px;
@@ -384,6 +305,48 @@ div.activity-share-modal-container {
 
       div.medium-row.url-field-row {
         margin-top: 24px;
+      }
+
+      div.checkbox-row {
+        height: 18px;
+        margin-top: 9px;
+        cursor: pointer;
+
+        div.checkbox {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          border: 1px solid $carrot_light_gray;
+          float: left;
+          margin: 0;
+          padding: 0;
+          position: relative;
+
+          &.selected:after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            top: 4px;
+            left: 4px;
+            background-color: $sea_blue;
+            border-radius: 50%;
+          }
+        }
+
+        div.checkbox-label {
+          display: block;
+          float: left;
+          line-height: 18px;
+          @include avenir_R();
+          font-size: 12px;
+          color: $deep_navy;
+          margin-left: 8px;
+
+          span.bold {
+            @include avenir_H();
+          }
+        }
       }
 
       div.share-headline {
@@ -407,7 +370,7 @@ div.activity-share-modal-container {
         border-left: 1px solid rgba($carrot_light_gray_1, 0.5);
         border-bottom: 1px solid rgba($carrot_light_gray_1, 0.5);
         padding: 7px 4px 7px 8px;
-        width: calc(100% - 72px);
+        width: calc(100% - 96px);
         height: 40px;
         float: left;
         border-top-left-radius: 4px;
@@ -422,7 +385,7 @@ div.activity-share-modal-container {
           width: 100%;
           @include avenir_M();
           color: $deep_navy;
-          font-size: 15px;
+          font-size: 14px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -434,7 +397,7 @@ div.activity-share-modal-container {
       }
 
       button.copy-btn {
-        width: 72px;
+        width: 96px;
         height: 40px;
         text-align: center;
         padding: 4px 0px;
