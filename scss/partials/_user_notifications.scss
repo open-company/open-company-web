@@ -178,10 +178,15 @@ div.user-notifications {
           line-height: 16px;
           color: $deep_navy;
           float: right;
+          overflow-wrap: break-word;
 
           p {
             margin: 0px;
             padding: 0px;
+          }
+
+          a {
+            color: $carrot_green;
           }
         }
 
