@@ -4,14 +4,17 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.lib.chat :as chat]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.chat :as chat]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.nux :as nux-actions]
+            [oc.web.components.ui.menu :as menu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.nux :as nux-actions]
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -55,6 +58,7 @@
                                 (drv/drv :board-data)
                                 (drv/drv :show-section-add)
                                 (drv/drv :change-cache-data)
+                                (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
@@ -88,6 +92,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-cache-data)
+        current-user-data (drv/react s :current-user-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
@@ -115,14 +120,18 @@
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952) 2) "px"))}}
-      [:div.mobile-board-name-container
-        {:on-click #(nav-actions/mobile-nav-sidebar)}
-        [:div.board-name
-          (cond
-            is-all-posts "All posts"
-            is-drafts-board "Drafts"
-            is-must-see "Must see"
-            :else (:name board-data))]]
+      [:div.mobile-header-container
+        [:button.mlb-reset.mobile-header-close
+          {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+        (orgs-dropdown)
+        [:button.btn-reset.mobile-menu.group
+          {:on-click #(do
+                       (when is-mobile?
+                         (dis/dispatch! [:input [:user-settings] nil])
+                         (dis/dispatch! [:input [:org-settings] nil]))
+                       (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                       (menu/mobile-menu-toggle))}
+          (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts

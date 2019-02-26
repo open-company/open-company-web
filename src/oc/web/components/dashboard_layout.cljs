@@ -14,7 +14,6 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -52,11 +51,7 @@
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
-                                 :display (if (pos? opacity) "block" "none")}))))
-  (let [dashboard-layout (rum/dom-node s)]
-    (if (>= (.-scrollY js/window) 64)
-      (.add (.-classList dashboard-layout) "sticky-board-name")
-      (.remove (.-classList dashboard-layout) "sticky-board-name"))))
+                                 :display (if (pos? opacity) "block" "none")})))))
 
 (defn win-width
   "Save the window width in the state."
@@ -172,7 +167,6 @@
             [:div.board-container.group
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
-                {:on-click #(nav-actions/mobile-nav-sidebar)}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)

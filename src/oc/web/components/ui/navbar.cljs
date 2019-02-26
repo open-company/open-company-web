@@ -10,13 +10,14 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar)]))
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
@@ -31,8 +32,7 @@
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
                      s)}
   [s]
-  (let [{:keys [current-user-data
-                org-data
+  (let [{:keys [org-data
                 board-data
                 show-login-overlay
                 mobile-navigation-sidebar
@@ -57,20 +57,9 @@
                                                         (pos?
                                                          (:count
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
-                                :not-fixed (or (utils/in? (:route @router/path) "all-posts")
-                                               (utils/in? (:route @router/path) "must-see")
-                                               (utils/in? (:route @router/path) "dashboard"))
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
                                                      (not (:read-only org-data)))})}
-      [:div.mobile-bottom-line
-        {:class (utils/class-set {:search search-active
-                                  :user-notifications mobile-user-notifications
-                                  :user-menu (or mobile-menu-open
-                                                 (and is-mobile?
-                                                      (or user-settings
-                                                          org-settings)))})}
-        [:div.orange-active-tab]]
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
       [:div.oc-navbar-header.group
@@ -78,33 +67,38 @@
           [:div.navbar-left
             [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
               {:class (utils/class-set {:active mobile-ap-active?})
-               :on-click #(do
-                            (search-actions/inactive)
-                            (menu/mobile-menu-close)
-                            (user-actions/hide-mobile-user-notifications)
-                            (if (and is-mobile?
-                                     (or org-settings
-                                         user-settings))
-                              (do
-                                (dis/dispatch! [:input [:user-settings] nil])
-                                (dis/dispatch! [:input [:org-settings] nil]))))}]
-           (if is-mobile?
-             [:button.mlb-reset.search-bt
-               {:on-click #(do
-                             (menu/mobile-menu-close)
-                             (search-actions/active)
-                             (user-actions/hide-mobile-user-notifications)
-                             (utils/after 500 search-actions/focus))
-                :class (when search-active "active")}]
+               :on-click nav-actions/mobile-nav-sidebar}
+              (cond
+                (= (:access board-data) "private")
+                [:span.private-icon]
+                (= (:access board-data) "public")
+                [:span.public-icon]
+                (= (router/current-board-slug) "must-see")
+                [:span.must-see-icon])
+              [:span.board-name
+                (cond
+                  (= (router/current-board-slug) "all-posts")
+                  "All Posts"
+                  (= (router/current-board-slug) "must-see")
+                  "Must See"
+                  :else
+                  (:name board-data))]]
+           (when-not is-mobile?
              (orgs-dropdown))]
-          [:div.navbar-center
-            {:class (when search-active "search-active")}
-            (if is-mobile?
-             (orgs-dropdown)
-             (search-box))]
+          (when-not is-mobile?
+            [:div.navbar-center
+              {:class (when search-active "search-active")}
+              (search-box)])
           [:div.navbar-right
             (if is-mobile?
               [:div.mobile-right-nav
+                [:button.mlb-reset.search-bt
+                  {:on-click #(do
+                                (menu/mobile-menu-close)
+                                (search-actions/active)
+                                (user-actions/hide-mobile-user-notifications)
+                                (utils/after 500 search-actions/focus))
+                   :class (when search-active "active")}]
                 (when (jwt/user-is-part-of-the-team (:team-id org-data))
                   [:button.mlb-reset.mobile-notification-bell
                     {:class (utils/class-set {:active mobile-user-notifications})
@@ -115,17 +109,7 @@
                                           user-settings)
                                     (dis/dispatch! [:input [:user-settings] nil])
                                     (dis/dispatch! [:input [:org-settings] nil]))
-                                  (user-actions/show-mobile-user-notifications))}])
-                [:button.btn-reset.mobile-menu.group
-                  {:on-click #(do
-                               (search-actions/inactive)
-                               (when is-mobile?
-                                 (dis/dispatch! [:input [:user-settings] nil])
-                                 (dis/dispatch! [:input [:org-settings] nil]))
-                               (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                               (user-actions/hide-mobile-user-notifications)
-                               (menu/mobile-menu-toggle))}
-                  (user-avatar-image current-user-data)]]
+                                  (user-actions/show-mobile-user-notifications))}])]
               (if (jwt/jwt)
                 [:div.group
                   (user-notifications)

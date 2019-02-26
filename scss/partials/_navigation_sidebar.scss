@@ -3,14 +3,14 @@
 
   @include mobile() {
     height: 72px;
-    padding: 24px 32px;
+    padding: 24px 16px;
     position: relative;
 
     &:before {
       content: "";
       position: absolute;
       top: 0px;
-      left: 65px;
+      left: 46px;
       height: 1px;
       width: calc(100% - 65px);
       background-color: $ultra_light_grey;
@@ -123,6 +123,7 @@
 
   @include mobile() {
     border-radius: 0px;
+    background-color: transparent;
   }
 
   .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
@@ -245,7 +246,7 @@ div.left-navigation-sidebar {
 
   @include mobile() {
     position: absolute;
-    margin-top: 56px;
+    margin-top: 0;
     top: 0px;
     left: 0px;
     width: 100%;
@@ -263,46 +264,38 @@ div.left-navigation-sidebar {
     }
   }
 
-  div.mobile-board-name-container {
-    position: relative;
+  div.mobile-header-container {
     display: none;
 
     @include mobile() {
-      display: block;
-      height: 48px;
-      padding: 15px;
+      width: 100%;
+      height: 56px;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
       background-color: white;
-      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-      // border-top: 1px solid $light_tan;
-      @include avenir_H();
-      font-size: 16px;
-      color: $deep_navy;
+      display: block;
+      padding: 12px 16px;
 
-      &:before {
-        display: block;
-        content: "";
-        width: 14px;
-        height: 8px;
-        background-image: cdnUrl("/img/ML/section_chevron.svg");
-        background-size: 14px 8px;
-        background-repeat: no-repeat;
+      button.mobile-header-close {
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
         background-position: center;
-        position: absolute;
-        top: 21px;
-        left: 28px;
-        transform: rotate(180deg);
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        margin: 4px 16px 0 -5px;
+        float: left;
       }
-      
-      div.board-name {
-        max-width: 80vw;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        display: block;
-        width: auto;
-        margin: 0 auto;
-        text-align: center;
+
+      div.orgs-dropdown {
+        float: left;
+      }
+
+      button.mobile-menu {
+        padding: 0;
         position: relative;
+        float: right;
+
+        @include user-profile(32);
       }
     }
   }
@@ -370,7 +363,7 @@ div.left-navigation-sidebar {
       text-decoration: none;
 
       @include mobile() {
-        margin-left: 34px;
+        margin-left: 32px;
         width: auto;
         padding: 0px;
       }
@@ -446,7 +439,7 @@ div.left-navigation-sidebar {
 
     @include mobile() {
       border-top: 1px solid $ultra_light_grey;
-      height: 56px;
+      height: 32px;
     }
 
     .left-navigation-sidebar-top-title {
@@ -456,22 +449,23 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         background-color: $ultra_light_grey;
-        height: 56px;
+        height: 32px;
         width: 100%;
-        padding: 16px 32px;
+        padding: 8px 48px 6px;
         margin-bottom: 0px;
       }
 
       span {
         @include avenir_B();
         font-size: 13px;
-        color: rgba($deep_navy, 0.5);
+        color: rgba($ui_grey, 0.5);
         float: left;
         cursor: default;
 
         @include mobile() {
-          margin-left: 34px;
-          margin-top: 7px;
+          display: block;
+          height: 18px;
+          line-height: 18px;
         }
       }
 
