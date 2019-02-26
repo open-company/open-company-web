@@ -8,7 +8,7 @@ div.stream-item {
 
   @include mobile() {
     width: 100%;
-    padding: 24px 16px;
+    padding: 16px;
     margin: 0;
     border: none;
     border-bottom: 1px solid $ultra_light_grey;
@@ -17,14 +17,6 @@ div.stream-item {
 
   &.draft {
     cursor: pointer;
-  }
-
-  &.show-menu {
-    div.stream-item-header {
-      div.more-menu {
-        display: block;
-      }
-    }
   }
 
   &.new-item {
@@ -75,17 +67,33 @@ div.stream-item {
   }
 
   &.show-continue-reading:not(.single-post-view) {
+    div.stream-item-body-ext {
+      div.stream-item-footer {
+        button.expand-button {
+          display: flex;
+        }
+      }
+    }
+
     button.expand-button {
       display: flex;
     }
   }
 
   &:not(.show-continue-reading):not(.single-post-view) {
-    button.expand-button {
-      @include mobile() {
-        display: none;
+    div.stream-item-body-ext {
+      div.stream-item-footer {
+        button.expand-button {
+          @include mobile() {
+            display: none;
+          }
+        }
       }
-    } 
+    }
+
+    button.expand-button {
+      display: none;
+    }
   }  
 
   div.activity-share-container {
@@ -103,12 +111,9 @@ div.stream-item {
     }
     
     div.more-menu {
-      display: none;
+      float: right;
 
       @include mobile() {
-        display: block;
-        float: right;
-
         ul.more-menu-list {
           left: unset;
           right: 16px;
@@ -589,9 +594,46 @@ div.stream-item {
         }
       }
 
-      @include mobile() {
-        position: relative;
-        bottom: unset;
+      button.expand-button {
+        padding: 0;
+        height: 32px;
+        width: 100px;
+        color: $carrot_green;
+        @include avenir_H();
+        font-size: 14px;
+        justify-content: center;
+        align-items: center;
+        display: none;
+        float: right;
+        opacity: 1;
+
+        @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+
+        @include mobile() {
+          width: 100%;
+          margin: 16px auto 0;
+        }
+
+        span.expand-icon {
+          background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+          background-size: 14px 8px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 14px;
+          height: 8px;
+          transition: rotate 180ms;
+          margin-right: 8px;
+          display: block;
+        }
+
+        &.expanded {
+          color: $ui_grey;
+          margin-top: 0px;
+
+          span.expand-icon {
+            background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+          }
+        }
       }
     }
   }
@@ -613,26 +655,21 @@ div.stream-item {
     }
   }
 
-  button.expand-button {
-    border-top: 1px solid $ultra_light_grey;
-    margin-top: 16px;
-    padding: 12px 0 0;
-    height: 36px;
-    width: 100%;
+  & > button.expand-button {
+    padding: 0;
+    height: 24px;
     color: $carrot_green;
     @include avenir_H();
     font-size: 14px;
     justify-content: center;
     align-items: center;
     display: none;
+    float: none;
     opacity: 1;
+    width: 100%;
+    margin: 16px auto 0;
 
     @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
-
-    @include mobile() {
-      border-top: 0px solid $ultra_light_grey;
-      margin-top: 0px;
-    }
 
     span.expand-icon {
       background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
@@ -648,8 +685,6 @@ div.stream-item {
 
     &.expanded {
       color: $ui_grey;
-      border-top: 0px solid transparent;
-      margin-top: 0px;
 
       span.expand-icon {
         background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");

@@ -27,12 +27,6 @@ div.more-menu {
     background-repeat: no-repeat;
     opacity: 0.5;
 
-    span.more-menu-bt-copy {
-      @include avenir_R();
-      font-size: 14px;
-      color: $deep_navy;
-    }
-
     @include mobile() {
       width: 32px;
     }
@@ -40,10 +34,6 @@ div.more-menu {
     &:hover, &:active, &:focus {
       background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_active.svg");
       opacity: 1;
-
-      span.more-menu-bt-copy {
-        color: $carrot_green;
-      }
     }
 
     @include mobile() {
@@ -52,10 +42,6 @@ div.more-menu {
       background-position: center;
       padding: 0;
       opacity: 1;
-
-      span.more-menu-bt-copy {
-        display: none;
-      }
 
       &:hover, &:active, &:focus {
         background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
@@ -75,12 +61,6 @@ div.more-menu {
     display: inline-block;
     opacity: 0.5;
 
-    span.more-menu-bt-copy {
-      @include avenir_R();
-      font-size: 14px;
-      color: $deep_navy;
-    }
-
     @include mobile() {
       width: 32px;
     }
@@ -88,10 +68,6 @@ div.more-menu {
     &:hover, &:active, &:focus {
       background-image: cdnUrl("/img/ML/more_menu_share_arrow_active.svg");
       opacity: 1;
-
-      span.more-menu-bt-copy {
-        color: $carrot_green;
-      }
     }
 
     @include mobile() {
@@ -100,10 +76,6 @@ div.more-menu {
       background-position: center;
       padding: 0;
       opacity: 1;
-
-      span.more-menu-bt-copy {
-        display: none;
-      }
 
       &:hover, &:active, &:focus {
         background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");

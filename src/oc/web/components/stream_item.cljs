@@ -68,7 +68,6 @@
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
-                         (rum/local false ::more-menu-open)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
@@ -143,9 +142,7 @@
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)
-                                :single-post-view single-post-view
-                                :show-menu @(::more-menu-open s)})
-       :on-mouse-leave #(reset! (::more-menu-open s) false)
+                                :single-post-view single-post-view})
        ;; click on the whole tile only for draft editing
        :on-click #(when (and is-drafts-board
                              (not is-mobile?))
@@ -192,12 +189,9 @@
                     [:button.mlb-reset.post-added-bt
                       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                       "Ok, got it"]]])])]
-        (when (and is-published?
-                   is-mobile?)
+        (when is-published?
           (more-menu activity-data dom-element-id
-           {:will-open #(reset! (::more-menu-open s) true)
-            :will-close #(reset! (::more-menu-open s) false)
-            :external-share false}))]
+           {:external-share (not is-mobile?)}))]
       [:div.must-see-tag.mobile-only "Must see"]
       [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
@@ -280,12 +274,15 @@
                 {:on-click #(expand s true true)}
                 (comments-summary activity-data true)]
               (reactions activity-data)
-              (when (and is-published?
-                         (not is-mobile?))
-                (more-menu activity-data dom-element-id
-                 {:will-open #(reset! (::more-menu-open s) true)
-                  :will-close #(reset! (::more-menu-open s) false)
-                  :external-share true}))])]
+              [:button.mlb-reset.expand-button.big-web-tablet-only
+                {:class (when expanded? "expanded")
+                 :ref :expand-button
+                 :on-click #(expand s (not expanded?))}
+                [:span.expand-icon]
+                [:span.expand-label
+                  (if expanded?
+                    "Show less"
+                    "Show more")]]])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right
@@ -294,12 +291,12 @@
               (stream-comments activity-data comments-data true)
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])
-        [:button.mlb-reset.expand-button
+        [:button.mlb-reset.expand-button.mobile-only
           {:class (when expanded? "expanded")
            :ref :expand-button
            :on-click #(expand s (not expanded?))}
           [:span.expand-icon]
           [:span.expand-label
             (if expanded?
-              "Hide post"
-              "View post")]]]))
+              "Show less"
+              "Show more")]]]))
