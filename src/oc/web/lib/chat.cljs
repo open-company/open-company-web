@@ -25,7 +25,7 @@
 
 (defn chat-click [interaction]
   (.startInteraction js/drift.api (clj->js {:interactionId interaction}))
-  (utils/after 500 #(check-drift-dialog)))
+  (utils/after 500 check-drift-dialog))
 
 (defn identify []
   (when (and (exists? js/drift)

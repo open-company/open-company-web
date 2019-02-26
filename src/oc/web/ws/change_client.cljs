@@ -45,7 +45,7 @@
     (let [current-set (set @container-ids)
           new-set (set watch-ids)
           union-set (clojure.set/union current-set new-set)]
-      (reset! container-ids (into [] union-set)))
+      (reset! container-ids (vec union-set)))
     (container-watch))
 
   ([]
