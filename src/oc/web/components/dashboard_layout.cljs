@@ -44,19 +44,20 @@
                           (- max-scroll min-scroll))]
     (max 0 (min (/ fixed-scroll-top 100) 1))))
 
-(defn did-scroll [e s]
-  (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
-    (when (pos? (.-length entry-floating))
-      (let [scroll-top (document-scroll-top)
-            opacity (if (responsive/is-tablet-or-mobile?)
-                      1
-                      (calc-opacity scroll-top))]
-        (.css entry-floating #js {:opacity opacity
-                                 :display (if (pos? opacity) "block" "none")}))))
-  (let [dashboard-layout (rum/dom-node s)]
-    (if (>= (.-scrollY js/window) 64)
-      (.add (.-classList dashboard-layout) "sticky-board-name")
-      (.remove (.-classList dashboard-layout) "sticky-board-name"))))
+(defn did-scroll [s e]
+  (when @(::is-mounted s)
+    (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
+      (when (pos? (.-length entry-floating))
+        (let [scroll-top (document-scroll-top)
+              opacity (if (responsive/is-tablet-or-mobile?)
+                        1
+                        (calc-opacity scroll-top))]
+          (.css entry-floating #js {:opacity opacity
+                                   :display (if (pos? opacity) "block" "none")}))))
+    (let [dashboard-layout (rum/dom-node s)]
+      (if (>= (.-scrollY js/window) 64)
+        (.add (.-classList dashboard-layout) "sticky-board-name")
+        (.remove (.-classList dashboard-layout) "sticky-board-name")))))
 
 (defn win-width
   "Save the window width in the state."
@@ -93,6 +94,7 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
+                              (rum/local false ::is-mounted)
                               ;; Commenting out grid view switcher for now
                               ; (rum/local nil ::board-switch)
                               ;; Mixins
@@ -114,10 +116,11 @@
                                 ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
+                                (reset! (::is-mounted s) true)
                                 (when-not (utils/is-test-env?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
-                                   (events/listen js/window EventType/SCROLL #(did-scroll % s))))
+                                   (events/listen js/window EventType/SCROLL (utils/debounce-fn (partial did-scroll s) 500))))
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
                                 (activity-actions/cmail-reopen?)
@@ -125,6 +128,7 @@
                                 (reminder-actions/load-reminders)
                                 s)
                                :will-unmount (fn [s]
+                                (reset! (::is-mounted s) false)
                                 (when-not (utils/is-test-env?)
                                   (when @(::scroll-listener s)
                                     (events/unlistenByKey @(::scroll-listener s))

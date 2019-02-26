@@ -30,13 +30,21 @@
 (rum/defcs site-header < rum/static
                          (rum/local nil ::scroll-listener)
                          (rum/local false ::sticky-navbar)
+                         (rum/local false ::is-mounted)
                          {:will-mount (fn [s]
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL
-                            #(let [scroll-top (.scrollTop (js/$ js/window))]
-                               (reset! (::sticky-navbar s) (pos? scroll-top)))))
+                            (utils/debounce-fn
+                              #(when @(::is-mounted s)
+                                 (let [scroll-top (.scrollTop (js/$ js/window))]
+                                   (reset! (::sticky-navbar s) (pos? scroll-top))))
+                              500)))
                           s)
+                          :did-mount (fn [s]
+                           (reset! (::is-mounted s) true)
+                           s)
                           :will-unmount (fn [s]
+                           (reset! (::is-mounted s) false)
                            (when @(::scroll-listener s)
                              (events/unlistenByKey @(::scroll-listener s))
                              (reset! (::scroll-listener s) nil))

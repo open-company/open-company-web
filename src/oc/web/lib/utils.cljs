@@ -645,3 +645,25 @@
   (int (* width (/ 3 4))))
 
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
+
+(defn debounce-fn
+  "Debounce function: give a function and a wait time call it immediately
+  and avoid calling it again for the wait time.
+  NB: check component is still mounted in the passed f if needed since this can
+  be called after a component unmount."
+  [f w]
+  (js/console.log "DBG debounce-fn")
+  (let [timeout (atom nil)]
+    (fn [& args]
+      (js/console.log "DBG debounced fn wait?" @timeout)
+      (let [wait? @timeout
+            later (fn []
+                    (reset! timeout nil)
+                    (when wait?
+                      (apply f args)))]
+        (when-not wait?
+          (js/console.log "DBG    reset timeout")
+          (reset! timeout (js/setTimeout later w)))
+        (when-not wait?
+          (js/console.log "DBG    calling")
+          (apply f args))))))
