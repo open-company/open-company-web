@@ -80,9 +80,9 @@
 
   [s activity-data read-data show-above]
   (let [item-id (:uuid activity-data)
-        seen-users (into [] (sort-by utils/name-or-email (:reads read-data)))
+        seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
-        unseen-users (into [] (sort-by utils/name-or-email (:unreads read-data)))
+        unseen-users (vec (sort-by utils/name-or-email (:unreads read-data)))
         all-users (sort-by utils/name-or-email (concat seen-users unseen-users))
         read-count (:count read-data)
         query (::query s)

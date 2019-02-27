@@ -318,8 +318,7 @@
         (storage-http (method-for-link create-org-link) (relative-href create-org-link)
           {:headers (headers-for-link create-org-link)
            :json-params (cljs->json fixed-org-data)}
-          (fn [response]
-            (callback response)))))
+          callback)))
     (handle-missing-link "create-org" create-org-link callback {:org-data org-data})))
 
 ;; Board/section

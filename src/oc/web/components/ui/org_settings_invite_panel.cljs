@@ -4,10 +4,13 @@
             [cuerdas.core :as s]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.team :as team-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
@@ -78,6 +81,7 @@
     (rum/local (int (rand 10000)) ::rand)
     (rum/local "Send" ::send-bt-cta)
     (rum/local 0 ::sending)
+    (rum/local 0 ::initial-sending)
     {:will-mount (fn [s]
                    (setup-initial-rows s)
                    (nux-actions/dismiss-post-added-tooltip)
@@ -88,17 +92,33 @@
                         (.tooltip "hide"))
                      s)
      :will-update (fn [s]
-                   (let [sending @(::sending s)]
-                     (when (pos? sending)
+                   (let [sending (::sending s)
+                         initial-sending (::initial-sending s)]
+                     (when (pos? @sending)
                        (let [invite-drv @(drv/get-ref s :invite-data)
-                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))]
-                         (reset! (::sending s) (count no-error-invites))
+                             no-error-invites (filter #(not (:error %)) (:invite-users invite-drv))
+                             error-invites (filter :error (:invite-users invite-drv))
+                             hold-initial-sending @initial-sending]
+                         (reset! sending (count no-error-invites))
                          (when (zero? (count no-error-invites))
                            (utils/after 1000
                              (fn []
-                               (reset! (::send-bt-cta s) "Sent")
-                               (reset! (::sending s) 0)
-                               (utils/after 2500 #(reset! (::send-bt-cta s) "Send"))))))))
+                               (reset! sending 0)
+                               (reset! initial-sending 0)
+                               (if (zero? (count error-invites))
+                                 (do
+                                   (reset! (::send-bt-cta s) "Sent")
+                                   (utils/after 2500 #(reset! (::send-bt-cta s) "Send"))
+                                   (notification-actions/show-notification {:title (str "Invite"
+                                                                                    (when (> hold-initial-sending 1)
+                                                                                      "s")
+                                                                                    " sent.")
+                                                                            :primary-bt-title "OK"
+                                                                            :primary-bt-dismiss true
+                                                                            :expire 10
+                                                                            :primary-bt-inline true
+                                                                            :id :invites-sent}))
+                                 (reset! (::send-bt-cta s) "Send"))))))))
                    s)
      :did-update (fn [s]
                    (setup-initial-rows s)
@@ -119,17 +139,26 @@
              :class (utils/class-set {:active (= "email" @(::inviting-from s))})}
             "Email"]
           (let [has-slack-org? (:has-slack-org team-data)
-                slack-enabled? (:can-slack-invite team-data)]
-            [:div.org-settings-panel-choice
-              {:on-click #(when slack-enabled?
-                            (user-type-did-change s invite-users "slack"))
-               :data-toggle (when-not slack-enabled? "tooltip")
-               :data-placement "top"
-               :data-container "body"
-               :title "In Settings, enable the Carrot Bot for Slack."
-               :class (utils/class-set {:disabled (not slack-enabled?)
-                                        :active (= "slack" @(::inviting-from s))})}
-              "Slack"])]
+                slack-enabled? (:can-slack-invite team-data)
+                has-slack-user? (pos? (count (:slack-users cur-user-data)))]
+            (if slack-enabled?
+              [:div.org-settings-panel-choice
+                {:on-click #(user-type-did-change s invite-users "slack")
+                 :class (utils/class-set {:disabled (not slack-enabled?)
+                                          :active (= "slack" @(::inviting-from s))})}
+                "Slack"]
+              [:div.org-settings-panel-slack-fallback
+                [:span.slack-copy
+                  "Want to invite your team via Slack? "]
+                (let [redirect-to (js/encodeURIComponent
+                                   (str (router/get-token) "?org-settings=invite"))]
+                  [:button.mlb-reset.add-slack-team
+                    {:on-click #(if has-slack-user?
+                                  (org-actions/bot-auth team-data cur-user-data redirect-to)
+                                  (team-actions/slack-team-add cur-user-data redirect-to))}
+                    (if has-slack-user?
+                      "Enable Carrot Bot"
+                      "Add a Slack team")])]))]
         ;; Panel rows
         [:div.org-settings-invite-table-container.org-settings-panel-row
           ;; Team table
@@ -229,8 +258,9 @@
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
         [:button.mlb-reset.mlb-default.save-btn
-          {:on-click #(do
-                        (reset! (::sending s) (count (filterv valid-user? invite-users)))
+          {:on-click #(let [valid-count (count (filterv valid-user? invite-users))]
+                        (reset! (::sending s) valid-count)
+                        (reset! (::initial-sending s) valid-count)
                         (reset! (::send-bt-cta s) "Sending")
                         (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
            :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")

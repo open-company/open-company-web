@@ -46,7 +46,9 @@
                              (vals
                               (group-by :avatar-url (map :author (sort-by :created-at comments-data))))))
                            (reverse (:authors comments-link)))
-        comments-count (max (count comments-data) (:count comments-link))
+        comments-count (if comments-data
+                         (count comments-data)
+                         (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))]
     (when (and comments-count
                (or show-zero-comments?
