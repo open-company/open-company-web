@@ -287,7 +287,7 @@
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                     non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                            "decisions to keep you and your team pulling in the same direction.")
-                    is-second-user (= add-post-tooltip :has-organic-post)]
+                    is-second-user (= add-post-tooltip :is-second-user)]
                 (when (and (not is-drafts-board)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
