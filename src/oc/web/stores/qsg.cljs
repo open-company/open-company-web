@@ -27,7 +27,7 @@
   (let [all-keys admin-keys
                   ;; :see-digest-sample?]
         done-values (vals (select-keys qsg-data all-keys))
-        truty-values (filterv #(boolean %) done-values)]
+        truty-values (filterv boolean done-values)]
     (* (/ (count truty-values) (count all-keys)) 100)))
 
 (defmethod dispatcher/action :show-qsg-view

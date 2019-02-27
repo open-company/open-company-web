@@ -324,9 +324,8 @@
 (defn delete-samples [delete-samples-link callback]
   (if delete-samples-link
     (storage-http (method-for-link delete-samples-link) (relative-href delete-samples-link)
-     {:headers (headers-for-link delete-samples-link)}
-     (fn [response]
-       (callback response)))
+      {:headers (headers-for-link delete-samples-link)}
+      callback)
     (handle-missing-link "delete-samples" delete-samples-link callback)))
 
 ;; Board/section

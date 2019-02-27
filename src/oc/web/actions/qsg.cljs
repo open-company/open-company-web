@@ -29,7 +29,7 @@
         user-profile-link (utils/link-for (:links user-data) "partial-update" "PATCH")
         cleaned-qsg-checklist (select-keys qsg-data qsg-checklist-allowed-props)]
     (when (and user-profile-link
-               (not (empty? cleaned-qsg-checklist)))
+               (not-empty cleaned-qsg-checklist))
       (api/patch-user user-profile-link {:qsg-checklist cleaned-qsg-checklist}
         (fn [status body success]
          (if (= status 422)
