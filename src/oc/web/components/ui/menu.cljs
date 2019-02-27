@@ -119,7 +119,7 @@
           {:href "#"
            :on-click notifications-settings-click}
           [:div.oc-menu-item.notifications-settings
-            "Notifications"]])
+            "Notification Settings"]])
       (when show-reminders?
         [:a
           {:href "#"

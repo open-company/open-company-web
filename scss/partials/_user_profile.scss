@@ -44,10 +44,10 @@ div.user-profile {
         display: block;
         width: 24px;
         height: 24px;
-        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+        background-image: cdnUrl("/img/ML/mobile_back_arrow.svg");
+        background-size: 16px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: 14px 14px;
         margin: -2px 16px 0 -5px;
         float: left;
       }

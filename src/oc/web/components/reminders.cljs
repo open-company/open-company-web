@@ -295,14 +295,20 @@
                               adding-new-reminder?)
                       "back-arrow")
              :on-click (fn [_]
-                        (cancel-clicked reminder-edit-data
-                         ;; On mobile the X goes back to the list of reminders
-                         ;; on desktop it always dismiss the reminders modal
-                         (if (and (or editing-reminder?
-                                      adding-new-reminder?)
-                                  is-mobile?)
-                          #(reminder-actions/cancel-edit-reminder)
-                          #(close-clicked s))))}])
+                        (let [mobile-back-action #(when is-mobile?
+                                                    (nav-actions/mobile-menu-toggle))]
+                          (cancel-clicked reminder-edit-data
+                           ;; On mobile the X goes back to the list of reminders
+                           ;; on desktop it always dismiss the reminders modal
+                           (if (and (or editing-reminder?
+                                        adding-new-reminder?)
+                                    is-mobile?)
+                            (fn []
+                              (reminder-actions/cancel-edit-reminder)
+                              (mobile-back-action))
+                            (fn []
+                              (close-clicked s)
+                              (mobile-back-action))))))}])
         [:div.reminders-header
           [:div.reminders-header-title
             (if (and editing-reminder?
