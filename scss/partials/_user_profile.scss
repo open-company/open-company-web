@@ -19,9 +19,47 @@ div.user-profile {
 
   @include mobile() {
     background-color: white;
-    height: calc(100vh - #{$navbar_height}px);
-    top: #{$navbar_height}px;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
     position: absolute;
+
+    button.settings-modal-close {
+      display: none;
+    }
+  }
+
+  div.user-profile-mobile-header{
+    dislpay: none;
+
+    @include mobile() {
+      display: block;
+      width: 100%;
+      height: 56px;
+      background-color: white;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      padding: 21px 16px;
+
+      button.user-profile-mobile-close {
+        display: block;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        margin: -2px 16px 0 -5px;
+        float: left;
+      }
+
+      div.user-profile-mobile-header-title {
+        @include avenir_H();
+        font-size: 16px;
+        color: $deep_navy;
+        line-height: 20px;
+        height: 20px;
+      }
+    }
   }
 
   div.user-profile-inner {
@@ -43,6 +81,7 @@ div.user-profile {
       box-shadow: none;
       border: none;
       border-radius: 0px;
+      background-color: transparent;
     }
 
     div.user-profile-header {

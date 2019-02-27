@@ -72,12 +72,14 @@
         search-active? (drv/react s store/search-active?)
         result-count (if (< store/search-limit (:count search-results))
                        store/search-limit
-                       (:count search-results))]
+                       (:count search-results))
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.search-results {:ref "results"
                           :class (when-not search-active? "inactive")}
-      (when-not (responsive/is-mobile-size?) (results-header result-count))
+      (when-not is-mobile?
+        (results-header result-count))
       [:div.search-results-container
-        (when (responsive/is-mobile-size?)
+        (when is-mobile?
           (results-header result-count))
         (if (pos? result-count)
           (let [results (reverse (:results search-results))]
@@ -135,6 +137,13 @@
                     (when (and (not @(::search-clicked? s))
                                (not (utils/event-inside? e (rum/ref-node s :search-close))))
                       (.focus (rum/ref-node s "search-input"))))}
+        [:div.mobile-header
+          [:button.mlb-reset.search-close-bt
+            {:on-click #(do
+                         (utils/event-stop %)
+                         (search-inactive s))}]
+          [:div.mobile-header-title
+            "Search"]]
         [:button.mlb-reset.search-close
           {:ref :search-close
            :on-click #(search-inactive s)}]
@@ -146,11 +155,11 @@
            :placeholder "Search posts…"
            :on-blur #(do
                        (when (responsive/is-mobile-size?)
-                        (set! (.-placehoder (.-target %)) ""))
+                         (set! (.-placehoder (.-target %)) ""))
                        (let [search-input (.-target %)
                              search-query (.-value search-input)]
-                        (when-not (seq (utils/trim search-query))
-                          (search-inactive s))))
+                         (when-not (seq (utils/trim search-query))
+                           (search-inactive s))))
            :on-focus #(let [search-input (.-target %)
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)

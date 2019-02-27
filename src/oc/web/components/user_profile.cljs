@@ -118,6 +118,11 @@
         temp-user-avatar @(::temp-user-avatar s)
         is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")]
     [:div.user-profile
+      [:div.user-profile-mobile-header
+        [:button.mlb-reset.user-profile-mobile-close
+          {:on-click #(close-cb current-user-data)}]
+        [:div.user-profile-mobile-header-title
+          "My Profile"]]
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
           {:on-click #(close-cb current-user-data)}]
