@@ -15,6 +15,11 @@ div.more-menu {
     bottom: 32px;
     left: unset;
     right: -9px;
+
+    @include mobile() {
+      top: 40px;
+      bottom: unset;
+    }
   }
 
   button.more-menu-bt {
@@ -96,6 +101,11 @@ div.more-menu {
     margin: 0;
     padding: 0px 16px;
     list-style-type: none;
+
+    @include mobile() {
+      top: 40px;
+      bottom: unset;
+    }
 
     li {
       height: 48px;
