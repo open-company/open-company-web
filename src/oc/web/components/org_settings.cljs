@@ -168,6 +168,7 @@
       (utils/after 100 dismiss-modal))
     (if org-data
       [:div.org-settings.fullscreen-page
+        {:class (when (:visible qsg-data) "showing-qsg")}
         [:div.org-settings-inner
           (when-not alert-modal-data
             [:button.settings-modal-close.mlb-reset

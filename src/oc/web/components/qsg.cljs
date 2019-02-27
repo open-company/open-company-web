@@ -14,11 +14,7 @@
 (rum/defcs qsg < rum/reactive
                  (drv/drv :qsg)
                  {:did-mount (fn [s]
-                   (.add (.-classList (sel1 [:body])) "showing-qsg")
                    (js/OCYTVideoInit)
-                   s)
-                  :will-unmount (fn [s]
-                   (,remove (.-classList (sel1 [:body])) "showing-qsg")
                    s)}
   [s]
   (let [qsg-data (drv/react s :qsg)]
