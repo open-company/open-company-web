@@ -186,7 +186,7 @@
                          (when       ;; element is the initially visible body
                                 (and (.contains (.-classList el) "to-truncate")
                                      ;; but item is not truncated
-                                     (not (.contains (.-classList el) "wrt-truncated"))
+                                     (not (.contains (.-classList el) "ddd-truncated"))
                                      ;; and the element is visible in the viewport
                                      (au/is-element-visible? el))
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
@@ -204,11 +204,11 @@
           (fn [e] (utils/after 0 #(check-items-fn s e)))))))
       :did-mount (fn [s]
        (reset! (get s mounted-kw) true)
-       (utils/after 500 #(check-items-fn s))
+       (utils/after 2500 #(check-items-fn s))
        s)
       :did-remount (fn [_ s]
        ;; Let's delay to give the time to render
-       (utils/after 1500 #(check-items-fn s))
+       (utils/after 2500 #(check-items-fn s))
        s)
       :will-unmount (fn [s]
        (reset! (get s mounted-kw) false)

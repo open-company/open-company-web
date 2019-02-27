@@ -28,7 +28,6 @@
  (try
    (apply @chsk-send! args)
    (catch ExceptionInfo e
-     (js/console.log "DBG ex-info" e args)
      (sentry-report (str "Error sending event for " service-name)
       chsk-send! ch-state (ffirst args)
       {:rest-args (rest (first args))
