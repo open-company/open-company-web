@@ -282,7 +282,7 @@
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :navbar-data         [[:base :org-data :board-data :current-user-data]
-                          (fn [base org-data board-data]
+                          (fn [base org-data board-data current-user-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
