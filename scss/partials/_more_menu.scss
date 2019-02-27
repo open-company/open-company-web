@@ -12,7 +12,7 @@ div.more-menu {
 
   div.activity-move {
     position: absolute;
-    top: 40px;
+    bottom: 32px;
     left: unset;
     right: -9px;
   }
@@ -85,7 +85,7 @@ div.more-menu {
 
   ul.more-menu-list {
     position: absolute;
-    top: 40px;
+    bottom: 32px;
     left: calc(100% - 120px);
     width: 128px;
     outline: none;
