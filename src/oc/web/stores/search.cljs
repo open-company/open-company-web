@@ -58,7 +58,7 @@
 
 (defmethod dispatcher/action :search-reset
   [db [_]]
-  (assoc db search-key []))
+  (dissoc db search-key))
 
 (defmethod dispatcher/action :search-result-clicked
   [db [_]]
