@@ -270,10 +270,16 @@ $h2_top_margin: 24;
   }
 
   b, strong{
-    @include avenir_R();
+    @include avenir_H();
     color: $color;
-    font-weight: 700;
     letter-spacing: normal !important;
+  }
+
+  &.editing {
+    b, strong {
+      @include avenir_R();
+      font-weight: 700;
+    }
   }
 
   *:first-child {

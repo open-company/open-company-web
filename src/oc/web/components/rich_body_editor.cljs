@@ -415,7 +415,7 @@
                                         (.removeSelection (get-media-picker-extension s))
                                         (start-video-recording-cb %))})
          multi-picker-container)))
-    [:div.rich-body-editor.oc-mentions.oc-mentions-hover
+    [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
       {:ref "body"
        :content-editable (not nux)
        :class (str classes
