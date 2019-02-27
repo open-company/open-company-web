@@ -149,6 +149,10 @@
                                                @(::more-menu-open s))})
        :on-mouse-enter #(reset! (::hovering-tile s) true)
        :on-mouse-leave #(reset! (::hovering-tile s) false)
+       ;; click on the whole tile only for draft editing
+       :on-click #(when (and is-drafts-board
+                             (not is-mobile?))
+                   (activity-actions/activity-edit activity-data))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
@@ -202,13 +206,15 @@
       [:div.stream-item-body-ext.group
         {:class (when expanded? "expanded")}
         [:div.thumbnail-container.group
-          {:on-click #(when (and ;; it's truncated
+          {:on-click #(when (and ;; it's not a draft
+                                 (not is-drafts-board)
+                                 ;; it's truncated
                                  truncated?
                                  ;; it's not already expanded
                                  (not expanded?)
                                  ;; click is not on a Ziggeo video to play it inline
                                  (not (utils/event-inside? % (rum/ref-node s :ziggeo-player))))
-                       (expand s true))}
+                          (expand s true))}
           (if has-video
             [:div.group
              {:key (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))

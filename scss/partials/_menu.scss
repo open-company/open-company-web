@@ -50,8 +50,6 @@ div.menu {
     width: 100%;
     height: calc(100vh - 64px);
     border: none;
-    border-top: 1px solid rgba(78,90,107,0.1);
-    border-bottom: 1px solid rgba(78,90,107,0.1);
     box-shadow: none;
     transition: 230ms;
     display: block;
@@ -59,6 +57,7 @@ div.menu {
     background-color: white;
     display: none;
     opacity: 0;
+    padding: 0 30px;
 
     &.mobile-menu-open {
       display: block;
@@ -154,6 +153,12 @@ div.menu {
         }
       }
 
+      &.reminders {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_reminders_hover.svg");
+        }
+      }
+
       &.manage-team {
         &:before {
           background-image: cdnUrl("/img/ML/menu_manage_team_hover.svg");
@@ -196,10 +201,21 @@ div.menu {
     position: relative;
   }
 
+  @include mobile() {
+    // Remove the last bottom line on mobile
+    & > *:last-child div.oc-menu-item:after{
+      display: none;
+    }
+  }
+
   div.oc-menu-item {
     opacity: 0.9;
     padding: 14px 0px 0px 48px;
     position: relative;
+
+    @include mobile() {
+      padding: 24px 0 24px 46px;
+    }
 
     &.divider-item {
       box-shadow: inset 0 -1px 0 0 $carrot_dark_bg_gray;
@@ -217,33 +233,69 @@ div.menu {
       left: 8px;
 
       @include mobile() {
-        top: 20px;
+        left: 0;
+        top: 27px;
+      }
+    }
+
+    &:after {
+      @include mobile() {
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 46px;
+        width: calc(100% - 16px);
+        height: 1px;
+        background-color: $ultra_light_grey;
       }
     }
 
     &.personal-profile {
-      @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_personal_profile.svg");
       }
     }
 
     &.notifications-settings {
-      @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_user_notifications.svg");
       }
     }
 
+    &.reminders {
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_reminders_hover.svg"));
+      }
+
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_reminders.svg");
+      }
+    }
+
     &.manage-team {
-      @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_manage_team.svg");
       }
     }
 
     &.digest-settings {
-      @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
       }
@@ -260,7 +312,10 @@ div.menu {
     }
 
     &.whats-new {
-      @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_whats_new.svg");
       }
@@ -273,14 +328,20 @@ div.menu {
     }
 
     &.support {
-      @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_support.svg");
       }
     }
 
     &.logout {
-      @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_logout.svg");
       }

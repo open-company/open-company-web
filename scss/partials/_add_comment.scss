@@ -91,6 +91,10 @@ div.add-comment-box-container {
         .emojione {
           @include emoji-size(13);
         }
+
+        a {
+          color: $carrot_green;
+        }
       }
 
       div.emoji-picker {

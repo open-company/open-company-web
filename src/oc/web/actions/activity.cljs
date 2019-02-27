@@ -354,7 +354,7 @@
      (entry-save edit-key edited-data section-editing create-update-entry-cb))
 
   ([edit-key edited-data section-editing entry-save-cb]
-     (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+     (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
            fixed-edit-key (or edit-key :entry-editing)]
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
@@ -492,7 +492,7 @@
     (dis/dispatch! [:activity-share share-data])))
 
 (defn entry-revert [revision-id entry-editing]
-  (when (not (nil? revision-id))
+  (when-not (nil? revision-id)
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
           org-slug (router/current-org-slug)
@@ -912,7 +912,7 @@
   ([]
     (activity-edit (get-board-for-edit)))
   ([activity-data]
-    (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
+    (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
           is-published? (= (:status fixed-activity-data) "published")

@@ -55,7 +55,7 @@
                        (rum/local false ::move-activity)
                        (on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
-                          (when-let* [args (into [] (:rum/args s))
+                          (when-let* [args (vec (:rum/args s))
                                       opts (get args 2)
                                       will-close (:will-close opts)]
                             (when (fn? will-close)
