@@ -109,7 +109,7 @@
                                 ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
-                                (when-not (utils/is-test-env?)
+                                (when-not (responsive/is-tablet-or-mobile?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
@@ -313,8 +313,8 @@
                   (section-stream)))
               ;; Add entry floating button
               (when can-compose
-                (let [opacity (if (responsive/is-tablet-or-mobile?)
-                                1
+                (let [opacity (if is-mobile?
+                                0
                                 (calc-opacity (document-scroll-top)))]
                   [:div.new-post-floating-dropdown-container.group
                     {:id "new-entry-floating-btn-container"
