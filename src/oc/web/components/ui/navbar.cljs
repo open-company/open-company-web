@@ -6,7 +6,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.stores.user :as user-store]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
@@ -34,6 +36,7 @@
   [s]
   (let [{:keys [org-data
                 board-data
+                current-user-data
                 show-login-overlay
                 mobile-navigation-sidebar
                 mobile-menu-open
@@ -49,7 +52,10 @@
                                 (not org-settings)
                                 (not user-settings)
                                 (not search-active)
-                                (not mobile-user-notifications))]
+                                (not mobile-user-notifications))
+         user-role (user-store/user-role org-data current-user-data)
+         can-compose? (or (= user-role :admin)
+                          (= user-role :author))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -65,24 +71,26 @@
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
-            [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
-              {:class (utils/class-set {:active mobile-ap-active?})
-               :on-click nav-actions/mobile-nav-sidebar}
-              (cond
-                (= (:access board-data) "private")
-                [:span.private-icon]
-                (= (:access board-data) "public")
-                [:span.public-icon]
-                (= (router/current-board-slug) "must-see")
-                [:span.must-see-icon])
-              [:span.board-name
-                (cond
-                  (= (router/current-board-slug) "all-posts")
-                  "All Posts"
-                  (= (router/current-board-slug) "must-see")
-                  "Must See"
-                  :else
-                  (:name board-data))]]
+            (let [board-icon (cond
+                              (= (:access board-data) "private")
+                              [:span.private-icon]
+                              (= (:access board-data) "public")
+                              [:span.public-icon]
+                              (= (router/current-board-slug) "must-see")
+                              [:span.must-see-icon])]
+              [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+                {:class (utils/class-set {:active mobile-ap-active?})
+                 :on-click nav-actions/mobile-nav-sidebar}
+                board-icon
+                [:span.board-name
+                  {:class (when board-icon "has-icon")}
+                  (cond
+                    (= (router/current-board-slug) "all-posts")
+                    "All Posts"
+                    (= (router/current-board-slug) "must-see")
+                    "Must See"
+                    :else
+                    (:name board-data))]])
            (when-not is-mobile?
              (orgs-dropdown))]
           (when-not is-mobile?
@@ -109,7 +117,10 @@
                                           user-settings)
                                     (dis/dispatch! [:input [:user-settings] nil])
                                     (dis/dispatch! [:input [:org-settings] nil]))
-                                  (user-actions/show-mobile-user-notifications))}])]
+                                  (user-actions/show-mobile-user-notifications))}])
+                (when can-compose?
+                  [:button.mlb-reset.mobile-compose-bt
+                    {:on-click #(ui-compose)}])]
               (if (jwt/jwt)
                 [:div.group
                   (user-notifications)

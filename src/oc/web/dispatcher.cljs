@@ -281,7 +281,7 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data]
+   :navbar-data         [[:base :org-data :board-data :current-user-data]
                           (fn [base org-data board-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
                                                                  :show-login-overlay
@@ -294,7 +294,8 @@
                                                                  :mobile-user-notifications])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
-                                (assoc :board-data board-data))))]
+                                (assoc :board-data board-data)
+                                (assoc :current-user-data current-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
                             (fn [base route auth-settings jwt]
                               {:invitation-confirmed (:email-confirmed base)

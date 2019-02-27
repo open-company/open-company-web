@@ -171,6 +171,13 @@ nav.oc-navbar {
               line-height: 32px;
               display: block;
               float: left;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: calc(60vw - 35px);
+
+              &.has-icon {
+                max-width: calc(60vw - 53px);
+              }
             }
           }
         }
@@ -225,10 +232,9 @@ nav.oc-navbar {
             display: block;
             float: right;
             height: 32px;
-            padding-top: 4px;
 
             button:not(:last-child) {
-              margin: 0 24px 0 0;
+              margin: 0 16px 0 0;
             }
 
             button:last-child {
@@ -243,6 +249,9 @@ nav.oc-navbar {
               background-repeat: no-repeat;
               background-position: 0px center;
               padding: 0;
+              margin-top: 4px;
+              display: block;
+              float: left;
 
               @include preload_image(cdnUlr("/img/ML/spyglass_active.svg"));
 
@@ -259,12 +268,27 @@ nav.oc-navbar {
               background-position: 0 center;
               background-repeat: no-repeat;
               padding: 0;
+              margin-top: 4px;
+              display: block;
+              float: left;
 
               @include preload_image(cdnUlr("/img/ML/notification_bell_active.svg"));
 
               &.active {
                 background-image: cdnUrl("/img/ML/notification_bell_active.svg");
               }
+            }
+
+            button.mobile-compose-bt {
+              width: 32px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/mobile_plus_button.svg");
+              background-size: 32px 32px;
+              background-position: 0 center;
+              background-repeat: no-repeat;
+              padding: 0;
+              display: block;
+              float: left;
             }
           }
         }

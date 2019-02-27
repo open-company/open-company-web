@@ -573,6 +573,10 @@ div.dashboard-layout {
       bottom: 24px;
       right: 24px;
 
+      @include mobile() {
+        display: none;
+      }
+
       button.add-to-board-floating-button {
         width: 56px;
         height: 56px;
