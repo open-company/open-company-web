@@ -649,21 +649,20 @@
 (defn debounce-fn
   "Debounce function: give a function and a wait time call it immediately
   and avoid calling it again for the wait time.
-  NB: check component is still mounted in the passed f if needed since this can
-  be called after a component unmount."
+  NB: if you call setState in the passed fn you need to check it's still mounted
+  manually since this can be calling f after it has been unmounted."
   [f w]
   (js/console.log "DBG debounce-fn")
   (let [timeout (atom nil)]
     (fn [& args]
-      (js/console.log "DBG debounced fn wait?" @timeout)
+      (js/console.log "DBG is this an infinite loop" @timeout)
       (let [wait? @timeout
             later (fn []
                     (reset! timeout nil)
                     (when wait?
                       (apply f args)))]
+        (when wait?
+          (js/clearTimeout @timeout))
+        (reset! timeout (js/setTimeout later w))
         (when-not wait?
-          (js/console.log "DBG    reset timeout")
-          (reset! timeout (js/setTimeout later w)))
-        (when-not wait?
-          (js/console.log "DBG    calling")
           (apply f args))))))
