@@ -79,7 +79,7 @@ div.search-box {
       box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
       width: 100vw;
       background-color: white;
-      padding: 21px 16px;
+      padding: 17px 16px;
       display: block;
       position: absolute;
       top: 0;
@@ -95,6 +95,7 @@ div.search-box {
         background-size: 14px 14px;
         margin: 0 16px 0 0;
         float: left;
+        margin-top: -2px;
       }
 
       div.mobile-header-title {

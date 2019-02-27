@@ -90,7 +90,9 @@
                                                        mobile-menu-open)})}
       [:div.menu-header
         [:button.mlb-reset.mobile-close-bt
-          {:on-click #(mobile-menu-toggle)}]
+          {:on-click #(do
+                       (mobile-menu-toggle)
+                       (nav-actions/mobile-nav-sidebar))}]
         (user-avatar-image current-user-data)
         [:div.mobile-user-name
           {:class utils/hide-class}
