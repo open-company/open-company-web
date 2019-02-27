@@ -67,39 +67,27 @@ div.stream-item {
   }
 
   &.show-continue-reading:not(.single-post-view) {
-    div.stream-item-body-ext {
-      div.stream-item-footer {
-        button.expand-button {
-          display: flex;
-        }
-      }
-    }
-
     button.expand-button {
       display: flex;
     }
   }
 
   &:not(.show-continue-reading):not(.single-post-view) {
-    div.stream-item-body-ext {
-      div.stream-item-footer {
-        button.expand-button {
-          @include mobile() {
-            display: none;
-          }
-        }
-      }
-    }
-
     button.expand-button {
       display: none;
+    }
+
+    @include mobile(){
+      div.stream-item-bottom-footer {
+        display: none;
+      }
     }
   }  
 
   div.activity-share-container {
     div.activity-share-modal-container {
       right: -9px;
-      margin-top: 40px;
+      margin-top: 0;
     }
   }
 
@@ -504,39 +492,8 @@ div.stream-item {
     }
 
     div.stream-item-footer {
-      height: 32px;
-      margin-top: 8px;
-
-      @include mobile() {
-        margin-top: 16px;
-      }
-
-      div.mobile-summary-attachments {
-        float: right;
-        text-align: right;
-        height: 16px;
-        margin-top: 10px;
-        
-        span.attachments-icon {
-          float: left;
-          display: block;
-          width: 14px;
-          height: 15px;
-          background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
-          background-repeat: no-repeat;
-          background-size: 14px 15px;
-          background-position: center;
-        }
-
-        span.attachments-count {
-          float: left;
-          display: block;
-          @include avenir_H();
-          font-size: 12px;
-          color: $ui_grey;
-          margin-left: 6px;
-        }
-      }
+      height: 26px;
+      margin-top: 16px;
 
       div.stream-body-draft-edit {
         float: left;
@@ -563,7 +520,6 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         margin-right: 16px;
-        margin-top: 4px;
         float: left;
         cursor: pointer;
 
@@ -576,7 +532,6 @@ div.stream-item {
 
       div.reactions {
         float: left;
-        margin-top: 4px;
 
         div.reactions-picker-container {
           div.emoji-mart {
@@ -593,54 +548,12 @@ div.stream-item {
           }
         }
       }
-
-      button.expand-button {
-        padding: 0;
-        height: 32px;
-        width: 100px;
-        color: $carrot_green;
-        @include avenir_H();
-        font-size: 14px;
-        justify-content: center;
-        align-items: center;
-        display: none;
-        float: right;
-        opacity: 1;
-
-        @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
-
-        @include mobile() {
-          width: 100%;
-          margin: 16px auto 0;
-        }
-
-        span.expand-icon {
-          background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-          background-size: 14px 8px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 14px;
-          height: 8px;
-          transition: rotate 180ms;
-          margin-right: 8px;
-          display: block;
-        }
-
-        &.expanded {
-          color: $ui_grey;
-          margin-top: 0px;
-
-          span.expand-icon {
-            background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
-          }
-        }
-      }
     }
   }
 
   div.stream-body-right {
     position: relative;
-    margin-top: 24px;
+    margin-top: 16px;
     padding-top: 24px;
     border-top: 1px solid $ultra_light_grey;
 
@@ -655,40 +568,73 @@ div.stream-item {
     }
   }
 
-  & > button.expand-button {
-    padding: 0;
-    height: 24px;
-    color: $carrot_green;
-    @include avenir_H();
-    font-size: 14px;
-    justify-content: center;
-    align-items: center;
-    display: none;
-    float: none;
-    opacity: 1;
-    width: 100%;
-    margin: 16px auto 0;
+  div.stream-item-bottom-footer {
+    margin-top: 16px;
+    border-top: 1px solid $ultra_light_grey;
+    padding-top: 12px;
+    height: 36px;
 
-    @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
-
-    span.expand-icon {
-      background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-      background-size: 14px 8px;
-      background-position: center;
-      background-repeat: no-repeat;
-      width: 14px;
-      height: 8px;
-      transition: rotate 180ms;
-      margin-right: 8px;
-      display: block;
+    @include mobile() {
+      border-top: 0px solid transparent;
+      padding-top: 0;
+      height: 32px;
     }
 
     &.expanded {
-      color: $ui_grey;
+      margin-top: 0;
+      border-top: 0px solid transparent;
+
+      @include mobile() {
+        margin-top: 16px;
+        height: 24px;
+      }
+    }
+
+    button.expand-button {
+      padding: 0;
+      height: 24px;
+      color: $carrot_green;
+      @include avenir_H();
+      font-size: 14px;
+      justify-content: center;
+      align-items: center;
+      display: none;
+      float: none;
+      opacity: 1;
+      float: left;
+      width: 100px;
+      margin-top: 0;
+
+      @include mobile(){
+        width: 100%;
+      }
+
+      @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
 
       span.expand-icon {
-        background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+        background-size: 14px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 14px;
+        height: 8px;
+        transition: rotate 180ms;
+        margin-right: 8px;
+        display: block;
       }
+
+      &.expanded {
+        color: $ui_grey;
+
+        span.expand-icon {
+          background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+        }
+      }
+    }
+
+    div.more-menu {
+      float: right;
+      margin-top: -4px;
     }
   }
 }

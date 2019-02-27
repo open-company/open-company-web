@@ -189,7 +189,8 @@
                     [:button.mlb-reset.post-added-bt
                       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                       "Ok, got it"]]])])]
-        (when is-published?
+        (when (and is-published?
+                   is-mobile?)
           (more-menu activity-data dom-element-id
            {:external-share (not is-mobile?)}))]
       [:div.must-see-tag.mobile-only "Must see"]
@@ -273,16 +274,7 @@
               [:div.stream-item-comments-summary
                 {:on-click #(expand s true true)}
                 (comments-summary activity-data true)]
-              (reactions activity-data)
-              [:button.mlb-reset.expand-button.big-web-tablet-only
-                {:class (when expanded? "expanded")
-                 :ref :expand-button
-                 :on-click #(expand s (not expanded?))}
-                [:span.expand-icon]
-                [:span.expand-label
-                  (if expanded?
-                    "Show less"
-                    "Show more")]]])]
+              (reactions activity-data)])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right
@@ -291,12 +283,19 @@
               (stream-comments activity-data comments-data true)
               (when (:can-comment activity-data)
                 (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])
-        [:button.mlb-reset.expand-button.mobile-only
-          {:class (when expanded? "expanded")
-           :ref :expand-button
-           :on-click #(expand s (not expanded?))}
-          [:span.expand-icon]
-          [:span.expand-label
-            (if expanded?
-              "Show less"
-              "Show more")]]]))
+        (when-not is-drafts-board
+          [:div.stream-item-bottom-footer.group
+            {:class (when expanded? "expanded")}
+            [:button.mlb-reset.expand-button
+              {:class (when expanded? "expanded")
+               :ref :expand-button
+               :on-click #(expand s (not expanded?))}
+              [:span.expand-icon]
+              [:span.expand-label
+                (if expanded?
+                  "Show less"
+                  "Show more")]]
+            (when (and is-published?
+                       (not is-mobile?))
+              (more-menu activity-data dom-element-id
+               {:external-share (not is-mobile?)}))])]))
