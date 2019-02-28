@@ -233,7 +233,7 @@
                        (assoc :links fixed-next-links))
           new-items (map :uuid (:items container-data))
           without-items (dissoc with-links :items)
-          with-posts-list (assoc without-items :posts-list (into []
+          with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
                                                               :up (concat new-items (:posts-list container-data))
                                                               :down (concat (:posts-list container-data) new-items)
@@ -274,7 +274,7 @@
   (let [all-items (set (keys activities-read-data))
         request-set (set item-ids)
         diff-ids (clojure.set/difference request-set all-items)]
-    (into [] diff-ids)))
+    (vec diff-ids)))
 
 ;; Last used section
 
