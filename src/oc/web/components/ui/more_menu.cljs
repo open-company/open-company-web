@@ -30,10 +30,10 @@
                     :title "Delete this post?"
                     :message "This action cannot be undone."
                     :link-button-style :green
-                    :link-button-title "No, keep post"
+                    :link-button-title "No, keep it"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
-                    :solid-button-title "Yes, delete post"
+                    :solid-button-title "Yes, delete it"
                     :solid-button-cb #(let [org-slug (router/current-org-slug)
                                             board-slug (router/current-board-slug)
                                             board-url (oc-urls/board org-slug board-slug)]
