@@ -357,6 +357,8 @@ div.cmail-outer {
           padding: 20px 24px;
         }
 
+        @include must-see-tag();
+
         div.board-name {
           margin-top: 2px;
           margin-left: 6px;
@@ -393,8 +395,6 @@ div.cmail-outer {
           }
         }
 
-        @include must-see-tag();
-
         div.must-see-tag {
           float: left;
           margin-left: 12px;
@@ -412,6 +412,11 @@ div.cmail-outer {
         div.cmail-section-right {
           float: right;
           margin-top: -2px;
+
+          div.must-see-tag {
+            float: left;
+            margin-right: 8px;
+          }
 
           div.must-see-toggle-container {
             float: left;

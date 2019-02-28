@@ -464,6 +464,9 @@
               [:div.must-see-tag.big-web-tablet-only
                 "Must see"])
             [:div.cmail-section-right
+              (when (:must-see cmail-data)
+                [:div.must-see-tag.mobile-only
+                  "Must see"])
               [:div.must-see-toggle-container
                 {:class (when (:must-see cmail-data) "on")}
                 [:div.must-see-toggle
