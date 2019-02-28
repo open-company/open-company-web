@@ -94,9 +94,6 @@
                       (when (fn? dismiss)
                         (dismiss %)))
          :ref :dismiss-bt}])
-    (when mention-author
-      [:div.mention-author
-        (user-avatar-image mention-author)])
     [:div.notification-title.group
       (when slack-icon
         [:span.slack-icon])

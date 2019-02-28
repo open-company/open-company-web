@@ -215,6 +215,10 @@ div.stream-comments {
             //   margin-top: 20px;
             // }
           }
+
+          a {
+            color: $carrot_green;
+          }
         }
 
         button.stream-comment-reaction {

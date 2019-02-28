@@ -91,7 +91,7 @@
                                 (reset! (::mounted s) true)
                                 s)
                                :did-mount (fn [s]
-                               (let [args (into [] (:rum/args s))
+                               (let [args (vec (:rum/args s))
                                      {:keys [submit-cb start-cb cancel-cb width height
                                              pick-cover-start-cb pick-cover-end-cb upload-started-cb
                                              rerecord-cb]

@@ -11,8 +11,12 @@ div.stream-item {
     padding: 24px 16px;
     margin: 0;
     border: none;
-    border-bottom: 4px solid $ultra_light_grey;
+    border-bottom: 1px solid $ultra_light_grey;
     border-radius: 0;
+  }
+
+  &.draft {
+    cursor: pointer;
   }
 
   &.show-menu {

@@ -9,9 +9,8 @@
 ;; Connection check
 
 (defn sentry-report [message chsk-send! ch-state & [action-id infos]]
-  (let [connection-status (if @ch-state
-                            @@ch-state
-                            nil)
+  (let [connection-status (when @ch-state
+                            @@ch-state)
         ch-send-fn? (fn? @chsk-send!)
         ctx {:action action-id
              :connection-status connection-status
@@ -29,9 +28,8 @@
  (try
    (apply @chsk-send! args)
    (catch ExceptionInfo e
-     (js/console.log "DBG ex-info" e args)
      (sentry-report (str "Error sending event for " service-name)
-      chsk-send! ch-state (first (first args))
+      chsk-send! ch-state (ffirst args)
       {:rest-args (rest (first args))
        :ex-message (.-message e)}))))
 
@@ -79,9 +77,8 @@
   (check-interval last-interval service-name chsk-send! ch-state))
 
 (defn report-invalid-jwt [service-name ch-state rep]
-  (let [connection-status (if @ch-state
-                            @@ch-state
-                            nil)
+  (let [connection-status (when @ch-state
+                            @@ch-state)
         ctx {:jwt (j/jwt)
              :connection-status connection-status
              :timestamp (.getTime (new js/Date))
@@ -93,9 +90,8 @@
     (timbre/error (str service-name " WS: not valid JWT") ctx)))
 
 (defn report-connect-timeout [service-name ch-state]
-  (let [connection-status (if @ch-state
-                            @@ch-state
-                            nil)
+  (let [connection-status (when @ch-state
+                            @@ch-state)
         ctx {:timestamp (.getTime (new js/Date))
              :connection-status connection-status
              :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
