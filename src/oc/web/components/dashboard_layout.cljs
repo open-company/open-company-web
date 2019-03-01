@@ -123,7 +123,9 @@
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
-                                (activity-actions/cmail-reopen?)
+                                (when-let [org-data @(drv/get-ref s :org-data)]
+                                  (when (utils/is-admin-or-author? org-data)
+                                    (activity-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
                                 s)
