@@ -120,7 +120,7 @@
                                 (when-not (utils/is-test-env?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
-                                   (events/listen js/window EventType/SCROLL (utils/debounce-fn (partial did-scroll s) 500))))
+                                   (events/listen js/window EventType/SCROLL (utils/throttled-debounced-fn (partial did-scroll s) 500))))
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
                                 (activity-actions/cmail-reopen?)

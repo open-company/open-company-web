@@ -201,7 +201,7 @@
        (-> s
         (assoc scroll-listener-kw
          (events/listen js/window EventType/SCROLL
-          (utils/debounce-fn (partial check-items-fn s) 500)))))
+          (utils/throttled-debounced-fn (partial check-items-fn s) 500)))))
       :did-mount (fn [s]
        (reset! (get s mounted-kw) true)
        (utils/after 500 #(check-items-fn s))
