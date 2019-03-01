@@ -1,5 +1,6 @@
 (ns oc.web.utils.user
-  (:require [oc.web.utils.activity :as activity-utils]))
+  (:require [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.activity :as activity-utils]))
 
 (def user-avatar-filestack-config
   {:accept "image/*"
@@ -91,3 +92,6 @@
   (let [slack-orgs-with-bot (map :slack-org-id bots-data)
         slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
     (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
+
+(defn is-org-creator? [org-data]
+  (= (:user-id (:author org-data)) (jwt/user-id)))

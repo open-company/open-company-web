@@ -41,11 +41,11 @@
                                        (activity-actions/activity-delete activity-data)
                                        (alert-modal/hide-alert))
                     :bottom-button-title (when (and (:sample activity-data)
-                                                    (activity-actions/has-sample-posts))
+                                                    (activity-actions/has-sample-posts?))
                                            "Delete all sample posts")
                     :bottom-button-style :red
                     :bottom-button-cb #(do
-                                         (activity-actions/delete-all-sample-posts)
+                                         (activity-actions/delete-samples)
                                          (alert-modal/hide-alert))
                     }]
     (alert-modal/show-alert alert-data)))
