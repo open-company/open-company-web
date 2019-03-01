@@ -12,6 +12,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.utils.user :as user-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
@@ -188,13 +189,13 @@
                   [:button.mlb-reset.post-added-tooltip-dismiss
                     {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
                   [:div.post-added-tooltips
-                    [:div.post-added-tooltip-title
-                      "Nice job!"]
                     [:div.post-added-tooltip
-                      "Now that you've posted something, you'll always know who saw it."]
+                      (if (user-utils/is-org-creator? org-data)
+                        "After you invite your team, you'll know who saw this post."
+                        "Here's where you'll know who saw this post.")]
                     [:button.mlb-reset.post-added-bt
                       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                      "Ok, got it"]]])])]
+                      "OK, got it"]]])])]
         (when (and is-published?
                    (or @(::hovering-tile s)
                        @(::more-menu-open s)
