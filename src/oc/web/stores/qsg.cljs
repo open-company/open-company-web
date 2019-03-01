@@ -193,13 +193,14 @@
 
 (defmethod dispatcher/action :qsg-add-section
   [db [_ force-step]]
-  (let [cur-step (:step (:qsg db))
+  (let [qsg-data (:qsg db)
+        cur-step (:step qsg-data)
         next-step (or force-step
                       (add-section-next-step cur-step))
         next-db (if (= force-step :add-section?)
                   (-> db
                     (assoc-in [:qsg :add-section?] true)
-                    (assoc-in [:qsg :show-section-settings-tooltip] true))
+                    (assoc-in [:qsg :show-section-settings-tooltip] (not (:add-section? qsg-data))))
                   db)
         next-qsg (assoc-in next-db [:qsg :step] next-step)]
     (assoc-in next-qsg [:qsg :overall-progress] (progress-percentage (:qsg next-qsg)))))
