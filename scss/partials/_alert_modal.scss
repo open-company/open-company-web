@@ -49,8 +49,8 @@ div.alert-modal-container {
       text-align: center;
 
       @include mobile() {
-        margin: 100px 0px 0px;
-        width: 100%;
+        margin: 100px 16px 0px;
+        width: calc(100% - 32px);
         border-radius: 8px;
       }
 

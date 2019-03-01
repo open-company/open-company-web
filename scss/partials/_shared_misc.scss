@@ -1165,3 +1165,46 @@ section.home-keep-aligned {
     }
   }
 }
+
+body.show-animation-lightbox {
+  div.animation-lightbox-container {
+    display: block;
+  }
+}
+
+div.animation-lightbox-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: $carrot_modal_bg;
+  text-align: center;
+  z-index: #{$navbar_zindex + 2001};
+  display: none;
+
+  div.animation-lightbox {
+    width: 100vw;
+    height: 100vh;
+    max-width: 1080px;
+    max-height: 608px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 6px;
+  }
+
+  button.settings-modal-close {
+    position: fixed;
+    top: 24px;
+    right: -54px;
+    left: unset;
+    bottom: unset;
+    z-index: 1001;
+
+    @media screen and (max-width: 1080px) {
+      right: 24px;
+    }
+  }
+}

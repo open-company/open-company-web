@@ -21,6 +21,7 @@
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
+            [oc.web.stores.qsg]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]

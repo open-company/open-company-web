@@ -109,6 +109,7 @@ var OCWebPrintPostsData = function(){};
 var OCWebPrintUserNotifications = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};
+var OCWebPrintQSGData = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
@@ -175,3 +176,6 @@ drift.identify = function(){};
 drift.track = function(){};
 // Homepage animation
 var OCWebSetupMarketingSiteJS = function(){};
+var OCStaticShowAnimationLightbox = function(){};
+var OCStaticHideAnimationLightbox = function(){};
+var OCYTVideoInit = function(){};
