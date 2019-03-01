@@ -394,7 +394,9 @@
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
                                   (cancel-clicked s)
-                                  (activity-actions/cmail-hide)))
+                                  (do
+                                    (qsg-actions/turn-on-show-guide)
+                                    (activity-actions/cmail-hide))))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement "top"
                    :data-trigger "hover"
