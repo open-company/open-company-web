@@ -462,6 +462,8 @@
     (refresh-org-data)))
 
 (defn activity-delete [activity-data]
+  ;; Make sure the WRT sample is dismissed
+  (nux-actions/dismiss-post-added-tooltip)
   (remove-cached-item (:uuid activity-data))
   (when (:links activity-data)
     (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
@@ -817,6 +819,8 @@
 ;; Sample post handling
 
 (defn delete-samples []
+  ;; Make sure the WRT sample is dismissed
+  (nux-actions/dismiss-post-added-tooltip)
   (let [org-data (dis/org-data)
         org-link (utils/link-for (:links org-data) ["item" "self"] "GET")
         delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")]
