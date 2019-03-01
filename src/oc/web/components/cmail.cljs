@@ -14,6 +14,7 @@
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -177,6 +178,8 @@
       (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
             updated-cmail-data @(drv/get-ref s :cmail-data)
             section-editing @(drv/get-ref s :section-editing)]
+        (qsg-actions/finish-create-post-trail)
+        (qsg-actions/turn-on-show-guide)
         (remove-autosave s)
         (if published?
           (do
@@ -245,6 +248,7 @@
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
+                   (drv/drv :qsg)
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
                    (drv/drv :show-sections-picker)
@@ -353,11 +357,13 @@
                      {:width 548
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
-                               (not (seq @(::initial-uuid s))))]
+                               (not (seq @(::initial-uuid s))))
+        qsg-data (drv/react s :qsg)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
-                                :collapse (:collapse cmail-state)})}
+                                :collapse (:collapse cmail-state)
+                                :showing-qsg (:visible qsg-data)})}
       [:div.cmail-middle
         [:div.cmail-container
           [:div.cmail-header
@@ -388,7 +394,9 @@
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
                                   (cancel-clicked s)
-                                  (activity-actions/cmail-hide)))
+                                  (do
+                                    (qsg-actions/turn-on-show-guide)
+                                    (activity-actions/cmail-hide))))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement "top"
                    :data-trigger "hover"
