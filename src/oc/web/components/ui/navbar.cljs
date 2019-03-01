@@ -1,17 +1,20 @@
 (ns oc.web.components.ui.navbar
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
             [oc.web.components.search :refer (search-box)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -20,10 +23,12 @@
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
+                    (drv/drv :qsg)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::expanded-user-menu)
                     (on-window-click-mixin (fn [s e]
-                     (when-not (utils/event-inside? e (rum/ref-node s "user-menu"))
+                     (when (and (not (utils/event-inside? e (rum/ref-node s "user-menu")))
+                                (not (utils/event-inside? e (sel1 [:a.whats-new-link]))))
                        (reset! (::expanded-user-menu s) false))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
@@ -49,7 +54,8 @@
                                 (not org-settings)
                                 (not user-settings)
                                 (not search-active)
-                                (not mobile-user-notifications))]
+                                (not mobile-user-notifications))
+        qsg-data (drv/react s :qsg)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :mobile-menu-open mobile-menu-open
@@ -62,7 +68,8 @@
                                                (utils/in? (:route @router/path) "dashboard"))
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
-                                                     (not (:read-only org-data)))})}
+                                                     (not (:read-only org-data)))
+                                :showing-qsg (:visible qsg-data)})}
       [:div.mobile-bottom-line
         {:class (utils/class-set {:search search-active
                                   :user-notifications mobile-user-notifications
@@ -129,10 +136,35 @@
               (if (jwt/jwt)
                 [:div.group
                   (user-notifications)
-                  [:div.user-menu
-                    {:ref "user-menu"}
-                    (user-avatar
-                     {:click-cb #(swap! (::expanded-user-menu s) not)})
+                  [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1
+                    (when (or (= (:step qsg-data) :profile-photo-1)
+                              (= (:step qsg-data) :company-logo-1))
+                      (qsg-breadcrumb qsg-data))
+                    [:div
+                      {:ref "user-menu"}
+                      (user-avatar
+                       {:click-cb #(do
+                                     (when (= (:step qsg-data) :profile-photo-1)
+                                       (qsg-actions/next-profile-photo-trail))
+                                     (when (= (:step qsg-data) :company-logo-1)
+                                       (qsg-actions/next-company-logo-trail))
+                                     (swap! (::expanded-user-menu s) not))})
+                      (when (:show-qsg-tooltip? qsg-data)
+                        [:div.qsg-tooltip-container.group
+                          [:div.qsg-tooltip-top-arrow]
+                          [:button.mlb-reset.qsg-tooltip-dismiss
+                            {:on-click #(qsg-actions/dismiss-qsg-tooltip)}]
+                          [:div.qsg-tooltips
+                            [:div.qsg-tooltip-title
+                              (str
+                               "Quickstart guide"
+                               (when (> (:overall-progress qsg-data) 95)
+                                 " complete!"))]
+                            [:div.qsg-tooltip
+                              "You can find the quickstart guide here anytime."]
+                            [:button.mlb-reset.qsg-tooltip-bt
+                              {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
+                              "Ok, got it"]]])]
                     (when @(::expanded-user-menu s)
                       (menu/menu))]]
                 (login-button)))]]]
