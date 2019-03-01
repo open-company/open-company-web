@@ -192,7 +192,7 @@
                     [:div.post-added-tooltip
                       (if (user-utils/is-org-creator? org-data)
                         "After you invite your team, you'll know who saw this post."
-                        "You'll know who saw this post.")]
+                        "Here's where you'll know who saw this post.")]
                     [:button.mlb-reset.post-added-bt
                       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                       "OK, got it"]]])])]
