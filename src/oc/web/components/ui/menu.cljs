@@ -12,12 +12,14 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.whats-new :as whats-new]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn mobile-menu-toggle []
@@ -36,6 +38,7 @@
 (defn user-profile-click [e]
   ; (utils/event-stop e)
   (.preventDefault e)
+  (qsg-actions/next-profile-photo-trail)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
     (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
@@ -50,6 +53,7 @@
 (defn team-settings-click [e]
   ; (utils/event-stop e)
   (.preventDefault e)
+  (qsg-actions/next-company-logo-trail)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
@@ -64,6 +68,11 @@
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
+(defn show-qsg-click [e]
+  (mobile-menu-toggle)
+  (.preventDefault e)
+  (qsg-actions/show-qsg-view))
+
 (defn whats-new-click [e]
   (.preventDefault e)
   (whats-new/show))
@@ -76,6 +85,7 @@
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
+                  (drv/drv :qsg)
                   {:did-mount (fn [s]
                    (whats-new/init ".whats-new")
                    s)}
@@ -84,6 +94,7 @@
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
+        qsg-data (drv/react s :qsg)
         show-reminders? (utils/link-for (:links org-data) "reminders")]
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
@@ -109,9 +120,11 @@
             :viewer
             "Viewer")]]
       (when (jwt/jwt)
-        [:a
+        [:a.qsg-profile-photo-2
           {:href "#"
            :on-click user-profile-click}
+          (when (= (:step qsg-data) :profile-photo-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.personal-profile
             "My Profile"]])
       (when (jwt/jwt)
@@ -143,18 +156,27 @@
       (when (and (not is-mobile?)
                  (= user-role :admin)
                  (router/current-org-slug))
-        [:a
+        [:a.qsg-company-logo-2
           {:href "#"
            :on-click team-settings-click}
+          (when (= (:step qsg-data) :company-logo-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.digest-settings
             "Settings"]])
-      [:a
+      [:a.whats-new-link
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
            :target "_blank"}
           {:on-click whats-new-click})
         [:div.oc-menu-item.whats-new
           "What’s New"]]
+      (when (and (not is-mobile?)
+                 (jwt/jwt)
+                 (= user-role :admin))
+        [:a
+          {:on-click show-qsg-click}
+          [:div.oc-menu-item.show-qsg
+            "Quickstart Guide"]])
       [:a
         {:on-click #(chat/chat-click 42861)}
         [:div.oc-menu-item.support

@@ -19,6 +19,24 @@ div.org-dashboard {
     }
   }
 
+  &.showing-qsg {
+    overflow: hidden;
+    height: 100%;
+
+    div.page {
+      width: calc(100% - #{$qsg_width});
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+  }
+
+  &.showing-digest-sample, &.showing-qsg.showing-digest-sample {
+    div.page {
+      overflow: hidden;
+    }
+  }
+
   div.page{
     position: relative; /* Set the position property so z-index will apply */
     z-index: 20; /* Make sure this is higher than #menu */
