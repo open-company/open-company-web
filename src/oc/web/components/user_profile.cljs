@@ -11,6 +11,7 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -25,10 +26,12 @@
 (defn dismiss-modal []
   (dis/dispatch! [:input [:user-settings] nil]))
 
-(defn real-close-cb [editing-user-data]
+(defn real-close-cb [editing-user-data & [mobile-back-bt]]
   (when (:has-changes editing-user-data)
     (user-actions/user-profile-reset))
-  (dismiss-modal))
+  (dismiss-modal)
+  (when mobile-back-bt
+    (nav-actions/mobile-menu-toggle)))
 
 (def default-user-profile (oc.web.stores.user/random-user-image))
 
@@ -48,7 +51,7 @@
                                       :container "body"})
         (.tooltip $header-avatar "destroy")))))
 
-(defn close-cb [current-user-data]
+(defn close-cb [current-user-data & [mobile-back-bt]]
   (dis/dispatch! [:input [:latest-entry-point] 0])
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
@@ -60,9 +63,9 @@
                       :solid-button-title "Lose changes"
                       :solid-button-cb #(do
                                           (alert-modal/hide-alert)
-                                          (real-close-cb current-user-data))}]
+                                          (real-close-cb current-user-data mobile-back-bt))}]
       (alert-modal/show-alert alert-data))
-    (real-close-cb current-user-data)))
+    (real-close-cb current-user-data mobile-back-bt)))
 
 (defn error-cb [res error]
   (notification-actions/show-notification
@@ -123,6 +126,11 @@
         is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")
         qsg-data (drv/react s :qsg)]
     [:div.user-profile
+      [:div.user-profile-mobile-header
+        [:button.mlb-reset.user-profile-mobile-close
+          {:on-click #(close-cb current-user-data true)}]
+        [:div.user-profile-mobile-header-title
+          "My Profile"]]
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
           {:on-click #(close-cb current-user-data)}]

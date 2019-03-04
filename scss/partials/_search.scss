@@ -17,14 +17,14 @@ div.search-box {
 
   @include mobile() {
     position: absolute;
-    top: 57px;
+    top: 0;
     left: 0px;
     width: 100vw;
-    height: calc(100vh - 57px);
+    height: 100vh;
     background-color: white;
     border-radius: unset;
     z-index: 1081;
-    padding: 16px 24px 0px;
+    padding: 72px 24px 0px;
     border: none;
     box-shadow: none;
     transition: width 0ms ease-in, background-color 0ms ease-in;
@@ -67,6 +67,43 @@ div.search-box {
 
       &::placeholder {
         color: $deep_navy;
+      }
+    }
+  }
+
+  div.mobile-header {
+    display: none;
+
+    @include mobile() {
+      height: 56px;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      width: 100vw;
+      background-color: white;
+      padding: 17px 16px;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      button.search-close-bt {
+        display: block;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        margin: 0 16px 0 0;
+        float: left;
+        margin-top: -2px;
+      }
+
+      div.mobile-header-title {
+        @include avenir_H();
+        font-size: 16px;
+        color: $deep_navy;
+        line-height: 24px;
+        height: 24px;
       }
     }
   }
@@ -146,7 +183,7 @@ div.search-box {
 
     @include mobile() {
       right: 13px;
-      top: 16px;
+      top: 72px;
     }
 
     &:hover {

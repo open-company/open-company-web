@@ -185,21 +185,7 @@ div.dashboard-layout {
         position: relative;
 
         @include mobile() {
-          width: 100%;
-          height: 48px;
-          position: relative;
-          z-index: #{$navbar_zindex - 1};
-          top: 0px;
-          left: 0px;
-          background-color: white;
-          box-shadow: none;
-          border-bottom: 1px solid $ultra_light_grey;
-          padding: 15px;
-          text-align: center;
-
-          &.sticky {
-            position: absolute;
-          }
+          display: none;
         }
           
         div.board-name {
@@ -651,6 +637,10 @@ div.dashboard-layout {
       position: fixed;
       bottom: 24px;
       right: 24px;
+
+      @include mobile() {
+        display: none;
+      }
 
       &.showing-qsg {
         right: 244px;
