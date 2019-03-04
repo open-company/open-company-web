@@ -320,9 +320,9 @@
            "offices is up to date on what matters.”")]
         [:div.slack-email-switch-bottom-panel-img]
         [:div.slack-email-switch-bottom-panel-name
-          "Bev Pellow"]
+          "Chris Cairns"]
         [:div.slack-email-switch-bottom-panel-role
-          "QPL Rural, Owner"]]
+          "Skylight Digital, Managing Director"]]
       (when-not slack?
         [:div.slack-email-switch-bottom-panel.slack-panel
           [:div.slack-email-switch-bottom-panel-copy

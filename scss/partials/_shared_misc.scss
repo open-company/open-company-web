@@ -593,10 +593,13 @@ section.home-keep-aligned {
           top: 0;
 
           @include tablet() {
+            position: absolute;
             width: calc(100% + 48px);
             right: -24px;
+            left: unset;
             top: 0;
             height: 100%;
+            border-bottom-right-radius: 0;
             border-bottom-left-radius: 100px;
           }
         }
@@ -682,6 +685,7 @@ section.home-keep-aligned {
               img.keep-aligned-section-screenshot {
                 display: block;
                 width: 72vw;
+                max-width: initial;
                 height: calc(72vw * 1.33);
               }
 
@@ -815,6 +819,7 @@ section.home-keep-aligned {
               top: 0;
               left: 0;
               width: 72vw;
+              max-width: initial;
               height: calc(72vw * 1.33);
               padding: 0;
               margin-top: 40px;
@@ -1055,7 +1060,7 @@ section.home-keep-aligned {
 
               &.slack-panel {
                 div.slack-email-switch-bottom-panel-img {
-                  @include image-2x("/img/ML/testimonial_qpl_rural");
+                  @include image-2x("/img/ML/testimonial_partner_hero");
                 }
               }
 
