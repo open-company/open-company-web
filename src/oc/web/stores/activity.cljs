@@ -192,7 +192,7 @@
         old-ap-data (get-in db ap-key)
         old-ap-data-posts (get old-ap-data :posts-list)
         ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
-        new-ap-data-posts (into []
+        new-ap-data-posts (vec
                             (if is-ap?
                               (conj ap-without-uuid (:uuid activity-data))
                               ap-without-uuid))
@@ -207,7 +207,7 @@
         old-ms-data (get-in db ms-key)
         old-ms-data-posts (get old-ms-data :posts-list)
         ms-without-uuid (utils/vec-dissoc old-ms-data-posts (:uuid activity-data))
-        new-ms-data-posts (into []
+        new-ms-data-posts (vec
                             (if is-ms?
                               (conj ms-without-uuid (:uuid activity-data))
                               ms-without-uuid))
@@ -292,19 +292,19 @@
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]
   (let [old-reads-data (get-in db dispatcher/activities-read-key)
-        ks (into [] (map :item-id items-count))
+        ks (vec (map :item-id items-count))
         vs (map #(zipmap [:count :reads :item-id] [(:count %) (get-in old-reads-data [(:item-id %) :reads]) (:item-id %)]) items-count)
         new-items-count (zipmap ks vs)]
     (update-in db dispatcher/activities-read-key merge new-items-count)))
 
 (defmethod dispatcher/action :activity-reads
   [db [_ item-id read-data team-roster]]
-  (let [fixed-read-data (into [] (map #(assoc % :seen true) read-data))
+  (let [fixed-read-data (vec (map #(assoc % :seen true) read-data))
         team-users (filter #(= (:status %) "active") (:users team-roster))
         seen-ids (set (map :user-id read-data))
         all-ids (set (map :user-id team-users))
         unseen-ids (clojure.set/difference all-ids seen-ids)
-        unseen-users (into [] (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
+        unseen-users (vec (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
     (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads fixed-read-data :item-id item-id :unreads unseen-users})))
 
 (defmethod dispatcher/action :must-see-get/finish

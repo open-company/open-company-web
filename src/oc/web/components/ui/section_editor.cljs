@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
@@ -108,6 +109,7 @@
                              (when-not (utils/event-inside? e (rum/dom-node s))
                                (dismiss))))
                             ;; Derivatives
+                            (drv/drv :qsg)
                             (drv/drv :org-data)
                             (drv/drv :board-data)
                             (drv/drv :section-editing)
@@ -154,7 +156,8 @@
         can-change (or (= (:slug section-editing) utils/default-section-slug)
                        (some #{current-user-id} (:authors section-editing))
                        (jwt/is-admin? (:team-id org-data)))
-        last-section-standing (= (count no-drafts-boards) 1)]
+        last-section-standing (= (count no-drafts-boards) 1)
+        qsg-data (drv/react s :qsg)]
     [:div.section-editor-container
       [:div.section-editor.group
         {:on-click (fn [e]
@@ -465,6 +468,8 @@
                                     personal-note (when personal-note-node (.-innerText personal-note-node))
                                     success-cb #(when (fn? on-change)
                                                   (on-change % personal-note))]
+                                (when (not @(::editing-existing-section s))
+                                  (qsg-actions/finish-add-section-trail))
                                 (section-actions/section-save-create section-editing section-name success-cb))))
                  :class (when disable-bt "disabled")}
                 (if @(::editing-existing-section s)

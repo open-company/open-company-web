@@ -134,6 +134,7 @@
 (defn drv-spec [db route-db]
   {:base                [[] db]
    :route               [[] route-db]
+   :qsg                 [[:base] (fn [base] (:qsg base))]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
@@ -281,8 +282,8 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data]
-                          (fn [base org-data board-data]
+   :navbar-data         [[:base :org-data :board-data :current-user-data]
+                          (fn [base org-data board-data current-user-data]
                             (let [navbar-data (select-keys base [:mobile-menu-open
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
@@ -294,7 +295,8 @@
                                                                  :mobile-user-notifications])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
-                                (assoc :board-data board-data))))]
+                                (assoc :board-data board-data)
+                                (assoc :current-user-data current-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
                             (fn [base route auth-settings jwt]
                               {:invitation-confirmed (:email-confirmed base)
@@ -756,6 +758,9 @@
 (defn print-reminder-edit-data []
   (js/console.log (reminder-edit-data (router/current-org-slug) @app-state)))
 
+(defn print-qsg-data []
+  (js/console.log (:qsg @app-state)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -776,3 +781,4 @@
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
+(set! (.-OCWebPrintQSGData js/window) print-qsg-data)

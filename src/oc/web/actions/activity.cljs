@@ -354,7 +354,7 @@
      (entry-save edit-key edited-data section-editing create-update-entry-cb))
 
   ([edit-key edited-data section-editing entry-save-cb]
-     (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+     (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
            fixed-edit-key (or edit-key :entry-editing)]
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
@@ -462,6 +462,8 @@
     (refresh-org-data)))
 
 (defn activity-delete [activity-data]
+  ;; Make sure the WRT sample is dismissed
+  (nux-actions/dismiss-post-added-tooltip)
   (remove-cached-item (:uuid activity-data))
   (when (:links activity-data)
     (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
@@ -492,7 +494,7 @@
     (dis/dispatch! [:activity-share share-data])))
 
 (defn entry-revert [revision-id entry-editing]
-  (when (not (nil? revision-id))
+  (when-not (nil? revision-id)
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
           org-slug (router/current-org-slug)
@@ -816,18 +818,21 @@
 
 ;; Sample post handling
 
-(defn delete-all-sample-posts []
-  (let [all-posts (dis/posts-data)
-        sample-posts (filterv :sample (vals all-posts))]
-    (when (router/current-activity-id)
-      (router/nav! (oc-urls/all-posts)))
-    (doseq [post sample-posts]
-      (activity-delete post))))
+(defn delete-samples []
+  ;; Make sure the WRT sample is dismissed
+  (nux-actions/dismiss-post-added-tooltip)
+  (let [org-data (dis/org-data)
+        org-link (utils/link-for (:links org-data) ["item" "self"] "GET")
+        delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")]
+    (when delete-samples-link
+      (api/delete-samples delete-samples-link
+       #(do
+          (api/get-org org-link refresh-org-data-cb)
+          (router/nav! (oc-urls/all-posts)))))))
 
-(defn has-sample-posts []
-  (let [all-posts (dis/posts-data)
-        sample-posts (filterv :sample (vals all-posts))]
-    (pos? (count sample-posts))))
+(defn has-sample-posts? []
+  (let [org-data (dis/org-data)]
+    (utils/link-for (:links org-data) "delete-samples" "DELETE")))
 
 ;; Last used and default section for editing
 
@@ -911,7 +916,7 @@
   ([]
     (activity-edit (get-board-for-edit)))
   ([activity-data]
-    (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
+    (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
           is-published? (= (:status fixed-activity-data) "published")

@@ -11,6 +11,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
+            [oc.web.components.qsg :refer (qsg)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
@@ -24,9 +25,11 @@
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
+            [oc.web.components.qsg-digest-sample :refer (qsg-digest-sample)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -63,6 +66,7 @@
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
+                           (drv/drv :qsg)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
@@ -153,7 +157,8 @@
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
                         loading?)
-        is-showing-mobile-search (and is-mobile? search-active?)]
+        is-showing-mobile-search (and is-mobile? search-active?)
+        qsg-data (drv/react s :qsg)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -162,7 +167,9 @@
         {:class (utils/class-set {:org-dashboard true
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
-                                  :activity-removed show-activity-removed})}
+                                  :activity-removed show-activity-removed
+                                  :showing-qsg (:visible qsg-data)
+                                  :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
@@ -236,7 +243,8 @@
                        (not show-section-add)
                        (not show-section-editor)
                        (not show-cmail)
-                       (not wrt-activity-data)))
+                       (not wrt-activity-data)
+                       (not show-reminders)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
@@ -249,4 +257,10 @@
                               (not mobile-menu-open)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
-                 (dashboard-layout))]]])])))
+                 (dashboard-layout))]]
+            (when (:qsg-show-sample-digest-view qsg-data)
+              (qsg-digest-sample))])
+        (when (:visible qsg-data)
+          [:div.qsg-main-container
+            (qsg)
+            (video-lightbox)])])))

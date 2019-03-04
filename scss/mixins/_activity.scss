@@ -43,17 +43,31 @@ $h2_top_margin: 24;
 @mixin new-tag() {
   div.new-tag {
     @include avenir_B();
-    color: #FFB03D;
+    color: #F8A936;
     font-size: 11px;
     line-height: 17px;
-    padding: 2px 0px 0px;
+    padding: 2px 0px 0px 18px;
     border-radius: 4px;
     height: 18px;
-    width: 36px;
-    background-color: rgba(255,176,61,.2);
+    width: 50px;
+    background-color: #FFEFD8;
     text-transform: uppercase;
-    text-align: center;
+    text-align: left;
+    position: relative;
     vertical-align: top;
+
+    &:before {
+      content: "";
+      width: 8px;
+      height: 10px;
+      background-image: cdnUrl("/img/ML/new_badge_bell.svg");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 8px 10px;
+      position: absolute;
+      top: 4px;
+      left: 6px;
+    }
   }
 }
 
@@ -270,10 +284,16 @@ $h2_top_margin: 24;
   }
 
   b, strong{
-    @include avenir_R();
+    @include avenir_H();
     color: $color;
-    font-weight: 700;
     letter-spacing: normal !important;
+  }
+
+  &.editing {
+    b, strong {
+      @include avenir_R();
+      font-weight: 700;
+    }
   }
 
   *:first-child {

@@ -294,9 +294,8 @@
         [:div.title.about-yourself
           "Tell us about you"]
         (when-not has-org?
-          [:div.steps.first-step
-            [:div.step]
-            [:div.step]])
+          [:div.steps
+            "Step 1 of 2"])
         [:div.steps-separator]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
@@ -574,9 +573,8 @@
            "Start"]]
         [:div.title
           "Pick a few topics to start"]
-        [:div.steps.second-step
-          [:div.step]
-          [:div.step]]
+        [:div.steps
+          "Step 2 of 2"]
         [:div.steps-separator]]
       [:div.onboard-form
         [:div.sections-list
@@ -672,10 +670,8 @@
           "Invite your team"]
         [:div.subtitle
           "Invite some colleagues to explore Carrot with you."]
-        [:div.steps.third-step
-          [:div.step]
-          [:div.step]
-          [:div.step]]
+        [:div.steps
+          "Step 3 of 3"]
         [:div.steps-separator]]
       [:div.onboard-form
         [:form

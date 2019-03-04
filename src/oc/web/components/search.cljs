@@ -72,27 +72,35 @@
         search-active? (drv/react s store/search-active?)
         result-count (if (< store/search-limit (:count search-results))
                        store/search-limit
-                       (:count search-results))]
-    [:div.search-results {:ref "results"
-                          :class (when-not search-active? "inactive")}
-      (when-not (responsive/is-mobile-size?) (results-header result-count))
-      [:div.search-results-container
-        (when (responsive/is-mobile-size?)
+                       (:count search-results))
+        is-mobile? (responsive/is-mobile-size?)]
+    (when-not (nil? search-results)
+      [:div.search-results {:ref "results"
+                            :class (when-not search-active? "inactive")}
+        (when-not is-mobile?
           (results-header result-count))
-        (if (pos? result-count)
-          (let [results (reverse (:results search-results))]
-            (for [sr (take @(::page-size s) results)]
-              (let [key (str "result-" (:uuid (:_source sr)))]
-                (case (:type (:_source sr))
-                  "entry" (rum/with-key (entry-display sr) key)
-                  "board" (rum/with-key (board-display sr) key)))))
-          [:div.empty-result
-            [:div.message "No matching results..."]])]
-      (when (< @(::page-size s) result-count)
-        [:div.show-more
-          {:on-click (fn [e] (reset! (::page-size s)
-                                     (+ @(::page-size s) 15)))}
-          [:button.mlb-reset "Show More"]])]))
+        [:div.search-results-container
+          (when is-mobile?
+            (results-header result-count))
+          (if (pos? result-count)
+            (let [results (reverse (:results search-results))]
+              (for [sr (take @(::page-size s) results)]
+                (let [key (str "result-" (:uuid (:_source sr)))]
+                  (case (:type (:_source sr))
+                    "entry" (rum/with-key (entry-display sr) key)
+                    "board" (rum/with-key (board-display sr) key)))))
+            [:div.empty-result
+              [:div.message "No matching results..."]])]
+        (when (< @(::page-size s) result-count)
+          [:div.show-more
+            {:on-click (fn [e] (reset! (::page-size s)
+                                       (+ @(::page-size s) 15)))}
+            [:button.mlb-reset "Show More"]])])))
+
+(defn search-reset [s]
+  (set! (.-value (rum/ref-node s "search-input")) "")
+  (reset! (::search-clicked? s) false)
+  (search/reset))
 
 (defn search-inactive [s]
   (set! (.-value (rum/ref-node s "search-input")) "")
@@ -135,9 +143,16 @@
                     (when (and (not @(::search-clicked? s))
                                (not (utils/event-inside? e (rum/ref-node s :search-close))))
                       (.focus (rum/ref-node s "search-input"))))}
+        [:div.mobile-header
+          [:button.mlb-reset.search-close-bt
+            {:on-click #(do
+                         (utils/event-stop %)
+                         (search-inactive s))}]
+          [:div.mobile-header-title
+            "Search"]]
         [:button.mlb-reset.search-close
           {:ref :search-close
-           :on-click #(search-inactive s)}]
+           :on-click #(search-reset s)}]
         [:div.spyglass-icon
           {:on-click #(reset! (::search-clicked? s) true)}]
         [:input.search
@@ -146,11 +161,11 @@
            :placeholder "Search posts…"
            :on-blur #(do
                        (when (responsive/is-mobile-size?)
-                        (set! (.-placehoder (.-target %)) ""))
+                         (set! (.-placehoder (.-target %)) ""))
                        (let [search-input (.-target %)
                              search-query (.-value search-input)]
-                        (when-not (seq (utils/trim search-query))
-                          (search-inactive s))))
+                         (when-not (seq (utils/trim search-query))
+                           (search-inactive s))))
            :on-focus #(let [search-input (.-target %)
                             search-query (.-value search-input)]
                         (reset! (::search-clicked? s) true)
@@ -164,4 +179,5 @@
                           (reset! (::search-timeout s)
                            (utils/after 500
                             #(search/query v)))))}]
+
        (search-results-view)])))

@@ -183,10 +183,6 @@
                                                                    :occurrence-value (get-in reminder-utils/occurrence-values [(:frequency reminder-data) (:value item)])})
                                                (reset! (::on-dropdown s) false))})])]])]
       [:div.edit-reminder-footer
-        (when (:uuid reminder-data)
-          [:button.mlb-reset.delete-bt
-            {:on-click #(delete-reminder-clicked s)}
-            "Delete reminder"])
         (let [save-disabled? (or (s/blank? (:headline reminder-data))
                                  (empty? (:assignee reminder-data))
                                  (not (:frequency reminder-data))
@@ -201,7 +197,11 @@
         [:button.mlb-reset.cancel-bt
           {:on-click (fn [_]
                       (cancel-clicked reminder-data #(reminder-actions/cancel-edit-reminder)))}
-          "Cancel"]]]))
+          "Cancel"]
+        (when (:uuid reminder-data)
+          [:button.mlb-reset.delete-bt
+            {:on-click #(delete-reminder-clicked s)}
+            "Delete reminder"])]]))
 
 ;; Manage reminders component
 
@@ -220,7 +220,8 @@
 (rum/defcs manage-reminders
   [s reminders-data]
   (let [reminders-list (:items reminders-data)
-        can-add-reminder? (utils/link-for (:links reminders-data) "create")]
+        can-add-reminder? (utils/link-for (:links reminders-data) "create")
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.reminders-tab.manage-reminders
       (if (empty? reminders-list)
         (empty-reminders can-add-reminder?)
@@ -238,13 +239,15 @@
               [:div.reminder-row-inner.group
                 [:div.reminder-assignee
                   {:title (utils/name-or-email (:assignee reminder))
-                   :data-toggle (when-not (responsive/is-tablet-or-mobile?) "tooltip")
+                   :data-toggle (when-not is-mobile? "tooltip")
                    :data-placement "top"
                    :data-container "body"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
                   (user-avatar-image (:assignee reminder))]
                 [:div.reminder-title
-                  (utils/name-or-email (:assignee reminder))
+                  (if is-mobile?
+                    (:short-name (:assignee reminder))
+                    (utils/name-or-email (:assignee reminder)))
                   [:span.dot " · "]
                   (:headline reminder)]
                 [:div.reminder-description
@@ -269,6 +272,7 @@
                        (drv/drv :show-reminders)
                        (drv/drv :reminders-data)
                        (drv/drv :reminder-edit)
+                       (drv/drv :qsg)
                        {:did-mount (fn [s]
                          (reminder-actions/load-reminders-roster)
                          (reminder-actions/load-reminders)
@@ -276,21 +280,42 @@
   [s]
   (let [reminder-tab (drv/react s :show-reminders)
         editing-reminder? (string? reminder-tab)
+        adding-new-reminder? (= reminder-tab :new)
         alert-modal-data (drv/react s :alert-modal)
         reminders-data (drv/react s :reminders-data)
         reminder-edit-data (drv/react s :reminder-edit)
-        can-add-reminder? (utils/link-for (:links reminders-data) "create")]
+        can-add-reminder? (utils/link-for (:links reminders-data) "create")
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        qsg-data (drv/react s :qsg)]
     [:div.reminders-container.fullscreen-page
+      {:class (when (:visible qsg-data) "showing-qsg")}
       [:div.reminders-inner
         {:class (utils/class-set {:no-bottom-padding (= reminder-tab :reminders)
                                   :loading (not reminders-data)})}
         (when-not alert-modal-data
           [:button.settings-modal-close.mlb-reset
-            {:on-click (fn [_]
-                         (cancel-clicked reminder-edit-data #(close-clicked s)))}])
+            {:class (when (or editing-reminder?
+                              adding-new-reminder?)
+                      "back-arrow")
+             :on-click (fn [_]
+                        (let [mobile-back-action #(when is-mobile?
+                                                    (nav-actions/mobile-menu-toggle))]
+                          (cancel-clicked reminder-edit-data
+                           ;; On mobile the X goes back to the list of reminders
+                           ;; on desktop it always dismiss the reminders modal
+                           (if (and (or editing-reminder?
+                                        adding-new-reminder?)
+                                    is-mobile?)
+                            (fn []
+                              (reminder-actions/cancel-edit-reminder)
+                              (mobile-back-action))
+                            (fn []
+                              (close-clicked s)
+                              (mobile-back-action))))))}])
         [:div.reminders-header
           [:div.reminders-header-title
-            (if editing-reminder?
+            (if (and editing-reminder?
+                     (not is-mobile?))
               "Edit reminder"
               "Reminders")]
           (when-not editing-reminder?

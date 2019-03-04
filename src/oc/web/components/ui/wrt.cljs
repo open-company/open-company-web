@@ -48,6 +48,12 @@
   (reset! (::query s) "")
   (reset! (::search-focused s) false))
 
+(defn- sort-users [user-id users]
+  (let [{:keys [self-user other-users]}
+         (group-by #(if (= (:user-id %) user-id) :self-user :other-users) users)
+        sorted-other-users (sort-by utils/name-or-email other-users)]
+    (remove nil? (concat self-user sorted-other-users))))
+
 (rum/defcs wrt < rum/reactive
                  ;; Locals
                  (rum/local false ::search-active)
@@ -55,6 +61,7 @@
                  (rum/local "" ::query)
                  (rum/local 0 ::left-position)
                  (rum/local :seen ::list-view)
+                 (drv/drv :current-user-data)
 
                  {:after-render (fn [s]
                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -73,9 +80,9 @@
 
   [s activity-data read-data show-above]
   (let [item-id (:uuid activity-data)
-        seen-users (into [] (sort-by utils/name-or-email (:reads read-data)))
+        seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
-        unseen-users (into [] (sort-by utils/name-or-email (:unreads read-data)))
+        unseen-users (vec (sort-by utils/name-or-email (:unreads read-data)))
         all-users (sort-by utils/name-or-email (concat seen-users unseen-users))
         read-count (:count read-data)
         query (::query s)
@@ -89,7 +96,8 @@
                           (filterv #(filter-by-query % (string/lower @query)) all-users)
                           [])
                          unsorted-list)
-        sorted-filtered-users (sort-by utils/name-or-email filtered-users)
+        current-user-data (drv/react s :current-user-data)
+        sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-popup
       {:class (utils/class-set {:top show-above

@@ -215,7 +215,7 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
-(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium])
+(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
 
@@ -318,9 +318,15 @@
         (storage-http (method-for-link create-org-link) (relative-href create-org-link)
           {:headers (headers-for-link create-org-link)
            :json-params (cljs->json fixed-org-data)}
-          (fn [response]
-            (callback response)))))
+          callback)))
     (handle-missing-link "create-org" create-org-link callback {:org-data org-data})))
+
+(defn delete-samples [delete-samples-link callback]
+  (if delete-samples-link
+    (storage-http (method-for-link delete-samples-link) (relative-href delete-samples-link)
+      {:headers (headers-for-link delete-samples-link)}
+      callback)
+    (handle-missing-link "delete-samples" delete-samples-link callback)))
 
 ;; Board/section
 
@@ -623,6 +629,13 @@
         (callback status)))
     (handle-missing-link "password-reset" reset-link callback
      {:email email})))
+
+(defn resend-verification-email [resend-link callback]
+  (if resend-link
+    (auth-http (method-for-link resend-link) (relative-href resend-link)
+     {:headers (headers-for-link resend-link)}
+     (fn [{:keys [status success body]}]
+      (callback success)))))
 
 ;; Interactions
 

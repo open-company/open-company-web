@@ -10,9 +10,9 @@ div.reminders-container {
   height: 100vh;
 
   @include mobile() {
-    top: 65px;
+    top: 0;
     background-color: white;
-    height: calc(100vh - 65px);
+    height: 100vh;
   }
 
   div.reminders-inner {
@@ -37,6 +37,10 @@ div.reminders-container {
       border: none;
       border-radius: 0px;
       margin-top: 0px;
+      top: 0;
+      transform: translateY(0);
+      padding: 0;
+      margin-bottom: 32px;
     }
 
     &.loading {
@@ -46,6 +50,10 @@ div.reminders-container {
 
     &.no-bottom-padding {
       padding: 24px 0 0;
+
+      @include mobile() {
+        padding: 0;
+      }
     }
 
     div.small-loading {
@@ -57,7 +65,24 @@ div.reminders-container {
       top: 0px;
 
       @include mobile() {
-        display: none;
+        top: 16px;
+        left: 11px;
+        right: unset;
+        display: block;
+        background-image: cdnUrl("/img/ML/mobile_back_arrow.svg");
+        background-size: 16px 12px;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        z-index: 2;
+      }
+
+      &.back-arrow {
+        @include mobile(){
+          background-image: cdnUrl("/img/ML/reminders_back_arrow.svg");
+          background-size: 16px 12px;
+          top: 14px;
+        }
       }
     }
 
@@ -67,12 +92,27 @@ div.reminders-container {
       border-bottom: 1px solid $ultra_light_grey;
       text-align: left;
 
+      @include mobile() {
+        padding: 0;
+      }
+
       div.reminders-header-title {
         margin-bottom: 16px;
         @include avenir_H();
         font-size: 22px;
         color: $deep_navy;
         line-height: 30px;
+
+        @include mobile() {
+          text-align: left;
+          width: 100%;
+          height: 56px;
+          font-size: 16px;
+          line-height: 22px;
+          padding: 18px 16px 18px 46px;
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+          margin-bottom: 0;
+        }
       }
 
       div.reminders-header-tab-line {
@@ -80,6 +120,11 @@ div.reminders-container {
         width: calc(100% + 48px);
         margin-left: -24px;
         padding: 0 24px;
+
+        @include mobile() {
+          width: 100%;
+          height: 48px;
+        }
 
         div.reminders-header-tab {
           position: relative;
@@ -91,6 +136,15 @@ div.reminders-container {
           margin-right: 16px;
           cursor: pointer;
           padding-bottom: 16px;
+
+          @include mobile() {
+            padding-bottom: 10px;
+            margin: 21px 8px 0 8px;
+
+            &:first-child {
+              margin-left: 24px;
+            }
+          }
 
           &.active {
             color: $carrot_orange;
@@ -120,16 +174,33 @@ div.reminders-container {
           margin: 24px auto 0;
           padding: 0 24px 32px;
 
+          @include mobile() {
+            width: 100%;
+            margin-top: calc(50% - 50px);
+            padding: 0 22px;
+          }
+
           div.empty-reminders-logo {
             width: 56px;
             height: 56px;
             border-radius: 8px;
-            background-color: #D9D7D7;
-            background-image: cdnUrl("/img/ML/reminders_logo_white.svg");
-            background-size: 24px 24px;
-            background-repeat: no-repeat;
-            background-position: center;
+            background-color: #F5F5F5;
             margin: 32px auto 0;
+            position: relative;
+
+            &:after {
+              content: "";
+              position: absolute;
+              width: 56px;
+              height: 56px;
+              top: 0;
+              left: 0;
+              background-image: cdnUrl("/img/ML/menu_reminders.svg");
+              background-size: 24px 24px;
+              background-repeat: no-repeat;
+              background-position: center;
+              opacity: 0.6;
+            }
           }
 
           div.empty-reminders-title {
@@ -150,9 +221,9 @@ div.reminders-container {
             margin: 16px auto 0;
             width: 192px;
             height: 40px;
-            border-radius: 100px;
-            background-color: $coral;
-            color: $carrot_orange;
+            border-radius: 6px;
+            background-color: $carrot_green;
+            color: white;
             @include avenir_H();
             font-size: 14px;
           }
@@ -171,6 +242,9 @@ div.reminders-container {
               cursor: pointer;
               &:hover {
                 background-color: #FBFBFB;
+                @include mobile() {
+                  background-color: initial;
+                }
               }
             }
 
@@ -189,6 +263,12 @@ div.reminders-container {
               padding: 16px 0;
               height: 64px;
               border-bottom: 1px solid $ultra_light_grey;
+
+              &:first-child {
+                @include mobile() {
+                  margin-top: 8px;
+                }
+              }
 
               div.reminder-assignee {
                 width: 32px;
@@ -209,6 +289,11 @@ div.reminders-container {
                 white-space: nowrap;
                 float: left;
 
+                @include mobile() {
+                  margin-left: 12px;
+                  max-width: calc(100% - 140px - 12px - 8px - 32px);
+                }
+
                 span.dot {
                   color: $light_ui_grey;
                   font-size: 16px;
@@ -228,6 +313,11 @@ div.reminders-container {
                 line-height: 32px;
                 color: #99A0A7;
                 float: right;
+
+                @include mobile() {
+                  margin-left: 8px;
+                  max-width: 140px;
+                }
               }
             }
           }
@@ -238,17 +328,38 @@ div.reminders-container {
         margin-top: 4px;
         padding: 0 24px;
 
+        @include mobile() {
+          marign-top: 24px;
+        }
+
         div.edit-reminder-row {
+
+          &:first-child {
+            @include mobile() {
+              margin-top: 24px;
+            }
+          }
 
           div.half-row-left {
             float: left;
             width: calc(50% - 8px);
+
+            @include mobile() {
+              float: unset;
+              width: 100%;
+            }
           }
 
           div.half-row-right {
             float: right;
             width: calc(50% - 8px);
             margin-left: 16px;
+
+            @include mobile() {
+              float: unset;
+              width: 100%;
+              margin-left: 0;
+            }
           }
 
           div.edit-reminder-label {
@@ -260,6 +371,13 @@ div.reminders-container {
 
           input.edit-reminder-field, textarea.edit-reminder-field {
             cursor: initial;
+
+            @include mobile() {
+              padding-top: initial;
+              padding-bottom: initial;
+              padding-left: 9px;
+              padding-right: 9px;
+            }
 
             @include placeholder(){
               color: rgba($deep_navy, 0.5);
@@ -389,18 +507,29 @@ div.reminders-container {
           margin-top: 24px;
           height: 32px;
 
-          button.delete-bt {
-            float: left;
-            height: 32px;
-            padding: 0;
-            color: $carrot_orange_2;
-            @include avenir_R();
-            font-size: 14px;
-          }
-
           button {
             float: right;
             height: 32px;
+
+            @include mobile() {
+              height: 40px;
+              margin-top: 16px;
+              width: 100%;
+              float: unset;
+            }
+
+            &.delete-bt {
+              float: left;
+              height: 32px;
+              padding: 0;
+              color: $carrot_orange_2;
+              @include avenir_R();
+              font-size: 14px;
+
+              @include mobile() {
+                margin-top: 8px;
+              }
+            }
 
             &.cancel-bt {
               @include avenir_R();

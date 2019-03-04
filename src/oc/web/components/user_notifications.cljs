@@ -4,8 +4,10 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -18,9 +20,10 @@
 
 (rum/defcs user-notifications < rum/reactive
                                 (drv/drv :user-notifications)
+                                (drv/drv :show-add-post-tooltip)
                                 (rum/local false ::tray-open)
                                 (on-window-click-mixin (fn [s e]
-                                 (when-not (utils/event-inside? e (rum/dom-node s))
+                                 (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
                                    (close-tray s))))
   [s]
   (let [user-notifications-data (drv/react s :user-notifications)
@@ -35,6 +38,8 @@
       [:div.user-notifications-tray
         {:class (utils/class-set {:hidden-tray (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group
+          [:button.mlb-reset.user-notifications-tray-mobile-close
+            {:on-click #(user-actions/hide-mobile-user-notifications)}]
           [:div.title "Notifications"]
           (when has-new-content
             [:button.mlb-reset.all-read-bt
@@ -44,16 +49,40 @@
           (if (empty? user-notifications-data)
             [:div.user-notifications-tray-empty
               (all-caught-up)]
-            (for [n user-notifications-data]
+            (for [n user-notifications-data
+                  :let [entry-uuid (:uuid n)
+                        board-slug (:board-slug n)
+                        reminder? (:reminder? n)
+                        reminder (when reminder?
+                                   (:reminder n))
+                        notification-type (when reminder?
+                                            (:notification-type reminder))
+                        ;; Base string for the key of the React child
+                        children-key-base (str "user-notification-" (:created-at n) "-")
+                        ;; add a unique part to the key to make sure the children are rendered
+                        children-key (str children-key-base
+                                      (if (seq entry-uuid)
+                                        entry-uuid
+                                        (if (and reminder?
+                                                 (seq (:uuid reminder)))
+                                          (:uuid reminder)
+                                          (rand 1000))))]]
               [:div.user-notification.group
                 {:class (utils/class-set {:unread (:unread n)})
-                 :on-click #(do
-                              (when (and (:uuid n)
-                                         (:board-slug n)
-                                         (not (utils/event-inside? % (rum/ref-node s :read-bt))))
-                                (router/nav! (oc-urls/entry (:board-slug n) (:uuid n))))
-                              (user-actions/hide-mobile-user-notifications))
-                 :key (str "user-notification-" (:created-at n))}
+                 :on-click (fn [e]
+                             (cond
+                               (and reminder?
+                                    (= notification-type "reminder-alert"))
+                               (ui-compose @(drv/get-ref s :show-add-post-tooltip))
+                               (and reminder?
+                                    (= notification-type "reminder-notification"))
+                               (nav-actions/show-reminders)
+                               (and entry-uuid
+                                    board-slug
+                                    (not (utils/event-inside? e (rum/ref-node s :read-bt))))
+                               (router/nav! (oc-urls/entry board-slug entry-uuid)))
+                             (user-actions/hide-mobile-user-notifications))
+                 :key children-key}
                 (user-avatar-image (:author n))
                 [:div.user-notification-title
                   (:title n)]
