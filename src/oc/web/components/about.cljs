@@ -32,98 +32,98 @@
           [:h1.about
             "Meet the team"]
 
-          [:div.team-container
-            [:div.team-row.group.three-cards
-              [:div.team-card.iacopo-carraro
-                [:div.user-avatar]
-                [:div.user-name
-                  "Iacopo Carraro"]
-                [:div.user-position
-                  "Software Engineer"
-                  [:br]
-                  "in Livorno, Italy"]
-                [:div.user-links
-                  [:a.twitter-link
-                    {:href "https://twitter.com/bago2k4"
-                     :target "_blank"}]
-                  [:a.linkedin-link
-                    {:href "https://linkedin.com/in/iacopocarraro/"
-                     :target "_blank"}]]]
-              [:div.team-card.sean-johnson
-                [:div.user-avatar]
-                [:div.user-name
-                  "Sean Johnson"]
-                [:div.user-position
-                  "CTO & Founder"
-                  [:br]
-                  "in Chapel Hill, USA"]
-                [:div.user-links
-                  [:a.twitter-link
-                    {:href "https://twitter.com/belucid"
-                     :target "_blank"}]
-                  [:a.linkedin-link
-                    {:href "https://linkedin.com/in/snootymonkey/"
-                     :target "_blank"}]]]
-              [:div.team-card.georgiana-laudi
-                [:div.user-avatar]
-                [:div.user-name
-                  "Georgiana Laudi"]
-                [:div.user-position
-                  "Marketing & CX Advisor"
-                  [:br]
-                  "in Montreal, Canada"]
-                [:div.user-links
-                  [:a.twitter-link
-                    {:href "https://twitter.com/ggiiaa"
-                     :target "_blank"}]
-                  [:a.linkedin-link
-                    {:href "https://linkedin.com/in/georgianalaudi/"
-                     :target "_blank"}]]]
-              [:div.team-card.stuart-levinson
-                [:div.user-avatar]
-                [:div.user-name
-                  "Stuart Levinson"]
-                [:div.user-position
-                  "CEO & Founder"
-                  [:br]
-                  "in Cambridge, USA"]
-                [:div.user-links
-                  [:a.twitter-link
-                    {:href "https://twitter.com/stuartlevinson"
-                     :target "_blank"}]
-                  [:a.linkedin-link
-                    {:href "https://linkedin.com/in/stuartlevinson/"
-                     :target "_blank"}]]]
-              [:div.team-card.ryan-le-roux
-                [:div.user-avatar]
-                [:div.user-name
-                  "Ryan Le Roux"]
-                [:div.user-position
-                  "Head of Design"
-                  [:br]
-                  "in Vancouver, Canada"]
-                [:div.user-links
-                  [:a.twitter-link
-                    {:href "https://twitter.com/ryanleroux"
-                     :target "_blank"}]
-                  [:a.linkedin-link
-                    {:href "https://linkedin.com/in/ryanleroux/"
-                     :target "_blank"}]]]
-              [:div.team-card.nathan-zorn
-                [:div.user-avatar]
-                [:div.user-name
-                  "Nathan Zorn"]
-                [:div.user-position
-                  "Software Engineer"
-                  [:br]
-                  "in Charleston, USA"]
-                [:div.user-links
-                  [:a.twitter-link
-                    {:href "https://twitter.com/thepug"
-                     :target "_blank"}]
-                  [:a.linkedin-link
-                    {:href "https://linkedin.com/in/nathanzorn/"
-                     :target "_blank"}]]]]]
+          ; [:div.team-container
+          ;   [:div.team-row.group.three-cards
+          ;     [:div.team-card.iacopo-carraro
+          ;       [:div.user-avatar]
+          ;       [:div.user-name
+          ;         "Iacopo Carraro"]
+          ;       [:div.user-position
+          ;         "Software Engineer"
+          ;         [:br]
+          ;         "in Livorno, Italy"]
+          ;       [:div.user-links
+          ;         [:a.twitter-link
+          ;           {:href "https://twitter.com/bago2k4"
+          ;            :target "_blank"}]
+          ;         [:a.linkedin-link
+          ;           {:href "https://linkedin.com/in/iacopocarraro/"
+          ;            :target "_blank"}]]]
+          ;     [:div.team-card.sean-johnson
+          ;       [:div.user-avatar]
+          ;       [:div.user-name
+          ;         "Sean Johnson"]
+          ;       [:div.user-position
+          ;         "CTO & Founder"
+          ;         [:br]
+          ;         "in Chapel Hill, USA"]
+          ;       [:div.user-links
+          ;         [:a.twitter-link
+          ;           {:href "https://twitter.com/belucid"
+          ;            :target "_blank"}]
+          ;         [:a.linkedin-link
+          ;           {:href "https://linkedin.com/in/snootymonkey/"
+          ;            :target "_blank"}]]]
+          ;     [:div.team-card.georgiana-laudi
+          ;       [:div.user-avatar]
+          ;       [:div.user-name
+          ;         "Georgiana Laudi"]
+          ;       [:div.user-position
+          ;         "Marketing & CX Advisor"
+          ;         [:br]
+          ;         "in Montreal, Canada"]
+          ;       [:div.user-links
+          ;         [:a.twitter-link
+          ;           {:href "https://twitter.com/ggiiaa"
+          ;            :target "_blank"}]
+          ;         [:a.linkedin-link
+          ;           {:href "https://linkedin.com/in/georgianalaudi/"
+          ;            :target "_blank"}]]]
+          ;     [:div.team-card.stuart-levinson
+          ;       [:div.user-avatar]
+          ;       [:div.user-name
+          ;         "Stuart Levinson"]
+          ;       [:div.user-position
+          ;         "CEO & Founder"
+          ;         [:br]
+          ;         "in Cambridge, USA"]
+          ;       [:div.user-links
+          ;         [:a.twitter-link
+          ;           {:href "https://twitter.com/stuartlevinson"
+          ;            :target "_blank"}]
+          ;         [:a.linkedin-link
+          ;           {:href "https://linkedin.com/in/stuartlevinson/"
+          ;            :target "_blank"}]]]
+          ;     [:div.team-card.ryan-le-roux
+          ;       [:div.user-avatar]
+          ;       [:div.user-name
+          ;         "Ryan Le Roux"]
+          ;       [:div.user-position
+          ;         "Head of Design"
+          ;         [:br]
+          ;         "in Vancouver, Canada"]
+          ;       [:div.user-links
+          ;         [:a.twitter-link
+          ;           {:href "https://twitter.com/ryanleroux"
+          ;            :target "_blank"}]
+          ;         [:a.linkedin-link
+          ;           {:href "https://linkedin.com/in/ryanleroux/"
+          ;            :target "_blank"}]]]
+          ;     [:div.team-card.nathan-zorn
+          ;       [:div.user-avatar]
+          ;       [:div.user-name
+          ;         "Nathan Zorn"]
+          ;       [:div.user-position
+          ;         "Software Engineer"
+          ;         [:br]
+          ;         "in Charleston, USA"]
+          ;       [:div.user-links
+          ;         [:a.twitter-link
+          ;           {:href "https://twitter.com/thepug"
+          ;            :target "_blank"}]
+          ;         [:a.linkedin-link
+          ;           {:href "https://linkedin.com/in/nathanzorn/"
+          ;            :target "_blank"}]]]]]
 
           [:div.about-copy
             [:div.about-copy-inner

@@ -113,6 +113,9 @@
                   ", plus:"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
+                [:span "Custom plans"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
                 [:span "Carrot AI"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
@@ -187,7 +190,15 @@
             [:a.chat-with-us
               {:href "#"
                :on-click #(chat/chat-click 43234)}
-              "Get in touch with us"]]]]
+              "Get in touch with us"]]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]]
 
         shared-misc/testimonials-section
 
