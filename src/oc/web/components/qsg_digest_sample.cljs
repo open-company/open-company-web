@@ -22,9 +22,9 @@
             "Starting each morning in sync"]
           [:div.qsg-digest-sample-desc
             (str
-             "Carrot reduces noisy interruptions so your team can stay focused on what matters. "
-             "Posts are shared in a digest each morning "
-             "in email or Slack.")]
+             "When you add a post to Carrot, your team sees it in "
+             "their daily digest. Your digest is the simplest way "
+             "for everyone to get caught up quickly each morning.")]
           [:button.mlb-reset.qsg-digest-sample-bt
             {:on-click #(qsg-actions/dismiss-digest-sample)}
             "Ok, got it"]]
