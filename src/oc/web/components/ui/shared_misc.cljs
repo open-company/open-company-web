@@ -351,3 +351,15 @@
           {;:onClick "OCStaticHideAnimationLightbox(event);"
            :on-mouse-down dismiss-cb
            :on-touch-start dismiss-cb}]]]))
+
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:onClick "OCStaticShowAnimationLightbox();"}
+    [:div.green-play]
+    "Carrot in 60 seconds"])
+
+(def carrot-in-actions
+  [:section.carrot-in-action
+    [:div.carrot-in-action-title
+      "Want to see Carrot in action?"]
+    show-animation-button])
