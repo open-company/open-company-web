@@ -204,18 +204,18 @@
     [:div.keep-aligned-title
       "Company updates that rise above the noise"]
     [:div.keep-aligned-values-line.big-web-tablet-only
-      [:img.keep-aligned-value.value-announcements
-        {:src (utils/cdn "/img/ML/homepage_bottom_section_announcements.png")
-         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
-      [:img.keep-aligned-value.value-decisions
-        {:src (utils/cdn "/img/ML/homepage_bottom_section_decisions.png")
-         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-team-updates
         {:src (utils/cdn "/img/ML/homepage_bottom_section_team_updates.png")
          :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_team_updates@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-news
         {:src (utils/cdn "/img/ML/homepage_bottom_section_news.png")
-         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]]
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-announcements
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_announcements.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-decisions
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_decisions.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
     [:button.mlb-reset.get-started-button
       "Get started - It's free"]])
 

@@ -274,18 +274,18 @@
     [:div.keep-aligned-title
       "Never miss what matters most"]
     [:div.keep-aligned-values-line.big-web-tablet-only
-      [:img.keep-aligned-value.value-announcements
-        {:src (cdn "/img/ML/homepage_bottom_section_announcements.png")
-         :srcSet (str (cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
-      [:img.keep-aligned-value.value-decisions
-        {:src (cdn "/img/ML/homepage_bottom_section_decisions.png")
-         :srcSet (str (cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-team-updates
         {:src (cdn "/img/ML/homepage_bottom_section_team_updates.png")
          :srcSet (str (cdn "/img/ML/homepage_bottom_section_team_updates@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-news
         {:src (cdn "/img/ML/homepage_bottom_section_news.png")
-         :srcSet (str (cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]]
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-announcements
+        {:src (cdn "/img/ML/homepage_bottom_section_announcements.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-decisions
+        {:src (cdn "/img/ML/homepage_bottom_section_decisions.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
     [:button.mlb-reset.get-started-button
       "Create your team - It's free"]])
 
@@ -395,7 +395,7 @@
               (str
                "Your team can view and comment on posts "
                "in the app, or directly from Slack and email. "
-               "Rest assured, Carrot updates won't get lost "
+               "Rest assured, Carrot updates never get lost "
                "in the noise.")]
             [:div.keep-aligned-section-footer
               [:button.mlb-reset.create-team-bt
@@ -415,11 +415,9 @@
               "Start every day in sync"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Each morning, your team wakes up to a daily "
-               "digest of what's important. This curated "
-               "summary reduces noisy interruptions during "
-               "the day, and makes it easy to get caught up "
-               "fast - perfect for remote teams.")]
+               "Your team wakes up to a daily digest of what's "
+               "important. This curated summary makes it easy "
+               "to get caught up fast - perfect for remote teams.")]
             [:div.keep-aligned-section-footer
               [:button.mlb-reset.create-team-bt
                 "Create your team - it’s free"]]
