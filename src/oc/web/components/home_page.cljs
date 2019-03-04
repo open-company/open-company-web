@@ -61,7 +61,7 @@
 
         (shared-misc/keep-aligned-section false)
 
-        shared-misc/carrot-in-actions
+        shared-misc/carrot-in-action
 
         shared-misc/testimonials-section
 

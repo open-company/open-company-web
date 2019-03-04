@@ -358,7 +358,7 @@
     [:div.green-play]
     "Carrot in 60 seconds"])
 
-(def carrot-in-actions
+(def carrot-in-action
   [:section.carrot-in-action
     [:div.carrot-in-action-title
       "Want to see Carrot in action?"]

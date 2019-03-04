@@ -263,7 +263,7 @@
     [:div.green-play]
     "Carrot in 60 seconds"])
 
-(def carrot-in-actions
+(def carrot-in-action
   [:section.carrot-in-action
     [:div.carrot-in-action-title
       "Want to see Carrot in action?"]
@@ -500,7 +500,7 @@
 
       (keep-aligned-section false)
 
-      carrot-in-actions
+      carrot-in-action
 
       testimonials-section
 
@@ -699,13 +699,13 @@
       [:section.carrot-plus-slack.group
 
         [:h1.slack-headline
-          "Rise above the noise"]
+          "Lead with clarity"]
 
         [:div.slack-subline
           (str
-           "Leaders struggle to communicate effectively with fast-growing and "
-           "remote teams. Carrot makes sure everyone hears you - even in noisy "
-           "places like Slack and email. With Carrot, everyone stays on the same page.")]
+           "Carrot makes sure must-see information doesn't get lost in fast-moving "
+           "conversations. With Carrot, everyone sees the key team updates, news and "
+           "decisions that keep your Slack team focused on what matters.")]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
@@ -720,6 +720,8 @@
         testimonials-logos-line]
 
       (keep-aligned-section true)
+
+      carrot-in-action
 
       testimonials-section
 

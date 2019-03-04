@@ -27,6 +27,7 @@
         (login-overlays-handler)
 
         [:div.main.slack
+          (shared-misc/video-lightbox)
           ; Hope page header
           [:section.carrot-plus-slack.group
 
@@ -61,6 +62,8 @@
             shared-misc/testimonials-logos-line]
 
           (shared-misc/keep-aligned-section true)
+
+          shared-misc/carrot-in-action
 
           shared-misc/testimonials-section
 
