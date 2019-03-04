@@ -597,6 +597,9 @@
                 ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
+              [:span "Custom plans"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
               [:span "Carrot AI"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -671,7 +674,15 @@
             [:a.chat-with-us
               {:href "#"
                :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
-              "Get in touch with us"]]]]
+              "Get in touch with us"]]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]]
 
       testimonials-section
 
@@ -936,8 +947,8 @@
     [:div.main.about
       [:section.about-header
 
-        [:h1.about
-          "Meet the team"]
+        ; [:h1.about
+        ;   "Meet the team"]
 
         ; [:div.team-container
         ;   [:div.team-row.group.three-cards

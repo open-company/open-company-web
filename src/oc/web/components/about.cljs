@@ -29,8 +29,8 @@
       [:div.main.about
         [:section.about-header
 
-          [:h1.about
-            "Meet the team"]
+          ; [:h1.about
+          ;   "Meet the team"]
 
           ; [:div.team-container
           ;   [:div.team-row.group.three-cards
