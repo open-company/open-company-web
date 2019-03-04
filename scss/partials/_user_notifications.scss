@@ -3,10 +3,10 @@ div.user-notifications {
 
   @include mobile() {
     position: absolute;
-    top: #{$navbar_height}px;
+    top: 0;
     left: 0px;
     width: 100%;
-    height: calc(100vh - #{$navbar_height}px);
+    height: 100vh;
     background-color: transparent;
     z-index: 21;
     overflow-y: auto;
@@ -77,6 +77,29 @@ div.user-notifications {
     div.user-notifications-tray-header {
       padding: 16px;
 
+      @include mobile(){
+        height: 56px;
+        background-color: white;
+        padding: 20px 16px;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      }
+
+      button.user-notifications-tray-mobile-close {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 14px 14px;
+          margin: -4px 16px 0 0;
+          float: left;
+        }
+      }
+
       div.title {
         @include avenir_H();
         color: $deep_navy;
@@ -84,6 +107,10 @@ div.user-notifications {
         float: left;
         line-height: 20px;
         height: 20px;
+
+        @include mobile() {
+          font-size: 16px;
+        }
       }
 
       button.all-read-bt {

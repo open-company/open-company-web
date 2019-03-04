@@ -259,48 +259,15 @@ div.onboard-lander {
     }
 
     div.steps {
-      width: 64px;
-      height: 8px;
-      margin: 24px auto 0;
-
-      &.first-step {
-        div.step:first-child {
-          background-color: #FFD24A;
-        }
-      }
-
-      &.second-step {
-        div.step:first-child {
-          background-color: #FFD24A;
-        }
-
-        div.step:nth-child(2) {
-          background-color: #FFD24A;
-        }
-      }
-
-      &.third-step {
-        div.step:first-child {
-          background-color: #FFD24A;
-        }
-
-        div.step:nth-child(2) {
-          background-color: #FFD24A;
-        }
-
-        div.step:nth-child(3) {
-          background-color: #FFD24A;
-        }
-      }
-
-      div.step {
-        width: 24px;
-        height: 8px;
-        background-color: #E0E2EC;
-        border-radius: 100px;
-        margin: 0 4px;
-        float: left;
-      }
+      width: 100px;
+      height: 15px;
+      margin: 12px auto 0;
+      text-align: center;
+      @include avenir_B();
+      font-size: 11px;
+      letter-spacing: 0.42px;
+      color: $light_ui_grey;
+      text-transform: uppercase;
     }
 
     div.steps-separator {

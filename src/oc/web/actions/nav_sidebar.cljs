@@ -1,6 +1,8 @@
 (ns oc.web.actions.nav-sidebar
   (:require [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
@@ -20,6 +22,7 @@
         (routing-actions/routing @router/path)
         (user-actions/initial-loading true))
       (router/nav! url)))
+  (qsg-actions/turn-on-show-guide)
   (close-navigation-sidebar))
 
 (defn mobile-nav-sidebar []
@@ -53,3 +56,12 @@
 
 (defn close-reminders []
   (dis/dispatch! [:input [:show-reminders] nil]))
+
+;; Mobile menu
+
+(defn mobile-menu-toggle []
+  (when (responsive/is-mobile-size?)
+    (dis/dispatch! [:update [:mobile-menu-open] not])))
+
+(defn mobile-menu-close []
+  (dis/dispatch! [:input [:mobile-menu-open] false]))

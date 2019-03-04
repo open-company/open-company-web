@@ -12,9 +12,9 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -22,6 +22,7 @@
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -52,11 +53,7 @@
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
-                                 :display (if (pos? opacity) "block" "none")}))))
-  (let [dashboard-layout (rum/dom-node s)]
-    (if (>= (.-scrollY js/window) 64)
-      (.add (.-classList dashboard-layout) "sticky-board-name")
-      (.remove (.-classList dashboard-layout) "sticky-board-name"))))
+                                 :display (if (pos? opacity) "block" "none")})))))
 
 (defn win-width
   "Save the window width in the state."
@@ -77,6 +74,7 @@
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
+                              (drv/drv :qsg)
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :team-data)
@@ -114,13 +112,15 @@
                                 ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
-                                (when-not (utils/is-test-env?)
+                                (when-not (responsive/is-tablet-or-mobile?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
-                                (activity-actions/cmail-reopen?)
+                                (when-let [org-data @(drv/get-ref s :org-data)]
+                                  (when (utils/is-admin-or-author? org-data)
+                                    (activity-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
                                 s)
@@ -159,7 +159,8 @@
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))]
+                                     (not (:read-only board-data)))
+        qsg-data (drv/react s :qsg)]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -172,7 +173,6 @@
             [:div.board-container.group
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
-                {:on-click #(nav-actions/mobile-nav-sidebar)}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
@@ -207,20 +207,35 @@
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :title "Visible to the world, including search engines"}
                       "Public"])
-                  ;; Settings button
                   (when should-show-settings-bt
-                    [:button.mlb-reset.board-settings-bt
-                      {:data-toggle (when-not is-mobile? "tooltip")
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (str (:name board-data) " settings")
-                       :on-click #(dis/dispatch! [:input [:show-section-editor] true])}])]
+                    [:div.board-settings-container
+                      ;; Settings button
+                      [:button.mlb-reset.board-settings-bt
+                        {:data-toggle (when-not is-mobile? "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title (str (:name board-data) " settings")
+                         :on-click #(do
+                                      (when (:show-section-settings-tooltip qsg-data)
+                                        (qsg-actions/dismiss-section-settings-tooltip))
+                                      (dis/dispatch! [:input [:show-section-editor] true]))}]
+                    (when (:show-section-settings-tooltip qsg-data)
+                      [:div.section-settings-tooltip-container.group
+                        [:div.section-settings-tooltip-top-arrow]
+                        [:button.mlb-reset.section-settings-tooltip-dismiss
+                          {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
+                        [:div.section-settings-tooltips
+                          [:div.section-settings-tooltip
+                            "You can make changes to a section at any time."]
+                          [:button.mlb-reset.section-settings-bt
+                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
+                            "OK, got it"]]])])]
                 ;; Add entry button
                 (when should-show-top-compose
                   [:div.new-post-top-dropdown-container.group
                     (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
-                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group
+                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group.qsg-create-post-1
                         {:ref :top-compose-button
                          :on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
                          :class (when-not can-compose "disabled")
@@ -230,6 +245,8 @@
                          :data-placement (when show-tooltip? "top")
                          :data-container (when show-tooltip? "body")
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                        (when (= (:step qsg-data) :create-post-1)
+                          (qsg-breadcrumb qsg-data))
                         [:div.add-to-board-plus]
                         [:label.add-to-board-label
                           "New"]])
@@ -266,12 +283,14 @@
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                     non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                            "decisions to keep you and your team pulling in the same direction.")
-                    is-second-user (= add-post-tooltip :has-organic-post)]
+                    is-second-user (= add-post-tooltip :is-second-user)]
                 (when (and (not is-drafts-board)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
-                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                      {:on-click #(do
+                                    (nux-actions/dismiss-add-post-tooltip)
+                                    (qsg-actions/turn-on-show-guide))}]
                     [:div.add-post-tooltips
                       {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]
@@ -319,18 +338,21 @@
                   (section-stream)))
               ;; Add entry floating button
               (when can-compose
-                (let [opacity (if (responsive/is-tablet-or-mobile?)
-                                1
+                (let [opacity (if is-mobile?
+                                0
                                 (calc-opacity (document-scroll-top)))]
                   [:div.new-post-floating-dropdown-container.group
                     {:id "new-entry-floating-btn-container"
                      :style {:opacity opacity
-                             :display (if (pos? opacity) "block" "none")}}
-                    [:button.mlb-reset.mlb-default.add-to-board-floating-button
+                             :display (if (pos? opacity) "block" "none")}
+                     :class (when (:visible qsg-data) "showing-qsg")}
+                    [:button.mlb-reset.mlb-default.add-to-board-floating-button.qsg-create-post-1
                       {:data-placement "left"
                        :data-container "body"
                        :data-toggle (when-not is-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+                      (when (= (:step qsg-data) :create-post-1)
+                        (qsg-breadcrumb qsg-data))
                       [:div.add-to-board-plus]]]))])]]))

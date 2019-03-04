@@ -7,11 +7,8 @@ nav.oc-navbar {
   transition: height 230ms;
   border-bottom: 1px solid $ultra_light_grey;
 
-  &.not-fixed {
-    @include mobile() {
-      box-shadow: none;
-      position: absolute;
-    }
+  &.showing-qsg {
+    width: calc(100% - #{$qsg_width});
   }
 
   &.showing-orgs-dropdown {
@@ -28,6 +25,7 @@ nav.oc-navbar {
     height: #{$navbar_height}px;
     padding-bottom: 1px;
     border-bottom: none;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
 
     &.show-login-overlay {
       height: 100vh !important;
@@ -46,49 +44,6 @@ nav.oc-navbar {
   background-color: white;
   margin: 0px;
 
-  div.mobile-bottom-line {
-    display: none;
-
-    @include mobile() {
-      display: block;
-      width: 100vw;
-      height: 1px;
-      background-color: $ultra_light_grey;
-      position: absolute;
-      top: #{$navbar_height - 1}px;
-      left: 0px;
-
-      &.search {
-        div.orange-active-tab {
-          margin-left: 20%;
-        }
-      }
-
-      &.user-notifications {
-        div.orange-active-tab {
-          margin-left: 60%;
-        }
-      }
-
-      &.user-menu {
-        div.orange-active-tab {
-          margin-left: 80%;
-        }
-      }
-
-      div.orange-active-tab {
-        width: 20vw;
-        height: 1px;
-        position: relative;
-        top: 0;
-        left: 0;
-        margin-left: 0;
-        transition: margin-left 230ms ease-in;
-        background-color: $carrot_orange;
-      }
-    }
-  }
-
   div.oc-navbar-header {
     padding-top: 10px;
   }
@@ -102,6 +57,7 @@ nav.oc-navbar {
 
     @include mobile() {
       width: 100vw;
+      padding: 12px 16px;
     }
 
     div.oc-navbar-header-container{
@@ -153,22 +109,80 @@ nav.oc-navbar {
         button.mobile-navigation-sidebar-ham-bt {
           display: none;
 
-          &.active {
-            @include mobile() {
-              background-image: cdnUrl("/img/ML/navbar_all_posts_active.svg");
-            }
-          }
-
           @include mobile() {
-            width: 24px;
-            height: 24px;
-            background-image: cdnUrl("/img/ML/navbar_all_posts.svg");
-            background-repeat: no-repeat;
-            background-size: 19px 19px;
-            background-position: center;
-            float: left;
+            position: relative;
+            padding: 0 0 0 35px;
             display: block;
-            margin-top: 4px;
+            height: 32px;
+            opacity: 1;
+            width: 60vw;
+
+            &:after {
+              content: "";
+              width: 19px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
+              background-repeat: no-repeat;
+              background-size: 19px 12px;
+              background-position: center;
+              position: absolute;
+              opacity: 0.5;
+              left: 0;
+              top: 9px;
+            }
+
+            span.private-icon {
+              margin-right: 6px;
+              width: 10px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/mobile_navbar_private_board.svg");
+              background-repeat: no-repeat;
+              background-size: 10px 13px;
+              background-position: center 8px;
+              display: block;
+              float: left;
+            }
+
+            span.public-icon {
+              margin-right: 6px;
+              width: 12px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/mobile_navbar_public_board.svg");
+              background-repeat: no-repeat;
+              background-size: 12px 12px;
+              background-position: center;
+              display: block;
+              float: left;
+            }
+
+            span.must-see-icon {
+              margin-right: 6px;
+              width: 12px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/mobile_navbar_must_see.svg");
+              background-repeat: no-repeat;
+              background-size: 12px 16px;
+              background-position: center;
+              display: block;
+              float: left;
+            }
+
+            span.board-name {
+              @include avenir_H();
+              font-size: 16px;
+              color: $deep_navy;
+              height: 32px;
+              line-height: 32px;
+              display: block;
+              float: left;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: calc(60vw - 35px);
+
+              &.has-icon {
+                max-width: calc(60vw - 53px);
+              }
+            }
           }
         }
 
@@ -203,17 +217,87 @@ nav.oc-navbar {
           margin-top: 4px;
         }
 
-        @include mobile() {
-          margin-right: -16px;
-        }
-
         div.user-menu {
           width: 48px;
           height: 32px;
           float: right;
+          position: relative;
 
           @inlcude mobile() {
             float: unset;
+          }
+
+
+          div.qsg-tooltip-container {
+            border: 1px solid rgba($carrot_gold, 0.5);
+            background-color: #FDF6E4;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            width: 300px;
+            border-radius: 6px;
+            padding: 24px 20px;
+            margin: 12px 0 0;
+            position: absolute;
+            right: -16px;
+            top: 28px;
+            text-align: center;
+            z-index: 5;
+
+            div.qsg-tooltip-top-arrow {
+              position: absolute;
+              top: -6px;
+              width: 10px;
+              height: 6px;
+              right: 14px;
+              background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
+              background-position: center;
+              background-size: 10px 6px;
+              background-repeat: no-repeat;
+            }
+
+            button.qsg-tooltip-dismiss {
+              position: absolute;
+              top: 0;
+              right: 0;
+              width: 32px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
+              background-size: 8px 8px;
+              background-position: center;
+              background-repeat: no-repeat;
+            }
+
+            div.qsg-tooltips {
+
+              div.qsg-tooltip-title {
+                @include PTSerif();
+                font-size: 18px;
+                color: $deep_navy;
+                line-height: 20px;
+              }
+
+              div.qsg-tooltip {
+                @include avenir_R();
+                font-size: 16px;
+                color: $deep_navy;
+                line-height: 18px;
+                margin: 4px auto 0;
+                text-align: center;
+                max-width: 92%;
+              }
+
+              button.qsg-tooltip-bt {
+                width: auto;
+                margin-top: 16px;
+                height: 32px;
+                width: 96px;
+                background-color: transparent;
+                border-radius: 6px;
+                color: white;
+                background-color: $carrot_green;
+                @include avenir_H();
+                font-size: 16px;
+              }
+            }
           }
         }
 
@@ -224,6 +308,35 @@ nav.oc-navbar {
         @include mobile() {
           div.mobile-right-nav {
             display: block;
+            float: right;
+            height: 32px;
+
+            button:not(:last-child) {
+              margin: 0 16px 0 0;
+            }
+
+            button:last-child {
+              margin: 0;
+            }
+
+            button.search-bt {
+              width: 24px;
+              height: 24px;
+              background-image: cdnUrl("/img/ML/spyglass.svg");
+              background-size: 18px 18px;
+              background-repeat: no-repeat;
+              background-position: 0px center;
+              padding: 0;
+              margin-top: 4px;
+              display: block;
+              float: left;
+
+              @include preload_image(cdnUlr("/img/ML/spyglass_active.svg"));
+
+              &.active {
+                background-image: cdnUrl("/img/ML/spyglass_active.svg");
+              }
+            }
 
             button.mobile-notification-bell {
               width: 24px;
@@ -232,39 +345,28 @@ nav.oc-navbar {
               background-size: 16px 20px;
               background-position: 0 center;
               background-repeat: no-repeat;
-              position: absolute;
-              margin: 0;
               padding: 0;
-              left: calc(70vw - 12px);
-              top: 16px;
+              margin-top: 4px;
+              display: block;
+              float: left;
 
               @include preload_image(cdnUlr("/img/ML/notification_bell_active.svg"));
 
               &.active {
                 background-image: cdnUrl("/img/ML/notification_bell_active.svg");
               }
-
             }
 
-            button.mobile-menu {
-              font-size: 24px;
-              padding: 0px 16px 0px 0px;
-              position: relative;
-
-              &:after {
-                content: "";
-                width: 9px;
-                height: 6px;
-                background-image: cdnUrl("/img/ML/user_menu_chevron.svg");
-                background-size: 9px 6px;
-                background-repeat: no-repeat;
-                background-position: center;
-                position: absolute;
-                top: 12px;
-                right: 0px;
-              }
-
-              @include user-profile(32);
+            button.mobile-compose-bt {
+              width: 32px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/mobile_plus_button.svg");
+              background-size: 32px 32px;
+              background-position: 0 center;
+              background-repeat: no-repeat;
+              padding: 0;
+              display: block;
+              float: left;
             }
           }
         }

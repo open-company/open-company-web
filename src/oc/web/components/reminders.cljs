@@ -272,6 +272,7 @@
                        (drv/drv :show-reminders)
                        (drv/drv :reminders-data)
                        (drv/drv :reminder-edit)
+                       (drv/drv :qsg)
                        {:did-mount (fn [s]
                          (reminder-actions/load-reminders-roster)
                          (reminder-actions/load-reminders)
@@ -284,8 +285,10 @@
         reminders-data (drv/react s :reminders-data)
         reminder-edit-data (drv/react s :reminder-edit)
         can-add-reminder? (utils/link-for (:links reminders-data) "create")
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        qsg-data (drv/react s :qsg)]
     [:div.reminders-container.fullscreen-page
+      {:class (when (:visible qsg-data) "showing-qsg")}
       [:div.reminders-inner
         {:class (utils/class-set {:no-bottom-padding (= reminder-tab :reminders)
                                   :loading (not reminders-data)})}
@@ -295,14 +298,20 @@
                               adding-new-reminder?)
                       "back-arrow")
              :on-click (fn [_]
-                        (cancel-clicked reminder-edit-data
-                         ;; On mobile the X goes back to the list of reminders
-                         ;; on desktop it always dismiss the reminders modal
-                         (if (and (or editing-reminder?
-                                      adding-new-reminder?)
-                                  is-mobile?)
-                          #(reminder-actions/cancel-edit-reminder)
-                          #(close-clicked s))))}])
+                        (let [mobile-back-action #(when is-mobile?
+                                                    (nav-actions/mobile-menu-toggle))]
+                          (cancel-clicked reminder-edit-data
+                           ;; On mobile the X goes back to the list of reminders
+                           ;; on desktop it always dismiss the reminders modal
+                           (if (and (or editing-reminder?
+                                        adding-new-reminder?)
+                                    is-mobile?)
+                            (fn []
+                              (reminder-actions/cancel-edit-reminder)
+                              (mobile-back-action))
+                            (fn []
+                              (close-clicked s)
+                              (mobile-back-action))))))}])
         [:div.reminders-header
           [:div.reminders-header-title
             (if (and editing-reminder?

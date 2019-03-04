@@ -23,7 +23,7 @@
   (reset! (::dismiss s) true)
   (utils/after 180 dismiss))
 
-(defn- has-bot?
+(defn- has-slack-bot?
   "Check if the current team has a bot associated."
   [org-data]
   (jwt/team-has-bot? (:team-id org-data)))
@@ -59,13 +59,9 @@
                                     org-data @(drv/get-ref s :org-data)
                                     subject (.text (.html (js/$ "<div />") (:headline activity-data)))]
                                (when (and (not @(drv/get-ref s :activity-share-medium))
-                                          (has-bot? org-data))
+                                          (has-slack-bot? org-data))
                                  (dis/dispatch! [:input [:activity-share-medium] :slack])))
                              s)
-                             :did-mount (fn [s]
-                              (when (not (has-bot? @(drv/get-ref s :org-data)))
-                                (.tooltip (js/$ (rum/ref-node s "slack-button"))))
-                              s)
                              :did-update (fn [s]
                               ;; When we have a sharing response
                               (when-let [shared-data @(drv/get-ref s :activity-shared-data)]
@@ -93,7 +89,9 @@
         _ (drv/react s :activity-shared-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         medium (drv/react s :activity-share-medium)
-        has-bot? (has-bot? org-data)]
+        has-bot? (has-slack-bot? org-data)
+        can-share-to-slack? (and (not is-mobile?)
+                                 has-bot?)]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -103,7 +101,7 @@
             [:button.mobile-modal-close-bt.mlb-reset
               {:on-click #(close-clicked s)}])
           "Share this post"]
-        (when has-bot?
+        (when can-share-to-slack?
           [:div.activity-share-medium-selector-container
             [:div.activity-share-medium-selector
               {:class (when (= medium :url) "selected")
@@ -115,9 +113,7 @@
                              #(highlight-url s))))}
               "URL"]
             [:div.activity-share-medium-selector
-              {:class (utils/class-set {:selected (= medium :slack)
-                                        :medium-selector-disabled (not has-bot?)})
-               :ref "slack-button"
+              {:class (utils/class-set {:selected (= medium :slack)})
                :on-click (fn [e]
                            (utils/event-stop e)
                            (when-not @(::sharing s)
