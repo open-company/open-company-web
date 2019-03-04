@@ -79,7 +79,8 @@
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
             (let [board-icon (cond
-                              (= (:access board-data) "private")
+                              (and (= (:access board-data) "private")
+                                   (not= (:slug board-data) utils/default-drafts-board-slug))
                               [:span.private-icon]
                               (= (:access board-data) "public")
                               [:span.public-icon]

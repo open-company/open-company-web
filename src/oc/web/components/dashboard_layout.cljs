@@ -178,7 +178,8 @@
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (= (:access board-data) "private")
+                        {:class (utils/class-set {:private (and (= (:access board-data) "private")
+                                                                (not is-drafts-board))
                                                   :public (= (:access board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
@@ -189,7 +190,8 @@
 
                                                    :default
                                                    (:name board-data)))}]])
-                  (when (= (:access board-data) "private")
+                  (when (and (= (:access board-data) "private")
+                             (not is-drafts-board))
                     [:div.private-board
                       {:data-toggle "tooltip"
                        :data-placement "top"
