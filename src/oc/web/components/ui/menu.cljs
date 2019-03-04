@@ -100,7 +100,14 @@
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
       [:div.menu-header
+        [:button.mlb-reset.mobile-close-bt
+          {:on-click #(do
+                       (mobile-menu-toggle)
+                       (nav-actions/mobile-nav-sidebar))}]
         (user-avatar-image current-user-data)
+        [:div.mobile-user-name
+          {:class utils/hide-class}
+          (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
         [:div.user-name
           {:class utils/hide-class}
           (str "Hi " (jwt/get-key :first-name) "!")]
@@ -125,7 +132,7 @@
           {:href "#"
            :on-click notifications-settings-click}
           [:div.oc-menu-item.notifications-settings
-            "Notifications"]])
+            "Notification Settings"]])
       (when show-reminders?
         [:a
           {:href "#"

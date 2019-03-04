@@ -11,8 +11,11 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.components.ui.menu :as menu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
@@ -58,6 +61,7 @@
                                 (drv/drv :board-data)
                                 (drv/drv :show-section-add)
                                 (drv/drv :change-cache-data)
+                                (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
@@ -91,6 +95,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-cache-data)
+        current-user-data (drv/react s :current-user-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
@@ -125,14 +130,18 @@
                                    (= (:step qsg-data) :create-reminder-1)
                                    (= (:step qsg-data) :add-section-1))
                            "visible")}}
-      [:div.mobile-board-name-container
-        {:on-click #(nav-actions/mobile-nav-sidebar)}
-        [:div.board-name
-          (cond
-            is-all-posts "All posts"
-            is-drafts-board "Drafts"
-            is-must-see "Must see"
-            :else (:name board-data))]]
+      [:div.mobile-header-container
+        [:button.mlb-reset.mobile-header-close
+          {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+        (orgs-dropdown)
+        [:button.btn-reset.mobile-menu.group
+          {:on-click #(do
+                       (when is-mobile?
+                         (dis/dispatch! [:input [:user-settings] nil])
+                         (dis/dispatch! [:input [:org-settings] nil]))
+                       (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                       (menu/mobile-menu-toggle))}
+          (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts

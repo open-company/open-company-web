@@ -15,7 +15,6 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -54,11 +53,7 @@
                       1
                       (calc-opacity scroll-top))]
         (.css entry-floating #js {:opacity opacity
-                                 :display (if (pos? opacity) "block" "none")}))))
-  (let [dashboard-layout (rum/dom-node s)]
-    (if (>= (.-scrollY js/window) 64)
-      (.add (.-classList dashboard-layout) "sticky-board-name")
-      (.remove (.-classList dashboard-layout) "sticky-board-name"))))
+                                 :display (if (pos? opacity) "block" "none")})))))
 
 (defn win-width
   "Save the window width in the state."
@@ -117,7 +112,7 @@
                                 ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
-                                (when-not (utils/is-test-env?)
+                                (when-not (responsive/is-tablet-or-mobile?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
                                    (events/listen js/window EventType/SCROLL #(did-scroll % s))))
@@ -178,13 +173,13 @@
             [:div.board-container.group
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
-                {:on-click #(nav-actions/mobile-nav-sidebar)}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (= (:access board-data) "private")
+                        {:class (utils/class-set {:private (and (= (:access board-data) "private")
+                                                                (not is-drafts-board))
                                                   :public (= (:access board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
@@ -195,7 +190,8 @@
 
                                                    :default
                                                    (:name board-data)))}]])
-                  (when (= (:access board-data) "private")
+                  (when (and (= (:access board-data) "private")
+                             (not is-drafts-board))
                     [:div.private-board
                       {:data-toggle "tooltip"
                        :data-placement "top"
@@ -344,8 +340,8 @@
                   (section-stream)))
               ;; Add entry floating button
               (when can-compose
-                (let [opacity (if (responsive/is-tablet-or-mobile?)
-                                1
+                (let [opacity (if is-mobile?
+                                0
                                 (calc-opacity (document-scroll-top)))]
                   [:div.new-post-floating-dropdown-container.group
                     {:id "new-entry-floating-btn-container"

@@ -38,6 +38,8 @@
       [:div.user-notifications-tray
         {:class (utils/class-set {:hidden-tray (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group
+          [:button.mlb-reset.user-notifications-tray-mobile-close
+            {:on-click #(user-actions/hide-mobile-user-notifications)}]
           [:div.title "Notifications"]
           (when has-new-content
             [:button.mlb-reset.all-read-bt
