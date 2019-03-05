@@ -9,16 +9,27 @@ div.stream-attachments {
     width: 100%;
     height: auto;
 
+    &.collapsed {
+      height: 30px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     div.stream-attachments-show-more {
       cursor: pointer;
       height: 20px;
-      margin-top: 12px;
-      @include avenir_H()
+      margin-top: 8px;
+      @include avenir_R();
       font-size: 12px;
       color: $deep_navy;
+      line-height: 20px;
+      float: left;
     }
 
     div.stream-attachments-item {
+      margin-right: 8px;
+      height: 28px;
+      float: left;
 
       a {
         float: left;
@@ -39,25 +50,25 @@ div.stream-attachments {
         }
 
         span.attachment-name {
-          @include avenir_M();
-          font-size: 14px;
+          @include avenir_R();
+          font-size: 12px;
           color: $deep_navy;
           white-space: nowrap;
+          line-height: 20px;
           display: block;
           float: left;
           margin-left: 6px;
-          margin-top: 2px;
         }
 
         span.attachment-description {
-          @include avenir_M();
+          @include avenir_R();
           font-size: 12px;
           color: $light_ui_grey;
           white-space: nowrap;
+          line-height: 20px;
           display: block;
           float: left;
           margin-left: 6px;
-          margin-top: 4px;
         }
 
         button.remove-attachment-bt {
