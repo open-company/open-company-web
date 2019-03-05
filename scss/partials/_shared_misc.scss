@@ -548,6 +548,10 @@ section.home-keep-aligned {
       }
 
       &.second-row {
+        @include mobile() {
+          padding-top: 0;
+        }
+
         div.keep-aligned-section-row-right {
           padding: 24px 70px 24px 114px;
 
@@ -680,7 +684,7 @@ section.home-keep-aligned {
           }
 
           @include mobile() {
-            width: calc(144vw + 96px);
+            width: calc(144vw + 65px);
             height: calc(72vw * 1.33 + 40px);
           }
 
