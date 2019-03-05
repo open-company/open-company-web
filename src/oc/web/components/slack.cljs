@@ -32,15 +32,14 @@
           [:section.carrot-plus-slack.group
 
             [:h1.slack-headline
-              "Rise above the noise"]
+              "Lead with clarity"]
 
             [:div.slack-subline
               (str
-               "Leaders struggle to communicate effectively with fast-growing and "
-               "remote teams. Carrot makes sure everyone hears you - even in noisy "
-               "places like Slack and email. With Carrot, everyone stays on the same page.")]
+               "Carrot makes sure must-see information doesn't get lost in fast-moving "
+               "conversations. With Carrot, everyone sees the key team updates, news and "
+               "decisions that keep your Slack team focused on what matters.")]
 
-            ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
               [:a.add-to-slack-button
                 {:on-click #(do
@@ -48,11 +47,6 @@
                              (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                    {:auth-source "slack"})]
                                (user-actions/login-with-slack auth-link)))}]]
-            [:div.carrot-box-container.confirm-thanks.group
-              {:style {:display "none"}}
-              [:div.carrot-box-thanks
-                [:div.thanks-headline "You are Confirmed!"]
-                [:div.thanks-subheadline "Thank you for subscribing."]]]
 
             [:div.main-animation-container
               [:img.main-animation

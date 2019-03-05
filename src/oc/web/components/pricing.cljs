@@ -185,20 +185,20 @@
 
         [:div.faq-row
           [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
               {:href "#"
                :on-click #(chat/chat-click 43234)}
-              "Get in touch with us"]]]
-
-        [:div.faq-row
-          [:div.faq-row-question
-            "Are custom plans available?"]
-          [:div.faq-row-answer
-            (str
-             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
-             "unique needs. Please contact us to discuss further details.")]]]
+              "Get in touch with us"]]]]
 
         shared-misc/testimonials-section
 

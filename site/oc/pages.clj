@@ -367,8 +367,8 @@
     [:div.slack-email-switch-bottom-panel.email-panel
       [:div.slack-email-switch-bottom-panel-copy
         (str
-         "“The morning digest is a great way to get everyone "
-         "aligned around what matters right from the start.”")]
+         "“The morning digest is how we know everyone in our "
+         "offices is up to date on what matters.”")]
       [:div.slack-email-switch-bottom-panel-img]
       [:div.slack-email-switch-bottom-panel-name
         "Chris Cairns"]
@@ -667,20 +667,20 @@
 
         [:div.faq-row
           [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
               {:href "#"
                :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
-              "Get in touch with us"]]]
-
-        [:div.faq-row
-          [:div.faq-row-question
-            "Are custom plans available?"]
-          [:div.faq-row-answer
-            (str
-             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
-             "unique needs. Please contact us to discuss further details.")]]]
+              "Get in touch with us"]]]]
 
       testimonials-section
 
@@ -695,6 +695,7 @@
   [:div.slack-wrap
     {:id "wrap"}
     [:div.main.slack
+      animation-lightbox
       ; Hope page header
       [:section.carrot-plus-slack.group
 
@@ -760,6 +761,7 @@
   [:div.press-kit-wrap
     {:id "wrap"}
     [:div.main.press-kit
+      animation-lightbox
       [:section.cta.group
 
         [:h1.headline
