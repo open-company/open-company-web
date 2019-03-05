@@ -519,7 +519,7 @@
           "It’s free to get started"]
 
         [:div.pricing-subheadline
-          "Carrot makes leadership communication work for fast-growing and distributed teams."]
+          "Carrot keeps fast-growing and remote teams focused on what matters."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -529,7 +529,7 @@
             [:h3.tear-price
               "$0"]
             [:div.tear-subtitle
-              "Free for small teams up to 10 users."]
+              "Free for small teams up to 10 users"]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Start for free"]
