@@ -111,7 +111,7 @@
                            (when @(::should-scroll-to-card s)
                              (let [dom-node (rum/dom-node s)]
                                (utils/scroll-to-y
-                                (- (.-top (.offset (js/$ dom-node))) 30)))
+                                (- (.-top (.offset (js/$ dom-node))) 30) 180))
                              (reset! (::should-scroll-to-card s) false))
                            s)}
   [s activity-data read-data]
