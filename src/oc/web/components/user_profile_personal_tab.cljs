@@ -147,7 +147,7 @@
         [:div.user-profile-column-right
           {:class utils/hide-class}
           ; Last name
-          [:div.user-profile-field-box.big-web-only
+          [:div.user-profile-field-box.big-web-tablet-only
             [:div.user-profile-field-label
               "Last name"]
             [:div.user-profile-field

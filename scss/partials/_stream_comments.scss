@@ -11,6 +11,10 @@ div.stream-comments {
     div.stream-comment {
       padding: 0px 0px 16px;
 
+      &:last-child {
+        padding: 0;
+      }
+
       &:hover, &.showing-more-menu {
         div.stream-comment-header {
           div.stream-comment-more-menu-container {
