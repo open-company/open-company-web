@@ -34,6 +34,7 @@ div.about-wrap {
 
         @include mobile() {
           max-width: 380px;
+          font-size: 36px;
         }
       }
 
@@ -187,8 +188,14 @@ div.about-wrap {
         text-align: center;
 
         @include tablet() {
-          max-width: 360px;
-          margin: 80px auto;
+          max-width: 595px;
+          margin: 80px auto 0;
+        }
+
+        @include mobile() {
+          font-size: 36px;
+          line-height: normal;
+          max-width: 202px;
         }
       }
 
@@ -200,23 +207,6 @@ div.about-wrap {
         position: relative;
         z-index: 1;
         text-align: left;
-
-        &:before {
-          content: "";
-          background-color: $another_ui_grey;
-          border-top-right-radius: 200px;
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          width: 86vw;
-          z-index: 2;
-
-          @media screen and (max-width: 1200px) {
-            width: 100vw;
-            border-top-right-radius: 100px;
-          }
-        }
 
         @include tablet() {
           width: 100%;

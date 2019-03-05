@@ -379,6 +379,7 @@ section.keep-aligned {
 
     @include tablet() {
       max-width: initial;
+      font-size: 40px;
     }
 
     @include mobile() {
