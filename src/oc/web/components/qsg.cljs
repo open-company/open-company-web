@@ -27,7 +27,7 @@
       [:div.qsg-top
         [:div.qsg-top-title
           (if (> (:overall-progress qsg-data) 99)
-            "You completed the quickstart - you’re ready to go!"
+            "🎉 Quickstart complete!"
             "Keep your team informed - let’s get started!")]
         [:div.qsg-progress-bar
           [:div.qsg-progress-bar-inner
@@ -121,4 +121,4 @@
                 "Add to Slack")]])
         [:button.mlb-reset.qsg-dismiss
           {:on-click #(qsg-actions/dismiss-qsg-view)}
-          "Dismiss quickstart guide"]]]))
+          "Close guide"]]]))
