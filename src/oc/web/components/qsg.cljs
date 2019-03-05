@@ -27,7 +27,9 @@
       [:div.qsg-top
         [:div.qsg-top-title
           (if (> (:overall-progress qsg-data) 99)
-            "🎉 Quickstart complete!"
+            [:span
+              [:span.complete-icon]
+              "Quickstart complete!"]
             "Keep your team informed - let’s get started!")]
         [:div.qsg-progress-bar
           [:div.qsg-progress-bar-inner
@@ -44,12 +46,12 @@
             {:on-click #(qsg-actions/start-add-section-trail)
              :class (when (:add-section? qsg-data)
                       "done")}
-            "Add a section"]
+            "Create a section"]
           [:button.mlb-reset.qsg-list-item.qsg-digest-sample-bt
             {:on-click #(qsg-actions/see-digest-sample)
              :class (when (:see-digest-sample? qsg-data)
                       "done")}
-            "See a sample digest"]
+            "See sample digest"]
           [:button.mlb-reset.qsg-list-item.qsg-create-reminder-bt
             {:on-click #(qsg-actions/start-create-reminder-trail)
              :class (when (:add-reminder? qsg-data)
@@ -80,12 +82,12 @@
             {:on-click #(qsg-actions/start-profile-photo-trail)
              :class (when (:profile-photo-done qsg-data)
                       "done")}
-            "Add a profile photo"]
+            "Add profile photo"]
           [:button.mlb-reset.qsg-list-item.add-company-logo-bt
             {:on-click #(qsg-actions/start-company-logo-trail)
              :class (when (:company-logo-done qsg-data)
                       "done")}
-            "Add a company logo"]
+            "Add company logo"]
           [:button.mlb-reset.qsg-list-item.qsg-invite-team-bt
             {:on-click #(qsg-actions/start-invite-team-trail)
              :class (when (:invited? qsg-data)
@@ -109,8 +111,8 @@
           [:div.qsg-using-slack-section
             [:div.qsg-using-slack-title
               (if (:has-slack-user? qsg-data)
-                "Receive digests in Slack. Share posts to Slack."
-                "Using Slack? Carrot and Slack work together.")]
+                "Receive digests in Slack. Share posts to Slack"
+                "Using Slack? Share posts with your team")]
             [:button.mlb-reset.qsg-using-slack-dismiss
               {:on-click #(qsg-actions/dismiss-slack)}]
             [:button.mlb-reset.qsg-using-slack-bt
