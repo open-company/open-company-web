@@ -575,7 +575,7 @@ section.home-keep-aligned {
           }
 
           @include mobile() {
-            height: calc(72vw * 1.33 + 40px);
+            height: calc(72vw * 1.33 + 40px + 48px + 16px);
           }
 
           img.keep-aligned-section-screenshot {
@@ -1176,6 +1176,10 @@ section.home-keep-aligned {
               margin-left: 8px;
               float: right;
             }
+          }
+
+          @include mobile() {
+            display: none;
           }
         }
 

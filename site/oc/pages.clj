@@ -286,7 +286,7 @@
       [:img.keep-aligned-value.value-decisions
         {:src (cdn "/img/ML/homepage_bottom_section_decisions.png")
          :srcSet (str (cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
-    [:button.mlb-reset.get-started-button
+    [:button.mlb-reset.get-started-button.get-started-action
       "Create your team - It's free"]])
 
 (defn slack-email-switch [slack?]
@@ -398,7 +398,7 @@
                "Rest assured, Carrot updates never get lost "
                "in the noise.")]
             [:div.keep-aligned-section-footer
-              [:button.mlb-reset.create-team-bt
+              [:button.mlb-reset.create-team-bt.get-started-action
                 "Create your team - it’s free"]]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
@@ -419,7 +419,7 @@
                "important. This curated summary makes it easy "
                "to get caught up fast - perfect for remote teams.")]
             [:div.keep-aligned-section-footer
-              [:button.mlb-reset.create-team-bt
+              [:button.mlb-reset.create-team-bt.get-started-action
                 "Create your team - it’s free"]]
             (slack-email-switch slack?)]
           [:div.keep-aligned-section-row-left
@@ -449,7 +449,7 @@
                "engagement, and which ones aren’t getting "
                "through.")]
             [:div.keep-aligned-section-footer
-              [:button.mlb-reset.create-team-bt
+              [:button.mlb-reset.create-team-bt.get-started-action
                 "Create your team - it’s free"]]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
@@ -487,7 +487,7 @@
            "on what matters. With Carrot, nothing gets lost in the noise.")]
 
         [:div.get-started-button-container.group
-          [:button.mlb-reset.get-started-button
+          [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
             "Create your team - It's free"]]
 
