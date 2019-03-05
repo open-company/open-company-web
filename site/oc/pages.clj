@@ -1045,10 +1045,11 @@
         ;           {:href "https://linkedin.com/in/nathanzorn/"
         ;            :target "_blank"}]]]]]
 
+        [:h3.about-copy-header
+          "Why we built Carrot"]
+
         [:div.about-copy
           [:div.about-copy-inner
-            [:h3.about-copy-header
-              "Why we built Carrot"]
             [:p
               (str
                "In the age of Slack and fast-moving conversations, the lack of "

@@ -175,12 +175,28 @@ div.about-wrap {
           }
         }
       }
+      
+      h3.about-copy-header {
+        @include PTSerif()
+        color: $deep_navy;
+        font-size: 60px;
+        line-height: 78px;
+        position: relative;
+        z-index: 3;
+        margin: 120px auto;
+        text-align: center;
+
+        @include tablet() {
+          max-width: 360px;
+          margin: 80px auto;
+        }
+      }
 
       div.about-copy {
         width: 100%;
         margin: 0 auto;
         border-radius: 8px;
-        padding: 40px 0 120px;
+        padding: 80px 0 120px;
         position: relative;
         z-index: 1;
         text-align: left;
@@ -204,7 +220,7 @@ div.about-wrap {
 
         @include tablet() {
           width: 100%;
-          padding: 80px 24px;
+          padding: 48px 24px 80px;
         }
 
         div.about-copy-inner {
@@ -215,13 +231,6 @@ div.about-wrap {
 
           @include tablet() {
             width: 100%;
-          }
-
-          h3.about-copy-header {
-            @include PTSerif()
-            color: $deep_navy;
-            font-size: 60px;
-            line-height: 78px;
           }
 
           div.about-copy-title {
