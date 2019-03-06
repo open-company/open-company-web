@@ -7,14 +7,15 @@ div.about-wrap {
     width: 100%;
 
     section.about-header {
-      padding-top: 239px;
+      // padding-top: 239px;
+      padding-top: 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
-      @include tablet() {
-        padding-top: 131px;
-      }
+      // @include tablet() {
+      //   padding-top: 131px;
+      // }
 
       h1.about {
         @include PTSerif()
@@ -33,6 +34,7 @@ div.about-wrap {
 
         @include mobile() {
           max-width: 380px;
+          font-size: 36px;
         }
       }
 
@@ -174,36 +176,43 @@ div.about-wrap {
           }
         }
       }
+      
+      h3.about-copy-header {
+        @include PTSerif()
+        color: $deep_navy;
+        font-size: 60px;
+        line-height: 78px;
+        position: relative;
+        z-index: 3;
+        margin: 120px auto 0;
+        text-align: left;
+        max-width: 795px;
+
+        @include tablet() {
+          max-width: 595px;
+          text-align: center;
+          margin: 80px auto 0;
+        }
+
+        @include mobile() {
+          font-size: 36px;
+          line-height: normal;
+          max-width: 202px;
+        }
+      }
 
       div.about-copy {
         width: 100%;
         margin: 0 auto;
         border-radius: 8px;
-        padding: 120px 0;
+        padding: 0 0 120px;
         position: relative;
         z-index: 1;
         text-align: left;
 
-        &:before {
-          content: "";
-          background-color: $another_ui_grey;
-          border-top-right-radius: 200px;
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          width: 86vw;
-          z-index: 2;
-
-          @media screen and (max-width: 1200px) {
-            width: 100vw;
-            border-top-right-radius: 100px;
-          }
-        }
-
         @include tablet() {
           width: 100%;
-          padding: 80px 24px;
+          padding: 0 24px 80px;
         }
 
         div.about-copy-inner {
@@ -214,13 +223,6 @@ div.about-wrap {
 
           @include tablet() {
             width: 100%;
-          }
-
-          h3.about-copy-header {
-            @include PTSerif()
-            color: $deep_navy;
-            font-size: 60px;
-            line-height: 78px;
           }
 
           div.about-copy-title {
@@ -254,10 +256,18 @@ div.about-wrap {
               font-size: 20px;
               line-height: 26px;
               margin: 32px 0 0;
+
+              &:first-child {
+                margin-top: 40px;
+              }
             }
 
             @include mobile() {
               margin: 24px 0 0;
+
+              &:first-child {
+                margin-top: 40px;
+              }
             }
 
             span.oblique {
