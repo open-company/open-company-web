@@ -561,9 +561,9 @@
                 "$4"]]
             [:div.tear-subtitle
               [:span.billed-annually
-                "Per user, billed annually"]
+                "Per user, per month, billed annually"]
               [:span.billed-monthly
-                "Per user, billed monthly"]]
+                "Per user, per month"]]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Try free for 14 days"]
