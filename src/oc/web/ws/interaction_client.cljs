@@ -158,14 +158,15 @@
 
 (defn start-router! []
   (s/start-client-chsk-router! @ch-chsk event-msg-handler)
-  (timbre/info "Connection estabilished"))
+  (timbre/info "Connection estabilished")
+  (ws-utils/reconnected last-interval "Interaction" chsk-send! ch-state
+   #(reconnect @last-ws-link (j/user-id))))
 
 (defn reconnect [ws-link uid]
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-board-path (.getPath ws-uri)]
     (reset! last-ws-link ws-link)
-    (ws-utils/reconnect last-interval "Interaction" chsk-send! ch-state)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))
             (not= @current-board-path ws-board-path))
