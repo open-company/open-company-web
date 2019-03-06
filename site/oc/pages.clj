@@ -247,108 +247,194 @@
                    :target "_blank"}
                   "Skylight Digital, Managing Director"]]]]]]]])
 
+(def animation-lightbox
+  [:div.animation-lightbox-container
+    {:onClick "OCStaticHideAnimationLightbox(event);"}
+    [:div.animation-lightbox
+      [:div {:id "youtube-player"}]
+      [:button.settings-modal-close.mlb-reset
+        {;:onClick "OCStaticHideAnimationLightbox(event);"
+         :onMouseDown "OCStaticHideAnimationLightbox(event);"
+         :ontouchstart "OCStaticHideAnimationLightbox(event);"}]]])
+
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:onClick "OCStaticShowAnimationLightbox();"}
+    [:div.green-play]
+    "Carrot in 60 seconds"])
+
+(def carrot-in-action
+  [:section.carrot-in-action
+    [:div.carrot-in-action-title
+      "Want to see Carrot in action?"]
+    show-animation-button])
+
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Company updates that rise above the noise"]
+      "Never miss what matters most"]
     [:div.keep-aligned-values-line.big-web-tablet-only
-      [:img.keep-aligned-value.value-announcements
-        {:src (cdn "/img/ML/homepage_bottom_section_announcements.png")
-         :srcSet (str (cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
-      [:img.keep-aligned-value.value-decisions
-        {:src (cdn "/img/ML/homepage_bottom_section_decisions.png")
-         :srcSet (str (cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-team-updates
         {:src (cdn "/img/ML/homepage_bottom_section_team_updates.png")
          :srcSet (str (cdn "/img/ML/homepage_bottom_section_team_updates@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-news
         {:src (cdn "/img/ML/homepage_bottom_section_news.png")
-         :srcSet (str (cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]]
-    [:button.mlb-reset.get-started-button
-      "Get started - It's free"]])
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-announcements
+        {:src (cdn "/img/ML/homepage_bottom_section_announcements.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-decisions
+        {:src (cdn "/img/ML/homepage_bottom_section_decisions.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
+    [:button.mlb-reset.get-started-button.get-started-action
+      "Create your team - It's free"]])
+
+(defn slack-email-switch [slack?]
+  [:div.slack-email-container.group.big-web-only
+    [:div.slack-email-switch-container.group
+      {:class (if slack? "show-slack" "show-email")}
+      (when slack?
+        [:button.mlb-reset.slack-email-switch-bt.slack-bt
+          [:div.slack-logo]])
+      [:button.mlb-reset.slack-email-switch-bt.email-bt
+        [:div.email-logo]]
+      (when-not slack?
+        [:button.mlb-reset.slack-email-switch-bt.slack-bt
+          [:div.slack-logo]])
+      (when slack?
+        [:div.slack-email-switch-bottom-panel.slack-panel
+          [:div.slack-email-switch-bottom-panel-copy
+            (str
+             "“Our remote teams are ecstatic about not having to read "
+             "hundreds of Slack messages each morning to make sense of "
+             "the previous day.”")]
+          [:div.slack-email-switch-bottom-panel-img]
+          [:div.slack-email-switch-bottom-panel-name
+            "Andrew Love"]
+          [:div.slack-email-switch-bottom-panel-role
+            "PartnerHero, Director of R&D"]])
+      [:div.slack-email-switch-bottom-panel.email-panel
+        [:div.slack-email-switch-bottom-panel-copy
+          (str
+           "“The morning digest is how we know everyone in our "
+           "offices is up to date on what matters.”")]
+        [:div.slack-email-switch-bottom-panel-img]
+        [:div.slack-email-switch-bottom-panel-name
+          "Chris Cairns"]
+        [:div.slack-email-switch-bottom-panel-role
+          "Skylight Digital, Managing Director"]]
+      (when-not slack?
+        [:div.slack-email-switch-bottom-panel.slack-panel
+          [:div.slack-email-switch-bottom-panel-copy
+            (str
+             "“Our remote teams are ecstatic about not having to read "
+             "hundreds of Slack messages each morning to make sense of "
+             "the previous day.”")]
+          [:div.slack-email-switch-bottom-panel-img]
+          [:div.slack-email-switch-bottom-panel-name
+            "Andrew Love"]
+          [:div.slack-email-switch-bottom-panel-role
+            "PartnerHero, Director of R&D"]])]])
+
+(defn- slack-panel [first-panel?]
+  [:div.keep-aligned-section-carion-block
+    [:div.keep-aligned-section-header.tablet-mobile-only
+      [:span.slack-logo]]
+    [:img.keep-aligned-section-screenshot.screenshot-1
+      {:class (if first-panel? "carion-1" "carion-1-alt")
+       :src (cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+       :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
+    [:div.slack-email-switch-bottom-panel.slack-panel
+      [:div.slack-email-switch-bottom-panel-copy
+        (str
+         "“Our remote teams are ecstatic about not having to read "
+         "hundreds of Slack messages each morning to make sense of "
+         "the previous day.”")]
+      [:div.slack-email-switch-bottom-panel-img]
+      [:div.slack-email-switch-bottom-panel-name
+        "Andrew Love"]
+      [:div.slack-email-switch-bottom-panel-role
+        "PartnerHero, Director of R&D"]]])
+
+(defn- email-panel [first-panel?]
+  [:div.keep-aligned-section-carion-block
+    [:div.keep-aligned-section-header.tablet-mobile-only
+      [:span.email-logo]]
+    [:img.keep-aligned-section-screenshot.screenshot-1
+      {:class (if first-panel? "carion-1" "carion-1-alt")
+       :src (cdn "/img/ML/homepage_screenshots_first_row.png")
+       :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+    [:div.slack-email-switch-bottom-panel.email-panel
+      [:div.slack-email-switch-bottom-panel-copy
+        (str
+         "“The morning digest is how we know everyone in our "
+         "offices is up to date on what matters.”")]
+      [:div.slack-email-switch-bottom-panel-img]
+      [:div.slack-email-switch-bottom-panel-name
+        "Chris Cairns"]
+      [:div.slack-email-switch-bottom-panel-role
+        "Skylight Digital, Managing Director"]]])
 
 (defn keep-aligned-section [slack?]
   [:section.home-keep-aligned.group
 
     [:div.keep-aligned-section
+
       [:div.keep-aligned-section-row.first-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Start each day in sync"]
+              "Share what matters"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot condenses noisy updates into "
-               "a morning digest for Slack or email.")]
-            [:div.slack-email-container.group.big-web-only
-              [:div.slack-email-switch-container.group
-                {:class "show-slack"}
-                [:button.mlb-reset.slack-email-switch-bt.slack-bt
-                  [:div.slack-logo]]
-                [:button.mlb-reset.slack-email-switch-bt.email-bt
-                  [:div.email-logo]]
-                [:div.slack-email-switch-bottom-panel.slack-panel
-                  [:div.slack-email-switch-bottom-panel-copy
-                    (str
-                     "“Our remote teams are ecstatic about not having to read "
-                     "hundreds of Slack messages each morning to make sense of "
-                     "the previous day.”")]
-                  [:div.slack-email-switch-bottom-panel-img]
-                  [:div.slack-email-switch-bottom-panel-name
-                    "Andrew Love"]
-                  [:div.slack-email-switch-bottom-panel-role
-                    "PartnerHero, Director of R&D"]]
-                [:div.slack-email-switch-bottom-panel.email-panel
-                  [:div.slack-email-switch-bottom-panel-copy
-                    (str
-                     "“The morning digest is a great way to get everyone "
-                     "aligned around what matters right from the start.”")]
-                  [:div.slack-email-switch-bottom-panel-img]
-                  [:div.slack-email-switch-bottom-panel-name
-                    "Chris Cairns"]
-                  [:div.slack-email-switch-bottom-panel-role
-                    "Skylight Digital, Managing Director"]]]]]
+               "Carrot gives you the space you need to "
+               "update your team, and even reminds you "
+               "when it's time to share the latest.")
+              [:br]
+              [:br]
+              (str
+               "Your team can view and comment on posts "
+               "in the app, or directly from Slack and email. "
+               "Rest assured, Carrot updates never get lost "
+               "in the noise.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]]
           [:div.keep-aligned-section-row-right
-            [:div.keep-aligned-section-carion-container
-              [:div.keep-aligned-section-carion-inner
-                [:div.keep-aligned-section-carion-block
-                  [:div.keep-aligned-section-header.tablet-mobile-only.first-header
-                    [:span.slack-logo]]
-                  [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
-                    {:src (cdn "/img/ML/homepage_screenshots_first_row_slack.png")
-                     :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
-                  [:div.slack-email-switch-bottom-panel.slack-panel
-                    [:div.slack-email-switch-bottom-panel-copy
-                      (str
-                       "“Our remote teams are ecstatic about not having to read "
-                       "hundreds of Slack messages each morning to make sense of "
-                       "the previous day.”")]
-                    [:div.slack-email-switch-bottom-panel-img]
-                    [:div.slack-email-switch-bottom-panel-name
-                      "Andrew Love"]
-                    [:div.slack-email-switch-bottom-panel-role
-                      "PartnerHero, Director of R&D"]]]
-                [:div.keep-aligned-section-carion-block
-                  [:div.keep-aligned-section-header..tablet-mobile-only.second-header
-                    [:span.email-logo]]
-                  [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
-                    {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
-                     :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
-                  [:div.slack-email-switch-bottom-panel.email-panel
-                    [:div.slack-email-switch-bottom-panel-copy
-                      (str
-                       "“The morning digest is a great way to get everyone "
-                       "aligned around what matters right from the start.”")]
-                    [:div.slack-email-switch-bottom-panel-img]
-                    [:div.slack-email-switch-bottom-panel-name
-                      "Chris Cairns"]
-                    [:div.slack-email-switch-bottom-panel-role
-                      "Skylight Digital, Managing Director"]]]]
-              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
+            [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
+              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
+               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
+               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-right.keep-aligned-section-copy
+            [:div.keep-aligned-section-copy-title
+              "Start every day in sync"]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "Your team wakes up to a daily digest of what's "
+               "important. This curated summary makes it easy "
+               "to get caught up fast - perfect for remote teams.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]
+            (slack-email-switch slack?)]
+          [:div.keep-aligned-section-row-left
+            [:div.keep-aligned-section-carion-container
+              [:div.keep-aligned-section-carion-inner
+                (when slack?
+                  (slack-panel true))
+                (email-panel (not slack?))
+                (when-not slack?
+                  (slack-panel false))]
+              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
+
+      [:div.keep-aligned-section-row.third-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Know who’s engaged"]
             [:div.keep-aligned-section-copy-subtitle
@@ -361,37 +447,22 @@
               (str
                "See which updates create energy and "
                "engagement, and which ones aren’t getting "
-               "through.")]]
-          [:div.keep-aligned-section-row-left
+               "through.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]]
+          [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
               {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
                :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
             [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
               {:src (cdn "/img/ML/homepage_screenshots_second_row_mobile.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row_mobile@2x.png") " 2x")}]]]]
-
-      [:div.keep-aligned-section-row.third-row
-        [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
-            [:div.keep-aligned-section-copy-title
-              "Stay current"]
-            [:div.keep-aligned-section-copy-subtitle
-              (str
-               "Carrot reminds you when it’s time to update "
-               "your team. Consistent communication builds "
-               "trust and transparency.")]]
-          [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
-              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
-               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
-            [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
-               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])
+               :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row_mobile@2x.png") " 2x")}]]]]]])
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Great teams like these use Carrot to stay up to date."]
+      "Fast-growing and remote teams around the world use Carrot"]
     [:div.homepage-testimonials-logo.logo-novo]
     [:div.homepage-testimonials-logo.logo-ph]
     [:div.homepage-testimonials-logo.logo-wsu]
@@ -403,6 +474,7 @@
   [:div.home-wrap
     {:id "wrap"}
     [:div.main.home-page
+      animation-lightbox
       ; Hope page header
       [:section.cta.group
 
@@ -410,14 +482,14 @@
           "Lead with clarity"]
         [:div.subheadline
           (str
-           "Leaders struggle to communicate effectively with fast-growing and "
-           "remote teams. Carrot keeps everyone on the same page - even "
-           "when you can’t be in the same place.")]
+           "Carrot is a platform for must-see communication. Share the "
+           "important team updates and news that keeps your team focused "
+           "on what matters. With Carrot, nothing gets lost in the noise.")]
 
         [:div.get-started-button-container.group
-          [:button.mlb-reset.get-started-button
+          [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Get started - It's free"]]
+            "Create your team - It's free"]]
 
         [:div.main-animation-container
           [:img.main-animation
@@ -427,6 +499,8 @@
         testimonials-logos-line]
 
       (keep-aligned-section false)
+
+      carrot-in-action
 
       testimonials-section
 
@@ -445,7 +519,7 @@
           "It’s free to get started"]
 
         [:div.pricing-subheadline
-          "Carrot makes leadership communication work for fast-growing and distributed teams."]
+          "Carrot keeps fast-growing and remote teams focused on what matters."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -455,7 +529,7 @@
             [:h3.tear-price
               "$0"]
             [:div.tear-subtitle
-              "Free for small teams up to 10 users."]
+              "Free for small teams up to 10 users"]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Start for free"]
@@ -487,9 +561,9 @@
                 "$4"]]
             [:div.tear-subtitle
               [:span.billed-annually
-                "Per active user, billed annually"]
+                "Per user, per month, billed annually"]
               [:span.billed-monthly
-                "Per active user, billed monthly"]]
+                "Per user, per month"]]
             [:a.tear-start-bt
               {:href "/sign-up"}
               "Try free for 14 days"]
@@ -519,6 +593,9 @@
                 "Everything in the "
                 [:span.heavy "Team plan"]
                 ", plus:"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
+              [:span "Custom plans"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
               [:span "Carrot AI"]]
@@ -590,6 +667,14 @@
 
         [:div.faq-row
           [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
@@ -610,17 +695,18 @@
   [:div.slack-wrap
     {:id "wrap"}
     [:div.main.slack
+      animation-lightbox
       ; Hope page header
       [:section.carrot-plus-slack.group
 
         [:h1.slack-headline
-          "Rise above the noise"]
+          "Lead with clarity"]
 
         [:div.slack-subline
           (str
-           "Leaders struggle to communicate effectively with fast-growing and "
-           "remote teams. Carrot makes sure everyone hears you - even in noisy "
-           "places like Slack and email. With Carrot, everyone stays on the same page.")]
+           "Carrot makes sure must-see information doesn't get lost in fast-moving "
+           "conversations. With Carrot, everyone sees the key team updates, news and "
+           "decisions that keep your Slack team focused on what matters.")]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
@@ -635,6 +721,8 @@
         testimonials-logos-line]
 
       (keep-aligned-section true)
+
+      carrot-in-action
 
       testimonials-section
 
@@ -673,6 +761,7 @@
   [:div.press-kit-wrap
     {:id "wrap"}
     [:div.main.press-kit
+      animation-lightbox
       [:section.cta.group
 
         [:h1.headline
@@ -860,106 +949,107 @@
     [:div.main.about
       [:section.about-header
 
-        [:h1.about
-          "Meet the team"]
+        ; [:h1.about
+        ;   "Meet the team"]
 
-        [:div.team-container
-          [:div.team-row.group.three-cards
-            [:div.team-card.iacopo-carraro
-              [:div.user-avatar]
-              [:div.user-name
-                "Iacopo Carraro"]
-              [:div.user-position
-                "Software Engineer"
-                [:br]
-                "in Livorno, Italy"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/bago2k4"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/iacopocarraro/"
-                   :target "_blank"}]]]
-            [:div.team-card.sean-johnson
-              [:div.user-avatar]
-              [:div.user-name
-                "Sean Johnson"]
-              [:div.user-position
-                "CTO & Founder"
-                [:br]
-                "in Chapel Hill, USA"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/belucid"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/snootymonkey/"
-                   :target "_blank"}]]]
-            [:div.team-card.georgiana-laudi
-              [:div.user-avatar]
-              [:div.user-name
-                "Georgiana Laudi"]
-              [:div.user-position
-                "Marketing & CX Advisor"
-                [:br]
-                "in Montreal, Canada"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/ggiiaa"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/georgianalaudi/"
-                   :target "_blank"}]]]
-            [:div.team-card.stuart-levinson
-              [:div.user-avatar]
-              [:div.user-name
-                "Stuart Levinson"]
-              [:div.user-position
-                "CEO & Founder"
-                [:br]
-                "in Cambridge, USA"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/stuartlevinson"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/stuartlevinson/"
-                   :target "_blank"}]]]
-            [:div.team-card.ryan-le-roux
-              [:div.user-avatar]
-              [:div.user-name
-                "Ryan Le Roux"]
-              [:div.user-position
-                "Head of Design"
-                [:br]
-                "in Vancouver, Canada"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/ryanleroux"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/ryanleroux/"
-                   :target "_blank"}]]]
-            [:div.team-card.nathan-zorn
-              [:div.user-avatar]
-              [:div.user-name
-                "Nathan Zorn"]
-              [:div.user-position
-                "Software Engineer"
-                [:br]
-                "in Charleston, USA"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/thepug"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/nathanzorn/"
-                   :target "_blank"}]]]]]
+        ; [:div.team-container
+        ;   [:div.team-row.group.three-cards
+        ;     [:div.team-card.iacopo-carraro
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Iacopo Carraro"]
+        ;       [:div.user-position
+        ;         "Software Engineer"
+        ;         [:br]
+        ;         "in Livorno, Italy"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/bago2k4"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/iacopocarraro/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.sean-johnson
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Sean Johnson"]
+        ;       [:div.user-position
+        ;         "CTO & Founder"
+        ;         [:br]
+        ;         "in Chapel Hill, USA"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/belucid"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/snootymonkey/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.georgiana-laudi
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Georgiana Laudi"]
+        ;       [:div.user-position
+        ;         "Marketing & CX Advisor"
+        ;         [:br]
+        ;         "in Montreal, Canada"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/ggiiaa"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/georgianalaudi/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.stuart-levinson
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Stuart Levinson"]
+        ;       [:div.user-position
+        ;         "CEO & Founder"
+        ;         [:br]
+        ;         "in Cambridge, USA"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/stuartlevinson"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/stuartlevinson/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.ryan-le-roux
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Ryan Le Roux"]
+        ;       [:div.user-position
+        ;         "Head of Design"
+        ;         [:br]
+        ;         "in Vancouver, Canada"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/ryanleroux"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/ryanleroux/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.nathan-zorn
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Nathan Zorn"]
+        ;       [:div.user-position
+        ;         "Software Engineer"
+        ;         [:br]
+        ;         "in Charleston, USA"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/thepug"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/nathanzorn/"
+        ;            :target "_blank"}]]]]]
+
+        [:h3.about-copy-header
+          "Why we built Carrot"]
 
         [:div.about-copy
           [:div.about-copy-inner
-            [:h3.about-copy-header
-              "Why we built Carrot"]
             [:p
               (str
                "In the age of Slack and fast-moving conversations, the lack of "
@@ -976,18 +1066,19 @@
               [:span.heavy "leadership is getting lost in the noise."]]
             [:p
               (str
-               "Sharing key information everyone needs alongside random chats just increases "
-               "the likelihood it will scroll by without being noticed. It’s difficult for the "
-               "team to know what matters, and leaders have no idea if anyone even heard what they said.")]
+               "Sharing important team updates, news, and decisions alongside random chats "
+               "just increases the likelihood it will scroll by without being noticed. "
+               "It’s difficult for the team to know what matters, and leaders have no idea "
+               "if anyone even heard what they said.")]
             [:p
               (str
                "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
-               "to handle leadership communication. We wanted this “non-chat” communication "
-               "to be as fun, delightful and interactive as chat; but we also wanted it to be "
-               "asynchronous so people could get caught up on their own time.")]
+               "to handle must-see communication. We wanted this “non-chat” communication "
+               "to be as fun, delightful and interactive as chat; but we also wanted it "
+               "to be asynchronous so people could get caught up on their own time.")]
             [:p
               (str
-               "The result is Carrot - a platform for leadership communication that keeps "
+               "The result is Carrot - a platform for must-see communication that keeps "
                "everyone focused on what matters to build transparency, trust, and stronger teams.")]]
 
           [:div.about-bottom-copy
