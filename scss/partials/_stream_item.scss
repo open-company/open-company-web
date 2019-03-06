@@ -3,12 +3,12 @@ div.stream-item {
   margin: 12px 0px 16px;
   border: 1px solid $ultra_light_grey;
   border-radius: 6px;
-  padding: 32px 40px;
+  padding: 24px 32px;
   background-color: white;
 
   @include mobile() {
     width: 100%;
-    padding: 24px 16px;
+    padding: 16px;
     margin: 0;
     border: none;
     border-bottom: 1px solid $ultra_light_grey;
@@ -17,14 +17,6 @@ div.stream-item {
 
   &.draft {
     cursor: pointer;
-  }
-
-  &.show-menu {
-    div.stream-item-header {
-      div.more-menu {
-        display: block;
-      }
-    }
   }
 
   &.new-item {
@@ -75,19 +67,27 @@ div.stream-item {
   }
 
   &.show-continue-reading:not(.single-post-view) {
-    div.stream-item-body-ext {
-      div.stream-item-footer {
-        button.expand-button {
-          display: block;
-        }
-      }
+    button.expand-button {
+      display: flex;
     }
   }
+
+  &:not(.show-continue-reading):not(.single-post-view) {
+    button.expand-button {
+      display: none;
+    }
+
+    @include mobile(){
+      div.stream-item-bottom-footer {
+        display: none;
+      }
+    }
+  }  
 
   div.activity-share-container {
     div.activity-share-modal-container {
       right: -9px;
-      margin-top: 40px;
+      margin-top: 0;
     }
   }
 
@@ -99,12 +99,9 @@ div.stream-item {
     }
     
     div.more-menu {
-      display: none;
+      float: right;
 
       @include mobile() {
-        display: block;
-        float: right;
-
         ul.more-menu-list {
           left: unset;
           right: 16px;
@@ -487,93 +484,8 @@ div.stream-item {
     }
 
     div.stream-item-footer {
-      height: 32px;
-      margin-top: 8px;
-
-      @include mobile() {
-        margin-top: 16px;
-      }
-      
-      div.mobile-summary {
-        float: right;
-        margin-top: 10px;
-
-        div.mobile-comments-summary {
-          float: left;
-          height: 16px;
-          margin-left: 6px;
-
-          div.mobile-comments-summary-icon {
-            background-image: cdnUrl("/img/ML/tile_comments_icon_mobile.svg");
-            background-size: 14px 14px;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 14px;
-            height: 14px;
-            float: left;
-            display: block;
-          }
-
-          span {
-            margin-left: 6px;
-            font-size: 12px;
-            color: $light_ui_grey;
-            margin-left: 6px;
-            line-height: 14px;
-            float: left;
-            display: block;
-          }
-        }
-
-        div.mobile-summary-reaction {
-          height: 16px;
-          margin-left: 6px;
-          float: left;
-
-          span.reaction {
-            font-size: 12px;
-            float: left;
-            display: block;
-            margin-left: 6px;
-          }
-
-          span.count {
-            @include avenir_H();
-            font-size: 11px;
-            color: $ui_grey;
-            float: left;
-            display: block;
-            margin-left: 4px;
-          }
-        }
-
-        div.mobile-summary-attachments {
-          float: right;
-          text-align: right;
-          height: 16px;
-          margin-top: 10px;
-          
-          span.attachments-icon {
-            float: left;
-            display: block;
-            width: 14px;
-            height: 15px;
-            background-image: cdnUrl("/img/ML/tile_attachments_icon.svg");
-            background-repeat: no-repeat;
-            background-size: 14px 15px;
-            background-position: center;
-          }
-
-          span.attachments-count {
-            float: left;
-            display: block;
-            @include avenir_H();
-            font-size: 12px;
-            color: $ui_grey;
-            margin-left: 6px;
-          }
-        }
-      }
+      height: 26px;
+      margin-top: 16px;
 
       div.stream-body-draft-edit {
         float: left;
@@ -600,22 +512,18 @@ div.stream-item {
 
       div.stream-item-comments-summary {
         margin-right: 16px;
-        margin-top: 4px;
         float: left;
         cursor: pointer;
 
-        @include tablet() {
-          display: none;
+        @include mobile() {
+          max-width: calc(50% - 16px);
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
 
       div.reactions {
         float: left;
-        margin-top: 4px;
-
-        @include tablet() {
-          float: right;
-        }
 
         div.reactions-picker-container {
           div.emoji-mart {
@@ -632,60 +540,12 @@ div.stream-item {
           }
         }
       }
-
-      @include mobile() {
-        position: relative;
-        bottom: unset;
-      }
-
-      button.expand-button {
-        width: auto;
-        height: 24px;
-        color: $carrot_green;
-        @include avenir_H();
-        font-size: 14px;
-        text-align: left;
-        display: none;
-        padding: 6px 0 0 22px;
-        position: relative;
-        overflow: visible;
-        float: right;
-
-        @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
-
-        @include mobile() {
-          margin-right: 24px;
-          float: left;
-          padding: 6px 7px 0px 22px;
-        }
-
-        &:before {
-          position: absolute;
-          content: "";
-          background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-          background-size: 14px 8px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 14px;
-          height: 8px;
-          top: 12px;
-          left: 0px;
-          transition: rotate 180ms;
-        }
-
-        &.expanded {
-          color: $ui_grey;
-          &:before {
-            background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
-          }
-        }
-      }
     }
   }
 
   div.stream-body-right {
     position: relative;
-    margin-top: 24px;
+    margin-top: 16px;
     padding-top: 24px;
     border-top: 1px solid $ultra_light_grey;
 
@@ -697,13 +557,76 @@ div.stream-item {
 
     div.stream-body-comments {
       height: 100%;
+    }
+  }
 
-      div.stream-comments-title {
-        @include avenir_H();
-        font-size: 14px;
-        color: $carrot_dark_gray;
-        margin-bottom: 8px;
+  div.stream-item-bottom-footer {
+    margin-top: 16px;
+    border-top: 1px solid $ultra_light_grey;
+    padding-top: 12px;
+    height: 36px;
+
+    @include mobile() {
+      border-top: 0px solid transparent;
+      padding-top: 0;
+      height: 32px;
+    }
+
+    &.expanded {
+      margin-top: 0;
+      border-top: 0px solid transparent;
+
+      @include mobile() {
+        margin-top: 16px;
+        height: 24px;
       }
+    }
+
+    button.expand-button {
+      padding: 0;
+      height: 24px;
+      color: $carrot_green;
+      @include avenir_H();
+      font-size: 14px;
+      justify-content: center;
+      align-items: center;
+      display: none;
+      float: none;
+      opacity: 1;
+      float: left;
+      width: 100px;
+      margin-top: 0;
+
+      @include mobile(){
+        width: 100%;
+      }
+
+      @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+
+      span.expand-icon {
+        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
+        background-size: 14px 8px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 14px;
+        height: 8px;
+        transition: rotate 180ms;
+        margin-right: 8px;
+        display: block;
+      }
+
+      &.expanded {
+        color: $ui_grey;
+
+        span.expand-icon {
+          background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+        }
+      }
+    }
+
+    div.more-menu {
+      float: right;
+      margin-top: -4px;
     }
   }
 }
