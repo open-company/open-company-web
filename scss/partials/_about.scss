@@ -184,7 +184,7 @@ div.about-wrap {
         line-height: 78px;
         position: relative;
         z-index: 3;
-        margin: 120px auto;
+        margin: 120px auto 0;
         text-align: center;
 
         @include tablet() {
@@ -203,14 +203,14 @@ div.about-wrap {
         width: 100%;
         margin: 0 auto;
         border-radius: 8px;
-        padding: 80px 0 120px;
+        padding: 0 0 120px;
         position: relative;
         z-index: 1;
         text-align: left;
 
         @include tablet() {
           width: 100%;
-          padding: 48px 24px 80px;
+          padding: 0 24px 80px;
         }
 
         div.about-copy-inner {
@@ -254,10 +254,18 @@ div.about-wrap {
               font-size: 20px;
               line-height: 26px;
               margin: 32px 0 0;
+
+              &:first-child {
+                margin-top: 40px;
+              }
             }
 
             @include mobile() {
               margin: 24px 0 0;
+
+              &:first-child {
+                margin-top: 40px;
+              }
             }
 
             span.oblique {

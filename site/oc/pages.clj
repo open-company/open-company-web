@@ -1064,20 +1064,22 @@
               "This is the question that led us to build Carrot. What we "
               "found is that "
               [:span.heavy "leadership is getting lost in the noise."]]
+
             [:p
               (str
-               "Sharing key information everyone needs alongside random chats just increases "
-               "the likelihood it will scroll by without being noticed. It’s difficult for the "
-               "team to know what matters, and leaders have no idea if anyone even heard what they said.")]
+               "Sharing important team updates, news, and decisions everyone needs alongside "
+               "random chats just increases the likelihood it will scroll by without being noticed. "
+               "It’s difficult for the team to know what matters, and leaders have no idea if anyone "
+               "even heard what they said.")]
             [:p
               (str
                "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
-               "to handle leadership communication. We wanted this “non-chat” communication "
-               "to be as fun, delightful and interactive as chat; but we also wanted it to be "
-               "asynchronous so people could get caught up on their own time.")]
+               "to handle must-see communication. We wanted this “non-chat” communication "
+               "to be as fun, delightful and interactive as chat; but we also wanted it "
+               "to be asynchronous so people could get caught up on their own time.")]
             [:p
               (str
-               "The result is Carrot - a platform for leadership communication that keeps "
+               "The result is Carrot - a platform for must-see communication that keeps "
                "everyone focused on what matters to build transparency, trust, and stronger teams.")]]
 
           [:div.about-bottom-copy
