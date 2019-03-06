@@ -37,7 +37,7 @@
             "It’s free to get started"]
 
           [:div.pricing-subheadline
-            "Carrot makes leadership communication work for fast-growing and distributed teams."]
+            "Carrot keeps fast-growing and remote teams focused on what matters."]
 
           [:div.pricing-three-columns.group
             ;; Free
@@ -47,7 +47,7 @@
               [:h3.tear-price
                 "$0"]
               [:div.tear-subtitle
-                "Free for small teams up to 10 users."]
+                "Free for small teams up to 10 users"]
               [:a.tear-start-bt
                 {:href "/sign-up"}
                 "Start for free"]
@@ -111,6 +111,9 @@
                   "Everything in the "
                   [:span.heavy "Team plan"]
                   ", plus:"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
+                [:span "Custom plans"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
                 [:span "Carrot AI"]]
@@ -179,6 +182,14 @@
                :on-click #(chat/chat-click 43239)}
               "Contact us"]
             " to see if your organization is eligible."]]
+
+        [:div.faq-row
+          [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]
 
         [:div.faq-row
           [:div.faq-row-question
