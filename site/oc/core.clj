@@ -76,7 +76,7 @@
       [:button.mlb-reset.login-btn
         {:id "site-mobile-menu-login"}
         "Login"]
-      [:button.mlb-reset.get-started-button
+      [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
         "Get started for free"]]])
 

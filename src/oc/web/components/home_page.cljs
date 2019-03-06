@@ -35,6 +35,7 @@
       {:id "wrap"}
       (login-overlays-handler)
       [:div.main.home-page
+        (shared-misc/video-lightbox)
         ; Hope page header
         [:section.cta.group
 
@@ -42,20 +43,14 @@
             "Lead with clarity"]
           [:div.subheadline
             (str
-             "Leaders struggle to communicate effectively with fast-growing and "
-             "remote teams. Carrot keeps everyone on the same page - even "
-             "when you can’t be in the same place.")]
-          ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+             "Carrot is a platform for must-see communication. Share the "
+             "important team updates and news that keeps your team focused "
+             "on what matters. With Carrot, nothing gets lost in the noise.")]
+
           [:div.get-started-button-container.group
             [:button.mlb-reset.get-started-button
-              {:id "get-started-centred-bt"
-               :on-click #(router/nav! oc-urls/sign-up)}
-              "Get started - It's free"]]
-          [:div.carrot-box-container.confirm-thanks.group
-            {:style {:display "none"}}
-            [:div.carrot-box-thanks
-              [:div.thanks-headline "You are Confirmed!"]
-              [:div.thanks-subheadline "Thank you for subscribing."]]]
+              {:id "get-started-centred-bt"}
+              "Create your team - It's free"]]
 
           [:div.main-animation-container
             [:img.main-animation
@@ -65,6 +60,8 @@
           shared-misc/testimonials-logos-line]
 
         (shared-misc/keep-aligned-section false)
+
+        shared-misc/carrot-in-action
 
         shared-misc/testimonials-section
 
