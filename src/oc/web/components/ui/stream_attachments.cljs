@@ -10,16 +10,20 @@
 (rum/defcs stream-attachments < (rum/local false ::attachments-dropdown)
   [s attachments expand-cb remove-cb]
   (let [atc-num (count attachments)
-        ww (responsive/ww)
         editable? (fn? remove-cb)
         show-all? (not (fn? expand-cb))
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        attachments-num (if show-all?
+                          (count attachments)
+                          (if is-mobile? 1 2))
         attachments-list (if show-all?
                            attachments
-                           (take 3 attachments))
+                           (take attachments-num attachments))
         should-show-expand? (> (count attachments) (count attachments-list))]
     (when (pos? atc-num)
       [:div.stream-attachments
-        [:div.stream-attachments-content
+        [:div.stream-attachments-content.group
+          {:class (when-not show-all? "collapsed")}
           (for [idx (range (count attachments-list))
                 :let [atch (nth attachments-list idx)
                       atch-key (str "attachment-" idx "-" (:file-url atch))
@@ -40,7 +44,7 @@
                   [:span.attachment-description subtitle]
                   (when editable?
                     [:button.mlb-reset.remove-attachment-bt
-                      {:data-toggle (when-not (responsive/is-tablet-or-mobile?) "" "tooltip")
+                      {:data-toggle (when-not is-mobile? "" "tooltip")
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -53,4 +57,4 @@
           (when should-show-expand?
             [:div.stream-attachments-show-more
               {:on-click expand-cb}
-              (str "+" (- (count attachments) (count attachments-list)) " more attachments")])]])))
+              (str "+ " (- (count attachments) (count attachments-list)) " more")])]])))
