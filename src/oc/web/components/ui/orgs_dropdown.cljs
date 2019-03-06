@@ -46,7 +46,7 @@
                      (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                      (when should-show-dropdown?
                        (dis/dispatch! [:input [:orgs-dropdown-visible] (not orgs-dropdown-visible)])))}
-        (org-avatar org-data (not should-show-dropdown?) (if is-mobile? :never :always) (not is-mobile?))]
+        (org-avatar org-data (not should-show-dropdown?) :always true)]
       (when orgs-dropdown-visible
         [:div.orgs-dropdown-container
           [:div.triangle]

@@ -339,3 +339,15 @@
             [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
               {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
                :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])
+
+(defn video-lightbox []
+  (let [dismiss-cb (fn [e]
+                     (js/OCStaticHideAnimationLightbox e))]
+    [:div.animation-lightbox-container
+      {:on-click dismiss-cb}
+      [:div.animation-lightbox
+        [:div#youtube-player]
+        [:button.settings-modal-close.mlb-reset
+          {;:onClick "OCStaticHideAnimationLightbox(event);"
+           :on-mouse-down dismiss-cb
+           :on-touch-start dismiss-cb}]]]))

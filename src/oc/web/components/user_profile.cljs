@@ -8,11 +8,14 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-stores]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.user-profile-personal-tab :refer (user-profile-personal-tab)]
             [oc.web.components.user-profile-notifications-tab :refer (user-profile-notifications-tab)]))
@@ -23,10 +26,12 @@
 (defn dismiss-modal []
   (dis/dispatch! [:input [:user-settings] nil]))
 
-(defn real-close-cb [editing-user-data]
+(defn real-close-cb [editing-user-data & [mobile-back-bt]]
   (when (:has-changes editing-user-data)
     (user-actions/user-profile-reset))
-  (dismiss-modal))
+  (dismiss-modal)
+  (when mobile-back-bt
+    (nav-actions/mobile-menu-toggle)))
 
 (def default-user-profile (oc.web.stores.user/random-user-image))
 
@@ -46,7 +51,7 @@
                                       :container "body"})
         (.tooltip $header-avatar "destroy")))))
 
-(defn close-cb [current-user-data]
+(defn close-cb [current-user-data & [mobile-back-bt]]
   (dis/dispatch! [:input [:latest-entry-point] 0])
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
@@ -58,9 +63,9 @@
                       :solid-button-title "Lose changes"
                       :solid-button-cb #(do
                                           (alert-modal/hide-alert)
-                                          (real-close-cb current-user-data))}]
+                                          (real-close-cb current-user-data mobile-back-bt))}]
       (alert-modal/show-alert alert-data))
-    (real-close-cb current-user-data)))
+    (real-close-cb current-user-data mobile-back-bt)))
 
 (defn error-cb [res error]
   (notification-actions/show-notification
@@ -71,7 +76,8 @@
 
 (defn success-cb
   [res]
-  (let [url    (googobj/get res "url")]
+  (let [url (googobj/get res "url")]
+    (qsg-actions/finish-profile-photo-trail)
     (if-not url
       (error-cb nil nil)
       (do
@@ -90,6 +96,7 @@
                           (drv/drv :edit-user-profile)
                           (drv/drv :user-settings)
                           (drv/drv :edit-user-profile-avatar)
+                          (drv/drv :qsg)
                           ;; Locals
                           (rum/local nil ::temp-user-avatar)
                           ;; Mixins
@@ -116,16 +123,24 @@
         edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         temp-user-avatar @(::temp-user-avatar s)
-        is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")]
+        is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")
+        qsg-data (drv/react s :qsg)]
     [:div.user-profile
+      [:div.user-profile-mobile-header
+        [:button.mlb-reset.user-profile-mobile-close
+          {:on-click #(close-cb current-user-data true)}]
+        [:div.user-profile-mobile-header-title
+          "My Profile"]]
       [:div.user-profile-inner
         [:button.mlb-reset.settings-modal-close
           {:on-click #(close-cb current-user-data)}]
         [:div.user-profile-header.group
-          [:div.user-profile-header-avatar
+          [:div.user-profile-header-avatar.qsg-profile-photo-3
             {:ref "user-profile-header-avatar"
              :class (utils/class-set {:profile-tab (= tab :profile)})
              :on-click #(upload-user-profile-pictuer-clicked)}
+            (when (= (:step qsg-data) :profile-photo-3)
+              (qsg-breadcrumb qsg-data))
             (if is-jelly-head-avatar
               [:div.empty-user-avatar-placeholder]
               (user-avatar-image user-for-avatar))]

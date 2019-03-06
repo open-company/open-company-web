@@ -90,7 +90,7 @@
                                                                 "Reminder created and teammate notified")
                                                         :primary-bt-title "OK"
                                                         :primary-bt-dismiss true
-                                                        :expire 1000
+                                                        :expire 10
                                                         :id :reminder-created})))
            (refresh-reminders)))))))
 

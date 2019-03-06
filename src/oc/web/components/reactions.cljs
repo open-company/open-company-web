@@ -45,7 +45,8 @@
         react-link (utils/link-for (:links entry-data) "react")
         should-show-picker? (and (not hide-last-reaction?)
                                  react-link
-                                 (< (count reactions-data) default-reaction-number))]
+                                 (< (count reactions-data) default-reaction-number))
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)
               should-show-picker?)
@@ -84,13 +85,14 @@
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))
                                           utils/hide-class true})
-                 :on-mouse-leave #(this-as this
-                                   (utils/remove-tooltips)
-                                   (.tooltip (js/$ this)))
+                 :on-mouse-leave (when-not is-mobile?
+                                   #(this-as this
+                                     (utils/remove-tooltips)
+                                     (.tooltip (js/$ this))))
                  :title reaction-attribution
                  :data-placement "top"
                  :data-container "body"
-                 :data-toggle "tooltip"
+                 :data-toggle (when-not is-mobile? "tooltip")
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
                                (when (and (not (:reacted r))
