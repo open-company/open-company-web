@@ -53,14 +53,10 @@
                 "Start for free"]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "500mb storage"]]
+                [:span "1gb storage"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                {:data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title "Browse and search posts from the previous 3 months"}
-                [:span "3 months history"]]]
+                [:span "Access 3 months recent history"]]]
             ;; Team
             [:div.pricing-column.team-column.annual
               [:h2.tear-title
