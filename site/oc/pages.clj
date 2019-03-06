@@ -1064,13 +1064,12 @@
               "This is the question that led us to build Carrot. What we "
               "found is that "
               [:span.heavy "leadership is getting lost in the noise."]]
-
             [:p
               (str
-               "Sharing important team updates, news, and decisions everyone needs alongside "
-               "random chats just increases the likelihood it will scroll by without being noticed. "
-               "It’s difficult for the team to know what matters, and leaders have no idea if anyone "
-               "even heard what they said.")]
+               "Sharing important team updates, news, and decisions alongside random chats "
+               "just increases the likelihood it will scroll by without being noticed. "
+               "It’s difficult for the team to know what matters, and leaders have no idea "
+               "if anyone even heard what they said.")]
             [:p
               (str
                "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
