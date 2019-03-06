@@ -110,6 +110,11 @@ var OCWebPrintUserNotifications = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};
 var OCWebPrintQSGData = function(){};
+// Cljs utility externs
+var OCWebUtils = {};
+OCWebUtils.deref = function(){};
+OCWebUtils.keyword = function(){};
+OCWebUtils.app_state = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
