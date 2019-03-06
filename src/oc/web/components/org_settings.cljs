@@ -7,10 +7,10 @@
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
@@ -32,7 +32,7 @@
   (dis/dispatch! [:input [:org-settings] nil]))
 
 (rum/defc org-settings-tabs
-  [org-data active-tab]
+  [org-data active-tab qsg-data]
   [:div.org-settings-tabs.group
     [:div.org-settings-bottom-line]
     (when (utils/is-admin? org-data)
@@ -52,9 +52,14 @@
     (when (utils/is-admin-or-author? org-data)
       [:div.org-settings-tab
         {:class (when (= :invite active-tab) "active")}
-        [:a.org-settings-tab-link
+        [:a.org-settings-tab-link.qsg-invite-team-3
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :invite))}
+           :on-click (fn [e]
+                       (utils/event-stop e)
+                       (qsg-actions/finish-invite-team-trail)
+                       (show-modal :invite))}
+          (when (= (:step qsg-data) :invite-team-3)
+            (qsg-breadcrumb qsg-data))
           "INVITE PEOPLE"]])])
 
 (defn close-clicked [s]
@@ -185,7 +190,7 @@
               (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
-          (org-settings-tabs org-data settings-tab)
+          (org-settings-tabs org-data settings-tab qsg-data)
           (case settings-tab
             :team
             (org-settings-team-panel org-data)

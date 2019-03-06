@@ -33,13 +33,22 @@
                                   (= step :company-logo-3)
                                   (qsg-actions/reset-qsg)
                                   ;; Invite team
-                                  (= step :invite-team-1)
+                                  (and (= step :invite-team-1)
+                                       (not (utils/event-inside? e (sel1 :.qsg-invite-team-1))))
+                                  (qsg-actions/reset-qsg)
+                                  (and (= step :invite-team-2)
+                                       (not (utils/event-inside? e (sel1 :.qsg-invite-team-2))))
+                                  (qsg-actions/reset-qsg)
+                                  (= step :invite-team-3)
                                   (qsg-actions/reset-qsg)
                                   ;; Create post
                                   (= step :create-post-1)
                                   (qsg-actions/reset-qsg)
                                   ;; Create reminder
-                                  (= step :create-reminder-1)
+                                  (and (= step :create-reminder-1)
+                                       (not (utils/event-inside? e (sel1 :.qsg-create-reminder-1))))
+                                  (qsg-actions/reset-qsg)
+                                  (= step :create-reminder-3)
                                   (qsg-actions/reset-qsg)
                                   ;; Create section
                                   (= step :add-section-1)

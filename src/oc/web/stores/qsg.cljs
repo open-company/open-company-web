@@ -115,6 +115,12 @@
     :invite-team-1
 
     :invite-team-1
+    :invite-team-2
+
+    :invite-team-2
+    :invite-team-3
+
+    :invite-team-3
     nil
 
     ;; default
@@ -163,6 +169,9 @@
     :create-reminder-1
 
     :create-reminder-1
+    :create-reminder-2
+
+    :create-reminder-2
     nil
 
     ;; default

@@ -30,13 +30,11 @@
   (dis/dispatch! [:input [:mobile-menu-open] false]))
 
 (defn logout-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
   (jwt-actions/logout))
 
 (defn user-profile-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (qsg-actions/next-profile-photo-trail)
   (if (responsive/is-tablet-or-mobile?)
@@ -45,21 +43,21 @@
   (mobile-menu-toggle))
 
 (defn notifications-settings-click [e]
-  ; (utils/event-stop e)
   (.preventDefault e)
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
-(defn team-settings-click [e]
-  ; (utils/event-stop e)
+(defn team-settings-click [e qsg-data]
   (.preventDefault e)
-  (qsg-actions/next-company-logo-trail)
+  (when (= (:step qsg-data) :company-logo-2)
+    (qsg-actions/next-company-logo-trail))
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
-(defn manage-team-click [e]
-  ; (utils/event-stop e)
+(defn manage-team-click [e qsg-data]
   (.preventDefault e)
+  (when (= (:step qsg-data) :invite-team-2)
+    (qsg-actions/next-invite-team-trail))
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
 
@@ -77,9 +75,11 @@
   (.preventDefault e)
   (whats-new/show))
 
-(defn reminders-click [e]
-  (mobile-menu-toggle)
+(defn reminders-click [e qsg-data]
   (.preventDefault e)
+  (when (= (:step qsg-data) :create-reminder-2)
+    (qsg-actions/finish-create-reminder-trail))
+  (mobile-menu-toggle)
   (nav-actions/show-reminders))
 
 (rum/defcs menu < rum/reactive
@@ -134,9 +134,11 @@
           [:div.oc-menu-item.notifications-settings
             "Notification Settings"]])
       (when show-reminders?
-        [:a
+        [:a.qsg-create-reminder-2
           {:href "#"
-           :on-click reminders-click}
+           :on-click #(reminders-click % qsg-data)}
+          (when (= (:step qsg-data) :create-reminder-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.reminders
             "Reminders"]])
       [:div.oc-menu-separator]
@@ -148,9 +150,11 @@
       (when (and (not is-mobile?)
                  (router/current-org-slug)
                  (= user-role :admin))
-        [:a
+        [:a.qsg-invite-team-2
           {:href "#"
-           :on-click manage-team-click}
+           :on-click #(manage-team-click % qsg-data)}
+          (when (= (:step qsg-data) :invite-team-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.manage-team
             "Manage Team"]])
       (when (and (not is-mobile?)
@@ -158,7 +162,7 @@
                  (router/current-org-slug))
         [:a.qsg-company-logo-2
           {:href "#"
-           :on-click team-settings-click}
+           :on-click #(team-settings-click % qsg-data)}
           (when (= (:step qsg-data) :company-logo-2)
             (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.digest-settings
