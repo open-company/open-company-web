@@ -138,3 +138,5 @@
   (if (j/expired?)
     (jwt-refresh-cb auth-cb)
     (auth-cb)))
+
+(set! (.-ws_cdm_queue js/OCWebUtils) cmd-queue)
