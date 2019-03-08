@@ -24,15 +24,15 @@
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
-(def sidebar-top-margin 84)
+(def sidebar-top-margin 90)
 
 (defn save-content-height [s]
   (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
-    (let [height (.height (js/$ navigation-sidebar-content))]
+    (let [height (+ (.height (js/$ navigation-sidebar-content)) 32)]
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height))))
   (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
-    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 86)]
+    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 8)]
       (when (not= footer-height @(::footer-height s))
         (reset! (::footer-height s) footer-height)))))
 
@@ -116,14 +116,15 @@
                                 is-admin-or-author?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
-                            (< @(::content-height s)
-                             (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
+                            (not (neg?
+                             (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
         is-mobile? (responsive/is-tablet-or-mobile?)
         show-reminders? (utils/link-for (:links org-data) "reminders")
         qsg-data (drv/react s :qsg)
         showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
+      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
+                                :navigation-sidebar-overflow (not is-tall-enough?)})
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
                :overflow (when (or (= (:step qsg-data) :invite-team-1)
@@ -231,7 +232,7 @@
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
-         :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
+         :class (utils/class-set {:push-to-bottom is-tall-enough?})}
         (when show-reminders?
           [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
