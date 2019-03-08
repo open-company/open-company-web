@@ -41,7 +41,6 @@
     (reset! (::autosave-timer s) nil)))
 
 (defn autosave [s]
-  (reset! (::autosaving s) true)
   (let [cmail-data @(drv/get-ref s :cmail-data)
         section-editing @(drv/get-ref s :section-editing)]
     (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
@@ -172,8 +171,8 @@
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
-          fixed-headline (fix-headline cmail-data)
-          published? (= (:status cmail-data) "published")]
+        fixed-headline (fix-headline cmail-data)
+        published? (= (:status cmail-data) "published")]
       (if (is-publishable? s cmail-data)
         (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
               updated-cmail-data @(drv/get-ref s :cmail-data)
@@ -215,9 +214,10 @@
   (let [disabled? (disable-post-bt? s)]
     (when-not disabled?
       (reset! (::disable-post s) true)
-      (if @(::autosaving s)
-        (reset! (::publish-after-autosave s) true)
-        (real-post-action s)))))
+      (let [cmail-data @(drv/get-ref s :cmail-data)]
+        (if (:auto-saving cmail-data)
+          (reset! (::publish-after-autosave s) true)
+          (real-post-action s))))))
 
 (defn fix-tooltips [s]
   (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
@@ -281,7 +281,6 @@
                    (rum/local false ::saving)
                    (rum/local false ::publishing)
                    (rum/local false ::disable-post)
-                   (rum/local false ::autosaving)
                    (rum/local false ::publish-after-autosave)
                    (rum/local nil ::autosave-timer)
                    (rum/local false ::record-video)
@@ -329,11 +328,10 @@
                         (real-close))
                       ;; Entry is saving
                       ;: and save request finished
-                      (when (and @(::autosaving s)
+                      (when (and @(::publish-after-autosave s)
                                  (not (:auto-saving cmail-data)))
-                        (reset! (::autosaving s) false)
-                        (when @(::publish-after-autosave s)
-                          (real-post-action s)))
+                        (reset! (::publish-after-autosave s) false)
+                        (real-post-action s))
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
                         (reset! (::saving s) false)
