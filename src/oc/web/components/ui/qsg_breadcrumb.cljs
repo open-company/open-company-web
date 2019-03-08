@@ -36,10 +36,7 @@
                                   (and (= step :invite-team-1)
                                        (not (utils/event-inside? e (sel1 :.qsg-invite-team-1))))
                                   (qsg-actions/reset-qsg)
-                                  (and (= step :invite-team-2)
-                                       (not (utils/event-inside? e (sel1 :.qsg-invite-team-2))))
-                                  (qsg-actions/reset-qsg)
-                                  (= step :invite-team-3)
+                                  (= step :invite-team-2)
                                   (qsg-actions/reset-qsg)
                                   ;; Create post
                                   (= step :create-post-1)

@@ -56,10 +56,11 @@
 
 (defn manage-team-click [e qsg-data]
   (.preventDefault e)
-  (when (= (:step qsg-data) :invite-team-2)
-    (qsg-actions/next-invite-team-trail))
-  (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
+  (let [invite-team-step? (= (:step qsg-data) :invite-team-2)]
+    (when invite-team-step?
+      (qsg-actions/finish-invite-team-trail))
+    (mobile-menu-toggle)
+    (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal (if invite-team-step? :invite :team)))))
 
 (defn sign-in-sign-up-click [e]
   (mobile-menu-toggle)

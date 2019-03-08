@@ -118,9 +118,6 @@
     :invite-team-2
 
     :invite-team-2
-    :invite-team-3
-
-    :invite-team-3
     nil
 
     ;; default

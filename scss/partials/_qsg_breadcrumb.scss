@@ -23,13 +23,6 @@ div.qsg-breadcrumb {
     top: 8px;
   }
 
-  // Org settings panel
-  &.invite-team-3 {
-    top: -12px;
-    right: -32px;
-    animation: rightSwing .8s infinite linear;
-  }
-
   // Prg settings and profile settings
   &.profile-photo-3, &.company-logo-3,  {
     animation: leftSwing .8s infinite linear;

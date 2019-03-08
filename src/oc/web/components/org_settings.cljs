@@ -18,7 +18,6 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
@@ -32,7 +31,7 @@
   (dis/dispatch! [:input [:org-settings] nil]))
 
 (rum/defc org-settings-tabs
-  [org-data active-tab qsg-data]
+  [org-data active-tab]
   [:div.org-settings-tabs.group
     [:div.org-settings-bottom-line]
     (when (utils/is-admin? org-data)
@@ -52,14 +51,11 @@
     (when (utils/is-admin-or-author? org-data)
       [:div.org-settings-tab
         {:class (when (= :invite active-tab) "active")}
-        [:a.org-settings-tab-link.qsg-invite-team-3
+        [:a.org-settings-tab-link
           {:href "#"
            :on-click (fn [e]
                        (utils/event-stop e)
-                       (qsg-actions/finish-invite-team-trail)
                        (show-modal :invite))}
-          (when (= (:step qsg-data) :invite-team-3)
-            (qsg-breadcrumb qsg-data))
           "INVITE PEOPLE"]])])
 
 (defn close-clicked [s]
@@ -190,7 +186,7 @@
               (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]
-          (org-settings-tabs org-data settings-tab qsg-data)
+          (org-settings-tabs org-data settings-tab)
           (case settings-tab
             :team
             (org-settings-team-panel org-data)
