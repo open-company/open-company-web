@@ -5,6 +5,35 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
+(defn add-remove-item-from-all-posts [db org-slug activity-data]
+  (let [;; Add/remove item from AP
+        is-ap? (= (:status activity-data) "published")
+        ap-key (dispatcher/container-key org-slug :all-posts)
+        old-ap-data (get-in db ap-key)
+        old-ap-data-posts (get old-ap-data :posts-list)
+        ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
+        new-ap-data-posts (vec
+                            (if is-ap?
+                              (conj ap-without-uuid (:uuid activity-data))
+                              ap-without-uuid))
+        next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)]
+    (assoc-in db ap-key next-ap-data)))
+
+(defn add-remove-item-from-must-see [db org-slug activity-data]
+  (let [;; Add/remove item from MS
+        is-ms? (and (:must-see activity-data)
+                    (not= (:status activity-data) "draft"))
+        ms-key (dispatcher/container-key org-slug :must-see)
+        old-ms-data (get-in db ms-key)
+        old-ms-data-posts (get old-ms-data :posts-list)
+        ms-without-uuid (utils/vec-dissoc old-ms-data-posts (:uuid activity-data))
+        new-ms-data-posts (vec
+                            (if is-ms?
+                              (conj ms-without-uuid (:uuid activity-data))
+                              ms-without-uuid))
+        next-ms-data (assoc old-ms-data :posts-list new-ms-data-posts)]
+    (assoc-in db ms-key next-ms-data)))
+
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
   (-> db
@@ -106,12 +135,12 @@
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ edit-key activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
-        board-slug (:board-slug activity-data)
-        board-key (dispatcher/board-data-key org-slug board-slug)
-        board-data (get-in db board-key)
+        board-data (au/board-by-uuid (:board-uuid activity-data))
         fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))]
     (-> db
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
+      (add-remove-item-from-all-posts org-slug fixed-activity-data)
+      (add-remove-item-from-must-see org-slug fixed-activity-data)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
@@ -184,35 +213,6 @@
 (defmethod dispatcher/action :entry-revert [db [_ entry]]
   ;; do nothing for now
   db)
-
-(defn add-remove-item-from-all-posts [db org-slug activity-data]
-  (let [;; Add/remove item from AP
-        is-ap? (= (:status activity-data) "published")
-        ap-key (dispatcher/container-key org-slug :all-posts)
-        old-ap-data (get-in db ap-key)
-        old-ap-data-posts (get old-ap-data :posts-list)
-        ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
-        new-ap-data-posts (vec
-                            (if is-ap?
-                              (conj ap-without-uuid (:uuid activity-data))
-                              ap-without-uuid))
-        next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)]
-    (assoc-in db ap-key next-ap-data)))
-
-(defn add-remove-item-from-must-see [db org-slug activity-data]
-  (let [;; Add/remove item from MS
-        is-ms? (and (:must-see activity-data)
-                    (not= (:status activity-data) "draft"))
-        ms-key (dispatcher/container-key org-slug :must-see)
-        old-ms-data (get-in db ms-key)
-        old-ms-data-posts (get old-ms-data :posts-list)
-        ms-without-uuid (utils/vec-dissoc old-ms-data-posts (:uuid activity-data))
-        new-ms-data-posts (vec
-                            (if is-ms?
-                              (conj ms-without-uuid (:uuid activity-data))
-                              ms-without-uuid))
-        next-ms-data (assoc old-ms-data :posts-list new-ms-data-posts)]
-    (assoc-in db ms-key next-ms-data)))
 
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status org-slug activity-data secure-uuid]]
