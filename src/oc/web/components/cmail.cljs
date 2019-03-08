@@ -41,7 +41,6 @@
     (reset! (::autosave-timer s) nil)))
 
 (defn autosave [s]
-  (js/console.log "DBG autosaving")
   (reset! (::autosaving s) true)
   (let [cmail-data @(drv/get-ref s :cmail-data)
         section-editing @(drv/get-ref s :section-editing)]
@@ -172,7 +171,6 @@
       (utils/after 5000 #(.tooltip $post-btn "hide")))))
 
 (defn real-post-action [s]
-  (js/console.log "DBG real-post-action")
   (let [cmail-data @(drv/get-ref s :cmail-data)
           fixed-headline (fix-headline cmail-data)
           published? (= (:status cmail-data) "published")]
@@ -180,7 +178,6 @@
         (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
-          (js/console.log "DBG     is publishable, saving only?" published?)
           (qsg-actions/finish-create-post-trail)
           (qsg-actions/turn-on-show-guide)
           (remove-autosave s)
@@ -205,7 +202,6 @@
             (and @(::record-video s)
                  (not @(::video-uploading s)))
             (show-post-error s "Please finish video recording."))
-          (js/console.log "DBG     errro")
           (reset! (::disable-post s) false)))))
 
 (defn- disable-post-bt? [s]
@@ -217,11 +213,8 @@
 (defn post-clicked [s]
   (clean-body s)
   (let [disabled? (disable-post-bt? s)]
-    (js/console.log "DBG post-clicked disabled?" disabled?)
     (when-not disabled?
-      (js/console.log "DBG    disable post bt")
       (reset! (::disable-post s) true)
-      (js/console.log "DBG    autosaving?" @(::autosaving s))
       (if @(::autosaving s)
         (reset! (::publish-after-autosave s) true)
         (real-post-action s)))))
@@ -333,9 +326,7 @@
                     (let [cmail-data @(drv/get-ref s :cmail-data)]
                       ;; Did activity get removed in another client?
                       (when (:delete cmail-data)
-                        (js/console.log "DBG deleted")
                         (real-close))
-                      (js/console.log "DBG before-render autosaving" @(::autosaving s) "publish-after-autosave" @(::publish-after-autosave s)
                        "saving" @(::saving s)
                        "publishing" @(::publishing s)
                        "cmail-data" cmail-data)
@@ -343,20 +334,17 @@
                       ;: and save request finished
                       (when (and @(::autosaving s)
                                  (not (:auto-saving cmail-data)))
-                        (js/console.log "DBG autosave finished!")
                         (reset! (::autosaving s) false)
                         (when @(::publish-after-autosave s)
                           (real-post-action s)))
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
-                        (js/console.log "DBG published save finished! error?" (:error cmail-data))
                         (reset! (::saving s) false)
                         (if (:error cmail-data)
                           (reset! (::disable-post s) false)
                           (real-close)))
                       (when (and @(::publishing s)
                                  (not (:publishing cmail-data)))
-                        (js/console.log "DBG publish finished! error?" (:error cmail-data))
                         (reset! (::publishing s) false)
                         (if (:error cmail-data)
                           (reset! (::disable-post s) false)
