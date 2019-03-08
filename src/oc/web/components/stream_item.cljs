@@ -290,7 +290,10 @@
             [:button.mlb-reset.expand-button
               {:class (when expanded? "expanded")
                :ref :expand-button
-               :on-click #(expand s (not expanded?))}
+               :on-click #(when-not expanded?
+                            (expand s true))
+               :on-mouse-down #(when expanded?
+                                (expand s false))}
               [:span.expand-icon]
               [:span.expand-label
                 (if expanded?
