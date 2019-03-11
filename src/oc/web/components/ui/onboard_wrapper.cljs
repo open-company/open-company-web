@@ -362,7 +362,7 @@
                  :type "text"
                  :auto-capitalize "none"
                  :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
-                 :autocomplete "off"
+                 :autoComplete "off"
                  :value (:email-domain org-editing)
                  :on-change (fn [v]
                               (let [domain (.. v -target -value)
