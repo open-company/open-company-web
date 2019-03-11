@@ -479,12 +479,12 @@
       [:section.cta.group
 
         [:h1.headline
-          "Lead with clarity"]
+          "Where teams find clarity"]
         [:div.subheadline
           (str
-           "Carrot is a platform for must-see communication. Share the "
-           "important team updates and news that keeps your team focused "
-           "on what matters. With Carrot, nothing gets lost in the noise.")]
+           "Carrot is the platform for team communication that matters. "
+           "Share and discuss important team updates, decisions and key "
+           "topics nobody should miss — perfect for remote teams.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
@@ -696,13 +696,13 @@
       [:section.carrot-plus-slack.group
 
         [:h1.slack-headline
-          "Lead with clarity"]
-
+          "Where teams find clarity"]
+        
         [:div.slack-subline
           (str
-           "Carrot makes sure must-see information doesn't get lost in fast-moving "
-           "conversations. With Carrot, everyone sees the key team updates, news and "
-           "decisions that keep your Slack team focused on what matters.")]
+           "Carrot is the platform for team communication that matters. "
+           "Share and discuss important team updates, decisions and key "
+           "topics nobody should miss — perfect for remote teams.")]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
