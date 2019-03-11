@@ -132,9 +132,11 @@
               (if (jwt/jwt)
                 [:div.group
                   (user-notifications)
-                  [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1
+                  [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1.qsg-invite-team-1.qsg-create-reminder-1
                     (when (or (= (:step qsg-data) :profile-photo-1)
-                              (= (:step qsg-data) :company-logo-1))
+                              (= (:step qsg-data) :company-logo-1)
+                              (= (:step qsg-data) :invite-team-1)
+                              (= (:step qsg-data) :create-reminder-1))
                       (qsg-breadcrumb qsg-data))
                     [:div
                       {:ref "user-menu"}
@@ -142,9 +144,16 @@
                        {:click-cb #(do
                                      (when (= (:step qsg-data) :profile-photo-1)
                                        (qsg-actions/next-profile-photo-trail))
+                                     (when (= (:step qsg-data) :invite-team-1)
+                                        (qsg-actions/next-invite-team-trail))
                                      (when (= (:step qsg-data) :company-logo-1)
                                        (qsg-actions/next-company-logo-trail))
-                                     (swap! (::expanded-user-menu s) not))})
+                                     (when (= (:step qsg-data) :create-reminder-1)
+                                       (qsg-actions/next-create-reminder-trail))
+                                     (swap! (::expanded-user-menu s) not)
+                                     ;; Dismiss the QSG tooltip is it's open
+                                     (when (:show-qsg-tooltip? qsg-data)
+                                       (qsg-actions/dismiss-qsg-tooltip)))})
                       (when (:show-qsg-tooltip? qsg-data)
                         [:div.qsg-tooltip-container.group
                           [:div.qsg-tooltip-top-arrow]

@@ -94,14 +94,25 @@ if (jwt) {
 }
 
 function OCWebSetupMarketingSiteJS(){
-  $("button.slack-email-switch-bt, button.keep-aligned-section-next-bt").on("click", function(){
+  var switchFn = function() {
     $("button.keep-aligned-section-next-bt").toggleClass("active");
     var $switchContainer = $("div.slack-email-switch-container");
     $switchContainer.toggleClass("show-slack");
     $switchContainer.toggleClass("show-email");
     $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1");
     $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1-alt");
-  });
+  };
+  $("button.slack-email-switch-bt").on("click", function(){
+    var $switchContainer = $("div.slack-email-switch-container");
+    if ($(this).hasClass("email-bt") && $switchContainer.hasClass("show-email")) {
+      return;
+    }
+    if ($(this).hasClass("slack-bt") && $switchContainer.hasClass("show-slack")) {
+      return;
+    }
+    switchFn();
+  })
+  $("button.keep-aligned-section-next-bt").on("click", switchFn);
 
   $("div.pricing-toggle").on("click", function(){
     var $teamColumn = $("div.pricing-column.team-column");
@@ -201,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.home-page").removeClass("no-get-started-button");
     $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
-    $("button.get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $("button.get-started-action").attr("onClick", "window.location = \"/sign-up\"");
     $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner login button

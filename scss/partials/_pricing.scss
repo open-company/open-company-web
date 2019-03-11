@@ -24,7 +24,7 @@ div.pricing-wrap {
     }
 
     section.pricing-header {
-      padding: 239px 0 0;
+      padding: 200px 0 0;
       text-align: center;
       position: relative;
 
@@ -87,11 +87,11 @@ div.pricing-wrap {
 
         div.pricing-column {
           width: 382px;
-          min-height: 773px;
+          min-height: 812px;
           background-color: $another_ui_grey;
           float: left;
           margin-left: 32px;
-          padding: 40px 32px;
+          padding: 40px 32px 16px;
           text-align: center;
 
           &:nth-child(odd) {
@@ -209,13 +209,21 @@ div.pricing-wrap {
           }
 
           &.team-column {
-            min-height: 816px;
+            min-height: 856px;
             background-color: white;
             border: 1px solid $deep_tan;
             box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
 
             h3.tear-price {
               margin-top: 39px;
+            }
+
+            div.tear-subtitle {
+              height: 52px;
+
+              @include tablet(){
+                height: auto;
+              }
             }
 
             div.pricing-toggle-line {
@@ -318,7 +326,7 @@ div.pricing-wrap {
             }
 
             div.tear-subtitle {
-              max-width: 151px;
+              max-width: 185px;
             }
           }
 
