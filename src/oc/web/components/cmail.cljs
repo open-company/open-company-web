@@ -209,7 +209,7 @@
 
 ;; Delete handling
 
-(defn delete-clicked [e activity-data]
+(defn delete-clicked [s e activity-data]
   (let [post-type (if (= (:status activity-data) "published")
                     "post"
                     "draft")
@@ -221,6 +221,7 @@
                     :solid-button-style :red
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
+                                       (reset! (::deleting s) true)
                                        (activity-actions/activity-delete activity-data)
                                        (alert-modal/hide-alert)
                                        (real-close))
@@ -268,6 +269,7 @@
                    (rum/local false ::video-uploading)
                    (rum/local false ::video-picking-cover)
                    (rum/local 0 ::mobile-video-height)
+                   (rum/local false ::deleting)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
 
@@ -305,7 +307,9 @@
                     ;; Handle saving/publishing states to dismiss the component
                     (let [cmail-data @(drv/get-ref s :cmail-data)]
                       ;; Did activity get removed in another client?
-                      (when (:delete cmail-data)
+                      (when (and @(::deleting s)
+                                 (:delete cmail-data))
+                        (reset! (::deleting s) false)
                         (real-close))
                       ;; Entry is saving
                       ;: and save request finished
@@ -390,7 +394,9 @@
                                                        :body
                                                        (cleaned-body)))
                                   (autosave s)
-                                  (activity-actions/activity-delete cmail-data))
+                                  (do
+                                    (reset! (::deleting s) true)
+                                    (activity-actions/activity-delete cmail-data)))
                                 (if (and (= (:status cmail-data) "published")
                                          (:has-changes cmail-data))
                                   (cancel-clicked s)
@@ -584,7 +590,7 @@
                  :data-placement "top"
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :on-click #(delete-clicked % cmail-data)}]]]
+                 :on-click #(delete-clicked s % cmail-data)}]]]
           (when (and (not= (:status cmail-data) "published")
                      (not is-mobile?))
             (if (or (:has-changes cmail-data)
