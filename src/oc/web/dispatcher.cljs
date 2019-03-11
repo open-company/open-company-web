@@ -115,9 +115,8 @@
                     (if (= board-slug utils/default-drafts-board-slug)
                       #(not= (:status %) "published")
                       #(and (= (:board-slug %) board-slug)
-                                                   (= (:status %) "published"))))
-        board-posts (map :uuid (filter filter-fn posts-list))]
-    (select-keys posts-data board-posts)))
+                            (= (:status %) "published"))))]
+    (filter (comp filter-fn last) posts-data)))
 
 ;; Functions needed by derivatives
 
