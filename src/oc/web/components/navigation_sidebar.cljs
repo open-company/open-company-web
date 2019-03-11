@@ -9,7 +9,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
             [oc.web.lib.responsive :as responsive]
@@ -127,9 +126,7 @@
                                 :navigation-sidebar-overflow (not is-tall-enough?)})
        :style {:left (when-not is-mobile?
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
-               :overflow (when (or (= (:step qsg-data) :invite-team-1)
-                                   (= (:step qsg-data) :create-reminder-1)
-                                   (= (:step qsg-data) :add-section-1))
+               :overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
       [:div.mobile-header-container
         [:button.mlb-reset.mobile-header-close
@@ -236,7 +233,6 @@
         (when show-reminders?
           [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
-                          (qsg-actions/finish-create-reminder-trail)
                           (nav-actions/show-reminders)
                           (utils/after 500 utils/remove-tooltips))
              :title "Set reminders to update your team on time"
@@ -244,12 +240,10 @@
              :data-placement "top"
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            (when (= (:step qsg-data) :create-reminder-1)
-              (qsg-breadcrumb qsg-data))
             [:div.bottom-nav-icon.reminders-icon]
             [:span "Reminders"]])
         (when show-invite-people
-          [:button.mlb-reset.bottom-nav-bt.qsg-invite-team-1
+          [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
                           (nav-actions/show-invite)
                           (utils/after 500 utils/remove-tooltips))
@@ -258,8 +252,6 @@
              :data-placement "top"
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            (when (= (:step qsg-data) :invite-team-1)
-              (qsg-breadcrumb qsg-data))
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
         [:button.mlb-reset.bottom-nav-bt
