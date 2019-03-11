@@ -78,7 +78,9 @@
     (reset! (::pre-flight-check s) false)
     (reset! (::pre-flight-ok s) false)
     (if (pos? (count equal-names))
-      (dis/dispatch! [:input [:section-editing :section-name-error] utils/section-name-exists-error])
+      (dis/dispatch! [:update [:section-editing] #(-> %
+                                                    (assoc :section-name-error utils/section-name-exists-error)
+                                                    (dissoc :loading))])
       (do
         (when (:section-name-error section-editing)
           (dis/dispatch! [:input [:section-editing :section-name-error] nil]))
@@ -103,6 +105,7 @@
                             (rum/local false ::pre-flight-check)
                             (rum/local false ::pre-flight-ok)
                             (rum/local nil ::section-name-check-timeout)
+                            (rum/local false ::saving)
                             ;; Mixins
                             mixins/no-scroll-mixin
                             (on-window-click-mixin (fn [s e]
@@ -137,7 +140,11 @@
                                   (when-not (:pre-flight-loading section-editing)
                                     (reset! (::pre-flight-check s) false)
                                     (when-not (:section-name-error section-editing)
-                                      (reset! (::pre-flight-ok s) true)))))
+                                      (reset! (::pre-flight-ok s) true))))
+                                ;; Re-enable the save button after a save failure
+                                (when (and @(::saving s)
+                                           (not (:loading section-editing)))
+                                  (reset! (::saving s) false)))
                               s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
@@ -455,13 +462,15 @@
                          "Delete this section and all its posts.")
                  :class (when last-section-standing "disabled")}
                 "Delete section"])
-            (let [disable-bt (or (< (count @(::section-name s)) section-actions/min-section-name-length)
+            (let [disable-bt (or @(::saving s)
+                                 (< (count @(::section-name s)) section-actions/min-section-name-length)
                                  @(::pre-flight-check s)
                                  (:pre-flight-loading section-editing)
                                  (seq (:section-name-error section-editing)))]
               [:button.mlb-reset.create-bt
                 {:on-click (fn [_]
-                            (when-not disable-bt
+                            (when (and (not disable-bt)
+                                       (compare-and-set! (::saving s) false true))
                               (let [section-node (rum/ref-node s "section-name")
                                     section-name (.-innerText section-node)
                                     personal-note-node (rum/ref-node s "personal-note")

@@ -293,10 +293,9 @@
       (send-item-read (:uuid saved-activity-data)))))
 
 (defn board-name-exists-error [edit-key]
-  (dis/dispatch!
-   [:input
-    [edit-key :section-name-error]
-    utils/section-name-exists-error]))
+  (dis/dispatch! [:update [edit-key] #(-> %
+                                        (assoc :section-name-error utils/section-name-exists-error)
+                                        (dissoc :loading))]))
 
 (defn entry-modal-save [activity-data section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
