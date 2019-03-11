@@ -31,7 +31,7 @@
       (utils/clean-body-html (.-innerHTML body-el)))))
 
 (defn real-close []
-  (utils/after 180 activity-actions/cmail-hide))
+  (activity-actions/cmail-hide))
 
 ;; Local cache for outstanding edits
 
