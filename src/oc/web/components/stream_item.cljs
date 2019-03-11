@@ -36,7 +36,9 @@
     (reset! (::should-scroll-to-comments s) true))
   (when expand?
     ;; When expanding a post send the WRT read
-    (activity-actions/send-item-read (:uuid (first (:rum/args s))))))
+    (activity-actions/send-item-read (:uuid (first (:rum/args s)))))
+  (when-not expand?
+    (reset! (::should-scroll-to-card s) true)))
 
 (defn should-show-continue-reading? [s]
   (let [activity-data (first (:rum/args s))
@@ -69,6 +71,9 @@
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
+                         (rum/local false ::should-scroll-to-card)
+                         (rum/local false ::more-menu-open)
+                         (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
@@ -103,6 +108,13 @@
                                 (when (zero? actual-comments-count)
                                   (.focus (.find (js/$ dom-node) "div.add-comment"))))
                                (reset! (::should-scroll-to-comments s) false)))
+                           (when @(::should-scroll-to-card s)
+                             (utils/after 180
+                              #(let [dom-node (rum/dom-node s)]
+                                 (when-not (au/is-element-top-in-viewport? dom-node 32)
+                                   (utils/scroll-to-y
+                                    (- (.-top (.offset (js/$ dom-node))) responsive/navbar-height 16) 80))))
+                             (reset! (::should-scroll-to-card s) false))
                            s)}
   [s activity-data read-data]
   (let [single-post-view (boolean (seq (router/current-activity-id)))
