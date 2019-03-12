@@ -112,7 +112,9 @@
   (assoc-in db [edit-key :publishing] true))
 
 (defmethod dispatcher/action :section-edit/error [db [_ error]]
-  (assoc-in db [:section-editing :section-name-error] error))
+  (-> db
+    (assoc-in [:section-editing :section-name-error] error)
+    (update-in [:section-editing] dissoc :loading)))
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
   [db [_ new-board-data edit-key]]
