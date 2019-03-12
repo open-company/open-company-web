@@ -264,6 +264,18 @@ div.left-navigation-sidebar {
     }
   }
 
+  &.navigation-sidebar-overflow {
+    position: absolute;
+    overflow-x: unset;
+    overflow-y: unset;
+    overflow: auto;
+    height: auto;
+    max-height: unset;
+    top: unset;
+    left: unset;
+    float: left;
+  }
+
   div.mobile-header-container {
     display: none;
 
@@ -649,7 +661,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    &.navigation-sidebar-overflow {
+    &.push-to-bottom {
       position: absolute;
       bottom: 23px;
       padding-bottom: 0px;
