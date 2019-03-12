@@ -32,7 +32,7 @@
           [:section.carrot-plus-slack.group
 
             [:h1.slack-headline
-              "Lead with clarity"]
+              "Where teams find clarity"]
 
             [:div.slack-subline
               (str
