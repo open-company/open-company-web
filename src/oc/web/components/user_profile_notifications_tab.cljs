@@ -22,11 +22,11 @@
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
 (defn save-clicked [s]
-  (reset! (::loading s) true)
-  (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
-        current-user-data @(drv/get-ref s :current-user-data)
-        user-data (:user-data edit-user-profile)]
-    (user-actions/user-profile-save current-user-data edit-user-profile)))
+  (when (compare-and-set! (::loading s) false true)
+    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+          current-user-data @(drv/get-ref s :current-user-data)
+          user-data (:user-data edit-user-profile)]
+      (user-actions/user-profile-save current-user-data edit-user-profile))))
 
 (defn add-slack-clicked [current-user-data real-close-cb]
   (let [switch-cb (fn []
@@ -193,7 +193,8 @@
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)
            :class (when @(::show-success s) "no-disable")
-           :disabled (not (:has-changes current-user-data))}
+           :disabled (or (not (:has-changes current-user-data))
+                         @(::loading s))}
            (when (:loading current-user-data)
               (small-loading))
           (if @(::show-success s)
