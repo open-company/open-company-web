@@ -16,6 +16,14 @@
 (defn add-comment-blur []
   (dis/dispatch! [:add-comment-focus nil]))
 
+(defn add-comment-change [activity-data comment-body]
+  ;; Save the comment change in the app state to remember it
+  (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) comment-body]))
+
+(defn add-comment-cancel [activity-data]
+  ;; Remove cached comment for activity
+  (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))
+
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
   ;; Send WRT read on comment add
@@ -32,6 +40,9 @@
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
+        ;; If comment was succesfully added delete the cached comment
+        (when success
+          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
         (dis/dispatch! [:comment-add/finish {:success success
