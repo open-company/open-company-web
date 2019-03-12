@@ -169,38 +169,55 @@
       (utils/after 10 #(.tooltip $post-btn "show"))
       (utils/after 5000 #(.tooltip $post-btn "hide")))))
 
-(defn post-clicked [s]
-  (clean-body s)
+(defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         fixed-headline (fix-headline cmail-data)
         published? (= (:status cmail-data) "published")]
-    (if (is-publishable? s cmail-data)
-      (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
-            updated-cmail-data @(drv/get-ref s :cmail-data)
-            section-editing @(drv/get-ref s :section-editing)]
-        (qsg-actions/finish-create-post-trail)
-        (qsg-actions/turn-on-show-guide)
-        (remove-autosave s)
-        (if published?
-          (do
-            (reset! (::saving s) true)
-            (activity-actions/entry-save :cmail-data updated-cmail-data section-editing))
-          (do
-            (reset! (::publishing s) true)
-            (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
-      (cond
-        ;; Missing headline error
-        (zero? (count fixed-headline))
-        (show-post-error s "A title is required in order to save or share this post.")
-        ;; User needs to pick a cover shot
-        (and @(::record-video s)
-             (not @(::video-uploading s))
-             @(::video-picking-cover s))
-        (show-post-error s "Please pick a cover image for your video.")
-        ;; Video still recording
-        (and @(::record-video s)
-             (not @(::video-uploading s)))
-        (show-post-error s "Please finish video recording.")))))
+      (if (is-publishable? s cmail-data)
+        (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
+              updated-cmail-data @(drv/get-ref s :cmail-data)
+              section-editing @(drv/get-ref s :section-editing)]
+          (qsg-actions/finish-create-post-trail)
+          (qsg-actions/turn-on-show-guide)
+          (remove-autosave s)
+          (if published?
+            (do
+              (reset! (::saving s) true)
+              (activity-actions/entry-save :cmail-data updated-cmail-data section-editing))
+            (do
+              (reset! (::publishing s) true)
+              (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
+        (do
+          (cond
+            ;; Missing headline error
+            (zero? (count fixed-headline))
+            (show-post-error s "A title is required in order to save or share this post.")
+            ;; User needs to pick a cover shot
+            (and @(::record-video s)
+                 (not @(::video-uploading s))
+                 @(::video-picking-cover s))
+            (show-post-error s "Please pick a cover image for your video.")
+            ;; Video still recording
+            (and @(::record-video s)
+                 (not @(::video-uploading s)))
+            (show-post-error s "Please finish video recording."))
+          (reset! (::disable-post s) false)))))
+
+(defn- disable-post-bt? [s]
+  (let [cmail-data @(drv/get-ref s :cmail-data)]
+    (or @(::publishing s)
+        (not (is-publishable? s cmail-data))
+        @(::disable-post s))))
+
+(defn post-clicked [s]
+  (clean-body s)
+  (let [disabled? (disable-post-bt? s)]
+    (when-not disabled?
+      (reset! (::disable-post s) true)
+      (let [cmail-data @(drv/get-ref s :cmail-data)]
+        (if (:auto-saving cmail-data)
+          (reset! (::publish-after-autosave s) true)
+          (real-post-action s))))))
 
 (defn fix-tooltips [s]
   (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
@@ -264,6 +281,8 @@
                    (rum/local nil ::uploading-media)
                    (rum/local false ::saving)
                    (rum/local false ::publishing)
+                   (rum/local false ::disable-post)
+                   (rum/local false ::publish-after-autosave)
                    (rum/local nil ::autosave-timer)
                    (rum/local false ::record-video)
                    (rum/local false ::video-uploading)
@@ -313,31 +332,39 @@
                         (real-close))
                       ;; Entry is saving
                       ;: and save request finished
+                      (when (and @(::publish-after-autosave s)
+                                 (not (:auto-saving cmail-data)))
+                        (reset! (::publish-after-autosave s) false)
+                        (real-post-action s))
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
                         (reset! (::saving s) false)
-                        (when-not (:error cmail-data)
+                        (if (:error cmail-data)
+                          (reset! (::disable-post s) false)
                           (real-close)))
                       (when (and @(::publishing s)
                                  (not (:publishing cmail-data)))
                         (reset! (::publishing s) false)
-                        (when-not (:error cmail-data)
+                        (if (:error cmail-data)
+                          (reset! (::disable-post s) false)
                           (let [redirect? (seq (:board-slug cmail-data))]
                             ;; Redirect to the publishing board if the slug is available
-                            (when redirect?
-                              (real-close)
-                              (utils/after
-                               180
-                               #(let [from-ap (or (:from-all-posts @router/path)
-                                                  (= (router/current-board-slug) "all-posts"))
-                                      go-to-ap (and (not (:new-section cmail-data))
-                                                    from-ap)]
-                                  ;; Redirect to AP if coming from it or if the post is not published
-                                  (router/nav!
-                                    (if go-to-ap
-                                      (oc-urls/all-posts (router/current-org-slug))
-                                      (oc-urls/board (router/current-org-slug)
-                                       (:board-slug cmail-data)))))))))))
+                            (if redirect?
+                              (do
+                                (real-close)
+                                (utils/after
+                                 180
+                                 #(let [from-ap (or (:from-all-posts @router/path)
+                                                    (= (router/current-board-slug) "all-posts"))
+                                        go-to-ap (and (not (:new-section cmail-data))
+                                                      from-ap)]
+                                    ;; Redirect to AP if coming from it or if the post is not published
+                                    (router/nav!
+                                      (if go-to-ap
+                                        (oc-urls/all-posts (router/current-org-slug))
+                                        (oc-urls/board (router/current-org-slug)
+                                         (:board-slug cmail-data)))))))
+                              (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)
@@ -362,7 +389,12 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        qsg-data (drv/react s :qsg)]
+        qsg-data (drv/react s :qsg)
+        disabled? (disable-post-bt? s)
+        working? (or (and published?
+                          @(::saving s))
+                     (and (not published?)
+                          @(::publishing s)))]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen (and (not (:collapse cmail-state))
                                                  (:fullscreen cmail-state))
@@ -434,22 +466,16 @@
                  :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title (if (:collapse cmail-state) "Show" "Collapse")}]]
-            (let [disabled? (or @(::publishing s)
-                                (not (is-publishable? s cmail-data)))
-                  working? (or (and published?
-                                    @(::saving s))
-                               (and (not published?)
-                                    @(::publishing s)))]
-              [:button.mlb-reset.mobile-post-button
-                {:ref "mobile-post-btn"
-                 :on-click #(post-clicked s)
-                 :class (utils/class-set {:disabled disabled?
-                                          :loading working?})}
-                (when working?
-                  (small-loading))
-                (if (= (:status cmail-data) "published")
-                  "SAVE"
-                  "POST")])]
+            [:button.mlb-reset.mobile-post-button
+              {:ref "mobile-post-btn"
+               :on-click #(post-clicked s)
+               :class (utils/class-set {:disabled disabled?
+                                        :loading working?})}
+              (when working?
+                (small-loading))
+              (if (= (:status cmail-data) "published")
+                "SAVE"
+                "POST")]]
           [:div.cmail-section
             [:div.board-name
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
@@ -558,20 +584,14 @@
                        show-edit-tooltip)
               (edit-tooltip s))]
         [:div.cmail-footer
-          (let [disabled? (or @(::publishing s)
-                              (not (is-publishable? s cmail-data)))
-                working? (or (and published?
-                                  @(::saving s))
-                             (and (not published?)
-                                  @(::publishing s)))]
-            [:button.mlb-reset.post-button
-              {:ref "post-btn"
-               :on-click #(post-clicked s)
-               :class (utils/class-set {:disabled disabled?
-                                        :loading working?})}
-              (if (= (:status cmail-data) "published")
-                "SAVE"
-                "POST")])
+          [:button.mlb-reset.post-button
+            {:ref "post-btn"
+             :on-click #(post-clicked s)
+             :class (utils/class-set {:disabled disabled?
+                                      :loading working?})}
+            (if (= (:status cmail-data) "published")
+              "SAVE"
+              "POST")]
           [:div.footer-separator]
           [:div.cmail-footer-multi-picker
             {:id "cmail-footer-multi-picker"}]
