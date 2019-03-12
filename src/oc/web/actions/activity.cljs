@@ -356,6 +356,7 @@
   ([edit-key edited-data section-editing entry-save-cb]
      (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
            fixed-edit-key (or edit-key :entry-editing)]
+       (dis/dispatch! [:entry-save fixed-edit-key])
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                   section-editing)
@@ -388,8 +389,7 @@
            (let [org-slug (router/current-org-slug)
                  entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
                  entry-create-link (utils/link-for (:links entry-board-data) "create")]
-             (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))
-       (dis/dispatch! [:entry-save fixed-edit-key]))))
+             (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
@@ -437,6 +437,7 @@
 (defn entry-publish [entry-editing section-editing & [edit-key]]
   (let [fixed-entry-editing (assoc entry-editing :status "published")
         fixed-edit-key (or edit-key :entry-editing)]
+    (dis/dispatch! [:entry-publish fixed-edit-key])
     (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
              section-editing)
       (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
@@ -453,8 +454,7 @@
                                 ;; If the entry is new, use
                                 (utils/link-for (:links board-data) "create"))]
         (api/publish-entry publish-entry-link fixed-entry-editing
-         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key))))
-    (dis/dispatch! [:entry-publish fixed-edit-key])))
+         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key))))))
 
 (defn activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation

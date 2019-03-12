@@ -340,6 +340,7 @@ div.cmail-outer {
 
             &.disabled {
               opacity: 0.4;
+              cursor: not-allowed;
             }
           }
         }
@@ -705,7 +706,8 @@ div.cmail-outer {
           }
 
           &.disabled {
-            opacity: 0.6;
+            opacity: 0.4;
+            cursor: not-allowed;
           }
 
           &:not(.disabled):hover {

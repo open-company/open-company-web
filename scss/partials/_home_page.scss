@@ -61,7 +61,7 @@ div.home-wrap {
       }
 
       h1.headline {
-        font-size: 80px;
+        font-size: 64px;
         @include PTSerif()
         color: $deep_navy;
         margin: 0 auto 24px;
@@ -88,7 +88,7 @@ div.home-wrap {
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 640px;
+        max-width: 720px;
 
         @include tablet(){
           font-size: 24px;
