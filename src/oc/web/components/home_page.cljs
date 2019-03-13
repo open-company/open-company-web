@@ -43,9 +43,9 @@
             "Where teams find clarity"]
           [:div.subheadline
             (str
-             "Carrot is the platform for team communication that matters. "
-             "Share and discuss important team updates, decisions and key "
-             "topics nobody should miss — perfect for remote teams.")]
+              "Carrot is the platform for team communication that matters. "
+              "Post important updates, news, decisions and stories "
+              "that nobody should miss — perfect for remote teams.")]
 
           [:div.get-started-button-container.group
             [:button.mlb-reset.get-started-button
