@@ -40,15 +40,15 @@
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
-        ;; If comment was succesfully added delete the cached comment
-        (when success
-          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
-        (dis/dispatch! [:comment-add/finish {:success success
-                                             :error (when-not success body)
-                                             :body (when (seq body) (json->cljs body))
-                                             :activity-data activity-data}])))))
+        (when success
+          (dis/dispatch! [:comment-add/finish {:success success
+                                               :error (when-not success body)
+                                               :body (when (seq body) (json->cljs body))
+                                               :activity-data activity-data}])
+          ;; If comment was succesfully added delete the cached comment
+          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))))))
 
 (defn get-comments [activity-data]
   (comment-utils/get-comments activity-data))
