@@ -483,8 +483,8 @@
         [:div.subheadline
           (str
            "Carrot is the platform for team communication that matters. "
-           "Share and discuss important team updates, decisions and key "
-           "topics nobody should miss — perfect for remote teams.")]
+           "Post important updates, news, decisions and stories "
+           "that nobody should miss — perfect for remote teams.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
@@ -700,9 +700,9 @@
         
         [:div.slack-subline
           (str
-            "Carrot makes sure must-see information doesn't get lost in fast-moving "
-            "conversations. With Carrot, everyone sees the key team updates, news and "
-            "decisions that keep your Slack team focused on what matters.")]
+            "Carrot is the platform for team communication that matters. "
+            "Post important updates, news, decisions and stories "
+            "that nobody should miss — perfect for remote teams.")]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
