@@ -777,4 +777,6 @@
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:deref cljs.core.deref
                                     :keyword cljs.core.keyword
-                                    :app_state app-state})
+                                    :app_state app-state
+                                    :clj__GT_js cljs.core.clj__GT_js
+                                    :js__GT_clj cljs.core.js__GT_clj})

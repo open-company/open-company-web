@@ -115,6 +115,8 @@ var OCWebUtils = {};
 OCWebUtils.deref = function(){};
 OCWebUtils.keyword = function(){};
 OCWebUtils.app_state = function(){};
+OCWebUtils.clj__GT_js = function(){};
+OCWebUtils.js__GT_clj = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
