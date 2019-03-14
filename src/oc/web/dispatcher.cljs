@@ -781,5 +781,6 @@
                                     :count cljs.core.count
                                     :get cljs.core.get
                                     :filter cljs.core.filter
+                                    :map cljs.core.map
                                     :clj__GT_js cljs.core.clj__GT_js
                                     :js__GT_clj cljs.core.js__GT_clj})
