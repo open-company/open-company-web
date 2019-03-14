@@ -73,4 +73,4 @@
     ;; for the team value
     (some (fn [[k v]] (when (= (slack-bots-team-key team-id) k) v)) slack-bots)))
 
-(set! (.-OCWebPrintJWTContents js/window) #(get-contents))
+(set! (.-OCWebPrintJWTContents js/window) get-contents)
