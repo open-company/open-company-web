@@ -782,7 +782,3 @@
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
 (set! (.-OCWebPrintQSGData js/window) print-qsg-data)
-;; Utility externs
-(set! (.-OCWebUtils js/window) #js {:deref cljs.core.deref
-                                    :keyword cljs.core.keyword
-                                    :app_state app-state})
