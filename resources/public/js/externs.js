@@ -112,9 +112,12 @@ var OCWebPrintReminderEditData = function(){};
 var OCWebPrintQSGData = function(){};
 // Cljs utility externs
 var OCWebUtils = {};
+OCWebUtils.app_state = function(){};
 OCWebUtils.deref = function(){};
 OCWebUtils.keyword = function(){};
-OCWebUtils.app_state = function(){};
+OCWebUtils.count = function(){};
+OCWebUtils.get = function(){};
+OCWebUtils.filter = function(){};
 OCWebUtils.clj__GT_js = function(){};
 OCWebUtils.js__GT_clj = function(){};
 // Moment
