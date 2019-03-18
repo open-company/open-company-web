@@ -8,8 +8,12 @@
 
 (defn clean-email-domain [email-domain]
   (when email-domain
-    (-> email-domain
-     (subs (if (.startsWith email-domain "@") 1 0))
-     (subs (if (.startsWith email-domain "http://") 7 0))
-     (subs (if (.startsWith email-domain "https://") 8 0))
-     (subs (if (.startsWith email-domain "www.") 4 0)))))
+    (let [trailing-slash? (.endsWith email-domain "/")
+          no-trailing-slash (if trailing-slash?
+                              (subs email-domain 0 (dec (count email-domain)))
+                              email-domain)]
+      (-> no-trailing-slash
+       (subs (if (.startsWith email-domain "@") 1 0))
+       (subs (if (.startsWith email-domain "http://") 7 0))
+       (subs (if (.startsWith email-domain "https://") 8 0))
+       (subs (if (.startsWith email-domain "www.") 4 0))))))
