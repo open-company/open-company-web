@@ -11,9 +11,16 @@
     (let [trailing-slash? (.endsWith email-domain "/")
           no-trailing-slash (if trailing-slash?
                               (subs email-domain 0 (dec (count email-domain)))
-                              email-domain)]
-      (-> no-trailing-slash
-       (subs (if (.startsWith email-domain "@") 1 0))
-       (subs (if (.startsWith email-domain "http://") 7 0))
-       (subs (if (.startsWith email-domain "https://") 8 0))
-       (subs (if (.startsWith email-domain "www.") 4 0))))))
+                              email-domain)
+          no-beginning-at (if (.startsWith no-trailing-slash "@")
+                            (subs no-trailing-slash 1 0)
+                            no-trailing-slash)
+          no-beginning-http (if (.startsWith no-beginning-at "http://")
+                              (subs no-beginning-at 7 0)
+                              no-beginning-at)
+          no-beginning-https (if (.startsWith no-beginning-http "https://")
+                               (subs no-beginning-http 8 0)
+                               no-beginning-http)]
+      (if (.startsWith no-beginning-https "www.")
+        (subs no-beginning-https 4 0)
+        no-beginning-https))))
