@@ -265,7 +265,7 @@ div.left-navigation-sidebar {
   }
 
   &.navigation-sidebar-overflow {
-    position: absolute;
+    position: relative;
     overflow-x: unset;
     overflow-y: unset;
     overflow: auto;
