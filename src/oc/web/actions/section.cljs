@@ -117,12 +117,13 @@
 
 (defn section-name-error [status]
   ;; Board name exists or too short
-  (dispatcher/dispatch!
-   [:input
-    [:section-editing :section-name-error]
-    (cond
-      (= status 409) "Section name already exists or isn't allowed"
-      :else "An error occurred, please retry.")]))
+  (dispatcher/dispatch! [:update [:section-editing]
+   #(-> %
+     (assoc :section-name-error
+      (cond
+        (= status 409) "Section name already exists or isn't allowed"
+        :else "An error occurred, please retry."))
+     (dissoc :loading))]))
 
 (defn section-save
   ([section-data note] (section-save section-data note nil))
@@ -242,6 +243,7 @@
   (if (< (count section-name) min-section-name-length)
     (dispatcher/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
     (let [next-section-editing (merge section-editing {:slug utils/default-section-slug
+                                                       :loading true
                                                        :name section-name})]
       (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
       (success-cb next-section-editing))))
