@@ -51,6 +51,12 @@
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
 
+(defn add-comment-key [org-slug]
+  (vec (concat (org-key org-slug) [:add-comment-data])))
+
+(defn add-comment-activity-key [org-slug activity-uuid]
+  (vec (concat (add-comment-key org-slug) [activity-uuid])))
+
 (defn comments-key [org-slug]
   (vec (conj (org-key org-slug) :comments)))
 
@@ -154,6 +160,8 @@
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
+   :add-comment-data    [[:base :org-slug] (fn [base org-slug]
+                          (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings

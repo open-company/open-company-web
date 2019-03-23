@@ -10,7 +10,9 @@
             [oc.web.ws.utils :as ws-utils]
             [goog.Uri :as guri]))
 
+(defonce last-ws-link (atom nil))
 (defonce current-org (atom nil))
+(defonce current-uid (atom nil))
 (defonce container-ids (atom []))
 
 ;; Sente WebSocket atoms
@@ -103,32 +105,32 @@
 
 (defmethod event-handler :container/status
   [_ body]
-  (timbre/debug "Status event:" body)
+  (timbre/debug "Status event :container/status" body)
   (go (>! ch-pub { :topic :container/status :data body })))
 
 (defmethod event-handler :org/change
   [_ body]
-  (timbre/debug "Change event:" body)
+  (timbre/debug "Change event :org/change" body)
   (go (>! ch-pub { :topic :org/change :data body })))
 
 (defmethod event-handler :container/change
   [_ body]
-  (timbre/debug "Change event:" body)
+  (timbre/debug "Change event :container/change" body)
   (go (>! ch-pub { :topic :container/change :data body })))
 
 (defmethod event-handler :item/change
   [_ body]
-  (timbre/debug "Change event:" body)
+  (timbre/debug "Change event :item/change" body)
   (go (>! ch-pub { :topic :item/change :data body })))
 
 (defmethod event-handler :item/counts
   [_ body]
-  (timbre/debug "Change event:" body)
+  (timbre/debug "Change event :item/counts" body)
   (go (>! ch-pub { :topic :item/counts :data body })))
 
 (defmethod event-handler :item/status
   [_ body]
-  (timbre/debug "Change event:" body)
+  (timbre/debug "Change event :item/status" body)
   (go (>! ch-pub { :topic :item/status :data body })))
 
 ;; ----- Sente event handlers -----
@@ -168,6 +170,8 @@
 
 ;; ----- Sente event router (our `event-msg-handler` loop) -----
 
+(declare reconnect)
+
 (defn  stop-router! []
   (when @channelsk
     (s/chsk-disconnect! @channelsk)
@@ -175,30 +179,34 @@
 
 (defn start-router! []
   (s/start-client-chsk-router! @ch-chsk event-msg-handler)
-  (timbre/info "Connection estabilished"))
+  (timbre/info "Connection estabilished")
+  (ws-utils/reconnected last-interval "Change" chsk-send! ch-state
+   #(reconnect @last-ws-link @current-uid @current-org @container-ids)))
 
 (defn reconnect
   "Connect or reconnect the WebSocket connection to the change service"
   [ws-link uid org-slug containers]
+  (timbre/debug "Change service reconnect" (:href ws-link) uid org-slug containers)
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (ws-utils/reconnect last-interval "Change" chsk-send! ch-state)
+    ;; Save passed parameters
+    (reset! last-ws-link ws-link)
+    (reset! container-ids containers)
+    (reset! current-org org-slug)
+    (reset! current-uid uid)
     (if (or (not @ch-state)
             (not (:open? @@ch-state))
             (not= @current-org org-slug))
-
       ;; Need a connection to change service
       (do
-        (timbre/debug "Reconnect for" (:href ws-link) "and" uid "current state:" @ch-state
-         "current org:" @current-org "this org:" org-slug)
+        (timbre/debug "Connection is down, reconnecting. Current state:" @ch-state)
         ; if the path is different it means
         (when (and @ch-state
                    (:open? @@ch-state))
           (timbre/info "Closing previous connection for:" @current-org)
           (stop-router!))
         (timbre/info "Attempting change service connection to:" ws-domain "for org:" org-slug)
-        (reset! container-ids containers)
         (let [{:keys [chsk ch-recv send-fn state] :as x} (s/make-channel-socket! ws-org-path
                                                           {:type :auto
                                                            :host ws-domain
@@ -206,7 +214,7 @@
                                                            :packer :edn
                                                            :uid uid
                                                            :params {:user-id uid}})]
-            (reset! current-org org-slug)
+            
             (reset! channelsk chsk)
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
@@ -215,5 +223,5 @@
 
       ;; already connected, make sure we're watching all the current containers
       (do
-        (reset! container-ids containers)
+        (timbre/debug "Connection already up, watch containers")
         (container-watch)))))
