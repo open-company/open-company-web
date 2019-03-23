@@ -16,6 +16,14 @@
 (defn add-comment-blur []
   (dis/dispatch! [:add-comment-focus nil]))
 
+(defn add-comment-change [activity-data comment-body]
+  ;; Save the comment change in the app state to remember it
+  (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) comment-body]))
+
+(defn add-comment-cancel [activity-data]
+  ;; Remove cached comment for activity
+  (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))
+
 (defn add-comment [activity-data comment-body]
   (add-comment-blur)
   ;; Send WRT read on comment add
@@ -34,10 +42,13 @@
       (fn [{:keys [status success body]}]
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
-        (dis/dispatch! [:comment-add/finish {:success success
-                                             :error (when-not success body)
-                                             :body (when (seq body) (json->cljs body))
-                                             :activity-data activity-data}])))))
+        (when success
+          (dis/dispatch! [:comment-add/finish {:success success
+                                               :error (when-not success body)
+                                               :body (when (seq body) (json->cljs body))
+                                               :activity-data activity-data}])
+          ;; If comment was succesfully added delete the cached comment
+          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))))))
 
 (defn get-comments [activity-data]
   (comment-utils/get-comments activity-data))

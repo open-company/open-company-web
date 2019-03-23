@@ -123,8 +123,10 @@
         showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :navigation-sidebar-overflow (not is-tall-enough?)})
-       :style {:left (when-not is-mobile?
+                                :navigation-sidebar-overflow (and (not is-mobile?)
+                                                                  (not is-tall-enough?))})
+       :style {:left (when (and (not is-mobile?)
+                                is-tall-enough?)
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
                :overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
