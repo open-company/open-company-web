@@ -344,7 +344,7 @@
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
           (when-not has-org?
             [:div.field-label.email-domain-field-label.group
-              [:span.field-label-span "Domain setup"]
+              [:span.field-label-span "Email domain — optional"]
               (cond
                 @(::checking-email-domain s)
                 (small-loading)
@@ -378,7 +378,7 @@
                                 (when (and (seq cleaned-email-domain)
                                            valid-email-domain?)
                                   (check-email-domain cleaned-email-domain s))))
-                 :placeholder "Domain, e.g. acme.com"}]
+                 :placeholder "Email domain, e.g. acme.com"}]
             [:div.field-label.info
               "Anyone with email addresses at these domain can automatically join your workspace."]])
           [:button.continue
