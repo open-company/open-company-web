@@ -79,11 +79,11 @@
        ;; WS connection is closed
        (if (:udt-next-reconnect @@ch-state)
          ;; There is an auto reconnect set, let's wait for it
-         (timbre/debug "will reconnect automatically at " (utils/js-date (:udt-next-reconnect @@ch-state)))
+         (timbre/debug "Will reconnect automatically at" (utils/js-date (:udt-next-reconnect @@ch-state)))
          ;; no auto reconnect, let's force a reconnect
          (do
            (timbre/debug "No auto reconnect set, forcing reconnection")
-           (sentry-report (str "No auto reconnect set for " service-name ". Forcing reconnect!") chsk-send! ch-state)
+           (sentry-report (str "No auto reconnect set for" service-name ". Forcing reconnect!") chsk-send! ch-state)
            (utils/after 0 reconnect-cb))))
     (* ls/ws-monitor-interval 1000))))
 
@@ -104,7 +104,7 @@
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str service-name " WS: not valid JWT"))
     (sentry/clear-extra-context!)
-    (timbre/error (str service-name " WS: not valid JWT") ctx)))
+    (timbre/error service-name "WS: not valid JWT" ctx)))
 
 (defn report-connect-timeout [service-name ch-state]
   (timbre/debug "Report connection-timeout" service-name)
@@ -116,7 +116,7 @@
     (sentry/set-extra-context! ctx)
     (sentry/capture-message (str service-name " WS: handshake timeout"))
     (sentry/clear-extra-context!)
-    (timbre/error (str service-name " WS: handshake timeout") ctx)))
+    (timbre/error service-name "WS: handshake timeout" ctx)))
 
 (defn auth-check [service-name ch-state chsk-send! channelsk jwt-refresh-cb reconnect-cb success-cb rep]
   (timbre/debug "Auth-check" service-name)
@@ -125,7 +125,7 @@
     (when (fn? success-cb)
       (success-cb rep))
     (do
-      (timbre/warn "disconnecting client due to invalid JWT!" rep)
+      (timbre/warn "Disconnecting client due to invalid JWT!" rep)
       (s/chsk-disconnect! @channelsk)
       (cond
         (j/expired?)

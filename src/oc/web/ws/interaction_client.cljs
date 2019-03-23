@@ -158,7 +158,7 @@
 
 (defn start-router! []
   (s/start-client-chsk-router! @ch-chsk event-msg-handler)
-  (timbre/info "Connection estabilished")
+  (timbre/info "Connection established")
   (ws-utils/reconnected last-interval "Interaction" chsk-send! ch-state
    #(reconnect @last-ws-link (j/user-id))))
 
