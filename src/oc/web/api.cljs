@@ -195,7 +195,7 @@
 
 ;; Report failed api request
 
-(defn- handle-missing-link [callee-name link callback & parameters]
+(defn- handle-missing-link [callee-name link callback & [parameters]]
   (timbre/error "Handling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
                                      :link link
@@ -308,7 +308,7 @@
          :json-params json-data}
         callback))
     (handle-missing-link "add-email-domain" add-email-domain-link callback
-     {:domain domain :team-data team-data})))
+     {:domain domain :team-data team-data :pre-flight pre-flight})))
 
 (defn create-org [create-org-link org-data callback]
   (if create-org-link
