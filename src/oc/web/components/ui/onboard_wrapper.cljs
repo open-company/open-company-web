@@ -939,7 +939,7 @@
     (cond
       (= (:error email-verification) 401)
       [:div.onboard-email-container.error
-        "This link is not valid, please try again."]
+        "This link is no longer valid."]
       (:error email-verification)
       [:div.onboard-email-container.error
         "An error occurred, please try again."]
@@ -986,7 +986,7 @@
     (cond
       (= (:error password-reset) 401)
       [:div.onboard-email-container.error
-        "This link is not valid, please try again."]
+        "This link is no longer valid."]
       (:error password-reset)
       [:div.onboard-email-container.error
         "An error occurred, please try again."]
