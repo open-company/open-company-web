@@ -397,13 +397,13 @@
       [:div.animation-lightbox
         [:div#youtube-player]
         [:button.settings-modal-close.mlb-reset
-          {;:onClick "OCStaticHideAnimationLightbox(event);"
+          {;:on-click #(js/OCStaticHideAnimationLightbox %)
            :on-mouse-down dismiss-cb
            :on-touch-start dismiss-cb}]]]))
 
 (def show-animation-button
   [:button.mlb-reset.show-animation-bt
-    {:onClick "OCStaticShowAnimationLightbox();"}
+    {:on-click js/OCStaticShowAnimationLightbox}
     [:div.green-play]
     "Carrot in 60 seconds"])
 

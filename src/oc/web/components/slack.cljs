@@ -32,13 +32,13 @@
           [:section.carrot-plus-slack.group
 
             [:h1.slack-headline
-              "Lead with clarity"]
+              "Where teams find clarity"]
 
             [:div.slack-subline
               (str
-               "Carrot makes sure must-see information doesn't get lost in fast-moving "
-               "conversations. With Carrot, everyone sees the key team updates, news and "
-               "decisions that keep your Slack team focused on what matters.")]
+                "Carrot is the platform for team communication that matters. "
+                "Post important updates, news, decisions and stories "
+                "that nobody should miss — perfect for remote teams.")]
 
             [:div.slack-button-container.group
               [:a.add-to-slack-button

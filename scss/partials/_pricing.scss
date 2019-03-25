@@ -24,7 +24,7 @@ div.pricing-wrap {
     }
 
     section.pricing-header {
-      padding: 239px 0 0;
+      padding: 200px 0 0;
       text-align: center;
       position: relative;
 
@@ -218,6 +218,14 @@ div.pricing-wrap {
               margin-top: 39px;
             }
 
+            div.tear-subtitle {
+              height: 52px;
+
+              @include tablet(){
+                height: auto;
+              }
+            }
+
             div.pricing-toggle-line {
               margin: 16px auto;
               display: flex;
@@ -318,7 +326,7 @@ div.pricing-wrap {
             }
 
             div.tear-subtitle {
-              max-width: 151px;
+              max-width: 185px;
             }
           }
 

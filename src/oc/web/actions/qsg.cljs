@@ -133,6 +133,9 @@
 (defn start-invite-team-trail []
   (dis/dispatch! [:qsg-invite-team :invite-team-1]))
 
+(defn next-invite-team-trail []
+  (dis/dispatch! [:qsg-invite-team]))
+
 (defn finish-invite-team-trail []
   (dis/dispatch! [:qsg-invite-team :invited?])
   (update-qsg-checklist))
@@ -150,6 +153,9 @@
 
 (defn start-create-reminder-trail []
   (dis/dispatch! [:qsg-create-reminder :create-reminder-1]))
+
+(defn next-create-reminder-trail []
+  (dis/dispatch! [:qsg-create-reminder]))
 
 (defn finish-create-reminder-trail []
   (dis/dispatch! [:qsg-create-reminder :add-reminder?])

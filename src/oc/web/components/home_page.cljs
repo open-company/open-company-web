@@ -40,12 +40,12 @@
         [:section.cta.group
 
           [:h1.headline
-            "Lead with clarity"]
+            "Where teams find clarity"]
           [:div.subheadline
             (str
-             "Carrot is a platform for must-see communication. Share the "
-             "important team updates and news that keeps your team focused "
-             "on what matters. With Carrot, nothing gets lost in the noise.")]
+              "Carrot is the platform for team communication that matters. "
+              "Post important updates, news, decisions and stories "
+              "that nobody should miss — perfect for remote teams.")]
 
           [:div.get-started-button-container.group
             [:button.mlb-reset.get-started-button

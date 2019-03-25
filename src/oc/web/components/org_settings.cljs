@@ -7,10 +7,10 @@
             [oc.web.urls :as oc-urls]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
@@ -54,7 +54,9 @@
         {:class (when (= :invite active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :invite))}
+           :on-click (fn [e]
+                       (utils/event-stop e)
+                       (show-modal :invite))}
           "INVITE PEOPLE"]])])
 
 (defn close-clicked [s]

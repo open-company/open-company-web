@@ -25,32 +25,32 @@
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
 
 (defn save-clicked [s]
-  (reset! (::name-error s) false)
-  (reset! (::email-error s) false)
-  (reset! (::password-error s) false)
-  (reset! (::current-password-error s) false)
-  (reset! (::loading s) true)
-  (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
-        current-user-data @(drv/get-ref s :current-user-data)
-        user-data (:user-data edit-user-profile)]
-    (cond
-      (and (empty? (:first-name user-data))
-           (empty? (:last-name user-data)))
-      (reset! (::name-error s) true)
+  (when (compare-and-set! (::loading s) false true)
+    (reset! (::name-error s) false)
+    (reset! (::email-error s) false)
+    (reset! (::password-error s) false)
+    (reset! (::current-password-error s) false)
+    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+          current-user-data @(drv/get-ref s :current-user-data)
+          user-data (:user-data edit-user-profile)]
+      (cond
+        (and (empty? (:first-name user-data))
+             (empty? (:last-name user-data)))
+        (reset! (::name-error s) true)
 
-      (not (utils/valid-email? (:email user-data)))
-      (reset! (::email-error s) true)
+        (not (utils/valid-email? (:email user-data)))
+        (reset! (::email-error s) true)
 
-      (and (seq (:password user-data))
-           (empty? (:current-password user-data)))
-      (reset! (::current-password-error s) true)
+        (and (seq (:password user-data))
+             (empty? (:current-password user-data)))
+        (reset! (::current-password-error s) true)
 
-      (and (seq (:password user-data))
-           (< (count (:password user-data)) 8))
-      (reset! (::password-error s) true)
+        (and (seq (:password user-data))
+             (< (count (:password user-data)) 8))
+        (reset! (::password-error s) true)
 
-      :else
-      (user-actions/user-profile-save current-user-data edit-user-profile))))
+        :else
+        (user-actions/user-profile-save current-user-data edit-user-profile)))))
 
 (rum/defcs user-profile-personal-tab < rum/reactive
                                        (drv/drv :edit-user-profile)
@@ -197,7 +197,8 @@
         [:button.mlb-reset.save-bt
           {:on-click #(save-clicked s)
            :class (when @(::show-success s) "no-disable")
-           :disabled (not (:has-changes current-user-data))}
+           :disabled (or (not (:has-changes current-user-data))
+                         @(::loading s))}
            (when (:loading current-user-data)
               (small-loading))
           (if @(::show-success s)
