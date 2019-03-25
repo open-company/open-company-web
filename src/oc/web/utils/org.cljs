@@ -8,19 +8,20 @@
 
 (defn clean-email-domain [email-domain]
   (when email-domain
-    (let [trailing-slash? (.endsWith email-domain "/")
+    (let [lower-case-domain (clojure.string/lower-case email-domain)
+          trailing-slash? (.endsWith lower-case-domain "/")
           no-trailing-slash (if trailing-slash?
                               (subs email-domain 0 (dec (count email-domain)))
                               email-domain)
           no-beginning-at (if (.startsWith no-trailing-slash "@")
-                            (subs no-trailing-slash 1 0)
+                            (subs no-trailing-slash 1)
                             no-trailing-slash)
           no-beginning-http (if (.startsWith no-beginning-at "http://")
-                              (subs no-beginning-at 7 0)
+                              (subs no-beginning-at 7)
                               no-beginning-at)
           no-beginning-https (if (.startsWith no-beginning-http "https://")
-                               (subs no-beginning-http 8 0)
+                               (subs no-beginning-http 8)
                                no-beginning-http)]
       (if (.startsWith no-beginning-https "www.")
-        (subs no-beginning-https 4 0)
+        (subs no-beginning-https 4)
         no-beginning-https))))
