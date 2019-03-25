@@ -195,9 +195,6 @@
                       ;; Fallback for NUX: user has no team-id set from the org yet
                       ;; so the team data are not in the right position yet
                       (first (filter #(= (:team-id %) team-id) (dis/teams-data))))
-        fixed-email-domain (if (and email-domain (.startsWith email-domain "@"))
-                             (subs email-domain 1)
-                             email-domain)
         add-email-domain-link (utils/link-for
                                    (:links team-data)
                                    "add"
@@ -205,7 +202,7 @@
                                    {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
         redirect-cb (fn [{:keys [status success body]}]
                       (cb success status))]
-    (api/add-email-domain add-email-domain-link fixed-email-domain redirect-cb team-data true)))
+    (api/add-email-domain add-email-domain-link email-domain redirect-cb team-data true)))
 
 (defn org-create-check-errors [status]
   (if (= status 409)
@@ -241,9 +238,6 @@
 (defn create-or-update-org [org-data]
   (dis/dispatch! [:input [:org-editing :error] false])
   (let [email-domain (:email-domain org-data)
-        fixed-email-domain (if (and email-domain (.startsWith email-domain "@"))
-                             (subs email-domain 1)
-                             email-domain)
         existing-org (dis/org-data)
         logo-org-data (if (seq (:logo-url org-data))
                           org-data
@@ -253,9 +247,9 @@
                               (trunc (:name logo-org-data) 127))]
     (if (seq (:slug existing-org))
       (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-        (api/patch-org org-patch-link clean-org-data (partial org-update-cb fixed-email-domain)))
+        (api/patch-org org-patch-link clean-org-data (partial org-update-cb email-domain)))
       (let [create-org-link (utils/link-for (dis/api-entry-point) "create")]
-        (api/create-org create-org-link clean-org-data (partial org-create-cb fixed-email-domain))))))
+        (api/create-org create-org-link clean-org-data (partial org-create-cb email-domain))))))
 
 ;; Org edit
 
