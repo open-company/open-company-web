@@ -121,7 +121,9 @@
 
 (defn start-router! []
   (s/start-client-chsk-router! @ch-chsk event-msg-handler)
-  (timbre/info "Connection estabilished"))
+  (timbre/info "Connection estabilished")
+  (ws-utils/reconnected last-interval "Notify" chsk-send! ch-state
+   #(reconnect @last-ws-link (j/user-id))))
 
 (defn reconnect
   "Connect or reconnect the WebSocket connection to the notify service"
@@ -129,7 +131,6 @@
   (let [ws-uri (guri/parse (:href ws-link))
         ws-domain (str (.getDomain ws-uri) (when (.getPort ws-uri) (str ":" (.getPort ws-uri))))
         ws-org-path (.getPath ws-uri)]
-    (ws-utils/reconnect last-interval "Notify" chsk-send! ch-state)
     (if (or (not @ch-state)
             (not (:open? @@ch-state)))
 

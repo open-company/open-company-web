@@ -186,35 +186,36 @@
             (set! (.-src img) (:logo-url first-team)))))
       (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
-(defn check-email-domain [domain s & [reset-email-domain]]
+(defn- check-email-domain [domain s & [reset-email-domain]]
   (reset! (::checking-email-domain s) (not reset-email-domain))
   ;; If user is here it means he has only one team, if he already had one
   ;; he was redirected to it, not here to create a new team, so use the first team
-  (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
-   (fn [success status]
-     ;; Discard response if the domain changed
-     (when (or reset-email-domain
-               (= domain (:email-domain @(drv/get-ref s :org-editing))))
-       (reset! (::checking-email-domain s) false)
-       (let [domain-error (cond
-                           (= status 409)
-                           "Only company email domains are allowed."
-                           (not success)
-                           "An error occurred, please try again."
-                           :else
-                           nil)
-              next-org-editing {:valid-email-domain success
-                                :domain-error (if reset-email-domain
-                                                nil
-                                                domain-error)}
-              with-email-domain (if (and reset-email-domain
-                                         success)
-                                  (assoc next-org-editing :email-domain domain)
-                                  next-org-editing)]
-         (dis/dispatch! [:update [:org-editing]
-          #(merge % with-email-domain)]))))))
+  (let [clean-email-domain (org-utils/clean-email-domain domain)]
+    (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
+     (fn [success status]
+       ;; Discard response if the domain changed
+       (when (or reset-email-domain
+                 (= domain (:email-domain @(drv/get-ref s :org-editing))))
+         (reset! (::checking-email-domain s) false)
+         (let [domain-error (cond
+                             (= status 409)
+                             "Only company email domains are allowed."
+                             (not success)
+                             "An error occurred, please try again."
+                             :else
+                             nil)
+                next-org-editing {:valid-email-domain success
+                                  :domain-error (if reset-email-domain
+                                                  nil
+                                                  domain-error)}
+                with-email-domain (if (and reset-email-domain
+                                           success)
+                                    (assoc next-org-editing :email-domain domain)
+                                    next-org-editing)]
+           (dis/dispatch! [:update [:org-editing]
+            #(merge % with-email-domain)])))))))
 
-(defn precheck-user-email [s a]
+(defn- precheck-user-email [s a]
   (when-not @(::user-email-checked s)
     ;; Wait for the team data to be loaded to have the email domain link
     (when (first (filter #(= (:team-id %) (first (jwt/get-key :teams))) @(drv/get-ref s :teams-data)))
@@ -343,7 +344,7 @@
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
           (when-not has-org?
             [:div.field-label.email-domain-field-label.group
-              [:span.field-label-span "Domain setup"]
+              [:span.field-label-span "Email domain — optional"]
               (cond
                 @(::checking-email-domain s)
                 (small-loading)
@@ -366,17 +367,18 @@
                  :value (:email-domain org-editing)
                  :on-change (fn [v]
                               (let [domain (.. v -target -value)
-                                    valid-email-domain? (utils/valid-domain? domain)]
-                                (dis/dispatch! [:update [:org-editing] #(merge % {:email-domain domain
+                                    cleaned-email-domain (org-utils/clean-email-domain domain)
+                                    valid-email-domain? (utils/valid-domain? cleaned-email-domain)]
+                                (dis/dispatch! [:update [:org-editing] #(merge % {:email-domain (if valid-email-domain? cleaned-email-domain domain)
                                                                                   :domain-error (if (and (seq domain)
                                                                                                          (not valid-email-domain?))
                                                                                                   "Please enter a valid email domain."
                                                                                                   false)
                                                                                   :valid-email-domain nil})])
-                                (when (and (seq domain)
+                                (when (and (seq cleaned-email-domain)
                                            valid-email-domain?)
-                                  (check-email-domain domain s))))
-                 :placeholder "Domain, e.g. acme.com"}]
+                                  (check-email-domain cleaned-email-domain s))))
+                 :placeholder "Email domain, e.g. acme.com"}]
             [:div.field-label.info
               "Anyone with email addresses at these domain can automatically join your workspace."]])
           [:button.continue
@@ -937,7 +939,7 @@
     (cond
       (= (:error email-verification) 401)
       [:div.onboard-email-container.error
-        "This link is not valid, please try again."]
+        "This link is no longer valid."]
       (:error email-verification)
       [:div.onboard-email-container.error
         "An error occurred, please try again."]
@@ -984,7 +986,7 @@
     (cond
       (= (:error password-reset) 401)
       [:div.onboard-email-container.error
-        "This link is not valid, please try again."]
+        "This link is no longer valid."]
       (:error password-reset)
       [:div.onboard-email-container.error
         "An error occurred, please try again."]
