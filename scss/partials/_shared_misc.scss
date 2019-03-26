@@ -130,7 +130,7 @@ section.testimonials-section {
   &:before {
     content: "";
     position: absolute;
-    width: 100vw;
+    width: 100%;
     height: 100%;
     background-color: $another_ui_grey;
     top: 0;
@@ -667,7 +667,8 @@ section.home-keep-aligned {
           height: 1006px;
           position: absolute;
           left: 0;
-          width: 100vw;
+          width: calc(100vw - 16px);
+          padding-right: 16px;
           max-width: initial;
         }
 
@@ -1233,7 +1234,7 @@ div.animation-lightbox-container {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: $carrot_modal_bg;
   text-align: center;
@@ -1241,7 +1242,7 @@ div.animation-lightbox-container {
   display: none;
 
   div.animation-lightbox {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     max-width: 1080px;
     max-height: 608px;
