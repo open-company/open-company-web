@@ -164,6 +164,6 @@
 ;; Debug
 
 (defn print-router-path []
-  (js/console.log @path))
+  @path)
 
 (set! (.-OCWebPrintRouterPath js/window) print-router-path)
