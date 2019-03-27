@@ -237,11 +237,9 @@
           {:disabled (or @(::saving s)
                          (:saved org-editing)
                          (not (:has-changes org-editing))
-                         (s/blank? (:name org-editing))
                          (< (count (s/trim (:name org-editing))) 3))
            :class (when (:saved org-editing) "no-disable")
-           :on-click #(do
-                        (reset! (::saving s) true)
+           :on-click #(when (compare-and-set! (::saving s) false true)
                         (org-actions/org-edit-save @(drv/get-ref s :org-editing)))}
           (if (:saved org-editing)
             "Saved!"

@@ -235,13 +235,13 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - 96px);
+  max-height: calc(100vh - 90px);
   overflow-y: auto;
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 96px;
-  height: calc(100vh - 80px);
+  top: 90px;
+  height: calc(100vh - 90px);
   @include no-user-select();
 
   @include mobile() {
@@ -258,10 +258,23 @@ div.left-navigation-sidebar {
     height: unset;
     overflow-y: unset;
     overflow-x: unset;
+    padding-bottom: 0;
 
     &.show-mobile-boards-menu {
       display: block;
     }
+  }
+
+  &.navigation-sidebar-overflow {
+    position: relative;
+    overflow-x: unset;
+    overflow-y: unset;
+    overflow: auto;
+    height: auto;
+    max-height: unset;
+    top: unset;
+    left: unset;
+    float: left;
   }
 
   div.mobile-header-container {
@@ -649,7 +662,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    &.navigation-sidebar-overflow {
+    &.push-to-bottom {
       position: absolute;
       bottom: 23px;
       padding-bottom: 0px;

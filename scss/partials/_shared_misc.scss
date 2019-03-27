@@ -130,7 +130,7 @@ section.testimonials-section {
   &:before {
     content: "";
     position: absolute;
-    width: 100vw;
+    width: 100%;
     height: 100%;
     background-color: $another_ui_grey;
     top: 0;
@@ -379,6 +379,7 @@ section.keep-aligned {
 
     @include tablet() {
       max-width: initial;
+      font-size: 40px;
     }
 
     @include mobile() {
@@ -418,7 +419,7 @@ button.get-started-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2px 12px 0;
+  padding: 2px 0 0;
 
   @include mobile(){
     width: 100%;
@@ -538,6 +539,7 @@ section.home-keep-aligned {
 
           @include mobile(){
             padding: 24px 0;
+            width: 100%;
 
             img.keep-aligned-section-screenshot {
               margin-top: 0;
@@ -547,24 +549,8 @@ section.home-keep-aligned {
       }
 
       &.second-row {
-        &:before {
-          content: "";
-          display: block;
-          background-color: $another_ui_grey;
-          border-bottom-left-radius: 200px;
-          width: calc(50vw + 293px);
-          height: 100%;
-          position: absolute;
-          right: 0;
-          top: 0;
-
-          @include tablet() {
-            width: calc(100% + 48px);
-            right: -24px;
-            top: 0;
-            height: 100%;
-            border-bottom-left-radius: 100px;
-          }
+        @include mobile() {
+          padding-top: 0;
         }
 
         div.keep-aligned-section-row-right {
@@ -575,11 +561,26 @@ section.home-keep-aligned {
           }
         }
 
+        div.keep-aligned-section-row-inner {
+          @include tablet() {
+            position: unset;
+          }
+        }
+
         div.keep-aligned-section-row-left {
           padding: 24px 26px 24px 54px;
 
           @include tablet() {
             padding: 24px 0;
+            // Fixes for the scrolling digest images
+            width: 100%;
+            height: 1040px;
+            position: unset;
+            max-width: initial;
+          }
+
+          @include mobile() {
+            height: calc(72vw * 1.33 + 40px + 48px + 16px);
           }
 
           img.keep-aligned-section-screenshot {
@@ -601,6 +602,29 @@ section.home-keep-aligned {
       }
 
       &.third-row {
+        &:before {
+          content: "";
+          display: block;
+          background-color: $another_ui_grey;
+          border-bottom-right-radius: 200px;
+          width: calc(50vw + 293px);
+          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
+
+          @include tablet() {
+            position: absolute;
+            width: calc(100% + 48px);
+            right: -24px;
+            left: unset;
+            top: 0;
+            height: 100%;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 100px;
+          }
+        }
+
         div.keep-aligned-section-row-left {
           padding: 24px 0px 24px 54px;
           width: 486px;
@@ -639,8 +663,17 @@ section.home-keep-aligned {
           overflow-y: hidden;
           -webkit-overflow-scrolling: touch;
           margin: 16px 0 0 -24px;
-          width: calc(100% + 24px);
+          // width: calc(100% + 48px);
+          height: 1006px;
+          position: absolute;
+          left: 0;
+          width: calc(100vw - 16px);
+          padding-right: 16px;
           max-width: initial;
+        }
+
+        @include mobile(){
+          height: calc(72vw * 1.33 + 40px);
         }
 
         div.keep-aligned-section-carion-inner {
@@ -653,7 +686,7 @@ section.home-keep-aligned {
           }
 
           @include mobile() {
-            width: calc(144vw + 72px);
+            width: calc(144vw + 65px);
             height: calc(72vw * 1.33 + 40px);
           }
 
@@ -682,6 +715,7 @@ section.home-keep-aligned {
               img.keep-aligned-section-screenshot {
                 display: block;
                 width: 72vw;
+                max-width: initial;
                 height: calc(72vw * 1.33);
               }
 
@@ -781,7 +815,6 @@ section.home-keep-aligned {
                 background-size: 70px 18px;
                 background-position: center;
                 background-repeat: no-repeat;
-                opacity: 0.5;
               }
 
               span.email-logo {
@@ -791,7 +824,6 @@ section.home-keep-aligned {
                 background-size: 68px 22px;
                 background-position: center;
                 background-repeat: no-repeat;
-                opacity: 0.5;
               }
             }
           }
@@ -800,7 +832,7 @@ section.home-keep-aligned {
             width: 100%;
             height: auto;
             z-index: 3;
-            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
             position: relative;
             top: 0;
             display: block;
@@ -815,6 +847,7 @@ section.home-keep-aligned {
               top: 0;
               left: 0;
               width: 72vw;
+              max-width: initial;
               height: calc(72vw * 1.33);
               padding: 0;
               margin-top: 40px;
@@ -937,13 +970,6 @@ section.home-keep-aligned {
           transform: translateY(0%);
         }
 
-        div.slack-email-mobile-title {
-          margin-top: 40px;
-          @include avenir_H();
-          font-size: 14px;
-          color: $ui_grey;
-        }
-
         div.slack-email-container {
           margin-top: 40px;
 
@@ -1011,11 +1037,12 @@ section.home-keep-aligned {
               height: 48px;
               width: 131px;
               float: left;
-              background-color: rgba($deep_navy, 0.5);
+              background-color: #EDECE9;
               text-align: center;
               display: flex;
               justify-content: center;
               align-items: center;
+              margin-right: 8px;
 
               &.slack-bt {
                 border-top-right-radius: 6px;
@@ -1025,7 +1052,6 @@ section.home-keep-aligned {
               &.email-bt {
                 border-top-right-radius: 6px;
                 border-top-left-radius: 6px;
-                margin-left: 8px;
               }
 
               div.slack-logo {
@@ -1131,6 +1157,38 @@ section.home-keep-aligned {
           }
         }
 
+        div.keep-aligned-section-footer {
+          margin-top: 24px;
+          border-top: 1px solid $more_ultra_light_grey;
+          padding-top: 24px;
+
+          button.create-team-bt {
+            padding: 0;
+            @include avenir_B();
+            font-size: 14px;
+            height: 19px;
+            line-height: 19px;
+            color: $carrot_green;
+            text-transform: uppercase;
+
+            &:after {
+              content: "";
+              background-image: cdnUrl("/img/ML/create_team_green_arrow.svg");
+              background-size: 16px 8px;
+              background-position: center 4px;
+              background-repeat: no-repeat;
+              width: 16px;
+              height: 19px;
+              margin-left: 8px;
+              float: right;
+            }
+          }
+
+          @include mobile() {
+            display: none;
+          }
+        }
+
         img.keep-aligned-section-copy-values-list {
           margin-top: 32px;
           width: 220px;
@@ -1176,7 +1234,7 @@ div.animation-lightbox-container {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: $carrot_modal_bg;
   text-align: center;
@@ -1184,7 +1242,7 @@ div.animation-lightbox-container {
   display: none;
 
   div.animation-lightbox {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     max-width: 1080px;
     max-height: 608px;
@@ -1206,5 +1264,72 @@ div.animation-lightbox-container {
     @media screen and (max-width: 1080px) {
       right: 24px;
     }
+  }
+}
+
+section.carrot-in-action {
+  text-align: center;
+  padding: 120px 0px !important;
+  position: relative;
+
+  @include tablet() {
+    width: 100%;
+    padding: 56px 24px !important;
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+    text-align: center;
+  }
+
+  div.carrot-in-action-title {
+    @include PTSerif();
+    font-size: 40px;
+    line-height: 52px;
+    color: $deep_navy;
+
+    @include tablet(){
+      font-size: 40px;
+      line-height: initial;
+    }
+
+    @include mobile() {
+      font-size: 36px;
+    }
+  }
+}
+
+button.show-animation-bt {
+  background-color: $feint_emerald;
+  border-radius: 8px;
+  width: 320px;
+  height: 64px;
+  @include avenir_H();
+  font-size: 20px;
+  line-height: 27px;
+  color: $carrot_green;
+  margin: 48px auto 0;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 12px 0;
+
+  div.green-play {
+    width: 24px;
+    height: 18px;
+    background-image: cdnUrl("/img/ML/green_play.svg");
+    background-size: 24px 18px;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-top: -4px;
+  }
+
+  @include mobile() {
+    width: 100%;
+    margin: 16px auto;
+    padding: 2px 0 0;
+    font-size: 18px;
+    line-height: 25px;
   }
 }

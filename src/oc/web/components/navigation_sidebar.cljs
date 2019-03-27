@@ -9,7 +9,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
             [oc.web.lib.responsive :as responsive]
@@ -24,15 +23,15 @@
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
-(def sidebar-top-margin 84)
+(def sidebar-top-margin 90)
 
 (defn save-content-height [s]
   (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
-    (let [height (.height (js/$ navigation-sidebar-content))]
+    (let [height (+ (.height (js/$ navigation-sidebar-content)) 32)]
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height))))
   (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
-    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 86)]
+    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 8)]
       (when (not= footer-height @(::footer-height s))
         (reset! (::footer-height s) footer-height)))))
 
@@ -116,19 +115,20 @@
                                 is-admin-or-author?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
-                            (< @(::content-height s)
-                             (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
+                            (not (neg?
+                             (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
         is-mobile? (responsive/is-tablet-or-mobile?)
         show-reminders? (utils/link-for (:links org-data) "reminders")
         qsg-data (drv/react s :qsg)
         showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
-       :style {:left (when-not is-mobile?
+      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
+                                :navigation-sidebar-overflow (and (not is-mobile?)
+                                                                  (not is-tall-enough?))})
+       :style {:left (when (and (not is-mobile?)
+                                is-tall-enough?)
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
-               :overflow (when (or (= (:step qsg-data) :invite-team-1)
-                                   (= (:step qsg-data) :create-reminder-1)
-                                   (= (:step qsg-data) :add-section-1))
+               :overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
       [:div.mobile-header-container
         [:button.mlb-reset.mobile-header-close
@@ -231,11 +231,10 @@
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
-         :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
+         :class (utils/class-set {:push-to-bottom is-tall-enough?})}
         (when show-reminders?
           [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
-                          (qsg-actions/finish-create-reminder-trail)
                           (nav-actions/show-reminders)
                           (utils/after 500 utils/remove-tooltips))
              :title "Set reminders to update your team on time"
@@ -243,12 +242,10 @@
              :data-placement "top"
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            (when (= (:step qsg-data) :create-reminder-1)
-              (qsg-breadcrumb qsg-data))
             [:div.bottom-nav-icon.reminders-icon]
             [:span "Reminders"]])
         (when show-invite-people
-          [:button.mlb-reset.bottom-nav-bt.qsg-invite-team-1
+          [:button.mlb-reset.bottom-nav-bt
             {:on-click #(do
                           (nav-actions/show-invite)
                           (utils/after 500 utils/remove-tooltips))
@@ -257,8 +254,6 @@
              :data-placement "top"
              :data-container "body"
              :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            (when (= (:step qsg-data) :invite-team-1)
-              (qsg-breadcrumb qsg-data))
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
         [:button.mlb-reset.bottom-nav-bt

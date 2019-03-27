@@ -51,6 +51,12 @@
   (let [posts-key (posts-data-key org-slug)]
     (vec (concat posts-key [activity-uuid]))))
 
+(defn add-comment-key [org-slug]
+  (vec (concat (org-key org-slug) [:add-comment-data])))
+
+(defn add-comment-activity-key [org-slug activity-uuid]
+  (vec (concat (add-comment-key org-slug) [activity-uuid])))
+
 (defn comments-key [org-slug]
   (vec (conj (org-key org-slug) :comments)))
 
@@ -115,9 +121,8 @@
                     (if (= board-slug utils/default-drafts-board-slug)
                       #(not= (:status %) "published")
                       #(and (= (:board-slug %) board-slug)
-                                                   (= (:status %) "published"))))
-        board-posts (map :uuid (filter filter-fn posts-list))]
-    (select-keys posts-data board-posts)))
+                            (= (:status %) "published"))))]
+    (filter (comp filter-fn last) posts-data)))
 
 ;; Functions needed by derivatives
 
@@ -155,6 +160,8 @@
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
+   :add-comment-data    [[:base :org-slug] (fn [base org-slug]
+                          (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
                           (fn [base auth-settings]
                             {:auth-settings auth-settings
@@ -680,86 +687,79 @@
 ;; Debug functions
 
 (defn print-app-state []
-  (js/console.log @app-state))
+  @app-state)
 
 (defn print-org-data []
-  (js/console.log (get-in @app-state (org-data-key (router/current-org-slug)))))
+  (get-in @app-state (org-data-key (router/current-org-slug))))
 
 (defn print-team-data []
-  (js/console.log (get-in @app-state (team-data-key (:team-id (org-data))))))
+  (get-in @app-state (team-data-key (:team-id (org-data)))))
 
 (defn print-team-roster []
-  (js/console.log (get-in @app-state (team-roster-key (:team-id (org-data))))))
+  (get-in @app-state (team-roster-key (:team-id (org-data)))))
 
 (defn print-change-data []
-  (js/console.log (get-in @app-state (change-data-key (router/current-org-slug)))))
+  (get-in @app-state (change-data-key (router/current-org-slug))))
 
 (defn print-activity-read-data []
-  (js/console.log (get-in @app-state activities-read-key)))
+  (get-in @app-state activities-read-key))
 
 (defn print-change-cache-data []
-  (js/console.log (get-in @app-state (change-cache-data-key (router/current-org-slug)))))
+  (get-in @app-state (change-cache-data-key (router/current-org-slug))))
 
 (defn print-board-data []
-  (js/console.log
-   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
+  (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug))))
 
 (defn print-container-data []
-  (js/console.log
-   (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))))
+  (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug))))
 
 (defn print-activity-data []
-  (js/console.log
-   (get-in
-    @app-state
-    (activity-key (router/current-org-slug) (router/current-activity-id)))))
+  (get-in
+   @app-state
+   (activity-key (router/current-org-slug) (router/current-activity-id))))
 
 (defn print-secure-activity-data []
-  (js/console.log
-   (get-in
-    @app-state
-    (secure-activity-key (router/current-org-slug) (router/current-secure-activity-id)))))
+  (get-in
+   @app-state
+   (secure-activity-key (router/current-org-slug) (router/current-secure-activity-id))))
 
 (defn print-reactions-data []
-  (js/console.log
-   (get-in
-    @app-state
-    (conj
-     (activity-key (router/current-org-slug) (router/current-activity-id))
-     :reactions))))
+  (get-in
+   @app-state
+   (conj
+    (activity-key (router/current-org-slug) (router/current-activity-id))
+    :reactions)))
 
 (defn print-comments-data []
-  (js/console.log
-   (get-in
-    @app-state
-    (comments-key (router/current-org-slug)))))
+  (get-in
+   @app-state
+   (comments-key (router/current-org-slug))))
 
 (defn print-activity-comments-data []
-  (js/console.log
-   (get-in
-    @app-state
-    (activity-comments-key (router/current-org-slug) (router/current-activity-id)))))
+  (get-in
+   @app-state
+   (activity-comments-key (router/current-org-slug) (router/current-activity-id))))
 
 (defn print-entry-editing-data []
-  (js/console.log (get @app-state :entry-editing)))
+  (get @app-state :entry-editing))
 
 (defn print-posts-data []
-  (js/console.log (get-in @app-state (posts-data-key (router/current-org-slug)))))
+  (get-in @app-state (posts-data-key (router/current-org-slug))))
 
 (defn print-filtered-posts []
-  (js/console.log (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter))))
+  (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter)))
 
 (defn print-user-notifications []
-  (js/console.log (user-notifications-data (router/current-org-slug) @app-state)))
+  (user-notifications-data (router/current-org-slug) @app-state))
 
 (defn print-reminders-data []
-  (js/console.log (reminders-data (router/current-org-slug) @app-state)))
+  (reminders-data (router/current-org-slug) @app-state))
 
 (defn print-reminder-edit-data []
-  (js/console.log (reminder-edit-data (router/current-org-slug) @app-state)))
+  (reminder-edit-data (router/current-org-slug) @app-state))
 
 (defn print-qsg-data []
-  (js/console.log (:qsg @app-state)))
+  (:qsg @app-state))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
@@ -782,3 +782,13 @@
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
 (set! (.-OCWebPrintQSGData js/window) print-qsg-data)
+;; Utility externs
+(set! (.-OCWebUtils js/window) #js {:app_state app-state
+                                    :deref cljs.core.deref
+                                    :keyword cljs.core.keyword
+                                    :count cljs.core.count
+                                    :get cljs.core.get
+                                    :filter cljs.core.filter
+                                    :map cljs.core.map
+                                    :clj__GT_js cljs.core.clj__GT_js
+                                    :js__GT_clj cljs.core.js__GT_clj})

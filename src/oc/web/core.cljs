@@ -451,9 +451,11 @@
       (simple-handler press-kit "press-kit" target params))
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
+      (when-not (seq (:token (:query-params params)))
+        (router/redirect! (if (jwt/jwt) (utils/your-digest-url) urls/home)))
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (simple-handler #(onboard-wrapper :email-verified) "email-verification" target params))
 
     (defroute password-reset-route urls/password-reset {:as params}

@@ -196,111 +196,175 @@
   [:section.keep-aligned
     [:div.keep-aligned-title
       "It’s never been easier to keep everyone on the same page"]
-    [:button.mlb-reset.get-started-button
-      "Get started - It's free"]])
+    [:button.mlb-reset.get-started-button.get-started-action
+      "Create your team - It's free"]])
 
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
       "Company updates that rise above the noise"]
     [:div.keep-aligned-values-line.big-web-tablet-only
-      [:img.keep-aligned-value.value-announcements
-        {:src (utils/cdn "/img/ML/homepage_bottom_section_announcements.png")
-         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
-      [:img.keep-aligned-value.value-decisions
-        {:src (utils/cdn "/img/ML/homepage_bottom_section_decisions.png")
-         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-team-updates
         {:src (utils/cdn "/img/ML/homepage_bottom_section_team_updates.png")
          :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_team_updates@2x.png") " 2x")}]
       [:img.keep-aligned-value.value-news
         {:src (utils/cdn "/img/ML/homepage_bottom_section_news.png")
-         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]]
-    [:button.mlb-reset.get-started-button
-      "Get started - It's free"]])
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-announcements
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_announcements.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-decisions
+        {:src (utils/cdn "/img/ML/homepage_bottom_section_decisions.png")
+         :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
+    [:button.mlb-reset.get-started-button.get-started-action
+      "Create your team - It's free"]])
+
+(defn slack-email-switch [slack?]
+  [:div.slack-email-container.group.big-web-only
+    [:div.slack-email-switch-container.group
+      {:class (if slack? "show-slack" "show-email")}
+      (when slack?
+        [:button.mlb-reset.slack-email-switch-bt.slack-bt
+          [:div.slack-logo]])
+      [:button.mlb-reset.slack-email-switch-bt.email-bt
+        [:div.email-logo]]
+      (when-not slack?
+        [:button.mlb-reset.slack-email-switch-bt.slack-bt
+          [:div.slack-logo]])
+      (when slack?
+        [:div.slack-email-switch-bottom-panel.slack-panel
+          [:div.slack-email-switch-bottom-panel-copy
+            (str
+             "“Our remote teams are ecstatic about not having to read "
+             "hundreds of Slack messages each morning to make sense of "
+             "the previous day.”")]
+          [:div.slack-email-switch-bottom-panel-img]
+          [:div.slack-email-switch-bottom-panel-name
+            "Andrew Love"]
+          [:div.slack-email-switch-bottom-panel-role
+            "PartnerHero, Director of R&D"]])
+      [:div.slack-email-switch-bottom-panel.email-panel
+        [:div.slack-email-switch-bottom-panel-copy
+          (str
+           "“The morning digest is how we know everyone in our "
+           "offices is up to date on what matters.”")]
+        [:div.slack-email-switch-bottom-panel-img]
+        [:div.slack-email-switch-bottom-panel-name
+          "Chris Cairns"]
+        [:div.slack-email-switch-bottom-panel-role
+          "Skylight Digital, Managing Director"]]
+      (when-not slack?
+        [:div.slack-email-switch-bottom-panel.slack-panel
+          [:div.slack-email-switch-bottom-panel-copy
+            (str
+             "“Our remote teams are ecstatic about not having to read "
+             "hundreds of Slack messages each morning to make sense of "
+             "the previous day.”")]
+          [:div.slack-email-switch-bottom-panel-img]
+          [:div.slack-email-switch-bottom-panel-name
+            "Andrew Love"]
+          [:div.slack-email-switch-bottom-panel-role
+            "PartnerHero, Director of R&D"]])]])
+
+(defn- slack-panel [first-panel?]
+  [:div.keep-aligned-section-carion-block
+    [:div.keep-aligned-section-header.tablet-mobile-only
+      [:span.slack-logo]]
+    [:img.keep-aligned-section-screenshot.screenshot-1
+      {:class (if first-panel? "carion-1" "carion-1-alt")
+       :src (utils/cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+       :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
+    [:div.slack-email-switch-bottom-panel.slack-panel
+      [:div.slack-email-switch-bottom-panel-copy
+        (str
+         "“Our remote teams are ecstatic about not having to read "
+         "hundreds of Slack messages each morning to make sense of "
+         "the previous day.”")]
+      [:div.slack-email-switch-bottom-panel-img]
+      [:div.slack-email-switch-bottom-panel-name
+        "Andrew Love"]
+      [:div.slack-email-switch-bottom-panel-role
+        "PartnerHero, Director of R&D"]]])
+
+(defn- email-panel [first-panel?]
+  [:div.keep-aligned-section-carion-block
+    [:div.keep-aligned-section-header.tablet-mobile-only
+      [:span.email-logo]]
+    [:img.keep-aligned-section-screenshot.screenshot-1
+      {:class (if first-panel? "carion-1" "carion-1-alt")
+       :src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
+       :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+    [:div.slack-email-switch-bottom-panel.email-panel
+      [:div.slack-email-switch-bottom-panel-copy
+        (str
+         "“The morning digest is how we know everyone in our "
+         "offices is up to date on what matters.”")]
+      [:div.slack-email-switch-bottom-panel-img]
+      [:div.slack-email-switch-bottom-panel-name
+        "Chris Cairns"]
+      [:div.slack-email-switch-bottom-panel-role
+        "Skylight Digital, Managing Director"]]])
 
 (defn keep-aligned-section [slack?]
   [:section.home-keep-aligned.group
 
     [:div.keep-aligned-section
+
       [:div.keep-aligned-section-row.first-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Start each day in sync"]
+              "Share what matters"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Carrot condenses noisy updates into "
-               "a morning digest for Slack or email.")]
-            [:div.slack-email-container.group.big-web-only
-              [:div.slack-email-switch-container.group
-                {:class "show-slack"}
-                [:button.mlb-reset.slack-email-switch-bt.slack-bt
-                  [:div.slack-logo]]
-                [:button.mlb-reset.slack-email-switch-bt.email-bt
-                  [:div.email-logo]]
-                [:div.slack-email-switch-bottom-panel.slack-panel
-                  [:div.slack-email-switch-bottom-panel-copy
-                    (str
-                     "“Our remote teams are ecstatic about not having to read "
-                     "hundreds of Slack messages each morning to make sense of "
-                     "the previous day.”")]
-                  [:div.slack-email-switch-bottom-panel-img]
-                  [:div.slack-email-switch-bottom-panel-name
-                    "Andrew Love"]
-                  [:div.slack-email-switch-bottom-panel-role
-                    "PartnerHero, Director of R&D"]]
-                [:div.slack-email-switch-bottom-panel.email-panel
-                  [:div.slack-email-switch-bottom-panel-copy
-                    (str
-                     "“The morning digest is a great way to get everyone "
-                     "aligned around what matters right from the start.”")]
-                  [:div.slack-email-switch-bottom-panel-img]
-                  [:div.slack-email-switch-bottom-panel-name
-                    "Chris Cairns"]
-                  [:div.slack-email-switch-bottom-panel-role
-                    "Skylight Digital, Managing Director"]]]]]
+               "Carrot gives you the space you need to "
+               "update your team, and even reminds you "
+               "when it's time to share the latest.")
+              [:br]
+              [:br]
+              (str
+               "Your team can view and comment on posts "
+               "in the app, or directly from Slack and email. "
+               "Rest assured, Carrot updates never get lost "
+               "in the noise.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]]
           [:div.keep-aligned-section-row-right
-            [:div.keep-aligned-section-carion-container
-              [:div.keep-aligned-section-carion-inner
-                [:div.keep-aligned-section-carion-block
-                  [:div.keep-aligned-section-header.tablet-mobile-only.first-header
-                    [:span.slack-logo]]
-                  [:img.keep-aligned-section-screenshot.screenshot-1.carion-1.first-image
-                    {:src (utils/cdn "/img/ML/homepage_screenshots_first_row_slack.png")
-                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
-                  [:div.slack-email-switch-bottom-panel.slack-panel
-                    [:div.slack-email-switch-bottom-panel-copy
-                      (str
-                       "“Our remote teams are ecstatic about not having to read "
-                       "hundreds of Slack messages each morning to make sense of "
-                       "the previous day.”")]
-                    [:div.slack-email-switch-bottom-panel-img]
-                    [:div.slack-email-switch-bottom-panel-name
-                      "Andrew Love"]
-                    [:div.slack-email-switch-bottom-panel-role
-                      "PartnerHero, Director of R&D"]]]
-                [:div.keep-aligned-section-carion-block
-                  [:div.keep-aligned-section-header..tablet-mobile-only.second-header
-                    [:span.email-logo]]
-                  [:img.keep-aligned-section-screenshot.screenshot-1.second-image.carion-1-alt
-                    {:src (utils/cdn "/img/ML/homepage_screenshots_first_row.png")
-                     :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
-                  [:div.slack-email-switch-bottom-panel.email-panel
-                    [:div.slack-email-switch-bottom-panel-copy
-                      (str
-                       "“The morning digest is a great way to get everyone "
-                       "aligned around what matters right from the start.”")]
-                    [:div.slack-email-switch-bottom-panel-img]
-                    [:div.slack-email-switch-bottom-panel-name
-                      "Chris Cairns"]
-                    [:div.slack-email-switch-bottom-panel-role
-                      "Skylight Digital, Managing Director"]]]]
-              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
+            [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
+              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
+               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
+               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-right.keep-aligned-section-copy
+            [:div.keep-aligned-section-copy-title
+              "Start every day in sync"]
+            [:div.keep-aligned-section-copy-subtitle
+              (str
+               "Your team wakes up to a daily digest of what's "
+               "important. This curated summary makes it easy "
+               "to get caught up fast - perfect for remote teams.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]
+            (slack-email-switch slack?)]
+          [:div.keep-aligned-section-row-left
+            [:div.keep-aligned-section-carion-container
+              [:div.keep-aligned-section-carion-inner
+                (when slack?
+                  (slack-panel true))
+                (email-panel (not slack?))
+                (when-not slack?
+                  (slack-panel false))]
+              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
+
+      [:div.keep-aligned-section-row.third-row
+        [:div.keep-aligned-section-row-inner.group
+          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
               "Know who’s engaged"]
             [:div.keep-aligned-section-copy-subtitle
@@ -313,32 +377,17 @@
               (str
                "See which updates create energy and "
                "engagement, and which ones aren’t getting "
-               "through.")]]
-          [:div.keep-aligned-section-row-left
+               "through.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]]
+          [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")
                :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
             [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_second_row_mobile.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_mobile@2x.png") " 2x")}]]]]
-
-      [:div.keep-aligned-section-row.third-row
-        [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
-            [:div.keep-aligned-section-copy-title
-              "Stay current"]
-            [:div.keep-aligned-section-copy-subtitle
-              (str
-               "Carrot reminds you when it’s time to update "
-               "your team. Consistent communication builds "
-               "trust and transparency.")]]
-          [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
-              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
-               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
-            [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
-              {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
-               :srcSet (str (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]]])
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshots_second_row_mobile@2x.png") " 2x")}]]]]]])
 
 (defn video-lightbox []
   (let [dismiss-cb (fn [e]
@@ -348,6 +397,18 @@
       [:div.animation-lightbox
         [:div#youtube-player]
         [:button.settings-modal-close.mlb-reset
-          {;:onClick "OCStaticHideAnimationLightbox(event);"
+          {;:on-click #(js/OCStaticHideAnimationLightbox %)
            :on-mouse-down dismiss-cb
            :on-touch-start dismiss-cb}]]]))
+
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:on-click js/OCStaticShowAnimationLightbox}
+    [:div.green-play]
+    "Carrot in 60 seconds"])
+
+(def carrot-in-action
+  [:section.carrot-in-action
+    [:div.carrot-in-action-title
+      "Want to see Carrot in action?"]
+    show-animation-button])

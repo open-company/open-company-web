@@ -41,6 +41,16 @@
         (assoc :can-delete (boolean delete-comment-link))
         (assoc :can-react can-react?)))))
 
+(defmethod dispatcher/action :add-comment-change
+  [db [_ org-slug activity-uuid comment-body]]
+  (let [add-comment-activity-key (dispatcher/add-comment-activity-key org-slug activity-uuid)]
+    (assoc-in db add-comment-activity-key comment-body)))
+
+(defmethod dispatcher/action :add-comment-remove
+  [db [_ org-slug activity-uuid]]
+  (let [add-comment-key (dispatcher/add-comment-key org-slug)]
+    (update-in db add-comment-key dissoc activity-uuid)))
+
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
   (assoc db :add-comment-focus focus-uuid))
