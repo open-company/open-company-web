@@ -33,8 +33,8 @@
                          {:will-mount (fn [s]
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL
-                             #(let [scroll-top (.scrollTop (js/$ js/window))]
-                                 (reset! (::sticky-navbar s) (pos? scroll-top)))))
+                            #(let [scroll-top (.scrollTop (js/$ js/window))]
+                               (reset! (::sticky-navbar s) (pos? scroll-top)))))
                           s)
                           :will-unmount (fn [s]
                            (when @(::scroll-listener s)
