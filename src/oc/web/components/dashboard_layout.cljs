@@ -46,15 +46,14 @@
     (max 0 (min (/ fixed-scroll-top 100) 1))))
 
 (defn did-scroll [e s]
-  (when @(::is-mounted s)
-    (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
-      (when (pos? (.-length entry-floating))
-        (let [scroll-top (document-scroll-top)
-              opacity (if (responsive/is-tablet-or-mobile?)
-                        1
-                        (calc-opacity scroll-top))]
-          (.css entry-floating #js {:opacity opacity
-                                   :display (if (pos? opacity) "block" "none")}))))))
+  (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
+    (when (pos? (.-length entry-floating))
+      (let [scroll-top (document-scroll-top)
+            opacity (if (responsive/is-tablet-or-mobile?)
+                      1
+                      (calc-opacity scroll-top))]
+        (.css entry-floating #js {:opacity opacity
+                                 :display (if (pos? opacity) "block" "none")})))))
 
 (defn win-width
   "Save the window width in the state."
@@ -92,7 +91,6 @@
                               (rum/local nil ::scroll-listener)
                               (rum/local nil ::show-top-boards-dropdown)
                               (rum/local nil ::show-floating-boards-dropdown)
-                              (rum/local false ::is-mounted)
                               ;; Commenting out grid view switcher for now
                               ; (rum/local nil ::board-switch)
                               ;; Mixins
@@ -114,11 +112,10 @@
                                 ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
-                                (reset! (::is-mounted s) true)
                                 (when-not (responsive/is-tablet-or-mobile?)
                                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                   (reset! (::scroll-listener s)
-                                   (events/listen js/window EventType/SCROLL (utils/throttled-debounced-fn (partial did-scroll s) 500))))
+                                   (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
@@ -128,7 +125,6 @@
                                 (reminder-actions/load-reminders)
                                 s)
                                :will-unmount (fn [s]
-                                (reset! (::is-mounted s) false)
                                 (when-not (utils/is-test-env?)
                                   (when @(::scroll-listener s)
                                     (events/unlistenByKey @(::scroll-listener s))
