@@ -356,7 +356,7 @@ div.org-settings div.org-settings-inner {
 
       div.advanced-settings-rows {
         margin-top: 16px;
-        margin-bottom: 24px;
+        margin-bottom: 32px;
 
         div.advanced-settings-row-item {
           margin-top: 8px;
@@ -366,10 +366,11 @@ div.org-settings div.org-settings-inner {
 
           div.checkbox-label {
             @include avenir_R();
-            font-size: 12px;
+            font-size: 14px;
             color: $deep_navy;
             float: left;
             margin-left: 10px;
+            cursor: pointer;
 
             &.unselected {
               opacity: 0.5;
@@ -384,10 +385,11 @@ div.org-settings div.org-settings-inner {
     button.hidden-settings-bt {
       float: left;
       margin-right: 24px;
+      margin-left: 0px;
       height: 32px;
       background-color: transparent;
-      @include avenir_R();
-      font-size: 12px;
+      @include avenir_M();
+      font-size: 16px;
       color: $grey_num_1;
       padding: 0;
       text-align: left;

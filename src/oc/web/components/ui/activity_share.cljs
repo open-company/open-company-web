@@ -40,6 +40,7 @@
                             (drv/drv :activity-share)
                             (drv/drv :activity-shared-data)
                             (drv/drv :activity-share-medium)
+                            (drv/drv :current-user-data)
                             ;; Locals
                             (rum/local {:note ""} ::slack-data)
                             (rum/local false ::dismiss)
@@ -91,7 +92,12 @@
         medium (drv/react s :activity-share-medium)
         has-bot? (has-slack-bot? org-data)
         can-share-to-slack? (and (not is-mobile?)
-                                 has-bot?)]
+                                 has-bot?)
+        cur-user-data (drv/react s :current-user-data)
+        user-type (utils/get-user-type cur-user-data org-data)
+        disallow-public-links? (and (:content-visibility org-data)
+                                    (:disallow-public-share (:content-visibility org-data))
+                                    (= user-type :author))]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}

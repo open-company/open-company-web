@@ -170,7 +170,11 @@
                        (some #{current-user-id} (:authors section-editing))
                        (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)
-        qsg-data (drv/react s :qsg)]
+        qsg-data (drv/react s :qsg)
+        user-type (utils/get-user-type cur-user-data org-data)
+        disallow-public-board? (and (:content-security org-data)
+                                    (:disallow-public-board (:content-security org-data))
+                                    (= user-type :author))]
     [:div.section-editor-container
       [:div.section-editor.group
         {:on-click (fn [e]
@@ -282,12 +286,14 @@
                                 (dis/dispatch! [:input [:section-editing :slack-mirror] nil]))
                               (dis/dispatch! [:input [:section-editing :access] "private"]))}
                 private-access]
-              [:div.access-list-row
-                {:on-click #(do
-                              (utils/event-stop %)
-                              (reset! (::show-access-list s) false)
-                              (dis/dispatch! [:input [:section-editing :access] "public"]))}
-                public-access]])
+              (when (or (not disallow-public-board?)
+                        (= (:access section-data) "public"))
+                [:div.access-list-row
+                  {:on-click #(do
+                                (utils/event-stop %)
+                                (reset! (::show-access-list s) false)
+                                (dis/dispatch! [:input [:section-editing :access] "public"]))}
+                  public-access])])
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
               "Public sections are visible to the world, including search engines."])

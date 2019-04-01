@@ -32,14 +32,16 @@
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
+(defn- change-content-visibility [content-visibility-data k v]
+  (let [new-content-visibility (merge content-visibility-data {k v})]
+    (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
+                                                      :content-visibility new-content-visibility})])))
+
 (rum/defcs org-settings-main-panel
   < rum/reactive
     (rum/local false ::saving)
     (rum/local false ::showing-menu)
     (rum/local false ::show-advanced-settings)
-    (rum/local true ::advanced-settings-1)
-    (rum/local true ::advanced-settings-2)
-    (rum/local true ::advanced-settings-3)
     (drv/drv :org-data)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
@@ -73,7 +75,8 @@
                 team-data]
          :as team-management-data}
                     (drv/react s :org-settings-team-management)
-        cur-user-data (drv/react s :current-user-data)]
+        cur-user-data (drv/react s :current-user-data)
+        content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-panel
       ;; Panel rows
       [:div.org-settings-main
@@ -241,35 +244,29 @@
             [:label "Content visibility"]]
           [:div.advanced-settings-rows
             [:div.advanced-settings-row-item.group
-              (carrot-checkbox {:selected @(::advanced-settings-1 s)
+              (carrot-checkbox {:selected (:disallow-secure-links content-visibility-data)
                                 :disabled false
-                                :did-change-cb (fn [flag]
-                                                 (swap! (::advanced-settings-1 s) not)
-                                                 (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
-                                                                                                   :anonymous-digest-links flag})]))})
+                                :did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links %)})
               [:div.checkbox-label
-                {:class (when-not @(::advanced-settings-1 s) "unselected")}
-                "Hassle-free links in Slack and email digests that don't require a logged-in Carrot session"]]
+                {:class (when-not (:disallow-secure-links content-visibility-data) "unselected")
+                 :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
+                "Disallow secure links in morning digests"]]
             [:div.advanced-settings-row-item.group
-              (carrot-checkbox {:selected @(::advanced-settings-2 s)
+              (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                 :disabled false
-                                :did-change-cb (fn [flag]
-                                                 (swap! (::advanced-settings-2 s) not)
-                                                 (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
-                                                                                                   :deny-contrib-public-section-creation flag})]))})
+                                :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-board %)})
               [:div.checkbox-label
-                {:class (when-not @(::advanced-settings-2 s) "unselected")}
-                "Allow contributors to create public sections"]]
+                {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
+                 :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
+                "Disallow contributors to create public sections"]]
             [:div.advanced-settings-row-item.group
-              (carrot-checkbox {:selected @(::advanced-settings-3 s)
+              (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
                                 :disabled false
-                                :did-change-cb (fn [flag]
-                                                 (swap! (::advanced-settings-3 s) not)
-                                                 (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
-                                                                                                   :deny-contrib-public-share-creation flag})]))})
+                                :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share %)})
               [:div.checkbox-label
-                {:class (when-not @(::advanced-settings-3 s) "unselected")}
-                "Allow contributors to create public share links"]]]])]
+                {:class (when-not (:disallow-public-share content-visibility-data) "unselected")
+                 :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
+                "Disallow contributors to create public share links"]]]])]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group

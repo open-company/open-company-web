@@ -209,7 +209,7 @@
 
 ;; Allowed keys
 
-(def org-allowed-keys [:name :logo-url :logo-width :logo-height])
+(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
 (def entry-allowed-keys [:headline :body :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
 
