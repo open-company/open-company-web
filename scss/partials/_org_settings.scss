@@ -127,7 +127,7 @@ div.org-settings {
     }
 
     div.org-settings-footer {
-      margin-top: 64px;
+      margin-top: 24px;
       margin-bottom: 0px;
       height: 40px;
       width: 100%;
@@ -136,12 +136,12 @@ div.org-settings {
       button {
         float: right;
         margin-left: 24px;
-        height: 40px;
+        height: 32px;
 
         &.cancel-btn {
           background-color: transparent;
-          @include avenir_M();
-          font-size: 16px;
+          @include avenir_R();
+          font-size: 14px;
           color: $ui_grey;
         }
 
@@ -151,7 +151,7 @@ div.org-settings {
           background-color: $carrot_green;
           color: white;
           @include avenir_H();
-          font-size: 16px;
+          font-size: 14px;
         }
       }
     }
@@ -293,14 +293,14 @@ div.org-settings {
 
         .org-settings-label {
           width: 100%;
-          @include avenir_M();
-          font-size: 15px;
+          @include avenir_H();
+          font-size: 12px;
           color: $deep_navy;
           margin-bottom: 8px;
 
           label {
-            @include avenir_M();
-            font-size: 15px;
+            @include avenir_H();
+            font-size: 12px;
             color: $deep_navy;
             margin-bottom: 0px;
           }

@@ -15,6 +15,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
@@ -35,6 +36,10 @@
   < rum/reactive
     (rum/local false ::saving)
     (rum/local false ::showing-menu)
+    (rum/local false ::show-advanced-settings)
+    (rum/local true ::advanced-settings-1)
+    (rum/local true ::advanced-settings-2)
+    (rum/local true ::advanced-settings-3)
     (drv/drv :org-data)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
@@ -229,10 +234,49 @@
                         (when-not has-bot?
                           [:button.mlb-reset.enable-carrot-bot-bt
                             {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
-                            "Enable Carrot Bot"])]]]))])]]
+                            "Enable Carrot Bot"])]]]))])]
+      (when @(::show-advanced-settings s)
+        [:div.org-settings-panel-row.advanced-settings-row.group
+          [:div.org-settings-label
+            [:label "Content visibility"]]
+          [:div.advanced-settings-rows
+            [:div.advanced-settings-row-item.group
+              (carrot-checkbox {:selected @(::advanced-settings-1 s)
+                                :disabled false
+                                :did-change-cb (fn [flag]
+                                                 (swap! (::advanced-settings-1 s) not)
+                                                 (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
+                                                                                                   :anonymous-digest-links flag})]))})
+              [:div.checkbox-label
+                {:class (when-not @(::advanced-settings-1 s) "unselected")}
+                "Hassle-free links in Slack and email digests that don't require a logged-in Carrot session"]]
+            [:div.advanced-settings-row-item.group
+              (carrot-checkbox {:selected @(::advanced-settings-2 s)
+                                :disabled false
+                                :did-change-cb (fn [flag]
+                                                 (swap! (::advanced-settings-2 s) not)
+                                                 (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
+                                                                                                   :deny-contrib-public-section-creation flag})]))})
+              [:div.checkbox-label
+                {:class (when-not @(::advanced-settings-2 s) "unselected")}
+                "Allow contributors to create public sections"]]
+            [:div.advanced-settings-row-item.group
+              (carrot-checkbox {:selected @(::advanced-settings-3 s)
+                                :disabled false
+                                :did-change-cb (fn [flag]
+                                                 (swap! (::advanced-settings-3 s) not)
+                                                 (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
+                                                                                                   :deny-contrib-public-share-creation flag})]))})
+              [:div.checkbox-label
+                {:class (when-not @(::advanced-settings-3 s) "unselected")}
+                "Allow contributors to create public share links"]]]])]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
+        (when-not @(::show-advanced-settings s)
+          [:button.mlb-reset.hidden-settings-bt
+            {:on-click #(reset! (::show-advanced-settings s) true)}
+            "Show advanced security settings"])
         [:button.mlb-reset.save-btn
           {:disabled (or @(::saving s)
                          (:saved org-editing)
