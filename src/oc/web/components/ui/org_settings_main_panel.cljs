@@ -49,6 +49,8 @@
     (on-window-click-mixin (fn [s _] (reset! (::showing-menu s) false)))
     {:will-mount (fn [s]
                    (reset-form s)
+                   (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
+                    (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
                    s)
      :will-update (fn [s]
                     (let [org-editing @(drv/get-ref s :org-editing)]

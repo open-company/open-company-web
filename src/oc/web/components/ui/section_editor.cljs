@@ -171,10 +171,8 @@
                        (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)
         qsg-data (drv/react s :qsg)
-        user-type (utils/get-user-type cur-user-data org-data)
-        disallow-public-board? (and (:content-security org-data)
-                                    (:disallow-public-board (:content-security org-data))
-                                    (= user-type :author))]
+        disallow-public-board? (and (:content-visibility org-data)
+                                    (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
       [:div.section-editor.group
         {:on-click (fn [e]
@@ -286,8 +284,7 @@
                                 (dis/dispatch! [:input [:section-editing :slack-mirror] nil]))
                               (dis/dispatch! [:input [:section-editing :access] "private"]))}
                 private-access]
-              (when (or (not disallow-public-board?)
-                        (= (:access section-data) "public"))
+              (when-not disallow-public-board?
                 [:div.access-list-row
                   {:on-click #(do
                                 (utils/event-stop %)

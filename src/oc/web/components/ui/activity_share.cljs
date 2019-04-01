@@ -93,11 +93,8 @@
         has-bot? (has-slack-bot? org-data)
         can-share-to-slack? (and (not is-mobile?)
                                  has-bot?)
-        cur-user-data (drv/react s :current-user-data)
-        user-type (utils/get-user-type cur-user-data org-data)
-        disallow-public-links? (and (:content-visibility org-data)
-                                    (:disallow-public-share (:content-visibility org-data))
-                                    (= user-type :author))]
+        disallow-public-share? (and (:content-visibility org-data)
+                                    (:disallow-public-share (:content-visibility org-data)))]
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
@@ -134,20 +131,21 @@
           [:div.activity-share-modal-shared.group
             [:form
               {:on-submit #(utils/event-stop %)}
-              [:div.medium-row.group
-                [:div.fields
-                  [:div.checkbox-row.group
-                    {:on-click #(reset! (::url-audience s) :team)}
-                    [:div.checkbox
-                      {:class (when (= @(::url-audience s) :team)
-                                "selected")}]
-                    [:div.checkbox-label "Link that requires a Carrot login"]]
-                  [:div.checkbox-row.group
-                    {:on-click #(reset! (::url-audience s) :all)}
-                    [:div.checkbox
-                      {:class (when (= @(::url-audience s) :all)
-                                "selected")}]
-                    [:div.checkbox-label "Link that anyone can use"]]]]
+              (when-not disallow-public-share?
+                [:div.medium-row.group
+                  [:div.fields
+                    [:div.checkbox-row.group
+                      {:on-click #(reset! (::url-audience s) :team)}
+                      [:div.checkbox
+                        {:class (when (= @(::url-audience s) :team)
+                                  "selected")}]
+                      [:div.checkbox-label "Link that requires a Carrot login"]]
+                    [:div.checkbox-row.group
+                      {:on-click #(reset! (::url-audience s) :all)}
+                      [:div.checkbox
+                        {:class (when (= @(::url-audience s) :all)
+                                  "selected")}]
+                      [:div.checkbox-label "Link that anyone can use"]]]])
               [:div.medium-row.url-field-row.group
                 (let [url-protocol (str "http" (when ls/jwt-cookie-secure "s") "://")
                       secure-url (oc-urls/secure-activity (router/current-org-slug) secure-uuid)
