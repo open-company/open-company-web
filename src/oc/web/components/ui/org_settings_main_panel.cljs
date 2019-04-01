@@ -252,7 +252,13 @@
               [:div.checkbox-label
                 {:class (when-not (:disallow-secure-links content-visibility-data) "unselected")
                  :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
-                "Disallow secure links in morning digests"]]
+                "Disable secure links in morning digests"
+                [:i.mdi.mdi-information-outline
+                  {:title (str
+                           "Secure links are hassle-free links in Slack and email digest "
+                           "that let users comment and react to posts but don't require the user to log in.")
+                   :data-toggle "tooltip"
+                   :data-placement "top"}]]]
             [:div.advanced-settings-row-item.group
               (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                 :disabled false
@@ -260,7 +266,7 @@
               [:div.checkbox-label
                 {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
                  :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
-                "Disallow contributors to create public sections"]]
+                "Disable public sections"]]
             [:div.advanced-settings-row-item.group
               (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
                                 :disabled false
@@ -268,7 +274,7 @@
               [:div.checkbox-label
                 {:class (when-not (:disallow-public-share content-visibility-data) "unselected")
                  :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
-                "Disallow contributors to create public share links"]]]])]
+                "Disable public share links"]]]])]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group

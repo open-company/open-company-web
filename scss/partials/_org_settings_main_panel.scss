@@ -375,6 +375,15 @@ div.org-settings div.org-settings-inner {
             &.unselected {
               opacity: 0.5;
             }
+
+            i.mdi.mdi-information-outline {
+              margin-left: 8px;
+              color: $light_ui_grey;
+
+              &:before {
+                font-size: 16px;
+              }
+            }
           }
         }
       }

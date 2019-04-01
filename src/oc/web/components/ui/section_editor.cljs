@@ -142,7 +142,8 @@
                                 (when @(::pre-flight-check s)
                                   (when-not (:pre-flight-loading section-editing)
                                     (reset! (::pre-flight-check s) false)
-                                    (when-not (:section-name-error section-editing)
+                                    (when (and (not (:section-name-error section-editing))
+                                               (not (:section-error section-editing)))
                                       (reset! (::pre-flight-ok s) true))))
                                 ;; Re-enable the save button after a save failure
                                 (when (and @(::saving s)
@@ -216,9 +217,11 @@
                                       (= (.-key e) "Enter"))
                               (utils/event-stop e)))
              :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
-          (when (:section-name-error section-editing)
+          (when (or (:section-name-error section-editing)
+                    (:section-error section-editing))
             [:div.section-editor-error-label
-              (:section-name-error section-editing)])
+              (str (or (:section-name-error section-editing)
+                       (:section-error section-editing)))])
           (when show-slack-channels?
             [:div.section-editor-add-label
               "Auto-share to Slack"
