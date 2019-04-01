@@ -17,7 +17,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
+            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
 ;; Private section users search helpers
@@ -223,7 +223,7 @@
               (when show-slack-channels?
                 [:span.info])
               (when show-slack-channels?
-                (carrot-checkbox {:selected @(::slack-enabled s)
+                (carrot-switch {:selected @(::slack-enabled s)
                                   :did-change-cb #(do
                                                     (reset! (::slack-enabled s) %)
                                                     (when-not %

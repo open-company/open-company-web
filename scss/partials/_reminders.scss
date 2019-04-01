@@ -311,7 +311,7 @@ div.reminders-container {
                 @include avenir_R();
                 font-size: 14px;
                 line-height: 32px;
-                color: #99A0A7;
+                color: $grey_num_1;
                 float: right;
 
                 @include mobile() {

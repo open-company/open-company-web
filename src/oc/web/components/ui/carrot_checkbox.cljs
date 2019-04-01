@@ -3,17 +3,9 @@
             [oc.web.lib.utils :as utils]))
 
 (rum/defc carrot-checkbox < rum/static
-  [{:keys [selected disabled did-change-cb selected-label unselected-label]}]
+  [{:keys [selected disabled did-change-cb]}]
   [:div.carrot-checkbox
-    {:on-click #(did-change-cb (not selected))
+    {:on-click #(when-not disabled
+                  (did-change-cb (not selected)))
      :class (utils/class-set {:selected selected
-                              :disabled disabled})}
-    (when (and selected
-               selected-label)
-      [:span.selected-label
-        selected-label])
-    [:span.dot]
-    (when (and (not selected)
-               unselected-label)
-      [:span.unselected-label
-        unselected-label])])
+                              :disabled disabled})}])
