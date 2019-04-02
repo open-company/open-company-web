@@ -147,7 +147,7 @@ div.org-settings {
 
         &.save-btn {
           width: 100px;
-          border-radius: 100px;
+          border-radius: 6px;
           background-color: $carrot_green;
           color: white;
           @include avenir_H();
@@ -238,7 +238,7 @@ div.org-settings {
               th {
                 @include avenir_H();
                 font-size: 14px;
-                color: $oc_gray_7;
+                color: $ui_grey;
 
                 span.error {
                   @include avenir_H();
@@ -254,7 +254,7 @@ div.org-settings {
                 border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
                 @include avenir_R();
                 font-size: 16px;
-                color: $carrot_dark_gray;
+                color: $deep_navy;
               }
             }
           }
@@ -264,13 +264,9 @@ div.org-settings {
           width: 100%;
 
           .org-settings-list-item {
-            height: 48px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba($carrot_light_gray, 0.3);
-
-            &:last-child {
-              border-bottom: none;
-            }
+            border-top: 1px solid $ultra_light_grey;
+            margin: 24px 0 0;
+            padding: 24px 0 0;
 
             .org-settings-list-item-name {
               float: left;
@@ -368,7 +364,11 @@ div.org-settings-tabs {
     }
 
     &:hover {
-      border-bottom: 1px solid $carrot_orange;
+      border-bottom: 1px solid $deep_navy;
+
+      a.org-settings-tab-link {
+        color: $deep_navy;
+      }
     }
 
     &.active {

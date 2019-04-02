@@ -14,21 +14,23 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn enable-add-comment? [s]
-  (let [add-comment-div (rum/ref-node s "add-comment")
-        comment-text (cu/add-comment-content add-comment-div)
-        next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
-    (when (not= next-add-bt-disabled @(::add-button-disabled s))
-      (reset! (::add-button-disabled s) next-add-bt-disabled))))
+  (when-let [add-comment-div (rum/ref-node s "add-comment")]
+    (let [activity-data (first (:rum/args s))
+          comment-text (cu/add-comment-content add-comment-div)
+          next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
+      (comment-actions/add-comment-change activity-data comment-text)
+      (when (not= next-add-bt-disabled @(::add-button-disabled s))
+        (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
 (defn editable-input-change [s editable event]
   (enable-add-comment? s))
 
-(defn add-comment-focus [s]
+(defn focus-add-comment [s]
   (enable-add-comment? s)
   (comment-actions/add-comment-focus (:uuid (first (:rum/args s)))))
 
 (defn disable-add-comment-if-needed [s]
-  (let [add-comment-node (rum/ref-node s "add-comment")]
+  (when-let [add-comment-node (rum/ref-node s "add-comment")]
     (enable-add-comment? s)
     (when (and (zero? (count (.-innerText add-comment-node)))
                (not @(::emoji-picker-open s)))
@@ -41,6 +43,7 @@
                          (mention-mixins/oc-mentions-hover)
                          ;; Derivatives
                          (drv/drv :add-comment-focus)
+                         (drv/drv :add-comment-data)
                          (drv/drv :team-roster)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
@@ -49,18 +52,28 @@
                          (rum/local nil ::focus-listener)
                          (rum/local nil ::blur-listener)
                          (rum/local false ::emoji-picker-open)
-                         {:did-mount (fn [s]
+                         (rum/local "" ::initial-add-comment)
+                         {:will-mount (fn [s]
+                          (let [activity-data (first (:rum/args s))
+                                add-comment-data @(drv/get-ref s :add-comment-data)
+                                add-comment-activity-data (get add-comment-data (:uuid activity-data))]
+                            (reset! (::initial-add-comment s) (or add-comment-activity-data "")))
+                          s)
+                          :did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
                            (let [add-comment-node (rum/ref-node s "add-comment")
                                  users-list (:mention-users @(drv/get-ref s :team-roster))
-                                 medium-editor (cu/setup-medium-editor add-comment-node users-list)]
+                                 medium-editor (cu/setup-medium-editor add-comment-node users-list)
+                                 activity-data (first (:rum/args s))
+                                 add-comment-focus @(drv/get-ref s :add-comment-focus)
+                                 should-focus-field? (= (:uuid activity-data) add-comment-focus)]
                              (reset! (::medium-editor s) medium-editor)
                              (.subscribe medium-editor
                               "editableInput"
                               (partial editable-input-change s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
-                               #(add-comment-focus s)))
+                               #(focus-add-comment s)))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                #(disable-add-comment-if-needed s)))
@@ -70,7 +83,11 @@
                                 EventType/KEYDOWN
                                 #(when (and (= (.-key %) "Escape")
                                             (= (.-activeElement js/document) add-comment-node))
-                                   (.blur add-comment-node)))))
+                                   (.blur add-comment-node))))
+                             (when should-focus-field?
+                               (.focus add-comment-node)
+                               (utils/after 0
+                                #(utils/to-end-of-content-editable add-comment-node))))
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)
@@ -91,7 +108,8 @@
                              (reset! (::blur-listener s) nil))
                            s)}
   [s activity-data]
-  (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))]
+  (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
+        _ (drv/react s :add-comment-data)]
     [:div.add-comment-box-container
       [:div.add-comment-box
         {:class (utils/class-set {:show-buttons add-comment-focus})}
@@ -99,7 +117,8 @@
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover
            {:ref "add-comment"
             :content-editable true
-            :class utils/hide-class}]
+            :class utils/hide-class
+            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           (when (and (not (js/isIE))
                      (not (responsive/is-tablet-or-mobile?)))
             (emoji-picker {:width 32
@@ -135,6 +154,7 @@
             [:button.mlb-reset.cancel-btn
               {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                                 comment-body (cu/add-comment-content add-comment-div)]
+                            (comment-actions/add-comment-cancel activity-data)
                             (set! (.-innerHTML add-comment-div) "")
                             (comment-actions/add-comment-blur))}
               "Cancel"]])]]))

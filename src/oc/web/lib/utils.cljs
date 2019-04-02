@@ -65,6 +65,16 @@
       (clojure.string/replace upper-value #"-(\w)"
                               #(str " " (clojure.string/upper-case (second %1)))))))
 
+(defn get-week-day [day & [short-day]]
+  (case day
+   1 (if short-day "Mon" "Monday")
+   2 (if short-day "Tue" "Tuesday")
+   3 (if short-day "Wed" "Wednesday")
+   4 (if short-day "Thu" "Thursday")
+   5 (if short-day "Fri" "Friday")
+   6 (if short-day "Sat" "Saturday")
+   (if short-day "Sun" "Sunday")))
+
 (defn js-date [ & [date-str]]
   (if date-str
     (new js/Date date-str)
@@ -421,14 +431,16 @@
       (get-ampm-time js-date)
       (get-24h-time js-date))))
 
-(defn activity-date-string [js-date & [hide-time]]
+(defn activity-date-string [js-date & [hide-time hide-year]]
   (let [time-string (format-time-string js-date)]
     (str
      (full-month-string (inc (.getMonth js-date)))
      " "
      (.getDate js-date)
-     ", "
-     (.getFullYear js-date)
+     (when-not hide-year
+      ", ")
+     (when-not hide-year
+      (.getFullYear js-date))
      (when-not hide-time
       (str " at " time-string)))))
 
@@ -632,4 +644,4 @@
 (defn calc-video-height [width]
   (int (* width (/ 3 4))))
 
-(def hide-class "_lr-hide") ;; Use fs-hide for FullStory
+(def hide-class "fs-hide") ;; Use fs-hide for FullStory

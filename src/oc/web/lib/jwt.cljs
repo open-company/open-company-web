@@ -5,8 +5,7 @@
             [goog.date :as gd]
             [cljsjs.jwt-decode]))
 
-(defn jwt []
-  (cook/get-cookie :jwt))
+;; jwt_decode
 
 (defn decode [encoded-jwt]
   (when (exists? js/jwt_decode)
@@ -15,6 +14,23 @@
       (catch js/Object e
         (timbre/warn "Failed attempt to decode JWT:" encoded-jwt)
         nil))))
+
+;; ID Token
+
+(defn id-token []
+  (cook/get-cookie :id-token))
+
+(defn get-id-token-contents
+  ([] (get-id-token-contents (id-token)))
+  ([token]
+     (some-> token
+             decode
+             (js->clj :keywordize-keys true))))
+
+;; JWT
+
+(defn jwt []
+  (cook/get-cookie :jwt))
 
 (defn get-contents []
   (some-> (jwt) decode (js->clj :keywordize-keys true)))
@@ -55,6 +71,6 @@
     ;; interpreted as part of the key from the JSON parser.
     ;; When decode keywordize the keys it keeps them in the key so we need to add them to check
     ;; for the team value
-    (some #(= (slack-bots-team-key team-id) %) (keys slack-bots))))
+    (some (fn [[k v]] (when (= (slack-bots-team-key team-id) k) v)) slack-bots)))
 
-(set! (.-OCWebPrintJWTContents js/window) #(js/console.log (get-contents)))
+(set! (.-OCWebPrintJWTContents js/window) get-contents)

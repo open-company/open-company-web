@@ -12,46 +12,81 @@ div.more-menu {
 
   div.activity-move {
     position: absolute;
-    top: 40px;
+    bottom: 32px;
     left: unset;
     right: -9px;
+
+    @include mobile() {
+      top: 40px;
+      bottom: unset;
+    }
   }
 
   button.more-menu-bt {
-    width: 32px;
     height: 32px;
     display: inline;
-    background-image: cdnUrl("/img/ML/more_menu_icon.svg");
-    background-size: 32px 32px;
-    background-position: center;
+    background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
+    background-size: 18px 4px;
+    background-position: left center;
+    padding: 0 0 0 24px;
     background-repeat: no-repeat;
     opacity: 1;
 
+    @include mobile() {
+      width: 32px;
+    }
+
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
+      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_active.svg");
+    }
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/more_menu_icon.svg");
+      background-size: 32px 32px;
+      background-position: center;
+      padding: 0;
+
+      &:hover, &:active, &:focus {
+        background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
+      }      
     }
   }
 
   button.more-menu-share-bt {
-    width: 32px;
     height: 32px;
     display: inline;
-    background-image: cdnUrl("/img/ML/share_menu_icon.svg");
-    background-size: 32px 32px;
-    background-position: center;
+    background-image: cdnUrl("/img/ML/more_menu_share_arrow.svg");
+    background-size: 16px 14px;
+    background-position: left center;
+    padding: 0 0 0 24px;
     background-repeat: no-repeat;
-    margin-left: 7px;
+    margin-left: 16px;
     display: inline-block;
     opacity: 1;
 
+    @include mobile() {
+      width: 32px;
+    }
+
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");
+      background-image: cdnUrl("/img/ML/more_menu_share_arrow_active.svg");
+    }
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/share_menu_icon.svg");
+      background-size: 32px 32px;
+      background-position: center;
+      padding: 0;
+
+      &:hover, &:active, &:focus {
+        background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");
+      }      
     }
   }
 
   ul.more-menu-list {
     position: absolute;
-    top: 40px;
+    bottom: 32px;
     left: calc(100% - 120px);
     width: 128px;
     outline: none;
@@ -62,6 +97,11 @@ div.more-menu {
     margin: 0;
     padding: 0px 16px;
     list-style-type: none;
+
+    @include mobile() {
+      top: 40px;
+      bottom: unset;
+    }
 
     li {
       height: 48px;
@@ -90,7 +130,7 @@ div.more-menu {
       &.delete {
         &:before {
           background-image: cdnUrl("/img/ML/more_menu_delete.svg");
-        } 
+        }
       }
 
       &.share {

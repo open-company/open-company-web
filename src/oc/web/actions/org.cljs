@@ -9,13 +9,15 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.comment :as ca]
+            [oc.web.actions.section :as sa]
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
-            [oc.web.actions.section :as sa]
+            [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-notify-client :as ws-nc]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.notify-client :as ws-nc]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -37,14 +39,23 @@
                         redirect)]
     (router/redirect! fixed-auth-url)))
 
-(defn maybe-show-bot-added-notification? []
+(defn maybe-show-integration-added-notification? []
   ;; Do we need to show the add bot banner?
   (when-let* [org-data (dis/org-data)
               bot-access (dis/bot-access)]
-    (when (= bot-access :slack-bot-success-notification)
-      (notification-actions/show-notification {:title "Slack integration successful"
-                                               :slack-icon true
-                                               :id "slack-bot-integration-succesful"}))
+    (when (= bot-access "bot")
+      (notification-actions/show-notification {:title "Carrot Bot enabled"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :slack-bot-added}))
+    (when (and (= bot-access "team")
+               (not= (:new (router/query-params)) "true"))
+      (notification-actions/show-notification {:title "Integration added"
+                                                      :primary-bt-title "OK"
+                                                      :primary-bt-dismiss true
+                                                      :expire 10
+                                                      :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
 ;; Org get
@@ -55,7 +66,7 @@
     (if (pos? (count orgs))
       (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
       (cook/remove-cookie! (router/last-org-cookie)))
-    (router/redirect-404!)))
+    (routing-actions/maybe-404)))
 
 (defn org-loaded [org-data saved? & [email-domain]]
   ;; Save the last visited org
@@ -91,7 +102,7 @@
           (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
           (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
                      (not ap-initial-at)) ;; neither for a briefing link
-            (router/redirect-404!))))
+            (routing-actions/maybe-404))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
            (not (utils/in? (:route @router/path) "org-settings-team"))
@@ -123,7 +134,8 @@
       (ws-nc/reconnect ws-link (jwt/user-id))))
 
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
-  (utils/after 100 maybe-show-bot-added-notification?))
+  (utils/after 100 maybe-show-integration-added-notification?)
+  (fullstory/track-org org-data))
 
 (defn get-org-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)]
@@ -145,7 +157,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-invite (:slug org-data)))))
+   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -174,9 +186,23 @@
                                    (:links team-data)
                                    "add"
                                    "POST"
-                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})]
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})]
         (api/add-email-domain add-email-domain-link email-domain redirect-cb team-data))
       (redirect-cb))))
+
+(defn pre-flight-email-domain [email-domain team-id cb]
+  (let [team-data (or (dis/team-data team-id)
+                      ;; Fallback for NUX: user has no team-id set from the org yet
+                      ;; so the team data are not in the right position yet
+                      (first (filter #(= (:team-id %) team-id) (dis/teams-data))))
+        add-email-domain-link (utils/link-for
+                                   (:links team-data)
+                                   "add"
+                                   "POST"
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
+        redirect-cb (fn [{:keys [status success body]}]
+                      (cb success status))]
+    (api/add-email-domain add-email-domain-link email-domain redirect-cb team-data true)))
 
 (defn org-create-check-errors [status]
   (if (= status 409)
@@ -212,9 +238,6 @@
 (defn create-or-update-org [org-data]
   (dis/dispatch! [:input [:org-editing :error] false])
   (let [email-domain (:email-domain org-data)
-        fixed-email-domain (if (and email-domain (.startsWith email-domain "@"))
-                             (subs email-domain 1)
-                             email-domain)
         existing-org (dis/org-data)
         logo-org-data (if (seq (:logo-url org-data))
                           org-data
@@ -224,9 +247,9 @@
                               (trunc (:name logo-org-data) 127))]
     (if (seq (:slug existing-org))
       (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-        (api/patch-org org-patch-link clean-org-data (partial org-update-cb fixed-email-domain)))
+        (api/patch-org org-patch-link clean-org-data (partial org-update-cb email-domain)))
       (let [create-org-link (utils/link-for (dis/api-entry-point) "create")]
-        (api/create-org create-org-link clean-org-data (partial org-create-cb fixed-email-domain))))))
+        (api/create-org create-org-link clean-org-data (partial org-create-cb email-domain))))))
 
 ;; Org edit
 
@@ -237,8 +260,9 @@
   (org-loaded (json->cljs body) true))
 
 (defn org-edit-save [org-data]
-  (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-    (api/patch-org org-patch-link org-data org-edit-save-cb)))
+  (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
+        with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))]
+    (api/patch-org org-patch-link with-trimmed-name org-edit-save-cb)))
 
 (defn org-avatar-edit-save-cb [{:keys [success body status]}]
   (if success

@@ -60,14 +60,22 @@
                             s)}
   [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
-             secondary-bt-cb secondary-bt-title secondary-bt-style secondary-bt-dismiss
-             app-update slack-bot mention mention-author click] :as notification-data}]
+             primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
+             secondary-bt-dismiss app-update slack-bot mention mention-author
+             click] :as notification-data}]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update app-update
                               :slack-bot slack-bot
                               :opac opac
                               :mention-notification (and mention mention-author)
+                              :inline-bt (or primary-bt-inline
+                                             (and id
+                                                  ((keyword id) #{:slack-team-added :slack-bot-added
+                                                                  :org-settings-saved :invitation-resent
+                                                                  :cancel-invitation :member-removed-from-team
+                                                                  :reminder-created :reminder-updated
+                                                                  :reminder-deleted :resend-verification-ok})))
                               :dismiss-button dismiss-bt})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)
@@ -86,9 +94,6 @@
                       (when (fn? dismiss)
                         (dismiss %)))
          :ref :dismiss-bt}])
-    (when mention-author
-      [:div.mention-author
-        (user-avatar-image mention-author)])
     [:div.notification-title.group
       (when slack-icon
         [:span.slack-icon])

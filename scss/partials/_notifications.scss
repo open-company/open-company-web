@@ -78,21 +78,25 @@ div.notifications {
     }
 
     &.mention-notification {
+
       div.notification-title {
-        float: left;
-        margin-left: 8px;
-        max-width: 80%;
+        font-size: 12px;
       }
 
       div.notification-description {
-        float: right;
-        width: calc(100% - 32px);
-        text-align: left;
+        font-size: 14px;
 
         p {
           margin: 0;
           padding: 0;
         }
+      }
+    }
+
+    &.inline-bt {
+      div.notification-title {
+        max-width: 80%;
+        float: left;
       }
     }
 
@@ -118,6 +122,10 @@ div.notifications {
       @include avenir_H();
       font-size: 14px;
       color: white;
+
+      @include mobile() {
+        margin-top: 2px;
+      }
     }
 
     button.notification-dismiss-bt {
@@ -137,9 +145,16 @@ div.notifications {
       font-size: 14px;
       color: white;
       margin-top: 4px;
+      overflow-wrap: break-word;
 
       &.oc-mentions span.oc-mention[data-found="true"] {
         background-color: transparent !important;
+        color: white !important;
+        @include avenir_H();
+      }
+
+      a {
+        color: $carrot_green;
       }
     }
 

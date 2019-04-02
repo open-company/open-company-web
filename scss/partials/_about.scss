@@ -7,19 +7,20 @@ div.about-wrap {
     width: 100%;
 
     section.about-header {
-      padding-top: 239px;
+      // padding-top: 239px;
+      padding-top: 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
-      @include tablet() {
-        padding-top: 131px;
-      }
+      // @include tablet() {
+      //   padding-top: 131px;
+      // }
 
       h1.about {
         @include PTSerif()
-        font-size: 80px;
-        line-height: 90px;
+        font-size: 60px;
+        line-height: 78px;
         color: $deep_navy;
         margin: 0 auto;
         padding: 0 16px;
@@ -33,6 +34,7 @@ div.about-wrap {
 
         @include mobile() {
           max-width: 380px;
+          font-size: 36px;
         }
       }
 
@@ -73,7 +75,7 @@ div.about-wrap {
               width: 100%;
               margin-top: 32px;
               padding-top: 24px;
-              border-top: 1px solid #E7E6E5;
+              border-top: 1px solid $more_ultra_light_grey;
               margin-left: 0;
             }
 
@@ -174,36 +176,43 @@ div.about-wrap {
           }
         }
       }
+      
+      h3.about-copy-header {
+        @include PTSerif()
+        color: $deep_navy;
+        font-size: 60px;
+        line-height: 78px;
+        position: relative;
+        z-index: 3;
+        margin: 120px auto 0;
+        text-align: left;
+        max-width: 795px;
+
+        @include tablet() {
+          max-width: 595px;
+          text-align: center;
+          margin: 80px auto 0;
+        }
+
+        @include mobile() {
+          font-size: 36px;
+          line-height: normal;
+          max-width: 202px;
+        }
+      }
 
       div.about-copy {
         width: 100%;
         margin: 0 auto;
         border-radius: 8px;
-        padding: 120px 0;
+        padding: 0 0 120px;
         position: relative;
         z-index: 1;
         text-align: left;
 
-        &:before {
-          content: "";
-          background-color: #F8F7F3;
-          border-top-right-radius: 200px;
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          width: 86vw;
-          z-index: 2;
-
-          @media screen and (max-width: 1200px) {
-            width: 100vw;
-            border-top-right-radius: 100px;
-          }
-        }
-
         @include tablet() {
           width: 100%;
-          padding: 80px 24px;
+          padding: 0 24px 80px;
         }
 
         div.about-copy-inner {
@@ -214,13 +223,6 @@ div.about-wrap {
 
           @include tablet() {
             width: 100%;
-          }
-
-          h3.about-copy-header {
-            @include PTSerif()
-            color: $deep_navy;
-            font-size: 80px;
-            line-height: 78px;
           }
 
           div.about-copy-title {
@@ -254,10 +256,18 @@ div.about-wrap {
               font-size: 20px;
               line-height: 26px;
               margin: 32px 0 0;
+
+              &:first-child {
+                margin-top: 40px;
+              }
             }
 
             @include mobile() {
               margin: 24px 0 0;
+
+              &:first-child {
+                margin-top: 40px;
+              }
             }
 
             span.oblique {
@@ -282,12 +292,12 @@ div.about-wrap {
           }
 
           div.about-bottom-copy-row {
-            border-top: 1px solid #E7E6E5;
+            border-top: 1px solid $more_ultra_light_grey;
             padding: 40px 0;
 
             div.about-bottom-copy-left {
               float: left;
-              width: 45%;
+              width: 42%;
               @include PTSerif()
               font-size: 30px;
               line-height: 40px;
@@ -303,12 +313,29 @@ div.about-wrap {
 
             div.about-bottom-copy-right {
               float: right;
-              width: 45%;
+              width: 48%;
 
               @include tablet() {
                 float: unset;
                 width: 100%;
                 margin-top: 8px;
+              }
+
+              @include mobile() {
+                span.link-or {
+                  display: none;
+                }
+
+                a {
+                  // float: left;
+                  // width: 100%;
+                  display: block;
+                  margin-top: 16px;
+
+                  &:nth-child(2){
+                    margin-top: 24px;
+                  }
+                }
               }
 
               div.about-bottom-copy-description {
@@ -328,6 +355,16 @@ div.about-wrap {
                 @include avenir_B();
                 font-size: 14px;
                 letter-spacing: 0.5;
+              }
+
+              span.link-or {
+                margin-left: 16px;
+                margin-right: 16px;
+                color: rgba($deep_navy, 0.5);
+                text-transform: uppercase;
+                @include avenir_B();
+                font-size: 14px;
+                letter-spacing: 0.5; 
               }
             }
           }

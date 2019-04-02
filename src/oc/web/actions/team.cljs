@@ -64,7 +64,7 @@
       (let [team-data (when success (json->cljs body))]
         (when success
           (dis/dispatch! [:team-loaded team-data])
-          (utils/after 100 org-actions/maybe-show-bot-added-notification?)
+          (utils/after 100 org-actions/maybe-show-integration-added-notification?)
           (enumerate-channels team-data))))))
 
 (defn force-team-refresh [team-id]
@@ -268,8 +268,9 @@
 
 ;; Invite users
 
-(defn invite-users [inviting-users note]
-  (let [org-data (dis/org-data)
+(defn invite-users [inviting-users & [note]]
+  (let [note (or note "")
+        org-data (dis/org-data)
         team-data (dis/team-data (:team-id org-data))
         filter-empty (filterv #(seq (:user %)) inviting-users)
         checked-users (for [user filter-empty]
@@ -296,11 +297,15 @@
 (defn user-action-cb [_]
   (teams-get))
 
-(defn user-action [team-id invitation action method other-link-params payload]
+(defn user-action [team-id invitation action method other-link-params payload & [finished-cb]]
   (let [team-data (dis/team-data team-id)
         idx (.indexOf (:users team-data) invitation)]
     (when (> idx -1)
-      (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload user-action-cb)
+      (api/user-action (utils/link-for (:links invitation) action method other-link-params) payload
+       #(do
+          (when (fn? finished-cb)
+            (finished-cb team-id invitation action method other-link-params payload %))
+          (user-action-cb %)))
       (dis/dispatch! [:user-action team-id idx]))))
 
 ;; Email domains
@@ -317,7 +322,7 @@
                                    (:links team-data)
                                    "add"
                                    "POST"
-                                   {:content-type "application/vnd.open-company.team.email-domain.v1"})
+                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
           fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
       (api/add-email-domain add-email-domain-link fixed-domain email-domain-team-add-cb team-data))
     (dis/dispatch! [:email-domain-team-add])))
@@ -330,11 +335,15 @@
         team-data (dis/team-data team-id)
         add-slack-team-link (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
         redirect (or redirect-to (router/get-token))
+        with-add-team (js/encodeURIComponent
+                        (if (> (.indexOf redirect "?") -1)
+                          (str redirect "&add=team")
+                          (str redirect "?add=team")))
         fixed-add-slack-team-link (utils/slack-link-with-state
                                    (:href add-slack-team-link)
                                    (:user-id current-user-data)
                                    team-id
-                                   (str redirect "%26add=team"))]
+                                   with-add-team)]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 

@@ -5,17 +5,34 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-(defmethod dispatcher/action :activity-modal-fade-in
-  [db [_ activity-data editing dismiss-on-editing-end]]
-  (if (get-in db [:search-active])
-    db
-    (assoc db :activity-modal-fade-in (:uuid activity-data))))
+(defn add-remove-item-from-all-posts [db org-slug activity-data]
+  (let [;; Add/remove item from AP
+        is-ap? (= (:status activity-data) "published")
+        ap-key (dispatcher/container-key org-slug :all-posts)
+        old-ap-data (get-in db ap-key)
+        old-ap-data-posts (get old-ap-data :posts-list)
+        ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
+        new-ap-data-posts (vec
+                            (if is-ap?
+                              (conj ap-without-uuid (:uuid activity-data))
+                              ap-without-uuid))
+        next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)]
+    (assoc-in db ap-key next-ap-data)))
 
-(defmethod dispatcher/action :activity-modal-fade-out
-  [db [_ board-slug]]
-  (if (get-in db [:search-active])
-    db
-    (dissoc db :activity-modal-fade-in)))
+(defn add-remove-item-from-must-see [db org-slug activity-data]
+  (let [;; Add/remove item from MS
+        is-ms? (and (:must-see activity-data)
+                    (not= (:status activity-data) "draft"))
+        ms-key (dispatcher/container-key org-slug :must-see)
+        old-ms-data (get-in db ms-key)
+        old-ms-data-posts (get old-ms-data :posts-list)
+        ms-without-uuid (utils/vec-dissoc old-ms-data-posts (:uuid activity-data))
+        new-ms-data-posts (vec
+                            (if is-ms?
+                              (conj ms-without-uuid (:uuid activity-data))
+                              ms-without-uuid))
+        next-ms-data (assoc old-ms-data :posts-list new-ms-data-posts)]
+    (assoc-in db ms-key next-ms-data)))
 
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
@@ -95,7 +112,9 @@
   (assoc-in db [edit-key :publishing] true))
 
 (defmethod dispatcher/action :section-edit/error [db [_ error]]
-  (assoc-in db [:section-editing :section-name-error] error))
+  (-> db
+    (assoc-in [:section-editing :section-name-error] error)
+    (update-in [:section-editing] dissoc :loading)))
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
   [db [_ new-board-data edit-key]]
@@ -118,12 +137,12 @@
 (defmethod dispatcher/action :entry-publish/finish
   [db [_ edit-key activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
-        board-slug (:board-slug activity-data)
-        board-key (dispatcher/board-data-key org-slug board-slug)
-        board-data (get-in db board-key)
+        board-data (au/board-by-uuid (:board-uuid activity-data))
         fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))]
     (-> db
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
+      (add-remove-item-from-all-posts org-slug fixed-activity-data)
+      (add-remove-item-from-must-see org-slug fixed-activity-data)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
@@ -196,35 +215,6 @@
 (defmethod dispatcher/action :entry-revert [db [_ entry]]
   ;; do nothing for now
   db)
-
-(defn add-remove-item-from-all-posts [db org-slug activity-data]
-  (let [;; Add/remove item from AP
-        is-ap? (= (:status activity-data) "published")
-        ap-key (dispatcher/container-key org-slug :all-posts)
-        old-ap-data (get-in db ap-key)
-        old-ap-data-posts (get old-ap-data :posts-list)
-        ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
-        new-ap-data-posts (into []
-                            (if is-ap?
-                              (conj ap-without-uuid (:uuid activity-data))
-                              ap-without-uuid))
-        next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)]
-    (assoc-in db ap-key next-ap-data)))
-
-(defn add-remove-item-from-must-see [db org-slug activity-data]
-  (let [;; Add/remove item from MS
-        is-ms? (and (:must-see activity-data)
-                    (not= (:status activity-data) "draft"))
-        ms-key (dispatcher/container-key org-slug :must-see)
-        old-ms-data (get-in db ms-key)
-        old-ms-data-posts (get old-ms-data :posts-list)
-        ms-without-uuid (utils/vec-dissoc old-ms-data-posts (:uuid activity-data))
-        new-ms-data-posts (into []
-                            (if is-ms?
-                              (conj ms-without-uuid (:uuid activity-data))
-                              ms-without-uuid))
-        next-ms-data (assoc old-ms-data :posts-list new-ms-data-posts)]
-    (assoc-in db ms-key next-ms-data)))
 
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status org-slug activity-data secure-uuid]]
@@ -304,19 +294,19 @@
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]
   (let [old-reads-data (get-in db dispatcher/activities-read-key)
-        ks (into [] (map :item-id items-count))
+        ks (vec (map :item-id items-count))
         vs (map #(zipmap [:count :reads :item-id] [(:count %) (get-in old-reads-data [(:item-id %) :reads]) (:item-id %)]) items-count)
         new-items-count (zipmap ks vs)]
     (update-in db dispatcher/activities-read-key merge new-items-count)))
 
 (defmethod dispatcher/action :activity-reads
   [db [_ item-id read-data team-roster]]
-  (let [fixed-read-data (into [] (map #(assoc % :seen true) read-data))
+  (let [fixed-read-data (vec (map #(assoc % :seen true) read-data))
         team-users (filter #(= (:status %) "active") (:users team-roster))
         seen-ids (set (map :user-id read-data))
         all-ids (set (map :user-id team-users))
         unseen-ids (clojure.set/difference all-ids seen-ids)
-        unseen-users (into [] (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
+        unseen-users (vec (map (fn [user-id] (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
     (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data) :reads fixed-read-data :item-id item-id :unreads unseen-users})))
 
 (defmethod dispatcher/action :must-see-get/finish

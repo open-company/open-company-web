@@ -1,6 +1,6 @@
 div.menu {
-  top: 48px;
-  right: 14px !important;
+  top: 38px;
+  right: -4px !important;
   border: 1px solid $deep_tan;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   border-radius: 6px;
@@ -20,14 +20,43 @@ div.menu {
     width: 100%;
 
     @include mobile() {
+      height: 56px;
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      background-color: white;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      padding: 16px;
+    }
+
+    button.mobile-close-bt {
       display: none;
+
+      @include mobile() {
+        display: block;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/mobile_back_arrow.svg");
+        background-size: 16px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin: 2px 16px 0 -5px;
+        float: left;
+      }
     }
 
     @include user-profile(32);
 
+    @include mobile() {
+      @include user-profile(24);
+    }
+
     div.user-avatar-img-container {
       float: left;
       margin-right: 16px;
+
+      @include mobile() {
+        margin-right: 8px;
+      }
     }
 
     div.user-name {
@@ -35,24 +64,45 @@ div.menu {
       font-size: 15px;
       color: $deep_navy;
       line-height: 18px;
+
+      @include mobile(){
+        display: none;
+      }
+    }
+
+    div.mobile-user-name {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        float: left;
+        @include avenir_H();
+        font-size: 16px;
+        color: $deep_navy;
+        line-height: 24px;
+        height: 24px;
+      }
     }
 
     div.user-type {
       color: $light_ui_grey;
       @include avenir_R();
       font-size: 13px;
+
+      @include mobile() {
+        float: right;
+        font-size: 14px;
+      }
     }
   }
 
   @include mobile() {
-    position: relative;
-    top: 1px;
+    position: absolute;
+    top: 0px;
     left: 0px;
     width: 100%;
-    height: calc(100vh - 64px);
+    height: 100vh;
     border: none;
-    border-top: 1px solid rgba(78,90,107,0.1);
-    border-bottom: 1px solid rgba(78,90,107,0.1);
     box-shadow: none;
     transition: 230ms;
     display: block;
@@ -60,6 +110,7 @@ div.menu {
     background-color: white;
     display: none;
     opacity: 0;
+    padding: 0 16px;
 
     &.mobile-menu-open {
       display: block;
@@ -188,6 +239,12 @@ div.menu {
         }
       }
 
+      &.reminders {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_reminders_hover.svg");
+        }
+      }
+
       &.manage-team {
         &:before {
           background-image: cdnUrl("/img/ML/menu_manage_team_hover.svg");
@@ -211,6 +268,12 @@ div.menu {
           background-image: cdnUrl("/img/ML/menu_whats_new_hover.svg");
         }
       }
+      
+      &.show-qsg {
+        &:before {
+          background-image: cdnUrl("/img/ML/menu_quickstart_guide_hover.svg");
+        }
+      }
 
       &.support {
         &:before {
@@ -226,10 +289,27 @@ div.menu {
     }
   }
 
+  a.qsg-profile-photo-2, a.qsg-company-logo-2, a.qsg-invite-team-2, a.qsg-create-reminder-2 {
+    position: relative;
+  }
+
+  @include mobile() {
+    // Remove the last bottom line on mobile
+    & > *:last-child div.oc-menu-item:after{
+      display: none;
+    }
+  }
+
   div.oc-menu-item {
     opacity: 0.9;
     padding: 14px 0px 0px 48px;
     position: relative;
+    @include avenir_R();
+
+    @include mobile() {
+      padding: 24px 0 24px 30px;
+      font-size: 14px;
+    }
 
     &.divider-item {
       box-shadow: inset 0 -1px 0 0 $carrot_dark_bg_gray;
@@ -247,40 +327,89 @@ div.menu {
       left: 8px;
 
       @include mobile() {
-        top: 20px;
+        left: 0;
+        top: 25px;
+      }
+    }
+
+    &:after {
+      @include mobile() {
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 30px;
+        width: calc(100% - 16px);
+        height: 1px;
+        background-color: $ultra_light_grey;
       }
     }
 
     &.personal-profile {
-      @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_personal_profile.svg");
       }
     }
 
     &.notifications-settings {
-      @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_user_notifications.svg");
       }
     }
 
+    &.reminders {
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_reminders_hover.svg"));
+      }
+
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_reminders.svg");
+      }
+    }
+
     &.manage-team {
-      @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_manage_team.svg");
       }
     }
 
     &.digest-settings {
-      @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
       }
     }
 
+    &.show-qsg {
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_quickstart_guide_hover.svg"));
+      }
+
+      &:before {
+        background-image: cdnUrl("/img/ML/menu_quickstart_guide.svg");
+      }
+    }
+
     &.billing {
-      @include preload_image(cdnUrl("/img/ML/menu_billing_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_billing_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_billing.svg");
         background-size: 16px 12px;
@@ -288,7 +417,10 @@ div.menu {
     }
 
     &.whats-new {
-      @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_whats_new.svg");
       }
@@ -301,14 +433,20 @@ div.menu {
     }
 
     &.support {
-      @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_support.svg");
       }
     }
 
     &.logout {
-      @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
+      @include big_web(){
+        @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
+      }
+
       &:before {
         background-image: cdnUrl("/img/ML/menu_logout.svg");
       }

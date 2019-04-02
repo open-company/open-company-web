@@ -11,6 +11,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
+            [oc.web.components.qsg :refer (qsg)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
@@ -20,16 +21,18 @@
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
+            [oc.web.components.reminders :refer (reminders)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
+            [oc.web.components.qsg-digest-sample :refer (qsg-digest-sample)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
-            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
@@ -63,6 +66,7 @@
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
+                           (drv/drv :qsg)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
@@ -78,6 +82,7 @@
                 ap-initial-at
                 user-settings
                 org-settings-data
+                show-reminders
                 made-with-carrot-modal-data
                 is-sharing-activity
                 entry-edit-dissmissing
@@ -93,7 +98,8 @@
                 show-cmail
                 showing-mobile-user-notifications
                 wrt-activity-data
-                wrt-read-data]} (drv/react s :org-dashboard-data)
+                wrt-read-data
+                force-login-wall]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -137,11 +143,11 @@
                                  (and ap-initial-at
                                       (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
-                                     (or (router/current-activity-id)
-                                         ap-initial-at)
-                                     (or org-not-found
-                                         section-not-found
-                                         entry-not-found))
+                                     (or force-login-wall
+                                         (and (router/current-activity-id)
+                                              (or org-not-found
+                                                  section-not-found
+                                                  entry-not-found))))
         show-activity-removed (and jwt
                                    (or (router/current-activity-id)
                                        ap-initial-at)
@@ -151,7 +157,8 @@
         is-loading (and (not show-activity-not-found)
                         (not show-activity-removed)
                         loading?)
-        is-showing-mobile-search (and is-mobile? search-active?)]
+        is-showing-mobile-search (and is-mobile? search-active?)
+        qsg-data (drv/react s :qsg)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -160,7 +167,9 @@
         {:class (utils/class-set {:org-dashboard true
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
-                                  :activity-removed show-activity-removed})}
+                                  :activity-removed show-activity-removed
+                                  :showing-qsg (:visible qsg-data)
+                                  :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
@@ -173,6 +182,9 @@
           ;; Org settings
           org-settings-data
           (org-settings)
+          ;; Reminders
+          show-reminders
+          (reminders)
           ;; User settings
           user-settings
           (user-profile)
@@ -222,10 +234,6 @@
         ;; cmail editor
         (when show-cmail
           (cmail))
-        ;; Media video modal for entry editing
-        (when (and media-input
-                   (:media-video media-input))
-          (media-video-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
@@ -235,7 +243,8 @@
                        (not show-section-add)
                        (not show-section-editor)
                        (not show-cmail)
-                       (not wrt-activity-data)))
+                       (not wrt-activity-data)
+                       (not show-reminders)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
@@ -248,4 +257,10 @@
                               (not mobile-menu-open)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
-                 (dashboard-layout))]]])])))
+                 (dashboard-layout))]]
+            (when (:qsg-show-sample-digest-view qsg-data)
+              (qsg-digest-sample))])
+        (when (:visible qsg-data)
+          [:div.qsg-main-container
+            (qsg)
+            (video-lightbox)])])))

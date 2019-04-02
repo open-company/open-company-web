@@ -9,6 +9,7 @@
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
+            [oc.web.stores.jwt]
             [oc.web.stores.org]
             [oc.web.stores.team]
             [oc.web.stores.user]
@@ -19,8 +20,10 @@
             [oc.web.stores.subscription]
             [oc.web.stores.section]
             [oc.web.stores.notifications]
+            [oc.web.stores.reminder]
+            [oc.web.stores.qsg]
             ;; Pull in the needed file for the ws interaction events
-            [oc.web.lib.ws-interaction-client]
+            [oc.web.ws.interaction-client]
             [oc.web.actions.team]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
@@ -28,6 +31,7 @@
             [oc.web.actions.reaction :as ra]
             [oc.web.actions.section :as sa]
             [oc.web.actions.nux :as na]
+            [oc.web.actions.jwt :as ja]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
@@ -41,7 +45,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.raven :as sentry]
-            [oc.web.lib.logrocket :as logrocket]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
@@ -56,7 +59,8 @@
             [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
-            [oc.web.components.ui.notifications :refer (notifications)]))
+            [oc.web.components.ui.notifications :refer (notifications)]
+            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]))
 
 (enable-console-print!)
 
@@ -73,7 +77,6 @@
 
 ;; setup Sentry error reporting
 (defonce raven (sentry/raven-setup))
-(defonce _logrocket (logrocket/init))
 
 ;; Avoid warnings
 (declare route-dispatch!)
@@ -118,7 +121,12 @@
   (when (and (contains? query-params :jwt)
              (map? (js->clj (jwt/decode (:jwt query-params)))))
     ; contains :jwt, so saving it
-    (user-actions/update-jwt (:jwt query-params)))
+    (ja/update-jwt (:jwt query-params)))
+  (when (and (not (jwt/jwt))
+             (contains? query-params :id)
+             (map? (js->clj (jwt/decode (:id query-params)))))
+    ; contains :id, so saving it
+    (ja/update-id-token (:id query-params)))
   (check-get-params query-params)
   (when should-rewrite-url
     (rewrite-url rewrite-params))
@@ -152,18 +160,22 @@
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
-        org-settings (when (and (contains? query-params :org-settings)
+        org-settings (when (and (not user-settings)
+                              (contains? query-params :org-settings)
                               (#{:main :team :invite} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
-        bot-access (when (and (contains? query-params :access)
-                              (= (:access query-params) "bot"))
-                      :slack-bot-success-notification)
+        reminders (when (and (not org-settings)
+                             (contains? query-params :reminders))
+                    :reminders)
+        bot-access (when (contains? query-params :access)
+                      (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
                         :org-settings org-settings
                         :user-settings user-settings
+                        :show-reminders reminders
                         :bot-access bot-access}]
-        (utils/after 1 #(swap! dis/app-state merge next-app-state))))
+    (swap! dis/app-state merge next-app-state)))
 
 ;; Company list
 (defn org-handler [route target component params]
@@ -224,8 +236,7 @@
      {:org org
       :board board
       :activity entry
-      :query-params query-params
-      :from-all-posts (or has-at-param (contains? query-params :ap))})
+      :query-params query-params})
     (check-nux query-params)
     (post-routing)
     ;; render component
@@ -236,7 +247,7 @@
   (let [org (:org (:params params))
         secure-id (:secure-id (:params params))
         query-params (:query-params params)]
-    (pre-routing query-params)
+    (pre-routing query-params true)
     ;; save the route
     (router/set-route!
      (vec
@@ -244,9 +255,10 @@
        nil?
        [org route secure-id]))
      {:org org
-      :secure-id secure-id
+      :activity (:entry (:params params))
+      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
       :query-params query-params})
-    ;; do we have the company data already?
+     ;; do we have the company data already?
     (when (or ;; if the company data are not present
               (not (dis/board-data))
               ;; or the entries key is missing that means we have only
@@ -254,9 +266,16 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
-    (post-routing)
+    (aa/secure-activity-chain)
     ;; render component
     (drv-root component target)))
+
+(defn entry-handler [target params]
+  (if (and (not (jwt/jwt))
+           (:secure-uuid (jwt/get-id-token-contents
+                          (:id (:query-params params)))))
+    (secure-activity-handler secure-activity "secure-activity" target params)
+    (board-handler "activity" target org-dashboard params)))
 
 ;; Component specific to a team settings
 (defn team-handler [route target component params]
@@ -308,6 +327,13 @@
           (router/redirect! urls/sign-up-profile)))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
+    (defroute signup-slash-route (str urls/sign-up "/") {:as params}
+      (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
+      (when (and (jwt/jwt)
+                 (seq (cook/get-cookie (router/last-org-cookie))))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
+
     (defroute sign-up-slack-route urls/sign-up-slack {:as params}
       (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
       (when (jwt/jwt)
@@ -316,12 +342,13 @@
           (router/redirect! urls/sign-up-profile)))
       (simple-handler slack-lander "slack-lander" target params))
 
-    (defroute signup-slash-route (str urls/sign-up "/") {:as params}
-      (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
-      (when (and (jwt/jwt)
-                 (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
-      (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
+    (defroute sign-up-slack-slash-route (str urls/sign-up-slack "/") {:as params}
+      (timbre/info "Routing sign-up-slack-slash-route" (str urls/sign-up-slack "/"))
+      (when (jwt/jwt)
+        (if (seq (cook/get-cookie (router/last-org-cookie)))
+          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! urls/sign-up-profile)))
+      (simple-handler slack-lander "slack-lander" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
@@ -424,9 +451,11 @@
       (simple-handler press-kit "press-kit" target params))
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
+      (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
+      (when-not (seq (:token (:query-params params)))
+        (router/redirect! (if (jwt/jwt) (utils/your-digest-url) urls/home)))
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (simple-handler #(onboard-wrapper :email-verified) "email-verification" target params))
 
     (defroute password-reset-route urls/password-reset {:as params}
@@ -468,6 +497,19 @@
       (when (jwt/jwt)
         (router/redirect! urls/home))
       (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
+
+    (defroute login-wall-route urls/login-wall {:keys [query-params] :as params}
+      (timbre/info "Routing login-wall-route" urls/login-wall)
+      ; Email wall is shown only to not logged in users
+      (when (jwt/jwt)
+        (router/redirect-404!))
+      (simple-handler activity-not-found "login-wall" target params true))
+
+    (defroute login-wall-slash-route (str urls/login-wall "/") {:keys [query-params] :as params}
+      (timbre/info "Routing login-wall-slash-route" (str urls/login-wall "/"))
+      (when (jwt/jwt)
+        (router/redirect-404!))
+      (simple-handler activity-not-found "login-wall" target params true))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
@@ -526,7 +568,9 @@
       (post-routing)
       (if (jwt/jwt)
         (router/redirect! (str (utils/your-digest-url) "?user-settings=notifications"))
-        (router/redirect! urls/home)))
+        (do
+          (user-actions/save-login-redirect)
+          (router/redirect! urls/login))))
 
     (defroute user-profile-route urls/user-profile {:as params}
       (timbre/info "Routing user-profile-route" urls/user-profile)
@@ -535,7 +579,9 @@
       (post-routing)
       (if (jwt/jwt)
         (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
-        (router/redirect! urls/home)))
+        (do
+          (user-actions/save-login-redirect)
+          (router/redirect! urls/login))))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
@@ -555,22 +601,25 @@
 
     (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))
-      (board-handler "activity" target org-dashboard params))
+      (entry-handler target params))
 
     (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
-      (board-handler "activity" target org-dashboard params))
+      (entry-handler target params))
 
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
       ;; render component
-      (router/redirect-404!))
+      (if (jwt/jwt)
+        (router/redirect-404!)
+        (router/redirect! (str urls/login-wall "?login-redirect=" (js/encodeURIComponent (router/get-token))))))
 
     (def route-dispatch!
       (secretary/uri-dispatcher [_loading_route
                                  login-route
                                  ;; Signup email
                                  sign-up-slack-route
+                                 sign-up-slack-slash-route
                                  signup-profile-route
                                  signup-profile-slash-route
                                  signup-team-route
@@ -592,6 +641,9 @@
                                  ;; Email wall
                                  email-wall-route
                                  email-wall-slash-route
+                                 ;; Login wall
+                                 login-wall-route
+                                 login-wall-slash-route
                                  ;; Marketing site components
                                  about-route
                                  slack-route
@@ -652,13 +704,14 @@
   (logging/config-log-level! (or (:log-level (:query-params @router/path)) ls/log-level))
   ;; Setup API requests
   (api/config-request
-   #(user-actions/update-jwt %) ;; success jwt refresh after expire
-   #(user-actions/logout) ;; failed to refresh jwt
+   #(ja/update-jwt %) ;; success jwt refresh after expire
+   #(ja/logout) ;; failed to refresh jwt
    ;; network error
    #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
 
   ;; Persist JWT in App State
-  (user-actions/dispatch-jwt)
+  (ja/dispatch-jwt)
+  (ja/dispatch-id-token)
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)

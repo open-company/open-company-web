@@ -46,8 +46,12 @@
                              (vals
                               (group-by :avatar-url (map :author (sort-by :created-at comments-data))))))
                            (reverse (:authors comments-link)))
-        comments-count (max (count comments-data) (:count comments-link))
-        face-pile-count (min max-face-pile (count comments-authors))]
+        comments-count (if comments-data
+                         (count comments-data)
+                         (:count comments-link))
+        face-pile-count (min max-face-pile (count comments-authors))
+        short-label? (and (responsive/is-mobile-size?)
+                          (> (count (:reactions entry-data)) 3))]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
@@ -64,8 +68,11 @@
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
                                     :add-a-comment (not (pos? comments-count))
                                     utils/hide-class true})}
-          (if (responsive/is-tablet-or-mobile?)
-            (comment-summary-string comments-authors)
-            (if (pos? comments-count)
-              (str comments-count " comment" (when (not= comments-count 1) "s"))
-              [:span.add-a-comment "Add a comment"]))]])))
+          (if (pos? comments-count)
+            (str comments-count
+              (when-not short-label?
+                (str " comment" (when (not= comments-count 1) "s"))))
+            [:span.add-a-comment
+              (if short-label?
+                "Comment"
+                "Add a comment")])]])))

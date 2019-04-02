@@ -5,7 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.actions.org :as org-actions]
+            [oc.web.utils.user :as user-utils]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn get-nux-cookie
@@ -50,7 +50,7 @@
 (defn- parse-nux-cookie-value [v]
   (if (= v default-tooltip-done)
     false
-    (boolean v)))
+    v))
 
 (defn mark-nux-step-done [nux-step-key]
   (when-let [nux-cookie (get-nux-cookie)]
@@ -58,14 +58,11 @@
      {nux-step-key default-tooltip-done})))
 
 (defn check-nux
-  "NUX Logic:
-   if user is new
-     if "
   []
   (when-let* [nv (get-nux-cookie)
-              org-data (dis/org-data)
-              posts-data (dis/posts-data)]
-    (let [team-data (dis/team-data)
+              org-data (dis/org-data)]
+    (let [is-org-creator (user-utils/is-org-creator? org-data)
+          team-data (dis/team-data)
           can-edit? (utils/is-admin-or-author? org-data)
           is-admin? (jwt/is-admin? (:team-id org-data))
           add-post-tooltip (:show-add-post-tooltip nv)
@@ -73,12 +70,6 @@
           fixed-post-added-tooltip (parse-nux-cookie-value post-added-tooltip)
           edit-tooltip (:show-edit-tooltip nv)
           user-type (:user-type nv)
-          all-posts-count (count (vals posts-data))
-          sample-posts-count (count (filterv :sample (vals posts-data)))
-          ;; has organic posts: we start with a draft for user that is not sample
-          ;; so we have organic posts if all or less one are sample posts
-          has-organic-posts (or (= sample-posts-count all-posts-count)
-                                (= sample-posts-count (dec all-posts-count)))
           team-has-bot? (jwt/team-has-bot? (:team-id org-data))
           ;; Show add post tooltip if
           fixed-add-post-tooltip (and ;; it has not been done already
@@ -96,17 +87,19 @@
                  (true? post-added-tooltip))
         (mark-nux-step-done :show-add-post-tooltip))
       (when (and (not fixed-post-added-tooltip)
-                 (or team-has-bot?
-                     (not is-admin?)))
+                 (not can-edit?))
         (mark-nux-step-done :show-post-added-tooltip))
+      (when (and (not fixed-edit-tooltip)
+                 (not can-edit?))
+        (mark-nux-step-done :show-edit-tooltip))
       (when (and (not fixed-edit-tooltip)
                  (not can-edit?))
         (mark-nux-step-done :show-edit-tooltip))
       (dis/dispatch! [:input [:nux]
        {:show-add-post-tooltip (if fixed-add-post-tooltip
-                                 (if has-organic-posts
+                                 (if is-org-creator
                                   true
-                                  :has-organic-post)
+                                  :is-second-user)
                                  false)
         :show-post-added-tooltip fixed-post-added-tooltip
         :show-edit-tooltip fixed-edit-tooltip
@@ -122,11 +115,11 @@
   (mark-nux-step-done :show-add-post-tooltip)
   (check-nux))
 
-(defn show-post-added-tooltip []
+(defn show-post-added-tooltip [post-uuid]
   (when-let [nux-cookie (get-nux-cookie)]
     (set-nux-cookie (:user-type nux-cookie)
      {:show-add-post-tooltip default-tooltip-done
-      :show-post-added-tooltip (or (:show-post-added-tooltip nux-cookie) true)}))
+      :show-post-added-tooltip (or (:show-post-added-tooltip nux-cookie) post-uuid)}))
   (check-nux))
 
 (defn dismiss-post-added-tooltip []

@@ -159,9 +159,11 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
+(def login-redirect-cookie "login-redirect")
+
 ;; Debug
 
 (defn print-router-path []
-  (js/console.log @path))
+  @path)
 
 (set! (.-OCWebPrintRouterPath js/window) print-router-path)

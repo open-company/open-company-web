@@ -27,40 +27,37 @@
         (login-overlays-handler)
 
         [:div.main.slack
+          (shared-misc/video-lightbox)
           ; Hope page header
           [:section.carrot-plus-slack.group
-            shared-misc/animation-lightbox
 
             [:h1.slack-headline
-              "Lead with clarity"]
+              "Where teams find clarity"]
 
             [:div.slack-subline
               (str
-               "Carrot makes sure key leadership communication "
-               "doesn't get lost in fast-moving conversations.")]
+                "Carrot is the platform for team communication that matters. "
+                "Post important updates, news, decisions and stories "
+                "that nobody should miss — perfect for remote teams.")]
 
-            ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:div.slack-button-container.group
-              shared-misc/show-animation-button
               [:a.add-to-slack-button
                 {:on-click #(do
                              (.preventDefault %)
                              (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                    {:auth-source "slack"})]
                                (user-actions/login-with-slack auth-link)))}]]
-            shared-misc/no-credit-card
-            [:div.carrot-box-container.confirm-thanks.group
-              {:style {:display "none"}}
-              [:div.carrot-box-thanks
-                [:div.thanks-headline "You are Confirmed!"]
-                [:div.thanks-subheadline "Thank you for subscribing."]]]
 
             [:div.main-animation-container
               [:img.main-animation
                 {:src (utils/cdn "/img/ML/slack_screenshot.png")
-                 :srcSet (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]
+                 :srcSet (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-          shared-misc/keep-aligned-section
+            shared-misc/testimonials-logos-line]
+
+          (shared-misc/keep-aligned-section true)
+
+          shared-misc/carrot-in-action
 
           shared-misc/testimonials-section
 

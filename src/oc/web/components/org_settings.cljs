@@ -10,6 +10,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
@@ -17,6 +18,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]
@@ -53,7 +55,9 @@
         {:class (when (= :invite active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :invite))}
+           :on-click (fn [e]
+                       (utils/event-stop e)
+                       (show-modal :invite))}
           "INVITE PEOPLE"]])
     (when (and (utils/is-admin? org-data)
                ls/billing-enabled)
@@ -61,7 +65,9 @@
         {:class (when (= :billing active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :billing))}
+           :on-click (fn [e]
+                      (utils/event-stop e)
+                      (show-modal :billing))}
           "BILLING"]])])
 
 (defn close-clicked [s]
@@ -122,6 +128,7 @@
 (defn logo-on-click [org-avatar-editing]
   (iu/upload! org-utils/org-avatar-filestack-config
     (fn [res]
+      (qsg-actions/finish-company-logo-trail)
       (let [url (gobj/get res "url")
             img (gdom/createDom "img")]
         (set! (.-onerror img) #(logo-add-error img))
@@ -131,6 +138,7 @@
         (set! (.-src img) url)))
     nil
     (fn [err]
+      (qsg-actions/finish-company-logo-trail)
       (logo-add-error nil))))
 
 (rum/defcs org-settings
@@ -145,6 +153,7 @@
     (drv/drv :org-editing)
     (drv/drv :invite-data)
     (drv/drv :org-avatar-editing)
+    (drv/drv :qsg)
     ;; Mixins
     no-scroll-mixin
 
@@ -166,22 +175,26 @@
         alert-modal-data (drv/react s :alert-modal)
         main-tab? (= settings-tab :main)
         org-avatar-editing (drv/react s :org-avatar-editing)
-        org-data-for-avatar (merge org-data org-avatar-editing)]
+        org-data-for-avatar (merge org-data org-avatar-editing)
+        qsg-data (drv/react s :qsg)]
     (when (:read-only org-data)
       (utils/after 100 dismiss-modal))
     (if org-data
       [:div.org-settings.fullscreen-page
+        {:class (when (:visible qsg-data) "showing-qsg")}
         [:div.org-settings-inner
           (when-not alert-modal-data
             [:button.settings-modal-close.mlb-reset
               {:on-click #(close-clicked s)}])
           [:div.org-settings-header
-            [:div.org-settings-header-avatar
+            [:div.org-settings-header-avatar.qsg-company-logo-3
               {:ref "org-settings-header-logo"
                :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
                                         :main-panel main-tab?
                                         utils/hide-class true})
                :on-click logo-on-click}
+              (when (= (:step qsg-data) :company-logo-3)
+                (qsg-breadcrumb qsg-data))
               (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]

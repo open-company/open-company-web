@@ -45,16 +45,12 @@
         display: inline-block;
         float: left;
         margin: -#{($max_logo_height / 2) + ($max_logo_height / 4)}px 0 0 #{$max_logo_height + 8}px;
-
-        @include mobile() {
-          display: none;
-        }
       }
     }
 
     img.org-avatar-img{
       @if $show-border == true {
-        border: 1px solid #ECECEC;
+        border: 1px solid $ultra_light_grey;
         padding: 4px;
       }
 
@@ -76,10 +72,6 @@
       overflow: hidden;
       width: 100%;
       max-width: 250px;
-
-      @include mobile() {
-        display: none;
-      }
 
       &.no-logo {
         @include mobile(){

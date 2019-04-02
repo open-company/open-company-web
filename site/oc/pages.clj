@@ -54,9 +54,6 @@
 (defn fullstory-init []
   [:script (str "init_fullstory();")])
 
-(defn logrocket []
-  [:script {:src "https://cdn.logrocket.io/LogRocket.min.js" :crossorigin "anonymous"}])
-
 (defn cdn [img-src]
   (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
@@ -65,41 +62,6 @@
 
 (defn privacy [options]
   (privacy/privacy options))
-
-(defn carrot-box-thanks [carrot-box-class]
-  [:div.carrot-box-container.group
-    {:class carrot-box-class
-     :style {:display "none"}}
-    ; [:img.carrot-box {:src (cdn "/img/ML/carrot_box.svg")}]
-    [:div.carrot-box-thanks
-      [:div.thanks-headline "Thanks!"]
-      "We’ve sent you an email to confirm."
-      [:div.carrot-early-access-top.hidden "Get earlier access when your friends sign up with this link:"]
-      [:a.carrot-early-access-link.hidden {:href "/?no_redirect=1"} "/"]]])
-
-(defn try-it-form [form-id try-it-class]
-  [:form.validate
-    {:action (or
-              (env :oc-mailchimp-api-endpoint)
-              "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
-     :method "post"
-     :id form-id
-     :class "mailchimp-api-subscribe-form"
-     :no-validate true}
-    [:div.try-it-combo-field
-      {:class try-it-class}
-      [:div.mc-field-group
-        [:input.mail.required
-          {:type "text"
-           :value ""
-           :id "mce-EMAIL"
-           :class (str form-id "-input")
-           :name "email"
-           :placeholder "Email address"}]]
-      [:button.mlb-reset.try-it-get-started
-        {:type "submit"
-         :id "mc-embedded-subscribe"}
-        "Get Early Access"]]])
 
 (def desktop-video
   [:div.main-animation-container
@@ -114,177 +76,399 @@
     [:div.testimonials-section-subtitle
       "We’re helping teams like yours."]
     [:div.testimonials-cards-container.group
-      [:div.testimonial-card.skylight
-        [:div.testimonial-header.group
-          [:a
-            {:href "https://skylight.digital/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]
-        [:div.testimonial-quote
-          (str
-           "“As a busy leader it's hard to keep "
-           "everyone up to date. I use Carrot to "
-           "record a quick video update and it lets "
-           "me know that everyone's seen it.”")]
-        [:div.testimonial-footer.group
-          [:div.testimonial-image]
-          [:div.testimonial-name
-            "Chris Cairns"]
-          [:div.testimonial-role
-            "Managing Partner"]]]
-      ; [:div.testimonial-card.m-io
-      ;   [:div.testimonial-header.group
-      ;     [:a
-      ;       {:href "https://m.io/"
-      ;        :target "_blank"}
-      ;       [:div.testimonial-logo]]]
-      ;   [:div.testimonial-quote
-      ;     (str
-      ;      "“On Carrot, my updates get noticed and "
-      ;      "get the team talking. I love that.”")]
-      ;   [:div.testimonial-footer.group
-      ;     [:div.testimonial-image]
-      ;     [:div.testimonial-name
-      ;       "Tom Hadfield"]
-      ;     [:div.testimonial-role
-      ;       "CEO"]]]
-      [:div.testimonial-card.wayne-edu
-        [:div.testimonial-header.group
-          [:a
-            {:href "https://wayne.edu/"
-             :target "_blank"}
-            [:div.testimonial-logo]]]
-        [:div.testimonial-quote
-          (str
-           "“Carrot helps me share things the entire "
-           "team needs to know about - instead of "
-           "burying it somewhere it won’t get "
-           "noticed.”")]
-        [:div.testimonial-footer.group
-          [:div.testimonial-image]
-          [:div.testimonial-name
-            "Nick DeNardis"]
-          [:div.testimonial-role
-            "Director of Digital Communications"]]]]])
+      [:div.testimonials-cards-inner.group
+        ;; First column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.peak-support
+            [:div.testimonial-quote
+              (str
+               "“Carrot fixed our issue of "
+               "email overload. We use it "
+               "for important company "
+               "communications, shout- "
+               "outs, and announcements "
+               "so they won’t get buried in "
+               "everyone’s inbox. It’s been "
+               "a big win for us.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Jon Steiman"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://www.peaksupport.io/"
+                   :target "_blank"}
+                  "Peak Support, CEO"]]]]
+            [:div.testimonial-card.wayne-state-univerity
+              [:div.testimonial-quote
+                (str
+                 "“Carrot helps me share "
+                 "things the entire team "
+                 "needs to know - instead of "
+                 "burying it somewhere it "
+                 "won’t get noticed.”")]
+              [:div.testimonial-footer.group
+                [:div.testimonial-image]
+                [:div.testimonial-name
+                  "Nick DeNardis"]
+                [:div.testimonial-role
+                  [:a
+                    {:href "https://wayne.edu/"
+                     :targe "_blank"}
+                    "Wayne State University, Director of Communications"]]]]]
+        ;; Second column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.oval-money
+            [:div.testimonial-quote
+              (str
+               "“Carrot keeps our "
+               "distributed team informed "
+               "about what matters most.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Edoardo Benedetto"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Oval Money, Head of Design"]]]]
+          [:div.testimonial-card.helloticket
+            [:div.testimonial-quote
+              (str
+               "“Staying aligned across two "
+               "offices is hard. Slack feels "
+               "too ‘light’ and crazy for "
+               "important information; and "
+               "no one wants to read "
+               "weekly emails. With Carrot, "
+               "we have a knowledge base "
+               "of what's going on with the "
+               "company that’s made it "
+               "easy to stay aligned.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Alberto Martinez"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Hellotickets, CEO"]]]]]
+        ;; Third column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.m-io
+            [:div.testimonial-quote
+              (str
+               "“On Carrot, my updates "
+               "get noticed and get the "
+               "team talking. I love that.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tom Hadfield"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://m.io/"
+                   :target "_blank"}
+                  "M.io, CEO"]]]]
+          [:div.testimonial-card.partner-hero
+            [:div.testimonial-quote
+              (str
+               "“Carrot is where we "
+               "communicate important "
+               "information when we need "
+               "everyone to see it - "
+               "regardless of their time "
+               "zone.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Andrew Love"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://partnerhero.com/"
+                   :targe "_blank"}
+                  "PartnerHero, Director of R&D"]]]]
+          [:div.testimonial-card.blend-labs
+            [:div.testimonial-quote
+              (str
+               "“Carrot reminds us when "
+               "it’s time to share a weekly "
+               "update - so it’s easier for "
+               "everyone to stay in sync.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Sara Vienna"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://bl3ndlabs.com/"
+                   :target "_blank"}
+                  "BL3NDlabs, Head of Design"]]]]]
+        ;; Fourth column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.novo
+            [:div.testimonial-quote
+              (str
+               "“We use Carrot when we "
+               "need to make sure "
+               "everyone is on the same "
+               "page across all our offices "
+               "here and abroad. It helps us "
+               "share BIG wins, and in a "
+               "fast-growing startup "
+               "keeping that family vibe, "
+               "its awesome.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tyler McIntyre"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://banknovo.com/"
+                   :target "_blank"}
+                  "Novo, CEO"]]]]
+          [:div.testimonial-card.skylight-digital
+            [:div.testimonial-quote
+              (str
+               "“Carrot is a perfect "
+               "compliment for Slack. We "
+               "use it for longer-form "
+               "weekly updates no one "
+               "should miss.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Chris Cairns"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://skylight.digital/"
+                   :target "_blank"}
+                  "Skylight Digital, Managing Director"]]]]]]]])
 
-(def no-credit-card
-  [:div.no-credit-card
-    "No credit card required&nbsp;&nbsp;•&nbsp;&nbsp;No install required"])
+(def animation-lightbox
+  [:div.animation-lightbox-container
+    {:onClick "OCStaticHideAnimationLightbox(event);"}
+    [:div.animation-lightbox
+      [:div {:id "youtube-player"}]
+      [:button.settings-modal-close.mlb-reset
+        {;:onClick "OCStaticHideAnimationLightbox(event);"
+         :onMouseDown "OCStaticHideAnimationLightbox(event);"
+         :ontouchstart "OCStaticHideAnimationLightbox(event);"}]]])
+
+(def show-animation-button
+  [:button.mlb-reset.show-animation-bt
+    {:onClick "OCStaticShowAnimationLightbox();"}
+    [:div.green-play]
+    "Carrot in 60 seconds"])
+
+(def carrot-in-action
+  [:section.carrot-in-action
+    [:div.carrot-in-action-title
+      "Want to see Carrot in action?"]
+    show-animation-button])
 
 (def keep-aligned-bottom
   [:section.keep-aligned
     [:div.keep-aligned-title
-      "Try Carrot with your team for free."]
-    [:button.mlb-reset.get-started-button
-      "Get started for free"]
-    no-credit-card])
+      "Never miss what matters most"]
+    [:div.keep-aligned-values-line.big-web-tablet-only
+      [:img.keep-aligned-value.value-team-updates
+        {:src (cdn "/img/ML/homepage_bottom_section_team_updates.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_team_updates@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-news
+        {:src (cdn "/img/ML/homepage_bottom_section_news.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_news@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-announcements
+        {:src (cdn "/img/ML/homepage_bottom_section_announcements.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_announcements@2x.png") " 2x")}]
+      [:img.keep-aligned-value.value-decisions
+        {:src (cdn "/img/ML/homepage_bottom_section_decisions.png")
+         :srcSet (str (cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
+    [:button.mlb-reset.get-started-button.get-started-action
+      "Create your team - It's free"]])
 
-(def keep-aligned-section
+(defn slack-email-switch [slack?]
+  [:div.slack-email-container.group.big-web-only
+    [:div.slack-email-switch-container.group
+      {:class (if slack? "show-slack" "show-email")}
+      (when slack?
+        [:button.mlb-reset.slack-email-switch-bt.slack-bt
+          [:div.slack-logo]])
+      [:button.mlb-reset.slack-email-switch-bt.email-bt
+        [:div.email-logo]]
+      (when-not slack?
+        [:button.mlb-reset.slack-email-switch-bt.slack-bt
+          [:div.slack-logo]])
+      (when slack?
+        [:div.slack-email-switch-bottom-panel.slack-panel
+          [:div.slack-email-switch-bottom-panel-copy
+            (str
+             "“Our remote teams are ecstatic about not having to read "
+             "hundreds of Slack messages each morning to make sense of "
+             "the previous day.”")]
+          [:div.slack-email-switch-bottom-panel-img]
+          [:div.slack-email-switch-bottom-panel-name
+            "Andrew Love"]
+          [:div.slack-email-switch-bottom-panel-role
+            "PartnerHero, Director of R&D"]])
+      [:div.slack-email-switch-bottom-panel.email-panel
+        [:div.slack-email-switch-bottom-panel-copy
+          (str
+           "“The morning digest is how we know everyone in our "
+           "offices is up to date on what matters.”")]
+        [:div.slack-email-switch-bottom-panel-img]
+        [:div.slack-email-switch-bottom-panel-name
+          "Chris Cairns"]
+        [:div.slack-email-switch-bottom-panel-role
+          "Skylight Digital, Managing Director"]]
+      (when-not slack?
+        [:div.slack-email-switch-bottom-panel.slack-panel
+          [:div.slack-email-switch-bottom-panel-copy
+            (str
+             "“Our remote teams are ecstatic about not having to read "
+             "hundreds of Slack messages each morning to make sense of "
+             "the previous day.”")]
+          [:div.slack-email-switch-bottom-panel-img]
+          [:div.slack-email-switch-bottom-panel-name
+            "Andrew Love"]
+          [:div.slack-email-switch-bottom-panel-role
+            "PartnerHero, Director of R&D"]])]])
+
+(defn- slack-panel [first-panel?]
+  [:div.keep-aligned-section-carion-block
+    [:div.keep-aligned-section-header.tablet-mobile-only
+      [:span.slack-logo]]
+    [:img.keep-aligned-section-screenshot.screenshot-1
+      {:class (if first-panel? "carion-1" "carion-1-alt")
+       :src (cdn "/img/ML/homepage_screenshots_first_row_slack.png")
+       :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row_slack@2x.png") " 2x")}]
+    [:div.slack-email-switch-bottom-panel.slack-panel
+      [:div.slack-email-switch-bottom-panel-copy
+        (str
+         "“Our remote teams are ecstatic about not having to read "
+         "hundreds of Slack messages each morning to make sense of "
+         "the previous day.”")]
+      [:div.slack-email-switch-bottom-panel-img]
+      [:div.slack-email-switch-bottom-panel-name
+        "Andrew Love"]
+      [:div.slack-email-switch-bottom-panel-role
+        "PartnerHero, Director of R&D"]]])
+
+(defn- email-panel [first-panel?]
+  [:div.keep-aligned-section-carion-block
+    [:div.keep-aligned-section-header.tablet-mobile-only
+      [:span.email-logo]]
+    [:img.keep-aligned-section-screenshot.screenshot-1
+      {:class (if first-panel? "carion-1" "carion-1-alt")
+       :src (cdn "/img/ML/homepage_screenshots_first_row.png")
+       :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]
+    [:div.slack-email-switch-bottom-panel.email-panel
+      [:div.slack-email-switch-bottom-panel-copy
+        (str
+         "“The morning digest is how we know everyone in our "
+         "offices is up to date on what matters.”")]
+      [:div.slack-email-switch-bottom-panel-img]
+      [:div.slack-email-switch-bottom-panel-name
+        "Chris Cairns"]
+      [:div.slack-email-switch-bottom-panel-role
+        "Skylight Digital, Managing Director"]]])
+
+(defn keep-aligned-section [slack?]
   [:section.home-keep-aligned.group
 
     [:div.keep-aligned-section
+
       [:div.keep-aligned-section-row.first-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Stay visible."]
+              "Share what matters"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Key information stays organized and visible so your team can get caught "
-               "up anytime without worrying they missed something in fast-moving conversations.")]
-            [:img.keep-aligned-section-copy-values-list
-              {:src (cdn "/img/ML/homepage_vertical_values_list.png")
-               :srcSet (str (cdn "/img/ML/homepage_vertical_values_list@2x.png") " 2x")}]]
+               "Carrot gives you the space you need to "
+               "update your team, and even reminds you "
+               "when it's time to share the latest.")
+              [:br]
+              [:br]
+              (str
+               "Your team can view and comment on posts "
+               "in the app, or directly from Slack and email. "
+               "Rest assured, Carrot updates never get lost "
+               "in the noise.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-1
-              {:src (cdn "/img/ML/homepage_screenshots_first_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_first_row@2x.png") " 2x")}]]]]
+            [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
+              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
+               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "@2x.png")) " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-3.mobile-only
+              {:src (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile.png"))
+               :srcSet (str (cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") "_mobile@2x.png")) " 2x")}]]]]
 
       [:div.keep-aligned-section-row.second-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-right.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Spark meaningful discussions."]
+              "Start every day in sync"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "Reactions and comments stay together with "
-               "the post to provide greater context for "
-               "what’s happening and why.")
-              [:br][:br]
-              (str
-               "Your team can join the discussion from Slack "
-               "— Carrot keeps it all in sync.")]]
+               "Your team wakes up to a daily digest of what's "
+               "important. This curated summary makes it easy "
+               "to get caught up fast - perfect for remote teams.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]
+            (slack-email-switch slack?)]
           [:div.keep-aligned-section-row-left
-            [:img.keep-aligned-section-screenshot.screenshot-2
-              {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]]]]
+            [:div.keep-aligned-section-carion-container
+              [:div.keep-aligned-section-carion-inner
+                (when slack?
+                  (slack-panel true))
+                (email-panel (not slack?))
+                (when-not slack?
+                  (slack-panel false))]
+              [:button.keep-aligned-section-next-bt.mlb-reset]]]]]
 
       [:div.keep-aligned-section-row.third-row
         [:div.keep-aligned-section-row-inner.group
           [:div.keep-aligned-section-row-left.keep-aligned-section-copy
             [:div.keep-aligned-section-copy-title
-              "Make sure you're heard."]
+              "Know who’s engaged"]
             [:div.keep-aligned-section-copy-subtitle
               (str
-               "When you post something new, you’ll always know "
-               "who’s seen it. If they haven’t, Carrot reminds them "
-               "for you.")
-              [:br][:br]
+               "With Carrot, you know who saw your "
+               "update. If it’s missed, Carrot works in the "
+               "background to remind them for you.")
+              [:br]
+              [:br]
               (str
-               "Carrot AI works in the background to keep everyone "
-               "on your team looped in to what matters.")]]
+               "See which updates create energy and "
+               "engagement, and which ones aren’t getting "
+               "through.")]
+            [:div.keep-aligned-section-footer
+              [:button.mlb-reset.create-team-bt.get-started-action
+                "Create your team - it’s free"]]]
           [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-3
-              {:src (cdn "/img/ML/homepage_screenshots_third_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_third_row@2x.png") " 2x")}]]]]
+            [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
+              {:src (cdn "/img/ML/homepage_screenshots_second_row.png")
+               :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row@2x.png") " 2x")}]
+            [:img.keep-aligned-section-screenshot.screenshot-2.mobile-only
+              {:src (cdn "/img/ML/homepage_screenshots_second_row_mobile.png")
+               :srcSet (str (cdn "/img/ML/homepage_screenshots_second_row_mobile@2x.png") " 2x")}]]]]]])
 
-      [:div.keep-aligned-section-row.fourth-row
-        [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-right.keep-aligned-section-copy
-            [:div.keep-aligned-section-copy-title
-              "Update your team in seconds."]
-            [:div.keep-aligned-section-copy-subtitle
-              (str
-               "Starting a new post is fast - with text or video "
-               "- so it’s easy to create consistent "
-               "communication that builds transparency and "
-               "trust. Set up recurring updates, too.")]]
-          [:div.keep-aligned-section-row-left
-            [:img.keep-aligned-section-screenshot.screenshot-4
-              {:src (cdn "/img/ML/homepage_screenshots_fourth_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_fourth_row@2x.png") " 2x")}]]]]
-
-      [:div.keep-aligned-section-row.fifth-row
-        [:div.keep-aligned-section-row-inner.group
-          [:div.keep-aligned-section-row-left.keep-aligned-section-copy
-            [:div.keep-aligned-section-copy-title
-              "Perfect for Slack teams."]
-            [:div.keep-aligned-section-copy-subtitle
-              (str
-               "New posts automatically shared to the "
-               "appropriate Slack channel. Join the "
-               "discussion right from Slack — Carrot keeps "
-               "it all in sync.")]
-            [:a.keep-aligned-section-copy-button
-              {:href (env :slack-signup-url)}]]
-          [:div.keep-aligned-section-row-right
-            [:img.keep-aligned-section-screenshot.screenshot-5
-              {:src (cdn "/img/ML/homepage_screenshots_fifth_row.png")
-               :srcSet (str (cdn "/img/ML/homepage_screenshots_fifth_row@2x.png") " 2x")}]]]]]])
-
-(def animation-lightbox
-  [:div.animation-lightbox-container
-    {:onClick "OCStaticHideAnimationLightbox();"}
-    [:div.animation-lightbox
-      [:div {:id "youtube-player"}]
-      [:button.settings-modal-close.mlb-reset
-        {;:onClick "OCStaticHideAnimationLightbox();"
-         :onMouseDown "OCStaticHideAnimationLightbox();"
-         :ontouchstart "OCStaticHideAnimationLightbox();"}]]])
-
-(def show-animation-button
-  [:button.mlb-reset.show-animation-bt
-    {:onClick "OCStaticShowAnimationLightbox();"}])
+(def testimonials-logos-line
+  [:div.homepage-testimonials-container.group
+    [:div.homepage-testimonials-copy
+      "Fast-growing and remote teams around the world use Carrot"]
+    [:div.homepage-testimonials-logo.logo-novo]
+    [:div.homepage-testimonials-logo.logo-ph]
+    [:div.homepage-testimonials-logo.logo-wsu]
+    [:div.homepage-testimonials-logo.logo-om]
+    [:div.homepage-testimonials-logo.logo-mio]
+    [:div.homepage-testimonials-logo.logo-sd]])
 
 (defn index [options]
   [:div.home-wrap
@@ -295,34 +479,28 @@
       [:section.cta.group
 
         [:h1.headline
-          "Lead with clarity"]
-        [:div.subheadline.for-others
+          "Where teams find clarity"]
+        [:div.subheadline
           (str
-           "Leaders struggle to communicate clearly because "
-           "chat and email are too noisy. Carrot helps leaders "
-           "rise above the noise to keep teams focused.")]
-        [:div.subheadline.for-mobile
-          "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
-        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+           "Carrot is the platform for team communication that matters. "
+           "Post important updates, news, decisions and stories "
+           "that nobody should miss — perfect for remote teams.")]
+
         [:div.get-started-button-container.group
-          show-animation-button
-          [:button.mlb-reset.get-started-button
+          [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Get started for free"]]
-        no-credit-card
-        (carrot-box-thanks "carrot-box-thanks-top")
-        [:div.carrot-box-container.confirm-thanks.group
-          {:style {:display "none"}}
-          [:div.carrot-box-thanks
-            [:div.thanks-headline "You are Confirmed!"]
-            [:div.thanks-subheadline "Thank you for subscribing."]]]
+            "Create your team - It's free"]]
 
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/homepage_screenshot.png")
-             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
+             :srcSet (str (cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-      keep-aligned-section
+        testimonials-logos-line]
+
+      (keep-aligned-section false)
+
+      carrot-in-action
 
       testimonials-section
 
@@ -338,10 +516,10 @@
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Pricing"]
+          "It’s free to get started"]
 
         [:div.pricing-subheadline
-          "Simple plans to stay aligned. Get started for free."]
+          "Carrot keeps fast-growing and remote teams focused on what matters."]
 
         [:div.pricing-three-columns.group
           ;; Free
@@ -350,102 +528,57 @@
               "Free"]
             [:h3.tear-price
               "$0"]
-            [:h5.tear-period
-              "/month"]
             [:div.tear-subtitle
-              "Free for small teams up to 10 users."]
+              "Free for small teams up to 10 users"]
             [:a.tear-start-bt
               {:href "/sign-up"}
-              "Start Free"]
+              "Start for free"]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Attachments up to 20MB"}
-              [:span "20MB upload max"]]
+              [:span "1gb storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              [:span "1TB storage"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Browse and search posts from the previous 6 months"}
-              [:span "6 months history"]]]
+              [:span "Access 3 months recent history"]]]
           ;; Team
-          [:div.pricing-column.team-column
+          [:div.pricing-column.team-column.annual
             [:h2.tear-title
-              "Team"]
+              "Standard"]
+            [:div.pricing-toggle-line
+              [:span.pricing-toggle-annual
+                "Annual (20% off)"]
+              [:div.pricing-toggle
+                [:span.pricing-toggle-dot]]
+              [:span.pricing-toggle-monthly
+                "Monthly"]]
             [:h3.tear-price
-              "$65"]
-            [:h5.tear-period
-              "/month"]
+              [:span.annual
+                "$3.20"]
+              [:span.monthly
+                "$4"]]
             [:div.tear-subtitle
-              "Includes 15 users, additional users are $4 /mo."]
+              [:span.billed-annually
+                "Per user, per month, billed annually"]
+              [:span.billed-monthly
+                "Per user, per month"]]
             [:a.tear-start-bt
               {:href "/sign-up"}
-              "Start Free"]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Attachments up to 100MB"}
-              [:span "100MB file upload"]]
+              "Try free for 14 days"]
             [:div.tear-feature-separator]
             [:div.tear-feature
               [:span "Unlimited storage"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "No limits on history maintained in Carrot"}
               [:span "Unlimited history"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Support via chat and email"}
-              [:span "Priority support"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Don’t feel like writing? Record a quick video"}
-              [:span "Video updates"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Schedule and assign weekly and monthly updates to build consistency."}
-              [:span "Recurring updates"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Add private sections for invited team members only"}
-              [:span "Advanced permissions"]]
-            [:div.tear-feature-separator]
-            [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Make sure you’re being heard, and know who’s seen your post"}
-              [:span "Who saw that"]]]
+              [:span "Priority support"]]]
           ;; Enterprise
           [:div.pricing-column.enterprise-column
             [:h2.tear-title
               "Enterprise"]
             [:div.tear-price]
             [:div.tear-subtitle
-              "A team of more than 100? Let's create a custom plan."]
+              "A team of more than 250? Let's create a custom plan."]
             [:a.tear-start-bt
               {:href "#"
                :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
@@ -453,15 +586,14 @@
             [:div.tear-feature-separator]
             [:div.tear-feature
               [:span
-                "Includes everything in the "
+                "Everything in the "
                 [:span.heavy "Team plan"]
                 ", plus:"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
-              {:data-toggle "tooltip"
-               :data-placement "top"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Make sure everyone sees what matters most."}
+              [:span "Custom plans"]]
+            [:div.tear-feature-separator]
+            [:div.tear-feature
               [:span "Carrot AI"]]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -482,22 +614,18 @@
             "Can I use Carrot for free?"]
           [:div.faq-row-answer
             (str
-             "Absolutely! You can use Carrot for free with teams of up to 10 people. "
-             "The storage limit is 1TB and there's a maximum upload of 20mb per attachment. "
-             "When you sign up for the free plan you’ll get to try a fully-featured Team plan "
-             "(including in-app video recording, recurring updates, advanced permissions, and "
-             "Who Saw That) for 30 days. It’s fast to sign up, and no credit card is required.")]]
+             "Absolutely! Carrot is free for teams of up to 10 people. The Free plan "
+             "has a storage limit, but includes all of the features of the Standard plan. "
+             "It’s fast to sign up, and no credit card is required.")]]
 
         [:div.faq-row
           [:div.faq-row-question
-            "How is the Team plan different from the Free plan?"]
+            "How is the Standard plan different from the Free plan?"]
           [:div.faq-row-answer
-            "With the Team plan you get unlimited  upload file size and storage, and premium features, like:"
-            [:ul
-              [:li [:span.heavy "In-app video recording:"] " Don’t feel like writing? Record a quick video instead."]
-              [:li [:span.heavy "Recurring updates:"] " Schedule weekly and monthly updates to build consistency."]
-              [:li [:span.heavy "Advanced permissions:"] " Add private sections for invited members only."]
-              [:li [:span.heavy "Who saw that:"] " Make sure you’re being heard, and know who’s seen your post."]]]]
+            (str
+             "The Standard plan includes unlimited storage and history. "
+             "Choose the size of your team, and whether you’d like to pay "
+             "monthly or annually. Annual plans paid in advance provide a 20% discount.")]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -510,30 +638,17 @@
             "What happens if we go over our storage limit in the Free plan?"]
           [:div.faq-row-answer
             (str
-             "You can still read, write, edit, and organize existing content, "
-             "but you won't be able to add new attachments and videos.")]]
-
-        [:div.faq-row
-          [:div.faq-row-question
-            "How is pricing calculated for the Team plan?"]
-          [:div.faq-row-answer
-            (str
-             "When you upgrade to the Team plan, you will be charged a base fee of $65 per "
-             "month that includes up to 15 team members. Beyond the initial 15 members, you "
-             "will be charged a fee of $4 per additional member per month.")
-            [:br]
-            [:br]
-            (str
-             "For example, if you have 25 team members, you would pay $65 for the first 15 "
-             "members, and $4 for each of the additional 10 members, for a total of $105 per month.")]]
+             "You can still read, write, edit, and organize existing content, but you won't be able "
+             "to add new attachments and videos.")]]
 
         [:div.faq-row
           [:div.faq-row-question
             "How is the payment being processed?"]
           [:div.faq-row-answer
             (str
-             "We use Stripe to process your payment. It's the same payment provider used in products "
-             "such as Slack, Pinterest, and Lyft. We do not handle your credit card information directly.")]]
+             "We use Stripe to process your payment. It's the same payment provider used in "
+             "products such as Slack, Pinterest, and Lyft. We do not handle your credit card "
+             "information directly.")]]
 
         [:div.faq-row
           [:div.faq-row-question
@@ -548,6 +663,14 @@
 
         [:div.faq-row
           [:div.faq-row-question
+            "Are custom plans available?"]
+          [:div.faq-row-answer
+            (str
+             "Absolutely! Our Enterprise plan is 100% flexible and priced based on your "
+             "unique needs. Please contact us to discuss further details.")]]
+
+        [:div.faq-row
+          [:div.faq-row-question
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
@@ -556,6 +679,9 @@
               "Get in touch with us"]]]]
 
       testimonials-section
+
+      keep-aligned-bottom
+
     ]])
 
 (defn slack
@@ -565,38 +691,34 @@
   [:div.slack-wrap
     {:id "wrap"}
     [:div.main.slack
+      animation-lightbox
       ; Hope page header
       [:section.carrot-plus-slack.group
-        animation-lightbox
 
         [:h1.slack-headline
-          "Lead with clarity"]
-
+          "Where teams find clarity"]
+        
         [:div.slack-subline
           (str
-           "Carrot makes sure key leadership communication "
-           "doesn't get lost in fast-moving conversations.")]
+            "Carrot is the platform for team communication that matters. "
+            "Post important updates, news, decisions and stories "
+            "that nobody should miss — perfect for remote teams.")]
 
-        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
         [:div.slack-button-container.group
-            show-animation-button
             [:a.add-to-slack-button
               {:id "get-started-centred-bt"
                :href (env :slack-signup-url)}]]
-        no-credit-card
-        (carrot-box-thanks "carrot-box-thanks-top")
-        [:div.carrot-box-container.confirm-thanks.group
-          {:style {:display "none"}}
-          [:div.carrot-box-thanks
-            [:div.thanks-headline "You are Confirmed!"]
-            [:div.thanks-subheadline "Thank you for subscribing."]]]
 
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/slack_screenshot.png")
-             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]
+             :srcSet (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
 
-      keep-aligned-section
+        testimonials-logos-line]
+
+      (keep-aligned-section true)
+
+      carrot-in-action
 
       testimonials-section
 
@@ -618,14 +740,16 @@
 
         [:div.subheadline
           "Carrot makes it simple for Slack teams to stay aligned around what matters most."]
-        ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+
         [:a.continue-with-slack-bt
           {:href (env :slack-signup-url)}]
 
         [:div.main-animation-container
           [:img.main-animation
             {:src (cdn "/img/ML/slack_screenshot.png")
-             :src-set (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]]])
+             :src-set (str (cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
+
+        testimonials-logos-line]]])
 
 (defn press-kit
   "Press kit page."
@@ -633,8 +757,8 @@
   [:div.press-kit-wrap
     {:id "wrap"}
     [:div.main.press-kit
+      animation-lightbox
       [:section.cta.group
-        animation-lightbox
 
         [:h1.headline
           "Press kit"]
@@ -821,106 +945,107 @@
     [:div.main.about
       [:section.about-header
 
-        [:h1.about
-          "Meet the team"]
+        ; [:h1.about
+        ;   "Meet the team"]
 
-        [:div.team-container
-          [:div.team-row.group.three-cards
-            [:div.team-card.iacopo-carraro
-              [:div.user-avatar]
-              [:div.user-name
-                "Iacopo Carraro"]
-              [:div.user-position
-                "Software Engineer"
-                [:br]
-                "in Livorno, Italy"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/bago2k4"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/iacopocarraro/"
-                   :target "_blank"}]]]
-            [:div.team-card.sean-johnson
-              [:div.user-avatar]
-              [:div.user-name
-                "Sean Johnson"]
-              [:div.user-position
-                "CTO & Founder"
-                [:br]
-                "in Chapel Hill, USA"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/belucid"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/snootymonkey/"
-                   :target "_blank"}]]]
-            [:div.team-card.georgiana-laudi
-              [:div.user-avatar]
-              [:div.user-name
-                "Georgiana Laudi"]
-              [:div.user-position
-                "Marketing & CX Advisor"
-                [:br]
-                "in Montreal, Canada"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/ggiiaa"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/georgianalaudi/"
-                   :target "_blank"}]]]
-            [:div.team-card.stuart-levinson
-              [:div.user-avatar]
-              [:div.user-name
-                "Stuart Levinson"]
-              [:div.user-position
-                "CEO & Founder"
-                [:br]
-                "in Cambridge, USA"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/stuartlevinson"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/stuartlevinson/"
-                   :target "_blank"}]]]
-            [:div.team-card.ryan-le-roux
-              [:div.user-avatar]
-              [:div.user-name
-                "Ryan Le Roux"]
-              [:div.user-position
-                "Head of Design"
-                [:br]
-                "in Vancouver, Canada"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/ryanleroux"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/ryanleroux/"
-                   :target "_blank"}]]]
-            [:div.team-card.nathan-zorn
-              [:div.user-avatar]
-              [:div.user-name
-                "Nathan Zorn"]
-              [:div.user-position
-                "Software Engineer"
-                [:br]
-                "in Charleston, USA"]
-              [:div.user-links
-                [:a.twitter-link
-                  {:href "https://twitter.com/thepug"
-                   :target "_blank"}]
-                [:a.linkedin-link
-                  {:href "https://linkedin.com/in/nathanzorn/"
-                   :target "_blank"}]]]]]
+        ; [:div.team-container
+        ;   [:div.team-row.group.three-cards
+        ;     [:div.team-card.iacopo-carraro
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Iacopo Carraro"]
+        ;       [:div.user-position
+        ;         "Software Engineer"
+        ;         [:br]
+        ;         "in Livorno, Italy"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/bago2k4"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/iacopocarraro/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.sean-johnson
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Sean Johnson"]
+        ;       [:div.user-position
+        ;         "CTO & Founder"
+        ;         [:br]
+        ;         "in Chapel Hill, USA"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/belucid"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/snootymonkey/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.georgiana-laudi
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Georgiana Laudi"]
+        ;       [:div.user-position
+        ;         "Marketing & CX Advisor"
+        ;         [:br]
+        ;         "in Montreal, Canada"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/ggiiaa"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/georgianalaudi/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.stuart-levinson
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Stuart Levinson"]
+        ;       [:div.user-position
+        ;         "CEO & Founder"
+        ;         [:br]
+        ;         "in Cambridge, USA"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/stuartlevinson"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/stuartlevinson/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.ryan-le-roux
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Ryan Le Roux"]
+        ;       [:div.user-position
+        ;         "Head of Design"
+        ;         [:br]
+        ;         "in Vancouver, Canada"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/ryanleroux"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/ryanleroux/"
+        ;            :target "_blank"}]]]
+        ;     [:div.team-card.nathan-zorn
+        ;       [:div.user-avatar]
+        ;       [:div.user-name
+        ;         "Nathan Zorn"]
+        ;       [:div.user-position
+        ;         "Software Engineer"
+        ;         [:br]
+        ;         "in Charleston, USA"]
+        ;       [:div.user-links
+        ;         [:a.twitter-link
+        ;           {:href "https://twitter.com/thepug"
+        ;            :target "_blank"}]
+        ;         [:a.linkedin-link
+        ;           {:href "https://linkedin.com/in/nathanzorn/"
+        ;            :target "_blank"}]]]]]
+
+        [:h3.about-copy-header
+          "Why we built Carrot"]
 
         [:div.about-copy
           [:div.about-copy-inner
-            [:h3.about-copy-header
-              "Why we built Carrot"]
             [:p
               (str
                "In the age of Slack and fast-moving conversations, the lack of "
@@ -937,18 +1062,19 @@
               [:span.heavy "leadership is getting lost in the noise."]]
             [:p
               (str
-               "Sharing key information everyone needs alongside random chats just increases "
-               "the likelihood it will scroll by without being noticed. It’s difficult for the "
-               "team to know what matters, and leaders have no idea if anyone even heard what they said.")]
+               "Sharing important team updates, news, and decisions alongside random chats "
+               "just increases the likelihood it will scroll by without being noticed. "
+               "It’s difficult for the team to know what matters, and leaders have no idea "
+               "if anyone even heard what they said.")]
             [:p
               (str
                "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
-               "to handle leadership communication. We wanted this “non-chat” communication "
-               "to be as fun, delightful and interactive as chat; but we also wanted it to be "
-               "asynchronous so people could get caught up on their own time.")]
+               "to handle must-see communication. We wanted this “non-chat” communication "
+               "to be as fun, delightful and interactive as chat; but we also wanted it "
+               "to be asynchronous so people could get caught up on their own time.")]
             [:p
               (str
-               "The result is Carrot - a platform for leadership communication that keeps "
+               "The result is Carrot - a platform for must-see communication that keeps "
                "everyone focused on what matters to build transparency, trust, and stronger teams.")]]
 
           [:div.about-bottom-copy
@@ -976,7 +1102,12 @@
                 [:a
                   {:href "https://github.com/open-company"
                    :target "_blank"}
-                  "Build with us on git"]]]]]]
+                  "Build with us on git"]
+                [:span.link-or "or"]
+                [:a
+                  {:href "https://trello.com/b/eKs2LtLu"
+                   :target "_blank"}
+                  "VISIT OUR ROADMAP"]]]]]]
 
       keep-aligned-bottom
     ] ;<!-- main -->
@@ -1058,9 +1189,7 @@
           ;; Drift (Support): not enabled for local dev
           ;; [:script {:src (cdn "/js/drift.js")}]
           ;; Headway (What's New)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
-          ;; Session capture for support
-          (logrocket)]
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1150,8 +1279,7 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js
-          (logrocket)]
+          ziggeo-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -1183,6 +1311,6 @@
           [:script {:src (cdn "/oc.js")}]
           ;; Compiled assets
           [:script {:src (cdn "/oc_assets.js")}]
-          ; (when (= (env :fullstory) "true")
-          ;   (fullstory-init))
+          (when (= (env :fullstory) "true")
+            (fullstory-init))
           (google-analytics-init)]})

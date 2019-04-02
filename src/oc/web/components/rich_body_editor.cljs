@@ -307,11 +307,13 @@
                  :paste #js {:forcePlainText false
                              :cleanPastedHTML true
                              :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
-                             :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input" "textarea"]
+                             :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
+                                             "textarea" "style" "javascript"]
                              :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
                                                    (when-not show-subtitle "h2") "h3" "h4" "h5"
                                                    "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                   "details" "summary" "nav" "abbr"]))}
+                                                   "details" "summary" "nav" "abbr"
+                                                   "table" "thead" "tbody" "tr" "th" "td"]))}
                  :placeholder #js {:text placeholder
                                    :hideOnClick true}
                  :keyboardCommands #js {:commands #js [
@@ -398,7 +400,8 @@
              show-placeholder
              upload-progress-cb
              multi-picker-container-selector
-             dispatch-input-key]}]
+             dispatch-input-key
+             start-video-recording-cb]}]
   [:div.rich-body-editor-container
     (when multi-picker-container-selector
       (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
@@ -407,9 +410,12 @@
           {:toggle-button-id default-mutli-picker-button-id
            :add-photo-cb #(add-photo s nil)
            :add-video-cb #(add-video s nil)
-           :add-attachment-cb #(add-attachment s nil)})
+           :add-attachment-cb #(add-attachment s nil)
+           :start-video-recording-cb #(do
+                                        (.removeSelection (get-media-picker-extension s))
+                                        (start-video-recording-cb %))})
          multi-picker-container)))
-    [:div.rich-body-editor.oc-mentions.oc-mentions-hover
+    [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
       {:ref "body"
        :content-editable (not nux)
        :class (str classes

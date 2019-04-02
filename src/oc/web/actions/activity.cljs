@@ -12,9 +12,13 @@
             [oc.web.lib.user-cache :as uc]
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.interaction-client :as ws-ic]
+            [oc.web.utils.comment :as comment-utils]
+            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (def initial-revision (atom {}))
@@ -26,9 +30,9 @@
           org-boards (:boards org-data)
           org-board-map (zipmap (map :slug org-boards) (map :uuid org-boards))]
       (ws-ic/board-unwatch (fn [rep]
-        (doseq [board-slug board-slugs]
-          (timbre/debug "Watching on socket " board-slug (org-board-map board-slug))
-          (ws-ic/board-watch (org-board-map board-slug))))))))
+        (let [board-uuids (map org-board-map board-slugs)]
+          (timbre/debug "Watching on socket " board-slugs board-uuids)
+          (ws-ic/boards-watch board-uuids)))))))
 
 ;; Reads data
 
@@ -56,7 +60,7 @@
                            (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
       (when should-404?
-        (router/redirect-404!))
+        (routing-actions/maybe-404))
       (when (and (not should-404?)
                  (= (router/current-board-slug) "all-posts"))
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
@@ -112,12 +116,16 @@
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
-        is-all-posts (or (:from-all-posts @router/path)
-                         (= (router/current-board-slug) "all-posts"))
+        is-all-posts (= (router/current-board-slug) "all-posts")
+        is-must-see (= (router/current-board-slug) "must-see")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))]
     (dis/dispatch! [:org-loaded org-data])
-    (if is-all-posts
+    (cond
+      is-all-posts
       (all-posts-get org-data (:ap-initial-at @dis/app-state))
+      is-must-see
+      (must-see-get org-data)
+      :else
       (sa/section-get (utils/link-for (:links board-data) "self" "GET")))))
 
 (defn refresh-org-data []
@@ -155,51 +163,6 @@
        (when (fn? completed-cb)
          (completed-cb))))))
 
-(defn activity-modal-fade-in
-  [activity-data & [editing item-load-cb dismiss-on-editing-end]]
-  (let [org (router/current-org-slug)
-        board (:board-slug activity-data)
-        activity-uuid (:uuid activity-data)
-        to-url (oc-urls/entry board activity-uuid)]
-    (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org board activity-uuid "activity"]
-     {:org org
-      :board board
-      :activity activity-uuid
-      :previous-board (router/current-board-slug)
-      :query-params (dissoc (:query-params @router/path) :ap-initial-at)
-      :from-all-posts (= (router/current-board-slug) "all-posts")}))
-  (when editing
-    (utils/after 100 #(load-cached-item activity-data :modal-editing-data item-load-cb)))
-  (dis/dispatch! [:activity-modal-fade-in activity-data editing dismiss-on-editing-end]))
-
-(defn activity-modal-fade-out
-  [activity-board-slug]
-  (let [from-all-posts (:from-all-posts @router/path)
-        previous-board-slug (:previous-board @router/path)
-        to-board (cond
-                   ;; If user was in AP go back there
-                   from-all-posts "all-posts"
-                   ;; if the previous position is set use it
-                   (seq previous-board-slug) previous-board-slug
-                   ;; use the passed activity board slug if present
-                   (seq activity-board-slug) activity-board-slug
-                   ;; fallback to the current board slug
-                   :else (router/current-board-slug))
-        org (router/current-org-slug)
-        to-url (if from-all-posts
-                (oc-urls/all-posts org)
-                (oc-urls/board org to-board))]
-    (.pushState (.-history js/window) #js {} "" to-url)
-    (router/set-route! [org to-board (if from-all-posts "all-posts" "dashboard")]
-     {:org org
-      :board to-board
-      :activity nil
-      :previous-board nil
-      :query-params (:query-params @router/path)
-      :from-all-posts false}))
-  (dis/dispatch! [:activity-modal-fade-out activity-board-slug]))
-
 (defn- edit-open-cookie []
   (str "edit-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
 
@@ -212,12 +175,15 @@
   []
   ;; If the user was looking at the modal, dismiss it too
   (when (router/current-activity-id)
-    (utils/after 1 #(let [from-all-posts (or
-                                          (:from-all-posts @router/path)
-                                          (= (router/current-board-slug) "all-posts"))]
+    (utils/after 1 #(let [is-all-posts (= (router/current-board-slug) "all-posts")
+                          is-must-see (= (router/current-board-slug) "must-see")]
                       (router/nav!
-                        (if from-all-posts ; AP
+                        (cond
+                          is-all-posts ; AP
                           (oc-urls/all-posts (router/current-org-slug))
+                          is-must-see
+                          (oc-urls/must-see (router/current-org-slug))
+                          :else
                           (oc-urls/board (router/current-org-slug) (router/current-board-slug)))))))
   ;; Add :entry-edit-dissmissing for 1 second to avoid reopening the activity modal after edit is dismissed.
   (utils/after 1000 #(dis/dispatch! [:input [:entry-edit-dissmissing] false]))
@@ -248,7 +214,7 @@
                     (:has-changes entry-map)
                     (not (:auto-saving entry-map)))
            ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving true :has-changes false})])
+           (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving true :has-changes false :body (:body entry-map)})])
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (if-not success
@@ -327,10 +293,9 @@
       (send-item-read (:uuid saved-activity-data)))))
 
 (defn board-name-exists-error [edit-key]
-  (dis/dispatch!
-   [:input
-    [edit-key :section-name-error]
-    utils/section-name-exists-error]))
+  (dis/dispatch! [:update [edit-key] #(-> %
+                                        (assoc :section-name-error utils/section-name-exists-error)
+                                        (dissoc :loading))]))
 
 (defn entry-modal-save [activity-data section-editing]
   (if (and (= (:board-slug activity-data) utils/default-section-slug)
@@ -360,12 +325,16 @@
   (dis/dispatch! [:activity-remove-attachment dispatch-input-key attachment-data])
   (dis/dispatch! [:input [dispatch-input-key :has-changes] true]))
 
+(declare secure-activity-get)
+
 (defn get-entry [entry-data]
-  (let [entry-link (utils/link-for (:links entry-data) "self")]
-    (api/get-entry entry-link
-      (fn [{:keys [status success body]}]
-        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-         nil])))))
+  (if (router/current-secure-activity-id)
+    (secure-activity-get)
+    (let [entry-link (utils/link-for (:links entry-data) "self")]
+      (api/get-entry entry-link
+        (fn [{:keys [status success body]}]
+          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+           nil]))))))
 
 (declare entry-revert)
 
@@ -384,8 +353,9 @@
      (entry-save edit-key edited-data section-editing create-update-entry-cb))
 
   ([edit-key edited-data section-editing entry-save-cb]
-     (let [fixed-edited-data (assoc edited-data :status (or (:status edited-data) "draft"))
+     (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
            fixed-edit-key (or edit-key :entry-editing)]
+       (dis/dispatch! [:entry-save fixed-edit-key])
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
                   section-editing)
@@ -418,8 +388,7 @@
            (let [org-slug (router/current-org-slug)
                  entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
                  entry-create-link (utils/link-for (:links entry-board-data) "create")]
-             (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb))))
-       (dis/dispatch! [:entry-save fixed-edit-key]))))
+             (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
@@ -432,7 +401,9 @@
   (swap! initial-revision dissoc (:uuid activity-data))
   (dis/dispatch! [:entry-publish/finish edit-key activity-data])
   ;; Send item read
-  (send-item-read (:uuid activity-data)))
+  (send-item-read (:uuid activity-data))
+  ;; Show the first post added tooltip if needed
+  (nux-actions/show-post-added-tooltip (:uuid activity-data)))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -453,7 +424,8 @@
       (ws-cc/container-watch (:uuid new-board-data)))
     (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
-    (send-item-read (:uuid saved-activity-data))))
+    (send-item-read (:uuid saved-activity-data))
+    (nux-actions/show-post-added-tooltip (:uuid saved-activity-data))))
 
 (defn entry-publish-with-board-cb [entry-uuid edit-key {:keys [status success body]}]
   (if (= status 409)
@@ -464,6 +436,7 @@
 (defn entry-publish [entry-editing section-editing & [edit-key]]
   (let [fixed-entry-editing (assoc entry-editing :status "published")
         fixed-edit-key (or edit-key :entry-editing)]
+    (dis/dispatch! [:entry-publish fixed-edit-key])
     (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
              section-editing)
       (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
@@ -480,8 +453,7 @@
                                 ;; If the entry is new, use
                                 (utils/link-for (:links board-data) "create"))]
         (api/publish-entry publish-entry-link fixed-entry-editing
-         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key))))
-    (dis/dispatch! [:entry-publish fixed-edit-key])))
+         (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key))))))
 
 (defn activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
@@ -489,6 +461,8 @@
     (refresh-org-data)))
 
 (defn activity-delete [activity-data]
+  ;; Make sure the WRT sample is dismissed
+  (nux-actions/dismiss-post-added-tooltip)
   (remove-cached-item (:uuid activity-data))
   (when (:links activity-data)
     (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
@@ -519,7 +493,7 @@
     (dis/dispatch! [:activity-share share-data])))
 
 (defn entry-revert [revision-id entry-editing]
-  (when (not (nil? revision-id))
+  (when-not (nil? revision-id)
     (let [entry-exists? (seq (:links entry-editing))
           entry-version (assoc entry-editing :revision-id revision-id)
           org-slug (router/current-org-slug)
@@ -536,19 +510,102 @@
         (dis/dispatch! [:entry-revert false])))))
 
 (defn activity-get-finish [status activity-data secure-uuid]
-  (when (= status 404)
-    (router/redirect-404!))
-  (when (and secure-uuid
-             (jwt/jwt)
-             (jwt/user-is-part-of-the-team (:team-id activity-data)))
-    (router/nav! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))))
-  (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid]))
+  (cond
+
+   (some #{status} [401 404])
+   (routing-actions/maybe-404)
+
+   ;; The id token will have a current activity id, shared urls will not.
+   ;; if the ids don't match return a 404
+   (and (some? (router/current-activity-id))
+        (not= (:uuid activity-data)
+              (router/current-activity-id)))
+   (routing-actions/maybe-404)
+
+   (and secure-uuid
+        (jwt/jwt)
+        (jwt/user-is-part-of-the-team (:team-id activity-data)))
+   (router/redirect! (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data)))
+
+   :default
+   (dis/dispatch! [:activity-get/finish status (router/current-org-slug) activity-data secure-uuid])))
+
+(defn org-data-from-secure-activity [secure-activity-data]
+  (let [old-org-data (dis/org-data)]
+    (-> secure-activity-data
+      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
+      (clojure.set/rename-keys {:org-uuid :uuid
+                                :org-name :name
+                                :org-slug :slug
+                                :org-logo-url :logo-url
+                                :org-logo-width :logo-width
+                                :org-logo-height :logo-height})
+      (merge old-org-data))))
 
 (defn secure-activity-get-finish [{:keys [status success body]}]
-  (activity-get-finish status (if success (json->cljs body) {}) (router/current-secure-activity-id)))
+  (let [secure-activity-data (if success (json->cljs body) {})
+        org-data (org-data-from-secure-activity secure-activity-data)]
+    (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
+    (dis/dispatch! [:org-loaded org-data false])))
 
-(defn secure-activity-get []
-  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id) secure-activity-get-finish))
+(defn get-org [org-data cb]
+  (let [fixed-org-data (or org-data (dis/org-data))
+        org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
+    (api/get-org org-link (fn [{:keys [status body success]}]
+      (let [org-data (json->cljs body)]
+        (dis/dispatch! [:org-loaded org-data false nil])
+        (cb success))))))
+
+(defn connect-change-service []
+  ;; id token given and not logged in
+  (when-let* [claims (jwt/get-id-token-contents)
+              secure-uuid (:secure-uuid claims)
+              user-id (:user-id claims)
+              org-data (dis/org-data)
+              ws-link (utils/link-for (:links org-data) "changes")]
+    (ws-cc/reconnect ws-link user-id (:slug org-data) [])))
+
+(defn secure-activity-get [& [cb]]
+  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id)
+   (fn [resp]
+     (secure-activity-get-finish resp)
+     (when (fn? cb)
+       (cb resp)))))
+
+(defn secure-activity-chain []
+  (api/web-app-version-check
+    (fn [{:keys [success body status]}]
+      (when (= status 404)
+        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
+  ;; Quick check on token
+  (when-let [info (jwt/get-id-token-contents)]
+    (when (not= (:secure-uuid info)
+                (router/current-secure-activity-id))
+      (routing-actions/maybe-404)))
+  (let [org-slug (router/current-org-slug)]
+    (api/get-auth-settings (fn [body]
+      (when body
+        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+          (api/get-user user-link (fn [data]
+            (dis/dispatch! [:user-data (json->cljs data)]))))
+        (dis/dispatch! [:auth-settings body])
+        (api/get-entry-point org-slug
+          (fn [success body]
+            (let [collection (:collection body)]
+              (if success
+                (let [orgs (:items collection)]
+                  (dis/dispatch! [:entry-point orgs collection])
+                  (when-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+                    (when (and (not (jwt/jwt)) (jwt/id-token))
+                      (get-org org-data
+                       (fn [success]
+                         (if success
+                           (connect-change-service)
+                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))
+                  (secure-activity-get (fn []
+                    ;; Delay comment load
+                    (comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))))
+                (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
 
 ;; Change reaction
 
@@ -638,6 +695,18 @@
          (send-item-seen activity-id)))))))
 
 ;; WRT read
+
+(defn send-secure-item-seen-read []
+  (when-let* [activity-data (dis/secure-activity-data)
+              activity-id (:uuid activity-data)
+              publisher-id (:user-id (:publisher activity-data))
+              container-id (:board-uuid activity-data)
+              token-data (jwt/get-id-token-contents)
+              user-name (:name token-data)
+              avatar-url (:avatar-url token-data)
+              org-id (:uuid (dis/org-data))]
+    (ws-cc/item-seen publisher-id container-id activity-id)
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
 (defn- send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
@@ -748,18 +817,21 @@
 
 ;; Sample post handling
 
-(defn delete-all-sample-posts []
-  (let [all-posts (dis/posts-data)
-        sample-posts (filterv :sample (vals all-posts))]
-    (when (router/current-activity-id)
-      (router/nav! (oc-urls/all-posts)))
-    (doseq [post sample-posts]
-      (activity-delete post))))
+(defn delete-samples []
+  ;; Make sure the WRT sample is dismissed
+  (nux-actions/dismiss-post-added-tooltip)
+  (let [org-data (dis/org-data)
+        org-link (utils/link-for (:links org-data) ["item" "self"] "GET")
+        delete-samples-link (utils/link-for (:links org-data) "delete-samples" "DELETE")]
+    (when delete-samples-link
+      (api/delete-samples delete-samples-link
+       #(do
+          (api/get-org org-link refresh-org-data-cb)
+          (router/nav! (oc-urls/all-posts)))))))
 
-(defn has-sample-posts []
-  (let [all-posts (dis/posts-data)
-        sample-posts (filterv :sample (vals all-posts))]
-    (pos? (count sample-posts))))
+(defn has-sample-posts? []
+  (let [org-data (dis/org-data)]
+    (utils/link-for (:links org-data) "delete-samples" "DELETE")))
 
 ;; Last used and default section for editing
 
@@ -823,7 +895,10 @@
 
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
-    (if (contains? (router/query-params) :new)
+    ;; Make sure the new param is alone and not with an access param that means
+    ;; it was adding a slack team or bot
+    (if (and (contains? (router/query-params) :new)
+             (not (contains? (router/query-params) :access)))
       (let [new-data (get-board-for-edit (router/query-param :new))
             with-headline (if (router/query-param :headline)
                            (assoc new-data :headline (router/query-param :headline))
@@ -840,7 +915,7 @@
   ([]
     (activity-edit (get-board-for-edit)))
   ([activity-data]
-    (let [fixed-activity-data (if (not (seq (:uuid activity-data)))
+    (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
           is-published? (= (:status fixed-activity-data) "published")

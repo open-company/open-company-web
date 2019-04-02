@@ -9,6 +9,10 @@ div.cmail-outer {
   border-top-right-radius: 8px;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
 
+  &.showing-qsg {
+    right: 244px;
+  }
+
   @include tablet() {
     position: relative;
     bottom: unset;
@@ -46,6 +50,9 @@ div.cmail-outer {
         }
 
         div.cmail-header {
+          div.must-see-toggle {
+            display: none;
+          }
 
           div.collapse-bt-container {
             button.collapse-bt {
@@ -224,10 +231,6 @@ div.cmail-outer {
           opacity: 0.5;
         }
 
-        &.must-see-on {
-          background-color: $sea_blue;
-        }
-
         button.right-button {
           margin-top: -2px;
         }
@@ -337,6 +340,7 @@ div.cmail-outer {
 
             &.disabled {
               opacity: 0.4;
+              cursor: not-allowed;
             }
           }
         }
@@ -344,7 +348,7 @@ div.cmail-outer {
 
       div.cmail-section {
         height: 48px;
-        border-bottom: 1px solid #ECECEC;
+        border-bottom: 1px solid $ultra_light_grey;
         padding: 16px;
         position: relative;
 
@@ -353,6 +357,8 @@ div.cmail-outer {
           margin-top: 56px;
           padding: 20px 24px;
         }
+
+        @include must-see-tag();
 
         div.board-name {
           margin-top: 2px;
@@ -390,6 +396,11 @@ div.cmail-outer {
           }
         }
 
+        div.must-see-tag {
+          float: left;
+          margin-left: 12px;
+        }
+
         div.sections-picker {
           position: absolute;
           top: 36px;
@@ -401,40 +412,58 @@ div.cmail-outer {
 
         div.cmail-section-right {
           float: right;
+          margin-top: -2px;
 
-          button.video-record-bt {
-            display: none;
+          div.must-see-tag {
+            float: left;
+            margin-right: 8px;
+          }
 
-            @include tablet() {
-              @include avenir_M();
-              color: $light_ui_grey;
-              font-size: 14px;
-              height: 20px;
-              position: relative;
-              padding-left: 0;
-              width: 24px;
-              height: 24px;
-              display: block;
-              // FIXME: disable video on mobile for now
-              display: none;
+          div.must-see-toggle-container {
+            float: left;
+            position: relative;
+            width: 32px;
+            height: 20px;
 
-              &.remove-video-bt {
-                &:before {
-                  background-image: cdnUrl("/img/ML/remove_video_icon.svg");
+            .tooltip {
+              width: 97px;
+            }
+
+            &.on {
+              div.must-see-toggle {
+                background-color: rgba($sea_blue, 0.2);
+
+                span.must-see-toggle-circle {
+                  margin-left: 12px;
+                  background-color: $sea_blue;
                 }
               }
+            }
 
-              &:before {
-                content: "";
-                left: 0px;
-                top: 3px;
-                position: absolute;
-                height: 12px;
+            div.must-see-toggle {
+              width: 32px;
+              height: 16px;
+              position: absolute;
+              top: 2px;
+              left: 0px;
+              background-color: #D6D9DC;
+              border-radius: 100px;
+              cursor: pointer;
+
+              span.must-see-toggle-circle {
+                display: block;
                 width: 20px;
-                background-image: cdnUrl("/img/ML/mobile_capture_video_icon.svg");
-                background-size: 20px 12px;
-                background-repeat: no-repeat;
+                height: 20px;
+                position: absolute;
+                top: -2px;
+                left: 0px;
+                border-radius: 50%;
+                background-color: #617487;
+                background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
+                background-size: 8px 10px;
                 background-position: center;
+                background-repeat: no-repeat;
+                transition: margin-left 180ms ease-in, background-color 180ms ease-in;
               }
             }
           }
@@ -577,8 +606,8 @@ div.cmail-outer {
           max-height: 330px;
           margin-top: 16px;
           width: 100%;
-          background-color: rgba(#ECECEC, 0.2);
-          border-top: 1px solid #ECECEC;
+          background-color: rgba($ultra_light_grey, 0.2);
+          border-top: 1px solid $ultra_light_grey;
           padding: 24px;
           overflow-x: hidden;
           overflow-y: auto;
@@ -594,8 +623,8 @@ div.cmail-outer {
         }
 
         div.edit-tooltip-container {
-          border: 1px dashed $carrot_gold;
-          background-color: $opac_yellow;
+          border: 1px solid rgba($carrot_gold, 0.5);
+          background-color: #FDF6E4;
           border-radius: 6px;
           padding: 24px 24px;
           margin: 8px 0px;
@@ -667,7 +696,7 @@ div.cmail-outer {
           height: 40px;
           @include avenir_B();
           font-size: 14px;
-          border-radius: 100px;
+          border-radius: 6px;
           margin-right: 24px;
           float: left;
 
@@ -677,7 +706,8 @@ div.cmail-outer {
           }
 
           &.disabled {
-            opacity: 0.6;
+            opacity: 0.4;
+            cursor: not-allowed;
           }
 
           &:not(.disabled):hover {
@@ -690,7 +720,7 @@ div.cmail-outer {
           width: 1px;
           height: 16px;
           margin-top: 12px;
-          background-color: $light_ui_grey;
+          background-color: #E1E2E4;
           float: left;
           margin-right: 24px;
         }
@@ -705,8 +735,7 @@ div.cmail-outer {
 
         div.emoji-picker {
           float: left;
-          margin-left: 16px;
-          margin-right: 16px;
+          margin-left: 8px;
           margin-top: 8px;
 
           button.emoji-button {
@@ -794,14 +823,13 @@ div.cmail-outer {
         }
 
         div.saving-saved {
-          display: inline-block;
-          width: 40px;
-          height: 20px;
+          height: 35px;
           @include avenir_M();
           color: $light_ui_grey;
-          font-size: 12px;
-          line-height: 20px;
-          margin: 10px 0px 0px 16px;
+          font-size: 14px;
+          line-height: 46px;
+          margin: 0px 16px 0px 0px;
+          float: right;
         }
 
         div.cmail-footer-right {

@@ -1,5 +1,6 @@
 (ns oc.web.utils.user
-  (:require [oc.web.utils.activity :as activity-utils]))
+  (:require [oc.web.lib.jwt :as jwt]
+            [oc.web.utils.activity :as activity-utils]))
 
 (def user-avatar-filestack-config
   {:accept "image/*"
@@ -9,17 +10,49 @@
        :aspectRatio 1}}})
 
 (defn notification-title [notification]
-  (let [author (:author notification)
-        first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))]
+  (let [reminder? (:reminder? notification)
+        author (:author notification)
+        first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
+        reminder (when reminder?
+                    (:reminder notification))
+        notification-type (when reminder?
+                            (:notification-type reminder))
+        reminder-assignee (when reminder?
+                            (:assignee reminder))]
     (cond
-      (and (:mention notification) (:interaction-id notification))
+      (and reminder
+           (= notification-type "reminder-notification"))
+      (str first-name " created a new reminder for you")
+      (and reminder
+           (= notification-type "reminder-alert"))
+      (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
+      (and (:mention? notification) (:interaction-id notification))
       (str first-name " mentioned you in a comment")
-      (:mention notification)
+      (:mention? notification)
       (str first-name " mentioned you")
       (:interaction-id notification)
       (str first-name " commented on your post")
       :else
       nil)))
+
+(defn notification-content [notification]
+  (let [reminder? (:reminder? notification)
+        reminder (when reminder?
+                   (:reminder notification))
+        notification-type (when reminder?
+                            (:notification-type reminder))]
+    (cond
+      (and reminder
+           (= notification-type "reminder-notification"))
+      (str
+       (:headline reminder) ": "
+       (:frequency reminder) " starting "
+       (activity-utils/post-date (:next-send reminder)))
+      (and reminder
+           (= notification-type "reminder-alert"))
+      (:headline reminder)
+      :else
+      (:content notification))))
 
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
@@ -32,9 +65,11 @@
        :interaction-id (:interaction-id notification)
        :is-interaction is-interaction
        :unread unread
-       :mention (:mention notification)
+       :mention? (:mention? notification)
+       :reminder? (:reminder? notification)
+       :reminder (:reminder notification)
        :created-at (:notify-at notification)
-       :body (:content notification)
+       :body (notification-content notification)
        :title title
        :author (:author notification)})))
 
@@ -48,3 +83,15 @@
      notifications))))
 
 (def user-name-max-lenth 64)
+
+;; Associated Slack user check
+
+(defn user-has-slack-with-bot?
+  "Check if the current user has an associated Slack user under a team that has the bot."
+  [current-user-data bots-data team-roster]
+  (let [slack-orgs-with-bot (map :slack-org-id bots-data)
+        slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
+    (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
+
+(defn is-org-creator? [org-data]
+  (= (:user-id (:author org-data)) (jwt/user-id)))

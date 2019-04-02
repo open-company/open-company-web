@@ -16,6 +16,7 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.jwt :as jwt-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
@@ -150,11 +151,20 @@
 
 (defn- profile-setup-team-data
   ""
-  [s]
+  [s & [setup-email-domain]]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)]
+        teams-data @(drv/get-ref s :teams-data)
+        google-domain (jwt/get-key :google-domain)
+        user-email (jwt/get-key :email)
+        with-email-domain (cond
+                            (and setup-email-domain
+                                 google-domain
+                                 (clojure.string/blank? (:email-domain org-editing)))
+                            {:email-domain google-domain}
+                            :else
+                            {:email-domain (or (:email-domain org-editing) "")})]
     (if (and (zero? (count (:name org-editing)))
              (seq teams-data))
       (let [first-team (select-keys
@@ -173,7 +183,50 @@
                (dis/dispatch! [:update [:org-editing] #(dissoc % :logo-url)])
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
-            (set! (.-src img) (:logo-url first-team))))))))
+            (set! (.-src img) (:logo-url first-team)))))
+      (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
+
+(defn- check-email-domain [domain s & [reset-email-domain]]
+  (reset! (::checking-email-domain s) (not reset-email-domain))
+  ;; If user is here it means he has only one team, if he already had one
+  ;; he was redirected to it, not here to create a new team, so use the first team
+  (let [clean-email-domain (org-utils/clean-email-domain domain)]
+    (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
+     (fn [success status]
+       ;; Discard response if the domain changed
+       (when (or reset-email-domain
+                 (= domain (:email-domain @(drv/get-ref s :org-editing))))
+         (reset! (::checking-email-domain s) false)
+         (let [domain-error (cond
+                             (= status 409)
+                             "Only company email domains are allowed."
+                             (not success)
+                             "An error occurred, please try again."
+                             :else
+                             nil)
+                next-org-editing {:valid-email-domain success
+                                  :domain-error (if reset-email-domain
+                                                  nil
+                                                  domain-error)}
+                with-email-domain (if (and reset-email-domain
+                                           success)
+                                    (assoc next-org-editing :email-domain domain)
+                                    next-org-editing)]
+           (dis/dispatch! [:update [:org-editing]
+            #(merge % with-email-domain)])))))))
+
+(defn- precheck-user-email [s a]
+  (when-not @(::user-email-checked s)
+    ;; Wait for the team data to be loaded to have the email domain link
+    (when (first (filter #(= (:team-id %) (first (jwt/get-key :teams))) @(drv/get-ref s :teams-data)))
+      (let [domain (:email-domain @(drv/get-ref s :org-editing))
+            user-email (jwt/get-key :email)
+            splitted-email (string/split user-email #"@")
+            user-domain (string/trim (second splitted-email))]
+        (when (and (string/blank? domain)
+                   (not (string/blank? user-domain))))
+          (reset! (::user-email-checked s) true)
+          (check-email-domain user-domain s true)))))
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
@@ -182,14 +235,21 @@
                                   (drv/drv :org-editing)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
+                                  (rum/local false ::user-email-checked)
+                                  (rum/local false ::checking-email-domain)
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
+                                    (dis/dispatch! [:input [:org-editing :email-domain] ""])
                                     (user-actions/user-profile-reset)
                                     s)
                                    :did-mount (fn [s]
-                                    (profile-setup-team-data s)
+                                    (profile-setup-team-data s true)
                                     (delay-focus-field-with-ref s "first-name")
-                                    s)
+                                    (precheck-user-email s "did-mount")
+                                   s)
+                                   :did-remount (fn [_ s]
+                                    (precheck-user-email s "did-remount")
+                                   s)
                                    :will-update (fn [s]
                                     (profile-setup-team-data s)
                                     (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
@@ -198,7 +258,11 @@
                                                  (or (:error edit-user-profile)
                                                      (:error org-editing)))
                                         (reset! (::saving s) false)))
-                                    s)}
+                                    (precheck-user-email s "will-update")
+                                   s)
+                                   :did-update (fn [s]
+                                    (precheck-user-email s "did-update")
+                                   s)}
   [s]
   (let [has-org? (pos? (count (drv/react s :orgs)))
         edit-user-profile (drv/react s :edit-user-profile)
@@ -210,7 +274,9 @@
                               (and (empty? (:first-name user-data))
                                         (empty? (:last-name user-data)))
                               (and (not has-org?)
-                                   (<= (count (clean-org-name (:name org-editing))) 1)))
+                                   (<= (count (clean-org-name (:name org-editing))) 1))
+                              (and (seq (:email-domain org-editing))
+                                   (not (:valid-email-domain org-editing))))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
@@ -229,10 +295,8 @@
         [:div.title.about-yourself
           "Tell us about you"]
         (when-not has-org?
-          [:div.steps.first-step
-            [:div.step]
-            [:div.step]
-            [:div.step]])
+          [:div.steps
+            "Step 1 of 2"])
         [:div.steps-separator]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
@@ -241,25 +305,27 @@
         [:form
           {:on-submit (fn [e]
                         (.preventDefault e))}
-          [:div.field-label
-            "First name"]
-          [:input.field
-            {:class utils/hide-class
-             :type "text"
-             :ref "first-name"
-             :placeholder "First name"
-             :max-length user-utils/user-name-max-lenth
-             :value (or (:first-name user-data) "")
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-          [:div.field-label
-            "Last name"]
-          [:input.field
-            {:class utils/hide-class
-             :type "text"
-             :placeholder "Last name"
-             :value (or (:last-name user-data) "")
-             :max-length user-utils/user-name-max-lenth
-             :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
+          [:div.group
+            [:div.field-label.left-half-field-label.name-fields
+              "First name"]
+            [:div.field-label.right-half-field-label.name-fields
+              "Last name"]]
+          [:div.group
+            [:input.field.left-half-field
+              {:class utils/hide-class
+               :type "text"
+               :ref "first-name"
+               :placeholder "First name"
+               :max-length user-utils/user-name-max-lenth
+               :value (or (:first-name user-data) "")
+               :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+            [:input.field.right-half-field
+              {:class utils/hide-class
+               :type "text"
+               :placeholder "Last name"
+               :value (or (:last-name user-data) "")
+               :max-length user-utils/user-name-max-lenth
+               :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]]
           (when-not has-org?
             [:div.field-label
               "Company name"
@@ -276,6 +342,45 @@
                :value (:name org-editing)
                :on-change #(dis/dispatch! [:input [:org-editing]
                  (merge org-editing {:error nil :name (.. % -target -value)})])}])
+          (when-not has-org?
+            [:div.field-label.email-domain-field-label.group
+              [:span.field-label-span "Email domain — optional"]
+              (cond
+                @(::checking-email-domain s)
+                (small-loading)
+                (string? (:domain-error org-editing))
+                [:span.error
+                  (:domain-error org-editing)])])
+          (when-not has-org?
+            [:div.org-email-domain-field
+              [:input.field.email
+                {:name "um-domain-invite"
+                 :ref "um-domain-invite"
+                 :class (utils/class-set {:error (and (seq (:email-domain org-editing))
+                                                      (:domain-error org-editing))
+                                          :valid (and (seq (:email-domain org-editing))
+                                                      (:valid-email-domain org-editing))})
+                 :type "text"
+                 :auto-capitalize "none"
+                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :autoComplete "off"
+                 :value (:email-domain org-editing)
+                 :on-change (fn [v]
+                              (let [domain (.. v -target -value)
+                                    cleaned-email-domain (org-utils/clean-email-domain domain)
+                                    valid-email-domain? (utils/valid-domain? cleaned-email-domain)]
+                                (dis/dispatch! [:update [:org-editing] #(merge % {:email-domain (if valid-email-domain? cleaned-email-domain domain)
+                                                                                  :domain-error (if (and (seq domain)
+                                                                                                         (not valid-email-domain?))
+                                                                                                  "Please enter a valid email domain."
+                                                                                                  false)
+                                                                                  :valid-email-domain nil})])
+                                (when (and (seq cleaned-email-domain)
+                                           valid-email-domain?)
+                                  (check-email-domain cleaned-email-domain s))))
+                 :placeholder "Email domain, e.g. acme.com"}]
+            [:div.field-label.info
+              "Anyone with email addresses at these domain can automatically join your workspace."]])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -284,8 +389,8 @@
           [:div.logout-cancel
             "Need to start over? "
             [:button.mlb-reset.logout-cancel
-              {:on-click #(user-actions/logout oc-urls/sign-up)}
-              "Cancel sign up"]]]]]))
+              {:on-click #(jwt-actions/logout oc-urls/sign-up)}
+              "Click here"]]]]]))
 
 (defn- setup-team-data
   ""
@@ -437,7 +542,7 @@
                                (dis/dispatch! [:input [:org-editing :email-domain] domain])
                                (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
                                                                                         (not (utils/valid-domain? domain)))]))
-                 :placeholder "Domain, e.g. acme.com"}]]
+                 :placeholder "Domain, e.g. @acme.com"}]]
             [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
           [:button.continue
             {:class (when continue-disabled "disabled")
@@ -470,12 +575,8 @@
            "Start"]]
         [:div.title
           "Pick a few topics to start"]
-        [:div.subtitle
-          "What types of communication are shared with your team?"]
-        [:div.steps.third-step
-          [:div.step]
-          [:div.step]
-          [:div.step]]
+        [:div.steps
+          "Step 2 of 2"]
         [:div.steps-separator]]
       [:div.onboard-form
         [:div.sections-list
@@ -571,10 +672,8 @@
           "Invite your team"]
         [:div.subtitle
           "Invite some colleagues to explore Carrot with you."]
-        [:div.steps.second-step
-          [:div.step]
-          [:div.step]
-          [:div.step]]
+        [:div.steps
+          "Step 3 of 3"]
         [:div.steps-separator]]
       [:div.onboard-form
         [:form
@@ -840,7 +939,7 @@
     (cond
       (= (:error email-verification) 401)
       [:div.onboard-email-container.error
-        "This link is not valid, please try again."]
+        "This link is no longer valid."]
       (:error email-verification)
       [:div.onboard-email-container.error
         "An error occurred, please try again."]
@@ -887,7 +986,7 @@
     (cond
       (= (:error password-reset) 401)
       [:div.onboard-email-container.error
-        "This link is not valid, please try again."]
+        "This link is no longer valid."]
       (:error password-reset)
       [:div.onboard-email-container.error
         "An error occurred, please try again."]

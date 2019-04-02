@@ -20,6 +20,8 @@
                        {:did-mount (fn [s]
                                     (when (:tif (:query-params @router/path))
                                       (utils/after 1500 #(.focus (sel1 [:input.try-it-form-central-input]))))
+                                    (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
+                                      (js/OCWebSetupMarketingSiteJS))
                                     s)
                        :will-mount (fn [s]
                                      (when (:confirm (:query-params @router/path))
@@ -33,39 +35,33 @@
       {:id "wrap"}
       (login-overlays-handler)
       [:div.main.home-page
-        shared-misc/animation-lightbox
+        (shared-misc/video-lightbox)
         ; Hope page header
         [:section.cta.group
 
           [:h1.headline
-            "Lead with clarity"]
-          [:div.subheadline.for-others
+            "Where teams find clarity"]
+          [:div.subheadline
             (str
-             "Leaders struggle to communicate clearly because "
-             "chat and email are too noisy. Carrot helps leaders "
-             "rise above the noise to keep teams focused.")]
-          [:div.subheadline.for-mobile
-            "Carrot helps leaders rise above the noise to keep distributed teams up to date and aligned."]
-          ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
+              "Carrot is the platform for team communication that matters. "
+              "Post important updates, news, decisions and stories "
+              "that nobody should miss — perfect for remote teams.")]
+
           [:div.get-started-button-container.group
-            shared-misc/show-animation-button
             [:button.mlb-reset.get-started-button
-              {:id "get-started-centred-bt"
-               :on-click #(router/nav! oc-urls/sign-up)}
-              "Get started for free"]]
-          shared-misc/no-credit-card
-          [:div.carrot-box-container.confirm-thanks.group
-            {:style {:display "none"}}
-            [:div.carrot-box-thanks
-              [:div.thanks-headline "You are Confirmed!"]
-              [:div.thanks-subheadline "Thank you for subscribing."]]]
+              {:id "get-started-centred-bt"}
+              "Create your team - It's free"]]
 
           [:div.main-animation-container
             [:img.main-animation
               {:src (utils/cdn "/img/ML/homepage_screenshot.png")
-               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]]
+               :srcSet (str (utils/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]]
 
-        shared-misc/keep-aligned-section
+          shared-misc/testimonials-logos-line]
+
+        (shared-misc/keep-aligned-section false)
+
+        shared-misc/carrot-in-action
 
         shared-misc/testimonials-section
 

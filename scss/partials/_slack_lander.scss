@@ -29,10 +29,11 @@ div.slack-lander-wrap {
       }
 
       &:after {
-        background-color: #F8F7F3;
+        background-color: $another_ui_grey;
         content: "";
         width: 100%;
         height: 39%;
+        min-height: 500px;
         display: block;
         border-bottom-left-radius: 200px;
         position: absolute;
@@ -40,8 +41,13 @@ div.slack-lander-wrap {
         right: 0;
         z-index: 2;
 
+        @include tablet() {
+          border-bottom-left-radius: 0;
+          border-top-right-radius: 200px;
+        }
+
         @include mobile() {
-          border-bottom-left-radius: 100px; 
+          border-top-right-radius: 100px;
         }
 
         @media screen and (max-width: 440px) {
@@ -98,7 +104,7 @@ div.slack-lander-wrap {
       width: 320px;
       height: 64px;
       background-image: cdnUrl("/img/ML/continue_with_slack.svg");
-      background-size: 241px 24px;
+      background-size: 209px 17px;
       background-position: center;
       background-repeat: no-repeat;
       background-color: $carrot_orange;
@@ -113,7 +119,7 @@ div.slack-lander-wrap {
     section.keep-aligned {
       text-align: center;
       margin: 0px auto;
-      background-color: #F8F7F3;
+      background-color: $another_ui_grey;
       padding: 120px 0;
 
       @include mobile() {
@@ -124,19 +130,6 @@ div.slack-lander-wrap {
         @include avenir_H();
         font-size: 28px;
         color: $deep_navy;
-      }
-
-      div.no-credit-card {
-        @include avenir_R();
-        color: $ui_grey;
-        font-size: 14px;
-        margin-top: 24px;
-        text-align: center;
-
-        @include mobile() {
-          font-size: 12px;
-          margin-top: 0px;
-        }
       }
     }
   }

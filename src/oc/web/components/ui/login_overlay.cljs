@@ -71,6 +71,7 @@
                               email (:email login-with-email)
                               pswd (:pswd login-with-email)]
                           (.preventDefault %)
+                          (user-actions/maybe-save-login-redirect)
                           (user-actions/login-with-email email pswd)))]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
@@ -83,7 +84,7 @@
         [:div.login-overlay-cta.group
           [:button.mlb-reset.top-back-button
             {:on-touch-start identity
-             :on-click #(router/history-back!)
+             :on-click #(user-actions/show-login nil)
              :aria-label "Back"}]
           [:div.sign-in-cta "Sign In"]
           [:button.mlb-reset.top-continue
@@ -96,6 +97,7 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
+                         (user-actions/maybe-save-login-redirect)
                          (user-actions/login-with-slack auth-link)))
            :on-touch-start identity}
           [:div.signin-with-slack-content
@@ -108,6 +110,7 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                             {:auth-source "google"})]
+                         (user-actions/maybe-save-login-redirect)
                          (user-actions/login-with-google auth-link)))
            :on-touch-start identity}
           [:div.signin-with-google-content
@@ -305,20 +308,20 @@
   [s]
   (cond
     ; login via email
-    (or (= (drv/react s user-store/show-login-overlay-key) :login-with-email)
-        (= (drv/react s user-store/show-login-overlay-key) :login-with-slack))
+    (or (= (drv/react s dis/show-login-overlay-key) :login-with-email)
+        (= (drv/react s dis/show-login-overlay-key) :login-with-slack))
     (login-with-email)
     ; signup via email
-    (or (= (drv/react s user-store/show-login-overlay-key) :signup-with-email)
-        (= (drv/react s user-store/show-login-overlay-key) :signup-with-slack))
+    (or (= (drv/react s dis/show-login-overlay-key) :signup-with-email)
+        (= (drv/react s dis/show-login-overlay-key) :signup-with-slack))
     (do
       (utils/after 150 #(router/nav! oc-urls/sign-up))
       [:div])
     ; password reset
-    (= (drv/react s user-store/show-login-overlay-key) :password-reset)
+    (= (drv/react s dis/show-login-overlay-key) :password-reset)
     (password-reset)
     ; form to insert a new password
-    (= (drv/react s user-store/show-login-overlay-key) :collect-password)
+    (= (drv/react s dis/show-login-overlay-key) :collect-password)
     (collect-password)
     ; show nothing
     :else

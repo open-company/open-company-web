@@ -14,7 +14,7 @@
             [oc.web.lib.raven :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.lib.ws-change-client :as ws-cc]
+            [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -29,6 +29,8 @@
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
 (def ^:private search-endpoint ls/search-server-domain)
+
+(def ^:private reminders-endpoint ls/reminder-server-domain)
 
 (defun- relative-href
   "Given a link map or a link string return the relative href."
@@ -58,7 +60,8 @@
   (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
-  (if-let [jwt (j/jwt)]
+  (if-let [jwt (or (j/jwt)
+                   (j/id-token))]
     (-> {:with-credentials? false}
         (merge params)
         (update :headers merge {"Authorization" (str "Bearer " jwt)}))
@@ -137,7 +140,6 @@
   (timbre/debug "Req:" (method-name method) (str endpoint path))
   (let [jwt (j/jwt)
         expired? (j/expired?)]
-    (timbre/debug jwt expired?)
     (go
      ;; sync refresh
      (when (and jwt expired?)
@@ -169,10 +171,11 @@
                         :path path
                         :method (method-name method)
                         :jwt (j/jwt)
-                        :params params}]
+                        :params params
+                        :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/set-extra-context! report)
-            (sentry/capture-message (str "xhr response error:" status))
+            (sentry/capture-error-with-message (str "xhr response error:" status))
             (sentry/clear-extra-context!)))
         (on-complete response)))))
 
@@ -188,14 +191,17 @@
 
 (def ^:private search-http (partial req search-endpoint))
 
+(def ^:private reminders-http (partial req reminders-endpoint))
+
 ;; Report failed api request
 
-(defn- handle-missing-link [callee-name link callback & parameters]
-  (timbre/error "Hanling missing link:" callee-name ":" link)
+(defn- handle-missing-link [callee-name link callback & [parameters]]
+  (timbre/error "Handling missing link:" callee-name ":" link)
   (sentry/set-extra-context! (merge {:callee callee-name
-                                     :link link}
-                                     parameters))
-  (sentry/capture-message (str "Client API error on: " callee-name))
+                                     :link link
+                                     :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
+                                    parameters))
+  (sentry/capture-error-with-message (str "Client API error on: " callee-name))
   (sentry/clear-extra-context!)
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
@@ -209,7 +215,9 @@
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
-(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-frequency :digest-medium])
+(def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
+
+(def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -238,19 +246,18 @@
 ;; Entry point and Auth settings
 
 (defn get-entry-point [requested-org callback]
-  (let [entry-point-href (str "/" (when requested-org (str "?requested=" requested-org)))]
-    (storage-http http/get entry-point-href
-     nil
-     (fn [{:keys [success body]}]
-       (let [fixed-body (when success (json->cljs body))]
-         (callback success fixed-body))))))
+  (storage-http http/get "/"
+    {:query-params {:requested requested-org}}
+    (fn [{:keys [success body]}]
+      (let [fixed-body (when success (json->cljs body))]
+        (callback success fixed-body)))))
 
 (defn get-auth-settings [callback]
-  (auth-http http/get "/"
-   {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}
+  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}]
+  (auth-http http/get "/" header-options
    (fn [response]
      (let [body (if (:success response) (:body response) false)]
-       (callback body)))))
+       (callback body))))))
 
 ;; Subscription
 
@@ -263,9 +270,11 @@
 
 (defn get-org [org-link callback]
   (if org-link
-    (storage-http (method-for-link org-link) (relative-href org-link)
-     {:headers (headers-for-link org-link)}
-     callback)
+    (let [params {:headers (headers-for-link org-link)}]
+      (storage-http (method-for-link org-link)
+                    (relative-href org-link)
+                    params
+                    callback))
     (handle-missing-link "get-org" org-link callback)))
 
 (defn patch-org [org-patch-link data callback]
@@ -287,14 +296,19 @@
         callback))
     (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
 
-(defn add-email-domain [add-email-domain-link domain callback team-data]
+(defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)
-    (auth-http (method-for-link add-email-domain-link) (relative-href add-email-domain-link)
-      {:headers (headers-for-link add-email-domain-link)
-       :body domain}
-      callback)
+    (let [email-domain-payload {:email-domain domain}
+          with-preflight (if pre-flight
+                           (assoc email-domain-payload :pre-flight true)
+                           email-domain-payload)
+          json-data (cljs->json with-preflight)]
+      (auth-http (method-for-link add-email-domain-link) (relative-href add-email-domain-link)
+        {:headers (headers-for-link add-email-domain-link)
+         :json-params json-data}
+        callback))
     (handle-missing-link "add-email-domain" add-email-domain-link callback
-     {:domain domain :team-data team-data})))
+     {:domain domain :team-data team-data :pre-flight pre-flight})))
 
 (defn create-org [create-org-link org-data callback]
   (if create-org-link
@@ -304,9 +318,15 @@
         (storage-http (method-for-link create-org-link) (relative-href create-org-link)
           {:headers (headers-for-link create-org-link)
            :json-params (cljs->json fixed-org-data)}
-          (fn [response]
-            (callback response)))))
+          callback)))
     (handle-missing-link "create-org" create-org-link callback {:org-data org-data})))
+
+(defn delete-samples [delete-samples-link callback]
+  (if delete-samples-link
+    (storage-http (method-for-link delete-samples-link) (relative-href delete-samples-link)
+      {:headers (headers-for-link delete-samples-link)}
+      callback)
+    (handle-missing-link "delete-samples" delete-samples-link callback)))
 
 ;; Board/section
 
@@ -433,18 +453,20 @@
 
 ;; Signup
 
-(defn signup-with-email [auth-link first-name last-name email pswd callback]
-  (if (and auth-link first-name last-name email pswd)
-    (auth-http (method-for-link auth-link) (relative-href auth-link)
-      {:json-params {:first-name first-name
-                     :last-name last-name
-                     :email email
-                     :password pswd}
-       :headers (headers-for-link auth-link)}
-      (fn [{:keys [success body status]}]
-        (callback success body status)))
-    (handle-missing-link "signup-with-email" auth-link callback
-     {:first-name first-name :last-name last-name :email email :pswd (repeat (count pswd) "*")})))
+(defn signup-with-email [auth-link first-name last-name email pswd timezone callback]
+  (let [user-map {:first-name first-name
+                  :last-name last-name
+                  :email email
+                  :password pswd
+                  :timezone timezone}]
+    (if (and auth-link first-name last-name email pswd)
+      (auth-http (method-for-link auth-link) (relative-href auth-link)
+        {:json-params (cljs->json user-map)
+         :headers (headers-for-link auth-link)}
+        (fn [{:keys [success body status]}]
+          (callback success body status)))
+      (handle-missing-link "signup-with-email" auth-link callback
+       (assoc user-map :password (repeat (count pswd) "*"))))))
 
 ;; Team(s)
 
@@ -493,7 +515,9 @@
                               (merge
                                json-params
                                {:slack-id (:slack-id invited-user)
-                                :slack-org-id (:slack-org-id invited-user)})
+                                :slack-org-id (:slack-org-id invited-user)
+                                :avatar-url (:avatar-url invited-user)
+                                :email (:email invited-user)})
                               (assoc json-params :email invited-user))
           with-company-name (merge with-invited-user {:org-name (:name org-data)
                                                       :logo-url (:logo-url org-data)
@@ -605,6 +629,13 @@
         (callback status)))
     (handle-missing-link "password-reset" reset-link callback
      {:email email})))
+
+(defn resend-verification-email [resend-link callback]
+  (if resend-link
+    (auth-http (method-for-link resend-link) (relative-href resend-link)
+     {:headers (headers-for-link resend-link)}
+     (fn [{:keys [status success body]}]
+      (callback success)))))
 
 ;; Interactions
 
@@ -765,6 +796,50 @@
       (handle-missing-link "query" search-link callback
        {:org-uuid org-uuid
         :search-query search-query}))))
+
+;; Reminders
+
+(defn get-reminders
+  [reminders-link callback]
+  (if reminders-link
+    (reminders-http (method-for-link reminders-link) (relative-href reminders-link)
+     {:headers (headers-for-link reminders-link)}
+     callback)
+    (handle-missing-link "get-reminders" reminders-link callback)))
+
+(defn add-reminder [add-reminder-link reminder-data callback]
+  (if (and add-reminder-link reminder-data)
+    (let [fixed-reminder-data (select-keys reminder-data reminder-allowed-keys)
+          json-data (cljs->json fixed-reminder-data)]
+      (reminders-http (method-for-link add-reminder-link) (relative-href add-reminder-link)
+       {:headers (headers-for-link add-reminder-link)
+        :json-params json-data}
+       callback))
+    (handle-missing-link "add-reminder" add-reminder-link callback)))
+
+(defn update-reminder [update-reminder-link reminder-data callback]
+  (if (and update-reminder-link reminder-data)
+    (let [fixed-reminder-data (select-keys reminder-data reminder-allowed-keys)
+          json-data (cljs->json fixed-reminder-data)]
+      (reminders-http (method-for-link update-reminder-link) (relative-href update-reminder-link)
+       {:headers (headers-for-link update-reminder-link)
+        :json-params json-data}
+       callback))
+    (handle-missing-link "update-reminder" update-reminder-link callback)))
+
+(defn delete-reminder [delete-reminder-link callback]
+  (if delete-reminder-link
+    (reminders-http (method-for-link delete-reminder-link) (relative-href delete-reminder-link)
+     {:headers (headers-for-link delete-reminder-link)}
+     callback)
+    (handle-missing-link "delete-reminder" delete-reminder-link callback)))
+
+(defn get-reminders-roster [roster-link callback]
+  (if roster-link
+    (reminders-http (method-for-link roster-link) (relative-href roster-link)
+     {:headers (headers-for-link roster-link)}
+     callback)
+    (handle-missing-link "ger-reminders-roster" roster-link callback)))
 
 ;; WRT
 

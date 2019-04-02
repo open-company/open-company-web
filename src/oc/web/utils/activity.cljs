@@ -1,7 +1,6 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
-            [cljs-time.format :as f]
-            [cljs-time.core :as time]
+            [cljs-time.format :as time-format]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -234,7 +233,7 @@
                        (assoc :links fixed-next-links))
           new-items (map :uuid (:items container-data))
           without-items (dissoc with-links :items)
-          with-posts-list (assoc without-items :posts-list (into []
+          with-posts-list (assoc without-items :posts-list (vec
                                                              (case direction
                                                               :up (concat new-items (:posts-list container-data))
                                                               :down (concat (:posts-list container-data) new-items)
@@ -268,6 +267,21 @@
          ;; and more than the navigation bar to
          (> (.-bottom rect) responsive/navbar-height)))))
 
+(defn- is-element-top-in-viewport?
+   "Given a DOM element return true if it's actually visible in the viewport."
+  [el & [offset]]
+  (let [fixed-offset (or offset 0)
+        rect (.getBoundingClientRect el)
+        zero-pos? #(or (zero? %)
+                       (pos? %))
+        doc-element (.-documentElement js/document)
+        win-height (or (.-clientHeight doc-element)
+                       (.-innerHeight js/window))]
+           ;; Item top is more then the navbar height
+      (and (>= (+ (.-top rect) fixed-offset) responsive/navbar-height)
+           ;; and less than the screen height
+           (< (- (.-top rect) fixed-offset) win-height))))
+
 (defn clean-who-reads-count-ids
   "Given a list of items we want to request the who reads count
    and the current read data, filter out the ids we already have data."
@@ -275,7 +289,7 @@
   (let [all-items (set (keys activities-read-data))
         request-set (set item-ids)
         diff-ids (clojure.set/difference request-set all-items)]
-    (into [] diff-ids)))
+    (vec diff-ids)))
 
 ;; Last used section
 
@@ -308,3 +322,17 @@
   (or (some? (:video-id data))
       (has-attachments? data)
       (has-text? data)))
+
+(def iso-format (time-format/formatters :date-time))
+
+(def date-format (time-format/formatter "MMMM d"))
+
+(def date-format-year (time-format/formatter "MMMM d YYYY"))
+
+(defn post-date [timestamp & [force-year]]
+  (let [d (time-format/parse iso-format timestamp)
+        now-year (.getFullYear (utils/js-date))
+        timestamp-year (.getFullYear (utils/js-date timestamp))
+        show-year (or force-year (not= now-year timestamp-year))
+        f (if show-year date-format-year date-format)]
+    (time-format/unparse f d)))

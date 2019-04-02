@@ -8,6 +8,7 @@
 div.site-mobile-menu {
   display:none;
   position: absolute;
+  position: fixed;
   width: 100vw;
   height: calc(100vh - 64px);
   top: 64px;
@@ -22,7 +23,7 @@ div.site-mobile-menu {
 
   div.site-mobile-menu-container {
     margin: 64px 0 0;
-    min-height: calc(100vh - 366px);
+    min-height: calc(100vh - 396px);
 
     @media screen and (max-height: 610px) {
       margin: 40px 0 0;
@@ -77,19 +78,6 @@ div.site-mobile-menu {
       width: 100%;
       margin: 16px auto 0px;
       max-width: 320px;
-    }
-
-    div.no-credit-card {
-      width: 100%;
-      text-align: center;
-      margin: 16px auto 0;
-      @include avenir_R();
-      font-size: 14px;
-      color: $ui_grey;
-
-      span.dot {
-        font-size: 10px;
-      }
     }
   }
 }

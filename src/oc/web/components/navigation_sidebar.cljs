@@ -4,14 +4,18 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.lib.chat :as chat]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.chat :as chat]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.nux :as nux-actions]
+            [oc.web.components.ui.menu :as menu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.nux :as nux-actions]
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [goog.events :as events]
             [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]))
@@ -19,15 +23,15 @@
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
-(def sidebar-top-margin 84)
+(def sidebar-top-margin 90)
 
 (defn save-content-height [s]
   (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
-    (let [height (.height (js/$ navigation-sidebar-content))]
+    (let [height (+ (.height (js/$ navigation-sidebar-content)) 32)]
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height))))
   (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
-    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 86)]
+    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 8)]
       (when (not= footer-height @(::footer-height s))
         (reset! (::footer-height s) footer-height)))))
 
@@ -51,10 +55,12 @@
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
+                                (drv/drv :qsg)
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :show-section-add)
                                 (drv/drv :change-cache-data)
+                                (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
@@ -88,11 +94,13 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-cache-data)
+        current-user-data (drv/react s :current-user-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
-        is-all-posts (or (= (router/current-board-slug) "all-posts") (:from-all-posts @router/path))
+        sorted-boards (sort-boards boards)
+        is-all-posts (= (router/current-board-slug) "all-posts")
         is-must-see (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
@@ -102,25 +110,38 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
+        is-admin-or-author? (utils/is-admin-or-author? org-data)
         show-invite-people (and org-slug
-                                (utils/is-admin-or-author? org-data))
+                                is-admin-or-author?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
-                            (< @(::content-height s)
-                             (- @(::window-height s) sidebar-top-margin @(::footer-height s))))
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+                            (not (neg?
+                             (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        show-reminders? (utils/link-for (:links org-data) "reminders")
+        qsg-data (drv/react s :qsg)
+        showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar})
-       :style {:left (when-not is-mobile?
-                      (str (/ (- @(::window-width s) 952) 2) "px"))}}
-      [:div.mobile-board-name-container
-        {:on-click #(nav-actions/mobile-nav-sidebar)}
-        [:div.board-name
-          (cond
-            is-all-posts "All posts"
-            is-drafts-board "Drafts"
-            is-must-see "Must see"
-            :else (:name board-data))]]
+      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
+                                :navigation-sidebar-overflow (and (not is-mobile?)
+                                                                  (not is-tall-enough?))})
+       :style {:left (when (and (not is-mobile?)
+                                is-tall-enough?)
+                      (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
+               :overflow (when (= (:step qsg-data) :add-section-1)
+                           "visible")}}
+      [:div.mobile-header-container
+        [:button.mlb-reset.mobile-header-close
+          {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+        (orgs-dropdown)
+        [:button.btn-reset.mobile-menu.group
+          {:on-click #(do
+                       (when is-mobile?
+                         (dis/dispatch! [:input [:user-settings] nil])
+                         (dis/dispatch! [:input [:org-settings] nil]))
+                       (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                       (menu/mobile-menu-toggle))}
+          (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts
@@ -169,25 +190,30 @@
               [:span
                 "SECTIONS"]
               (when create-link
-                [:button.left-navigation-sidebar-top-title-button.btn-reset
+                [:button.left-navigation-sidebar-top-title-button.btn-reset.qsg-add-section-1
                   {:on-click #(nav-actions/show-section-add)
+                   :class (when (= (:step qsg-data) :add-section-1) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}])]])
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                  (when (= (:step qsg-data) :add-section-1)
+                    (qsg-breadcrumb qsg-data))])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
-            (for [board (sort-boards boards)
+            (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
                         is-current-board (= (router/current-board-slug) (:slug board))
                         board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
-                {:class (when (and (not is-all-posts) is-current-board) "item-selected")
+                {:class (utils/class-set {:item-selected (and (not is-all-posts)
+                                                              is-current-board)})
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
-                 :on-click #(nav-actions/nav-to-url! % board-url)}
+                 :on-click #(do
+                              (nav-actions/nav-to-url! % board-url))}
                 (when (= (:access board) "public")
                   [:div.public
                     {:class (when is-current-board "selected")}])
@@ -205,13 +231,39 @@
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
-         :class (utils/class-set {:navigation-sidebar-overflow is-tall-enough?})}
+         :class (utils/class-set {:push-to-bottom is-tall-enough?})}
+        (when show-reminders?
+          [:button.mlb-reset.bottom-nav-bt
+            {:on-click #(do
+                          (nav-actions/show-reminders)
+                          (utils/after 500 utils/remove-tooltips))
+             :title "Set reminders to update your team on time"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+            [:div.bottom-nav-icon.reminders-icon]
+            [:span "Reminders"]])
         (when show-invite-people
-          [:button.mlb-reset.invite-people-btn
-            {:on-click #(nav-actions/show-invite)}
+          [:button.mlb-reset.bottom-nav-bt
+            {:on-click #(do
+                          (nav-actions/show-invite)
+                          (utils/after 500 utils/remove-tooltips))
+             :title "Invite teammates with email or Slack"
+             :data-toggle (when-not is-mobile? "tooltip")
+             :data-placement "top"
+             :data-container "body"
+             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
             [:div.bottom-nav-icon.invite-people-icon]
             [:span "Invite team"]])
-        [:button.mlb-reset.invite-people-btn
-          {:on-click #(chat/chat-click 42861)}
+        [:button.mlb-reset.bottom-nav-bt
+          {:on-click #(do
+                        (chat/chat-click 42861)
+                        (utils/after 500 utils/remove-tooltips))
+           :title "Have a question for Carrot? Chat with us."
+           :data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
           [:div.bottom-nav-icon.support-icon]
           [:span "Get support"]]]]))

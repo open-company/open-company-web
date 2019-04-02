@@ -22,7 +22,6 @@ div.dashboard-layout {
     margin: 0 auto;
     width: auto;
     width: 100%;
-    position: relative;
     max-width: 952px;
 
     @include mobile(){
@@ -37,34 +36,7 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: #ECECEC;
-      }
-
-      &.all-posts-container {
-        width: #{$board_container_width}px;
-
-        @include mobile() {
-          width: 100%;
-        }
-
-        div.board-name-container {
-          
-          div.board-name {
-
-            div.board-name-with-icon {
-              max-width: 350px;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: nowrap;
-              width: auto;
-
-              @include mobile() {
-                margin: 0 auto;
-                text-align: center;
-              }
-            }
-          }
-        }
+        background-color: $ultra_light_grey;
       }
 
       @include mobile() {
@@ -74,8 +46,8 @@ div.dashboard-layout {
       }
 
       div.add-post-tooltip-container {
-        border: 1px dashed $carrot_gold;
-        background-color: $opac_yellow;
+        border: 1px solid rgba($carrot_gold, 0.5);
+        background-color: #FDF6E4;
         border-radius: 6px;
         padding: 34px 40px;
         margin: 8px 0px;
@@ -100,7 +72,7 @@ div.dashboard-layout {
         }
 
         div.add-post-tooltips {
-          width: 334px;
+          width: 374px;
           float: left;
 
           &.second-user {
@@ -146,16 +118,29 @@ div.dashboard-layout {
 
             button.add-post-bt {
               display: block;
-              background-color: $carrot_orange_2;
+              background-color: $carrot_green;
               height: 40px;
-              width: 192px;
-              border-radius: 100px;
+              border-radius: 6px;
               padding: 0;
               margin: 16px 0 0;
               color: white;
               @include avenir_H();
               font-size: 16px;
-              line-height: 20px;
+              line-height: 27px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 0 24px;
+
+              span.add-post-bt-pen {
+                width: 14px;
+                height: 14px;
+                background-size: 14px 14px;
+                background-image: cdnUrl("/img/ML/add_post_tooltip_pen.svg");
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-right: 8px;
+              }
 
               @include tablet() {
                 width: 100%;
@@ -195,126 +180,12 @@ div.dashboard-layout {
         }
       }
 
-      div.post-added-tooltip-container {
-        border: 1px dashed $carrot_gold;
-        background-color: $opac_yellow;
-        border-radius: 6px;
-        padding: 34px 40px;
-        margin: 8px 0px;
-        position: relative;
-
-        @include tablet() {
-          width: calc(100% - 48px);
-          margin: 16px 24px;
-          padding: 24px 24px;
-        }
-
-        div.post-added-tooltip-box-mobile {
-            display: none;
-
-            @include mobile() {
-              display: block;
-              width: 99px;
-              height: 80px;
-              @include image-2x("/img/ML/post_added_tooltip_box");
-              background-size: 99px 120px;
-              background-repeat: no-repeat;
-              background-position: center;
-              margin: 0 auto 24px;
-            }
-          }
-
-        button.post-added-tooltip-dismiss {
-          position: absolute;
-          top: 16px;
-          right: 16px;
-          width: 32px;
-          height: 32px;
-          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
-          background-size: 32px 32px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-
-        div.post-added-tooltips {
-          width: 464px;
-          float: left;
-
-          @include tablet() {
-            width: 100%;
-          }
-
-          div.post-added-tooltip-title {
-            @include avenir_H();
-            font-size: 22px;
-            color: $deep_navy;
-            line-height: 20px;
-          }
-
-          div.post-added-tooltip {
-            @include avenir_R();
-            font-size: 16px;
-            color: $deep_navy;
-            line-height: 20px;
-            margin-top: 8px;
-
-            button.post-added-bt {
-              display: inline;
-              background-color: transparent;
-              padding: 0;
-              margin: 0;
-              color: $carrot_green;
-              @include avenir_H();
-              font-size: 16px;
-              line-height: 20px;
-            }
-
-            @include tablet() {
-              float: unset;
-              margin: 8px auto 0px;
-              width: 100%;
-            }
-          }
-
-          div.post-added-tooltip-box {
-            position: absolute;
-            top: 50%;
-            margin-top: -40px;
-            right: 85px;
-            width: 99px;
-            height: 80px;
-            @include image-2x("/img/ML/post_added_tooltip_box");
-            background-size: 99px 80px;
-            background-repeat: no-repeat;
-            background-position: center;
-
-            @include tablet(){
-              display: none;
-            }
-          }
-        }
-      }
-
       div.board-name-container {
         padding: 0px 0px 8px;
         position: relative;
 
         @include mobile() {
-          width: 100%;
-          height: 48px;
-          position: relative;
-          z-index: #{$navbar_zindex - 1};
-          top: 0px;
-          left: 0px;
-          background-color: white;
-          box-shadow: none;
-          border-bottom: 1px solid #ECECEC;
-          padding: 15px;
-          text-align: center;
-
-          &.sticky {
-            position: absolute;
-          }
+          display: none;
         }
           
         div.board-name {
@@ -416,49 +287,116 @@ div.dashboard-layout {
             }
           }
 
-          button.board-settings-bt {
-            background-image: cdnUrl("/img/ML/section_settings_gear.svg");
-            background-size: 16px 16px;
-            background-repeat: no-repeat;
-            background-position: 16px center;
-            background-color: transparent;
-            border-radius: 10px;
-            width: 40px;
-            height: 40px;
-            opacity: 0.8;
-            padding: 0 0 0 16px;
-            margin: 0 0 0 16px;
+          div.board-settings-container {
             float: left;
             position: relative;
 
-            &:before {
-              content: "";
-              position: absolute;
-              left: 0;
-              top: 12px;
-              width: 1px;
-              height: 16px;
-              background-color: $light_ui_grey;
+            button.board-settings-bt {
+              background-image: cdnUrl("/img/ML/section_settings_gear.svg");
+              background-size: 16px 16px;
+              background-repeat: no-repeat;
+              background-position: 16px center;
+              background-color: transparent;
+              border-radius: 10px;
+              width: 40px;
+              height: 40px;
+              opacity: 0.8;
+              padding: 0 0 0 16px;
+              margin: 0 0 0 16px;
+              position: relative;
+
+              &:before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 12px;
+                width: 1px;
+                height: 16px;
+                background-color: $light_ui_grey;
+
+                @include mobile(){
+                  display: none;
+                }
+              }
 
               @include mobile(){
+                margin-right: -30px;
+                margin-left: 8px;
+                padding: 0px;
+                float: unset;
+                width: 20px;
+                height: 20px;
+
+                // Remove to show settings button on mobile
                 display: none;
+              }
+
+              &:hover {
+                opacity: 1;
               }
             }
 
-            @include mobile(){
-              margin-right: -30px;
-              margin-left: 8px;
-              padding: 0px;
-              float: unset;
-              width: 20px;
-              height: 20px;
+            div.section-settings-tooltip-container {
+              border: 1px solid rgba($carrot_gold, 0.5);
+              background-color: #FDF6E4;
+              box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+              width: 300px;
+              border-radius: 6px;
+              padding: 24px 20px;
+              margin: 0 0 0 12px;
+              position: absolute;
+              left: 52px;
+              top: -26px;
+              text-align: center;
+              z-index: 5;
 
-              // Remove to show settings button on mobile
-              display: none;
-            }
+              div.section-settings-tooltip-top-arrow {
+                position: absolute;
+                top: 38px;
+                left: -18px;
+                width: 24px;
+                height: 12px;
+                transform: rotate(-90deg);
+                background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
+                background-position: center;
+                background-size: 24px 12px;
+                background-repeat: no-repeat;
+              }
 
-            &:hover {
-              opacity: 1;
+              button.section-settings-tooltip-dismiss {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 32px;
+                height: 32px;
+                background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
+                background-size: 8px 8px;
+                background-position: center;
+                background-repeat: no-repeat;
+              }
+
+              div.section-settings-tooltips {
+
+                div.section-settings-tooltip {
+                  @include avenir_R();
+                  font-size: 16px;
+                  color: $deep_navy;
+                  line-height: 20px;
+                }
+
+                button.section-settings-bt {
+                  width: auto;
+                  margin-top: 16px;
+                  height: 32px;
+                  width: 96px;
+                  background-color: transparent;
+                  border-radius: 6px;
+                  color: white;
+                  background-color: $carrot_green;
+                  @include avenir_H();
+                  font-size: 16px;
+                }
+              }
             }
           }
 
@@ -571,7 +509,7 @@ div.dashboard-layout {
             height: 42px;
             background-color: $carrot_orange_light;
             color: $carrot_orange;
-            border-radius: 100px;
+            border-radius: 6px;
             padding: 8px 24px;
             margin-top: -3px;
             border: 2px solid transparent;
@@ -695,11 +633,18 @@ div.dashboard-layout {
     }
 
     div.new-post-floating-dropdown-container {
-      position: relative;
       position: absolute;
       position: fixed;
       bottom: 24px;
       right: 24px;
+
+      @include mobile() {
+        display: none;
+      }
+
+      &.showing-qsg {
+        right: 244px;
+      }
 
       button.add-to-board-floating-button {
         width: 56px;
@@ -710,6 +655,10 @@ div.dashboard-layout {
         opacity: 1;
         padding: 0px;
         margin: 0px;
+
+        div.qsg-breadcrumb.create-post-1 {
+          top: 12px;
+        }
 
         &:hover, &.active {
           background-color: #FF7C6C;

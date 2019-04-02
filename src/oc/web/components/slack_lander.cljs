@@ -37,6 +37,8 @@
             [:div.main-animation-container
               [:img.main-animation
                 {:src (utils/cdn "/img/ML/slack_screenshot.png")
-                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]]]]
+                 :src-set (str (utils/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
+
+            shared-misc/testimonials-logos-line]]]
 
       (site-footer)]))

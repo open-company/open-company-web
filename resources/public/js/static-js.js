@@ -93,6 +93,39 @@ if (jwt) {
   }
 }
 
+function OCWebSetupMarketingSiteJS(){
+  var switchFn = function() {
+    $("button.keep-aligned-section-next-bt").toggleClass("active");
+    var $switchContainer = $("div.slack-email-switch-container");
+    $switchContainer.toggleClass("show-slack");
+    $switchContainer.toggleClass("show-email");
+    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1");
+    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1-alt");
+  };
+  $("button.slack-email-switch-bt").on("click", function(){
+    var $switchContainer = $("div.slack-email-switch-container");
+    if ($(this).hasClass("email-bt") && $switchContainer.hasClass("show-email")) {
+      return;
+    }
+    if ($(this).hasClass("slack-bt") && $switchContainer.hasClass("show-slack")) {
+      return;
+    }
+    switchFn();
+  })
+  $("button.keep-aligned-section-next-bt").on("click", switchFn);
+
+  $("div.pricing-toggle").on("click", function(){
+    var $teamColumn = $("div.pricing-column.team-column");
+    if ($teamColumn.hasClass("monthly")) {
+      $teamColumn.removeClass("monthly");
+      $teamColumn.addClass("annual");
+    } else {
+      $teamColumn.removeClass("annual");
+      $teamColumn.addClass("monthly");
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function(_) {
 
   if ($("#youtube-player").length > 0) {
@@ -115,6 +148,15 @@ document.addEventListener("DOMContentLoaded", function(_) {
       }
     });
   }
+
+  OCWebSetupMarketingSiteJS();
+
+  $(window).on("click", function(e){
+    $target = $(e.target);
+    if (!$target.hasClass("tear-price-select") && !$target.parents(".tear-price-select").length) {
+      $("div.tear-price-select-container").removeClass("open");
+    }
+  });
 
   if (jwt) {
     $("#site-header-login-item").hide();
@@ -154,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
     var mobileSignupButton = $("#site-header-mobile-signup-item");
     mobileSignupButton.removeClass("start");
+    mobileSignupButton.addClass("go-to-digest-bt");
     mobileSignupButton.attr("href", your_board_url);
     mobileSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
 
@@ -169,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("div.home-page").removeClass("no-get-started-button");
     $("div.main.slack").removeClass("no-get-started-button");
     // link all get started button to signup with Slack
-    $("button.get-started-button").attr("onClick", "window.location = \"/sign-up\"");
+    $("button.get-started-action").attr("onClick", "window.location = \"/sign-up\"");
     $(".signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner login button
@@ -284,14 +327,27 @@ function OCStaticStartFixFixedPositioning(sel) {
   });
 }
 
+
+function OCStaticShowPHBanner(){
+  $(document.body).addClass("ph-banner");
+}
+
+function OCStaticHidePHBanner(){
+  $(document.body).removeClass("ph-banner");
+}
+
 var OCYTVideoPlayer = null,
-OCYTVideoFinished = false;
+OCYTVideoFinished = false,
+OCUTVScriptAdded = false;
 
 function OCYTVideoInit() {
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  if (!OCUTVScriptAdded) {
+    OCUTVScriptAdded = true;
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
 }
 
 function onYouTubeIframeAPIReady() {
@@ -301,10 +357,12 @@ function onYouTubeIframeAPIReady() {
     height: Math.min(winHeight, 608).toString(),
     width: Math.min(winWidth, 1080).toString(),
     videoId: 'dMWpnHxQMP4',
+    allowsInlineMediaPlayback: 'TRUE',
     allowfullscreen: 'true',
     playerVars: {
         showinfo: 0,
         rel: 0,
+        playsinline: 1,
         autoplay: 0
     },
     events: {
@@ -319,7 +377,7 @@ function OCYTVideoOnPlayerReady(event) {
 
 function OCStaticShowAnimationLightbox() {
   $(document.body).addClass('show-animation-lightbox no-scroll');
-  
+
   if (OCYTVideoFinished) {
     OCYTVideoPlayer.seekTo(0);
     OCYTVideoFinished = false;
@@ -334,15 +392,11 @@ function OCYTVideoOnPlayerStateChange(event){
   }
 }
 
-function OCStaticHideAnimationLightbox() {
+function OCStaticHideAnimationLightbox(e) {
   OCYTVideoPlayer.pauseVideo();
   $(document.body).removeClass('show-animation-lightbox no-scroll');
-}
-
-function OCStaticShowPHBanner(){
-  $(document.body).addClass("ph-banner");
-}
-
-function OCStaticHidePHBanner(){
-  $(document.body).removeClass("ph-banner");
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="4px" viewBox="0 0 18 4" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="FoC" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.5">
+        <g id="Variants" transform="translate(-740.000000, -350.000000)" fill="#898D93">
+            <g id="Group-14" transform="translate(132.000000, 322.000000)">
+                <g id="Group-26" transform="translate(608.000000, 24.000000)">
+                    <path d="M9,1 C7.8954305,1 7,0.1045695 7,-1 C7,-2.1045695 7.8954305,-3 9,-3 C10.1045695,-3 11,-2.1045695 11,-1 C11,0.1045695 10.1045695,1 9,1 Z M9,8 C7.8954305,8 7,7.1045695 7,6 C7,4.8954305 7.8954305,4 9,4 C10.1045695,4 11,4.8954305 11,6 C11,7.1045695 10.1045695,8 9,8 Z M9,15 C7.8954305,15 7,14.1045695 7,13 C7,11.8954305 7.8954305,11 9,11 C10.1045695,11 11,11.8954305 11,13 C11,14.1045695 10.1045695,15 9,15 Z" id="Combined-Shape" transform="translate(9.000000, 6.000000) rotate(90.000000) translate(-9.000000, -6.000000) "></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

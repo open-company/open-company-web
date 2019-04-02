@@ -50,6 +50,7 @@ $.after = function(){};
 $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
+$.datepicker = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -106,6 +107,20 @@ var OCWebForceRefreshToken = function(){};
 var OCWebPrintFilteredPostsData = function(){};
 var OCWebPrintPostsData = function(){};
 var OCWebPrintUserNotifications = function(){};
+var OCWebPrintRemindersData = function(){};
+var OCWebPrintReminderEditData = function(){};
+var OCWebPrintQSGData = function(){};
+// Cljs utility externs
+var OCWebUtils = {};
+OCWebUtils.app_state = function(){};
+OCWebUtils.deref = function(){};
+OCWebUtils.keyword = function(){};
+OCWebUtils.count = function(){};
+OCWebUtils.get = function(){};
+OCWebUtils.filter = function(){};
+OCWebUtils.map = function(){};
+OCWebUtils.clj__GT_js = function(){};
+OCWebUtils.js__GT_clj = function(){};
 // Moment
 var moment = {};
 moment.tz = {};
@@ -137,6 +152,8 @@ CarrotGA.NULL_VALUE = {};
 CarrotGA.clientid = '';
 var init_fullstory = function(){};
 var FS = function(){};
+FS.setUserVars = function(){};
+FS.getCurrentSessionURL = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -169,11 +186,7 @@ drift.api.startInteraction = function(){};
 drift.identify = function(){};
 drift.track = function(){};
 // Homepage animation
+var OCWebSetupMarketingSiteJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
-// Logrocket
-var LogRocket = function(){};
-LogRocket.init = function(){};
-LogRocket.getSessionURL = function(){};
-LogRocket.sessionURL = {};
-LogRocket.identify = function(){};
+var OCYTVideoInit = function(){};

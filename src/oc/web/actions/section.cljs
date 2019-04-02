@@ -7,8 +7,8 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
-            [oc.web.lib.ws-change-client :as ws-cc]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.change-client :as ws-cc]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn is-currently-shown? [section]
@@ -19,7 +19,7 @@
   ;; only watch the currently visible board.
   (ws-ic/board-unwatch (fn [rep]
     (timbre/debug rep "Watching on socket " (:uuid section))
-        (ws-ic/board-watch (:uuid section)))))
+        (ws-ic/boards-watch [(:uuid section)]))))
 
 (defn section-seen
   [uuid]
@@ -88,7 +88,7 @@
     (fn [status body success]
       (when success (section-get-finish (json->cljs body))))))
 
-(defn section-delete [section-slug]
+(defn section-delete [section-slug & callback]
   (let [section-data (dispatcher/board-data (router/current-org-slug) section-slug)
         delete-section-link (utils/link-for (:links section-data) "delete")]
     (api/delete-board delete-section-link section-slug (fn [status success body]
@@ -97,6 +97,8 @@
               last-used-section-slug (au/last-used-section)]
           (when (= last-used-section-slug section-slug)
             (au/save-last-used-section nil))
+          (when (fn? callback)
+           (callback section-slug))
           (if (= section-slug (router/current-board-slug))
             (do
               (router/nav! (oc-urls/all-posts org-slug))
@@ -115,12 +117,13 @@
 
 (defn section-name-error [status]
   ;; Board name exists or too short
-  (dispatcher/dispatch!
-   [:input
-    [:section-editing :section-name-error]
-    (cond
-      (= status 409) "Section name already exists or isn't allowed"
-      :else "An error occurred, please retry.")]))
+  (dispatcher/dispatch! [:update [:section-editing]
+   #(-> %
+     (assoc :section-name-error
+      (cond
+        (= status 409) "Section name already exists or isn't allowed"
+        :else "An error occurred, please retry."))
+     (dissoc :loading))]))
 
 (defn section-save
   ([section-data note] (section-save section-data note nil))
@@ -240,6 +243,7 @@
   (if (< (count section-name) min-section-name-length)
     (dispatcher/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
     (let [next-section-editing (merge section-editing {:slug utils/default-section-slug
+                                                       :loading true
                                                        :name section-name})]
       (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
       (success-cb next-section-editing))))

@@ -1,4 +1,5 @@
 (ns oc.web.actions.user
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -7,59 +8,19 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.local_settings :as ls]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
-            [oc.web.lib.logrocket :as logrocket]
+            [oc.web.lib.fullstory :as fullstory]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
+            [oc.web.actions.jwt :as jwt-actions]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
-            [oc.web.lib.ws-notify-client :as ws-nc]
+            [oc.web.ws.notify-client :as ws-nc]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
-
-;; Logout
-
-(defn logout
-  ([]
-     (logout oc-urls/home))
-  ([location]
-     (cook/remove-cookie! :jwt)
-     (router/redirect! location)
-     (dis/dispatch! [:logout])))
-
-;; JWT
-
-(defn update-jwt-cookie [jwt]
-  (cook/set-cookie! :jwt jwt (* 60 60 24 60) "/" ls/jwt-cookie-domain ls/jwt-cookie-secure))
-
-(defn dispatch-jwt []
-  (when (and (cook/get-cookie :show-login-overlay)
-             (not= (cook/get-cookie :show-login-overlay) "collect-name-password")
-             (not= (cook/get-cookie :show-login-overlay) "collect-password"))
-    (cook/remove-cookie! :show-login-overlay))
-  (let [jwt-contents (jwt/get-contents)
-        email (:email jwt-contents)]
-    (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
-    (when (and (exists? js/drift)
-               email)
-      (utils/after 1 #(.identify js/drift (:user-id jwt-contents)
-                        (clj->js {:nickname (:name jwt-contents)
-                                  :email email}))))
-    (when jwt-contents
-      (logrocket/identify))))
-
-(defn update-jwt [jbody]
-  (timbre/info jbody)
-  (when jbody
-    (update-jwt-cookie jbody)
-    (dispatch-jwt)))
-
-(defn jwt-refresh
-  ([]
-    (api/jwt-refresh update-jwt logout))
-  ([success-cb]
-    (api/jwt-refresh #(do (update-jwt %) (success-cb)) logout)))
 
 ;;User walls
 (defn- check-user-walls
@@ -100,10 +61,10 @@
   (let [collection (:collection body)]
     (if success
       (let [orgs (:items collection)]
-        (when (fn? callback)
-          (callback orgs collection))
         (dis/dispatch! [:entry-point orgs collection])
-        (check-user-walls))
+        (check-user-walls)
+        (when (fn? callback)
+          (callback orgs collection)))
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
@@ -130,11 +91,33 @@
                    (if (pos? (count orgs))
                      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
                      (cook/remove-cookie! (router/last-org-cookie)))
-                   (router/redirect-404!)))))
+                   (routing-actions/maybe-404)))))
            (when (and (jwt/jwt)
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
              (router/nav! (oc-urls/org (:slug (first orgs)))))))))))
+
+(defn save-login-redirect [& [url]]
+  (let [url (or url (.. js/window -location -href))]
+    (when url
+      (cook/set-cookie! router/login-redirect-cookie url))))
+
+(defn maybe-save-login-redirect []
+  (let [url-pathname (.. js/window -location -pathname)]
+    (cond
+      (and (= url-pathname oc-urls/login-wall)
+           (:login-redirect (:query-params @dis/app-state)))
+      (save-login-redirect (:login-redirect (:query-params @dis/app-state)))
+      (not= url-pathname oc-urls/login)
+      (save-login-redirect))))
+
+(defn login-redirect []
+  (let [redirect-url (cook/get-cookie router/login-redirect-cookie)
+        orgs (dis/orgs-data)]
+    (cook/remove-cookie! router/login-redirect-cookie)
+    (if redirect-url
+      (router/redirect! redirect-url)
+      (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))
 
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point (:org @router/path)
@@ -143,7 +126,7 @@
         (fn [orgs collection]
           (if (zero? (count orgs))
             (router/nav! oc-urls/sign-up-profile)
-            (router/nav! (oc-urls/org (:slug (utils/get-default-org orgs)))))))))))
+            (login-redirect))))))))
 
 ;; Login
 (defn login-with-email-finish
@@ -153,12 +136,9 @@
       (if (empty? body)
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
-          (update-jwt-cookie body)
+          (jwt-actions/update-jwt-cookie body)
           (api/get-entry-point (:org @router/path)
-           (fn [success body] (entry-point-get-finished success body
-             (fn [orgs collection]
-               (when (pos? (count orgs))
-                 (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))))))
+           (fn [success body] (entry-point-get-finished success body login-redirect)))))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -189,11 +169,22 @@
     (api/refresh-slack-user refresh-link
      (fn [status body success]
       (if success
-        (update-jwt body)
+        (jwt-actions/update-jwt body)
         (router/redirect! oc-urls/logout))))))
 
 (defn show-login [login-type]
   (dis/dispatch! [:login-overlay-show login-type]))
+
+;; User Timezone preset
+
+(defn- patch-timezone-if-needed [user-map]
+  (when-let* [_notz (clojure.string/blank? (:timezone user-map))
+              user-profile-link (utils/link-for (:links user-map) "partial-update" "PATCH")
+              guessed-timezone (.. js/moment -tz guess)]
+    (api/patch-user user-profile-link {:timezone guessed-timezone}
+     (fn [status body success]
+       (when success
+        (dis/dispatch! [:user-data (json->cljs body)]))))))
 
 ;; Auth
 
@@ -205,8 +196,10 @@
       ;; auth settings loaded
       (when-let [user-link (utils/link-for (:links body) "user" "GET")]
         (api/get-user user-link (fn [data]
-          (dis/dispatch! [:user-data (json->cljs data)])
-          (utils/after 100 nux-actions/check-nux))))
+          (let [user-map (json->cljs data)]
+            (dis/dispatch! [:user-data user-map])
+            (utils/after 100 nux-actions/check-nux)
+            (patch-timezone-if-needed user-map)))))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -218,7 +211,7 @@
 ;;Invitation
 (defn invitation-confirmed [status body success]
  (when success
-    (update-jwt body)
+    (jwt-actions/update-jwt body)
     (when (= status 201)
       (nux-actions/new-user-registered "email")
       (api/get-entry-point (:org @router/path) entry-point-get-finished)
@@ -250,7 +243,7 @@
   [token-type success body status]
   (if success
     (do
-      (update-jwt body)
+      (jwt-actions/update-jwt body)
       (when (and (not= token-type :password-reset)
                  (empty? (jwt/get-key :name)))
         (nux-actions/new-user-registered "email"))
@@ -293,7 +286,7 @@
                (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
-      (update-jwt-cookie jwt)
+      (jwt-actions/update-jwt-cookie jwt)
       (nux-actions/new-user-registered "email")
       (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
       (api/get-entry-point (:org @router/path) entry-point-get-finished)
@@ -313,6 +306,7 @@
      (or (:lastname signup-data) "")
      (:email signup-data)
      (:pswd signup-data)
+     (.. js/moment -tz guess)
      (partial signup-with-email-callback (:email signup-data)))
     (dis/dispatch! [:signup-with-email])))
 
@@ -362,9 +356,11 @@
                               (utils/valid-email? new-email))
                        (assoc with-pswd :email new-email)
                        (assoc with-pswd :email (:email current-user-data)))
+          timezone (or (:timezone edit-user-profile) (:timezone current-user-data) (.. js/moment -tz guess))
+          with-timezone (assoc with-email :timezone timezone)
           user-profile-link (utils/link-for (:links current-user-data) "partial-update" "PATCH")]
       (dis/dispatch! [:user-profile-save])
-      (api/patch-user user-profile-link with-email
+      (api/patch-user user-profile-link with-timezone
        (fn [status body success]
          (if (= status 422)
            (dis/dispatch! [:user-profile-update/failed])
@@ -375,9 +371,11 @@
                (dis/dispatch! [:input [:ap-loading] true]))
              (utils/after 100
               (fn []
-                (jwt-refresh
+                (jwt-actions/jwt-refresh
                  #(if org-editing
-                    (org-actions/create-or-update-org org-editing)
+                    (do
+                      (org-actions/create-or-update-org org-editing)
+                      (qsg-actions/first-user-qsg))
                     (utils/after 2000
                       (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
@@ -398,7 +396,7 @@
              :id :user-avatar-upload-failed
              :dismiss true}))
          (do
-           (utils/after 1000 jwt-refresh)
+           (utils/after 1000 jwt-actions/jwt-refresh)
            (dis/dispatch! [:user-data (json->cljs body)])
            (notification-actions/show-notification
             {:title "Image update succeeded"
@@ -408,6 +406,20 @@
 
 (defn user-profile-reset []
   (dis/dispatch! [:user-profile-reset]))
+
+(defn resend-verification-email []
+  (let [user-data (dis/current-user-data)
+        resend-link (utils/link-for (:links user-data) "resend-verification" "POST")]
+    (when resend-link
+      (api/resend-verification-email resend-link
+       (fn [success]
+         (notification-actions/show-notification
+          {:title (if success "Verification email re-sent!" "An error occurred")
+           :description (when-not success "Please try again.")
+           :expire 5
+           :primary-bt-title "OK"
+           :primary-bt-dismiss true
+           :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
 
 ;; Initial loading
 
@@ -474,6 +486,6 @@
 ;; Debug
 
 (defn force-jwt-refresh []
-  (when (jwt/jwt) (jwt-refresh)))
+  (when (jwt/jwt) (jwt-actions/jwt-refresh)))
 
 (set! (.-OCWebForceRefreshToken js/window) force-jwt-refresh)

@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.lib.ws-interaction-client :as ws-ic]
+            [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.activity :as activity-actions]))
 
 (defn react-from-picker [activity-data emoji]
@@ -40,6 +40,7 @@
     (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
     (api/toggle-reaction reaction-link
       (fn [{:keys [status success body]}]
+        (activity-actions/get-entry activity-data)
         (dis/dispatch!
          [:activity-reaction-toggle/finish
           activity-data

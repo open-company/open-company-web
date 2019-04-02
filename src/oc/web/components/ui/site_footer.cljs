@@ -15,7 +15,7 @@
 (rum/defcs site-footer 
   [s]
   [:footer.navbar.navbar-default.navbar-bottom
-    {:class (when (utils/in? (:route @router/path) "slack-lander") "light-background")}
+    {:class (utils/class-set {:no-border (utils/in? (:route @router/path) "slack-lander")})}
     [:div.container-fluid.group
       [:div.right-column.group
 
@@ -49,7 +49,7 @@
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-communication-copy
-          "Leadership communication for growing and distributed teams."]
+          "Leadership communication for fast-growing and remote teams."]
         (when-not (jwt/jwt)
           [:div.footer-small-links
             [:a
@@ -62,7 +62,7 @@
                :on-click #(do (utils/event-stop %) (router/nav! oc-urls/login))}
               "Login"]])
         [:div.copyright
-          "© 2018 Carrot"]
+          "© 2015-2019 Carrot"]
         [:div.tos-and-pp
           [:a {:href oc-urls/privacy}
            "Privacy"]

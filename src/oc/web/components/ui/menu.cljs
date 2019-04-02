@@ -10,11 +10,16 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.stores.user :as user-store]
+            [oc.web.actions.jwt :as jwt-actions]
+            [oc.web.lib.whats-new :as whats-new]
+            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn mobile-menu-toggle []
@@ -27,10 +32,11 @@
 (defn logout-click [e]
   (.preventDefault e)
   (mobile-menu-toggle)
-  (user-actions/logout))
+  (jwt-actions/logout))
 
 (defn user-profile-click [e]
   (.preventDefault e)
+  (qsg-actions/next-profile-photo-trail)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
     (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
@@ -41,24 +47,41 @@
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
-(defn team-settings-click [e]
+(defn team-settings-click [e qsg-data]
   (.preventDefault e)
+  (when (= (:step qsg-data) :company-logo-2)
+    (qsg-actions/next-company-logo-trail))
   (mobile-menu-toggle)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
-(defn manage-team-click [e]
+(defn manage-team-click [e qsg-data]
   (.preventDefault e)
-  (mobile-menu-toggle)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
+  (let [invite-team-step? (= (:step qsg-data) :invite-team-2)]
+    (when invite-team-step?
+      (qsg-actions/finish-invite-team-trail))
+    (mobile-menu-toggle)
+    (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal (if invite-team-step? :invite :team)))))
 
 (defn sign-in-sign-up-click [e]
   (mobile-menu-toggle)
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
+(defn show-qsg-click [e]
+  (mobile-menu-toggle)
+  (.preventDefault e)
+  (qsg-actions/show-qsg-view))
+
 (defn whats-new-click [e]
   (.preventDefault e)
-  (.show js/Headway))
+  (whats-new/show))
+
+(defn reminders-click [e qsg-data]
+  (.preventDefault e)
+  (when (= (:step qsg-data) :create-reminder-2)
+    (qsg-actions/finish-create-reminder-trail))
+  (mobile-menu-toggle)
+  (nav-actions/show-reminders))
 
 (defn billing-click [e]
   (.preventDefault e)
@@ -66,23 +89,29 @@
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :billing)))
 
 (rum/defcs menu < rum/reactive
-                  (drv/drv :menu-data)
+                  (drv/drv :navbar-data)
+                  (drv/drv :qsg)
+                  {:did-mount (fn [s]
+                   (whats-new/init ".whats-new")
+                   s)}
   [s]
-  (let [{:keys [mobile-menu-open org-data current-user-data team-data]} (drv/react s :menu-data)
+  (let [{:keys [mobile-menu-open org-data team-data current-user-data]} (drv/react s :navbar-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
-        headway-config (clj->js {
-          :selector ".whats-new"
-          :account "xGYD6J"
-          :position {:y "bottom"}
-          :translations {:title "What's New"
-                         :footer "👉 Show me more new stuff"}})]
-    (.init js/Headway headway-config)
+        qsg-data (drv/react s :qsg)
+        show-reminders? (utils/link-for (:links org-data) "reminders")]
     [:div.menu
       {:class (utils/class-set {:mobile-menu-open (and (responsive/is-mobile-size?)
                                                        mobile-menu-open)})}
       [:div.menu-header
+        [:button.mlb-reset.mobile-close-bt
+          {:on-click #(do
+                       (mobile-menu-toggle)
+                       (nav-actions/mobile-nav-sidebar))}]
         (user-avatar-image current-user-data)
+        [:div.mobile-user-name
+          {:class utils/hide-class}
+          (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
         [:div.user-name
           {:class utils/hide-class}
           (str "Hi " (jwt/get-key :first-name) "!")]
@@ -95,17 +124,27 @@
             :viewer
             "Viewer")]]
       (when (jwt/jwt)
-        [:a
+        [:a.qsg-profile-photo-2
           {:href "#"
            :on-click user-profile-click}
+          (when (= (:step qsg-data) :profile-photo-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.personal-profile
-            "Personal Profile"]])
+            "My Profile"]])
       (when (jwt/jwt)
         [:a
           {:href "#"
            :on-click notifications-settings-click}
           [:div.oc-menu-item.notifications-settings
             "Notification Settings"]])
+      (when show-reminders?
+        [:a.qsg-create-reminder-2
+          {:href "#"
+           :on-click #(reminders-click % qsg-data)}
+          (when (= (:step qsg-data) :create-reminder-2)
+            (qsg-breadcrumb qsg-data))
+          [:div.oc-menu-item.reminders
+            "Reminders"]])
       [:div.oc-menu-separator]
       (when org-data
         [:div.org-item
@@ -114,21 +153,24 @@
           [:div.org-url (str ls/web-server "/" (:slug org-data))]])
       (when (and (not is-mobile?)
                  (router/current-org-slug)
-                 (or (= user-role :admin)
-                     (= user-role :author)))
-        [:a
+                 (= user-role :admin))
+        [:a.qsg-invite-team-2
           {:href "#"
-           :on-click manage-team-click}
+           :on-click #(manage-team-click % qsg-data)}
+          (when (= (:step qsg-data) :invite-team-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.manage-team
             "Manage Team"]])
       (when (and (not is-mobile?)
                  (= user-role :admin)
                  (router/current-org-slug))
-        [:a
+        [:a.qsg-company-logo-2
           {:href "#"
-           :on-click team-settings-click}
+           :on-click #(team-settings-click % qsg-data)}
+          (when (= (:step qsg-data) :company-logo-2)
+            (qsg-breadcrumb qsg-data))
           [:div.oc-menu-item.digest-settings
-            "Digest Settings"]])
+            "Settings"]])
       (when (and (not is-mobile?)
                  ls/billing-enabled
                  (= user-role :admin)
@@ -138,28 +180,30 @@
            :on-click billing-click}
           [:div.oc-menu-item.billing
             "Billing"]])
-      [:a
+      [:a.whats-new-link
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
            :target "_blank"}
           {:on-click whats-new-click})
         [:div.oc-menu-item.whats-new
           "What’s New"]]
+      (when (and (not is-mobile?)
+                 (jwt/jwt)
+                 (= user-role :admin))
+        [:a
+          {:on-click show-qsg-click}
+          [:div.oc-menu-item.show-qsg
+            "Quickstart Guide"]])
       [:a
         {:on-click #(chat/chat-click 42861)}
         [:div.oc-menu-item.support
           "Support"]]
-      ; (when (and (router/current-org-slug)
-      ;            (= user-role :admin))
-      ;   [:div.oc-menu-item
-      ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
       ;; Show billing stuff only to admins and if feature is enabled for env
       (when (and ls/billing-enabled
                  (= user-role :admin)
                  (not is-mobile?))
         (case
-          ; (:exceeded-users team-data)
-          true
+          (:exceeded-users team-data)
           [:div.billing-yellow-box
             [:div.billing-yellow-box-title
               "Team size exceeded"]

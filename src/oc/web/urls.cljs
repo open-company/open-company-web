@@ -90,6 +90,8 @@
 
 (def email-wall "/email-required")
 
+(def login-wall "/login-wall")
+
 ;; User
 
 (def user-profile "/profile")
@@ -157,6 +159,6 @@
 
 (defn secure-activity
   "Secure url for activity to show read only view."
-  ([] (secure-activity (router/current-org-slug) (router/current-activity-id)))
+  ([] (secure-activity (router/current-org-slug) (router/current-secure-activity-id)))
   ([secure-id] (secure-activity (router/current-org-slug) secure-id))
   ([org-slug secure-id] (str (org org-slug) "/post/" secure-id)))

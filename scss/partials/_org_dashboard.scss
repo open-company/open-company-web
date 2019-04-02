@@ -9,8 +9,32 @@ div.org-dashboard {
     z-index: 1132;
   }
 
-  &.activity-not-found div.page, &.activity-removed div.page {
+  &.activity-not-found div.page {
     display: none;
+  }
+
+  @include mobile() {
+    &.activity-not-found div.page, &.activity-removed div.page {
+      display: none;
+    }
+  }
+
+  &.showing-qsg {
+    overflow: hidden;
+    height: 100%;
+
+    div.page {
+      width: calc(100% - #{$qsg_width});
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+  }
+
+  &.showing-digest-sample, &.showing-qsg.showing-digest-sample {
+    div.page {
+      overflow: hidden;
+    }
   }
 
   div.page{
@@ -57,7 +81,7 @@ div.org-dashboard {
 
 html {
   @include mobile(){
-    background-color: #ECECEC;
+    background-color: $ultra_light_grey;
   }
 }
 
@@ -79,12 +103,12 @@ body {
       min-height: 100vh;
 
       @include mobile(){
-        background-color: #ECECEC;
+        background-color: $ultra_light_grey;
       }
     }
 
     @include mobile(){
-      background-color: #ECECEC;
+      background-color: $ultra_light_grey;
     }
   }
 }
@@ -102,7 +126,7 @@ div.org-dashboard div.org-dashboard-inner {
     padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
   @include mobile(){
-    background-color: #ECECEC;
+    background-color: $ultra_light_grey;
     min-height: calc(100vh - #{$navbar_height}px);
   }
 }

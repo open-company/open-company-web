@@ -41,6 +41,16 @@
         (assoc :can-delete (boolean delete-comment-link))
         (assoc :can-react can-react?)))))
 
+(defmethod dispatcher/action :add-comment-change
+  [db [_ org-slug activity-uuid comment-body]]
+  (let [add-comment-activity-key (dispatcher/add-comment-activity-key org-slug activity-uuid)]
+    (assoc-in db add-comment-activity-key comment-body)))
+
+(defmethod dispatcher/action :add-comment-remove
+  [db [_ org-slug activity-uuid]]
+  (let [add-comment-key (dispatcher/add-comment-key org-slug)]
+    (update-in db add-comment-key dissoc activity-uuid)))
+
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
   (assoc db :add-comment-focus focus-uuid))
@@ -48,11 +58,14 @@
 (defmethod dispatcher/action :comment-add
   [db [_ activity-data comment-body comments-key]]
   (let [comments-data (get-in db comments-key)
+        user-data (if (jwt/jwt)
+                    (jwt/get-contents)
+                    (jwt/get-id-token-contents))
         new-comment-data (parse-comment {:body comment-body
                                          :created-at (utils/as-of-now)
-                                         :author {:name (jwt/get-key :name)
-                                                  :avatar-url (jwt/get-key :avatar-url)
-                                                  :user-id (jwt/get-key :user-id)}})
+                                         :author {:name (:name user-data)
+                                                  :avatar-url (:avatar-url user-data)
+                                                  :user-id (:user-id user-data)}})
         new-comments-data (sort-comments (conj comments-data new-comment-data))]
     (assoc-in db comments-key new-comments-data)))
 

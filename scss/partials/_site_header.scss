@@ -40,7 +40,7 @@ span.go-to-digest {
 nav.site-navbar {
   height: 64px;
   position: fixed;
-  width: 100vw;
+  width: 100%;
   z-index: 100;
   background-color: transparent;
   border-bottom: 1px solid transparent;
@@ -175,7 +175,7 @@ nav.site-navbar {
     margin: 0 auto;
 
     @include tablet() {
-      width: 100vw;
+      width: 100%;
       padding: 22px 24px;
       height: 72px;
     }
@@ -250,6 +250,10 @@ nav.site-navbar {
       @include mobile() {
         height: 30px;
         margin-top: 0;
+
+        a.go-to-digest-bt {
+          display: none;
+        }
       }
 
       a {

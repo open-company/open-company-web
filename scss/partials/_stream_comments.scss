@@ -9,7 +9,11 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment {
-      padding: 24px 0px 0px;
+      padding: 0px 0px 16px;
+
+      &:last-child {
+        padding: 0;
+      }
 
       &:hover, &.showing-more-menu {
         div.stream-comment-header {
@@ -51,13 +55,12 @@ div.stream-comments {
 
           div.stream-comment-author-timestamp {
             @include avenir_R();
-            font-size: 14px;
+            font-size: 12px;
             color: $ui_grey;
             opacity: 0.5;
             float: left;
             margin-left: 8px;
             line-height: 14px;
-            text-transform: capitalize;
           }
         }
 
@@ -80,6 +83,10 @@ div.stream-comments {
 
             &:hover, &:hover, &.active {
               opacity: 1;
+            }
+
+            @include tablet() {
+              display: block;
             }
           }
 
@@ -212,6 +219,10 @@ div.stream-comments {
             //   margin-top: 20px;
             // }
           }
+
+          a {
+            color: $carrot_green;
+          }
         }
 
         button.stream-comment-reaction {
@@ -220,7 +231,7 @@ div.stream-comments {
           font-size: 12px;
           color: $ui_grey;
           padding: 0;
-          margin-left: 10px;
+          margin-left: 6px;
           margin-top: 0;
           padding: 0 6px;
           display: inline;
@@ -233,7 +244,7 @@ div.stream-comments {
             background-image: cdnUrl("/img/ML/comment_agree_off.svg");
             opacity: 0.5;
             background-size: 14px 14px;
-            background-position: center;
+            background-position: center 2px;
 
             @include preload_image(cdnUrl("/img/ML/comment_agree_on.svg"));
           }
