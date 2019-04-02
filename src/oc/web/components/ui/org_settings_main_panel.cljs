@@ -252,13 +252,16 @@
               [:div.checkbox-label
                 {:class (when-not (:disallow-secure-links content-visibility-data) "unselected")
                  :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
-                "Disable secure links in morning digests"
+                "Do not allow secure links to open posts from email or Slack"
                 [:i.mdi.mdi-information-outline
                   {:title (str
-                           "Secure links are hassle-free links in Slack and email digest "
-                           "that let users comment and react to posts but don't require the user to log in.")
+                           "When team members receive Carrot posts via an email or Slack morning digest, secure "
+                           "links allow them to read the post without first logging in. A login is still required "
+                           "to access additional posts. If you turn off secure links, your team will always need to "
+                           "be logged in to view posts.")
                    :data-toggle "tooltip"
-                   :data-placement "top"}]]]
+                   :data-placement "top"
+                   :data-container "body"}]]]
             [:div.advanced-settings-row-item.group
               (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                 :disabled false
@@ -266,7 +269,7 @@
               [:div.checkbox-label
                 {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
                  :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
-                "Disable public sections"]]
+                "Do not allow public sections"]]
             [:div.advanced-settings-row-item.group
               (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
                                 :disabled false
@@ -274,7 +277,7 @@
               [:div.checkbox-label
                 {:class (when-not (:disallow-public-share content-visibility-data) "unselected")
                  :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
-                "Disable public share links"]]]])]
+                "Do not allow public share links"]]]])]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
