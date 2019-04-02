@@ -203,7 +203,8 @@
                  (= user-role :admin)
                  (not is-mobile?))
         (case
-          (:exceeded-users team-data)
+          ; (:exceeded-users team-data)
+          true
           [:div.billing-yellow-box
             [:div.billing-yellow-box-title
               "Team size exceeded"]
