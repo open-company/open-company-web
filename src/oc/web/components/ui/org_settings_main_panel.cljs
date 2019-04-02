@@ -260,8 +260,7 @@
                            "to access additional posts. If you turn off secure links, your team will always need to "
                            "be logged in to view posts.")
                    :data-toggle "tooltip"
-                   :data-placement "top"
-                   :data-container "body"}]]]
+                   :data-placement "top"}]]]
             [:div.advanced-settings-row-item.group
               (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                 :disabled false

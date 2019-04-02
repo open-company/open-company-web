@@ -362,6 +362,10 @@ div.org-settings div.org-settings-inner {
           margin-top: 8px;
           div.carrot-checkbox {
             float: left;
+
+            &:not(.selected) {
+              opacity: 0.5;
+            }
           }
 
           div.checkbox-label {
@@ -372,7 +376,7 @@ div.org-settings div.org-settings-inner {
             margin-left: 10px;
             cursor: pointer;
 
-            &.unselected {
+            &.unselected label{
               opacity: 0.5;
             }
 
@@ -383,6 +387,12 @@ div.org-settings div.org-settings-inner {
               &:before {
                 font-size: 16px;
               }
+            }
+
+            div.tooltip {
+              opacity: 1;
+              width: #{$settings_content_width - 48}px;
+              margin-left: -142px;
             }
           }
         }
