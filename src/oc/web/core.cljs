@@ -162,7 +162,7 @@
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:main :team :invite} (keyword (:org-settings query-params))))
+                              (#{:main :team :invite :billing} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and (not org-settings)
                              (contains? query-params :reminders))
