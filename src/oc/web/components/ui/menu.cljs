@@ -202,9 +202,8 @@
       (when (and ls/billing-enabled
                  (= user-role :admin)
                  (not is-mobile?))
-        (case
-          ; (:exceeded-users team-data)
-          true
+        (cond
+          (:exceeded-users team-data)
           [:div.billing-yellow-box
             [:div.billing-yellow-box-title
               "Team size exceeded"]
@@ -217,7 +216,7 @@
           (:upgrade-plan team-data)
           [:div.billing-yellow-box
             [:div.billing-yellow-box-title
-              "6 month history limit"]
+              "6 months history limit"]
             [:div.billing-yellow-box-desc
               "Your free plan maintains up to six months of history in Carrot."]
             [:a.billing-yellow-box-link
