@@ -7,36 +7,62 @@
             [goog.dom :as gdom]))
 
 (defn plan-summary [s team-data]
-  [:div.plan-summary
-    [:div.plan-summary-title
-      "Billing summary"]
-    [:div.plan-summary-details.group
-      [:div.plan-details-left
-        "Plan type"]
-      [:div.plan-details-right
-        [:div.plan-details-plan.group
-          [:div.plan-details-label
-            "You are currently on the "
-            [:strong "Free plan"]
-            "."]
-          [:button.mlb-reset.change-plan-bt
+  (let [plan-data {:name "Free"
+                   :slug "free"
+                   :alert [:div.plan-details-label
+                            [:strong "12 users"]
+                            " are currently on your team."
+                            [:br]
+                            "Free plans cover up 10 users."]}
+        exceeded-users-alert (:exceeded-users team-data)
+        upgrade-plan-alert (or true (:upgrade-plan team-data))]
+    [:div.plan-summary
+      [:div.plan-summary-title
+        "Billing summary"]
+      [:div.plan-summary-details.group
+        [:div.plan-details-left
+          "Plan type"]
+        [:div.plan-details-right
+          [:div.plan-details-plan.group
+            [:div.plan-details-label
+              "You are currently on the "
+              [:strong (str (:name plan-data) " plan")]
+              "."]
+            [:button.mlb-reset.change-plan-bt
+              {:on-click #(reset! (::billing-tab s) :change)}
+              "Change plan"]]
+          [:div.plan-details-description.group
+            (:alert plan-data)]]]
+      [:div.plan-summary-details.group
+        [:div.plan-details-left
+          "Plan type"]
+        [:div.plan-details-right
+          [:div.plan-details-plan.group
+            [:div.plan-details-label
+              "You are currently on the "
+              [:strong (str (:name plan-data) " plan")]
+              "."]
+            [:button.mlb-reset.change-plan-bt
+              {:on-click #(reset! (::billing-tab s) :change)}
+              "Change plan"]]
+          [:div.plan-details-description.group
+            (:alert plan-data)]]]
+      (cond
+        exceeded-users-alert
+        [:div.plan-summary-alert
+          "You've outgrown the Free plan. Please "
+          [:button.mlb-reset.upgrade-plan-bt
             {:on-click #(reset! (::billing-tab s) :change)}
-            "Change plan"]]
-        [:div.plan-details-description.group
-          [:div.plan-details-label
-            [:strong "12 users"]
-            " are currently on your team."
-            [:br]
-            "Free plans cover up 10 users."]]]]
-    (cond
-      ; (:exceeded-users team-data)
-      true
-      [:div.plan-summary-alert
-        "You've outgrown the Free plan. Please "
-        [:button.mlb-reset.upgrade-plan-bt
-          {:on-click #(reset! (::billing-tab s) :change)}
-          "upgrade"]
-        " to continue using Carrot."])])
+            "upgrade"]
+          " to continue using Carrot."]
+        upgrade-plan-alert
+        [:div.plan-summary-alert
+          "Your free plan maintains up to six months of history in Carrot."
+          [:br]
+          [:button.mlb-reset.upgrade-plan-bt
+            {:on-click #(reset! (::billing-tab s) :change)}
+            "Upgrade"]
+          " your plan for unlimited history"])]))
 
 (defn- plan-description [plan current-plan]
   (case plan

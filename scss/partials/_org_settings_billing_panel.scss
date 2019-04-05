@@ -1,221 +1,224 @@
-div.org-settings div.org-settings-inner div.org-settings-billing {
-  div.plan-summary {
-    div.plan-summary-title {
-      border-bottom: 1px solid $ultra_light_grey;
-      @include avenir_H();
-      font-size: 16px;
-      line-height: 22px;
-      color: $deep_navy;
-      height: 30px;
-      padding-bottom: 8px;
-    }
-
-    div.plan-summary-details {
-      margin-top: 16px;
-      div.plan-details-left {
-        float: left;
-        width: 149px;
-        padding-right: 16px;
-        @include avenir_R();
-        font-size: 14px;
+div.org-settings div.org-settings-inner {
+  div.org-settings-billing {
+    div.plan-summary {
+      div.plan-summary-title {
+        @include avenir_H();
+        font-size: 16px;
+        line-height: 22px;
         color: $deep_navy;
-        opacity: 0.5;
+        height: 30px;
       }
 
-      div.plan-details-right {
-        float: right;
-        width: calc(100% - 149px);
+      div.plan-summary-details {
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid $ultra_light_grey;
+        margin-bottom: 8px;
 
-        div.plan-details-label {
+        div.plan-details-left {
+          float: left;
+          width: 149px;
+          padding-right: 16px;
           @include avenir_R();
           font-size: 14px;
-          line-height: 19px;
-          max-width: 300px;
-          float: left;
-          
-          strong {
-            @include avenir_H();
-          }
+          color: $deep_navy;
+          opacity: 0.5;
         }
 
-        div.plan-details-plan {
-          padding-bottom: 16px;
-          border-bottom: 1px solid $ultra_light_grey;
+        div.plan-details-right {
+          float: right;
+          width: calc(100% - 149px);
 
-          button.change-plan-bt {
-            float: right;
-            padding: 0;
-            margin: 0;
-            text-align: right;
-            height: 19px;
+          div.plan-details-label {
             @include avenir_R();
             font-size: 14px;
             line-height: 19px;
-            color: $carrot_green;
+            max-width: 300px;
+            float: left;
+            strong {
+              @include avenir_H();
+            }
           }
-        }
 
-        div.plan-details-description {
-          margin-top: 16px;
-          @include avenir_R();
-          font-size: 14px;
-          line-height: 19px;
-        }
-      }
-    }
+          div.plan-details-plan {
+            padding-bottom: 16px;
+            border-bottom: 1px solid $ultra_light_grey;
 
-    div.plan-summary-alert {
-      width: 100%;
-      padding: 16px 38px;
-      background-color: $opac_yellow;
-      @include avenir_R();
-      font-size: 14px;
-      color: $deep_navy;
-      line-height: 19px;
-      margin-top: 24px;
-      text-align: center;
-      border-radius: 4px;
-
-      strong {
-        @include avenir_H();
-      }
-
-      button.upgrade-plan-bt {
-        @include avenir_H();
-        font-size: 14px;
-        color: $carrot_green;
-        padding: 0;
-        margin: 0;
-      }
-    }
-  }
-
-  div.plan-change {
-    position: relative;
-
-    div.plan-change-title {
-      @include avenir_H();
-      font-size: 16px;
-      line-height: 22px;
-      color: $deep_navy;
-      height: 30px;
-      padding-bottom: 8px;
-    }
-
-    button.plans-dropdown-bt {
-      width: 100%;
-      padding: 10px 13px 8px;
-      height: 40px;
-      @include avenir_R();
-      font-size: 14px;
-      color: $deep_navy;
-      line-height: 22px;
-      margin: 0;
-      text-align: left;
-      border: 1px solid rgba($carrot_light_gray_1, 0.5);
-      border-radius: 4px;
-      position: relative;
-
-      &:after {
-        color: $deep_navy;
-        font-size: 23px;
-        font-family: "Material Design Icons";
-        content: "\F35D";
-        position: absolute;
-        top: 8px;
-        right: 8px;
-      }
-    }
-
-    div.dropdown-list-container {
-      width: 100%;
-      top: 20px;
-      left: 0;
-
-      div.triangle {
-        display: none;
-      }
-
-      div.dropdown-list-content {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
-        padding: 0;
-        border: 1px solid $carrot_light_gray_1;
-        border-radius: 4px;
-
-        ul.dropdown-list {
-          border: none;
-          border-radius: 4px;
-
-          li.dropdown-list-item {
-            padding: 4px 13px;
-            margin: 0;
-
-            span.dropdown-list-item-label {
+            button.change-plan-bt {
+              float: right;
+              padding: 0;
+              margin: 0;
+              text-align: right;
+              height: 19px;
               @include avenir_R();
               font-size: 14px;
-              color: $deep_navy;
-              line-height: 22px;
-              opacity: 1;
-              padding: 0;
+              line-height: 19px;
+              color: $carrot_green;
+            }
+          }
 
-              @include big_web(){
-                &:hover {
-                  text-decoration: underline;
+          div.plan-details-description {
+            margin-top: 16px;
+            @include avenir_R();
+            font-size: 14px;
+            line-height: 19px;
+          }
+        }
+      }
+
+      div.plan-summary-alert {
+        width: 100%;
+        padding: 16px 38px;
+        background-color: $opac_yellow;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 19px;
+        margin-top: 24px;
+        text-align: center;
+        border-radius: 4px;
+
+        strong {
+          @include avenir_H();
+        }
+
+        button.upgrade-plan-bt {
+          @include avenir_H();
+          font-size: 14px;
+          color: $carrot_green;
+          padding: 0;
+          margin: 0;
+        }
+      }
+    }
+
+    div.plan-change {
+      position: relative;
+
+      div.plan-change-title {
+        @include avenir_H();
+        font-size: 16px;
+        line-height: 22px;
+        color: $deep_navy;
+        height: 30px;
+        padding-bottom: 8px;
+      }
+
+      button.plans-dropdown-bt {
+        width: 100%;
+        padding: 10px 13px 8px;
+        height: 40px;
+        @include avenir_R();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 22px;
+        margin: 0;
+        text-align: left;
+        border: 1px solid rgba($carrot_light_gray_1, 0.5);
+        border-radius: 4px;
+        position: relative;
+
+        &:after {
+          color: $deep_navy;
+          font-size: 23px;
+          font-family: "Material Design Icons";
+          content: "\F35D";
+          position: absolute;
+          top: 8px;
+          right: 8px;
+        }
+      }
+
+      div.dropdown-list-container {
+        width: 100%;
+        top: 20px;
+        left: 0;
+
+        div.triangle {
+          display: none;
+        }
+
+        div.dropdown-list-content {
+          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+          padding: 0;
+          border: 1px solid $carrot_light_gray_1;
+          border-radius: 4px;
+
+          ul.dropdown-list {
+            border: none;
+            border-radius: 4px;
+
+            li.dropdown-list-item {
+              padding: 4px 13px;
+              margin: 0;
+
+              span.dropdown-list-item-label {
+                @include avenir_R();
+                font-size: 14px;
+                color: $deep_navy;
+                line-height: 22px;
+                opacity: 1;
+                padding: 0;
+
+                @include big_web(){
+                  &:hover {
+                    text-decoration: underline;
+                  }
                 }
               }
             }
           }
         }
       }
-    }
 
-    div.plan-change-description {
-      margin-top: 16px;
+      div.plan-change-description {
+        margin-top: 16px;
 
-      div.plan-change-description-title {
-        @include avenir_H();
-        font-size: 12px;
-        color: $deep_navy;
-      }
+        div.plan-change-description-title {
+          @include avenir_H();
+          font-size: 12px;
+          color: $deep_navy;
+        }
 
-      div.plan-change-description-list {
-        margin-top: 8px;
+        div.plan-change-description-list {
+          margin-top: 8px;
 
-        ul {
-          padding: 0 0 0 27px;
-          margin: 0;
-          list-style-type: disc;
+          ul {
+            padding: 0 0 0 27px;
+            margin: 0;
+            list-style-type: disc;
 
-          li {
-            @include avenir_R();
-            font-size: 14px;
-            color: $deep_navy;
-            padding-left: 9px;
+            li {
+              @include avenir_R();
+              font-size: 14px;
+              color: $deep_navy;
+              padding-left: 9px;
 
-            strong {
-              @include avenir_H();
+              strong {
+                @include avenir_H();
+              }
             }
           }
         }
       }
-    }
 
-    div.plan-change-green-alert {
-      margin-top: 24px;
-      text-align: center;
-      padding: 16px;
-      @include avenir_R();
-      font-size: 14px;
-      color: $deep_navy;
-      border-radius: 4px;
-      background-color: #F9F9F9;
-
-      button.change-contact-bt {
-        color: $carrot_green;
-        @include avenir_H();
+      div.plan-change-green-alert {
+        margin-top: 24px;
+        text-align: center;
+        padding: 16px;
+        @include avenir_R();
         font-size: 14px;
-        padding: 0;
-        margin: 0;
+        color: $deep_navy;
+        border-radius: 4px;
+        background-color: #F9F9F9;
+
+        button.change-contact-bt {
+          color: $carrot_green;
+          @include avenir_H();
+          font-size: 14px;
+          padding: 0;
+          margin: 0;
+        }
       }
     }
   }
