@@ -33,20 +33,6 @@
               "Change plan"]]
           [:div.plan-details-description.group
             (:alert plan-data)]]]
-      [:div.plan-summary-details.group
-        [:div.plan-details-left
-          "Plan type"]
-        [:div.plan-details-right
-          [:div.plan-details-plan.group
-            [:div.plan-details-label
-              "You are currently on the "
-              [:strong (str (:name plan-data) " plan")]
-              "."]
-            [:button.mlb-reset.change-plan-bt
-              {:on-click #(reset! (::billing-tab s) :change)}
-              "Change plan"]]
-          [:div.plan-details-description.group
-            (:alert plan-data)]]]
       (cond
         exceeded-users-alert
         [:div.plan-summary-alert
