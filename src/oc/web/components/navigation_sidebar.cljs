@@ -113,20 +113,24 @@
         is-admin-or-author? (utils/is-admin-or-author? org-data)
         show-invite-people (and org-slug
                                 is-admin-or-author?)
+        is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        is-mobile? (responsive/is-tablet-or-mobile?)
+        is-wide-enough? (pos? (- @(::window-width s) 980))
+        window-overflow? (and (not is-mobile?)
+                              (or (not is-tall-enough?)
+                                  (not is-wide-enough?)))
         show-reminders? (utils/link-for (:links org-data) "reminders")
         qsg-data (drv/react s :qsg)
         showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :navigation-sidebar-overflow (and (not is-mobile?)
-                                                                  (not is-tall-enough?))})
+                                :navigation-sidebar-overflow window-overflow?})
        :style {:left (when (and (not is-mobile?)
-                                is-tall-enough?)
+                                is-tall-enough?
+                                is-wide-enough?)
                       (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
                :overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
