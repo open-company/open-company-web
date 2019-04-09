@@ -235,18 +235,16 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - #{$navbar_height + 16}px);
   overflow-y: auto;
   overflow-x: visible;
-  padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 0;
+  top: #{$navbar_height}px;
   left: 0;
-  height: calc(100vh - 90px);
+  height: calc(100vh - #{$navbar_height + 16}px);
   @include no-user-select();
   background-color: $ultra_light_grey;
   float: left;
-  margin-top: #{$navbar_height}px;
 
   @include mobile() {
     position: absolute;
@@ -279,7 +277,7 @@ div.left-navigation-sidebar {
     top: unset;
     left: unset;
     float: left;
-    min-height: calc(100vh - 90px);
+    min-height: calc(100vh - #{$navbar_height + 16}px);
     margin-top: 0;
   }
 
