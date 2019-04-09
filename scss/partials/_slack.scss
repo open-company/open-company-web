@@ -4,7 +4,7 @@
 //   border-radius: 100px;
 //   background-color: $carrot_orange;
 //   color: white;
-//   @include avenir_H();
+//   @include OC_Body_Bold();
 //   font-size: 20px;
 //   margin: 48px auto 0;
 //   position: relative;
@@ -90,7 +90,7 @@ div.slack-wrap {
       }
 
       h1.slack-headline {
-        @include PTSerif()
+        @include OC_Title()
         font-size: 64px;
         line-height: 90px;
         color: $deep_navy;
@@ -109,7 +109,7 @@ div.slack-wrap {
       }
 
       div.slack-subline {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 26px;
         line-height: 36px;
         color: $deep_navy;

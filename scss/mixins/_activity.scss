@@ -15,7 +15,7 @@ $h2_top_margin: 24;
   div.name {
     overflow: hidden;
     text-overflow: ellipsis;
-    @include avenir_M();
+    @include OC_Body_Book();
     color: $deep_navy;
     font-size: 14px;
     line-height: 20px;
@@ -25,7 +25,7 @@ $h2_top_margin: 24;
   div.time-since {
     overflow: hidden;
     text-overflow: ellipsis;
-    @include avenir_M();
+    @include OC_Body_Book();
     color: $ui_grey;
     font-size: 12px;
     white-space: nowrap;
@@ -42,7 +42,7 @@ $h2_top_margin: 24;
 
 @mixin new-tag() {
   div.new-tag {
-    @include avenir_B();
+    @include OC_Body_Black();
     color: #F8A936;
     font-size: 11px;
     line-height: 17px;
@@ -73,7 +73,7 @@ $h2_top_margin: 24;
 
 @mixin must-see-tag() {
   div.must-see-tag {
-    @include avenir_B();
+    @include OC_Body_Black();
     color: $sea_blue;
     font-size: 11px;
     line-height: 17px;
@@ -112,7 +112,7 @@ $h2_top_margin: 24;
     padding-top: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
-    @include avenir_M();
+    @include OC_Body_Medium();
     color: $ui_grey;
     font-size: 12px;
     white-space: nowrap;
@@ -140,7 +140,7 @@ $h2_top_margin: 24;
     border-radius: 100px;
     height: 26px;
     color: $ui_grey;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 12px;
     padding: 5px 12px 6px 12px;
     border: 1px solid #E7E6E1;
@@ -163,7 +163,7 @@ $h2_top_margin: 24;
     display: inline-block;
     height: 26px;
     border-radius: 100px;
-    @include avenir_B();
+    @include OC_Body_Black();
     font-size: 12px;
     color: $carrot_light_gray_3;
     background-color: $carrot_light_gray_7;
@@ -206,9 +206,10 @@ $h2_top_margin: 24;
 }
 
 @mixin activity-title(){
-  @include avenir_H();
-  font-size: 24px;
-  color: $carrot_dark_gray_1;
+  @include OC_Title();
+  font-size: 22px;
+  color: $deep_navy;
+  line-height: 28px;
 
   .emojione {
     @include emoji-size(22);
@@ -216,9 +217,10 @@ $h2_top_margin: 24;
 }
 
 @mixin activity-headline(){
-  @include avenir_H();
-  font-size: 20px;
-  color: $carrot_dark_gray;
+  @include OC_Title();
+  font-size: 22px;
+  color: $deep_navy;
+  line-height: 28px;
 
   .emojione {
     @include emoji-size(18);
@@ -246,14 +248,14 @@ $h2_top_margin: 24;
   }
 
   &.medium-editor-placeholder:after {
-    @include avenir_R();
+    @include OC_Body_Book();
     font-size: #{$font-size}px;
     line-height: #{$separator}px;
     color: $carrot_light_gray_1;
     font-style: none !important;
   }
 
-  @include avenir_R();
+  @include OC_Body_Book();
   font-size: #{$font-size}px;
   line-height: #{$separator}px;
   color: $color;
@@ -284,14 +286,14 @@ $h2_top_margin: 24;
   }
 
   b, strong{
-    @include avenir_H();
+    @include OC_Body_Medium();
     color: $color;
     letter-spacing: normal !important;
   }
 
   &.editing {
     b, strong {
-      @include avenir_R();
+      @include OC_Body_Book();
       font-weight: 700;
     }
   }
@@ -309,7 +311,7 @@ $h2_top_margin: 24;
   }
 
   h2 {
-    @include avenir_H();
+    @include OC_Title();
     font-size: #{$font-size + 2}px;
     line-height: #{$separator}px;
     padding-bottom: 0px;
@@ -414,14 +416,14 @@ $h2_top_margin: 24;
 
     label.media-attachment-title {
       font-size: 13px;
-      @include avenir_H();
+      @include OC_Body_Medium();
       color: $carrot_dark_gray;
       margin-left: 8px;
     }
 
     label.media-attachment-subtitle {
       font-size: 12px;
-      @include avenir_R();
+      @include OC_Body_Book();
       color: rgba($oc_gray_7, 0.5);
       margin-left: 8px;
     }

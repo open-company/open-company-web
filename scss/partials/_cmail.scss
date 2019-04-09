@@ -177,7 +177,7 @@ div.cmail-outer {
 
         div.cmail-header-title {
           color: white;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           max-width: 65%;
           overflow: hidden;
@@ -192,7 +192,7 @@ div.cmail-outer {
           div.cmail-header-title-inner {
             padding-left: 22px;
             position: relative;
-            @include avenir_B();
+            @include OC_Body_Black();
             font-size: 13px;
             line-height: 18px;
             height: 18px;
@@ -223,7 +223,7 @@ div.cmail-outer {
           display: inline-block;
           width: 40px;
           height: 20px;
-          @include avenir_M();
+          @include OC_Body_Medium();
           color: white;
           font-size: 12px;
           line-height: 20px;
@@ -320,7 +320,7 @@ div.cmail-outer {
             color: white;
             width: 40px;
             height: 24px;
-            @include avenir_B();
+            @include OC_Body_Black();
             font-size: 14px;
             float: right;
             margin: 0 2px 0 0 ;
@@ -366,7 +366,7 @@ div.cmail-outer {
           cursor: pointer;
           position: relative;
           float: left;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $deep_navy;
           line-height: 16px;
@@ -374,7 +374,7 @@ div.cmail-outer {
           @include tablet() {
             margin-left: 0;
             margin-top: 0;
-            @include avenir_M();
+            @include OC_Body_Medium();
             font-size: 14px;
           }
 
@@ -525,7 +525,7 @@ div.cmail-outer {
           outline: none;
           cursor: text;
           @include activity-headline();
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 22px;
           color: $deep_navy;
           white-space: pre-wrap;
@@ -558,7 +558,7 @@ div.cmail-outer {
             margin: 8px 0px 0px;
             cursor: text;
             color: $deep_navy;
-            @include avenir_R();
+            @include OC_Body_Medium();
             height: auto;
 
             @include big_web() {
@@ -651,7 +651,7 @@ div.cmail-outer {
             width: calc(100% - 40px);
 
             div.edit-tooltip {
-              @include avenir_R();
+              @include OC_Body_Medium();
               font-size: 14px;
               color: $deep_navy;
               line-height: 18px;
@@ -670,7 +670,7 @@ div.cmail-outer {
                 padding: 0;
                 margin: 0;
                 color: $carrot_green;
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 line-height: 18px;
               }
@@ -694,7 +694,7 @@ div.cmail-outer {
           color: $carrot_orange;
           width: 80px;
           height: 40px;
-          @include avenir_B();
+          @include OC_Body_Black();
           font-size: 14px;
           border-radius: 6px;
           margin-right: 24px;
@@ -824,7 +824,7 @@ div.cmail-outer {
 
         div.saving-saved {
           height: 35px;
-          @include avenir_M();
+          @include OC_Body_Medium();
           color: $light_ui_grey;
           font-size: 14px;
           line-height: 46px;

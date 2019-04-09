@@ -86,7 +86,7 @@ div.onboard-wrapper-container {
 
 div.onboard-email-container {
   width: 339px;
-  @include avenir_M;
+  @include OC_Body_Medium();
   color: $carrot_gray;
   font-size: 32px;
   margin: 0 auto;
@@ -109,7 +109,7 @@ div.onboard-email-container {
   &.email-wall {
     width: 385px;
     color: $deep_navy;
-    @incldude avenir_H();
+    @incldude OC_Body_Bold();
 
     div.email-wall-icon {
       background-image: cdnUrl("/img/ML/email_wall.svg");
@@ -121,19 +121,19 @@ div.onboard-email-container {
     }
 
     div.email-wall-subtitle {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 18px;
       margin-top: 16px;
     }
 
     div.email-wall-sent-link {
       color: $deep_navy;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 18px;
       margin-top: 56px;
 
       div.email-address {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 18px;
         color: $deep_navy;
       }
@@ -146,7 +146,7 @@ div.onboard-email-container {
     height: 42px;
     background-color: $sea_blue;
     color: white;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 16px;
     border-radius: 4px;
     outline: none;
@@ -223,7 +223,7 @@ div.onboard-lander {
         button.top-continue {
           display: block;
           float: right;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 15px;
           height: 32px;
           width: 66px;
@@ -263,7 +263,7 @@ div.onboard-lander {
       height: 15px;
       margin: 12px auto 0;
       text-align: center;
-      @include avenir_B();
+      @include OC_Body_Black();
       font-size: 11px;
       letter-spacing: 0.42px;
       color: $light_ui_grey;
@@ -287,7 +287,7 @@ div.onboard-lander {
       height: 42px;
       background-color: $sea_blue;
       color: white;
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 16px;
       border-radius: 4px;
       outline: none;
@@ -304,7 +304,7 @@ div.onboard-lander {
   }
 
   div.subtitle {
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 16px;
     margin-top: 16px;
     color: $deep_navy;
@@ -315,7 +315,7 @@ div.onboard-lander {
     }
 
     span.email-address {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
@@ -326,7 +326,7 @@ div.onboard-lander {
     text-align: left;
 
     div.subtitle {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 18px;
       color: $deep_navy;
       margin-top: 24px;
@@ -335,7 +335,7 @@ div.onboard-lander {
       @include mobile() {
         margin-top: 0px;
         padding-top: 16px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         margin: 0 auto;
       }
     }
@@ -366,7 +366,7 @@ div.onboard-lander {
       text-align: center;
 
       div.signup-with-slack-content, div.signup-with-google-content {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $deep_navy;
         width: 100%;
@@ -408,7 +408,7 @@ div.onboard-lander {
 
       div.or-with-email-copy {
         text-align: center;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         margin: 0 auto;
@@ -519,7 +519,7 @@ div.onboard-lander {
       }
 
       div.add-picture-link {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: $carrot_green;
         float: left;
@@ -534,7 +534,7 @@ div.onboard-lander {
       }
 
       div.add-picture-link-subtitle {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         float: left;
@@ -550,7 +550,7 @@ div.onboard-lander {
     }
 
     div.field-label {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 12px;
       color: $deep_navy;
       margin-top: 16px;
@@ -562,14 +562,14 @@ div.onboard-lander {
       }
 
       &.info {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 12px;
         margin-top: 8px;
         max-width: 300px;
       }
 
       span.info {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 12px;
         color: rgba($oc_gray_7, 0.5);
       }
@@ -612,7 +612,7 @@ div.onboard-lander {
     }
 
     div.field-description {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       margin-top: 16px;
       color: $deep_navy;
@@ -626,13 +626,13 @@ div.onboard-lander {
 
     div.footer-link {
       margin-top: 24px;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: $deep_navy;
       text-align: center;
 
       a {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $carrot_green;
         margin-left: 8px;
@@ -652,7 +652,7 @@ div.onboard-lander {
       outline: none;
       padding: 11px 16px 9px;
       position: relative;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: $deep_navy;
       line-height: 24px;
@@ -664,7 +664,7 @@ div.onboard-lander {
       }
 
       @include placeholder() {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $carrot_light_gray;
       }
@@ -699,7 +699,7 @@ div.onboard-lander {
       outline: none;
       padding: 10px 16px;
       position: relative;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: rgba($deep_navy, 0.5);
       margin-top: 4px;
@@ -712,7 +712,7 @@ div.onboard-lander {
     }
 
     div.description {
-      @include avenir_R();
+      @include OC_Body_Medium();
       color: $deep_navy;
       font-size: 14px;
       margin-top: 24px;
@@ -737,7 +737,7 @@ div.onboard-lander {
 
         label.error {
           margin-left: 0px !important;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 15px;
           color: $deep_navy;
           margin-top: 4px;
@@ -760,7 +760,7 @@ div.onboard-lander {
            outline: none;
 
            @include placeholder(){
-             @include avenir_R();
+             @include OC_Body_Medium();
              margin-top: 10px;
              color: $ui_grey;
              font-size: 14px;
@@ -775,7 +775,7 @@ div.onboard-lander {
            height: 20px;
            padding: 10px 10px;
            color: $carrot_green;
-           @include avenir_H();
+           @include OC_Body_Bold();
            font-size: 14px;
            border-top-right-radius: 6px;
            border-bottom-right-radius: 6px;
@@ -792,7 +792,7 @@ div.onboard-lander {
       height: 48px;
       background-color: $sea_blue;
       color: white;
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 16px;
       border-radius: 6px;
 
@@ -815,13 +815,13 @@ div.onboard-lander {
       align-items: center;
       justify-content: center;
       text-align: center;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: $deep_navy;
       margin: 24px 0 0;
 
       button.logout-cancel {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $carrot_green;
         padding: 0;
@@ -916,7 +916,7 @@ div.onboard-lander {
           margin-left: 8px;
           margin-top: 8px;
           display: inline-block;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           background-color: #F8FCFA;
           color: $carrot_green;
@@ -961,7 +961,7 @@ div.onboard-lander {
         button.add-another-invite-row {
           color: $carrot_green;
           float: right;
-          @include avenir_M();
+          @include OC_Body_Medium();
           font-size: 13px;
 
           @media screen and (max-width: 380px){
@@ -973,7 +973,7 @@ div.onboard-lander {
       }
 
       div.error {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 15px;
         margin-top: 16px;
         color: $carrot_orange;
@@ -1001,7 +1001,7 @@ div.onboard-lander {
           }
 
           input {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 14px;
             color: $deep_navy;
             outline: none;
@@ -1028,7 +1028,7 @@ div.onboard-lander {
       }
 
       button.skip-for-now {
-        @include avenir_M();
+        @include OC_Body_Medium();
         font-size: 16px;
         background-color: #E0E7FE;
         padding: 0;

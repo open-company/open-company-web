@@ -99,7 +99,7 @@ div.search-box {
       }
 
       div.mobile-header-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: $deep_navy;
         line-height: 24px;
@@ -133,7 +133,7 @@ div.search-box {
     background-color: transparent;
     text-align: left;
     padding: 0 0 0 24px;
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 14px;
     color: $deep_navy;
     width: 118px;
@@ -227,7 +227,7 @@ div.search-results {
     }
 
     span {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 12px;
       line-height: 12px;
       text-transform: uppercase;
@@ -258,7 +258,7 @@ div.search-results {
       }
 
       div.search-result-box {
-        @include avenir_H();
+        @include OC_Body_Bold();
         padding: 5px 16px 5px 16px;
 
         @include activity-author();
@@ -275,7 +275,7 @@ div.search-results {
           overflow: hidden;
           text-overflow: ellipsis;
           color: $deep_navy;
-          @include avenir_M();
+          @include OC_Body_Medium();
           font-size: 14px;
           max-width: 100%;
           white-space: nowrap;
@@ -285,7 +285,7 @@ div.search-results {
           overflow: hidden;
           text-overflow: ellipsis;
           color: $ui_grey;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 12px;
         }
 
@@ -350,7 +350,7 @@ div.search-results {
     div.message {
       margin: auto;
       width: 100%;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: $deep_navy;
     }

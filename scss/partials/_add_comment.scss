@@ -59,7 +59,7 @@ div.add-comment-box-container {
         resize: none;
         border: none;
         outline: none;
-        @include avenir_R();
+        @include OC_Body_Medium();
         color: $deep_navy;
         font-size: 16px;
         cursor: text;
@@ -73,7 +73,7 @@ div.add-comment-box-container {
         min-height: 27px;
 
         &.medium-editor-placeholder:after {
-          @include avenir_R();
+          @include OC_Body_Medium();
           color: rgba($ui_grey, 0.5);
           margin-left: 0px;
         }
@@ -128,7 +128,7 @@ div.add-comment-box-container {
         padding: 10px 24px;
         text-align: center;
         color: $ui_grey;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
 
         &:disabled {
@@ -144,7 +144,7 @@ div.add-comment-box-container {
         background-color: $carrot_green;
         text-align: center;
         color: white;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         border-radius: 100px;
 

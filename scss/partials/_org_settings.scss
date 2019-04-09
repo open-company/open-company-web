@@ -104,7 +104,7 @@ div.org-settings {
 
       div.org-name {
         margin-left: 64px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 22px;
         color: $deep_navy;
         line-height: 32px;
@@ -116,7 +116,7 @@ div.org-settings {
 
       div.org-url {
         margin-left: 64px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 18px;
         color: $light_ui_grey;
         text-overflow: ellipsis;
@@ -140,7 +140,7 @@ div.org-settings {
 
         &.cancel-btn {
           background-color: transparent;
-          @include avenir_M();
+          @include OC_Body_Medium();
           font-size: 16px;
           color: $ui_grey;
         }
@@ -150,7 +150,7 @@ div.org-settings {
           border-radius: 6px;
           background-color: $carrot_green;
           color: white;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 16px;
         }
       }
@@ -185,7 +185,7 @@ div.org-settings {
           outline: none;
           padding: 10px 16px;
           position: relative;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 16px;
           color: $carrot_dark_gray;
           resize: none;
@@ -205,7 +205,7 @@ div.org-settings {
           }
 
           @include placeholder() {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 16px;
             color: $light_ui_grey;
           }
@@ -236,12 +236,12 @@ div.org-settings {
             tr {
 
               th {
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $ui_grey;
 
                 span.error {
-                  @include avenir_H();
+                  @include OC_Body_Bold();
                   font-size: 14px;
                   margin-left: 16px;
                   color: $carrot_orange;
@@ -252,7 +252,7 @@ div.org-settings {
               td {
                 padding: 16px 0;
                 border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
-                @include avenir_R();
+                @include OC_Body_Medium();
                 font-size: 16px;
                 color: $deep_navy;
               }
@@ -270,21 +270,21 @@ div.org-settings {
 
             .org-settings-list-item-name {
               float: left;
-              @include avenir_R();
+              @include OC_Body_Medium();
               font-size: 16px;
               color: $carrot_dark_gray;
             }
 
             .org-settings-list-item-btn {
               @include mlb-link($carrot_text_blue);
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 14px;
               float: right;
             }
 
             .org-settings-list-item-remove-btn {
               @include mlb-link($carrot_orange);
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 14px;
               float: right;
             }
@@ -293,13 +293,13 @@ div.org-settings {
 
         .org-settings-label {
           width: 100%;
-          @include avenir_M();
+          @include OC_Body_Medium();
           font-size: 15px;
           color: $deep_navy;
           margin-bottom: 8px;
 
           label {
-            @include avenir_M();
+            @include OC_Body_Medium();
             font-size: 15px;
             color: $deep_navy;
             margin-bottom: 0px;
@@ -347,7 +347,7 @@ div.org-settings-tabs {
       margin: 0;
       padding: 0;
       cursor: pointer;
-      @include avenir_B();
+      @include OC_Body_Black();
       font-size: 13px;
       color: $ui_grey;
       text-decoration: none;

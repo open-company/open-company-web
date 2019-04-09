@@ -21,14 +21,14 @@ div.carrot-checkbox {
   span.selected-label {
     color: $carrot_green;
     float: left;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 12px;
   }
 
   span.unselected-label {
     color: $ui_grey;
     float: right;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 12px;
   }
 

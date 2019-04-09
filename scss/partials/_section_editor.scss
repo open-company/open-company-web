@@ -73,7 +73,7 @@ div.section-editor-container {
 
       div.section-editor-header-left {
         float: left;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: $deep_navy;
         white-space: nowrap;
@@ -84,7 +84,7 @@ div.section-editor-container {
         @include mobile() {
           float: none;
           text-align: center;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 18px;
           height: 64px;
           padding-top: 20px;
@@ -99,14 +99,14 @@ div.section-editor-container {
 
       div.section-editor-error-label {
         margin-top: 8px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 12px;
         color: $carrot_orange_2;
       }
 
       div.section-editor-add-label {
         margin-top: 16px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 15px;
         color: $deep_navy;
         height: 21px;
@@ -121,7 +121,7 @@ div.section-editor-container {
 
         span.role-header {
           float: right;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 15px;
           color: $ui_grey;
         }
@@ -136,7 +136,7 @@ div.section-editor-container {
         border: 1px solid rgba($carrot_light_gray_1, .5);
         min-height: 40px;
         width: 100%;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         padding: 10px 29px 10px 16px;
@@ -176,7 +176,7 @@ div.section-editor-container {
         border: 1px solid rgba($carrot_light_gray_1, .5);
         height: 40px;
         width: 100%;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         padding: 10px 16px;
@@ -191,7 +191,7 @@ div.section-editor-container {
           padding: 0px;
           border: none;
           outline: none;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $deep_navy;
 
@@ -241,7 +241,7 @@ div.section-editor-container {
             div.name {
               float: left;
               width: calc(100% - 40px);
-              @include avenir_R();
+              @include OC_Body_Medium();
               font-size: 14px;
               color: $deep_navy;
               margin-left: 16px;
@@ -269,7 +269,7 @@ div.section-editor-container {
 
       div.section-editor-enable-slack-bot {
         margin-top: 8px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 13px;
         color: $deep_navy;
         height: 24px;
@@ -290,7 +290,7 @@ div.section-editor-container {
       }
 
       div.section-editor-access-public-description {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $ui_grey;
         margin-top: 8px;
@@ -301,7 +301,7 @@ div.section-editor-container {
         border: 1px solid rgba($carrot_light_gray_1, .5);
         height: 40px;
         width: 100%;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         padding: 10px 32px 10px 16px;
@@ -354,7 +354,7 @@ div.section-editor-container {
       }
 
       div.access-item {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         padding-left: 24px;
@@ -416,7 +416,7 @@ div.section-editor-container {
         div.section-editor-add-private-users-list {
           width: 100%;
           padding: 0px;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $deep_navy;
           max-height: 210px;
@@ -457,7 +457,7 @@ div.section-editor-container {
               margin-top: 4px;
               position: relative;
               cursor: pointer;
-              @include avenir_R();
+              @include OC_Body_Medium();
               font-size: 14px;
               color: $deep_navy;
               padding-right: 12px;
@@ -517,7 +517,7 @@ div.section-editor-container {
         border: 1px solid rgba($carrot_light_gray_1, .5);
         min-height: 80px;
         width: 100%;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         padding: 10px 16px;
@@ -544,7 +544,7 @@ div.section-editor-container {
           float: left;
           width: 120px;
           color: $carrot_orange_2;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           margin-left: 0px;
           padding-left: 0px;
@@ -565,7 +565,7 @@ div.section-editor-container {
           float: right;
           height: 32px;
           margin-right: 16px;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $ui_grey;
         }
@@ -578,7 +578,7 @@ div.section-editor-container {
           color: white;
           background-color: $carrot_green;
           border-radius: 6px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
 
           &.disabled {

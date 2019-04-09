@@ -21,7 +21,7 @@ div.dropdown{
     padding: 0;
     width: 144px;
     min-width: 144px;
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 16px;
     color: $oc_gray_7;
     background-color: white;

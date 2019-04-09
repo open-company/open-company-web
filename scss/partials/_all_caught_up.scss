@@ -18,7 +18,7 @@ div.all-caught-up {
     text-align: center;
 
     div.message {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: $carrot_light_gray_4;
       padding-top: 33px;

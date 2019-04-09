@@ -8,7 +8,7 @@ div.wrt-count-container {
   }
 
   div.wrt-count {
-    @include avenir_M();
+    @include OC_Body_Medium();
     font-size: 12px;
     color: $ui_grey;
     cursor: pointer;
@@ -75,7 +75,7 @@ div.wrt-popup {
       span.wrt-popup-header-title {
         margin-left: 16px;
         line-height: 24px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: $deep_navy;
         white-space: nowrap;
@@ -106,7 +106,7 @@ div.wrt-popup {
     button.wrt-popup-tab {
       height: 41px;
       border-bottom: 1px solid transparent;
-      @include avenir_B();
+      @include OC_Body_Black();
       font-size: 13px;
       color: $deep_navy;
       line-height: 33px;
@@ -150,7 +150,7 @@ div.wrt-popup {
         border: none;
         outline: none;
         padding: 6px 14px;
-        @include avenir_M();
+        @include OC_Body_Medium();
         font-size: 15px;
         color: $deep_navy;
         outline: none;
@@ -216,7 +216,7 @@ div.wrt-popup {
       div.wrt-popup-list-row-name {
         float: left;
         margin-left: 16px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         line-height: 32px;
@@ -238,7 +238,7 @@ div.wrt-popup {
       }
 
       div.wrt-popup-list-row-seen {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         float: right;
@@ -251,7 +251,7 @@ div.wrt-popup {
 
         span.unopened-label {
           float: right;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $deep_navy;
         }
@@ -290,7 +290,7 @@ div.wrt-popup {
           height: 32px;
           text-align: left;
           padding-left: 32px;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $ui_grey;
           line-height: 32px;

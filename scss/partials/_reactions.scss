@@ -15,7 +15,7 @@ div.reactions {
       height: 26px;
       cursor: default;
       padding: 4px 3px;
-      @include avenir_H();
+      @include OC_Body_Bold();
       border: 1px solid #E2E3E4;
       box-shadow: none;
       font-size: 11px;

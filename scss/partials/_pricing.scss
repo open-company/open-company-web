@@ -38,7 +38,7 @@ div.pricing-wrap {
       h1.pricing-headline {
         font-size: 60px;
         line-height: 78px;
-        @include PTSerif()
+        @include OC_Title()
         color: $deep_navy;
         min-width: 300px;
         margin: 0 auto;
@@ -56,7 +56,7 @@ div.pricing-wrap {
         color: $deep_navy;
         font-size: 30px;
         line-height: 38px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;
@@ -110,13 +110,13 @@ div.pricing-wrap {
           }
 
           h2.tear-title {
-            @include PTSerif()
+            @include OC_Title()
             font-size: 40px;
             color: $deep_navy;
           }
 
           h3.tear-price {
-            @include PTSerif()
+            @include OC_Title()
             font-size: 60px;
             line-height: 78px;
             color: $deep_navy;
@@ -128,14 +128,14 @@ div.pricing-wrap {
           }
 
           div.tear-subtitle {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 20px;
             color: $deep_navy;
             line-height: 26px;
             margin: 32px auto 0;
 
             span.bold {
-              @include avenir_H();
+              @include OC_Body_Bold();
             }
 
             span.billed-monthly {
@@ -151,7 +151,7 @@ div.pricing-wrap {
             background-color: $carrot_orange;
             border-radius: 8px;
             color: white;
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 16px;
             padding: 10px 24px;
           }
@@ -165,7 +165,7 @@ div.pricing-wrap {
 
           div.tear-feature {
             max-width: 200px;
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 20px;
             color: $deep_navy;
             text-align: center;
@@ -191,7 +191,7 @@ div.pricing-wrap {
             }
 
             span.heavy {
-              @include avenir_H();
+              @include OC_Body_Bold();
             }
           }
 
@@ -234,7 +234,7 @@ div.pricing-wrap {
               height: 22px;
 
               span.pricing-toggle-annual {
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $deep_navy;
                 line-height: 22px;
@@ -264,7 +264,7 @@ div.pricing-wrap {
               }
 
               span.pricing-toggle-monthly {
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $ui_grey;
                 width: 90px;
@@ -375,7 +375,7 @@ div.pricing-wrap {
       }
 
       h2.faq-header {
-        @include PTSerif()
+        @include OC_Title()
         font-size: 60px;
         color: $deep_navy;
         margin-bottom: 80px;
@@ -391,7 +391,7 @@ div.pricing-wrap {
         margin-top: 40px;
 
         div.faq-row-question {
-          @include PTSerif()
+          @include OC_Title()
           font-size: 20px;
           color: $deep_navy;
           line-height: 28px;
@@ -399,19 +399,19 @@ div.pricing-wrap {
         }
 
         div.faq-row-answer {
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 20px;
           color: $deep_navy;
           margin-top: 8px;
 
           span.heavy {
-            @include avenir_H();
+            @include OC_Body_Bold();
           }
 
           a.chat-with-us {
             float: left;
             color: $carrot_green;
-            @include avenir_B();
+            @include OC_Body_Black();
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.5;

@@ -7,7 +7,7 @@ div.container {
 
   div.readable-content-container {
     margin: 240px auto 0;
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 22px;
     line-height: 32px;
     color: $deep_navy;
@@ -28,7 +28,7 @@ div.container {
     }
 
     h1 {
-      @include PTSerif();
+      @include OC_Title();
       font-size: 80px;
       line-height: 90px;
       text-align: center;
@@ -49,7 +49,7 @@ div.container {
       max-width: 800px;
       width: 100%;
       margin: 20px auto 40px;
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 30px;
       line-height: 38px;
       margin: 40px auto 80px;

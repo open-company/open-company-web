@@ -48,7 +48,7 @@ div.secure-activity-container {
 
       button.login-as-bt {
         float: right;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $carrot_green;
         @include user-profile(32);
@@ -73,7 +73,7 @@ div.secure-activity-container {
         float: right;
         padding: 0;
         height: 32px;
-        @include avenir_B();
+        @include OC_Body_Black();
         font-size: 12px;
         color: $ui_grey;
         text-transform: uppercase;
@@ -91,7 +91,7 @@ div.secure-activity-container {
         text-align: center;
         background-color: $coral;
         border-radius: 4px;
-        @include avenir_B();
+        @include OC_Body_Black();
         font-size: 12px;
         color: $carrot_orange;
         text-transform: uppercase;
@@ -132,13 +132,13 @@ div.secure-activity-container {
         @include activity-author(32);
 
         div.name {
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $deep_navy;
         }
 
         div.time-since {
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 12px;
           color: $ui_grey;
         }
@@ -160,9 +160,6 @@ div.secure-activity-container {
 
       div.activity-title {
         @include activity-title();
-        @include avenir_H();
-        font-size: 22px;
-        line-height: 28px;
         color: $deep_navy;
         margin-top: 16px;
 
@@ -178,7 +175,7 @@ div.secure-activity-container {
         cursor: text;
         @include activity-body(16, 22, 22, $deep_navy);
         color: $deep_navy;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 16px;
         line-height: 22px;
 
@@ -223,14 +220,14 @@ div.secure-activity-container {
         word-wrap: break-word;
 
         div.activity-video-transcript-header {
-          @include avenir_M();
+          @include OC_Body_Medium();
           font-size: 12px;
           color: $light_ui_grey;
         }
 
         div.activity-video-transcript-content {
           margin-top: 24px;
-          @include avenir_BOOK();
+          @include OC_Body_Book();
           font-size: 16px;
           color: $deep_navy;
         }
@@ -276,7 +273,7 @@ div.secure-activity-container {
 
     button.secure-activity-footer-bt {
       margin: 40px auto;
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 14px;
       color: $carrot_green;
       padding: 0;
@@ -298,7 +295,7 @@ div.secure-activity-container {
       }
 
       &.with-id-token {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $deep_navy;
         height: 32px;
@@ -326,7 +323,7 @@ div.secure-activity-container {
           background-color: $carrot_green;
           border-radius: 6px;
           padding: 8px 12px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           color: white;
           font-size: 14px;
 

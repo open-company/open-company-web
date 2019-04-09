@@ -73,13 +73,13 @@ div.alert-modal-container {
       }
 
       div.alert-modal-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 22px;
         color: $deep_navy;
       }
 
       div.alert-modal-message {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 16px;
         color: $oc_gray_7;
         margin-top: 8px;
@@ -106,7 +106,7 @@ div.alert-modal-container {
           height: 40px;
           padding: 0px;
           opacity: 0.9;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
 
           &:hover {
@@ -147,7 +147,7 @@ div.alert-modal-container {
         margin-left: -24px;
         height: 62px;
         border-top: 1px solid $light_ui_grey;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $deep_navy;
         margin-top: 32px;

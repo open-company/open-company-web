@@ -119,7 +119,7 @@ div.notifications {
     }
 
     div.notification-title {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 14px;
       color: white;
 
@@ -141,7 +141,7 @@ div.notifications {
     }
 
     div.notification-description {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: white;
       margin-top: 4px;
@@ -150,7 +150,7 @@ div.notifications {
       &.oc-mentions span.oc-mention[data-found="true"] {
         background-color: transparent !important;
         color: white !important;
-        @include avenir_H();
+        @include OC_Body_Bold();
       }
 
       a {
@@ -165,7 +165,7 @@ div.notifications {
       text-align: right;
       padding: 0px;
       margin: 0px;
-      @include avenir_B();
+      @include OC_Body_Black();
       font-size: 12px;
       line-height: 24px;
 
@@ -178,7 +178,7 @@ div.notifications {
         background-color: $carrot_green;
         padding: 9px 0px;
         text-align: center;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         line-height: 27px;
         letter-spacing: 0.22px;
@@ -201,7 +201,7 @@ div.notifications {
         float: unset;
         margin-top: 8px;
         height: 16px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
         color: white;

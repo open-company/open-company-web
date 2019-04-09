@@ -15,7 +15,7 @@ div.sections-picker {
 
     div.sections-picker-header-left {
       float: left;
-      @include avenir_B();
+      @include OC_Body_Black();
       font-size: 13px;
       color: $ui_grey;
       text-transform: uppercase;
@@ -99,7 +99,7 @@ div.sections-picker {
 
         &.active {
           div.sections-picker-section-name {
-            @include avenir_H();
+            @include OC_Body_Bold();
             color: $deep_navy;
           }
         }
@@ -113,7 +113,7 @@ div.sections-picker {
         }
 
         div.sections-picker-section-name {
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $ui_grey;
           float: left;

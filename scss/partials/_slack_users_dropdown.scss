@@ -17,7 +17,7 @@ div.slack-users-dropdown {
     border-radius: 4px;
     background-color: white;
     border: 1px solid rgba($carrot_light_gray_1, 0.5);
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 16px;
     color: $carrot_dark_gray;
     padding: 10px 16px;
@@ -28,7 +28,7 @@ div.slack-users-dropdown {
     }
 
     @include placeholder() {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 16px;
       color: $carrot_light_gray;
     }
@@ -71,7 +71,7 @@ div.slack-users-dropdown {
       @include user-profile(24);
 
       div.user-name {
-        @include avenir_M();
+        @include OC_Body_Medium();
         font-size: 16px;
         color: $carrot_dark_gray;
         white-space: nowrap;
@@ -79,7 +79,7 @@ div.slack-users-dropdown {
         overflow: hidden;
 
         span.slack-org {
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $carrot_light_gray;
           white-space: nowrap;

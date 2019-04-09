@@ -101,7 +101,7 @@ div.user-notifications {
       }
 
       div.title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         color: $deep_navy;
         font-size: 15px;
         float: left;
@@ -118,7 +118,7 @@ div.user-notifications {
         height: 20px;
         padding: 0px;
         margin: 0px;
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $ui_grey;
         line-height: 20px;
@@ -175,7 +175,7 @@ div.user-notifications {
           margin-left: 16px;
           width: calc(100% - 40px);
           padding-right: 8px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           line-height: 16px;
           color: $deep_navy;
@@ -188,7 +188,7 @@ div.user-notifications {
           margin-top: 4px;
           margin-left: 40px;
           width: calc(50%);
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 12px;
           color: $ui_grey;
           height: 12px;
@@ -200,7 +200,7 @@ div.user-notifications {
           margin-top: 4px;
           width: calc(100% - 40px);
           padding-right: 8px;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           line-height: 16px;
           color: $deep_navy;

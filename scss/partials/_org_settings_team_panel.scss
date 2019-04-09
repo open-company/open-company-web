@@ -8,7 +8,7 @@ div.org-settings {
           border: 1px solid rgba($carrot_light_gray_1, 0.5);
 
           input.org-settings-team-search-field {
-            @include avenir_M();
+            @include OC_Body_Medium();
             font-size: 15px;
             color: $deep_navy;
 
@@ -21,7 +21,7 @@ div.org-settings {
         table.org-settings-table.org-settings-team-table {
           thead tr {
             th {
-              @include avenir_B();
+              @include OC_Body_Black();
               font-size: 13px;
               color: $ui_grey;
             }
@@ -41,7 +41,7 @@ div.org-settings {
             border-top: 1px solid rgba($deep_tan, 0.5);
 
             td {
-              @include avenir_M();
+              @include OC_Body_Medium();
               color: $ui_grey;
               font-size: 14px;
             }
@@ -64,7 +64,7 @@ div.org-settings {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 margin-top: 6px;
-                @include avenir_M();
+                @include OC_Body_Medium();
                 font-size: 14px;
                 color: $deep_navy;
 
@@ -93,7 +93,7 @@ div.org-settings {
               }
 
               div.pending-user {
-                @include avenir_R();
+                @include OC_Body_Medium();
                 font-size: 14px;
                 color: $ui_grey;
                 vertical-align: bottom;

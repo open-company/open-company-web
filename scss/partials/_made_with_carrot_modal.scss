@@ -61,7 +61,7 @@ div.made-with-carrot-modal-container {
       }
 
       div.made-wih-carrot-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 28px;
         color: $carrot_dark_blue;
         margin: 32px auto;
@@ -69,7 +69,7 @@ div.made-with-carrot-modal-container {
       }
 
       div.made-wih-carrot-subtitle {
-        @include avenir_R();
+        @include OC_Body_Medium();
         font-size: 20px;
         color: #4D4D4D;
         margin: 32px auto;

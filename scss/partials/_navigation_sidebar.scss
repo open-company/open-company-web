@@ -23,7 +23,7 @@
   }
 
   .internal {
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 14px;
     line-height: 25px;
     color: $ui_grey;
@@ -34,13 +34,13 @@
     }
 
     &.new {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
 
   div.drafts-label {
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 14px;
     line-height: 25px;
     color: $ui_grey;
@@ -51,7 +51,7 @@
     }
 
     span.count {
-      @include avenir_M();
+      @include OC_Body_Medium();
       color: #C5C6C8;
     }
 
@@ -69,10 +69,10 @@
   }
 
   div.all-posts-label {
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 14px;
     line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -87,13 +87,13 @@
     }
 
     &.new {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
 
   div.must-see-label {
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 14px;
     line-height: 25px;
     color: $ui_grey;
@@ -111,7 +111,7 @@
     }
 
     &.new {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
@@ -127,14 +127,14 @@
   }
 
   .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
-    color: $carrot_green;
-    @include avenir_H();
+    // color: $carrot_green;
+    @include OC_Body_Bold();
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
 
     @include mobile() {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 16px;
     }
 
@@ -142,7 +142,7 @@
       color: $carrot_green;
 
       @include mobile() {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
       }
     }
@@ -166,7 +166,7 @@
   }
 
   div.all-posts-label, div.must-see-label {
-    @include avenir_H();
+    @include OC_Body_Bold();
     text-decoration: none;
 
     &:active, &:focus {
@@ -186,18 +186,18 @@
 
   .internal {
     color: $ui_grey;
-    @include avenir_R();
+    @include OC_Body_Medium();
     font-size: 14px;
     line-height: 25px;
     text-decoration: none;
 
     @include mobile() {
-      @include avenir_M();
+      @include OC_Body_Medium();
       font-size: 16px;
     }
 
     &.new {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
@@ -226,7 +226,7 @@
     }
 
     &.new {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
@@ -471,7 +471,7 @@ div.left-navigation-sidebar {
       }
 
       span {
-        @include avenir_B();
+        @include OC_Body_Black();
         font-size: 13px;
         color: rgba($ui_grey, 0.5);
         float: left;
@@ -511,7 +511,7 @@ div.left-navigation-sidebar {
       background-position: 50%;
       background-size: 8px 8px;
       border-radius: 10px;
-      @include avenir_H();
+      @include OC_Body_Bold();
 
       @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
 
@@ -670,7 +670,7 @@ div.left-navigation-sidebar {
     }
 
     button.bottom-nav-bt {
-      @include avenir_M();
+      @include OC_Body_Medium();
       width: 100%;
       text-align: left;
       padding: 2px 0px;

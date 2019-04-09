@@ -43,13 +43,13 @@ div.org-settings div.org-settings-inner div.org-settings-main {
       margin-top: 8px;
 
       div.cta {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: $carrot_text_blue;
       }
 
       div.description {
-        @include avenir_BOOK();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_light_gray;
         margin-top: 12px;
@@ -86,7 +86,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
 
       div.org-settings-list-item {
         div.org-settings-list-item-name {
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 16px;
           color: $carrot_dark_gray;
         }
@@ -111,7 +111,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
 
         span.org-settings-list-item-name {
           color: $carrot_green;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
         }
 
@@ -144,7 +144,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
         width: 390px;
 
         @include placeholder(){
-          @include avenir_R();
+          @include OC_Body_Medium();
           color: $ui_grey;
           font-size: 16px;
         }
@@ -154,7 +154,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
         height: 20px;
         padding: 0px 8px;
         color: $carrot_green;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         border-top-right-radius: 6px;
         border-bottom-right-radius: 6px;
@@ -238,7 +238,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
           }
 
           div.org-settings-list-item-name {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 14px;
             color: $deep_navy;
             float: none !important;
@@ -284,7 +284,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
 
                 li {
                   height: 48px;
-                  @include avenir_H();
+                  @include OC_Body_Bold();
                   font-size: 14px;
                   color: white;
                   cursor: pointer;
@@ -305,7 +305,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
           }
 
           div.org-settings-list-item-desc {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 14px;
             color: $deep_navy;
             line-height: 20px;
@@ -314,7 +314,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
           }
 
           div.slack-org-self-join {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 12px;
             color: $deep_navy;
             opacity: 0.5;
@@ -323,7 +323,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
           }
 
           div.slack-org-bot-switch {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 13px;
             color: $deep_navy;
             margin-top: 16px;
@@ -337,7 +337,7 @@ div.org-settings div.org-settings-inner div.org-settings-main {
               float: right;
               width: 140px;
               height: 32px;
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 13px;
               color: $carrot_green;
               background-color: $feint_emerald;

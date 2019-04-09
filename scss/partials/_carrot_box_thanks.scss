@@ -35,7 +35,7 @@ div.carrot-box-container {
     }
 
     div.thanks-headline {
-      @include avenir_M();
+      @include OC_Body_Medium();
       font-size: 32px;
       color: $carrot_gray;
 
@@ -45,23 +45,23 @@ div.carrot-box-container {
     }
 
     div.thanks-subheadline {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 16px;
       color: $oc_gray_7;
 
       span {
-        @include avenir_H();
+        @include OC_Body_Bold();
       }
     }
 
     div.carrot-early-access-top {
-      @include avenir_R();
+      @include OC_Body_Medium();
       font-size: 16px;
       margin-top: 20px;
     }
 
     a.carrot-early-access-link {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 16px;
       color: $carrot_text_blue;
 

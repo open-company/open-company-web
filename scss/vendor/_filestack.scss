@@ -42,7 +42,7 @@
 
 div.fsp-picker {
   background-color: $carrot_modal_bg !important;
-  @include avenir_M();
+  @include OC_Body_Medium();
 
   div.fsp-modal {
     background-color: white;
@@ -220,7 +220,7 @@ div.fsp-picker {
               opacity: 0.9;
               background-color: transparent;
               color: $carrot_dark_gray;
-              @include avenir_B();
+              @include OC_Body_Black();
 
               &:disabled {
                 cursor: not-allowed;
@@ -249,7 +249,7 @@ div.fsp-picker {
             div.fsp-text__title.fsp-source-auth__el {
               color: transparent;
               position: relative;
-              @include avenir_M();
+              @include OC_Body_Medium();
 
               &:after {
                 content: "Select a file to upload";
@@ -292,7 +292,7 @@ div.fsp-picker {
             div.fsp-drop-area__title.fsp-text__title {
               color: transparent;
               position: relative;
-              @include avenir_M();
+              @include OC_Body_Medium();
 
               &:after {
                 content: "Select a file to upload";

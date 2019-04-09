@@ -21,7 +21,7 @@ div.all-posts {
       color: $oc_gray_7;
       margin-bottom: 16px;
       font-size: 14px;
-      @include avenir_BOOKO();
+      @include OC_Body_Book_Italic();
     }
 
     div.all-posts-cards-inner {
@@ -57,7 +57,7 @@ div.all-posts {
           width: 100%;
           color: rgba($oc_gray_7, 0.5);
           font-size: 16px;
-          @include avenir_M();
+          @include OC_Body_Medium();
           text-align: center;
 
           @include mobile() {
@@ -73,7 +73,7 @@ div.all-posts {
 
       button.load-next {
         font-size: 16px;
-        @include avenir_H();
+        @include OC_Body_Bold();
       }
     }
   }

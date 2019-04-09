@@ -26,7 +26,7 @@ div.press-kit-wrap {
       h1.headline {
         font-size: 60px;
         line-height: 78px;
-        @include PTSerif()
+        @include OC_Title()
         color: $deep_navy;
         margin: 0 auto;
         position: relative;
@@ -84,12 +84,12 @@ div.press-kit-wrap {
           }
 
           div.press-kit-intro-title {
-            @include PTSerif();
+            @include OC_Title();
             font-size: 40px;
           }
 
           div.press-kit-intro-description {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 30px;
 
             p {
@@ -116,7 +116,7 @@ div.press-kit-wrap {
             div.press-kit-intro-footer-left {
               grid-column-start: 1;
               grid-row-start: 1;
-              @include PTSerif();
+              @include OC_Title();
               font-size: 20px;
             }
 
@@ -124,13 +124,13 @@ div.press-kit-wrap {
               grid-column-start: 2;
               grid-row-start: 1;
               text-align: left;
-              @include avenir_R();
+              @include OC_Body_Medium();
               font-size: 20px;
               line-height: 26px;
 
               a {
                 display: block;
-                @include avenir_B();
+                @include OC_Body_Black();
                 font-size: 14px;
                 text-decoration: uppercase;
                 letter-spacing: 0.5;
@@ -188,7 +188,7 @@ div.press-kit-wrap {
           }
 
           div.media-res-title {
-            @include PTSerif();
+            @include OC_Title();
             font-size: 80px;
 
             @include mobile() {
@@ -240,7 +240,7 @@ div.press-kit-wrap {
             a.media-res-content-video-download {
               text-align: center;
               margin: 32px auto 40px;
-              @include avenir_B();
+              @include OC_Body_Black();
               font-size: 14px;
               text-transform: uppercase;
               letter-spacing: 0.5;
@@ -268,7 +268,7 @@ div.press-kit-wrap {
               div.media-res-footer-left {
                 grid-column-start: 1;
                 grid-row-start: 1;
-                @include PTSerif();
+                @include OC_Title();
                 font-size: 20px;
                 text-align: left;
               }
@@ -276,7 +276,7 @@ div.press-kit-wrap {
               div.media-res-footer-right {
                 grid-column-start: 2;
                 grid-row-start: 1;
-                @include avenir_R();
+                @include OC_Body_Medium();
                 font-size: 20px;
 
                 @include tablet() {
@@ -290,7 +290,7 @@ div.press-kit-wrap {
                   a {
                     color: #32C97B;
                     text-align: left;
-                    @include avenir_B();
+                    @include OC_Body_Black();
                     font-size: 14px;
                     text-transform: uppercase;
                   }
@@ -315,7 +315,7 @@ div.press-kit-wrap {
         }
 
         div.core-ft-title {
-          @include PTSerif();
+          @include OC_Title();
           font-size: 80px;
 
           @include mobile() {
@@ -341,7 +341,7 @@ div.press-kit-wrap {
             div.core-ft-content-title {
               grid-column-start: 1;
               grid-row-start: 1;
-              @include PTSerif();
+              @include OC_Title();
               font-size: 20px;
               text-align: left;
             }
@@ -357,7 +357,7 @@ div.press-kit-wrap {
               }
 
               p {
-                @include avenir_R();
+                @include OC_Body_Medium();
                 font-size: 20px;
                 text-align: left;
                 margin: 0;
@@ -369,7 +369,7 @@ div.press-kit-wrap {
               }
 
               ul {
-                @include avenir_R();
+                @include OC_Body_Medium();
                 font-size: 20px;
                 text-align: left;
                 padding-inline-start: 30px;
@@ -394,7 +394,7 @@ div.press-kit-wrap {
         }
 
         div.odds-ends-title {
-          @include PTSerif();
+          @include OC_Title();
           font-size: 80px;
 
           @include mobile() {
@@ -404,7 +404,7 @@ div.press-kit-wrap {
 
         div.odds-ends-description {
           margin-top: 40px;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 30px;
 
           @include tablet() {
@@ -428,7 +428,7 @@ div.press-kit-wrap {
           div.odds-ends-content-left {
             grid-column-start: 1;
             grid-row-start: 1;
-            @include PTSerif();
+            @include OC_Title();
             font-size: 20px;
             text-align: left;
           }
@@ -436,7 +436,7 @@ div.press-kit-wrap {
           div.odds-ends-content-right {
             grid-column-start: 3;
             grid-row-start: 1;
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 20px;
             line-height: 26px;
             text-align: left;

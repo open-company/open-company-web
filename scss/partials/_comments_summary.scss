@@ -31,7 +31,7 @@ div.is-comments {
     float: left;
     font-size: 12px;
     color: $ui_grey;
-    @include avenir_R();
+    @include OC_Body_Medium();
     margin-top: 6px;
     text-align: left;
     white-space: nowrap;

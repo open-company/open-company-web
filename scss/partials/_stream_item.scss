@@ -197,7 +197,7 @@ div.stream-item {
           div.post-added-tooltips {
 
             div.post-added-tooltip {
-              @include avenir_R();
+              @include OC_Body_Medium();
               font-size: 16px;
               color: $deep_navy;
               line-height: 20px;
@@ -212,7 +212,7 @@ div.stream-item {
               border-radius: 6px;
               color: white;
               background-color: $carrot_green;
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 16px;
             }
           }
@@ -390,10 +390,7 @@ div.stream-item {
 
       div.stream-item-headline {
         @include activity-title();
-        @include avenir_H();
-        font-size: 22px;
         color: $deep_navy;
-        line-height: 28px;
         display: inline;
         @include mobile() {
           margin-top: 16px;
@@ -420,7 +417,7 @@ div.stream-item {
             &.to-truncate{
               @include activity-body(16, 22, 22, $deep_navy);
               color: $deep_navy;
-              @include avenir_R();
+              @include OC_Body_Book();
               line-height: 22px;
 
               @include mobile() {
@@ -438,7 +435,7 @@ div.stream-item {
             &.no-truncate {
               @include activity-body(16, 22, 22, $deep_navy);
               color: $deep_navy;
-              @include avenir_R();
+              @include OC_Body_Book();
               line-height: 22px;
               display: none;
 
@@ -470,14 +467,14 @@ div.stream-item {
       padding: 24px;
 
       div.stream-item-transcript-header {
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 12px;
         color: $light_ui_grey;
       }
 
       div.stream-item-transcript-content {
         margin-top: 24px;
-        @include avenir_BOOK();
+        @include OC_Body_Book();
         font-size: 16px;
         color: $deep_navy;
       }
@@ -493,7 +490,7 @@ div.stream-item {
         button.edit-draft-bt {
           text-align: left;
           padding: 0px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $carrot_green;
         }
@@ -504,7 +501,7 @@ div.stream-item {
         button.delete-draft-bt {
           text-align: right;
           padding: 0px;
-          @include avenir_R();
+          @include OC_Body_Medium();
           font-size: 14px;
           color: $ui_grey;
         }
@@ -586,7 +583,7 @@ div.stream-item {
       padding: 0;
       height: 24px;
       color: $carrot_green;
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 14px;
       justify-content: center;
       align-items: center;

@@ -18,7 +18,7 @@ div.slack-channels-dropdown {
     border-radius: 4px;
     background-color: white;
     border: 1px solid rgba($carrot_light_gray_1, 0.5);
-    @include avenir_M();
+    @include OC_Body_Medium();
     font-size: 14px;
     padding: 12px;
     outline: none;
@@ -30,7 +30,7 @@ div.slack-channels-dropdown {
     }
 
     @include placeholder() {
-      @include avenir_M();
+      @include OC_Body_Medium();
       font-size: 14px;
       color: $light_ui_grey;
     }
@@ -72,7 +72,7 @@ div.slack-channels-dropdown {
       }
 
       div.slack-team-name {
-        @include avenir_M();
+        @include OC_Body_Medium();
         font-size: 14px;
         color: $carrot_light_gray;
         padding: 0.4rem 0.8rem;
@@ -82,7 +82,7 @@ div.slack-channels-dropdown {
         width: 100%;
         padding: 8px 16px;
         color: $carrot_dark_gray;
-        @include avenir_M();
+        @include OC_Body_Medium();
         font-size: 14px;
         cursor: pointer;
 
@@ -91,7 +91,7 @@ div.slack-channels-dropdown {
         }
 
         span.ch-prefix {
-          @include avenir_R()
+          @include OC_Body_Medium()
           font-size: 16px;
           color: $carrot_light_gray_1;
           margin-right: 4px;

@@ -103,14 +103,14 @@ div.dashboard-layout {
           }
 
           div.add-post-tooltip-title {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 22px;
             color: $deep_navy;
             line-height: 20px;
           }
 
           div.add-post-tooltip {
-            @include avenir_R();
+            @include OC_Body_Medium();
             font-size: 16px;
             color: $deep_navy;
             line-height: 20px;
@@ -124,7 +124,7 @@ div.dashboard-layout {
               padding: 0;
               margin: 16px 0 0;
               color: white;
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 16px;
               line-height: 27px;
               display: flex;
@@ -201,7 +201,7 @@ div.dashboard-layout {
           }
 
           div.board-name-with-icon {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 28px;
             color: $deep_navy;
             float: left;
@@ -239,7 +239,7 @@ div.dashboard-layout {
             }
 
             @include mobile() {
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 15px;
               color: $deep_navy;
               width: auto;
@@ -378,7 +378,7 @@ div.dashboard-layout {
               div.section-settings-tooltips {
 
                 div.section-settings-tooltip {
-                  @include avenir_R();
+                  @include OC_Body_Medium();
                   font-size: 16px;
                   color: $deep_navy;
                   line-height: 20px;
@@ -393,7 +393,7 @@ div.dashboard-layout {
                   border-radius: 6px;
                   color: white;
                   background-color: $carrot_green;
-                  @include avenir_H();
+                  @include OC_Body_Bold();
                   font-size: 16px;
                 }
               }
@@ -401,7 +401,7 @@ div.dashboard-layout {
           }
 
           div.private-board {
-            @include avenir_M();
+            @include OC_Body_Medium();
             font-size: 14px;
             color: rgba($deep_navy, 0.5);
             position: relative;
@@ -435,7 +435,7 @@ div.dashboard-layout {
           }
 
           div.public-board {
-            @include avenir_M();
+            @include OC_Body_Medium();
             font-size: 14px;
             color: rgba($deep_navy, 0.5);
             position: relative;
@@ -565,7 +565,7 @@ div.dashboard-layout {
             }
 
             label.add-to-board-label {
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 16px;
               color: $carrot_orange;
               margin-left: 6px;
@@ -597,7 +597,7 @@ div.dashboard-layout {
               }
 
               button.compose-type {
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $carrot_green;
                 cursor: pointer;

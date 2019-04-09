@@ -6,7 +6,7 @@ span.go-to-digest {
   border-radius: 8px;
   background-color: $carrot_green;
   color: white;
-  @include avenir_B();
+  @include OC_Body_Black();
   font-size: 14px;
   position: relative;
   display: block;
@@ -198,7 +198,7 @@ nav.site-navbar {
     }
 
     a {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: rgba(#70674B, 0.8);
       font-size: 16px;
       margin: 0px 8px;
@@ -265,7 +265,7 @@ nav.site-navbar {
         min-width: 96px;
         height: 40px;
         color: $ui_grey;
-        @include avenir_B();
+        @include OC_Body_Black();
         font-size: 14px;
         padding: 10px 24px;
         text-align: center;
@@ -299,7 +299,7 @@ nav.site-navbar {
         min-width: 84px;
         height: 40px;
         border-radius: 8px;
-        @include avenir_B();
+        @include OC_Body_Black();
         font-size: 14px;
         color: #FB5E48;
         background-color: $coral;
@@ -429,7 +429,7 @@ nav.site-navbar {
       }
 
       a {
-        @include avenir_R();
+        @include OC_Body_Medium();
         padding: 0px 12px;
         display: inline-block;
         font-size: 18px;
@@ -439,7 +439,7 @@ nav.site-navbar {
         height: 28px;
 
         &.active {
-          @include avenir_H();
+          @include OC_Body_Bold();
           color: $deep_navy;
         }
       }
