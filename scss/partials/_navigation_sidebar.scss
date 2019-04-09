@@ -239,7 +239,7 @@ div.left-navigation-sidebar {
   overflow-y: auto;
   overflow-x: visible;
   width: #{$left_navigation_sidebar_width}px;
-  top: #{$navbar_height}px;
+  top: #{$navbar_height + 16}px;
   left: 0;
   height: calc(100vh - #{$navbar_height + 16}px);
   @include no-user-select();
