@@ -176,7 +176,7 @@
 }
 
 @mixin item-hover(){
-  background-color: #EFF0ED;
+  background-color: #FBFAF9;
   border-radius: 6px;
 
   @include mobile() {
@@ -235,16 +235,17 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - #{$navbar_height + 16}px);
+  max-height: calc(100vh - #{$navbar_height}px);
   overflow-y: auto;
   overflow-x: visible;
   width: #{$left_navigation_sidebar_width}px;
-  top: #{$navbar_height + 16}px;
+  top: #{$navbar_height}px;
   left: 0;
-  height: calc(100vh - #{$navbar_height + 16}px);
+  height: calc(100vh - #{$navbar_height}px);
   @include no-user-select();
   background-color: $ultra_light_grey;
   float: left;
+  padding-top: 16px;
 
   @include mobile() {
     position: absolute;
@@ -277,7 +278,7 @@ div.left-navigation-sidebar {
     top: unset;
     left: unset;
     float: left;
-    min-height: calc(100vh - #{$navbar_height + 16}px);
+    min-height: calc(100vh - #{$navbar_height}px);
     margin-top: 0;
   }
 
