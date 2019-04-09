@@ -127,12 +127,9 @@
         showing-qsg (:visible qsg-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :navigation-sidebar-overflow window-overflow?})
-       :style {:left (when (and (not is-mobile?)
-                                is-tall-enough?
-                                is-wide-enough?)
-                      (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
-               :overflow (when (= (:step qsg-data) :add-section-1)
+                                ; :navigation-sidebar-overflow window-overflow?
+                                })
+       :style {:overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
       [:div.mobile-header-container
         [:button.mlb-reset.mobile-header-close

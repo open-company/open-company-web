@@ -1,17 +1,14 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin: 12px 0px 16px;
-  border: 1px solid $ultra_light_grey;
-  border-radius: 6px;
   padding: 24px 32px;
-  background-color: white;
+  border-bottom: 1px solid $ultra_light_grey;
 
   @include mobile() {
     width: 100%;
     padding: 16px;
     margin: 0;
     border: none;
-    border-bottom: 1px solid $ultra_light_grey;
     border-radius: 0;
   }
 

@@ -118,7 +118,7 @@
 }
 
 @mixin item-selected() {
-  background-color: #D4F6E4;
+  background-color: #FBFAF9;
   border-radius: 6px;
 
   @include mobile() {
@@ -240,9 +240,13 @@ div.left-navigation-sidebar {
   overflow-x: visible;
   padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 90px;
+  top: 0;
+  left: 0;
   height: calc(100vh - 90px);
   @include no-user-select();
+  background-color: $ultra_light_grey;
+  float: left;
+  margin-top: #{$navbar_height}px;
 
   @include mobile() {
     position: absolute;
@@ -276,6 +280,7 @@ div.left-navigation-sidebar {
     left: unset;
     float: left;
     min-height: calc(100vh - 90px);
+    margin-top: 0;
   }
 
   div.mobile-header-container {
@@ -400,12 +405,12 @@ div.left-navigation-sidebar {
         opacity: 1;
       }
       
-      @include preload_image(cdnUrl("/img/ML/digest_icon_green.svg"));
+      // @include preload_image(cdnUrl("/img/ML/digest_icon_green.svg"));
 
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/digest_icon_green.svg");
-      }
+      // &.selected {
+      //   opacity: 1;
+      //   background-image: cdnUrl("/img/ML/digest_icon_green.svg");
+      // }
     }
 
     div.must-see-icon {
@@ -417,14 +422,14 @@ div.left-navigation-sidebar {
       height: 28px;
       float: left;
 
-      @include preload_image(cdnUrl("/img/ML/must_see_bolt_green.svg"));
+      // @include preload_image(cdnUrl("/img/ML/must_see_bolt_green.svg"));
 
-      @include mobile() {
-        margin-left: 0px;
-        margin-top: 0px;
-        background-position: center 3px;
-        opacity: 1;
-      }
+      // @include mobile() {
+      //   margin-left: 0px;
+      //   margin-top: 0px;
+      //   background-position: center 3px;
+      //   opacity: 1;
+      // }
 
       &.selected {
         opacity: 1;

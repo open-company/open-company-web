@@ -18,11 +18,12 @@ div.dashboard-layout {
   }
 
   div.dashboard-layout-container {
-    padding: 24px 0px;
+    padding: 0;
     margin: 0 auto;
     width: auto;
     width: 100%;
-    max-width: 952px;
+    max-width: calc(100vw - 200px);
+    margin-left: 200px;
 
     @include mobile(){
       padding: 0px;
@@ -32,7 +33,9 @@ div.dashboard-layout {
       width: #{$board_container_width}px;
       background-color: $oc_gray_8;
       position: relative;
-      float: right;
+      margin: 0 auto;
+      padding: 24px 0;
+      border-top: 1px solid $ultra_light_grey;
 
       @include mobile() {
         width: 100%;
@@ -183,6 +186,7 @@ div.dashboard-layout {
       div.board-name-container {
         padding: 0px 0px 8px;
         position: relative;
+        height: 40px;
 
         @include mobile() {
           display: none;
