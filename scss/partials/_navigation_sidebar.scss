@@ -245,7 +245,6 @@ div.left-navigation-sidebar {
   @include no-user-select();
   background-color: $ultra_light_grey;
   float: left;
-  padding-top: 16px;
 
   @include mobile() {
     position: absolute;
