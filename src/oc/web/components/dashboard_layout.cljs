@@ -9,7 +9,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
-            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.qsg :as qsg-actions]
@@ -27,43 +26,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(def min-scroll 50)
-(def max-scroll 92)
-
-(defn document-scroll-top []
-  (if (.-body js/document)
-    (max (.-pageYOffset js/window)
-         (.-scrollTop (.-documentElement js/document))
-         (.-scrollTop (.-body js/document)))
-    0))
-
-(defn calc-opacity [scroll-top]
-  (let [fixed-scroll-top (/
-                          (*
-                           (- (min scroll-top max-scroll) 50)
-                           100)
-                          (- max-scroll min-scroll))]
-    (max 0 (min (/ fixed-scroll-top 100) 1))))
-
-(defn did-scroll [e s]
-  (let [entry-floating (js/$ "#new-entry-floating-btn-container")]
-    (when (pos? (.-length entry-floating))
-      (let [scroll-top (document-scroll-top)
-            opacity (if (responsive/is-tablet-or-mobile?)
-                      1
-                      (calc-opacity scroll-top))]
-        (.css entry-floating #js {:opacity opacity
-                                 :display (if (pos? opacity) "block" "none")})))))
-
-(defn win-width
-  "Save the window width in the state."
-  [s]
-  (reset! (::ww s) (responsive/ww)))
-
 (defn- update-tooltips [s]
-  (when-let [$compose-button (js/$ (rum/ref-node s :top-compose-button))]
-    (when (.attr $compose-button "data-original-title")
-      (.tooltip $compose-button (.attr $compose-button "data-viewer"))))
   ;; Commenting out grid view switcher for now
   ; (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
   ;   (.tooltip $board-switcher)
@@ -85,22 +48,13 @@
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
-                              ;; Locals
-                              (rum/local nil ::force-update)
-                              (rum/local nil ::ww)
-                              (rum/local nil ::scroll-listener)
-                              (rum/local nil ::show-top-boards-dropdown)
-                              (rum/local nil ::show-floating-boards-dropdown)
                               ;; Commenting out grid view switcher for now
                               ; (rum/local nil ::board-switch)
-                              ;; Mixins
-                              (ui-mixins/render-on-resize win-width)
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
                                 s)
                                :will-mount (fn [s]
-                                (win-width s)
                                 ;; Commenting out grid view switcher for now
                                 ; (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
                                 ;       cookie-value (cook/get-cookie board-view-cookie)
@@ -112,10 +66,6 @@
                                 ;   (reset! (::board-switch s) fixed-board-view))
                                 s)
                                :did-mount (fn [s]
-                                (when-not (responsive/is-tablet-or-mobile?)
-                                  (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                                  (reset! (::scroll-listener s)
-                                   (events/listen js/window EventType/SCROLL #(did-scroll % s))))
                                 (update-tooltips s)
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
@@ -123,15 +73,6 @@
                                     (activity-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
-                                s)
-                               :will-unmount (fn [s]
-                                (when-not (utils/is-test-env?)
-                                  (when @(::scroll-listener s)
-                                    (events/unlistenByKey @(::scroll-listener s))
-                                    (reset! (::scroll-listener s) nil)))
-                                s)
-                               :did-update (fn [s]
-                                (update-tooltips s)
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -147,14 +88,13 @@
         empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
+        can-compose (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
         ; board-switch (::board-switch s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
-        can-compose (pos? (count all-boards))
-        should-show-top-compose (jwt/user-is-part-of-the-team (:team-id org-data))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and (router/current-board-slug)
@@ -234,38 +174,6 @@
                           [:button.mlb-reset.section-settings-bt
                             {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
                             "OK, got it"]]])])]
-                ;; Add entry button
-                (when should-show-top-compose
-                  [:div.new-post-top-dropdown-container.group
-                    (let [show-tooltip? (boolean (and should-show-top-compose (not can-compose)))]
-                      [:button.mlb-reset.mlb-default.add-to-board-top-button.group.qsg-create-post-1
-                        {:ref :top-compose-button
-                         :on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
-                         :class (when-not can-compose "disabled")
-                         :title (when show-tooltip? "You are a view-only user.")
-                         :data-viewer (if show-tooltip? "enable" "disable")
-                         :data-toggle (when show-tooltip? "tooltip")
-                         :data-placement (when show-tooltip? "top")
-                         :data-container (when show-tooltip? "body")
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                        (when (= (:step qsg-data) :create-post-1)
-                          (qsg-breadcrumb qsg-data))
-                        [:div.add-to-board-plus]
-                        [:label.add-to-board-label
-                          "New"]])
-                    (when @(::show-top-boards-dropdown s)
-                      (dropdown-list
-                       {:items (map
-                                #(-> %
-                                  (select-keys [:name :slug])
-                                  (clojure.set/rename-keys {:name :label :slug :value}))
-                                (vals all-boards))
-                        :value ""
-                        :on-blur #(reset! (::show-top-boards-dropdown s) false)
-                        :on-change (fn [item]
-                                     (reset! (::show-top-boards-dropdown s) false)
-                                     (activity-actions/activity-edit {:board-slug (:value item)
-                                                                      :board-name (:label item)}))}))])
                 ;; Commenting out grid view switcher for now
                 ; (when-not is-tablet-or-mobile?
                 ;   [:div.board-switcher.group
@@ -338,24 +246,4 @@
                   ; (entries-layout)
                   ;; Entries stream view
                   :else
-                  (section-stream)))
-              ;; Add entry floating button
-              (when can-compose
-                (let [opacity (if is-tablet-or-mobile?
-                                0
-                                (calc-opacity (document-scroll-top)))]
-                  [:div.new-post-floating-dropdown-container.group
-                    {:id "new-entry-floating-btn-container"
-                     :style {:opacity opacity
-                             :display (if (pos? opacity) "block" "none")}
-                     :class (when (:visible qsg-data) "showing-qsg")}
-                    [:button.mlb-reset.mlb-default.add-to-board-floating-button.qsg-create-post-1
-                      {:data-placement "left"
-                       :data-container "body"
-                       :data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                       :title "Start a new post"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
-                      (when (= (:step qsg-data) :create-post-1)
-                        (qsg-breadcrumb qsg-data))
-                      [:div.add-to-board-plus]]]))])]]))
+                  (section-stream)))])]]))

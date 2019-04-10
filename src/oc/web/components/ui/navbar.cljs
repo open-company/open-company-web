@@ -86,7 +86,7 @@
                               [:span.public-icon]
                               (= (router/current-board-slug) "must-see")
                               [:span.must-see-icon])]
-              [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+              [:button.mlb-reset.navigation-sidebar-ham-bt
                 {:class (utils/class-set {:active mobile-ap-active?})
                  :on-click nav-actions/mobile-nav-sidebar}
                 board-icon

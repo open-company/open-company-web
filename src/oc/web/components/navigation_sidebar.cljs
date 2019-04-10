@@ -4,13 +4,13 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.lib.chat :as chat]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -61,7 +61,9 @@
                                 (drv/drv :show-section-add)
                                 (drv/drv :change-cache-data)
                                 (drv/drv :current-user-data)
+                                (drv/drv :editable-boards)
                                 (drv/drv :mobile-navigation-sidebar)
+                                (drv/drv :show-add-post-tooltip)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -110,9 +112,6 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
-        is-admin-or-author? (utils/is-admin-or-author? org-data)
-        show-invite-people (and org-slug
-                                is-admin-or-author?)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
@@ -122,9 +121,10 @@
         window-overflow? (and (not is-mobile?)
                               (or (not is-tall-enough?)
                                   (not is-wide-enough?)))
-        show-reminders? (utils/link-for (:links org-data) "reminders")
         qsg-data (drv/react s :qsg)
-        showing-qsg (:visible qsg-data)]
+        showing-qsg (:visible qsg-data)
+        editable-boards (drv/react s :editable-boards)
+        can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
                                 ; :navigation-sidebar-overflow window-overflow?
@@ -230,41 +230,12 @@
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
+      (when can-compose
       [:div.left-navigation-sidebar-footer
         {:ref "left-navigation-sidebar-footer"
          :class (utils/class-set {:push-to-bottom is-tall-enough?})}
-        (when show-reminders?
-          [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(do
-                          (nav-actions/show-reminders)
-                          (utils/after 500 utils/remove-tooltips))
-             :title "Set reminders to update your team on time"
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            [:div.bottom-nav-icon.reminders-icon]
-            [:span "Reminders"]])
-        (when show-invite-people
-          [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(do
-                          (nav-actions/show-invite)
-                          (utils/after 500 utils/remove-tooltips))
-             :title "Invite teammates with email or Slack"
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            [:div.bottom-nav-icon.invite-people-icon]
-            [:span "Invite team"]])
-        [:button.mlb-reset.bottom-nav-bt
-          {:on-click #(do
-                        (chat/chat-click 42861)
-                        (utils/after 500 utils/remove-tooltips))
-           :title "Have a question for Carrot? Chat with us."
-           :data-toggle (when-not is-mobile? "tooltip")
-           :data-placement "top"
-           :data-container "body"
-           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-          [:div.bottom-nav-icon.support-icon]
-          [:span "Get support"]]]]))
+        [:button.mlb-reset.compose-green-bt
+          {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+          [:span.compose-green-icon]
+          [:span.compose-green-label
+            "New post"]]])]))

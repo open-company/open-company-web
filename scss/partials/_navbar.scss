@@ -105,30 +105,39 @@ nav.oc-navbar {
           width: 40%;
         }
 
-        button.mobile-navigation-sidebar-ham-bt {
-          display: none;
+        div.orgs-dropdown {
+          float: left;
+        }
+
+        button.navigation-sidebar-ham-bt {
+          position: relative;
+          padding: 0 0 0 35px;
+          display: block;
+          height: 32px;
+          opacity: 1;
+          float: left;
+
+          &:after {
+            content: "";
+            width: 19px;
+            height: 12px;
+            background-image: cdnUrl("/img/ML/navbar_ham.svg");
+            background-repeat: no-repeat;
+            background-size: 19px 12px;
+            background-position: center;
+            position: absolute;
+            opacity: 0.5;
+            left: 0;
+            top: 9px;
+          }
+
+          span.board-name, span.private-icon, span.public-icon, span.must-see-icon {
+            display: none;
+          }
 
           @include mobile() {
-            position: relative;
-            padding: 0 0 0 35px;
-            display: block;
-            height: 32px;
-            opacity: 1;
+            float: unset;
             width: 60vw;
-
-            &:after {
-              content: "";
-              width: 19px;
-              height: 12px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
-              background-repeat: no-repeat;
-              background-size: 19px 12px;
-              background-position: center;
-              position: absolute;
-              opacity: 0.5;
-              left: 0;
-              top: 9px;
-            }
 
             span.private-icon {
               margin-right: 6px;

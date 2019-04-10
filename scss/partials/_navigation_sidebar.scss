@@ -649,9 +649,8 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
-    margin-left: 16px;
     position: relative;
-    padding-bottom: 23px;
+    width: 100%;
 
     @include mobile() {
       // Temp remove bottom links on mobile
@@ -668,62 +667,35 @@ div.left-navigation-sidebar {
 
     &.push-to-bottom {
       position: absolute;
-      bottom: 23px;
+      bottom: 0;
       padding-bottom: 0px;
     }
 
-    button.bottom-nav-bt {
-      @include OC_Body_Medium();
-      width: 100%;
-      text-align: left;
-      padding: 2px 0px;
-      height: 28px;
-      display: block;
-      position: relative;
+    button.compose-green-bt {
+      border-radius: 6px;
+      background-color: $carrot_green;
+      margin: 16px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: calc(100% - 32px);
+      height: 40px;
 
-      &:hover {
-        text-decoration: underline;
-      }
-
-      div.bottom-nav-icon {
-        background-size: 16px 16px;
+      span.compose-green-icon {
+        width: 12px;
+        height: 12px;
+        background-image: cdnUrl("/img/ML/white_pen.svg");
+        background-size: 12px 12px;
+        background-position: center;
         background-repeat: no-repeat;
-        background-position: center 5px;
-        width: 16px;
-        height: 28px;
-        float: left;
-        opacity: 1;
-
-        @include mobile() {
-          opacity: 1;
-        }
-
-        &.invite-people-icon {
-          background-image: cdnUrl("/img/ML/invite_team.svg");
-        }
-
-        &.support-icon {
-          background-image: cdnUrl("/img/ML/support.svg");
-        }
-
-        &.reminders-icon {
-          background-image: cdnUrl("/img/ML/reminders_logo_dark.svg");
-          opacity: 0.6;
-        }
-
       }
 
-      span {
-        font-size: 14px;
-        line-height: 28px;
-        color: $ui_grey;
-        display: block;
-        float: left;
-        margin-left: 16px;
-
-        @include mobile() {
-          color: white;
-        }
+      span.compose-green-label {
+        @include OC_Body_Bold();
+        font-size: 16px;
+        color: white;
+        margin-left: 8px;
       }
     }
   }
