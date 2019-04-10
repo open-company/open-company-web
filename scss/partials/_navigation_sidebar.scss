@@ -119,10 +119,8 @@
 
 @mixin item-selected() {
   background-color: #FBFAF9;
-  border-radius: 6px;
 
   @include mobile() {
-    border-radius: 0px;
     background-color: transparent;
   }
 
@@ -177,11 +175,9 @@
 
 @mixin item-hover(){
   background-color: #FBFAF9;
-  border-radius: 6px;
 
   @include mobile() {
     background-color: transparent;
-    border-radius: 0px;
   }
 
   .internal {
@@ -347,8 +343,6 @@ div.left-navigation-sidebar {
     background-color: transparent;
     border: none;
     outline: none;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
     padding-left: 16px;
 
     @include mobile() {
@@ -544,8 +538,6 @@ div.left-navigation-sidebar {
     a.left-navigation-sidebar-item {
       display: block;
       cursor: default;
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
       padding-left: 16px;
       margin: 0;
       text-decoration: none;
