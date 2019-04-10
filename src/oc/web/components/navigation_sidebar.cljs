@@ -144,8 +144,7 @@
             {:class (utils/class-set {:item-selected is-all-posts})
              :href (oc-urls/all-posts)
              :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
-            [:div.all-posts-icon
-              {:class (when is-all-posts "selected")}]
+            [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
               "All posts"]])
@@ -155,8 +154,7 @@
                                       :showing-drafts drafts-link})
               :href (oc-urls/must-see)
               :on-click #(nav-actions/nav-to-url! % (oc-urls/must-see))}
-             [:div.must-see-icon
-               {:class (when is-must-see "selected")}]
+             [:div.must-see-icon]
              [:div.must-see-label
                "Must see"]])
         (when drafts-link
@@ -171,18 +169,18 @@
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
                :on-click #(nav-actions/nav-to-url! % board-url)}
+              [:div.drafts-icon]
               [:div.drafts-label.group
                 "Drafts "
                 (when (pos? draft-count)
-                  [:span.count "(" draft-count ")"])]]))
+                  [:span.count draft-count])]]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
             {:class (when (drv/react s :show-section-add) "show-section-add")}
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              [:span
-                "SECTIONS"]
+              [:span "Sections"]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset.qsg-add-section-1
                   {:on-click #(nav-actions/show-section-add)
@@ -208,12 +206,6 @@
                  :href board-url
                  :on-click #(do
                               (nav-actions/nav-to-url! % board-url))}
-                (when (= (:access board) "public")
-                  [:div.public
-                    {:class (when is-current-board "selected")}])
-                (when (= (:access board) "private")
-                  [:div.private
-                    {:class (when is-current-board "selected")}])
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")
@@ -222,7 +214,11 @@
                     {:class (utils/class-set {:new (seq (:unseen board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]
+                (when (= (:access board) "public")
+                  [:div.public])
+                (when (= (:access board) "private")
+                  [:div.private])])])]
       (when can-compose
         [:div.left-navigation-sidebar-footer
           {:ref "left-navigation-sidebar-footer"}

@@ -1,5 +1,7 @@
 @mixin default-item(){
   background-color: transparent;
+  height: 34px;
+  padding-top: 6px;
 
   @include mobile() {
     height: 72px;
@@ -23,36 +25,35 @@
   }
 
   .internal {
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
-
-    @include mobile() {
-      font-size: 16px;
-    }
 
     &.new {
       @include OC_Body_Bold();
-      color: $deep_navy;
     }
   }
 
   div.drafts-label {
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
 
-    @include mobile() {
-      font-size: 16px;
-    }
-
     span.count {
-      @include OC_Body_Medium();
-      color: #C5C6C8;
+      float: right;
+      @include OC_Body_Book();
+      font-size: 12px;
+      line-height: 16px;
+      text-align: center;
+      color: #FBFAF9;
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background-color: #C2C3C6;
+      border-radius: 4px;
+      margin-top: 2px;
     }
 
     &.new {
@@ -69,18 +70,13 @@
   }
 
   div.all-posts-label {
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
     color: $deep_navy;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    @include mobile() {
-      font-size: 16px;
-    }
 
     &:active, &:focus {
       text-decoration: none;
@@ -93,18 +89,13 @@
   }
 
   div.must-see-label {
-    @include OC_Body_Medium();
+    @include OC_Body_Bold();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    @include mobile() {
-      font-size: 16px;
-    }
 
     &:active, &:focus {
       text-decoration: none;
@@ -112,7 +103,6 @@
 
     &.new {
       @include OC_Body_Bold();
-      color: $deep_navy;
     }
   }
 }
@@ -126,33 +116,18 @@
 
   .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
     // color: $carrot_green;
-    @include OC_Body_Bold();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
     text-decoration: none;
-
-    @include mobile() {
-      @include OC_Body_Bold();
-      font-size: 16px;
-    }
 
     span.count {
       color: $carrot_green;
-
-      @include mobile() {
-        @include OC_Body_Bold();
-        font-size: 16px;
-      }
     }
   }
 
   div.all-posts-label, div.drafts-label, div.must-see-label {
     font-size: 14px;
     text-decoration: none;
-
-    @include mobile() {
-      font-size: 16px;
-    }
   }
 
   &:active, &:focus {
@@ -181,20 +156,13 @@
   }
 
   .internal {
-    color: $ui_grey;
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
+    color: $deep_navy;
     text-decoration: none;
-
-    @include mobile() {
-      @include OC_Body_Medium();
-      font-size: 16px;
-    }
 
     &.new {
       @include OC_Body_Bold();
-      color: $deep_navy;
     }
   }
 
@@ -208,14 +176,8 @@
 
   div.all-posts-label, div.drafts-label, div.must-see-label {
 
-    color: $ui_grey;
-    font-size: 14px;
-    line-height: 25px;
+    color: $deep_navy;
     text-decoration: none;
-
-    @include mobile() {
-      font-size: 16px;
-    }
 
     &:active, &:focus {
       text-decoration: none;
@@ -223,7 +185,6 @@
 
     &.new {
       @include OC_Body_Bold();
-      color: $deep_navy;
     }
   }
 }
@@ -308,8 +269,7 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-content {
     padding-bottom: 32px;
     width: #{$left_navigation_sidebar_width}px;
-    max-height: calc(100% - 72px);
-    min-height: calc(100% - 72px);
+    height: calc(100% - 72px);
     overflow-x: hidden;
     overflow-y: auto;
 
@@ -376,13 +336,17 @@ div.left-navigation-sidebar {
       }
     }
 
+    div.must-see-label {
+      padding: 2px 0px 0px 14px;
+    }
+
     div.all-posts-icon {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
       background-size: 16px 16px;
       background-repeat: no-repeat;
-      background-position: center 6px;
+      background-position: center;
       width: 16px;
-      height: 28px;
+      height: 23px;
       float: left;
 
       @include mobile() {
@@ -391,13 +355,6 @@ div.left-navigation-sidebar {
         background-position: center 4px;
         opacity: 1;
       }
-      
-      // @include preload_image(cdnUrl("/img/ML/digest_icon_green.svg"));
-
-      // &.selected {
-      //   opacity: 1;
-      //   background-image: cdnUrl("/img/ML/digest_icon_green.svg");
-      // }
     }
 
     div.must-see-icon {
@@ -406,21 +363,24 @@ div.left-navigation-sidebar {
       background-position: center 4px;
       background-repeat: no-repeat;
       width: 18px;
-      height: 28px;
+      height: 23px;
+      float: left;
+    }
+
+    div.drafts-icon {
+      background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
+      background-size: 16px 14px;
+      background-repeat: no-repeat;
+      background-position: center 6px;
+      width: 16px;
+      height: 23px;
       float: left;
 
-      // @include preload_image(cdnUrl("/img/ML/must_see_bolt_green.svg"));
-
-      // @include mobile() {
-      //   margin-left: 0px;
-      //   margin-top: 0px;
-      //   background-position: center 3px;
-      //   opacity: 1;
-      // }
-
-      &.selected {
+      @include mobile() {
+        margin-left: 0px;
+        margin-top: 0px;
+        background-position: center 4px;
         opacity: 1;
-        background-image: cdnUrl("/img/ML/must_see_bolt_green.svg");
       }
     }
   }
@@ -450,8 +410,9 @@ div.left-navigation-sidebar {
     }
 
     .left-navigation-sidebar-top-title {
-      padding: 0px 0px 0px 48px;
+      padding: 0px 0px 0px 16px;
       margin: 0;
+      height: 15px;
       margin-bottom: 8px;
 
       @include mobile() {
@@ -463,16 +424,17 @@ div.left-navigation-sidebar {
       }
 
       span {
-        @include OC_Body_Black();
-        font-size: 13px;
-        color: rgba($ui_grey, 0.5);
+        @include OC_Body_Book();
+        font-size: 12px;
+        line-height: 15px;
+        height: 15px;
+        color: #90939E;
         float: left;
         cursor: default;
 
         @include mobile() {
           display: block;
-          height: 18px;
-          line-height: 18px;
+          line-height: 15px;
         }
       }
 
@@ -491,26 +453,17 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-left: 8px;
-      margin-top: -5px;
-      float: left;
+      margin-right: 16px;
+      margin-top: -2px;
+      float: right;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
-      background-color: #F0EFEA;
       background-image: cdnUrl("/img/ML/plus_button_icon.svg");
       background-repeat: no-repeat;
-      background-position: 50%;
-      background-size: 8px 8px;
-      border-radius: 10px;
+      background-position: center;
+      background-size: 12px 12px;
       @include OC_Body_Bold();
-
-      @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
-
-      &:hover, &.active {
-        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
-        background-color: $carrot_green_2;
-      }
 
       &.qsg-add-section-1 {
         position: relative;
@@ -518,12 +471,6 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         display: none;
-        float: right;
-
-        &:hover {
-          background-color: #F0EFEA;
-          background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-        }
       }
     }
   }
@@ -575,43 +522,29 @@ div.left-navigation-sidebar {
       }
 
       div.public {
-        float: left;
+        float: right;
+        margin-right: 16px;
         width: 16px;
-        height: 28px;
+        height: 23px;
         background-image: cdnUrl("/img/ML/board_public.svg");
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        opacity: 0.5;
-
-        @include preload_image(cdnUrl("/img/ML/board_public_green.svg"));
-
-        &.selected {
-          opacity: 1;
-          background-image: cdnUrl("/img/ML/board_public_green.svg");
-        }
+        opacity: 0.4;
       }
 
       div.private {
-        float: left;
+        float: right;
+        margin-right: 16px;
         width: 16px;
-        height: 28px;
+        height: 23px;
         background-image: cdnUrl("/img/ML/board_private.svg");
-        background-size: 9px 11px;
+        background-size: 10px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        opacity: 0.5;
-
-        @include preload_image(cdnUrl("/img/ML/board_private_green.svg"));
-
-        &.selected {
-          opacity: 1;
-          background-image: cdnUrl("/img/ML/board_private_green.svg");
-        }
       }
 
       div.board-name {
-        margin-left: 32px;
 
         div.internal {
           padding: 3px 0px 0px;
@@ -640,12 +573,6 @@ div.left-navigation-sidebar {
     width: 100%;
 
     @include mobile() {
-      // Temp remove bottom links on mobile
-      display: none;
-
-      opacity: 0.5;
-      margin-left: 16px;
-
       button {
         width: 100%;
         text-align: left;
