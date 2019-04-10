@@ -24,6 +24,12 @@ div.dashboard-layout {
     width: 100%;
     max-width: calc(100vw - 200px);
     margin-left: 200px;
+    transition: margin-left 180ms ease-in, width 180ms ease-in, max-width 180ms ease-in;
+
+    &.hide-left-navbar {
+      margin-left: 0;
+      max-width: 100vw;
+    }
 
     @include mobile(){
       padding: 0px;

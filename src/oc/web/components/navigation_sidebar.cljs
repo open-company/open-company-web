@@ -125,7 +125,7 @@
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
                                 ; :navigation-sidebar-overflow window-overflow?
-                                :hide-lef-navbar (drv/react s :hide-left-navbar)
+                                :hide-left-navbar (drv/react s :hide-left-navbar)
                                 })
        :style {:overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}

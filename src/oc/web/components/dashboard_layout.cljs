@@ -48,6 +48,7 @@
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
+                              (drv/drv :hide-left-navbar)
                               ;; Commenting out grid view switcher for now
                               ; (rum/local nil ::board-switch)
                               {:before-render (fn [s]
@@ -105,6 +106,7 @@
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
+          {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (when-not is-mobile?
             (navigation-sidebar))
           ;; Show the board always on desktop and
