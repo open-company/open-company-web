@@ -427,7 +427,7 @@
       (fn [{:keys [success body status]}]
         (callback success body status)))
     (handle-missing-link "auth-with-email" auth-link callback
-     {:email email :pswd (repeat (count pswd) "*")})))
+     {:email email :pswd (str (repeat (count pswd) "*"))})))
 
 (defn auth-with-token [auth-link token callback]
   (if (and auth-link token)
@@ -466,7 +466,7 @@
         (fn [{:keys [success body status]}]
           (callback success body status)))
       (handle-missing-link "signup-with-email" auth-link callback
-       (assoc user-map :password (repeat (count pswd) "*"))))))
+       (assoc user-map :password (str (repeat (count pswd) "*")))))))
 
 ;; Team(s)
 
@@ -566,7 +566,7 @@
        :headers (headers-for-link update-link)}
       (fn [{:keys [status body success]}]
         (utils/after 100 #(callback status body success))))
-    (handle-missing-link "collect-password" update-link callback {:pswd (repeat (count pswd) "*")})))
+    (handle-missing-link "collect-password" update-link callback {:pswd (str (repeat (count pswd) "*"))})))
 
 (defn get-user [user-link callback]
   (if user-link
