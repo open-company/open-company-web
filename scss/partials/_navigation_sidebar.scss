@@ -268,20 +268,6 @@ div.left-navigation-sidebar {
     }
   }
 
-  &.navigation-sidebar-overflow {
-    position: relative;
-    overflow-x: unset;
-    overflow-y: unset;
-    overflow: auto;
-    height: auto;
-    max-height: unset;
-    top: unset;
-    left: unset;
-    float: left;
-    min-height: calc(100vh - #{$navbar_height}px);
-    margin-top: 0;
-  }
-
   div.mobile-header-container {
     display: none;
 
@@ -322,12 +308,16 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-content {
     padding-bottom: 32px;
     width: #{$left_navigation_sidebar_width}px;
+    max-height: calc(100% - 72px);
+    min-height: calc(100% - 72px);
+    overflow-x: hidden;
+    overflow-y: auto;
 
     @include mobile() {
       position: relative;
       padding-bottom: 0px;
-      background-color: white;
       width: 100%;
+      height: auto;
     }
   }
 
@@ -660,12 +650,6 @@ div.left-navigation-sidebar {
         width: 100%;
         text-align: left;
       }
-    }
-
-    &.push-to-bottom {
-      position: absolute;
-      bottom: 0;
-      padding-bottom: 0px;
     }
 
     button.compose-green-bt {

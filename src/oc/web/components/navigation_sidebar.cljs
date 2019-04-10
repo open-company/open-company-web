@@ -114,17 +114,12 @@
                             (not @(::footer-height s))
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        is-wide-enough? (pos? (- @(::window-width s) 980))
-        window-overflow? (and (not is-mobile?)
-                              (or (not is-tall-enough?)
-                                  (not is-wide-enough?)))
         qsg-data (drv/react s :qsg)
         showing-qsg (:visible qsg-data)
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                ; :navigation-sidebar-overflow window-overflow?
                                 :hide-left-navbar (drv/react s :hide-left-navbar)
                                 })
        :style {:overflow (when (= (:step qsg-data) :add-section-1)
@@ -229,11 +224,10 @@
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
       (when can-compose
-      [:div.left-navigation-sidebar-footer
-        {:ref "left-navigation-sidebar-footer"
-         :class (utils/class-set {:push-to-bottom is-tall-enough?})}
-        [:button.mlb-reset.compose-green-bt
-          {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
-          [:span.compose-green-icon]
-          [:span.compose-green-label
-            "New post"]]])]))
+        [:div.left-navigation-sidebar-footer
+          {:ref "left-navigation-sidebar-footer"}
+          [:button.mlb-reset.compose-green-bt
+            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+            [:span.compose-green-icon]
+            [:span.compose-green-label
+              "New post"]]])]))
