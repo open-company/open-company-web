@@ -96,9 +96,9 @@
   text-rendering: optimizeLegibility;;
 }
 
-@mixin OCBodyFont($font_variant){
+@mixin OCBodyFont($font_variant, $font_weight: normal){
   font-family: #{$font_variant}, Muli, Arial, sans-serif;
-  font-weight: normal;
+  font-weight: $font_weight;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -106,11 +106,11 @@
 }
 
 @mixin OC_Body_Book() {
-  @include OCBodyFont(Circular-Book);
+  @include OCBodyFont(Circular-Book, 300);
 }
 
 @mixin OC_Body_Book_Italic() {
-  @include OCBodyFont(Circular-BookItalic);
+  @include OCBodyFont(Circular-BookItalic, 300);
 }
 
 @mixin OC_Body_Medium(){
@@ -122,19 +122,19 @@
 }
 
 @mixin OC_Body_Bold(){
-  @include OCBodyFont(Circular-Bold);
+  @include OCBodyFont(Circular-Bold, bold);
 }
 
 @mixin OC_Body_Bold_Italic(){
-  @include OCBodyFont(Circular-BoldItalic);
+  @include OCBodyFont(Circular-BoldItalic, bold);
 }
 
 @mixin OC_Body_Black(){
-  @include OCBodyFont(Circular-Black);
+  @include OCBodyFont(Circular-Black, 900);
 }
 
 @mixin OC_Body_Black_Italic(){
-  @include OCBodyFont(Circular-BlackItalic);
+  @include OCBodyFont(Circular-BlackItalic, 900);
 }
 
 @mixin OC_Title($weight: 700){

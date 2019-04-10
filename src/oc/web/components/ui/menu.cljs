@@ -104,26 +104,15 @@
       [:button.mlb-reset.modal-close-bt
         {:on-click #(menu-close)}]
       [:div.menu-container
-        [:div.menu-header
+        [:div.menu-header.group
           [:button.mlb-reset.mobile-close-bt
             {:on-click #(do
                          (menu-toggle)
                          (nav-actions/mobile-nav-sidebar))}]
-          (user-avatar-image current-user-data)
-          [:div.mobile-user-name
-            {:class utils/hide-class}
-            (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
           [:div.user-name
             {:class utils/hide-class}
-            (str "Hi " (jwt/get-key :first-name) "!")]
-          [:div.user-type
-            (case user-role
-              :admin
-              "Admin"
-              :author
-              "Contributor"
-              :viewer
-              "Viewer")]]
+            (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
+          (user-avatar-image current-user-data)]
         (when (jwt/jwt)
           [:a.qsg-profile-photo-2
             {:href "#"
@@ -137,7 +126,7 @@
             {:href "#"
              :on-click notifications-settings-click}
             [:div.oc-menu-item.notifications-settings
-              "Notification Settings"]])
+              "Notifications"]])
         (when show-reminders?
           [:a.qsg-create-reminder-2
             {:href "#"
@@ -147,11 +136,6 @@
             [:div.oc-menu-item.reminders
               "Reminders"]])
         [:div.oc-menu-separator]
-        (when org-data
-          [:div.org-item
-            (org-avatar org-data false false true)
-            [:div.org-name (:name org-data)]
-            [:div.org-url (str ls/web-server "/" (:slug org-data))]])
         (when (and (not is-mobile?)
                    (router/current-org-slug)
                    (= user-role :admin))
@@ -194,7 +178,6 @@
         ;            (= user-role :admin))
         ;   [:div.oc-menu-item
         ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
-        [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out
             {:href oc-urls/logout :on-click logout-click} 
