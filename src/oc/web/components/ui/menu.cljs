@@ -8,6 +8,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.stores.user :as user-store]
             [oc.web.actions.jwt :as jwt-actions]
@@ -15,7 +16,6 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
@@ -23,91 +23,110 @@
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
+(defn real-menu-close []
+  (dis/dispatch! [:input [:expanded-user-menu] false]))
+
 (defn menu-toggle []
   (dis/dispatch! [:update [:expanded-user-menu] not]))
 
-(defn menu-close []
-  (dis/dispatch! [:input [:expanded-user-menu] false]))
+(defn menu-close [& [s]]
+  (if s
+    (reset! (::unmounting s) true)
+    (real-menu-close)))
 
-(defn logout-click [e]
+(defn logout-click [s e]
   (.preventDefault e)
-  (menu-toggle)
+  (menu-close s)
   (jwt-actions/logout))
 
-(defn user-profile-click [e]
+(defn user-profile-click [s e]
   (.preventDefault e)
   (qsg-actions/next-profile-photo-trail)
   (if (responsive/is-tablet-or-mobile?)
     (user-profile/show-modal :profile)
     (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
-  (menu-toggle))
+  (menu-close s))
 
-(defn notifications-settings-click [e]
+(defn notifications-settings-click [s e]
   (.preventDefault e)
-  (menu-toggle)
+  (menu-close s)
   (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
 
-(defn team-settings-click [e qsg-data]
+(defn team-settings-click [s e qsg-data]
   (.preventDefault e)
   (when (= (:step qsg-data) :company-logo-2)
     (qsg-actions/next-company-logo-trail))
-  (menu-toggle)
+  (menu-close s)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
-(defn manage-team-click [e qsg-data]
+(defn manage-team-click [s e qsg-data]
   (.preventDefault e)
   (let [invite-team-step? (= (:step qsg-data) :invite-team-2)]
     (when invite-team-step?
       (qsg-actions/finish-invite-team-trail))
-    (menu-toggle)
+    (menu-close s)
     (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal (if invite-team-step? :invite :team)))))
 
-(defn sign-in-sign-up-click [e]
-  (menu-toggle)
+(defn sign-in-sign-up-click [s e]
+  (menu-close s)
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
-(defn show-qsg-click [e]
-  (menu-toggle)
+(defn show-qsg-click [s e]
+  (menu-close s)
   (.preventDefault e)
   (qsg-actions/show-qsg-view))
 
-(defn whats-new-click [e]
+(defn whats-new-click [s e]
   (.preventDefault e)
   (whats-new/show))
 
-(defn reminders-click [e qsg-data]
+(defn reminders-click [s e qsg-data]
   (.preventDefault e)
   (when (= (:step qsg-data) :create-reminder-2)
     (qsg-actions/finish-create-reminder-trail))
-  (menu-toggle)
+  (menu-close s)
   (nav-actions/show-reminders))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :qsg)
+                  ;; Locals
+                  (rum/local false ::unmounting)
+                  (rum/local false ::unmounted)
                   ;; Mixins
-                  no-scroll-mixin
+                  mixins/no-scroll-mixin
+                  mixins/first-render-mixin
                   {:did-mount (fn [s]
                    (whats-new/init ".whats-new")
-                   s)}
+                   s)
+                   :did-update (fn [s]
+                    (when (and @(::unmounting s)
+                               (compare-and-set! (::unmounted s) false true))
+                      (utils/after 180 real-menu-close))
+                    s)}
   [s]
   (let [{:keys [expanded-user-menu org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         qsg-data (drv/react s :qsg)
-        show-reminders? (utils/link-for (:links org-data) "reminders")]
+        show-reminders? (utils/link-for (:links org-data) "reminders")
+        appear-class (and @(:first-render-done s)
+                          (not @(::unmounting s))
+                          (not @(::unmounted s)))]
     [:div.menu
-      {:class (utils/class-set {:expanded-user-menu expanded-user-menu})}
+      {:class (utils/class-set {:expanded-user-menu expanded-user-menu
+                                :appear appear-class})
+       :on-click (partial menu-close s)}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(menu-close)}]
+        {:on-click #(menu-close s)}]
       [:div.menu-container
         [:div.menu-header.group
           [:button.mlb-reset.mobile-close-bt
             {:on-click #(do
-                         (menu-toggle)
+                         (menu-close s)
                          (nav-actions/mobile-nav-sidebar))}]
           [:div.user-name
             {:class utils/hide-class}
@@ -116,7 +135,7 @@
         (when (jwt/jwt)
           [:a.qsg-profile-photo-2
             {:href "#"
-             :on-click user-profile-click}
+             :on-click (partial user-profile-click s)}
             (when (= (:step qsg-data) :profile-photo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.personal-profile
@@ -124,13 +143,13 @@
         (when (jwt/jwt)
           [:a
             {:href "#"
-             :on-click notifications-settings-click}
+             :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
         (when show-reminders?
           [:a.qsg-create-reminder-2
             {:href "#"
-             :on-click #(reminders-click % qsg-data)}
+             :on-click #(reminders-click s % qsg-data)}
             (when (= (:step qsg-data) :create-reminder-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.reminders
@@ -141,7 +160,7 @@
                    (= user-role :admin))
           [:a.qsg-invite-team-2
             {:href "#"
-             :on-click #(manage-team-click % qsg-data)}
+             :on-click #(manage-team-click s % qsg-data)}
             (when (= (:step qsg-data) :invite-team-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.manage-team
@@ -151,7 +170,7 @@
                    (router/current-org-slug))
           [:a.qsg-company-logo-2
             {:href "#"
-             :on-click #(team-settings-click % qsg-data)}
+             :on-click #(team-settings-click s % qsg-data)}
             (when (= (:step qsg-data) :company-logo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.digest-settings
@@ -160,14 +179,14 @@
           (if is-mobile?
             {:href "https://whats-new.carrot.io/"
              :target "_blank"}
-            {:on-click whats-new-click})
+            {:on-click (partial whats-new-click s)})
           [:div.oc-menu-item.whats-new
             "What’s New"]]
         (when (and (not is-mobile?)
                    (jwt/jwt)
                    (= user-role :admin))
           [:a
-            {:on-click show-qsg-click}
+            {:on-click (partial show-qsg-click s)}
             [:div.oc-menu-item.show-qsg
               "Quickstart Guide"]])
         [:a
@@ -180,9 +199,9 @@
         ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
         (if (jwt/jwt)
           [:a.sign-out
-            {:href oc-urls/logout :on-click logout-click} 
+            {:href oc-urls/logout :on-click (partial logout-click s)}
             [:div.oc-menu-item.logout
               "Sign Out"]]
-          [:a {:href "" :on-click sign-in-sign-up-click} 
+          [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
             [:div.oc-menu-item
               "Sign In / Sign Up"]])]]))

@@ -11,6 +11,16 @@ div.menu {
   text-transform: none;
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
+  opacity: 0;
+  transition: opacity 180ms ease-in;
+
+  &.appear {
+    opacity: 1;
+
+    div.menu-container {
+      right: 0;
+    }
+  }
 
   &.dropdown-menu {
     letter-spacing: 0em;
@@ -28,8 +38,9 @@ div.menu {
     position: absolute;
     top: 0;
     height: 100vh;
-    right: 0;
+    right: -320px;
     padding: 0 24px 16px;
+    transition: right 180ms ease-in;
 
     @include mobile() {
       position: absolute;
@@ -160,7 +171,7 @@ div.menu {
           display: inline;
         }
         #HW_badge {
-          top: -1px;
+          top: 1px;
           width: 16px;
           height: 16px;
           background-color: $carrot_green;

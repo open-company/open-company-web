@@ -16,7 +16,6 @@
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -29,10 +28,6 @@
                     (drv/drv :qsg)
                     (drv/drv :expanded-user-menu)
                     (ui-mixins/render-on-resize nil)
-                    (on-window-click-mixin (fn [s e]
-                     (when (and (not (utils/event-inside? e (rum/ref-node s "user-menu")))
-                                (not (utils/event-inside? e (sel1 [:a.whats-new-link]))))
-                       (menu/menu-close))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
