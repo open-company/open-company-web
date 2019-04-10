@@ -241,10 +241,18 @@ div.left-navigation-sidebar {
   @include no-user-select();
   background-color: $ultra_light_grey;
   float: left;
-  transition: left 180ms ease-in;
+  // Uncomment this for slide in/out
+  // transition: left 180ms ease-in;
+  // Remove following lines too
+  transform: rotate(0deg);
+  transform-origin: 0px 0px;
+  transition: transform 180ms ease-in;
 
   &.hide-left-navbar {
-    left: -200px;
+    // Uncomment following line for slide in/out
+    // left: -200px;
+    // Remove following line too
+    transform: rotate(90deg);
   }
 
   @include mobile() {
