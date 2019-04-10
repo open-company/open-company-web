@@ -161,6 +161,7 @@
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
    :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
+   :expanded-user-menu  [[:base] (fn [base] (:expanded-user-menu base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -175,7 +176,6 @@
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :show-reminders      [[:base] (fn [base] (:show-reminders base))]
@@ -292,7 +292,7 @@
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :navbar-data         [[:base :org-data :board-data :current-user-data]
                           (fn [base org-data board-data current-user-data]
-                            (let [navbar-data (select-keys base [:mobile-menu-open
+                            (let [navbar-data (select-keys base [:expanded-user-menu
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
                                                                  :current-user-data
@@ -335,10 +335,10 @@
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :jwt :wrt-show :show-reminders]
+                            :expanded-user-menu :jwt :wrt-show :show-reminders]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing mobile-menu-open jwt wrt-show show-reminders]
+                                 entry-editing expanded-user-menu jwt wrt-show show-reminders]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -361,7 +361,7 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open
+                               :expanded-user-menu expanded-user-menu
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :wrt-activity-data (when wrt-show

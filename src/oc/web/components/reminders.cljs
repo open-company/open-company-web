@@ -299,7 +299,7 @@
                       "back-arrow")
              :on-click (fn [_]
                         (let [mobile-back-action #(when is-mobile?
-                                                    (nav-actions/mobile-menu-toggle))]
+                                                    (nav-actions/menu-toggle))]
                           (cancel-clicked reminder-edit-data
                            ;; On mobile the X goes back to the list of reminders
                            ;; on desktop it always dismiss the reminders modal

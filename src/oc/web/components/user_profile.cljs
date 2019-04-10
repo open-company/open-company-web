@@ -31,7 +31,7 @@
     (user-actions/user-profile-reset))
   (dismiss-modal)
   (when mobile-back-bt
-    (nav-actions/mobile-menu-toggle)))
+    (nav-actions/menu-toggle)))
 
 (def default-user-profile (oc.web.stores.user/random-user-image))
 

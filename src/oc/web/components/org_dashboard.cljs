@@ -15,6 +15,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
+            [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
@@ -94,12 +95,13 @@
                 entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
-                mobile-menu-open
+                expanded-user-menu
                 show-cmail
                 showing-mobile-user-notifications
                 wrt-activity-data
                 wrt-read-data
-                force-login-wall]} (drv/react s :org-dashboard-data)
+                force-login-wall
+                expanded-user-menu]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -173,6 +175,9 @@
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
+          ;; User menu
+          expanded-user-menu
+          (menu)
           ;; Activity removed
           show-activity-removed
           (activity-removed)
@@ -254,7 +259,7 @@
                               (not mobile-navigation-sidebar)
                               (not org-settings-data)
                               (not user-settings)
-                              (not mobile-menu-open)
+                              (not expanded-user-menu)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]

@@ -139,7 +139,7 @@
                          (dis/dispatch! [:input [:user-settings] nil])
                          (dis/dispatch! [:input [:org-settings] nil]))
                        (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                       (menu/mobile-menu-toggle))}
+                       (menu/menu-toggle))}
           (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
