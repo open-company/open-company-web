@@ -241,6 +241,11 @@ div.left-navigation-sidebar {
   @include no-user-select();
   background-color: $ultra_light_grey;
   float: left;
+  transition: left 180ms ease-in;
+
+  &.hide-lef-navbar {
+    left: -200px;
+  }
 
   @include mobile() {
     position: absolute;

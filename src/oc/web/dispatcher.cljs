@@ -160,6 +160,7 @@
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
+   :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]

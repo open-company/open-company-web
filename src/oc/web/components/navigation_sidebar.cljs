@@ -60,6 +60,7 @@
                                 (drv/drv :editable-boards)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-add-post-tooltip)
+                                (drv/drv :hide-left-navbar)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -124,6 +125,7 @@
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
                                 ; :navigation-sidebar-overflow window-overflow?
+                                :hide-lef-navbar (drv/react s :hide-left-navbar)
                                 })
        :style {:overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}

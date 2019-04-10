@@ -88,7 +88,9 @@
                               [:span.must-see-icon])]
               [:button.mlb-reset.navigation-sidebar-ham-bt
                 {:class (utils/class-set {:active mobile-ap-active?})
-                 :on-click nav-actions/mobile-nav-sidebar}
+                 :on-click #(if is-mobile?
+                              (nav-actions/mobile-nav-sidebar)
+                              (dis/dispatch! [:update [:hide-left-navbar] not]))}
                 board-icon
                 [:span.board-name
                   {:class (when board-icon "has-icon")}
