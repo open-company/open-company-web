@@ -6,7 +6,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
@@ -15,10 +14,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
-            [goog.events :as events]
-            [taoensso.timbre :as timbre]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
