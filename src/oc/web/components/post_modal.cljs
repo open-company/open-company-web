@@ -58,10 +58,12 @@
       {:id dom-element-id
        :class (utils/class-set {:appear appear-class
                                 :must-see-item (:must-see activity-data)
-                                :new-item (:new activity-data)})}
+                                :new-item (:new activity-data)})
+       :on-click #(modal-close s)}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(modal-close s)}]
       [:div.post-modal-wrapper
+        {:on-click #(.stopPropagation %)}
         [:div.post-modal
           {:class (utils/class-set {dom-node-class true})}
           [:div.activity-share-container]
