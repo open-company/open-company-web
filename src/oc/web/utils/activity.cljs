@@ -1,6 +1,7 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
             [cljs-time.format :as time-format]
+            [oc.lib.html :as html]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -15,31 +16,6 @@
   (let [org-data (dis/org-data)
         boards (:boards org-data)]
     (first (filter #(= (:uuid %) board-uuid) boards))))
-
-(defn get-first-body-thumbnail
-  "Given an entry body get the first thumbnail available.
-  Thumbnail type: image, video or chart."
-  [activity-body]
-  (let [$body (js/$ (str "<div>" activity-body "</div>"))
-        thumb-els (js->clj (js/$ "img:not(.emojione), iframe" $body))
-        found (atom nil)]
-    (dotimes [el-num (.-length thumb-els)]
-      (let [el (aget thumb-els el-num)
-            $el (js/$ el)]
-        (when-not @found
-          (if (= (s/lower (.-tagName el)) "img")
-            (let [width (.attr $el "width")
-                  height (.attr $el "height")]
-              (when (and (not @found)
-                         (or (<= width (* height 2))
-                             (<= height (* width 2))))
-                (reset! found
-                  {:type "image"
-                   :thumbnail (if (.data $el "thumbnail")
-                                (.data $el "thumbnail")
-                                (.attr $el "src"))})))
-            (reset! found {:type (.data $el "media-type") :thumbnail (.data $el "thumbnail")})))))
-    @found))
 
 (defn reset-truncate-body
   "Reset dotdotdot for the give body element."
@@ -166,7 +142,7 @@
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
         fixed-video-id (:video-id entry-data)
-        body-thumbnail (get-first-body-thumbnail (:body entry-data))]
+        body-thumbnail (html/first-body-thumbnail (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
       (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
