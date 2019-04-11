@@ -40,7 +40,7 @@
                             (utils/after 180 real-modal-close))
                           (when-not @(::bottom-fixed-add-comment s)
                             (reset! (::bottom-fixed-add-comment s)
-                             (> (.height (js/$ (rum/ref-node s :post-modal-inner)))
+                             (> (.outerHeight (js/$ (rum/ref-node s :post-modal-inner)))
                                 (.height (js/$ js/window)))))
                          s)}
   [s]
