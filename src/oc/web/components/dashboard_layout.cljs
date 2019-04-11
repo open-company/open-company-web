@@ -142,7 +142,8 @@
         is-all-posts (utils/in? (:route route) "all-posts")
         is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
-        is-mobile? (responsive/is-tablet-or-mobile?)
+        is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
+        is-mobile? (responsive/is-mobile-size?)
         empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
@@ -168,7 +169,7 @@
             (navigation-sidebar))
           ;; Show the board always on desktop and
           ;; on mobile only when the navigation menu is not visible
-          (when (or (not is-mobile?)
+          (when (or (not is-tablet-or-mobile?)
                     (not mobile-navigation-sidebar))
             [:div.board-container.group
               ;; Board name row: board name, settings button and say something button
@@ -213,7 +214,7 @@
                     [:div.board-settings-container
                       ;; Settings button
                       [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-mobile? "tooltip")
+                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -266,7 +267,7 @@
                                      (activity-actions/activity-edit {:board-slug (:value item)
                                                                       :board-name (:label item)}))}))])
                 ;; Commenting out grid view switcher for now
-                ; (when-not is-mobile?
+                ; (when-not is-tablet-or-mobile?
                 ;   [:div.board-switcher.group
                 ;     (let [grid-view? (= @board-switch :grid)]
                 ;       [:button.mlb-reset.board-switcher-bt
@@ -340,7 +341,7 @@
                   (section-stream)))
               ;; Add entry floating button
               (when can-compose
-                (let [opacity (if is-mobile?
+                (let [opacity (if is-tablet-or-mobile?
                                 0
                                 (calc-opacity (document-scroll-top)))]
                   [:div.new-post-floating-dropdown-container.group
@@ -351,7 +352,7 @@
                     [:button.mlb-reset.mlb-default.add-to-board-floating-button.qsg-create-post-1
                       {:data-placement "left"
                        :data-container "body"
-                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                        :title "Start a new post"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                        :on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}

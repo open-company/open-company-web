@@ -275,6 +275,7 @@ div.left-navigation-sidebar {
     top: unset;
     left: unset;
     float: left;
+    min-height: calc(100vh - 90px);
   }
 
   div.mobile-header-container {
