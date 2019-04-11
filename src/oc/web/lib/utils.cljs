@@ -645,3 +645,39 @@
   (int (* width (/ 3 4))))
 
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
+
+(defn debounced-fn
+  "Debounce function: give a function and a wait time call it immediately
+  and avoid calling it again for the wait time.
+  NB: if you call setState in the passed fn you need to check it's still mounted
+  manually since this can be calling f after it has been unmounted."
+  [f w]
+  (let [timeout (atom nil)]
+    (fn [& args]
+      (let [wait? @timeout
+            later (fn []
+                    (reset! timeout nil)
+                    (when wait?
+                      (apply f args)))]
+        (when wait?
+          (js/clearTimeout @timeout))
+        (reset! timeout (js/setTimeout later w))
+        (when-not wait?
+          (apply f args))))))
+
+(defn throttled-debounced-fn
+  [f w]
+  (let [last-call (atom 0)
+        timeout (atom nil)]
+    (fn [& args]
+      (let [now (.getTime (js-date))
+            later (fn []
+                    (reset! timeout nil)
+                    (apply f args))]
+        (js/clearTimeout @timeout)
+        (if (< (- now @last-call) w)
+          (js/setTimeout later w)
+          (do ;; execute now
+            (reset! timeout nil)
+            (reset! last-call now)
+            (apply f args)))))))
