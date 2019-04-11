@@ -1,7 +1,7 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin: 12px 0px 16px;
-  padding: 24px 32px;
+  padding: 24px 40px;
   border-bottom: 1px solid $ultra_light_grey;
 
   @include mobile() {
@@ -21,16 +21,16 @@ div.stream-item {
       display: inline-block;
     }
 
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 52px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
-    }
+    // div.stream-item-header {
+    //   div.stream-header-head-author {
+    //     div.name div.name-inner {
+    //       max-width: calc(100% - 52px);
+    //       @include mobile() {
+    //         max-width: 100%;
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   &.must-see-item {
@@ -38,30 +38,30 @@ div.stream-item {
       display: inline-block;
     }
 
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 94px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
-    }
+    // div.stream-item-header {
+    //   div.stream-header-head-author {
+    //     div.name div.name-inner {
+    //       max-width: calc(100% - 94px);
+    //       @include mobile() {
+    //         max-width: 100%;
+    //       }
+    //     }
+    //   }
+    // }
   }
 
-  &.must-see-item.new-item {
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 138px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
-    }
-  }
+  // &.must-see-item.new-item {
+  //   div.stream-item-header {
+  //     div.stream-header-head-author {
+  //       div.name div.name-inner {
+  //         max-width: calc(100% - 138px);
+  //         @include mobile() {
+  //           max-width: 100%;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   &.show-continue-reading:not(.single-post-view) {
     button.expand-button {
@@ -70,14 +70,8 @@ div.stream-item {
   }
 
   &:not(.show-continue-reading):not(.single-post-view) {
-    button.expand-button {
+    div.stream-item-bottom-footer {
       display: none;
-    }
-
-    @include mobile(){
-      div.stream-item-bottom-footer {
-        display: none;
-      }
     }
   }  
 
@@ -107,17 +101,22 @@ div.stream-item {
     }
 
     div.stream-header-head-author {
-      float: left;
-      width: 567px;
+      width: 100%;
 
-      @include activity-author(32);
+      @include activity-author(24);
+
+      div.user-avatar-img-container {
+        margin-right: 8px;
+      }
 
       @include mobile() {
         width: calc(100% - 46px);
       }
 
       div.name {
-        height: 20px;
+        height: 24px;
+        float: left;
+        max-width: 70%;
 
         @include mobile() {
           width: auto;
@@ -127,94 +126,35 @@ div.stream-item {
           display: inline-block;
           text-overflow: ellipsis;
           overflow: hidden;
-          line-height: 20px;
+          line-height: 24px;
           margin-right: 8px;
         }
       }
 
       div.time-since {
-        float: left;
+        float: right;
+        max-width: 30%;
+        height: 24px;
+        line-height: 24px;
+        text-align: right;
+
         @include mobile() {
           width: auto;
         }
       }
 
-      div.separator {
-        width: 3px;
-        height: 3px;
-        border-radius: 4px;
-        background-color: $light_ui_grey;
-        margin: 6px 8px 0px;
-        float: left;
+      div.must-see-tag, div.new-tag {
+        margin-top: 2px;
       }
 
-      div.stream-item-wrt {
-        float: left;
-        position: relative;
-
-        div.post-added-tooltip-container {
-          border: 1px solid rgba($carrot_gold, 0.5);
-          background-color: #FDF6E4;
-          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-          width: 300px;
-          border-radius: 6px;
-          padding: 24px 20px;
-          margin: 12px 0 0;
-          position: absolute;
-          left: calc(50% - 150px);
-          top: 18px;
-          text-align: center;
-          z-index: 5;
-
-          div.post-added-tooltip-top-arrow {
-            position: absolute;
-            top: -12px;
-            width: 24px;
-            height: 12px;
-            margin-left: -12px;
-            left: 50%;
-            background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
-            background-position: center;
-            background-size: 24px 12px;
-            background-repeat: no-repeat;
-          }
-
-          button.post-added-tooltip-dismiss {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
-            background-size: 8px 8px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-
-          div.post-added-tooltips {
-
-            div.post-added-tooltip {
-              @include OC_Body_Medium();
-              font-size: 16px;
-              color: $deep_navy;
-              line-height: 20px;
-            }
-
-            button.post-added-bt {
-              width: auto;
-              margin-top: 16px;
-              height: 32px;
-              width: 96px;
-              background-color: transparent;
-              border-radius: 6px;
-              color: white;
-              background-color: $carrot_green;
-              @include OC_Body_Bold();
-              font-size: 16px;
-            }
-          }
-        }
-      }
+      // div.separator {
+      //   width: 3px;
+      //   height: 3px;
+      //   border-radius: 4px;
+      //   background-color: $light_ui_grey;
+      //   margin: 6px 8px 0px;
+      //   float: left;
+      // }
     }
   }
 
@@ -412,15 +352,10 @@ div.stream-item {
             margin-top: 8px;
 
             &.to-truncate{
-              @include activity-body(16, 22, 22, $deep_navy);
+              @include activity-body(18, 24, 24, $deep_navy);
               color: $deep_navy;
               @include OC_Body_Book();
-              line-height: 22px;
-
-              @include mobile() {
-                @include activity-body(18, 24, 24, $deep_navy); 
-                line-height: 24px;
-              }
+              line-height: 24px;
 
               &.hide-images {
                 img {
@@ -430,16 +365,11 @@ div.stream-item {
             }
 
             &.no-truncate {
-              @include activity-body(16, 22, 22, $deep_navy);
+              @include activity-body(18, 24, 24, $deep_navy);
               color: $deep_navy;
               @include OC_Body_Book();
-              line-height: 22px;
+              line-height: 24px;
               display: none;
-
-              @include mobile() {
-                @include activity-body(18, 24, 24, $deep_navy); 
-                line-height: 24px;
-              }
             }
 
             &>*:first-child {
@@ -518,6 +448,7 @@ div.stream-item {
 
       div.reactions {
         float: left;
+        margin-right: 16px;
 
         div.reactions-picker-container {
           div.emoji-mart {
@@ -530,6 +461,75 @@ div.stream-item {
               right: unset;
               top: unset;
               left: unset;
+            }
+          }
+        }
+      }
+
+      div.stream-item-wrt {
+        float: left;
+        position: relative;
+        margin-top: 4px;
+
+        div.post-added-tooltip-container {
+          border: 1px solid rgba($carrot_gold, 0.5);
+          background-color: #FDF6E4;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+          width: 300px;
+          border-radius: 6px;
+          padding: 24px 20px;
+          margin: 12px 0 0;
+          position: absolute;
+          left: calc(50% - 150px);
+          top: 18px;
+          text-align: center;
+          z-index: 5;
+
+          div.post-added-tooltip-top-arrow {
+            position: absolute;
+            top: -12px;
+            width: 24px;
+            height: 12px;
+            margin-left: -12px;
+            left: 50%;
+            background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
+            background-position: center;
+            background-size: 24px 12px;
+            background-repeat: no-repeat;
+          }
+
+          button.post-added-tooltip-dismiss {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
+            background-size: 8px 8px;
+            background-position: center;
+            background-repeat: no-repeat;
+          }
+
+          div.post-added-tooltips {
+
+            div.post-added-tooltip {
+              @include OC_Body_Medium();
+              font-size: 16px;
+              color: $deep_navy;
+              line-height: 20px;
+            }
+
+            button.post-added-bt {
+              width: auto;
+              margin-top: 16px;
+              height: 32px;
+              width: 96px;
+              background-color: transparent;
+              border-radius: 6px;
+              color: white;
+              background-color: $carrot_green;
+              @include OC_Body_Bold();
+              font-size: 16px;
             }
           }
         }
@@ -556,21 +556,20 @@ div.stream-item {
 
   div.stream-item-bottom-footer {
     margin-top: 16px;
-    border-top: 1px solid $ultra_light_grey;
-    padding-top: 12px;
-    height: 36px;
+    height: 24px;
 
     @include mobile() {
-      border-top: 0px solid transparent;
       padding-top: 0;
       height: 32px;
     }
 
     &.expanded {
       margin-top: 0;
-      border-top: 0px solid transparent;
+      padding-top: 12px;
+      height: 36px;
 
       @include mobile() {
+        padding-top: 0;
         margin-top: 16px;
         height: 24px;
       }
@@ -587,9 +586,8 @@ div.stream-item {
       display: none;
       float: none;
       opacity: 1;
-      float: left;
-      width: 100px;
-      margin-top: 0;
+      width: 100%;
+      margin: 0 auto;
 
       @include mobile(){
         width: 100%;
@@ -620,7 +618,6 @@ div.stream-item {
 
     div.more-menu {
       float: right;
-      margin-top: -4px;
     }
   }
 }

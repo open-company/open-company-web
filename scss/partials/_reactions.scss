@@ -16,13 +16,13 @@ div.reactions {
       cursor: default;
       padding: 4px 3px;
       @include OC_Body_Bold();
-      border: 1px solid #E2E3E4;
       box-shadow: none;
       font-size: 11px;
-      color: $ui_grey;
+      color: $light_ui_grey;
       min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
+      background-color: $ultra_light_grey;
 
       &:first-child {
         margin-left: 0px;
@@ -49,19 +49,23 @@ div.reactions {
 
         @include big_web() {
           &.reacted:hover {
-            border: 1px solid #7ED8AA;
             background-color: $feint_emerald;
+
+            div.count {
+              color: $carrot_green;
+            }
           }
 
           &:hover {
-            border: 1px solid $light_ui_grey;
+            div.count {
+              color: $ui_grey;
+            }
           }
         }
       }
 
       &.reacted {
         background-color: #EAFBF2;
-        border: 1px solid #7ED8AA;
 
         div.count {
           color: $carrot_green;
@@ -81,8 +85,7 @@ div.reactions {
 
         @include big_web() {
           &:hover {
-            background-color: transparent;
-            border: 1px solid $light_ui_grey;
+            background-color: $ultra_light_grey;
 
             div.count {
               color: $ui_grey;

@@ -16,8 +16,8 @@ $h2_top_margin: 24;
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
-    color: $deep_navy;
-    font-size: 14px;
+    color: $ui_grey;
+    font-size: 12px;
     line-height: 20px;
     white-space: nowrap;
   }
@@ -26,7 +26,7 @@ $h2_top_margin: 24;
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
-    color: $ui_grey;
+    color: rgba($ui_grey, 0.5);
     font-size: 12px;
     white-space: nowrap;
 

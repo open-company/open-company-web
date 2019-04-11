@@ -146,7 +146,7 @@ div.add-comment-box-container {
         color: white;
         @include OC_Body_Bold();
         font-size: 14px;
-        border-radius: 100px;
+        border-radius: 6px;
 
         &:disabled {
           background-color: $light_ui_grey;

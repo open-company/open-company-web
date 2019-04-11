@@ -182,26 +182,7 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]
-          (when should-show-wrt
-            [:div.separator])
-          (when should-show-wrt
-            [:div.stream-item-wrt
-              (wrt-count activity-data read-data)
-              (when (and (not is-mobile?)
-                         (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
-                [:div.post-added-tooltip-container.group
-                  [:div.post-added-tooltip-top-arrow]
-                  [:button.mlb-reset.post-added-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                  [:div.post-added-tooltips
-                    [:div.post-added-tooltip
-                      (if (user-utils/is-org-creator? org-data)
-                        "After you invite your team, you'll know who saw this post."
-                        "Here's where you'll know who saw this post.")]
-                    [:button.mlb-reset.post-added-bt
-                      {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                      "OK, got it"]]])])]
+                (utils/time-since t)])]]
         (when (and is-published?
                    is-mobile?)
           (more-menu activity-data dom-element-id
@@ -287,7 +268,28 @@
               [:div.stream-item-comments-summary
                 {:on-click #(expand s true true)}
                 (comments-summary activity-data true)]
-              (reactions activity-data)])]
+              (reactions activity-data)
+              (when should-show-wrt
+                [:div.stream-item-wrt
+                  (wrt-count activity-data read-data)
+                  (when (and (not is-mobile?)
+                             (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
+                    [:div.post-added-tooltip-container.group
+                      [:div.post-added-tooltip-top-arrow]
+                      [:button.mlb-reset.post-added-tooltip-dismiss
+                        {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
+                      [:div.post-added-tooltips
+                        [:div.post-added-tooltip
+                          (if (user-utils/is-org-creator? org-data)
+                            "After you invite your team, you'll know who saw this post."
+                            "Here's where you'll know who saw this post.")]
+                        [:button.mlb-reset.post-added-bt
+                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                          "OK, got it"]]])])
+              (when (and is-published?
+                         (not is-mobile?))
+                (more-menu activity-data dom-element-id
+                 {:external-share (not is-mobile?)}))])]
         (when (and expanded?
                    (:has-comments activity-data))
           [:div.stream-body-right
@@ -310,8 +312,4 @@
               [:span.expand-label
                 (if expanded?
                   "Show less"
-                  "Show more")]]
-            (when (and is-published?
-                       (not is-mobile?))
-              (more-menu activity-data dom-element-id
-               {:external-share (not is-mobile?)}))])]))
+                  "Show more")]]])]))

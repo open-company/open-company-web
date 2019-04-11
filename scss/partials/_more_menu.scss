@@ -1,7 +1,7 @@
 div.more-menu {
   float: right;
   width: auto;
-  height: 32px;
+  height: 26px;
   transform: opacity 180ms ease-in;
   opacity: 1;
   position: relative;
@@ -23,7 +23,7 @@ div.more-menu {
   }
 
   button.more-menu-bt {
-    height: 32px;
+    height: 26px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
     background-size: 18px 4px;
@@ -53,7 +53,7 @@ div.more-menu {
   }
 
   button.more-menu-share-bt {
-    height: 32px;
+    height: 24px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_share_arrow.svg");
     background-size: 16px 14px;
