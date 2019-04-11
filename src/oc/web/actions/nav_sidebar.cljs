@@ -1,5 +1,6 @@
 (ns oc.web.actions.nav-sidebar
-  (:require [oc.web.router :as router]
+  (:require [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.qsg :as qsg-actions]

@@ -27,18 +27,17 @@ div.stream-comments {
 
       div.stream-comment-author-avatar {
         float: left;
-        width: 32px;
-        height: 32px;
+        width: 24px;
+        height: 24px;
 
-        @include user-profile(32);
+        @include user-profile(24);
       }
 
       div.stream-comment-right {
-        margin-left: 48px;
+        margin-left: 40px;
       }
 
       div.stream-comment-header {
-        height: 24px;
 
         div.stream-comment-author-right {
           float: left;
@@ -46,8 +45,8 @@ div.stream-comments {
           // height: 24px;
 
           div.stream-comment-author-name {
-            @include OC_Body_Medium();
-            font-size: 14px;
+            @include OC_Body_Bold();
+            font-size: 12px;
             color: $deep_navy;
             line-height: 15px;
             float: left;
@@ -70,9 +69,9 @@ div.stream-comments {
           margin-left: 8px;
 
           button.comment-more-menu {
-            width: 24px;
-            height: 24px;
-            padding: 2px 2px 16px 2px;
+            width: 20px;
+            height: 20px;
+            padding: 2px 0 16px 0;
             display: block;
             background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
             background-position: 50% 3px;

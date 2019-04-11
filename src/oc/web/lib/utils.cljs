@@ -645,3 +645,6 @@
   (int (* width (/ 3 4))))
 
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
+
+(defn button-clicked? [e]
+  (and e (= (.-tagName (.-target e)) "BUTTON")))

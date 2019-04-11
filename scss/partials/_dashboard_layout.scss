@@ -305,29 +305,29 @@ div.dashboard-layout {
               background-image: cdnUrl("/img/ML/section_settings_gear.svg");
               background-size: 16px 16px;
               background-repeat: no-repeat;
-              background-position: 16px center;
+              background-position: center;
               background-color: transparent;
               border-radius: 10px;
-              width: 40px;
-              height: 40px;
+              width: 25px;
+              height: 25px;
               opacity: 0.8;
-              padding: 0 0 0 16px;
+              padding: 0;
               margin: 0 0 0 16px;
               position: relative;
 
-              &:before {
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 12px;
-                width: 1px;
-                height: 16px;
-                background-color: $light_ui_grey;
+              // &:before {
+              //   content: "";
+              //   position: absolute;
+              //   left: 0;
+              //   top: 12px;
+              //   width: 1px;
+              //   height: 16px;
+              //   background-color: $light_ui_grey;
 
-                @include mobile(){
-                  display: none;
-                }
-              }
+              //   @include mobile(){
+              //     display: none;
+              //   }
+              // }
 
               @include mobile(){
                 margin-right: -30px;

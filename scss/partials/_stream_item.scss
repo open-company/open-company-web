@@ -1,8 +1,18 @@
 div.stream-item {
   width: #{$board_container_width}px;
-  margin: 12px 0px 16px;
+  margin: 0;
   padding: 24px 40px;
   border-bottom: 1px solid $ultra_light_grey;
+
+  &.expandable {
+    cursor: pointer;
+
+    @include big_web() {
+      &:hover {
+        background-color: #F5F5F5;
+      }
+    }
+  }
 
   @include mobile() {
     width: 100%;
@@ -437,7 +447,6 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
-        cursor: pointer;
 
         @include mobile() {
           max-width: calc(50% - 16px);

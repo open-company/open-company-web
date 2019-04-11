@@ -23,6 +23,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.reminders :refer (reminders)]
+            [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -224,7 +225,9 @@
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)
-          (navigation-sidebar))
+          (navigation-sidebar)
+          (router/current-activity-id)
+          (post-modal))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

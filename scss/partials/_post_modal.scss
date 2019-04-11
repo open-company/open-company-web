@@ -1,0 +1,205 @@
+div.post-modal-container {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 146};
+  opacity: 0;
+  transition: opacity 180ms ease-in;
+
+  &.appear {
+    opacity: 1;
+
+    div.post-modal-wrapper {
+      right: 0;
+    }
+  }
+
+  &.new-item {
+    div.post-modal div.post-modal-inner div.post-modal-header div.name div.new-tag {
+      display: inline-block;
+    }
+  }
+
+  &.must-see-item {
+    div.post-modal div.post-modal-inner div.post-modal-header div.name div.must-see-tag {
+      display: inline-block;
+    }
+  }
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 736px;
+    top: 12px;
+  }
+
+  div.post-modal-wrapper {
+    width: 720px;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: -720px;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    background-color: $ultra_light_grey;
+    padding: 0;
+
+    div.post-modal {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+      div.post-modal-inner {
+        background-color: white;
+        padding: 32px 40px;
+
+        &.fixed-add-comment {
+          padding-bottom: 113px;
+        }
+
+        div.post-modal-header {
+          height: 24px;
+
+          @include activity-author(24);
+
+          div.user-avatar-img-container {
+            margin-right: 8px;
+          }
+
+          div.name {
+            max-width: calc(70% - 24px - 8px);
+            float: left;
+            
+            div.name-inner {
+              line-height: 24px;
+              float: left;
+            }
+
+            @include new-tag();
+
+            div.new-tag {
+              float: left;
+              display: none;
+              margin-left: 8px;
+              margin-top: 3px;
+            }
+
+            @include must-see-tag();
+
+            div.must-see-tag {
+              float: left;
+              display: none;
+              margin-left: 8px;
+              margin-top: 3px;
+            }
+          }
+
+          div.more-menu {
+            float: right;
+            max-width: 30%;
+            height: 24px;
+            button.more-menu-bt {
+              height: 24px;
+            }
+
+            ul.more-menu-list {
+              bottom: unset;
+              top: 24px;
+            }
+          }
+        }
+
+        div.post-modal-body {
+          div.post-headline {
+            @include activity-title();
+            margin-top: 22px;
+          }
+
+          div.post-body {
+            @include activity-body(18, 24, 24, $deep_navy);
+            margin-top: 16px;
+          }
+
+          div.time-since {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $light_ui_grey;
+            line-height: 18px;
+            margin-top: 16px;
+          }
+        }
+
+        div.post-modal-footer {
+          margin-top: 32px;
+          height: 24px;
+
+          div.is-comments {
+            margin-right: 16px;
+            float: left;
+          }
+
+          div.reactions {
+            float: left;
+            margin-right: 16px;
+
+            div.reactions-picker-container {
+              div.emoji-mart {
+                bottom: unset;
+                top: 0;
+                left: calc(100% + 8px);
+
+                @include mobile(){
+                  bottom: unset;
+                  right: unset;
+                  top: unset;
+                  left: unset;
+                }
+              }
+            }
+          }
+
+          div.more-menu {
+            float: right;
+            max-width: 30%;
+            height: 24px;
+
+            button.more-menu-bt {
+              height: 24px;
+            }
+          }
+        }
+
+        div.post-modal-comments {
+          padding-bottom: 0;
+          margin-top: 24px;
+          padding-top: 24px;
+          border-top: 1px solid $ultra_light_grey;
+
+          div.stream-comments {
+            width: 100%;
+          }
+
+          div.post-modal-comments-add-comment {
+            width: 640px;
+          }
+        }
+      }
+    }
+
+    div.post-modal-fixed-add-comment {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 720px;
+      padding: 24px 40px;
+      background-color: white;
+    }
+  }
+}
