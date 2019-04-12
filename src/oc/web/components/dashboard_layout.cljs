@@ -42,13 +42,15 @@
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
                               ;; Locals
-                              (rum/local :default ::board-sort)
-                              (rum/local false ::sorting-menu-expanded)
+                              ;; Commenting out board sorting for now
+                              ; (rum/local :default ::board-sort)
+                              ; (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              (on-window-click-mixin (fn [s e]
-                               (when (and @(::sorting-menu-expanded s)
-                                          (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
-                                (reset! (::sorting-menu-expanded s) false))))
+                              ;; Commenting out board sorting for now
+                              ; (on-window-click-mixin (fn [s e]
+                              ;  (when (and @(::sorting-menu-expanded s)
+                              ;             (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
+                              ;   (reset! (::sorting-menu-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -79,7 +81,7 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        board-sort (::board-sort s)
+        ; board-sort (::board-sort s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         current-user-data (drv/react s :current-user-data)
@@ -162,23 +164,23 @@
                           [:button.mlb-reset.section-settings-bt
                             {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
                             "OK, got it"]]])])]
-                (when-not is-mobile?
-                  (let [default-sort (= @board-sort :default)]
-                    [:div.board-sort.group
-                      {:ref :board-sort-menu}
-                      [:button.mlb-reset.board-sort-bt
-                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                        (if default-sort "Recent activity" "Recently posted")]
-                      [:div.board-sort-menu
-                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                        [:div.board-sort-menu-item
-                          {:class (when default-sort "active")
-                           :on-click #(reset! board-sort :defautl)}
-                          "Recent activity"]
-                        [:div.board-sort-menu-item
-                          {:class (when-not default-sort "active")
-                           :on-click #(reset! board-sort :own)}
-                          "Recently posted"]]]))
+                ; (when-not is-mobile?
+                ;   (let [default-sort (= @board-sort :default)]
+                ;     [:div.board-sort.group
+                ;       {:ref :board-sort-menu}
+                ;       [:button.mlb-reset.board-sort-bt
+                ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                ;         (if default-sort "Recent activity" "Recently posted")]
+                ;       [:div.board-sort-menu
+                ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                ;         [:div.board-sort-menu-item
+                ;           {:class (when default-sort "active")
+                ;            :on-click #(reset! board-sort :defautl)}
+                ;           "Recent activity"]
+                ;         [:div.board-sort-menu-item
+                ;           {:class (when-not default-sort "active")
+                ;            :on-click #(reset! board-sort :own)}
+                ;           "Recently posted"]]]))
                 ]
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                     non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
