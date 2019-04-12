@@ -95,8 +95,7 @@
                              (reset! (::should-scroll-to-card s) false))
                            s)}
   [s activity-data read-data]
-  (let [single-post-view (boolean (seq (router/current-activity-id)))
-        org-data (drv/react s :org-data)
+  (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
@@ -128,11 +127,9 @@
                              is-published?)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
-                                :show-continue-reading truncated?
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)
-                                :single-post-view single-post-view
                                 :expandable is-published?})
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
@@ -160,8 +157,7 @@
                (:name publisher)
                " in "
                (:board-name activity-data))]
-            [:div.must-see-tag.big-web-tablet-only "Must see"]
-            [:div.new-tag.big-web-tablet-only "NEW"]]
+            [:div.must-see-tag.big-web-tablet-only "Must see"]]
           [:div.time-since
             (let [t (or (:published-at activity-data) (:created-at activity-data))]
               [:time

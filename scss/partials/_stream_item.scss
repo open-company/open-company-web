@@ -3,6 +3,7 @@ div.stream-item {
   margin: 0;
   padding: 24px 40px;
   border-bottom: 1px solid $ultra_light_grey;
+  border-left: 4px solid transparent;
 
   &.expandable {
     cursor: pointer;
@@ -10,6 +11,7 @@ div.stream-item {
     @include big_web() {
       &:hover {
         background-color: #F5F5F5;
+        border-left: 4px solid #F5F5F5;
 
         div.stream-item-body-ext {
           div.stream-item-footer {
@@ -42,63 +44,40 @@ div.stream-item {
   }
 
   &.new-item {
-    div.new-tag {
-      display: inline-block;
+    background-color: white;
+    border-left: 4px solid white;
+
+    @include big_web(){
+      &:hover {
+        background-color: white;
+        border-left: 4px solid white;        
+      }
     }
 
-    // div.stream-item-header {
-    //   div.stream-header-head-author {
-    //     div.name div.name-inner {
-    //       max-width: calc(100% - 52px);
-    //       @include mobile() {
-    //         max-width: 100%;
-    //       }
-    //     }
-    //   }
-    // }
+    &.must-see-item {
+      border-left: 4px solid $sea_blue;
+
+      @include big_web(){
+        &:hover {
+          border-left: 4px solid $sea_blue;
+        }
+      }
+    }
   }
 
   &.must-see-item {
+    border-left: 4px solid $sea_blue;
+
+    @include big_web(){
+      &:hover {
+        border-left: 4px solid $sea_blue;
+      }
+    }
+
     div.must-see-tag {
       display: inline-block;
     }
-
-    // div.stream-item-header {
-    //   div.stream-header-head-author {
-    //     div.name div.name-inner {
-    //       max-width: calc(100% - 94px);
-    //       @include mobile() {
-    //         max-width: 100%;
-    //       }
-    //     }
-    //   }
-    // }
   }
-
-  // &.must-see-item.new-item {
-  //   div.stream-item-header {
-  //     div.stream-header-head-author {
-  //       div.name div.name-inner {
-  //         max-width: calc(100% - 138px);
-  //         @include mobile() {
-  //           max-width: 100%;
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
-  &.show-continue-reading:not(.single-post-view) {
-    button.expand-button {
-      display: flex;
-    }
-  }
-
-  &:not(.show-continue-reading):not(.single-post-view) {
-    div.stream-item-bottom-footer {
-      display: none;
-    }
-  }  
 
   div.activity-share-container {
     div.activity-share-modal-container {
