@@ -205,7 +205,7 @@ div.left-navigation-sidebar {
   transition: left 180ms ease-in;
 
   &.hide-left-navbar {
-    left: -200px;
+    left: -216px;
   }
 
   @include mobile() {
