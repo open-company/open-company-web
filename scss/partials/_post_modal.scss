@@ -15,13 +15,13 @@ div.post-modal-container {
   transition: opacity 180ms ease-in;
 
   &.new-item {
-    div.post-modal div.post-modal-inner div.post-modal-header div.name div.new-tag {
+    div.post-modal-wrapper div.post-modal div.post-modal-inner div.post-modal-header div.name div.new-tag {
       display: inline-block;
     }
   }
 
   &.must-see-item {
-    div.post-modal div.post-modal-inner div.post-modal-header div.name div.must-see-tag {
+    div.post-modal-wrapper div.post-modal div.post-modal-inner div.post-modal-header div.name div.must-see-tag {
       display: inline-block;
     }
   }
