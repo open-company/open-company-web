@@ -17,6 +17,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.section-stream :refer (section-stream)]
@@ -25,15 +26,6 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
-
-(defn- update-tooltips [s]
-  ;; Commenting out grid view switcher for now
-  ; (when-let [$board-switcher (js/$ (rum/ref-node s "board-switcher"))]
-  ;   (.tooltip $board-switcher)
-  ;   (doto $board-switcher
-  ;    (.tooltip "hide")
-  ;    (.tooltip "fixTitle")))
-  )
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
@@ -49,25 +41,19 @@
                               (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
-                              ;; Commenting out grid view switcher for now
-                              ; (rum/local nil ::board-switch)
+                              ;; Locals
+                              (rum/local :default ::board-sort)
+                              (rum/local false ::sorting-menu-expanded)
+                              ;; Mixins
+                              (on-window-click-mixin (fn [s e]
+                               (when (and @(::sorting-menu-expanded s)
+                                          (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
+                                (reset! (::sorting-menu-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
                                 s)
-                               :will-mount (fn [s]
-                                ;; Commenting out grid view switcher for now
-                                ; (let [board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
-                                ;       cookie-value (cook/get-cookie board-view-cookie)
-                                ;       board-view (or (keyword cookie-value) :stream)
-                                ;       fixed-board-view (if (or (responsive/is-tablet-or-mobile?)
-                                ;                                (not (nil? @(drv/get-ref s :ap-initial-at))))
-                                ;                         :stream
-                                ;                         board-view)]
-                                ;   (reset! (::board-switch s) fixed-board-view))
-                                s)
                                :did-mount (fn [s]
-                                (update-tooltips s)
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
                                   (when (utils/is-admin-or-author? org-data)
@@ -93,7 +79,7 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        ; board-switch (::board-switch s)
+        board-sort (::board-sort s)
         show-drafts (pos? (:count drafts-link))
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         current-user-data (drv/react s :current-user-data)
@@ -176,22 +162,23 @@
                           [:button.mlb-reset.section-settings-bt
                             {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
                             "OK, got it"]]])])]
-                ;; Commenting out grid view switcher for now
-                ; (when-not is-tablet-or-mobile?
-                ;   [:div.board-switcher.group
-                ;     (let [grid-view? (= @board-switch :grid)]
-                ;       [:button.mlb-reset.board-switcher-bt
-                ;         {:class (if grid-view? "stream-view" "grid-view")
-                ;          :ref "board-switcher"
-                ;          :on-click #(do
-                ;                       (reset! board-switch (if grid-view? :stream :grid))
-                ;                       (cook/set-cookie! board-view-cookie (if grid-view? "stream" "grid")
-                ;                        (* 60 60 24 365)))
-                ;          :data-toggle "tooltip"
-                ;          :data-placement "top"
-                ;          :data-container "body"
-                ;          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                ;          :title (if grid-view? "Stream view" "Grid view")}])])
+                (when-not is-mobile?
+                  (let [default-sort (= @board-sort :default)]
+                    [:div.board-sort.group
+                      {:ref :board-sort-menu}
+                      [:button.mlb-reset.board-sort-bt
+                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                        (if default-sort "Recent activity" "Recently posted")]
+                      [:div.board-sort-menu
+                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                        [:div.board-sort-menu-item
+                          {:class (when default-sort "active")
+                           :on-click #(reset! board-sort :defautl)}
+                          "Recent activity"]
+                        [:div.board-sort-menu-item
+                          {:class (when-not default-sort "active")
+                           :on-click #(reset! board-sort :own)}
+                          "Recently posted"]]]))
                 ]
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                     non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "

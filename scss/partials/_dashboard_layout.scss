@@ -480,33 +480,67 @@ div.dashboard-layout {
           }
         }
 
-        div.board-switcher {
+        div.board-sort {
           float: right;
-          width: 32px;
-          height: 32px;
-          margin-top: 2px;
+          height: 40px;
+          position: relative;
 
           @include mobile() {
             display: none;
           }
 
-          button.board-switcher-bt {
-            width: 32px;
-            height: 32px;
-            background-size: 16px 16px;
-            background-repeat: no-repeat;
-            background-position: center 8px;
-            float: left;
-            padding: 0;
+          button.board-sort-bt {
+            height: 23px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 23px;
+            color: $deep_navy;
+            padding: 0 14px 0 0;
             margin: 0;
-            opacity: 0.7;
+            position: relative;
 
-            &.stream-view {
-              background-image: cdnUrl("/img/ML/stream_view_button.svg");
+            &:after {
+              content: "";
+              width: 8px;
+              height: 4px;
+              position: absolute;
+              top: 9px;
+              right: 0;
+              background-image: cdnUrl("/img/ML/board_sort_dropdown.svg");
+              background-size: 8px 4px;
+              background-repeat: no-repeat;
+              background-position: center;
+            }
+          }
+
+          div.board-sort-menu {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: white;
+            width: 138px;
+            padding: 9px 0;
+            border-radius: 4px;
+            border: 1px solid #D6D6D8;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            display: none;
+            z-index: 100;
+
+            &.show-menu {
+              display: block;
             }
 
-            &.grid-view {
-              background-image: cdnUrl("/img/ML/grid_view_button.svg");
+            div.board-sort-menu-item {
+              height: 34px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              opacity: 0.5;
+              padding: 8px 16px;
+              cursor: pointer;
+
+              &.active, &:hover {
+                opacity: 1;
+              }
             }
           }
         }
