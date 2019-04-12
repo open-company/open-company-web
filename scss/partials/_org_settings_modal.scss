@@ -1,0 +1,209 @@
+div.org-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 0;
+  transition: opacity 180ms ease-in;
+
+  &.appear {
+    opacity: 1;
+
+    div.org-settings {
+      right: 0;
+    }
+  }
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.org-settings {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: -320px;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+
+    div.org-settings-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: #FBFAF9;
+      padding: 12px 16px;
+
+      div.org-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        margin-right: 8px;
+        float: right;
+      }
+      
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        background-color: $carrot_green;
+        border-radius: 6px;
+        color: white;
+        line-height: 18px;
+        float: right;
+      }
+    }
+
+    div.org-settings-body {
+      margin-top: 24px;
+
+      div.org-settings-header-avatar {
+        height: 32px;
+
+        div.org-avatar.missing-logo {
+          position: relative;
+          width: 32px;
+          height: 32px;
+          background-color: #F8FCFA;
+          border: 1px dashed $carrot_green;
+          border-radius: 8px;
+          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        @include org-avatar(32);
+
+        div.org-avatar-container img.org-avatar-img {
+          padding: 4px;
+        }
+
+        &:hover {
+          div.org-avatar-container img.org-avatar-img {
+            border: 1px solid $carrot_green;
+          }
+        }
+
+        div.org-avatar.missing-logo {
+          div.org-avatar-container.no-avatar.force-label {
+            &:before {
+              left: 10px;
+              top: 2px;
+            }
+          }
+        }
+
+        div.org-avatar * {
+          border-radius: 4px;
+        }
+
+        span.edit-company-logo {
+          float: left;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $carrot_green;
+          margin-left: 16px;
+        }
+      }
+    }
+
+    div.org-settings-fields {
+      margin-top: 16px;
+      border-top: 1px solid $ultra_light_grey;
+
+      div.org-settings-label {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+        margin-top: 16px;
+      }
+
+      input.org-settings-field {
+        margin-top: 8px;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        padding: 7px 8px;
+        width: 100%;
+        border: none;
+        outline: none;
+
+        &:active, &:focus {
+          border: none;
+          outline: none;            
+        }
+      }
+
+      div.org-settings-desc {
+        margin-top: 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        opacity: 0.5;
+      }
+
+      div.org-settings-email-domains {
+        margin-top: 16px;
+
+        div.org-settings-email-domain-row {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          margin-top: 8px;
+          line-height: 18px;
+          height: 18px;
+
+          button.remove-email-bt {
+            padding: 0 12px 0 0;
+            float: right;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: $ui_grey;
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+
+    div.org-settings-advanced {
+      margin-top: 24px;
+      border-top: 1px solid $ultra_light_grey;
+
+      button.advanced-settings-bt {
+        margin-top: 16px;
+        height: 18px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        padding: 0;
+        color: $carrot_green;
+      }
+    }
+  }
+}

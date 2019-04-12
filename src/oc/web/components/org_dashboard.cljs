@@ -25,6 +25,7 @@
             [oc.web.components.reminders :refer (reminders)]
             [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
+            [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.shared-misc :refer (video-lightbox)]
@@ -187,7 +188,7 @@
           (activity-not-found)
           ;; Org settings
           org-settings-data
-          (org-settings)
+          (org-settings-modal)
           ;; Reminders
           show-reminders
           (reminders)
