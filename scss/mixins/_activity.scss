@@ -73,14 +73,14 @@ $h2_top_margin: 24;
 
 @mixin must-see-tag() {
   div.must-see-tag {
-    @include OC_Body_Black();
+    @include OC_Body_Bold();
     color: $sea_blue;
     font-size: 11px;
-    line-height: 17px;
-    padding: 2px 6px 2px 17px;
+    line-height: 14px;
+    padding: 2px 4px 2px 14px;
     border-radius: 4px;
     height: 18px;
-    width: 78px;
+    width: 74px;
     background-color: rgba($sea_blue,.2);
     text-transform: uppercase;
     text-align: center;
@@ -97,8 +97,8 @@ $h2_top_margin: 24;
       background-position: center;
       background-size: 10px 10px;
       position: absolute;
-      top: 5px;
-      left: 6px;
+      top: 4px;
+      left: 4px;
     }
   }
 }

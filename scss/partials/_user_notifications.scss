@@ -17,19 +17,19 @@ div.user-notifications {
   }
 
   button.notification-bell-bt {
-    width: 20px;
-    height: 21px;
+    width: 32px;
+    height: 32px;
     background-image: cdnUrl("/img/ML/notification_bell.svg");
-    background-size: 16px 20px;
+    background-size: 32px 32px;
     background-position: 0px;
     background-repeat: no-repeat;
     position: relative;
     padding: 0;
     margin: 0;
 
-    &.active {
-      background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
-    }
+    // &.active {
+    //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
+    // }
 
     &.new:after {
       position: absolute;

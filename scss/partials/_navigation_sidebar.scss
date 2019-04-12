@@ -192,13 +192,13 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - #{$navbar_height}px);
+  max-height: calc(100vh - #{$navbar_height + 1}px);
   overflow-y: auto;
   overflow-x: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
   left: 0;
-  height: calc(100vh - #{$navbar_height}px);
+  height: calc(100vh - #{$navbar_height + 1}px);
   @include no-user-select();
   background-color: $ultra_light_grey;
   float: left;
@@ -267,7 +267,6 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-content {
-    padding-bottom: 32px;
     width: #{$left_navigation_sidebar_width}px;
     height: calc(100% - 72px);
     overflow-x: hidden;
@@ -525,7 +524,7 @@ div.left-navigation-sidebar {
         float: right;
         margin-right: 16px;
         width: 16px;
-        height: 23px;
+        height: 21px;
         background-image: cdnUrl("/img/ML/board_public.svg");
         background-size: 12px 12px;
         background-position: center;
@@ -537,7 +536,7 @@ div.left-navigation-sidebar {
         float: right;
         margin-right: 16px;
         width: 16px;
-        height: 23px;
+        height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
         background-size: 10px 12px;
         background-position: center;
@@ -545,15 +544,16 @@ div.left-navigation-sidebar {
       }
 
       div.board-name {
+        width: 120px;
+        float: left;
 
         div.internal {
-          padding: 3px 0px 0px;
+          padding: 1px 0px 0px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-          width: 120px;
-          float: left;
           cursor: pointer;
+          max-width: 120px;
 
           @include mobile() {
             width: auto;
@@ -589,6 +589,11 @@ div.left-navigation-sidebar {
       align-items: center;
       width: calc(100% - 32px);
       height: 40px;
+      opacity: 1;
+
+      @include big_web() {
+        opacity: 0.9;
+      }
 
       span.compose-green-icon {
         width: 12px;

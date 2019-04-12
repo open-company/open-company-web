@@ -10,6 +10,21 @@ div.stream-item {
     @include big_web() {
       &:hover {
         background-color: #F5F5F5;
+
+        div.stream-item-body-ext {
+          div.stream-item-footer {
+            div.stream-item-comments-summary {
+              div.is-comments {
+                div.is-comments-authors {
+                  div.is-comments-author {
+                    background-color: #F5F5F5;
+                    border: 2px solid #F5F5F5;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -308,7 +323,7 @@ div.stream-item {
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 400px;
+        width: 452px;
         min-height: 98px;
 
         @include mobile() {
@@ -452,6 +467,15 @@ div.stream-item {
           max-width: calc(50% - 16px);
           overflow: hidden;
           text-overflow: ellipsis;
+        }
+
+        div.is-comments {
+          div.is-comments-authors {
+            div.is-comment-author {
+              background-color: $ultra_light_grey;
+              border: 2px solid $ultra_light_grey;
+            }
+          }
         }
       }
 

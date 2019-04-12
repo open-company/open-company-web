@@ -11,16 +11,8 @@ div.post-modal-container {
   text-transform: none;
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 146};
-  opacity: 0;
+  opacity: 1;
   transition: opacity 180ms ease-in;
-
-  &.appear {
-    opacity: 1;
-
-    div.post-modal-wrapper {
-      right: 0;
-    }
-  }
 
   &.new-item {
     div.post-modal div.post-modal-inner div.post-modal-header div.name div.new-tag {
@@ -45,7 +37,7 @@ div.post-modal-container {
     position: absolute;
     top: 0;
     height: 100vh;
-    right: -720px;
+    right: 0;
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     background-color: $ultra_light_grey;

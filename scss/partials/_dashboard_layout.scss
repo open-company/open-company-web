@@ -40,7 +40,7 @@ div.dashboard-layout {
       background-color: $oc_gray_8;
       position: relative;
       margin: 0 auto;
-      padding: 40px 0 24px;
+      padding: 24px 0 24px;
 
       @include mobile() {
         width: 100%;
@@ -213,6 +213,7 @@ div.dashboard-layout {
           div.board-name-with-icon {
             @include OC_Body_Bold();
             font-size: 18px;
+            line-height: 23px;
             color: $deep_navy;
             float: left;
             max-width: 350px;

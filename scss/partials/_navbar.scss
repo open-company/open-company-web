@@ -44,13 +44,9 @@ nav.oc-navbar {
   margin: 0px;
 
   div.oc-navbar-header {
-    padding-top: 10px;
-  }
-
-  div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 12px 24px;
+    padding: 12px 16px;
     height: #{$navbar_height}px;
     width: 100%;
 
@@ -119,16 +115,15 @@ nav.oc-navbar {
 
           &:after {
             content: "";
-            width: 19px;
-            height: 12px;
+            width: 14px;
+            height: 10px;
             background-image: cdnUrl("/img/ML/navbar_ham.svg");
             background-repeat: no-repeat;
-            background-size: 19px 12px;
+            background-size: 14px 10px;
             background-position: center;
             position: absolute;
-            opacity: 0.5;
             left: 0;
-            top: 9px;
+            top: 10px;
           }
 
           span.board-name, span.private-icon, span.public-icon, span.must-see-icon {
@@ -221,12 +216,11 @@ nav.oc-navbar {
 
         div.user-notifications {
           float: left;
-          margin-right: 16px;
-          margin-top: 4px;
+          margin-right: 8px;
         }
 
         div.user-menu {
-          width: 48px;
+          width: 32px;
           height: 32px;
           float: right;
           position: relative;
@@ -347,22 +341,22 @@ nav.oc-navbar {
             }
 
             button.mobile-notification-bell {
-              width: 24px;
-              height: 24px;
+              width: 32px;
+              height: 32px;
               background-image: cdnUrl("/img/ML/notification_bell.svg");
-              background-size: 16px 20px;
+              background-size: 32px 32px;
               background-position: 0 center;
               background-repeat: no-repeat;
               padding: 0;
-              margin-top: 4px;
+              // margin-top: 4px;
               display: block;
               float: left;
 
-              @include preload_image(cdnUlr("/img/ML/notification_bell_active.svg"));
+              // @include preload_image(cdnUlr("/img/ML/notification_bell_active.svg"));
 
-              &.active {
-                background-image: cdnUrl("/img/ML/notification_bell_active.svg");
-              }
+              // &.active {
+              //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");
+              // }
             }
 
             button.mobile-compose-bt {

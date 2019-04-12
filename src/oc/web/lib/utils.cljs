@@ -108,26 +108,26 @@
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
         hours-interval (.floor js/Math (/ seconds 3600))
-        minutes-interval (.floor js/Math (/ seconds 60))]
+        minutes-interval (.floor js/Math (/ seconds 60))
+        short? (in? flags :short)]
     (cond
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
 
-      (or (pos? months-interval)
-          (> days-interval 7))
+      (pos? months-interval)
       (date-string past-js-date flags)
 
       (pos? days-interval)
-      (str days-interval " " (pluralize "day" days-interval) " ago")
+      (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
 
       (pos? hours-interval)
-      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+      (str hours-interval (if short? "h" (str " " (pluralize "hour" hours-interval) " ago")))
 
       (pos? minutes-interval)
-      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+      (str minutes-interval (if short? "m" (str " " (pluralize "min" minutes-interval) " ago")))
 
       :else
-      "Just now")))
+      (if short? "now" "Just now"))))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -647,7 +647,11 @@
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
 
 (defn button-clicked? [e]
-  (and e (= (.-tagName (.-target e)) "BUTTON")))
+  ; (and e (= (.-tagName (.-target e)) "BUTTON"))
+  (loop [el (.-target e)]
+    (if (or (not el) (= (.-tagName el) "BUTTON"))
+      el
+      (recur (.-parentElement el)))))
 
 (defn debounced-fn
   "Debounce function: give a function and a wait time call it immediately

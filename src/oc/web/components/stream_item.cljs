@@ -135,11 +135,19 @@
                                 :single-post-view single-post-view
                                 :expandable is-published?})
        ;; click on the whole tile only for draft editing
-       :on-click #(when-not is-mobile?
-                    (if is-drafts-board
-                      (activity-actions/activity-edit activity-data)
-                      (when-not (utils/button-clicked? %)
-                        (routing-actions/open-post-modal activity-data))))
+       :on-click (fn [e]
+                   (when-not is-mobile?
+                     (if is-drafts-board
+                       (activity-actions/activity-edit activity-data)
+                       (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                             stream-item-wrt-el (rum/ref-node s :stream-item-wrt)]
+                         (when (and ;; More menu wasn't clicked
+                                    (not (utils/event-inside? e more-menu-el))
+                                    ;; WRT wasn't clicked 
+                                    (not (utils/event-inside? e stream-item-wrt-el))
+                                    ;; a button wasn't clicked
+                                    (not (utils/button-clicked? e)))
+                           (routing-actions/open-post-modal activity-data))))))
        :id dom-element-id}
       [:div.activity-share-container]
       [:div.stream-item-header.group
@@ -162,7 +170,7 @@
                  :data-placement "top"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]]
+                (utils/time-since t [:short])])]]
         (when (and is-published?
                    is-mobile?)
           (more-menu activity-data dom-element-id
@@ -235,6 +243,7 @@
               (reactions activity-data)
               (when should-show-wrt
                 [:div.stream-item-wrt
+                  {:ref :stream-item-wrt}
                   (wrt-count activity-data read-data)
                   (when (and (not is-mobile?)
                              (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))

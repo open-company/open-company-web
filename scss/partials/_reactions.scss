@@ -48,24 +48,25 @@ div.reactions {
         cursor: pointer;
 
         @include big_web() {
-          &.reacted:hover {
-            background-color: $feint_emerald;
+          // &.reacted:hover {
+          //   background-color: $feint_emerald;
 
-            div.count {
-              color: $carrot_green;
-            }
-          }
+          //   div.count {
+          //     color: $carrot_green;
+          //   }
+          // }
 
-          &:hover {
+          &:hover, &.reacted:hover {
+            background-color: #D6D9DC;
             div.count {
-              color: $ui_grey;
+              color: $deep_navy;
             }
           }
         }
       }
 
       &.reacted {
-        background-color: #EAFBF2;
+        background-color: #D9F2E5;
 
         div.count {
           color: $carrot_green;
@@ -75,33 +76,22 @@ div.reactions {
       &.reaction-picker {
         box-shadow: none;
 
-        span.reaction, div.count {
-          opacity: .5;
-        }
-
-        div.count {
-          color: $ui_grey;
-        }
-
         @include big_web() {
           &:hover {
-            background-color: $ultra_light_grey;
-
-            div.count {
-              color: $ui_grey;
-            }
-
-            span.reaction, div.count {
+            span.reaction {
               opacity: 1;
             }
           }
         }
 
         span.reaction {
-          width: 16px;
-          height: 16px;
+          margin: 0 0 0 5px;
+          opacity: 0.4;
+          display: inline-block;
+          width: 23px;
+          height: 15px;
           background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
-          background-size: 16px 16px;
+          background-size: 23px 15px;
           background-position: center;
           background-repeat: no-repeat;
         }

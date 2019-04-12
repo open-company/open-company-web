@@ -12,13 +12,14 @@ div.is-comments {
 
     div.is-comments-author {
       float: left;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       background-color: white;
+      border: 2px solid white;
       border-radius: 50%;
       margin-left: -10px;
 
-      @include user-profile(26);
+      @include user-profile(24);
 
       &:first-child {
         margin-left: 0px;
@@ -31,29 +32,21 @@ div.is-comments {
     font-size: 12px;
     color: $ui_grey;
     @include OC_Body_Book();
-    margin-top: 6px;
+    margin-top: 4px;
     text-align: left;
     white-space: nowrap;
     // max-width: 74%;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    &.add-a-comment {
-      opacity: 0.5;
-    }
-
     @include mobile() {
       max-width: 68vw;
       opacity: 1;
     }
 
-    &:hover {
-      opacity: 1;
-    }
-
     span.add-a-comment {
       padding-left: 6px;
-      color: $deep_navy;
+      color: $ui_grey;
 
       &:before {
         content: "";

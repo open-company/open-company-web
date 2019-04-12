@@ -100,7 +100,6 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
@@ -148,15 +147,6 @@
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
               "All posts"]])
-        (when show-all-posts
-           [:a.must-see.hover-item.group
-            {:class (utils/class-set {:item-selected is-must-see
-                                      :showing-drafts drafts-link})
-              :href (oc-urls/must-see)
-              :on-click #(nav-actions/nav-to-url! % (oc-urls/must-see))}
-             [:div.must-see-icon]
-             [:div.must-see-label
-               "Must see"]])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-posts (dis/draft-posts-data)

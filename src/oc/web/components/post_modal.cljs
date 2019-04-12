@@ -14,30 +14,18 @@
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
-(defn real-modal-close []
-  ;; Redirect to board
+(defn modal-close []
   (routing-actions/dismiss-post-modal))
-
-(defn modal-close [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-modal-close)))
 
 (rum/defcs post-modal < (drv/drv :activity-data)
                         (drv/drv :comments-data)
                         (drv/drv :add-comment-focus)
                         ;; Locals
-                        (rum/local false ::unmounting)
-                        (rum/local false ::unmounted)
                         (rum/local false ::bottom-fixed-add-comment)
                         ;; Mixins
                         rum/reactive
                         mixins/no-scroll-mixin
-                        mixins/first-render-mixin
                         {:did-update (fn [s]
-                          (when (and @(::unmounting s)
-                                     (compare-and-set! (::unmounted s) false true))
-                            (utils/after 180 real-modal-close))
                           (when-not @(::bottom-fixed-add-comment s)
                             (reset! (::bottom-fixed-add-comment s)
                              (> (.outerHeight (js/$ (rum/ref-node s :post-modal-inner)))
@@ -49,19 +37,15 @@
         comments-data (au/get-comments activity-data comments-drv)
         dom-element-id (str "post-modal-" (:uuid activity-data))
         dom-node-class (str "post-modal-" (:uuid activity-data))
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)]
     [:div.post-modal-container
       {:id dom-element-id
-       :class (utils/class-set {:appear appear-class
-                                :must-see-item (:must-see activity-data)
+       :class (utils/class-set {:must-see-item (:must-see activity-data)
                                 :new-item (:new activity-data)})
-       :on-click #(modal-close s)}
+       :on-click modal-close}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(modal-close s)}]
+        {:on-click modal-close}]
       [:div.post-modal-wrapper
         {:on-click #(.stopPropagation %)}
         [:div.post-modal
@@ -90,14 +74,18 @@
                 {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
               (stream-attachments (:attachments activity-data))
               [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                (let [author (:author activity-data)
+                      t (if (pos? (count author))
+                          (:updated-at (last author))
+                          (or (:updated-at activity-data)
+                              (:published-at activity-data)))]
                   [:time
                     {:date-time t
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since t)])]]
+                    (str "Last edited " (clojure.string/lower-case (utils/time-since t)))])]]
             [:div.post-modal-footer
               (comments-summary activity-data true)
               (reactions activity-data)
