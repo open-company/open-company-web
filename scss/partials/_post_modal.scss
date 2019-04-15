@@ -7,7 +7,6 @@ div.post-modal-container {
   height: 100vh;
   position: fixed;
   overflow: visible;
-  padding: 24px;
   text-transform: none;
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 146};
@@ -28,20 +27,20 @@ div.post-modal-container {
 
   button.modal-close-bt {
     position: absolute;
-    right: 736px;
+    // right: 736px;
+    right: calc(50vw + 376px);
     top: 12px;
   }
 
   div.post-modal-wrapper {
     width: 720px;
-    position: absolute;
+    position: relative;
     top: 0;
     height: 100vh;
-    right: 0;
-    padding: 0 24px 16px;
+    margin: 0 auto;
+    // right: 0;
     transition: right 180ms ease-in;
     background-color: $ultra_light_grey;
-    padding: 0;
 
     div.post-modal {
       height: 100%;

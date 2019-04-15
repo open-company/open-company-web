@@ -66,11 +66,11 @@ div.stream-item {
   }
 
   &.must-see-item {
-    border-left: 4px solid $sea_blue;
+    border-left: 4px solid transparent;
 
     @include big_web(){
       &:hover {
-        border-left: 4px solid $sea_blue;
+        border-left: 4px solid transparent;
       }
     }
 
