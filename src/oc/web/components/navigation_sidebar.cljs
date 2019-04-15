@@ -161,9 +161,9 @@
                :on-click #(nav-actions/nav-to-url! % board-url)}
               [:div.drafts-icon]
               [:div.drafts-label.group
-                "Drafts "
-                (when (pos? draft-count)
-                  [:span.count draft-count])]]))
+                "Drafts "]
+              (when (pos? draft-count)
+                [:span.count draft-count])]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group

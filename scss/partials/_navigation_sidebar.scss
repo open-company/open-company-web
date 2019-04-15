@@ -35,26 +35,27 @@
     }
   }
 
+  span.count {
+    float: right;
+    @include OC_Body_Book();
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    color: #FBFAF9;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-color: #C2C3C6;
+    border-radius: 4px;
+    margin-top: 4px;
+    margin-right: 16px;
+  }
+
   div.drafts-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: $deep_navy;
     text-decoration: none;
-
-    span.count {
-      float: right;
-      @include OC_Body_Book();
-      font-size: 12px;
-      line-height: 16px;
-      text-align: center;
-      color: #FBFAF9;
-      width: 16px;
-      height: 16px;
-      display: inline-block;
-      background-color: #C2C3C6;
-      border-radius: 4px;
-      margin-top: 2px;
-    }
 
     &.new {
       color: $deep_navy;
@@ -323,7 +324,7 @@ div.left-navigation-sidebar {
 
     div.all-posts-label, div.drafts-label, div.must-see-label {
       padding: 2px 0px 0px 16px;
-      width: 164px;
+      float: left;
       text-align: left;
       margin-left: 16px;
       text-decoration: none;
@@ -413,7 +414,7 @@ div.left-navigation-sidebar {
       margin: 0;
       height: 15px;
       margin-bottom: 8px;
-      width: 200px;
+      width: 100%;
 
       @include mobile() {
         background-color: $ultra_light_grey;
@@ -454,6 +455,7 @@ div.left-navigation-sidebar {
       width: 20px;
       height: 20px;
       margin-top: -2px;
+      margin-right: 11px;
       float: right;
       padding: 0;
       cursor: pointer;
@@ -482,7 +484,7 @@ div.left-navigation-sidebar {
       padding-left: 16px;
       margin: 0;
       text-decoration: none;
-      width: 200px;
+      width: 100%;
 
       &:hover {
         text-decoration: none;
@@ -523,7 +525,7 @@ div.left-navigation-sidebar {
 
       div.public {
         float: right;
-        margin-right: 2px;
+        margin-right: 12px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_public.svg");
@@ -535,7 +537,7 @@ div.left-navigation-sidebar {
 
       div.private {
         float: right;
-        margin-right: 2px;
+        margin-right: 12px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
