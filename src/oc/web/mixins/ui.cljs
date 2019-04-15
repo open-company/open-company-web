@@ -233,3 +233,16 @@
       (events/unlistenByKey (:on-click-out-listener s))
       (dissoc s :on-click-out-listener))
     s))})
+
+(defn on-window-resize-mixin [callback]
+  {:did-mount (fn [s]
+   (let [on-resize-listener (events/listen (.getElementById js/document "app") EventType/RESIZE
+                             (fn [e]
+                              (callback s e)))]
+    (assoc s :on-resize-listener on-resize-listener)))
+   :will-unmount (fn [s]
+   (if (:on-resize-listener s)
+    (do
+      (events/unlistenByKey (:on-resize-listener s))
+      (dissoc s :on-resize-listener))
+    s))})

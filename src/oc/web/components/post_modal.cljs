@@ -25,15 +25,20 @@
                         (drv/drv :comments-data)
                         (drv/drv :add-comment-focus)
                         ;; Locals
-                        (rum/local false ::post-exceeds-window-height)
+                        (rum/local false ::scroll-outer-height)
+                        (rum/local nil ::wh)
                         ;; Mixins
                         rum/reactive
                         mixins/no-scroll-mixin
-                        {:did-update (fn [s]
-                          (when-not @(::post-exceeds-window-height s)
-                            (reset! (::post-exceeds-window-height s)
-                             (> (.outerHeight (js/$ (rum/ref-node s :post-modal-inner)))
-                                (.height (js/$ js/window)))))
+                        (mixins/on-window-resize-mixin (fn [s e]
+                          (reset! (::wh s) (.height (js/$ js/window)))))
+                        {:will-mount (fn [s]
+                          (reset! (::wh s) (.height (js/$ js/window)))
+                          s)
+                         :did-update (fn [s]
+                          (when-not @(::scroll-outer-height s)
+                            (reset! (::scroll-outer-height s)
+                             (.outerHeight (js/$ (rum/ref-node s :post-modal-inner)))))
                          s)
                          :did-mount (fn [s]
                           (when-let* [activity-data @(drv/get-ref s :activity-data)
@@ -48,7 +53,10 @@
         dom-element-id (str "post-modal-" (:uuid activity-data))
         dom-node-class (str "post-modal-" (:uuid activity-data))
         publisher (:publisher activity-data)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        fixed-add-comment (> @(::scroll-outer-height s) @(::wh s))
+        show-bottom-share (> @(::scroll-outer-height s) @(::wh s))]
+    (js/console.log "DBG render" @(::scroll-outer-height s) @(::wh s) "->" fixed-add-comment)
     [:div.post-modal-container
       {:id dom-element-id
        :class (utils/class-set {:must-see-item (:must-see activity-data)
@@ -63,7 +71,7 @@
           [:div.activity-share-container]
           [:div.post-modal-inner
             {:ref :post-modal-inner
-             :class (when @(::post-exceeds-window-height s) "fixed-add-comment")}
+             :class (when fixed-add-comment "fixed-add-comment")}
             [:div.post-modal-header.group
               (user-avatar-image publisher)
               [:div.name
@@ -99,18 +107,18 @@
             [:div.post-modal-footer
               (comments-summary activity-data true)
               (reactions activity-data)
-              (when @(::post-exceeds-window-height s)
+              (when show-bottom-share
                 (more-menu activity-data dom-element-id
                  {:external-share (not is-mobile?)}))]
             [:div.post-modal-comments.group
-              {:class (utils/class-set {:bottom-fixed @(::post-exceeds-window-height s)})}
+              {:class (utils/class-set {:bottom-fixed fixed-add-comment})}
               (stream-comments activity-data comments-data)
-              (when (and (not @(::post-exceeds-window-height s))
+              (when (and (not fixed-add-comment)
                          (:can-comment activity-data))
                 [:div.post-modal-comments-add-comment
                   (rum/with-key (add-comment activity-data)
                    (str "post-modal-add-comment-" (:uuid activity-data)))])]]]
-        (when (and @(::post-exceeds-window-height s)
+        (when (and fixed-add-comment
                    (:can-comment activity-data))
           [:div.post-modal-fixed-add-comment
             (rum/with-key (add-comment activity-data)
