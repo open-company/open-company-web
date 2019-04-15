@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [goog.dom :as gdom]
             [goog.object :as gobj]
+            [clojure.string :as str]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -11,6 +12,7 @@
             [oc.web.utils.org :as org-utils]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
@@ -25,6 +27,19 @@
   (if s
     (reset! (::unmounting s) true)
     (real-close)))
+
+(defn form-is-clean? [s]
+  (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
+        {:keys [um-domain-invite]} @(drv/get-ref s :org-settings-team-management)]
+    (and (not has-org-edit-changes)
+         (empty? (:domain um-domain-invite)))))
+
+(defn reset-form [s]
+  (let [org-data (first (:rum/args s))
+        um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
+    (org-actions/org-edit-setup org-data)
+    (dis/dispatch! [:input [:um-domain-invite :domain] ""])
+    (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
 (defn logo-on-load [org-avatar-editing url img]
   (org-actions/org-avatar-edit-save {:logo-url url
@@ -73,6 +88,14 @@
       (qsg-actions/finish-company-logo-trail)
       (logo-add-error nil))))
 
+(defn email-domain-removed [success?]
+  (notification-actions/show-notification
+   {:title (if success? "Email domain successfully removed" "Error")
+    :description (when-not success? "An error occurred while removing the email domain, please try again.")
+    :expire 5
+    :id (if success? :email-domain-remove-success :email-domain-remove-error)
+    :dismiss true}))
+
 (rum/defcs org-settings-modal < ;; Mixins
                                 rum/reactive
                                 (drv/drv :qsg)
@@ -84,7 +107,7 @@
                                 ;; Locals
                                 (rum/local false ::unmounting)
                                 (rum/local false ::unmounted)
-                                (rum/local "" ::email-domain)
+                                (rum/local false ::saving)
                                 ;; Mixins
                                 mixins/no-scroll-mixin
                                 mixins/first-render-mixin
@@ -92,6 +115,18 @@
                                   (when (and @(::unmounting s)
                                              (compare-and-set! (::unmounted s) false true))
                                     (utils/after 180 real-close))
+                                  s)
+                                 :will-update (fn [s]
+                                  (let [org-editing @(drv/get-ref s :org-editing)]
+                                    (when (and @(::saving s)
+                                               (:saved org-editing))
+                                      (reset! (::saving s) false)
+                                      (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
+                                      (notification-actions/show-notification {:title "Settings saved"
+                                                                               :primary-bt-title "OK"
+                                                                               :primary-bt-dismiss true
+                                                                               :expire 10
+                                                                               :id :org-settings-saved})))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -117,9 +152,18 @@
           [:div.org-settings-header-title
             "Admin settings"]
           [:button.mlb-reset.save-bt
+            {:on-click #(when (compare-and-set! (::saving s) false true)
+                         (org-actions/org-edit-save org-editing))
+             :disabled (or @(::saving s)
+                         (:saved org-editing)
+                         (not (:has-changes org-editing))
+                         (< (count (str/trim (:name org-editing))) 3))
+           :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(dismiss-modal s)}
+            {:on-click #(if (form-is-clean? s)
+                          (dismiss-modal s)
+                          (reset-form s))}
             "Back"]]
         [:div.org-settings-body
           [:div.org-settings-header-avatar.qsg-company-logo-3.group
@@ -146,15 +190,25 @@
               "Allowed email domains"]
             [:input.org-settings-field
               {:type "text"
-              :value @(::email-domain s)
-              :on-change #(reset! (::email-domain s) (.. % -target -value))}]
+               :placeholder "@domain.com"
+               :auto-capitalize "none"
+               :value (:domain um-domain-invite)
+               :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+               :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
+               :on-key-press (fn [e]
+                               (when (= (.-key e) "Enter")
+                                 (let [domain (:domain um-domain-invite)]
+                                   (when (utils/valid-domain? domain)
+                                     (team-actions/email-domain-team-add domain)))))}]
             [:div.org-settings-email-domains
               (for [domain (:email-domains team-data)]
                 [:div.org-settings-email-domain-row
                   {:key (str "org-settings-domain-" domain)}
-                  (str "@" domain)
-                  [:button.mlb-reset.remove-email-bt
-                    "Remove"]])]]
+                  (str "@" (:domain domain))
+                  (when (utils/link-for (:links domain) "remove")
+                    [:button.mlb-reset.remove-email-bt
+                      {:on-click #(team-actions/remove-team (:links domain) email-domain-removed)}
+                      "Remove"])])]]
           [:div.org-settings-advanced
             [:button.mlb-reset.advanced-settings-bt
               "Show advanced settings"]]]]]))

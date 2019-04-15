@@ -155,6 +155,10 @@ div.org-settings-modal {
         border: none;
         outline: none;
 
+        @include placeholder(){
+          opacity: 0.6;
+        }
+
         &:active, &:focus {
           border: none;
           outline: none;            

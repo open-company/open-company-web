@@ -59,13 +59,17 @@
   (menu-close s)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
 
-(defn manage-team-click [s e qsg-data]
+(defn manage-team-click [s e]
   (.preventDefault e)
-  (let [invite-team-step? (= (:step qsg-data) :invite-team-2)]
-    (when invite-team-step?
-      (qsg-actions/finish-invite-team-trail))
-    (menu-close s)
-    (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal (if invite-team-step? :invite :team)))))
+  (menu-close s)
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
+
+(defn invite-team-click [s e  qsg-data]
+  (.preventDefault e)
+  (when (= (:step qsg-data) :invite-team-2)
+    (qsg-actions/finish-invite-team-trail))
+  (menu-close s)
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
 (defn sign-in-sign-up-click [s e]
   (menu-close s)
@@ -156,16 +160,6 @@
               "Reminders"]])
         [:div.oc-menu-separator]
         (when (and (not is-mobile?)
-                   (router/current-org-slug)
-                   (= user-role :admin))
-          [:a.qsg-invite-team-2
-            {:href "#"
-             :on-click #(manage-team-click s % qsg-data)}
-            (when (= (:step qsg-data) :invite-team-2)
-              (qsg-breadcrumb qsg-data))
-            [:div.oc-menu-item.manage-team
-              "Manage Team"]])
-        (when (and (not is-mobile?)
                    (= user-role :admin)
                    (router/current-org-slug))
           [:a.qsg-company-logo-2
@@ -174,7 +168,30 @@
             (when (= (:step qsg-data) :company-logo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.digest-settings
-              "Settings"]])
+              "Admin Settings"]])
+        (when (and (not is-mobile?)
+                   (router/current-org-slug))
+          [:a.qsg-invite-team-2
+            {:href "#"
+             :on-click #(invite-team-click s %  qsg-data)}
+            (when (= (:step qsg-data) :invite-team-2)
+              (qsg-breadcrumb qsg-data))
+            [:div.oc-menu-item.invite-team
+              "Invite people"]])
+        (when (and (not is-mobile?)
+                   (router/current-org-slug)
+                   (= user-role :admin))
+          [:a
+            {:href "#"
+             :on-click #(manage-team-click s %)}
+            [:div.oc-menu-item.manage-team
+              "Manage Team"]])
+        ; (when (and (router/current-org-slug)
+        ;            (= user-role :admin))
+        ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
+        ;     [:div.oc-menu-item
+        ;       "Billing"]])
+        [:div.oc-menu-separator]
         [:a.whats-new-link
           (if is-mobile?
             {:href "https://whats-new.carrot.io/"
@@ -193,10 +210,6 @@
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
             "Support"]]
-        ; (when (and (router/current-org-slug)
-        ;            (= user-role :admin))
-        ;   [:div.oc-menu-item
-        ;     [:a {:href "#" :on-click #(js/alert "Coming soon")} "Billing"]])
         (if (jwt/jwt)
           [:a.sign-out
             {:href oc-urls/logout :on-click (partial logout-click s)}

@@ -349,5 +349,9 @@
 
 ;; Remove team
 
-(defn remove-team [team-links]
-  (api/user-action (utils/link-for team-links "remove" "DELETE") nil user-action-cb))
+(defn remove-team [team-links & [cb]]
+  (api/user-action (utils/link-for team-links "remove" "DELETE") nil
+   (fn [{:keys [status body success] :as resp}]
+    (when (fn? cb)
+      (cb success))
+    (user-action-cb resp))))
