@@ -140,11 +140,35 @@ div.integrations-settings-modal {
             }
           }
 
-          span.linked-to {
+          div.linked-to {
             margin-top: 8px;
             @include OC_Body_Book();
             font-size: 14px;
             color: $light_navy;
+            line-height: 18px;
+          }
+
+          div.self-join {
+            margin-top: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: rgba($light_navy, 0.4);
+            line-height: 18px;         
+          }
+
+          div.bot-line {
+            margin-top: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $light_navy;
+            line-height: 18px;
+             
+            button.turn-on-bot-bt {
+              padding: 0;
+              margin: 0;
+              display: inline-block;
+              color: $carrot_green;
+            }
           }
         }
       }

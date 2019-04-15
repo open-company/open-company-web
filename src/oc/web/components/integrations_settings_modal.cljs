@@ -6,6 +6,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -85,7 +86,17 @@
                       [:div.slack-team-name
                         (:name slack-team)]]
                     (when (seq slack-domain)
-                      [:span.linked-to
+                      [:div.linked-to
                         "This team is linked to:"
                         [:br]
-                        (str slack-domain ".slack.com")])]))])]]]))
+                        (str slack-domain ".slack.com")])
+                    [:div.self-join
+                      "Slack members can self-join this team."]
+                    (if has-bot?
+                      [:div.bot-line
+                        "Carrot bot is currently on."]
+                      [:div.bot-line
+                        "Carrot bot is currently off. "
+                        [:button.mlb-reset.turn-on-bot-bt
+                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
+                          "Turn it on?"]])]))])]]]))
