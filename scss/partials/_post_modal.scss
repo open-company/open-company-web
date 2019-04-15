@@ -110,6 +110,8 @@ div.post-modal-container {
         div.post-modal-body {
           div.post-headline {
             @include activity-title();
+            font-size: 26px;
+            line-height: 40px;
             margin-top: 22px;
           }
 
