@@ -147,7 +147,7 @@
       {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(dismiss-modal s)}]
-      [:div.org-settings
+      [:div.org-settings-modal-container
         [:div.org-settings-header
           [:div.org-settings-header-title
             "Admin settings"]

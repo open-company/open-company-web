@@ -17,7 +17,7 @@ div.org-settings-modal {
   &.appear {
     opacity: 1;
 
-    div.org-settings {
+    div.org-settings-modal-container {
       right: 0;
     }
   }
@@ -28,7 +28,7 @@ div.org-settings-modal {
     top: 12px;
   }
 
-  div.org-settings {
+  div.org-settings-modal-container {
     width: 320px;
     background-color: white;
     position: absolute;

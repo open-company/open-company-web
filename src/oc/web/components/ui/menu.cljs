@@ -71,6 +71,11 @@
   (menu-close s)
   (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
 
+(defn integrations-click [s e]
+  (.preventDefault e)
+  (menu-close s)
+  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :integrations)))
+
 (defn sign-in-sign-up-click [s e]
   (menu-close s)
   (.preventDefault e)
@@ -186,6 +191,14 @@
              :on-click #(manage-team-click s %)}
             [:div.oc-menu-item.manage-team
               "Manage Team"]])
+        (when (and (not is-mobile?)
+                   (router/current-org-slug)
+                   (= user-role :admin))
+          [:a
+            {:href "#"
+             :on-click #(integrations-click s %)}
+            [:div.oc-menu-item.team-integrations
+              "Integrations"]])
         ; (when (and (router/current-org-slug)
         ;            (= user-role :admin))
         ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
