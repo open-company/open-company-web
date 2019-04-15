@@ -1,11 +1,15 @@
 (ns oc.web.components.post-modal
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -21,16 +25,22 @@
                         (drv/drv :comments-data)
                         (drv/drv :add-comment-focus)
                         ;; Locals
-                        (rum/local false ::bottom-fixed-add-comment)
+                        (rum/local false ::post-exceeds-window-height)
                         ;; Mixins
                         rum/reactive
                         mixins/no-scroll-mixin
                         {:did-update (fn [s]
-                          (when-not @(::bottom-fixed-add-comment s)
-                            (reset! (::bottom-fixed-add-comment s)
+                          (when-not @(::post-exceeds-window-height s)
+                            (reset! (::post-exceeds-window-height s)
                              (> (.outerHeight (js/$ (rum/ref-node s :post-modal-inner)))
                                 (.height (js/$ js/window)))))
-                         s)}
+                         s)
+                         :did-mount (fn [s]
+                          (when-let* [activity-data @(drv/get-ref s :activity-data)
+                                      team-id (:team-id(dis/org-data))
+                                      _part_of_team (jwt/user-is-part-of-the-team team-id)]
+                            (activity-actions/send-item-seen (:uuid activity-data)))
+                          s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
         comments-drv (drv/react s :comments-data)
@@ -53,7 +63,7 @@
           [:div.activity-share-container]
           [:div.post-modal-inner
             {:ref :post-modal-inner
-             :class (when @(::bottom-fixed-add-comment s) "fixed-add-comment")}
+             :class (when @(::post-exceeds-window-height s) "fixed-add-comment")}
             [:div.post-modal-header.group
               (user-avatar-image publisher)
               [:div.name
@@ -89,17 +99,18 @@
             [:div.post-modal-footer
               (comments-summary activity-data true)
               (reactions activity-data)
-              (more-menu activity-data dom-element-id
-               {:external-share (not is-mobile?)})]
+              (when @(::post-exceeds-window-height s)
+                (more-menu activity-data dom-element-id
+                 {:external-share (not is-mobile?)}))]
             [:div.post-modal-comments.group
-              {:class (utils/class-set {:bottom-fixed @(::bottom-fixed-add-comment s)})}
+              {:class (utils/class-set {:bottom-fixed @(::post-exceeds-window-height s)})}
               (stream-comments activity-data comments-data)
-              (when (and (not @(::bottom-fixed-add-comment s))
+              (when (and (not @(::post-exceeds-window-height s))
                          (:can-comment activity-data))
                 [:div.post-modal-comments-add-comment
                   (rum/with-key (add-comment activity-data)
                    (str "post-modal-add-comment-" (:uuid activity-data)))])]]]
-        (when (and @(::bottom-fixed-add-comment s)
+        (when (and @(::post-exceeds-window-height s)
                    (:can-comment activity-data))
           [:div.post-modal-fixed-add-comment
             (rum/with-key (add-comment activity-data)

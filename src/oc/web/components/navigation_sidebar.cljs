@@ -216,4 +216,4 @@
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
             [:span.compose-green-icon]
             [:span.compose-green-label
-              "New post"]]])]))
+              "Share an update"]]])]))
