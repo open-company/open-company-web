@@ -12,6 +12,8 @@ div.post-modal-container {
   z-index: #{$navbar_zindex + 146};
   opacity: 1;
   transition: opacity 180ms ease-in;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   &.new-item {
     div.post-modal-wrapper div.post-modal div.post-modal-inner div.post-modal-header div.name div.new-tag {
@@ -26,7 +28,7 @@ div.post-modal-container {
   }
 
   button.modal-close-bt {
-    position: absolute;
+    position: fixed;
     // right: 736px;
     right: calc(50vw + 376px);
     top: 12px;
@@ -36,7 +38,7 @@ div.post-modal-container {
     width: 720px;
     position: relative;
     top: 0;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0 auto;
     // right: 0;
     transition: right 180ms ease-in;
@@ -44,8 +46,6 @@ div.post-modal-container {
 
     div.post-modal {
       height: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
 
       div.post-modal-inner {
         background-color: white;
@@ -187,9 +187,9 @@ div.post-modal-container {
     }
 
     div.post-modal-fixed-add-comment {
-      position: absolute;
+      position: fixed;
       bottom: 0;
-      right: 0;
+      margin: 0 auto;
       width: 720px;
       padding: 24px 40px;
       background-color: white;

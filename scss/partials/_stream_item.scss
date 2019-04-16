@@ -12,6 +12,7 @@ div.stream-item {
       &:hover {
         background-color: #F5F5F5;
         border-left: 4px solid #F5F5F5;
+        border-bottom: 1px solid #F5F5F5;
 
         div.stream-item-body-ext {
           div.stream-item-footer {
@@ -21,7 +22,7 @@ div.stream-item {
 
             div.stream-item-comments-summary {
               div.is-comments {
-                div.is-comments-authors {
+                div.is-comments-authors.show-borders {
                   div.is-comments-author {
                     background-color: #F5F5F5;
                     border: 2px solid #F5F5F5;
@@ -276,6 +277,7 @@ div.stream-item {
         right: 0;
         top: 50%;
         cursor: pointer;
+        border-radius: 4px;
 
         &.video {
           &:hover:after {
@@ -306,7 +308,7 @@ div.stream-item {
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 452px;
+        width: 484px;
         min-height: 98px;
 
         @include mobile() {

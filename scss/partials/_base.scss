@@ -53,7 +53,7 @@ html, body {
     max-width: none;
     text-align: left;
     opacity: 1;
-    @include OC_Body_Bold();
+    @include OC_Body_Medium();
     font-size: 14px;
     color: white;
     line-height: 18px;

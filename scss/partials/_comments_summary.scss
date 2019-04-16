@@ -10,12 +10,18 @@ div.is-comments {
       margin-right: 8px;
     }
 
+    &.show-border {
+      div.is-comments-author {
+        border: 2px solid white;
+      }
+    }
+
     div.is-comments-author {
       float: left;
       width: 28px;
       height: 28px;
       background-color: white;
-      border: 2px solid white;
+      border: 2px solid transparent;
       border-radius: 50%;
       margin-left: -10px;
 

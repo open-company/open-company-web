@@ -81,6 +81,7 @@ div.org-settings-modal {
 
       div.org-settings-header-avatar {
         height: 32px;
+        cursor: pointer;
 
         div.org-avatar.missing-logo {
           position: relative;
@@ -127,6 +128,7 @@ div.org-settings-modal {
           line-height: 18px;
           color: $carrot_green;
           margin-left: 16px;
+          margin-top: 7px;
         }
       }
     }

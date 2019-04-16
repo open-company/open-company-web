@@ -111,7 +111,13 @@
                                 ;; Mixins
                                 mixins/no-scroll-mixin
                                 mixins/first-render-mixin
-                                {:did-update (fn [s]
+                                {:will-mount (fn [s]
+                                  (let [org-data @(drv/get-ref s :org-data)]
+                                    (org-actions/get-org org-data)
+                                    (team-actions/force-team-refresh (:team-id org-data)))
+                                  (reset-form s)
+                                  s)
+                                 :did-update (fn [s]
                                   (when (and @(::unmounting s)
                                              (compare-and-set! (::unmounted s) false true))
                                     (utils/after 180 real-close))
@@ -155,9 +161,9 @@
             {:on-click #(when (compare-and-set! (::saving s) false true)
                          (org-actions/org-edit-save org-editing))
              :disabled (or @(::saving s)
-                         (:saved org-editing)
-                         (not (:has-changes org-editing))
-                         (< (count (str/trim (:name org-editing))) 3))
+                           (:saved org-editing)
+                           (and (seq (:name org-editing))
+                                (< (count (str/trim (:name org-editing))) 3)))
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
@@ -181,7 +187,7 @@
               "Company name"]
             [:input.org-settings-field
               {:type "text"
-              :value (:name org-editing)
+              :value (or (:name org-editing) "")
               :on-change #(dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. % -target -value)
                                                                                     :has-changes true})])}]
             [:div.org-settings-desc

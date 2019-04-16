@@ -155,6 +155,7 @@
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
+        [:div.oc-menu-separator]
         (when show-reminders?
           [:a.qsg-create-reminder-2
             {:href "#"
@@ -162,7 +163,7 @@
             (when (= (:step qsg-data) :create-reminder-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.reminders
-              "Reminders"]])
+              "Recurring updates"]])
         [:div.oc-menu-separator]
         (when (and (not is-mobile?)
                    (= user-role :admin)

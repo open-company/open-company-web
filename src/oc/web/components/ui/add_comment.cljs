@@ -23,7 +23,10 @@
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
 (defn editable-input-change [s editable event]
-  (enable-add-comment? s))
+  (enable-add-comment? s)
+  (let [on-change-cb (second (:rum/args s))]
+    (when (fn? on-change-cb)
+     (on-change-cb))))
 
 (defn focus-add-comment [s]
   (enable-add-comment? s)
@@ -107,7 +110,7 @@
                              (events/unlistenByKey @(::blur-listener s))
                              (reset! (::blur-listener s) nil))
                            s)}
-  [s activity-data]
+  [s activity-data on-change-cb]
   (let [add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
         _ (drv/react s :add-comment-data)]
     [:div.add-comment-box-container

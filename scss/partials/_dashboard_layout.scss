@@ -308,13 +308,13 @@ div.dashboard-layout {
               background-repeat: no-repeat;
               background-position: center;
               background-color: transparent;
-              border-radius: 10px;
-              width: 25px;
+              width: 48px;
               height: 25px;
               opacity: 0.8;
-              padding: 0;
+              padding: 0 0 0 16px;
               margin: 0 0 0 16px;
               position: relative;
+              border-left: 1px solid $ultra_light_grey;
 
               // &:before {
               //   content: "";

@@ -21,12 +21,20 @@
 (defn modal-close []
   (routing-actions/dismiss-post-modal))
 
+(defn save-fixed-comment-height [s]
+  (let [cur-height (.outerHeight (js/$ (rum/ref-node s :post-modal-fixed-add-comment)))]
+    (js/console.log "DBG comment outer height" cur-height)
+    (when-not (= @(::comment-height s) cur-height)
+      (js/console.log "DBG   setting it")
+      (reset! (::comment-height s) cur-height))))
+
 (rum/defcs post-modal < (drv/drv :activity-data)
                         (drv/drv :comments-data)
                         (drv/drv :add-comment-focus)
                         ;; Locals
                         (rum/local false ::scroll-outer-height)
                         (rum/local nil ::wh)
+                        (rum/local nil ::comment-height)
                         ;; Mixins
                         rum/reactive
                         mixins/no-scroll-mixin
@@ -45,10 +53,16 @@
                                       team-id (:team-id(dis/org-data))
                                       _part_of_team (jwt/user-is-part-of-the-team team-id)]
                             (activity-actions/send-item-seen (:uuid activity-data)))
+                          s)
+                         :after-render (fn [s]
+                          (when (and @(::scroll-outer-height s)
+                                     (> @(::scroll-outer-height s) @(::wh s)))
+                            (save-fixed-comment-height s))
                           s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
         comments-drv (drv/react s :comments-data)
+        _add-comment-focus (drv/react s :add-comment-focus)
         comments-data (au/get-comments activity-data comments-drv)
         dom-element-id (str "post-modal-" (:uuid activity-data))
         dom-node-class (str "post-modal-" (:uuid activity-data))
@@ -71,7 +85,9 @@
           [:div.activity-share-container]
           [:div.post-modal-inner
             {:ref :post-modal-inner
-             :class (when fixed-add-comment "fixed-add-comment")}
+             :class (when fixed-add-comment "fixed-add-comment")
+             :style {:padding-bottom (when @(::comment-height s)
+                                       (str @(::comment-height s) "px"))}}
             [:div.post-modal-header.group
               (user-avatar-image publisher)
               [:div.name
@@ -121,5 +137,6 @@
         (when (and fixed-add-comment
                    (:can-comment activity-data))
           [:div.post-modal-fixed-add-comment
-            (rum/with-key (add-comment activity-data)
+            {:ref :post-modal-fixed-add-comment}
+            (rum/with-key (add-comment activity-data #(save-fixed-comment-height s))
              (str "post-modal-fixed-add-comment-" (:uuid activity-data)))])]]))
