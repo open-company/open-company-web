@@ -323,10 +323,10 @@ div.left-navigation-sidebar {
     }
 
     div.all-posts-label, div.drafts-label, div.must-see-label {
-      padding: 2px 0px 0px 16px;
+      padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
-      margin-left: 16px;
+      margin-left: 12px;
       text-decoration: none;
 
       @include mobile() {
