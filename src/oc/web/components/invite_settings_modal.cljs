@@ -178,8 +178,7 @@
                   send-cta @(::send-bt-cta s)]
               (if (zero? valid-users-count)
                 send-cta
-                (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))
-            "Send"]
+                (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))]
           [:button.mlb-reset.cancel-bt
             {:on-click #(do
                          (reset! (::rand s) (int (rand 10000)))
