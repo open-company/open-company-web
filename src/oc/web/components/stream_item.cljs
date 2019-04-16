@@ -255,7 +255,8 @@
                         [:button.mlb-reset.post-added-bt
                           {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                           "OK, got it"]]])])
-              (when (and is-published?
-                         (not is-mobile?))
-                (more-menu activity-data dom-element-id
-                 {:external-share (not is-mobile?)}))])]]))
+              [:div.menu-container
+                (when (and is-published?
+                           (not is-mobile?))
+                  (more-menu activity-data dom-element-id
+                   {:external-share (not is-mobile?)}))]])]]))

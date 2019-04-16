@@ -15,6 +15,10 @@ div.stream-item {
 
         div.stream-item-body-ext {
           div.stream-item-footer {
+            div.menu-container {
+              display: block;
+            }
+
             div.stream-item-comments-summary {
               div.is-comments {
                 div.is-comments-authors {
@@ -415,6 +419,12 @@ div.stream-item {
       height: 26px;
       margin-top: 16px;
 
+      @include big_web(){
+        div.menu-container {
+          display: none;
+        }
+      }
+
       div.stream-body-draft-edit {
         float: left;
 
@@ -563,73 +573,6 @@ div.stream-item {
 
     div.stream-body-comments {
       height: 100%;
-    }
-  }
-
-  div.stream-item-bottom-footer {
-    margin-top: 16px;
-    height: 24px;
-
-    @include mobile() {
-      padding-top: 0;
-      height: 32px;
-    }
-
-    &.expanded {
-      margin-top: 0;
-      padding-top: 12px;
-      height: 36px;
-
-      @include mobile() {
-        padding-top: 0;
-        margin-top: 16px;
-        height: 24px;
-      }
-    }
-
-    button.expand-button {
-      padding: 0;
-      height: 24px;
-      color: $carrot_green;
-      @include OC_Body_Bold();
-      font-size: 14px;
-      justify-content: center;
-      align-items: center;
-      display: none;
-      float: none;
-      opacity: 1;
-      width: 100%;
-      margin: 0 auto;
-
-      @include mobile(){
-        width: 100%;
-      }
-
-      @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
-
-      span.expand-icon {
-        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-        background-size: 14px 8px;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 14px;
-        height: 8px;
-        transition: rotate 180ms;
-        margin-right: 8px;
-        display: block;
-      }
-
-      &.expanded {
-        color: $ui_grey;
-
-        span.expand-icon {
-          background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
-        }
-      }
-    }
-
-    div.more-menu {
-      float: right;
     }
   }
 }
