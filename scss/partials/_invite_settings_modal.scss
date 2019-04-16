@@ -37,6 +37,8 @@ div.invite-settings-modal {
     right: -320px;
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     div.invite-settings-header {
       width: calc(100% + 48px);
