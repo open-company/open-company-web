@@ -18,7 +18,7 @@ div.reactions {
       @include OC_Body_Bold();
       box-shadow: none;
       font-size: 11px;
-      color: $light_ui_grey;
+      color: $ui_grey;
       min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
@@ -48,18 +48,17 @@ div.reactions {
         cursor: pointer;
 
         @include big_web() {
-          // &.reacted:hover {
-          //   background-color: $feint_emerald;
-
-          //   div.count {
-          //     color: $carrot_green;
-          //   }
-          // }
-
-          &:hover, &.reacted:hover {
+          &:hover {
             background-color: #D6D9DC;
             div.count {
               color: $deep_navy;
+            }
+          }
+
+          &.reacted:hover {
+            background-color: #C6EBD8;
+            div.count {
+              color: $carrot_green;
             }
           }
         }
