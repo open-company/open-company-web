@@ -44,7 +44,7 @@
       span.org-name {
         display: inline-block;
         float: left;
-        margin: -#{($max_logo_height / 2) + ($max_logo_height / 4)}px 0 0 #{$max_logo_height + 8}px;
+        margin: -#{$max_logo_height * 0.87}px 0 0 #{$max_logo_height + 8}px;
       }
     }
 
