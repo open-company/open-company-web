@@ -164,10 +164,33 @@
           [:div.invite-settings-header-title
             "Invite people"]
           [:button.mlb-reset.save-bt
-            {:on-click #(dismiss-modal s)}
+            {:on-click #(let [valid-count (count (filterv valid-user? invite-users))]
+                          (qsg-actions/finish-invite-team-trail)
+                          (reset! (::sending s) valid-count)
+                          (reset! (::initial-sending s) valid-count)
+                          (reset! (::send-bt-cta s) "Sending")
+                          (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
+             :class (when (= "Sent" @(::send-bt-cta s)) "no-disable")
+             :disabled (or (not (has-valid-user? invite-users))
+                           (pos? @(::sending s)))}
+            (let [valid-users-count (count (filterv valid-user? invite-users))
+                  needs-plural (> valid-users-count 1)
+                  send-cta @(::send-bt-cta s)]
+              (if (zero? valid-users-count)
+                send-cta
+                (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))
             "Send"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(dismiss-modal s)}
+            {:on-click #(do
+                         (reset! (::rand s) (int (rand 10000)))
+                         (dis/dispatch!
+                          [:input
+                           [:invite-users]
+                           (vec
+                            (repeat
+                             default-row-num
+                             (assoc default-user-row :type @(::inviting-from s))))])
+                         (dismiss-modal s))}
             "Back"]]
         [:div.invite-settings-body
           [:div.invite-via
