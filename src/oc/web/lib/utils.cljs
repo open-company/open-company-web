@@ -102,7 +102,8 @@
   [past-date & [flags]]
   (let [past-js-date (js-date past-date)
         past (.getTime past-js-date)
-        now (.getTime (js-date))
+        now-date (js-date)
+        now (.getTime now-date)
         seconds (.floor js/Math (/ (- now past) 1000))
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
@@ -120,8 +121,12 @@
       (pos? days-interval)
       (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
       ;; time only
-      short?
-      (str (add-zero (.getHours past-js-date)) ":" (add-zero (.getMinutes past-js-date)))
+      (and short?
+           (= (.getDate past-js-date) (.getDate now-date)))
+      (s/lower
+       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
+                                                                                  :minute "2-digit"
+                                                                                  :format "hour:minute"}))
 
       (pos? hours-interval)
       (str hours-interval " " (pluralize "hour" hours-interval) " ago")

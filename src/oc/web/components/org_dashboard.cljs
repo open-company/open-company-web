@@ -38,8 +38,9 @@
             [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
-            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
-            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
+            [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
+            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
+            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
 
 (defn refresh-board-data [s]
   (when (and (not (router/current-activity-id))
@@ -193,6 +194,9 @@
           ;; Integrations settings
           (and org-settings-data (= org-settings-data :integrations))
           (integrations-settings-modal)
+          ;; Invite settings
+          true ;(and org-settings-data (= org-settings-data :invite))
+          (invite-settings-modal)
           ;; Other settings panels
           org-settings-data
           (org-settings)

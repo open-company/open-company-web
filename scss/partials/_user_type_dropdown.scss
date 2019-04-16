@@ -7,13 +7,16 @@ div.dropdown{
     padding-right: 25px;
 
     &:after {
-      color: $oc_gray_7;
-      font-size: 23px;
-      font-family: "Material Design Icons";
-      content: "\F35D";
+      content: "";
+      width: 8px;
+      height: 10px;
       position: absolute;
-      top: -6px;
-      right: 0px;
+      right: 4px;
+      top: 11px;
+      background-image: cdnUrl("/img/ML/select_arrows.svg");
+      background-size: 8px 10px;
+      background-position: center;
+      background-repeat: no-repeat;
     }
   }
 
@@ -21,8 +24,8 @@ div.dropdown{
     padding: 0;
     width: 144px;
     min-width: 144px;
-    @include OC_Body_Medium();
-    font-size: 16px;
+    @include OC_Body_Book();
+    font-size: 14px;
     color: $oc_gray_7;
     background-color: white;
     border: none;

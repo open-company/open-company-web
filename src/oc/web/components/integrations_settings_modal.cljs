@@ -8,6 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
 
 (defn show-modal [& [panel]]
@@ -55,9 +56,12 @@
         [:div.integrations-settings-header
           [:div.integrations-settings-header-title
             "Integrations"]
+          [:button.mlb-reset.save-bt
+            {:on-click #(dismiss-modal s)}
+            "Save"]
           [:button.mlb-reset.cancel-bt
             {:on-click #(dismiss-modal s)}
-            "Close"]]
+            "Back"]]
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
@@ -84,14 +88,35 @@
                           {:class (when-not has-logo "no-logo")
                            :src logo-url}]]
                       [:div.slack-team-name
-                        (:name slack-team)]]
+                        (:name slack-team)]
+                      [:button.mlb-reset.button.remove-slack-team-bt
+                        {:on-click (fn []
+                                     (alert-modal/show-alert {:icon "/img/ML/trash.svg"
+                                                              :action "remove-slack-team"
+                                                              :message "Are you sure you want to remove this Slack team?"
+                                                              :link-button-title "Keep"
+                                                              :link-button-cb #(alert-modal/hide-alert)
+                                                              :solid-button-style :red
+                                                              :solid-button-title "Yes"
+                                                              :solid-button-cb (fn []
+                                                                                (team-actions/remove-team (:links slack-team))
+                                                                                (alert-modal/hide-alert))}))
+                         :title "Remove"
+                         :data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"}]]
                     (when (seq slack-domain)
                       [:div.linked-to
-                        "This team is linked to:"
-                        [:br]
                         (str slack-domain ".slack.com")])
                     [:div.self-join
-                      "Slack members can self-join this team."]
+                      "Slack members can self-join this as: "
+                      [:select.self-join-select
+                        [:option
+                          "Admin"]
+                        [:option
+                          "Contributor"]
+                        [:option
+                          "Viewer"]]]
                     (if has-bot?
                       [:div.bot-line
                         "Carrot bot is currently on."]

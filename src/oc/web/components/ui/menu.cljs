@@ -128,10 +128,12 @@
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu
                                 :appear appear-class})
-       :on-click (partial menu-close s)}
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
+                    (menu-close s))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(menu-close s)}]
       [:div.menu-container
+        {:ref :menu-container}
         [:div.menu-header.group
           [:button.mlb-reset.mobile-close-bt
             {:on-click #(do
@@ -191,7 +193,7 @@
             {:href "#"
              :on-click #(manage-team-click s %)}
             [:div.oc-menu-item.manage-team
-              "Manage Team"]])
+              "Manage team"]])
         (when (and (not is-mobile?)
                    (router/current-org-slug)
                    (= user-role :admin))
