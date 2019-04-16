@@ -195,7 +195,7 @@
           (and org-settings-data (= org-settings-data :integrations))
           (integrations-settings-modal)
           ;; Invite settings
-          true ;(and org-settings-data (= org-settings-data :invite))
+          (and org-settings-data (= org-settings-data :invite))
           (invite-settings-modal)
           ;; Other settings panels
           org-settings-data
