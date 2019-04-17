@@ -119,8 +119,7 @@
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :hide-left-navbar (drv/react s :hide-left-navbar)
-                                })
+                                :hide-left-navbar (drv/react s :hide-left-navbar)})
        :style {:overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
       [:div.mobile-header-container

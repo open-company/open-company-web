@@ -28,6 +28,7 @@
 
 (rum/defcs post-modal < (drv/drv :activity-data)
                         (drv/drv :comments-data)
+                        (drv/drv :hide-left-navbar)
                         (drv/drv :add-comment-focus)
                         ;; Locals
                         (rum/local false ::scroll-outer-height)
@@ -67,7 +68,9 @@
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         fixed-add-comment (> @(::scroll-outer-height s) @(::wh s))
-        show-bottom-share (> @(::scroll-outer-height s) @(::wh s))]
+        show-bottom-share (> @(::scroll-outer-height s) @(::wh s))
+        hide-left-navbar (drv/react s :hide-left-navbar)]
+    (js/console.log "DBG hide-left-navbar" hide-left-navbar)
     [:div.post-modal-container
       {:id dom-element-id
        :class (utils/class-set {:must-see-item (:must-see activity-data)
@@ -76,7 +79,8 @@
       [:button.mlb-reset.modal-close-bt
         {:on-click modal-close}]
       [:div.post-modal-wrapper
-        {:on-click #(.stopPropagation %)}
+        {:on-click #(.stopPropagation %)
+         :class (utils/class-set {:left-navbar-hidden hide-left-navbar})}
         [:div.post-modal
           {:class (utils/class-set {dom-node-class true})}
           [:div.activity-share-container]
