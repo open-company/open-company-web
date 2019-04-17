@@ -1,46 +1,48 @@
-div.org-settings div.org-settings-inner div.org-settings-main {
-  div.org-settings-panel-row.org-logo-row {
-    cursor: pointer;
+div.org-settings div.org-settings-inner {
+  div.org-settings-main {
+    div.org-settings-panel-row.org-logo-row {
+      cursor: pointer;
 
-    div.org-logo-container {
-      float: left;
-      min-width: 64px;
-      max-width: #{64 * 8}px;
-      height: 64px;
-      text-align: center;
+      div.org-logo-container {
+        float: left;
+        min-width: 64px;
+        max-width: #{64 * 8}px;
+        height: 64px;
+        text-align: center;
 
-      div.org-avatar {
+        div.org-avatar {
 
-        &.missing-logo {
-          border: 1px solid $carrot_light_gray;
-          border-radius: 4px;
-          opacity: 0.2;
-          position: relative;
-          min-width: 64px;
-          height: 64px;
-
-          &:after {
-            content: "";
-            background-image: cdnUrl("/img/ML/carrot_grey.svg");
-            background-position: 50%;
-            background-size: 23px 48px;
-            background-repeat: no-repeat;
-            width: 64px;
+          &.missing-logo {
+            border: 1px solid $carrot_light_gray;
+            border-radius: 4px;
+            opacity: 0.2;
+            position: relative;
+            min-width: 64px;
             height: 64px;
-            position: absolute;
-            top: 0px;
-            left: 0px;
+
+            &:after {
+              content: "";
+              background-image: cdnUrl("/img/ML/carrot_grey.svg");
+              background-position: 50%;
+              background-size: 23px 48px;
+              background-repeat: no-repeat;
+              width: 64px;
+              height: 64px;
+              position: absolute;
+              top: 0px;
+              left: 0px;
+            }
           }
+
+          @include org-avatar(64);
         }
-
-        @include org-avatar(64);
       }
-    }
 
-    div.org-logo-label {
-      float: left;
-      margin-left: 16px;
-      margin-top: 8px;
+      div.org-logo-label {
+        float: left;
+        margin-left: 16px;
+        margin-top: 8px;
+      }
 
       div.cta {
         @include OC_Body_Bold();
@@ -55,34 +57,30 @@ div.org-settings div.org-settings-inner div.org-settings-main {
         margin-top: 12px;
       }
     }
-  }
 
-  div.org-settings-panel-row.email-domains-row {
-    padding-bottom: 24px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid $ultra_light_grey;
+    div.org-settings-panel-row.email-domains-row {
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid $ultra_light_grey;
 
-    div.org-settings-label {
-      i.mdi.mdi-information-outline {
-        margin-left: 8px;
-        color: $light_ui_grey;
+      div.org-settings-label {
+        i.mdi.mdi-information-outline {
+          margin-left: 8px;
+          color: $light_ui_grey;
 
-        &:before {
-          font-size: 16px;
+          &:before {
+            font-size: 16px;
+          }
+        }
+
+        div.tooltip {
+          width: 160px;
+        }
+
+        label.error {
+          margin-left: 0px !important;
         }
       }
-
-      div.tooltip {
-        width: 160px;
-      }
-
-      label.error {
-        margin-left: 0px !important;
-      }
-    }
-
-    div.org-settings-list {
-      margin-bottom: 16px;
 
       div.org-settings-list-item {
         div.org-settings-list-item-name {
@@ -91,62 +89,64 @@ div.org-settings div.org-settings-inner div.org-settings-main {
           color: $carrot_dark_gray;
         }
       }
-    }
 
-    div.org-settings-list.org-settings-email-domains-list {
-      margin-top: 16px;
-      margin-bottom: 0px;
+      div.org-settings-list.org-settings-email-domains-list {
+        margin-top: 16px;
+        margin-bottom: 0px;
 
-      div.org-settings-list-item {
-        display: inline-block;
-        padding: 6px 13px;
-        background-color: $feint_emerald;
-        height: 32px;
-        border-radius: 6px;
-        margin-right: 8px;
-        color: $carrot_green;
-        border: none;
-        outline: none;
-        box-shadow: none;
-
-        span.org-settings-list-item-name {
+        div.org-settings-list-item {
+          display: inline-block;
+          padding: 6px 13px;
+          background-color: $feint_emerald;
+          height: 32px;
+          border-radius: 6px;
+          margin-right: 8px;
           color: $carrot_green;
           @include OC_Body_Bold();
           font-size: 14px;
-        }
+          border: none;
+          outline: none;
+          box-shadow: none;
 
-        button.remove-team-btn {
-          width: 20px;
-          height: 28px;
-          margin-left: 4px;
-          margin-top: -5px;
-          background-image: cdnUrl("/img/ML/remove_email_domain.svg");
-          background-size: 8px 8px;
-          background-position: 6px 10px;
-          background-repeat: no-repeat;
-          display: block;
+          span.org-settings-list-item-name {
+            color: $carrot_green;
+            @include OC_Body_Bold();
+            font-size: 14px;
+          }
+
+          button.remove-team-btn {
+            width: 20px;
+            height: 28px;
+            margin-left: 4px;
+            margin-top: -5px;
+            background-image: cdnUrl("/img/ML/remove_email_domain.svg");
+            background-size: 8px 8px;
+            background-position: 6px 10px;
+            background-repeat: no-repeat;
+            display: block;
+          }
         }
       }
-    }
 
-    div.org-settings-field.org-settings-email-domain-field {
-      width: 100%;
-      height: 40px;
-      border-radius: 6px;
-      border: 1px solid $light_ui_grey;
+      div.org-settings-field.org-settings-email-domain-field {
+        width: 100%;
+        height: 40px;
+        border-radius: 6px;
+        border: 1px solid $light_ui_grey;
 
-      @include mobile() {
-        width: 70% !important;
-      }
+        @include mobile() {
+          width: 70% !important;
+        }
 
-      input {
-        float: left;
-        width: 390px;
+        input {
+          float: left;
+          width: 390px;
 
-        @include placeholder(){
-          @include OC_Body_Medium();
-          color: $ui_grey;
-          font-size: 16px;
+          @include placeholder(){
+            @include OC_Body_Medium();
+            color: $ui_grey;
+            font-size: 16px;
+          }
         }
       }
 
@@ -161,77 +161,77 @@ div.org-settings div.org-settings-inner div.org-settings-main {
         float: right;
       }
     }
-  }
 
-  button.save-btn {
-    &.no-disable {
-      opacity: 1 !important;
-    }
-  }
-
-  div.org-settings-panel-row.slack-teams-row {
-    div.org-settings-label {
-      i.mdi.mdi-information-outline {
-        margin-left: 8px;
-        color: $light_ui_grey;
-
-        &:before {
-          font-size: 16px;
-        }
-      }
-
-      div.tooltip {
-        width: 160px;
+    button.save-btn {
+      &.no-disable {
+        opacity: 1 !important;
       }
     }
 
-    button.add-slack-team-bt {
-      margin-top: 8px;
-      opacity: 0.9;
-      padding: 0px;
+    div.org-settings-panel-row.slack-teams-row {
+      div.org-settings-label {
+        i.mdi.mdi-information-outline {
+          margin-left: 8px;
+          color: $light_ui_grey;
 
-      &:hover{
-        opacity: 1;
-      }
-    }
-
-    div.org-settings-list {
-      div.org-settings-list-item {
-        &:last-child {
-          border-bottom: 1px solid $ultra_light_grey;
-          padding-bottom: 24px;
-        }
-
-        div.logo-container {
-          float: left;
-          width: 40px;
-          height: 40px;
-          border: 1px solid rgba(#B1B8C0, 0.5);
-          border-radius: 4px;
-          margin-right: 16px;
-
-          img.slack-logo {
-            width: 38px;
-            height: 38px;
-            padding: 3px;
-
-            &.no-logo {
-              width: 22px;
-              height: 22px;
-              padding: 0px;
-              margin: 8px;
-            }
+          &:before {
+            font-size: 16px;
           }
         }
 
-        div.org-settings-list-item-slack-org {
-          padding-left: 64px;
+        div.tooltip {
+          width: 160px;
+        }
+      }
 
-          &:hover {
-            div.org-settings-list-item-name {
-              div.integrations-more-menu {
-                button.integrations-more-menu-bt {
-                  display: inline;
+      button.add-slack-team-bt {
+        margin-top: 8px;
+        opacity: 0.9;
+        padding: 0px;
+
+        &:hover{
+          opacity: 1;
+        }
+      }
+
+      div.org-settings-list {
+        div.org-settings-list-item {
+          &:last-child {
+            border-bottom: 1px solid $ultra_light_grey;
+            padding-bottom: 24px;
+          }
+
+          div.logo-container {
+            float: left;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(#B1B8C0, 0.5);
+            border-radius: 4px;
+            margin-right: 16px;
+
+            img.slack-logo {
+              width: 38px;
+              height: 38px;
+              padding: 3px;
+
+              &.no-logo {
+                width: 22px;
+                height: 22px;
+                padding: 0px;
+                margin: 8px;
+              }
+            }
+          }
+
+          div.org-settings-list-item-slack-org {
+            padding-left: 64px;
+
+            &:hover {
+              div.org-settings-list-item-name {
+                div.integrations-more-menu {
+                  button.integrations-more-menu-bt {
+                    display: inline;
+                  }
                 }
               }
             }
@@ -295,10 +295,6 @@ div.org-settings div.org-settings-inner div.org-settings-main {
                   &:first-child {
                     margin-top: 0px;
                   }
-
-                  &:last-child {
-                    border-bottom: 0px;
-                  }
                 }
               }
             }
@@ -311,26 +307,86 @@ div.org-settings div.org-settings-inner div.org-settings-main {
             line-height: 20px;
             height: 20px;
             float: none;
+
+            div.slack-org-self-join {
+              @include OC_Body_Medium();
+              font-size: 12px;
+              color: $deep_navy;
+              opacity: 0.5;
+              line-height: 14px;
+              margin-top: 8px;
+            }
+
+            div.slack-org-bot-switch {
+              @include OC_Body_Medium();
+              font-size: 13px;
+              color: $deep_navy;
+              margin-top: 16px;
+
+              i.mdi-information-outline {
+                color: $light_ui_grey;
+                margin-left: 6px;
+              }
+
+              button.enable-carrot-bot-bt {
+                float: right;
+                width: 140px;
+                height: 32px;
+                @include OC_Body_Bold();
+                font-size: 13px;
+                color: $carrot_green;
+                background-color: $feint_emerald;
+                border-radius: 6px;
+                margin-top: -5px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    div.org-settings-panel-row.advanced-settings-row {
+      border-bottom: 1px solid $ultra_light_grey;
+
+      div.advanced-settings-rows {
+        margin-top: 16px;
+        margin-bottom: 32px;
+
+        div.advanced-settings-row-item {
+          margin-top: 8px;
+          div.carrot-checkbox {
+            float: left;
+
+            &:not(.selected) {
+              opacity: 0.5;
+            }
           }
 
-          div.slack-org-self-join {
-            @include OC_Body_Medium();
-            font-size: 12px;
+          div.checkbox-label {
+            @include OC_Body_Book();
+            font-size: 14px;
             color: $deep_navy;
-            opacity: 0.5;
-            line-height: 14px;
-            margin-top: 8px;
-          }
+            float: left;
+            margin-left: 10px;
+            cursor: pointer;
 
-          div.slack-org-bot-switch {
-            @include OC_Body_Medium();
-            font-size: 13px;
-            color: $deep_navy;
-            margin-top: 16px;
+            &.unselected label{
+              opacity: 0.5;
+            }
 
-            i.mdi-information-outline {
+            i.mdi.mdi-information-outline {
+              margin-left: 8px;
               color: $light_ui_grey;
-              margin-left: 6px;
+
+              &:before {
+                font-size: 16px;
+              }
+            }
+
+            div.tooltip {
+              opacity: 1;
+              width: #{$settings_content_width - 48}px;
+              margin-left: -142px;
             }
 
             button.enable-carrot-bot-bt {
@@ -347,6 +403,21 @@ div.org-settings div.org-settings-inner div.org-settings-main {
           }
         }
       }
+    }
+  }
+
+  div.org-settings-footer {
+    button.hidden-settings-bt {
+      float: left;
+      margin-right: 24px;
+      margin-left: 0px;
+      height: 32px;
+      background-color: transparent;
+      @include OC_Body_Medium();
+      font-size: 16px;
+      color: $grey_num_1;
+      padding: 0;
+      text-align: left;
     }
   }
 }

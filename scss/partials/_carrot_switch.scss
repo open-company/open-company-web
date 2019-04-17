@@ -1,0 +1,56 @@
+$carrot_switch_animation: 130ms;
+
+div.carrot-switch {
+  display: block-inline;
+  width: 28px;
+  height: 16px;
+  border-radius: 100px;
+  background-color: $light_ui_grey;
+  color: $light_ui_grey;
+  transition: background-color $carrot_switch_animation, color $carrot_switch_animation;
+  position: relative;
+  cursor: pointer;
+  @include no-user-select();
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  span.selected-label {
+    color: $carrot_green;
+    float: left;
+    @include OC_Body_Bold();
+    font-size: 12px;
+  }
+
+  span.unselected-label {
+    color: $ui_grey;
+    float: right;
+    @include OC_Body_Bold();
+    font-size: 12px;
+  }
+
+  span.dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background-color: $ui_grey;
+    display: block;
+    border-radius: 50%;
+    transition: margin-left $carrot_switch_animation;
+  }
+
+  &.selected {
+    background-color: $feint_emerald;
+    color: $carrot_green;
+
+    span.dot {
+      margin-left: 12px;
+      background-color: $carrot_green;
+    }
+  }
+}
