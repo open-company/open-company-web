@@ -138,11 +138,13 @@
                        (activity-actions/activity-edit activity-data)
                        (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
                              stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
-                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")))]
+                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)]
                          (when (and ;; More menu wasn't clicked
                                     (not (utils/event-inside? e more-menu-el))
                                     ;; WRT wasn't clicked 
                                     (not (utils/event-inside? e stream-item-wrt-el))
+                                    ;; Emoji picker wasn't clicked
+                                    (not (utils/event-inside? e emoji-picker))
                                     ;; a button wasn't clicked
                                     (not (utils/button-clicked? e)))
                            (routing-actions/open-post-modal activity-data))))))

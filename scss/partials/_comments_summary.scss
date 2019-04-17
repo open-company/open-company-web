@@ -45,6 +45,19 @@ div.is-comments {
     overflow: hidden;
     text-overflow: ellipsis;
 
+    @include big_web() {
+      cursor: pointer;
+
+      &:hover {
+        opacity: 1;
+
+        span.add-a-comment {
+          color: $deep_navy;
+          opacity: 1;
+        }
+      }
+    }
+
     @include mobile() {
       max-width: 68vw;
       opacity: 1;

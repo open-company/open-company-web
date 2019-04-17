@@ -27,9 +27,19 @@ div.post-modal-container {
     }
   }
 
+  &.left-navbar-hidden {
+    button.modal-close-bt {
+      right: calc(50vw + 376px);
+    }
+
+    div.post-modal-wrapper {
+      left: calc(50vw - 360px);
+    }
+  }
+
   button.modal-close-bt {
     position: fixed;
-    right: calc(50vw + 376px);
+    right: calc(50vw + 285px);
     top: 12px;
   }
 
@@ -41,10 +51,6 @@ div.post-modal-container {
     transition: right 180ms ease-in;
     background-color: $ultra_light_grey;
     left: calc(#{$left_navigation_sidebar_width}px + ((100vw - #{$left_navigation_sidebar_width}px) / 2) - 360px - 16px);
-
-    &.left-navbar-hidden {
-      left: calc(50vw - 360px);
-    }
 
     div.post-modal {
       height: 100%;

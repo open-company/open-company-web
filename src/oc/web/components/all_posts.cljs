@@ -168,7 +168,7 @@
       [:div.all-posts-cards
         (when @(::top-loading s)
           [:div.loading-updates.top-loading
-            "Retrieving activity..."])
+            "Loading more posts..."])
         [:div.all-posts-cards-inner.group
           (when (or @(::top-loading s)
                     (and (:loading-more container-data)
@@ -187,7 +187,7 @@
              (str "all-posts-entry-" (:uuid e) "-" (:updated-at e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
-            "Retrieving activity..."])
+            "Loading more posts..."])
         (when (and @(::show-all-caught-up-message s)
                    (responsive/is-mobile-size?))
           (all-caught-up))]]))
