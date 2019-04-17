@@ -25,7 +25,7 @@
             [oc.web.components.reminders :refer (reminders)]
             [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.user-profile :refer (user-profile)]
+            [oc.web.components.user-profile-modal :refer (user-profile-modal)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -204,8 +204,8 @@
           show-reminders
           (reminders)
           ;; User settings
-          user-settings
-          (user-profile)
+          (and user-settings (= user-settings :profile))
+          (user-profile-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)

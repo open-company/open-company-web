@@ -23,9 +23,7 @@
 
 (defn save-fixed-comment-height [s]
   (let [cur-height (.outerHeight (js/$ (rum/ref-node s :post-modal-fixed-add-comment)))]
-    (js/console.log "DBG comment outer height" cur-height)
     (when-not (= @(::comment-height s) cur-height)
-      (js/console.log "DBG   setting it")
       (reset! (::comment-height s) cur-height))))
 
 (rum/defcs post-modal < (drv/drv :activity-data)
@@ -70,7 +68,6 @@
         is-mobile? (responsive/is-mobile-size?)
         fixed-add-comment (> @(::scroll-outer-height s) @(::wh s))
         show-bottom-share (> @(::scroll-outer-height s) @(::wh s))]
-    (js/console.log "DBG render" @(::scroll-outer-height s) @(::wh s) "->" fixed-add-comment)
     [:div.post-modal-container
       {:id dom-element-id
        :class (utils/class-set {:must-see-item (:must-see activity-data)
