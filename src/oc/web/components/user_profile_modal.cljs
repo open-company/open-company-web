@@ -11,7 +11,6 @@
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
-            [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]

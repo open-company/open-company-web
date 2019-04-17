@@ -25,7 +25,6 @@
             [oc.web.components.reminders :refer (reminders)]
             [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.user-profile-modal :refer (user-profile-modal)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -33,6 +32,7 @@
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.qsg-digest-sample :refer (qsg-digest-sample)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
+            [oc.web.components.user-profile-modal :refer (user-profile-modal)]
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -40,6 +40,7 @@
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
+            [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
 
 (defn refresh-board-data [s]
@@ -206,6 +207,9 @@
           ;; User settings
           (and user-settings (= user-settings :profile))
           (user-profile-modal)
+          ;; User notifications
+          (and user-settings (= user-settings :notifications))
+          (user-notifications-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
