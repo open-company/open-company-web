@@ -15,7 +15,8 @@
             [oc.web.actions.team :as team-actions]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
+            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 (defn show-modal [& [panel]]
   (dis/dispatch! [:input [:org-settings] (or panel :main)]))
@@ -40,6 +41,11 @@
     (org-actions/org-edit-setup org-data)
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
+
+(defn- change-content-visibility [content-visibility-data k v]
+  (let [new-content-visibility (merge content-visibility-data {k v})]
+    (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
+                                                      :content-visibility new-content-visibility})])))
 
 (defn logo-on-load [org-avatar-editing url img]
   (org-actions/org-avatar-edit-save {:logo-url url
@@ -96,44 +102,48 @@
     :id (if success? :email-domain-remove-success :email-domain-remove-error)
     :dismiss true}))
 
-(rum/defcs org-settings-modal < ;; Mixins
-                                rum/reactive
-                                (drv/drv :qsg)
-                                (drv/drv :org-data)
-                                (drv/drv :team-data)
-                                (drv/drv :org-editing)
-                                (drv/drv :org-avatar-editing)
-                                (drv/drv :org-settings-team-management)
-                                ;; Locals
-                                (rum/local false ::unmounting)
-                                (rum/local false ::unmounted)
-                                (rum/local false ::saving)
-                                ;; Mixins
-                                mixins/no-scroll-mixin
-                                mixins/first-render-mixin
-                                {:will-mount (fn [s]
-                                  (let [org-data @(drv/get-ref s :org-data)]
-                                    (org-actions/get-org org-data)
-                                    (team-actions/force-team-refresh (:team-id org-data)))
-                                  (reset-form s)
-                                  s)
-                                 :did-update (fn [s]
-                                  (when (and @(::unmounting s)
-                                             (compare-and-set! (::unmounted s) false true))
-                                    (utils/after 180 real-close))
-                                  s)
-                                 :will-update (fn [s]
-                                  (let [org-editing @(drv/get-ref s :org-editing)]
-                                    (when (and @(::saving s)
-                                               (:saved org-editing))
-                                      (reset! (::saving s) false)
-                                      (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
-                                      (notification-actions/show-notification {:title "Settings saved"
-                                                                               :primary-bt-title "OK"
-                                                                               :primary-bt-dismiss true
-                                                                               :expire 10
-                                                                               :id :org-settings-saved})))
-                                  s)}
+(rum/defcs org-settings-modal <
+  ;; Mixins
+  rum/reactive
+  (drv/drv :qsg)
+  (drv/drv :org-data)
+  (drv/drv :team-data)
+  (drv/drv :org-editing)
+  (drv/drv :org-avatar-editing)
+  (drv/drv :org-settings-team-management)
+  ;; Locals
+  (rum/local false ::unmounting)
+  (rum/local false ::unmounted)
+  (rum/local false ::saving)
+  (rum/local false ::show-advanced-settings)
+  ;; Mixins
+  mixins/no-scroll-mixin
+  mixins/first-render-mixin
+  {:will-mount (fn [s]
+    (let [org-data @(drv/get-ref s :org-data)]
+      (org-actions/get-org org-data)
+      (team-actions/force-team-refresh (:team-id org-data)))
+    (reset-form s)
+    (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
+      (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
+    s)
+   :did-update (fn [s]
+    (when (and @(::unmounting s)
+               (compare-and-set! (::unmounted s) false true))
+      (utils/after 180 real-close))
+    s)
+   :will-update (fn [s]
+    (let [org-editing @(drv/get-ref s :org-editing)]
+      (when (and @(::saving s)
+                 (:saved org-editing))
+        (reset! (::saving s) false)
+        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
+        (notification-actions/show-notification {:title "Settings saved"
+                                                 :primary-bt-title "OK"
+                                                 :primary-bt-dismiss true
+                                                 :expire 10
+                                                 :id :org-settings-saved})))
+    s)}
   [s]
   (let [org-data (drv/react s :org-data)
         appear-class (and @(:first-render-done s)
@@ -148,7 +158,8 @@
                 add-email-domain-team-error
                 team-data]
          :as team-management-data}
-                    (drv/react s :org-settings-team-management)]
+                    (drv/react s :org-settings-team-management)
+        content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-modal
       {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
@@ -215,8 +226,43 @@
                     [:button.mlb-reset.remove-email-bt
                       {:on-click #(team-actions/remove-team (:links domain) email-domain-removed)}
                       "Remove"])])]]
-          ;; Comment out for now the advanced settings
-          ; [:div.org-settings-advanced
-          ;   [:button.mlb-reset.advanced-settings-bt
-          ;     "Show advanced settings"]]
-          ]]]))
+          (if-not @(::show-advanced-settings s)
+            [:div.org-settings-advanced
+              [:button.mlb-reset.advanced-settings-bt
+                {:on-click #(reset! (::show-advanced-settings s) true)}
+                "Show advanced settings"]]
+            [:div.org-settings-advanced
+              [:div.org-settings-advanced-title
+                "Advanced settings"]
+              [:div.org-settings-advanced-row.digest-links.group
+                (carrot-checkbox {:selected (:disallow-secure-links content-visibility-data)
+                                  :disabled false
+                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links %)})
+                [:div.checkbox-label
+                  {:class (when-not (:disallow-secure-links content-visibility-data) "unselected")
+                   :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
+                  "Do not allow secure links to open posts from email or Slack"
+                  [:i.mdi.mdi-information-outline
+                    {:title (str
+                             "When team members receive Carrot posts via an email or Slack morning digest, secure "
+                             "links allow them to read the post without first logging in. A login is still required "
+                             "to access additional posts. If you turn off secure links, your team will always need to "
+                             "be logged in to view posts.")
+                     :data-toggle "tooltip"
+                     :data-placement "top"}]]]
+              [:div.org-settings-advanced-row.public-sections.group
+                (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
+                                  :disabled false
+                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-board %)})
+                [:div.checkbox-label
+                  {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
+                   :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
+                  "Do not allow public sections"]]
+              [:div.org-settings-advanced-row.public-share.group
+                (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
+                                  :disabled false
+                                  :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share %)})
+                [:div.checkbox-label
+                  {:class (when-not (:disallow-public-share content-visibility-data) "unselected")
+                   :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
+                  "Do not allow public share links"]]])]]]))

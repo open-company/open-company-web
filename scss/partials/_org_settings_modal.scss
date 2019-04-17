@@ -201,14 +201,47 @@ div.org-settings-modal {
     div.org-settings-advanced {
       margin-top: 24px;
       border-top: 1px solid $ultra_light_grey;
+      padding-top: 16px;
 
       button.advanced-settings-bt {
-        margin-top: 16px;
         height: 18px;
         @include OC_Body_Book();
         font-size: 14px;
         padding: 0;
         color: $carrot_green;
+      }
+
+      div.org-settings-advanced-title {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+      }
+
+      div.org-settings-advanced-row {
+        margin-top: 8px;
+
+        div.carrot-checkbox {
+          float: left;
+        }
+
+        div.checkbox-label {
+          float: left;
+          margin-left: 8px;
+          width: calc(100% - 24px);
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
+          cursor: pointer;
+
+          i.mdi-information-outline {
+            margin-left: 6px;
+
+            &:before {
+              font-size: 14px;
+            }
+          }
+        }
       }
     }
   }
