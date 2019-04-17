@@ -215,6 +215,8 @@
                     [:button.mlb-reset.remove-email-bt
                       {:on-click #(team-actions/remove-team (:links domain) email-domain-removed)}
                       "Remove"])])]]
-          [:div.org-settings-advanced
-            [:button.mlb-reset.advanced-settings-bt
-              "Show advanced settings"]]]]]))
+          ;; Comment out for now the advanced settings
+          ; [:div.org-settings-advanced
+          ;   [:button.mlb-reset.advanced-settings-bt
+          ;     "Show advanced settings"]]
+          ]]]))

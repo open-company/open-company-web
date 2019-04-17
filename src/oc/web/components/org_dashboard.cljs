@@ -22,7 +22,6 @@
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.reminders :refer (reminders)]
             [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
@@ -39,8 +38,10 @@
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
+            [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
+            [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
 
 (defn refresh-board-data [s]
@@ -201,15 +202,18 @@
           ;; Other settings panels
           org-settings-data
           (org-settings)
-          ;; Reminders
-          show-reminders
-          (reminders)
           ;; User settings
           (and user-settings (= user-settings :profile))
           (user-profile-modal)
           ;; User notifications
           (and user-settings (= user-settings :notifications))
           (user-notifications-modal)
+          ;; Reminders list
+          (and show-reminders (= show-reminders :reminders))
+          (recurring-updates-modal)
+          ;; Edit a reminder
+          show-reminders
+          (edit-recurring-update-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
