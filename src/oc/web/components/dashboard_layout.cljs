@@ -121,25 +121,23 @@
 
                                                    :default
                                                    (:name board-data)))}]])
-                  ; (when (and (= (:access board-data) "private")
-                  ;            (not is-drafts-board))
-                  ;   [:div.private-board
-                  ;     {:data-toggle "tooltip"
-                  ;      :data-placement "top"
-                  ;      :data-container "body"
-                  ;      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                  ;      :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-                  ;              "Only visible to you"
-                  ;              "Only visible to invited team members")}
-                  ;     "Private"])
-                  ; (when (= (:access board-data) "public")
-                  ;   [:div.public-board
-                  ;     {:data-toggle "tooltip"
-                  ;      :data-placement "top"
-                  ;      :data-container "body"
-                  ;      :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                  ;      :title "Visible to the world, including search engines"}
-                  ;     "Public"])
+                  (when (and (= (:access board-data) "private")
+                             (not is-drafts-board))
+                    [:div.private-board
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+                               "Only visible to you"
+                               "Only visible to invited team members")}])
+                  (when (= (:access board-data) "public")
+                    [:div.public-board
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title "Visible to the world, including search engines"}])
                   (when should-show-settings-bt
                     [:div.board-settings-container
                       ;; Settings button

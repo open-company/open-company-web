@@ -412,70 +412,40 @@ div.dashboard-layout {
           }
 
           div.private-board {
-            @include OC_Body_Medium();
-            font-size: 14px;
-            color: rgba($deep_navy, 0.5);
             position: relative;
-            padding-left: 16px;
+            width: 12px;
+            height: 23px;
+            background-image: cdnUrl("/img/ML/board_private_dark.svg");
+            background-size: 10px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
             float: left;
-            margin-top: 12px;
-            margin-left: 12px;
+            margin-left: 6px;
 
-            @include mobile() {
-              display: none;
-            }
-
-            &:before {
-              content: "";
-              background-image: cdnUrl("/img/ML/board_private.svg");
-              background-size: 8px 10px;
-              background-repeat: no-repeat;
-              width: 8px;
-              height: 10px;
-              position: absolute;
-              top: 3px;
-              left: 0px;
-              opacity: 0.5;
-
-              @include mobile(){
-                left: unset;
-                top: 0px;
-                margin-left: -12px;
-              }
+            @include mobile(){
+              left: unset;
+              height: 12px;
+              top: 0px;
+              margin-left: -12px;
             }
           }
 
           div.public-board {
-            @include OC_Body_Medium();
-            font-size: 14px;
-            color: rgba($deep_navy, 0.5);
             position: relative;
-            padding-left: 16px;
+            width: 12px;
+            height: 23px;
+            background-image: cdnUrl("/img/ML/board_public_dark.svg");
+            background-size: 12px 12px;
+            background-repeat: no-repeat;
+            background-position: center;
             float: left;
-            margin-top: 12px;
-            margin-left: 12px;
+            margin-left: 6px;
 
-            @include mobile() {
-              display: none;
-            }
-
-            &:before {
-              content: "";
-              background-image: cdnUrl("/img/ML/board_public.svg");
-              background-size: 10px 10px;
-              background-repeat: no-repeat;
-              width: 10px;
-              height: 10px;
-              position: absolute;
-              top: 4px;
-              left: 0px;
-              opacity: 0.5;
-
-              @include mobile(){
-                left: unset;
-                top: 0px;
-                margin-left: -12px;
-              }
+            @include mobile(){
+              left: unset;
+              height: 12px;
+              top: 0px;
+              margin-left: -12px;
             }
           }
         }
