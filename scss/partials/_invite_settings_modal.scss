@@ -158,6 +158,14 @@ div.invite-settings-modal {
             @include OC_Body_Book();
             font-size: 14px;
             color: $deep_navy;
+            border: none;
+            outline: none;
+            padding: 7px 8px;
+
+            &:focus, &:active {
+              border: none;
+              outline: none;              
+            }
           }
 
           div.user-type-dropdown {
