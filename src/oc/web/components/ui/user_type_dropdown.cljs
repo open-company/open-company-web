@@ -23,16 +23,19 @@
         {:aria-labelledby user-dropdown-id}
         [:li
           {:on-click #(when (fn? on-change)
-                        (on-change :viewer))}
+                        (on-change :viewer))
+           :class (when (= user-type :viewer) "selected")}
           "Viewer"]
         [:li
           {:on-click #(when (fn? on-change)
-                        (on-change :author))}
+                        (on-change :author))
+           :class (when (= user-type :author) "selected")}
           "Contributor"]
         (when-not hide-admin
           [:li
             {:on-click #(when (fn? on-change)
-                        (on-change :admin))}
+                        (on-change :admin))
+             :class (when (= user-type :admin) "selected")}
             "Admin"])
         (when (fn? on-remove)
           [:li.remove-li

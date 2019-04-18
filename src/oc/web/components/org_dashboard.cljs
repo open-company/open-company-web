@@ -38,6 +38,7 @@
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
+            [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
@@ -199,7 +200,10 @@
           ;; Invite settings
           (and org-settings-data (= org-settings-data :invite))
           (invite-settings-modal)
-          ;; Other settings panels
+          ;; Team management
+          (and org-settings-data (= org-settings-data :team))
+          (team-management-modal)
+          ;; Billing
           org-settings-data
           (org-settings)
           ;; User settings

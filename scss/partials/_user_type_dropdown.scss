@@ -12,7 +12,7 @@ div.dropdown{
       height: 10px;
       position: absolute;
       right: 4px;
-      top: 11px;
+      top: 25%;
       background-image: cdnUrl("/img/ML/select_arrows.svg");
       background-size: 8px 10px;
       background-position: center;
@@ -24,9 +24,6 @@ div.dropdown{
     padding: 0;
     width: 144px;
     min-width: 144px;
-    @include OC_Body_Book();
-    font-size: 14px;
-    color: $oc_gray_7;
     background-color: white;
     border: none;
     padding: 0.5rem 0;
@@ -34,25 +31,32 @@ div.dropdown{
     top: 0px;
     left: -20px;
     box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.2), 0 5px 12.5px 0.5px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    border-radius: 4px;
+    padding: 8px 0;
 
     li {
       cursor: pointer;
       width: 144px;
       height: 32px;
-      padding: 6px 24px;
+      padding: 4px 16px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $ui_grey;
+      background-color: transparent;
+
+      &.selected {
+        color: $deep_navy;
+        background-color: transparent;
+      }
 
       &:hover {
         text-decoration: underline;
-      }
-
-      &:hover, &.active {
-        background-color: white;
-        color: $oc_gray_7;
+        background-color: transparent;
       }
 
       &.remove-li {
         color: $carrot_orange;
+        background-color: transparent;
         border-top: 1px solid rgba($carrot_light_gray_1, 0.2);
       }
     }
