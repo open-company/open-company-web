@@ -8,6 +8,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notifications-actions]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -50,12 +51,19 @@
         sorted-other-users (sort-by utils/name-or-email other-users)]
     (remove nil? (concat self-user sorted-other-users))))
 
+(defn dropdown-label [val total]
+  (case val
+    :all (str "Everyone (" total ")")
+    :seen "Veiwed"
+    :unseen "Unopened"))
+
 (rum/defcs wrt < rum/reactive
                  ;; Locals
                  (rum/local false ::search-active)
                  (rum/local false ::search-focused)
                  (rum/local "" ::query)
-                 (rum/local :seen ::list-view)
+                 (rum/local false ::list-view-dropdown-open)
+                 (rum/local :all ::list-view) ;; :seen :unseen
                  (rum/local false ::unmounting)
                  (rum/local false ::unmounted)
                  (drv/drv :current-user-data)
@@ -85,20 +93,19 @@
         query (::query s)
         lower-query (string/lower @query)
         list-view (::list-view s)
-        unsorted-list (if (= @list-view :seen)
-                        seen-users
-                        unseen-users)
-        filtered-users (if @(::search-active s)
-                         (if (seq @query)
-                          (filterv #(filter-by-query % (string/lower @query)) all-users)
-                          [])
-                         unsorted-list)
+        filtered-users (case @list-view
+                         :all (filterv #(filter-by-query % (string/lower (or @query ""))) all-users)
+                         :seen seen-users
+                         :unseen unseen-users)
         current-user-data (drv/react s :current-user-data)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
         appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
-                          (not @(::unmounted s)))]
+                          (not @(::unmounted s)))
+        seen-percent (if (count seen-users)
+                       (int (* (/ (count seen-users) (count all-users)) 100))
+                       0)]
     [:div.wrt-popup-container
       {:class (utils/class-set {:appear appear-class})
        :on-click #(dismiss-modal s)}
@@ -116,73 +123,61 @@
           (when is-mobile?
             (small-loading))
           [:div.wrt-popup-inner
-            (if @(::search-active s)
-              [:div.wrt-popup-tabs.search-active
-                [:button.mlb-reset.close-search-bt
-                  {:on-click #(reset-search s)}]
+            [:div.wrt-popup-tabs
+              [:div.wrt-popup-tabs-select
+                {:on-click #(swap! (::list-view-dropdown-open s) not)}
+                (dropdown-label @list-view (count all-users))]
+              (when @(::list-view-dropdown-open s)
+                (dropdown-list {:items [{:value :all
+                                         :label (dropdown-label :all (count all-users))}
+                                        {:value :seen
+                                         :label (dropdown-label :seen (count all-users))}
+                                        {:value :unseen
+                                         :label (dropdown-label :unseen (count all-users))}]
+                                 :value @list-view
+                                 :on-change #(do
+                                              (reset! list-view (:value %))
+                                              (reset! (::list-view-dropdown-open s) false)
+                                              (reset! query ""))}))]
+            (when (= @list-view :all)
+              [:div.wrt-popup-search-container.group
                 [:input.wrt-popup-query
                   {:value @query
                    :type "text"
-                   :placeholder "Find by name..."
+                   :placeholder "Search by name..."
                    :ref :search-field
                    :on-key-up #(when (= (.-key %) "Escape")
                                  (reset-search s))
-                   :on-change #(reset! query (.. % -target -value))}]]
-              [:div.wrt-popup-tabs
-                [:button.mlb-reset.wrt-popup-tab.viewed
-                  {:class (when (= @list-view :seen) "active")
-                   :on-click #(reset! list-view :seen)}
-                  "Viewed"]
-                [:button.mlb-reset.wrt-popup-tab.unseen
-                  {:class (when (= @list-view :unseen) "active")
-                   :on-click #(reset! list-view :unseen)}
-                  "Unopened"]
-                [:button.mlb-reset.search-bt
-                  {:on-click #(reset! (::search-active s) true)}]])
+                   :on-change #(reset! query (.. % -target -value))}]])
             [:div.wrt-popup-list
-              (if (pos? (count sorted-filtered-users))
-                (for [u sorted-filtered-users]
-                  [:div.wrt-popup-list-row
-                    {:key (str "wrt-popup-row-" (:user-id u))}
-                    [:div.wrt-popup-list-row-avatar
-                      {:class (when (:seen u) "seen")}
-                      (user-avatar-image u)]
-                    [:div.wrt-popup-list-row-name
-                      (utils/name-or-email u)]
-                    [:div.wrt-popup-list-row-seen
-                      {:class (when (:seen u) "seen")}
-                      (if (:seen u)
-                        ;; Show time the read happened
-                        (utils/time-since (:read-at u))
-                        ;; Send reminder button
-                        [:div
-                          [:button.mlb-reset.button.send-reminder-bt
-                            {:data-toggle (when-not is-mobile? "tooltip")
-                             :data-placement "top"
-                             :data-container "body"
-                             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                             :title "Send a reminder"
-                             :on-click #(let [email-share {:medium :email
-                                                           :note "When you have a moment, please check out this post."
-                                                           :subject (str "Just a reminder: " (:headline activity-data))
-                                                           :to [(:email u)]}]
-                                          ;; Show the share popup
-                                          (activity-actions/activity-share activity-data [email-share]
-                                           (fn []
-                                            (notifications-actions/show-notification
-                                             {:title (str "Reminder sent to " (utils/name-or-email u) ".")
-                                              :id (str "wrt-share-" (utils/name-or-email u))
-                                              :dismiss true
-                                              :expire 5}))))}]
-                          (when @(::search-active s)
-                            [:span.unopened-label "Unopened"])])]])
-                [:div.wrt-popup-list-row.empty-list
-                  {:class (if (= @list-view :seen) "viewed" "unseen")}
-                  (if @(::search-active s)
-                    [:div.empty-copy.empty-search]
-                    (if (= @list-view :seen)
-                      [:div.empty-copy.no-viewed "No one has seen this post yet…"]
-                      [:div.empty-copy.no-unseen "Everyone has seen this post!"]))])]])]]))
+              (for [u sorted-filtered-users]
+                [:div.wrt-popup-list-row
+                  {:key (str "wrt-popup-row-" (:user-id u))}
+                  [:div.wrt-popup-list-row-avatar
+                    {:class (when (:seen u) "seen")}
+                    (user-avatar-image u)]
+                  [:div.wrt-popup-list-row-name
+                    (utils/name-or-email u)]
+                  [:div.wrt-popup-list-row-seen
+                    {:class (when (:seen u) "seen")}
+                    (if (:seen u)
+                      ;; Show time the read happened
+                      (utils/time-since (:read-at u))
+                      ;; Send reminder button
+                      [:button.mlb-reset.send-reminder-bt
+                        {:on-click #(let [email-share {:medium :email
+                                                       :note "When you have a moment, please check out this post."
+                                                       :subject (str "Just a reminder: " (:headline activity-data))
+                                                       :to [(:email u)]}]
+                                      ;; Show the share popup
+                                      (activity-actions/activity-share activity-data [email-share]
+                                       (fn []
+                                        (notifications-actions/show-notification
+                                         {:title (str "Reminder sent to " (utils/name-or-email u) ".")
+                                          :id (str "wrt-share-" (utils/name-or-email u))
+                                          :dismiss true
+                                          :expire 5}))))}
+                        "Send post"])]])]])]]))
 
 (defn- under-middle-screen? [el]
   (let [el-offset-top (aget (.offset (js/$ el)) "top")

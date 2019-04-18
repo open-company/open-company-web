@@ -158,10 +158,10 @@ button.slack-button {
   padding: 8px 5px 5px 5px;
   border-radius: 5px;
   border: 1px solid rgba(78,90,107,0.4);
-  opacity: 0.8;
+  opacity: 1;
 
   &:hover {
-    opacity: 1;
+    opacity: 0.9;
   }
 
   &:before {
