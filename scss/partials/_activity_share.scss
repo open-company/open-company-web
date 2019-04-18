@@ -9,13 +9,13 @@ div.activity-share-modal-container {
   background-color: $carrot_modal_bg;
   z-index: 110;
   transition: opacity 180ms ease-in;
-  width: 360px;
+  width: 250px;
   background-color: white;
   border-radius: 8px;
-  padding: 32px 24px;
+  padding: 16px;
   margin-top: 55px;
-  border: 1px solid $deep_tan;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #D6D6D8;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
   text-align: left;
 
   @include mobile() {
@@ -48,10 +48,9 @@ div.activity-share-modal-container {
     }
 
     div.activity-share-main-cta {
-      @include OC_Body_Bold();
-      font-size: 16px;
-      color: $deep_navy;
-      line-height: 22px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $light_navy;
       position: relative;
       max-width: 100%;
       overflow: hidden;
@@ -97,22 +96,6 @@ div.activity-share-modal-container {
 
       @include mobile(){
         margin: 0px 24px;
-      }
-    }
-
-    div.activity-share-subheadline {
-      @include OC_Body_Medium();
-      font-size: 14px;
-      color: $oc_gray_3;
-      line-height: 20px;
-      text-align: center;
-      position: relative;
-      padding-bottom: 24px;
-      margin-top: 20px;
-
-      @include mobile() {
-        padding-bottom: 16px;
-        margin-top: 8px;
       }
     }
 
@@ -291,7 +274,7 @@ div.activity-share-modal-container {
     }
 
     div.activity-share-modal-shared {
-      margin-top: 24px;
+      margin-top: 8px;
 
       @include mobile() {
         padding: 0px 24px;
@@ -306,35 +289,15 @@ div.activity-share-modal-container {
         margin-top: 24px;
       }
 
-      div.medium-row.url-field-row {
-        margin-top: 24px;
-      }
-
-      div.checkbox-row {
+      button.checkbox-row {
         height: 18px;
-        margin-top: 9px;
         cursor: pointer;
+        padding: 0;
+        width: 100%;
 
-        div.checkbox {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          border: 1px solid $carrot_light_gray;
+        div.carrot-option-button {
           float: left;
-          margin: 0;
-          padding: 0;
-          position: relative;
-
-          &.selected:after {
-            content: "";
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            top: 4px;
-            left: 4px;
-            background-color: $sea_blue;
-            border-radius: 50%;
-          }
+          margin-top: 2px;
         }
 
         div.checkbox-label {
@@ -369,29 +332,25 @@ div.activity-share-modal-container {
       }
 
       div.shared-url-container {
-        border-top: 1px solid rgba($carrot_light_gray_1, 0.5);
-        border-left: 1px solid rgba($carrot_light_gray_1, 0.5);
-        border-bottom: 1px solid rgba($carrot_light_gray_1, 0.5);
-        padding: 7px 4px 7px 8px;
-        width: calc(100% - 96px);
-        height: 40px;
-        float: left;
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-        margin-top: 8px;
+        width: 100%;
+        height: 32px;
+        margin-top: 16px;
 
         input {
           border: none;
           outline: none;
-          padding: 0;
+          padding: 7px 8px;
+          height: 32px;
+          border-radius: 4px;
           margin: 0;
           width: 100%;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           color: $deep_navy;
           font-size: 14px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          background-color: $ultra_light_grey;
         }
 
         div.tooltip {
@@ -400,19 +359,16 @@ div.activity-share-modal-container {
       }
 
       button.copy-btn {
-        width: 96px;
-        height: 40px;
+        width: 100%;
+        margin-top: 8px;
+        height: 32px;
         text-align: center;
-        padding: 4px 0px;
-        margin: 0;
         @include OC_Body_Bold();
-        font-size: 12px;
-        float: left;
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
+        font-size: 14px;
+        border-radius: 4px;
         background-color: $carrot_green;
         color: white;
-        margin-top: 8px;
+        padding: 0;
       }
 
       button.done-btn {

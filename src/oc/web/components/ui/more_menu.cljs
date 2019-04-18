@@ -88,7 +88,7 @@
              :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             ; :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
              :title "More"}])
         (cond
           @(::move-activity s)
