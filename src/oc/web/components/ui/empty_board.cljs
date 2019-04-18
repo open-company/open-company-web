@@ -30,10 +30,10 @@
                                     :drafts is-drafts-board?})}]
         [:div.empty-board-title
           (cond
-           is-all-posts? "Stay up to date"
+           ; is-all-posts? "Stay up to date"
            is-must-see? "Highlight what's important"
            is-drafts-board? "Jot down your ideas and notes"
-           :else "This section is empty")]
+           :else "Create a post to get started")]
         [:div.empty-board-subtitle
           (cond
            is-all-posts? "All posts is a stream of what’s new across all sections."
