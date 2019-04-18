@@ -102,10 +102,7 @@
         is-mobile? (responsive/is-tablet-or-mobile?)
         appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        seen-percent (if (count seen-users)
-                       (int (* (/ (count seen-users) (count all-users)) 100))
-                       0)]
+                          (not @(::unmounted s)))]
     [:div.wrt-popup-container
       {:class (utils/class-set {:appear appear-class})
        :on-click #(dismiss-modal s)}
