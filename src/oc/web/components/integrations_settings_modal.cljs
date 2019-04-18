@@ -22,23 +22,24 @@
     (reset! (::unmounting s) true)
     (real-close)))
 
-(rum/defcs integrations-settings-modal < ;; Mixins
-                                         rum/reactive
-                                         (drv/drv :org-data)
-                                         (drv/drv :team-data)
-                                         (drv/drv :current-user-data)
-                                         ;; Locals
-                                         (rum/local false ::unmounting)
-                                         (rum/local false ::unmounted)
-                                         (rum/local false ::saving)
-                                         ;; Mixins
-                                         mixins/no-scroll-mixin
-                                         mixins/first-render-mixin
-                                         {:did-update (fn [s]
-                                           (when (and @(::unmounting s)
-                                                      (compare-and-set! (::unmounted s) false true))
-                                             (utils/after 180 real-close))
-                                           s)}
+(rum/defcs integrations-settings-modal <
+  ;; Mixins
+  rum/reactive
+  (drv/drv :org-data)
+  (drv/drv :team-data)
+  (drv/drv :current-user-data)
+  ;; Locals
+  (rum/local false ::unmounting)
+  (rum/local false ::unmounted)
+  (rum/local false ::saving)
+  ;; Mixins
+  mixins/no-scroll-mixin
+  mixins/first-render-mixin
+  {:did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         appear-class (and @(:first-render-done s)
