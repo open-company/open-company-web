@@ -3,51 +3,34 @@ div.slack-channels-dropdown {
   position: relative;
 
   &.disabled {
-    opacity: 0.6;
+    opacity: 0.4;
     cursor: not-allowed;
-
-    i.fa {
-      cursor: not-allowed;
-      color: $ui_grey;
-    }
   }
 
   input.board-edit-slack-channel {
     width: 100%;
-    height: 40px;
+    height: 32px;
     border-radius: 4px;
-    background-color: white;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
-    @include OC_Body_Medium();
+    background-color: $ultra_light_grey;
+    @include OC_Body_Book();
     font-size: 14px;
-    padding: 12px;
-    outline: none;
     color: $deep_navy;
+    padding: 7px 8px;
+    background-image: cdnUrl("/img/ML/select_arrows.svg");
+    background-size: 8px 10px;
+    background-position: top 11px right 4px;
+    background-repeat: no-repeat;
+    outline: none;
+    border: none;
 
-    &[disabled]{
+    &[disabled], &.disabled, &:disabled {
       cursor: not-allowed;
       color: $ui_grey;
     }
 
     @include placeholder() {
-      @include OC_Body_Medium();
-      font-size: 14px;
       color: $light_ui_grey;
     }
-  }
-
-  &:after {
-    content: "";
-    position: absolute;
-    width: 8px;
-    height: 5px;
-    top: 18px;
-    right: 16px;
-    background-image: cdnUrl("/img/ML/section_access_chevron.svg");
-    background-size: 8px 5px;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
   }
 
   div.slack-channels-dropdown-list {
@@ -57,9 +40,8 @@ div.slack-channels-dropdown {
     max-height: 184px;
     border: 1px solid rgba($carrot_light_gray_1, 0.5);
     background-color: white;
-    margin-left: -260px;
-    top: 39px;
-    left: 260px;
+    top: 32px;
+    left: 0;
     overflow-y: auto;
     border-radius: 4px;
 
@@ -72,7 +54,7 @@ div.slack-channels-dropdown {
       }
 
       div.slack-team-name {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_light_gray;
         padding: 0.4rem 0.8rem;
@@ -82,7 +64,7 @@ div.slack-channels-dropdown {
         width: 100%;
         padding: 8px 16px;
         color: $carrot_dark_gray;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         cursor: pointer;
 
@@ -91,7 +73,7 @@ div.slack-channels-dropdown {
         }
 
         span.ch-prefix {
-          @include OC_Body_Medium()
+          @include OC_Body_Book()
           font-size: 16px;
           color: $carrot_light_gray_1;
           margin-right: 4px;

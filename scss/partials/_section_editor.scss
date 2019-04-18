@@ -1,93 +1,88 @@
 div.section-editor-container {
-  background-color: $carrot_modal_bg;
-  width: 100vw;
-  height: 100vh;
-  z-index: #{$navbar_zindex + 136};
-  position: fixed;
   top: 0;
   left: 0;
-  overflow-y: auto;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 0;
+  transition: opacity 180ms ease-in;
+
+  &.appear {
+    opacity: 1;
+
+    div.section-editor {
+      right: 0;
+    }
+  }
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
 
   div.section-editor {
+    width: 320px;
     background-color: white;
-    border-radius: 6px;
-    border: 1px solid $deep_tan;
-    padding: 20px 24px;
-    width: 360px;
-    z-index: 1000;
-    cursor: default;
     position: absolute;
     top: 0;
-    left: 50%;
-    margin-left: -180px;
-    margin-top: 60px;
-    margin-bottom: 60px;
-
-    @include mobile() {
-      width: 100vw;
-      min-height: 100vh;
-      padding: 20px 24px 16px;
-      border-radius: 0px;
-      position: relative;
-      top: unset;
-      left: unset;
-      margin-left: 0;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-
-    button.settings-modal-close {
-      right: -56px;
-      top: 0;
-
-      @include mobile() {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/section_add_mobile_close.svg");
-        background-size: 14px 14px;
-        background-position: center;
-        background-repeat: no-repeat;
-        top: 15px;
-        left: 19px;
-        padding: 0;
-        right: unset;
-        z-index: 2;
-      }
-    }
+    height: 100vh;
+    right: -320px;
+    padding: 56px 24px 32px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     div.section-editor-header {
-      height: 30px;
-      border-bottom: 1px solid $deep_tan;
-      padding-bottom: 8px;
+      width: 320px;
+      height: 56px;
+      margin-left: -24px;
+      background-color: #FBFAF9;
+      padding: 12px 16px;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      right: 0;
 
-      @include mobile() {
-        height: 56px;
-        border-bottom: 0px;
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        width: 100vw;
-        padding-bottom: 0px;
-        box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+      div.section-editor-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
       }
 
-      div.section-editor-header-left {
-        float: left;
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        margin-right: 8px;
+        float: right;
+      }
+      
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
         @include OC_Body_Bold();
-        font-size: 16px;
-        color: $deep_navy;
-        white-space: nowrap;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 14px;
+        background-color: $carrot_green;
+        border-radius: 6px;
+        color: white;
+        line-height: 18px;
+        float: right;
 
-        @include mobile() {
-          float: none;
-          text-align: center;
-          @include OC_Body_Bold();
-          font-size: 18px;
-          height: 64px;
-          padding-top: 20px;
+        &.disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
         }
       }
     }
@@ -99,17 +94,23 @@ div.section-editor-container {
 
       div.section-editor-error-label {
         margin-top: 8px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 12px;
         color: $carrot_orange_2;
       }
 
       div.section-editor-add-label {
         margin-top: 16px;
-        @include OC_Body_Bold();
-        font-size: 15px;
-        color: $deep_navy;
-        height: 21px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+        line-height: 18px;
+        min-height: 18px;
+
+        &.top-separator {
+          border-top: 1px solid $ultra_light_grey;
+          padding-top: 16px;
+        }
 
         div.carrot-switch {
           float: right;
@@ -121,8 +122,8 @@ div.section-editor-container {
 
         span.role-header {
           float: right;
-          @include OC_Body_Medium();
-          font-size: 15px;
+          @include OC_Body_Book();
+          font-size: 13px;
           color: $ui_grey;
         }
 
@@ -133,13 +134,13 @@ div.section-editor-container {
 
       div.section-editor-add-name {
         border-radius: 4px;
-        border: 1px solid rgba($carrot_light_gray_1, .5);
-        min-height: 40px;
+        background-color: $ultra_light_grey;
+        height: 32px;
         width: 100%;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
-        padding: 10px 29px 10px 16px;
+        padding: 7px 8px;
         position: relative;
         cursor: text;
         outline: none;
@@ -148,7 +149,7 @@ div.section-editor-container {
         overflow-x: hidden;
 
         &.preflight-error {
-          border: 1px solid $carrot_orange_2;
+          background-color: rgba($carrot_orange_2, 0.4);
         }
 
         &.preflight-ok:after {
@@ -166,58 +167,57 @@ div.section-editor-container {
 
         &:empty:before {
           content: attr(placeholder);
-          opacity: 0.5;
+          opacity: 0.4;
           display: block;
         }
       }
 
       div.section-editor-private-users-search {
-        border-radius: 4px;
-        border: 1px solid rgba($carrot_light_gray_1, .5);
-        height: 40px;
         width: 100%;
-        @include OC_Body_Medium();
-        font-size: 14px;
-        color: $deep_navy;
-        padding: 10px 16px;
         position: relative;
         cursor: text;
         outline: none;
         margin-top: 8px;
 
         input {
+          border-radius: 4px;
+          background-color: $ultra_light_grey;
+          height: 32px;
           width: 100%;
           margin: 0px;
-          padding: 0px;
+          padding: 7px 8px;
           border: none;
           outline: none;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $deep_navy;
+          background-image: cdnUrl("/img/ML/select_arrows.svg");
+          background-size: 8px 10px;
+          background-position: top 11px right 4px;
+          background-repeat: no-repeat;
 
           @include placeholder() {
-            opacity: 0.6;
+            opacity: 0.4;
           }
         }
 
         div.section-editor-private-users-results {
           position: absolute;
-          top: 38px;
+          top: 32px;
           left: 0px;
           border-radius: 4px;
           border: 1px solid rgba($carrot_light_gray_1, .5);
-          width: calc(100% + 2px);
-          margin-left: -1px;
           background-color: white;
-          padding: 10px 16px;
+          width: 100%;
+          padding: 0 8px;
           z-index: 10;
           max-height: 200px;
           overflow-y: auto;
 
           div.section-editor-private-users-result {
-            height: 40px;
+            height: 32px;
             cursor: pointer;
-            padding: 12px 0px;
+            padding: 7px 8px;
 
             @include user-profile(24);
 
@@ -241,7 +241,7 @@ div.section-editor-container {
             div.name {
               float: left;
               width: calc(100% - 40px);
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 14px;
               color: $deep_navy;
               margin-left: 16px;
@@ -259,17 +259,11 @@ div.section-editor-container {
             pointer-events: none;
           }
         }
-
-        div.slack-channels-dropdown {
-          input.board-edit-slack-channel {
-            height: 40px;
-          }
-        }
       }
 
       div.section-editor-enable-slack-bot {
         margin-top: 8px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 13px;
         color: $deep_navy;
         height: 24px;
@@ -290,7 +284,7 @@ div.section-editor-container {
       }
 
       div.section-editor-access-public-description {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $ui_grey;
         margin-top: 8px;
@@ -298,47 +292,33 @@ div.section-editor-container {
 
       div.section-editor-add-access {
         border-radius: 4px;
-        border: 1px solid rgba($carrot_light_gray_1, .5);
-        height: 40px;
+        background-color: $ultra_light_grey;
+        height: 32px;
         width: 100%;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
-        padding: 10px 32px 10px 16px;
+        padding: 7px 8px;
         position: relative;
         cursor: pointer;
         margin-top: 8px;
-
-        &.expanded:after {
-          transform: rotate(180deg);
-        }
-
-        &:after {
-          content: "";
-          position: absolute;
-          width: 8px;
-          height: 5px;
-          top: 18px;
-          right: 16px;
-          background-image: cdnUrl("/img/ML/section_access_chevron.svg");
-          background-size: 8px 5px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-
+        background-image: cdnUrl("/img/ML/select_arrows.svg");
+        background-size: 8px 10px;
+        background-position: top 11px right 4px;
+        background-repeat: no-repeat;
       }
 
       div.section-editor-add-access-list {
         border-radius: 4px;
         border: 1px solid rgba($carrot_light_gray_1, .5);
         position: absolute;
-        width: 310px;
+        width: 100%;
         background-color: white;
         z-index: 1001;
 
         div.access-list-row {
-          height: 40px;
-          padding: 10px 16px;
+          height: 32px;
+          padding: 7px 8px;
           border-bottom: 1px solid rgba($deep_tan, 0.3);
           opacity: 0.6;
           cursor: pointer;
@@ -354,12 +334,12 @@ div.section-editor-container {
       }
 
       div.access-item {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
         padding-left: 24px;
         position: relative;
-        height: 22px;
+        height: 18px;
         float: left;
 
         &.private-access:before {
@@ -401,14 +381,7 @@ div.section-editor-container {
             left: unset;
 
             div.triangle {
-              top: unset;
-              bottom: -2px;
-              left: unset;
-              right: 20px;
-              border-top: 0px solid rgba(177,184,192,0.50);
-              border-left: 0px solid rgba(177,184,192,0.50);
-              border-bottom: 1px solid rgba(177,184,192,0.50);
-              border-right: 1px solid rgba(177,184,192,0.50);
+              display: none;
             }
           }
         }
@@ -416,25 +389,16 @@ div.section-editor-container {
         div.section-editor-add-private-users-list {
           width: 100%;
           padding: 0px;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $deep_navy;
           max-height: 210px;
           overflow-y: auto;
 
           div.section-editor-add-private-user {
-            height: 60px;
+            height: 32px;
             width: 100%;
-            padding: 16px 0px;
-            border-bottom: 1px solid rgba($deep_tan, 0.3);
-
-            &:first-child {
-              border-top: 1px solid rgba($deep_tan, 0.3);
-            }
-
-            &:last-child {
-              border-bottom: none;
-            }
+            padding: 4px 0px;
 
             @include user-profile(24);
 
@@ -445,7 +409,7 @@ div.section-editor-container {
             div.name {
               float: left;
               max-width: 50%;
-              margin-left: 16px;
+              margin-left: 8px;
               overflow: hidden;
               text-overflow: ellipsis;
               margin-top: 4px;
@@ -457,8 +421,8 @@ div.section-editor-container {
               margin-top: 4px;
               position: relative;
               cursor: pointer;
-              @include OC_Body_Medium();
-              font-size: 14px;
+              @include OC_Body_Book();
+              font-size: 13px;
               color: $deep_navy;
               padding-right: 12px;
               opacity: 0.6;
@@ -514,13 +478,13 @@ div.section-editor-container {
 
       div.section-editor-add-personal-note {
         border-radius: 4px;
-        border: 1px solid rgba($carrot_light_gray_1, .5);
+        background-color: $ultra_light_grey;
         min-height: 80px;
         width: 100%;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
-        padding: 10px 16px;
+        padding: 7px 8px;
         position: relative;
         cursor: text;
         outline: none;
@@ -528,31 +492,30 @@ div.section-editor-container {
 
         &:empty:before {
           content: attr(placeholder);
-          opacity: 0.5;
+          opacity: 0.4;
           display: block;
         }
       }
 
       div.section-editor-add-footer {
-        margin-top: 24px;
+        margin-top: 16px;
         height: 24px;
         border-top: 1px solid rgba($deep_tan, 0.3);
-        padding-top: 24px;
+        padding-top: 16px;
 
         button.delete-bt {
-          height: 32px;
+          height: 18px;
           float: left;
           width: 120px;
           color: $carrot_orange_2;
-          @include OC_Body_Bold();
+          @include OC_Body_Book();
           font-size: 14px;
           margin-left: 0px;
           padding-left: 0px;
           text-align: left;
-          opacity: 0.8;
 
           &:not(.disabled):hover {
-            opacity: 1;
+            opacity: 0.8;
           }
 
           &.disabled {
@@ -565,7 +528,7 @@ div.section-editor-container {
           float: right;
           height: 32px;
           margin-right: 16px;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $ui_grey;
         }
