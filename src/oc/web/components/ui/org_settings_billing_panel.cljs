@@ -6,12 +6,18 @@
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
+(defn- user-count [team-data]
+  (let [user-count (count (:users team-data))]
+    (if (> user-count 1)
+      [:span [:strong (str user-count " users")] " are"]
+      [:span [:strong  "1 user"] " is"])))
+
 (defn plan-summary [s team-data]
   (let [plan-data {:name "Free"
                    :slug "free"
                    :alert [:div.plan-details-label
-                            [:strong "12 users"]
-                            " are currently on your team."
+                            (user-count team-data)
+                            " currently on your team."
                             [:br]
                             "Free plans cover up 10 users."]}
         exceeded-users-alert (:exceeded-users team-data)
@@ -19,20 +25,6 @@
     [:div.plan-summary
       [:div.plan-summary-title
         "Billing summary"]
-      [:div.plan-summary-details.group
-        [:div.plan-details-left
-          "Plan type"]
-        [:div.plan-details-right
-          [:div.plan-details-plan.group
-            [:div.plan-details-label
-              "You are currently on the "
-              [:strong (str (:name plan-data) " plan")]
-              "."]
-            [:button.mlb-reset.change-plan-bt
-              {:on-click #(reset! (::billing-tab s) :change)}
-              "Change plan"]]
-          [:div.plan-details-description.group
-            (:alert plan-data)]]]
       [:div.plan-summary-details.group
         [:div.plan-details-left
           "Plan type"]
@@ -57,12 +49,15 @@
           " to continue using Carrot."]
         upgrade-plan-alert
         [:div.plan-summary-alert
-          "Your free plan maintains up to six months of history in Carrot."
+          "Your free plan is missing "
+          [:a {:href "/pricing" :target "_blank"}
+            "some features"]
+          " that may be important to you."
           [:br]
           [:button.mlb-reset.upgrade-plan-bt
             {:on-click #(reset! (::billing-tab s) :change)}
             "Upgrade"]
-          " your plan for unlimited history"])]))
+          " your plan for more features."])]))
 
 (defn- plan-description [plan current-plan]
   (case plan

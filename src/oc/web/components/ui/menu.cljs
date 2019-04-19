@@ -179,7 +179,7 @@
           {:href "#"
            :on-click billing-click}
           [:div.oc-menu-item.billing
-            "Billing"]])
+            "Payments & Billing"]])
       [:a.whats-new-link
         (if is-mobile?
           {:href "https://whats-new.carrot.io/"
