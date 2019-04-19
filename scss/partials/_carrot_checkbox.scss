@@ -1,56 +1,22 @@
-$carrot_checkbox_animation: 130ms;
-
 div.carrot-checkbox {
   display: block-inline;
-  width: 28px;
+  border-radius: 2px;
+  border: 1.5px solid $carrot_light_gray;
+  width: 16px;
   height: 16px;
-  border-radius: 100px;
-  background-color: $light_ui_grey;
-  color: $light_ui_grey;
-  transition: background-color $carrot_checkbox_animation, color $carrot_checkbox_animation;
-  position: relative;
-  cursor: pointer;
-  @include no-user-select();
-
-  &.disabled {
-    cursor: not-allowed;
-    opacity: 0.3;
-    pointer-events: none;
-  }
-
-  span.selected-label {
-    color: $carrot_green;
-    float: left;
-    @include avenir_H();
-    font-size: 12px;
-  }
-
-  span.unselected-label {
-    color: $ui_grey;
-    float: right;
-    @include avenir_H();
-    font-size: 12px;
-  }
-
-  span.dot {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 16px;
-    height: 16px;
-    background-color: $ui_grey;
-    display: block;
-    border-radius: 50%;
-    transition: margin-left $carrot_checkbox_animation;
-  }
 
   &.selected {
-    background-color: $feint_emerald;
-    color: $carrot_green;
+    border: 1.5px solid $carrot_text_blue;
+    background-color: $carrot_text_blue;
+    background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
+    background-size: 14px 11px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 
-    span.dot {
-      margin-left: 12px;
-      background-color: $carrot_green;
-    }
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }

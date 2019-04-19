@@ -154,10 +154,8 @@
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status response)
-        ; when a request get a 401 logout the user since his using an old token, need to repeat auth process
-        ; no token refresh
-        (when (and (j/jwt)
-                   (= status 401))
+        ; when a request get a 401 logout the user (presumably using an old token, or attempting anonymous access)
+        (when (= status 401)
           (router/redirect! oc-urls/logout))
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
@@ -209,7 +207,7 @@
 
 ;; Allowed keys
 
-(def org-allowed-keys [:name :logo-url :logo-width :logo-height])
+(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
 (def entry-allowed-keys [:headline :body :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
 
@@ -427,7 +425,7 @@
       (fn [{:keys [success body status]}]
         (callback success body status)))
     (handle-missing-link "auth-with-email" auth-link callback
-     {:email email :pswd (repeat (count pswd) "*")})))
+     {:email email :pswd (str (repeat (count pswd) "*"))})))
 
 (defn auth-with-token [auth-link token callback]
   (if (and auth-link token)
@@ -466,7 +464,7 @@
         (fn [{:keys [success body status]}]
           (callback success body status)))
       (handle-missing-link "signup-with-email" auth-link callback
-       (assoc user-map :password (repeat (count pswd) "*"))))))
+       (assoc user-map :password (str (repeat (count pswd) "*")))))))
 
 ;; Team(s)
 
@@ -566,7 +564,7 @@
        :headers (headers-for-link update-link)}
       (fn [{:keys [status body success]}]
         (utils/after 100 #(callback status body success))))
-    (handle-missing-link "collect-password" update-link callback {:pswd (repeat (count pswd) "*")})))
+    (handle-missing-link "collect-password" update-link callback {:pswd (str (repeat (count pswd) "*"))})))
 
 (defn get-user [user-link callback]
   (if user-link

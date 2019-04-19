@@ -15,6 +15,7 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
@@ -31,10 +32,16 @@
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
     (dis/dispatch! [:input [:add-email-domain-team-error] nil])))
 
+(defn- change-content-visibility [content-visibility-data k v]
+  (let [new-content-visibility (merge content-visibility-data {k v})]
+    (dis/dispatch! [:update [:org-editing] #(merge % {:has-changes true
+                                                      :content-visibility new-content-visibility})])))
+
 (rum/defcs org-settings-main-panel
   < rum/reactive
     (rum/local false ::saving)
     (rum/local false ::showing-menu)
+    (rum/local false ::show-advanced-settings)
     (drv/drv :org-data)
     (drv/drv :org-settings-team-management)
     (drv/drv :org-editing)
@@ -42,6 +49,8 @@
     (on-window-click-mixin (fn [s _] (reset! (::showing-menu s) false)))
     {:will-mount (fn [s]
                    (reset-form s)
+                   (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
+                    (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
                    s)
      :will-update (fn [s]
                     (let [org-editing @(drv/get-ref s :org-editing)]
@@ -68,7 +77,8 @@
                 team-data]
          :as team-management-data}
                     (drv/react s :org-settings-team-management)
-        cur-user-data (drv/react s :current-user-data)]
+        cur-user-data (drv/react s :current-user-data)
+        content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-panel
       ;; Panel rows
       [:div.org-settings-main
@@ -229,10 +239,51 @@
                         (when-not has-bot?
                           [:button.mlb-reset.enable-carrot-bot-bt
                             {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
-                            "Enable Carrot Bot"])]]]))])]]
+                            "Enable Carrot Bot"])]]]))])]
+      (when @(::show-advanced-settings s)
+        [:div.org-settings-panel-row.advanced-settings-row.group
+          [:div.org-settings-label
+            [:label "Content visibility"]]
+          [:div.advanced-settings-rows
+            [:div.advanced-settings-row-item.group
+              (carrot-checkbox {:selected (:disallow-secure-links content-visibility-data)
+                                :disabled false
+                                :did-change-cb #(change-content-visibility content-visibility-data :disallow-secure-links %)})
+              [:div.checkbox-label
+                {:class (when-not (:disallow-secure-links content-visibility-data) "unselected")
+                 :on-click #(change-content-visibility content-visibility-data :disallow-secure-links (not (:disallow-secure-links content-visibility-data)))}
+                "Do not allow secure links to open posts from email or Slack"
+                [:i.mdi.mdi-information-outline
+                  {:title (str
+                           "When team members receive Carrot posts via an email or Slack morning digest, secure "
+                           "links allow them to read the post without first logging in. A login is still required "
+                           "to access additional posts. If you turn off secure links, your team will always need to "
+                           "be logged in to view posts.")
+                   :data-toggle "tooltip"
+                   :data-placement "top"}]]]
+            [:div.advanced-settings-row-item.group
+              (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
+                                :disabled false
+                                :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-board %)})
+              [:div.checkbox-label
+                {:class (when-not (:disallow-public-board content-visibility-data) "unselected")
+                 :on-click #(change-content-visibility content-visibility-data :disallow-public-board (not (:disallow-public-board content-visibility-data)))}
+                "Do not allow public sections"]]
+            [:div.advanced-settings-row-item.group
+              (carrot-checkbox {:selected (:disallow-public-share content-visibility-data)
+                                :disabled false
+                                :did-change-cb #(change-content-visibility content-visibility-data :disallow-public-share %)})
+              [:div.checkbox-label
+                {:class (when-not (:disallow-public-share content-visibility-data) "unselected")
+                 :on-click #(change-content-visibility content-visibility-data :disallow-public-share (not (:disallow-public-share content-visibility-data)))}
+                "Do not allow public share links"]]]])]
 
       ;; Save and cancel buttons
       [:div.org-settings-footer.group
+        (when-not @(::show-advanced-settings s)
+          [:button.mlb-reset.hidden-settings-bt
+            {:on-click #(reset! (::show-advanced-settings s) true)}
+            "Show advanced security settings"])
         [:button.mlb-reset.save-btn
           {:disabled (or @(::saving s)
                          (:saved org-editing)

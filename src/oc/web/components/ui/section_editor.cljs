@@ -17,7 +17,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
+            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
 ;; Private section users search helpers
@@ -142,7 +142,8 @@
                                 (when @(::pre-flight-check s)
                                   (when-not (:pre-flight-loading section-editing)
                                     (reset! (::pre-flight-check s) false)
-                                    (when-not (:section-name-error section-editing)
+                                    (when (and (not (:section-name-error section-editing))
+                                               (not (:section-error section-editing)))
                                       (reset! (::pre-flight-ok s) true))))
                                 ;; Re-enable the save button after a save failure
                                 (when (and @(::saving s)
@@ -170,7 +171,9 @@
                        (some #{current-user-id} (:authors section-editing))
                        (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)
-        qsg-data (drv/react s :qsg)]
+        qsg-data (drv/react s :qsg)
+        disallow-public-board? (and (:content-visibility org-data)
+                                    (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
       [:div.section-editor.group
         {:on-click (fn [e]
@@ -214,16 +217,18 @@
                                       (= (.-key e) "Enter"))
                               (utils/event-stop e)))
              :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
-          (when (:section-name-error section-editing)
+          (when (or (:section-name-error section-editing)
+                    (:section-error section-editing))
             [:div.section-editor-error-label
-              (:section-name-error section-editing)])
+              (str (or (:section-name-error section-editing)
+                       (:section-error section-editing)))])
           (when show-slack-channels?
             [:div.section-editor-add-label
               "Auto-share to Slack"
               (when show-slack-channels?
                 [:span.info])
               (when show-slack-channels?
-                (carrot-checkbox {:selected @(::slack-enabled s)
+                (carrot-switch {:selected @(::slack-enabled s)
                                   :did-change-cb #(do
                                                     (reset! (::slack-enabled s) %)
                                                     (when-not %
@@ -282,12 +287,13 @@
                                 (dis/dispatch! [:input [:section-editing :slack-mirror] nil]))
                               (dis/dispatch! [:input [:section-editing :access] "private"]))}
                 private-access]
-              [:div.access-list-row
-                {:on-click #(do
-                              (utils/event-stop %)
-                              (reset! (::show-access-list s) false)
-                              (dis/dispatch! [:input [:section-editing :access] "public"]))}
-                public-access]])
+              (when-not disallow-public-board?
+                [:div.access-list-row
+                  {:on-click #(do
+                                (utils/event-stop %)
+                                (reset! (::show-access-list s) false)
+                                (dis/dispatch! [:input [:section-editing :access] "public"]))}
+                  public-access])])
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
               "Public sections are visible to the world, including search engines."])
