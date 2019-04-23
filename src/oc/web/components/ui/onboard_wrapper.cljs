@@ -101,6 +101,7 @@
             {:type "email"
              :class (utils/class-set {:error (= (:error signup-with-email) 409)
                                       utils/hide-class true})
+             :pattern utils/valid-email-pattern
              :value @(::email s)
              :on-change #(let [v (.. % -target -value)]
                            (reset! (::password-error s) false)
@@ -361,7 +362,7 @@
                                                       (:valid-email-domain org-editing))})
                  :type "text"
                  :auto-capitalize "none"
-                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :pattern utils/valid-domain-pattern
                  :autoComplete "off"
                  :value (:email-domain org-editing)
                  :on-change (fn [v]
@@ -535,7 +536,7 @@
                  :ref "um-domain-invite"
                  :type "text"
                  :auto-capitalize "none"
-                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :pattern utils/valid-domain-pattern
                  :value (:email-domain org-editing)
                  :on-change #(let [domain (.. % -target -value)]
                                (dis/dispatch! [:input [:org-editing :email-domain] domain])

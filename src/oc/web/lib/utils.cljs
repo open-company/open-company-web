@@ -274,14 +274,23 @@
       (.collapse rg false)
       (.select rg))))
 
+;; Based on https://github.com/google/closure-library/blob/master/closure/goog/format/emailaddress.js#L134
+;;      and https://github.com/google/closure-library/blob/master/closure/goog/format/emailaddress.js#L142
+;; It is designed to match about 99.9% of the valid emails while accepting some invalid emails.
+(def valid-email-pattern "^[+a-zA-Z0-9_.!#$%&\\'*\\\\/=?^`{|}~-]+@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z0-9]{2,63}$")
+(def valid-email-re (re-pattern valid-email-pattern))
+
 (defn valid-email? [addr]
   (when addr
     (email/isValidAddress addr)))
 
+;; Based on https://github.com/google/closure-library/blob/master/closure/goog/format/emailaddress.js#L142
+(def valid-domain-pattern "^@?(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z0-9]{2,63}$")
+(def valid-domain-re (re-pattern valid-domain-pattern))
+
 (defn valid-domain? [domain]
   (when (string? domain)
-    (let [re #"(?i)^@?([a-z0-9][a-z0-9\-]{1,61}[A-Za-z0-9]\.)+[A-Za-z]+$"]
-      (pos? (count (.match domain re))))))
+    (re-matches valid-domain-re domain)))
 
 (defn remove-tooltips []
   (.remove (js/$ "div.tooltip")))
