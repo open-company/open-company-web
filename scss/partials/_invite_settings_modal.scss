@@ -151,6 +151,62 @@ div.invite-settings-modal {
             margin-top: 16px;
           }
 
+          div.org-settings-field-container {
+            width: 100%;
+            border-radius: 4px;
+            background-color: $ultra_light_grey;
+            border: none;
+            outline: none;
+
+            &.focus {
+              background-color: $mid_light_grey;
+
+              input.org-settings-field {
+                background-color: $mid_light_grey;
+              }
+            }
+
+            &.has-value {
+              button.remove-user {
+                display: none;
+              }
+
+              button.clear-user {
+                display: block;
+              }
+            }
+
+            input.org-settings-field {
+              width: calc(100% - 24px);
+            }
+
+            button.remove-user {
+              float: right;
+              width: 24px;
+              height: 24px;
+              margin-top: 4px;
+              padding: 0;
+              background-image: cdnUrl("/img/ML/remove_user.svg");
+              background-size: 12px 14px;
+              background-position: center;
+              background-repeat: no-repeat;
+              display: block;
+            }
+
+            button.clear-user {
+              float: right;
+              width: 24px;
+              height: 24px;
+              margin-top: 4px;
+              padding: 0;
+              background-image: cdnUrl("/img/ML/clear_user.svg");
+              background-size: 10px 10px;
+              background-position: center;
+              background-repeat: no-repeat;
+              display: none;
+            }
+          }
+
           input.org-settings-field {
             width: 100%;
             border-radius: 4px;

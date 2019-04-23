@@ -97,6 +97,7 @@
   (rum/local "Send" ::send-bt-cta)
   (rum/local 0 ::sending)
   (rum/local 0 ::initial-sending)
+  (rum/local false ::email-focused)
   ;; Mixins
   mixins/no-scroll-mixin
   mixins/first-render-mixin
@@ -182,13 +183,8 @@
           [:button.mlb-reset.cancel-bt
             {:on-click #(do
                          (reset! (::rand s) (int (rand 10000)))
-                         (dis/dispatch!
-                          [:input
-                           [:invite-users]
-                           (vec
-                            (repeat
-                             default-row-num
-                             (assoc default-user-row :type @(::inviting-from s))))])
+                         (dis/dispatch! [:input [:invite-users]
+                          (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))])
                          (dismiss-modal s))}
             "Back"]]
         [:div.invite-settings-body
@@ -198,7 +194,7 @@
             [:select.invite-via-select
               {:disabled (not (:can-slack-invite team-data))
                :value @(::inviting-from s)
-               :on-change #(reset! (::inviting-from s) (.. % -target -value))}
+               :on-change #(user-type-did-change s invite-users (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Email"]
@@ -231,19 +227,30 @@
                                                     (merge user-data {:user nil :error nil :temp-user %}))])
                           :initial-value (utils/name-or-email (:user user-data))})
                         (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
-                    [:input.org-settings-field.email-field
-                      {:type "text"
-                       :class (when (:error user-data) "error")
-                       :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
-                       :placeholder "email@example.com"
-                       :on-change #(dis/dispatch!
-                                    [:input
-                                     [:invite-users]
-                                     (assoc
-                                      invite-users
-                                      i
-                                      (merge user-data {:error nil :user (.. % -target -value)}))])
-                       :value (or (:user user-data) "")}])]
+                    [:div.org-settings-field-container.group
+                      {:class (utils/class-set {:focus @(::email-focused s) 
+                                                :has-value (seq (:user user-data))})}
+                      [:input.org-settings-field.email-field
+                        {:type "text"
+                         :class (when (:error user-data) "error")
+                         :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+                         :placeholder "email@example.com"
+                         :on-focus #(reset! (::email-focused s) true)
+                         :on-blur #(reset! (::email-focused s) false)
+                         :on-change #(dis/dispatch! [:input [:invite-users]
+                                       (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
+                         :value (or (:user user-data) "")}]
+                      [:button.mlb-reset.remove-user
+                        {:on-click #(let [before (subvec invite-users 0 i)
+                                        after (subvec invite-users (inc i) (count invite-users))
+                                        next-invite-users (vec (concat before after))
+                                        fixed-next-invite-users (if (zero? (count next-invite-users))
+                                                                  [(assoc default-user-row :type (:type user-data))]
+                                                                  next-invite-users)]
+                                      (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}]
+                      [:button.mlb-reset.clear-user
+                        {:on-click #(dis/dispatch! [:input [:invite-users]
+                                     (assoc invite-users i (merge user-data {:error nil :user ""}))])}]])]
                 [:div.user-type-dropdown
                   (user-type-dropdown {:user-id (utils/guid)
                                        :user-type (:role user-data)
@@ -255,17 +262,7 @@
                                            (assoc
                                             invite-users
                                             i
-                                            (merge user-data {:role % :error nil}))])})]
-                [:button.mlb-reset.remove-user
-                  {:on-click #(let [before (subvec invite-users 0 i)
-                                    after (subvec invite-users (inc i) (count invite-users))
-                                    next-invite-users (vec (concat before after))
-                                    fixed-next-invite-users (if (zero? (count next-invite-users))
-                                                              [(assoc default-user-row :type (:type user-data))]
-                                                              next-invite-users)]
-                                (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}
-                  [:i.mdi.mdi-delete]
-                  "Remove"]])]
+                                            (merge user-data {:role % :error nil}))])})]])]
           [:button.mlb-reset.add-button
             {:on-click
               #(dis/dispatch!
