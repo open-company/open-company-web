@@ -101,7 +101,6 @@
             {:type "email"
              :class (utils/class-set {:error (= (:error signup-with-email) 409)
                                       utils/hide-class true})
-             :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
              :value @(::email s)
              :on-change #(let [v (.. % -target -value)]
                            (reset! (::password-error s) false)
