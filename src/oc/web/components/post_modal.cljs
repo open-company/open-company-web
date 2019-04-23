@@ -8,6 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
@@ -39,6 +40,7 @@
                         mixins/no-scroll-mixin
                         (mixins/on-window-resize-mixin (fn [s e]
                           (reset! (::wh s) (.height (js/$ js/window)))))
+                        (mention-mixins/oc-mentions-hover)
                         {:will-mount (fn [s]
                           (reset! (::wh s) (.height (js/$ js/window)))
                           s)
@@ -105,7 +107,7 @@
             [:div.post-modal-body
               [:div.post-headline
                 (:headline activity-data)]
-              [:div.post-body
+              [:div.post-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
               (stream-attachments (:attachments activity-data))
               [:div.time-since
