@@ -171,7 +171,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
+                 :data-title (str "Published by " (:name publisher) " on " (utils/tooltip-date (:published-at activity-data)))}
                 (utils/foc-date-time t)])]]
         (when (and is-published?
                    is-mobile?)

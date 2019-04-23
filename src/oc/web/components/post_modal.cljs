@@ -100,7 +100,8 @@
                 [:div.must-see-tag.big-web-tablet-only "Must see"]
                 [:div.new-tag.big-web-tablet-only "NEW"]]
               (more-menu activity-data dom-element-id
-               {:external-share (not is-mobile?)})]
+               {:external-share (not is-mobile?)
+                :tooltip-position "bottom"})]
             [:div.post-modal-body
               [:div.post-headline
                 (:headline activity-data)]
@@ -108,24 +109,28 @@
                 {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
               (stream-attachments (:attachments activity-data))
               [:div.time-since
-                (let [author (:author activity-data)
-                      t (if (pos? (count author))
-                          (:updated-at (last author))
-                          (or (:updated-at activity-data)
-                              (:published-at activity-data)))]
+                (let [authors (:author activity-data)
+                      has-author (seq authors)
+                      last-author-name (if has-author
+                                         (:name (last authors))
+                                         (:name (:publisher activity-data)))
+                      last-edit-date (if has-author
+                                       (:updated-at (last authors))
+                                       (:published-at activity-data))]
                   [:time
-                    {:date-time t
+                    {:date-time last-edit-date
                      :data-toggle (when-not is-mobile? "tooltip")
                      :data-placement "top"
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (str "Last edited " (clojure.string/lower-case (utils/time-since t)))])]]
+                     :data-title (str "Last edited by " last-author-name " on " (utils/tooltip-date last-edit-date))}
+                    (str "Last edited " (clojure.string/lower-case (utils/time-since last-edit-date)))])]]
             [:div.post-modal-footer
               (comments-summary activity-data true)
               (reactions activity-data)
               (when show-bottom-share
                 (more-menu activity-data dom-element-id
-                 {:external-share (not is-mobile?)}))]
+                 {:external-share (not is-mobile?)
+                  :tooltip-position "bottom"}))]
             [:div.post-modal-comments.group
               {:class (utils/class-set {:bottom-fixed fixed-add-comment})}
               (stream-comments activity-data comments-data)
