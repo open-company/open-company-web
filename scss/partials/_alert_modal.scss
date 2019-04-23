@@ -23,16 +23,19 @@ div.alert-modal-container {
     min-height: 147px;
     position: relative;
 
-    button.settings-modal-close {
-      right: -56px;
-    }
-
     @include mobile() {
       width: 100%;
       height: 100vh;
       margin: 0px;
+    }
 
-      button.settings-modal-close {
+    button.modal-close-bt {
+      position: absolute;
+      left: 50%;
+      margin-left: -228px;
+      top: 12px;
+
+      @include mobile() {
         display: none;
       }
     }
@@ -43,7 +46,7 @@ div.alert-modal-container {
       position: relative;
       overflow: hidden;
       background-color: white;
-      border-radius: 8px;
+      border-radius: 6px;
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
       padding: 24px;
       text-align: center;
@@ -51,7 +54,6 @@ div.alert-modal-container {
       @include mobile() {
         margin: 100px 16px 0px;
         width: calc(100% - 32px);
-        border-radius: 8px;
       }
 
       &.has-bottom-button {
@@ -108,6 +110,9 @@ div.alert-modal-container {
           opacity: 0.9;
           @include OC_Body_Bold();
           font-size: 14px;
+          border-radius: 4px;
+          background-color: transparent;
+          color: $light_navy;
 
           &:hover {
             opacity: 1;
@@ -119,15 +124,33 @@ div.alert-modal-container {
           }
 
           &.mlb-link-black {
+            color: $deep_navy;
+
             &.green {
               color: $carrot_green;
             }
           }
 
           &.mlb-default.red {
-            background-color: $carrot_orange_light;
-            color: $carrot_orange;
-            padding: 0px 16px;
+            background-color: $carrot_orange;
+            color: white;
+            padding: 7px 16px;
+
+            &:hover, &:focus {
+              background-color: $carrot_orange;
+              color: white;
+            }
+
+            &:active, &.active {
+              background-color: $carrot_orange;
+              color: white;
+            }
+          }
+
+          &.mlb-default.green {
+            background-color: $carrot_green;
+            color: white;
+            padding: 7px 16px;
 
             &:hover, &:focus {
               background-color: $carrot_orange;
@@ -151,12 +174,7 @@ div.alert-modal-container {
         font-size: 14px;
         color: $deep_navy;
         margin-top: 32px;
-        opacity: 0.9;
-
-        &:hover {
-          opacity: 1;
-          text-decoration: underline;
-        }
+        border-radius: 4px;
 
         &.red {
           color: $carrot_orange;
