@@ -1,7 +1,7 @@
 div.notifications {
   position: fixed;
-  left: 24px;
-  bottom: 24px;
+  left: 16px;
+  bottom: 16px;
   z-index: 10000;
 
   @include mobile() {
@@ -12,13 +12,13 @@ div.notifications {
 
   div.notification {
     width: 320px;
-    background-color: white;
+    background-color: $light_navy;
     border-radius: 6px;
     box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
     margin-top: 8px;
     transition: opacity 180ms ease-in;
     // z-index: 10000;
-    padding: 16px;
+    padding: 11px 16px;
     position: relative;
 
     @include mobile() {
@@ -27,29 +27,19 @@ div.notifications {
     }
 
     &.server-error {
-      background-color: #FDAB1D;
-
-      div.notification-title {
-        color: $deep_navy;
-      }
-
-      div.notification-description {
-        color: $deep_navy;
-      }
-
-      button.notification-dismiss-bt {
-        background-image: cdnUrl("/img/ML/close_notification_black.svg"); 
-      }
-    }
-
-    &.app-update {
-      background-color: $sea_blue;
+      background-color: $carrot_orange;
 
       div.notification-title {
         color: white;
       }
 
       div.notification-description {
+        color: white;
+      }
+
+      button.notification-dismiss-bt {
+        // background-image: cdnUrl("/img/ML/close_notification_black.svg");
+        content: "Ok";
         color: white;
       }
     }
@@ -121,7 +111,11 @@ div.notifications {
     div.notification-title {
       @include OC_Body_Bold();
       font-size: 14px;
-      color: $light_navy;
+      color: white;
+
+      &.no-description {
+        @include OC_Body_Book();
+      }
 
       @include mobile() {
         margin-top: 2px;
@@ -131,19 +125,23 @@ div.notifications {
     button.notification-dismiss-bt {
       position: absolute;
       right: 16px;
-      top: 16px;
-      width: 12px;
-      height: 12px;
-      background-size: 12px 12px;
-      background-image: cdnUrl("/img/ML/close_notification_white.svg");
-      background-position: center;
-      background-repeat: no-repeat;
+      top: 11px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      margin: 0;
+      // background-size: 12px 12px;
+      // background-image: cdnUrl("/img/ML/close_notification_white.svg");
+      // background-position: center;
+      // background-repeat: no-repeat;
+      content: "Ok";
+      color: $carrot_green;
     }
 
     div.notification-description {
       @include OC_Body_Book();
       font-size: 14px;
-      color: $light_navy;
+      color: white;
       margin-top: 4px;
       overflow-wrap: break-word;
 
@@ -203,7 +201,7 @@ div.notifications {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
-        color: $light_navy;
+        color: white;
         background-color: transparent;
         opacity: 0.6;
       }
