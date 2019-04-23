@@ -20,7 +20,7 @@
 
 (def loom-regexp
  (str
-  "(?:http|https)?:\\/\\/(?:www\\.)?useloom.com\\/share\\/"
+  "(?:http|https)?:\\/\\/(?:www\\.)?(?:useloom|loom).com\\/share\\/"
   "([a-zA-Z0-9_-]*/?)"))
 
 (defn get-video-data [url]
