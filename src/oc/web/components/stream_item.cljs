@@ -169,9 +169,10 @@
                 {:date-time t
                  :data-toggle (when-not is-mobile? "tooltip")
                  :data-placement "top"
+                 :data-container "body"
                  :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                  :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t [:short])])]]
+                (utils/foc-date-time t)])]]
         (when (and is-published?
                    is-mobile?)
           (more-menu activity-data dom-element-id

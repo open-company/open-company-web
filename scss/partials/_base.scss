@@ -48,17 +48,19 @@ html, body {
   }
 
   .tooltip-inner {
-    background-color: $deep_navy;
+    background-color: white;
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
     opacity: 1;
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 14px;
-    color: white;
+    color: $light_navy;
     line-height: 18px;
-    padding: 14px 18px;
-    corner-radius: 6px;
+    padding: 11px 16px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+    border: 1px solid #D6D6D8;
   }
 }
 

@@ -120,13 +120,6 @@
 
       (pos? days-interval)
       (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
-      ;; time only
-      (and short?
-           (= (.getDate past-js-date) (.getDate now-date)))
-      (s/lower
-       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
-                                                                                  :minute "2-digit"
-                                                                                  :format "hour:minute"}))
 
       (pos? hours-interval)
       (str hours-interval " " (pluralize "hour" hours-interval) " ago")
@@ -136,6 +129,20 @@
 
       :else
       (if short? "now" "Just now"))))
+
+(defn foc-date-time [past-date & [flags]]
+  (let [past-js-date (js-date past-date)
+        past (.getTime past-js-date)
+        now-date (js-date)
+        now (.getTime now-date)]
+    (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
+             (= (.getMonth past-js-date) (.getMonth now-date))
+             (= (.getDate past-js-date) (.getDate now-date)))
+      (s/lower
+       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
+                                                                                  :minute "2-digit"
+                                                                                  :format "hour:minute"}))
+      (time-since past-date (concat flags [:short])))))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -484,21 +491,20 @@
         :else
         "Just now"))))
 
-(defn entry-date-tooltip [entry-data]
+(defn activity-date-tooltip [entry-data]
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
         updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
                        "Posted "
-                       "Created ")]
-    (if (or (= (:created-at entry-data) (:updated-at entry-data))
-            (not (:updated-at entry-data)))
+                       "Created ")
+        last-edit (last (:author entry-data))]
+    (if (= (:created-at entry-data) (:updated-at last-edit))
       (str label-prefix created-str)
-      (str label-prefix created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
-
-(defn activity-date-tooltip [activity-data]
-  (entry-date-tooltip activity-data))
+      (if (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+        (str label-prefix created-str "\nEdited " updated-str)
+        (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 
 (defn ios-copy-to-clipboard [el]
   (let [old-ce (.-contentEditable el)
