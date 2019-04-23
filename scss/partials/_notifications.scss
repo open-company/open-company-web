@@ -11,10 +11,10 @@ div.notifications {
   }
 
   div.notification {
-    width: 289px;
-    background-color: $deep_navy;
-    border-radius: 3px;
-    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
     margin-top: 8px;
     transition: opacity 180ms ease-in;
     // z-index: 10000;
@@ -121,7 +121,7 @@ div.notifications {
     div.notification-title {
       @include OC_Body_Bold();
       font-size: 14px;
-      color: white;
+      color: $light_navy;
 
       @include mobile() {
         margin-top: 2px;
@@ -141,16 +141,16 @@ div.notifications {
     }
 
     div.notification-description {
-      @include OC_Body_Medium();
+      @include OC_Body_Book();
       font-size: 14px;
-      color: white;
+      color: $light_navy;
       margin-top: 4px;
       overflow-wrap: break-word;
 
       &.oc-mentions span.oc-mention[data-found="true"] {
         background-color: transparent !important;
         color: white !important;
-        @include OC_Body_Bold();
+        @include OC_Body_Medium();
       }
 
       a {
@@ -165,24 +165,23 @@ div.notifications {
       text-align: right;
       padding: 0px;
       margin: 0px;
-      @include OC_Body_Black();
+      @include OC_Body_Bold();
       font-size: 12px;
       line-height: 24px;
 
       &.solid-green {
         float: unset;
         width: 100%;
-        height: 40px;
+        height: 32px;
         margin-top: 16px;
         color: white;
         background-color: $carrot_green;
-        padding: 9px 0px;
+        padding: 7px 0px;
         text-align: center;
         @include OC_Body_Bold();
         font-size: 16px;
-        line-height: 27px;
         letter-spacing: 0.22px;
-        border-radius: 100px;
+        border-radius: 4px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -204,7 +203,7 @@ div.notifications {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
-        color: white;
+        color: $light_navy;
         background-color: transparent;
         opacity: 0.6;
       }
