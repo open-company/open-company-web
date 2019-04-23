@@ -78,6 +78,11 @@
        (.tooltip "fixTitle")
        (.tooltip "hide")))
    s)
+  :did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)
   :did-remount (fn [old-state new-state]
    (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
      (when (and @(::loading new-state)
