@@ -54,7 +54,7 @@
 (defn dropdown-label [val total]
   (case val
     :all (str "Everyone (" total ")")
-    :seen "Veiwed"
+    :seen "Viewed"
     :unseen "Unopened"))
 
 (rum/defcs wrt < rum/reactive
