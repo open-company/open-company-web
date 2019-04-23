@@ -462,11 +462,10 @@
 (defn tooltip-date [past-date]
   (let [past-js-date (js-date past-date)
         now-date (js-date)
-        hide-year (= (.getFullYear past-js-date) (.getFullYear now-date))
-        hide-time (or (not hide-year)
+        hide-time (or (not= (.getFullYear past-js-date) (.getFullYear now-date))
                       (not= (.getMonth past-js-date) (.getMonth now-date))
                       (not= (.getDate past-js-date) (.getDate now-date)))]
-    (activity-date-string past-js-date hide-time hide-year)))
+    (activity-date-string past-js-date hide-time false)))
 
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"
