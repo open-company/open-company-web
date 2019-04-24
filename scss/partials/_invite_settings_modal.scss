@@ -35,17 +35,20 @@ div.invite-settings-modal {
     top: 0;
     height: 100vh;
     right: -320px;
-    padding: 0 24px 16px;
+    padding: 56px 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
     overflow-y: auto;
 
     div.invite-settings-header {
-      width: calc(100% + 48px);
+      width: 320px;
       height: 56px;
-      margin-left: -24px;
       background-color: #FBFAF9;
       padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
       div.invite-settings-header-title {
         @include OC_Body_Bold();
@@ -146,17 +149,24 @@ div.invite-settings-modal {
 
         div.invites-list-item {
           margin-top: 8px;
+          position: relative;
 
           &:not(:first-child) {
             margin-top: 16px;
           }
 
           div.org-settings-field-container {
-            width: 100%;
+            width: calc(100% - 24px);
             border-radius: 4px;
             background-color: $ultra_light_grey;
             border: none;
             outline: none;
+
+            &.has-value {
+              button.clear-user {
+                display: block;
+              }
+            }
 
             &.focus {
               background-color: $mid_light_grey;
@@ -166,31 +176,21 @@ div.invite-settings-modal {
               }
             }
 
-            &.has-value {
-              button.remove-user {
-                display: none;
-              }
-
-              button.clear-user {
-                display: block;
-              }
-            }
-
             input.org-settings-field {
               width: calc(100% - 24px);
-            }
+              border-radius: 4px;
+              background-color: $ultra_light_grey;
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: $deep_navy;
+              border: none;
+              outline: none;
+              padding: 7px 8px;
 
-            button.remove-user {
-              float: right;
-              width: 24px;
-              height: 24px;
-              margin-top: 4px;
-              padding: 0;
-              background-image: cdnUrl("/img/ML/remove_user.svg");
-              background-size: 12px 14px;
-              background-position: center;
-              background-repeat: no-repeat;
-              display: block;
+              &:focus, &:active {
+                border: none;
+                outline: none;
+              }
             }
 
             button.clear-user {
@@ -207,24 +207,28 @@ div.invite-settings-modal {
             }
           }
 
-          input.org-settings-field {
-            width: 100%;
-            border-radius: 4px;
-            background-color: $ultra_light_grey;
-            @include OC_Body_Book();
-            font-size: 14px;
-            color: $deep_navy;
-            border: none;
-            outline: none;
-            padding: 7px 8px;
+          div.user-name-dropdown {
+            width: calc(100% - 24px);
+          }
 
-            &:focus, &:active {
-              border: none;
-              outline: none;              
-            }
+          button.remove-user {
+            position: absolute;
+            top: 16px;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            margin-top: 4px;
+            padding: 0;
+            background-image: cdnUrl("/img/ML/remove_user.svg");
+            background-size: 12px 14px;
+            background-position: top 5px right 0px;
+            background-repeat: no-repeat;
+            display: block;
           }
 
           div.user-type-dropdown {
+            width: calc(100% - 24px);
+
             div.dropdown {
               margin-top: 8px;
               height: 32px;

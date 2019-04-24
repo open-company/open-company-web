@@ -16,10 +16,6 @@ div.stream-item {
 
         div.stream-item-body-ext {
           div.stream-item-footer {
-            div.menu-container {
-              display: block;
-            }
-
             div.stream-item-comments-summary {
               div.is-comments {
                 div.is-comments-authors.show-borders {
@@ -420,12 +416,6 @@ div.stream-item {
     div.stream-item-footer {
       height: 26px;
       margin-top: 16px;
-
-      @include big_web(){
-        div.menu-container {
-          display: none;
-        }
-      }
 
       div.stream-body-draft-edit {
         float: left;

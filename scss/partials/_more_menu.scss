@@ -30,14 +30,14 @@ div.more-menu {
     background-position: left center;
     padding: 0 0 0 24px;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
 
     @include mobile() {
       width: 32px;
     }
 
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_active.svg");
+      opacity: 1;
     }
 
     @include mobile() {
@@ -48,7 +48,7 @@ div.more-menu {
 
       &:hover, &:active, &:focus {
         background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
-      }      
+      }
     }
   }
 
@@ -62,14 +62,14 @@ div.more-menu {
     background-repeat: no-repeat;
     margin-left: 16px;
     display: inline-block;
-    opacity: 1;
+    opacity: 0.5;
 
     @include mobile() {
       width: 32px;
     }
 
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/more_menu_share_arrow_active.svg");
+      opacity: 1;
     }
 
     @include mobile() {

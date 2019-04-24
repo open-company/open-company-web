@@ -182,7 +182,7 @@
                 (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))]
           [:button.mlb-reset.cancel-bt
             {:on-click #(do
-                         (reset! (::rand s) (int (rand 10000)))
+                         ; (reset! (::rand s) (int (rand 10000)))
                          (dis/dispatch! [:input [:invite-users]
                           (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))])
                          (dismiss-modal s))}
@@ -202,15 +202,16 @@
                 {:value "slack"}
                 "Slack"]]]
           [:div.invites-list
-            {:key (str "org-settings-invite-table-" @(::rand s))}
+            {:key "org-settings-invite-table"}
             [:div.invites-list-title "Invitee"]
             (for [i (range (count invite-users))
-                  :let [user-data (get invite-users i)]]
+                  :let [user-data (get invite-users i)
+                        key-string (str "invite-users-tabe-" i)]]
               [:div.invites-list-item
-                {:key (str "invite-users-tabe-" i "-" @(::rand s))}
-                [:div.invites-list-item
+                {:key key-string}
+                [:div.invites-list-item.group
                   (if (= "slack" (:type user-data))
-                    [:div
+                    [:div.user-name-dropdown
                       {:class (when (:error user-data) "error")}
                       (rum/with-key
                        (slack-users-dropdown
@@ -228,26 +229,18 @@
                           :initial-value (utils/name-or-email (:user user-data))})
                         (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                     [:div.org-settings-field-container.group
-                      {:class (utils/class-set {:focus @(::email-focused s) 
+                      {:class (utils/class-set {:focus (= @(::email-focused s) key-string)
                                                 :has-value (seq (:user user-data))})}
                       [:input.org-settings-field.email-field
                         {:type "text"
                          :class (when (:error user-data) "error")
                          :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
                          :placeholder "email@example.com"
-                         :on-focus #(reset! (::email-focused s) true)
+                         :on-focus #(reset! (::email-focused s) key-string)
                          :on-blur #(reset! (::email-focused s) false)
                          :on-change #(dis/dispatch! [:input [:invite-users]
                                        (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
                          :value (or (:user user-data) "")}]
-                      [:button.mlb-reset.remove-user
-                        {:on-click #(let [before (subvec invite-users 0 i)
-                                        after (subvec invite-users (inc i) (count invite-users))
-                                        next-invite-users (vec (concat before after))
-                                        fixed-next-invite-users (if (zero? (count next-invite-users))
-                                                                  [(assoc default-user-row :type (:type user-data))]
-                                                                  next-invite-users)]
-                                      (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}]
                       [:button.mlb-reset.clear-user
                         {:on-click #(dis/dispatch! [:input [:invite-users]
                                      (assoc invite-users i (merge user-data {:error nil :user ""}))])}]])]
@@ -262,7 +255,15 @@
                                            (assoc
                                             invite-users
                                             i
-                                            (merge user-data {:role % :error nil}))])})]])]
+                                            (merge user-data {:role % :error nil}))])})]
+                [:button.mlb-reset.remove-user
+                  {:on-click #(let [before (subvec invite-users 0 i)
+                                  after (subvec invite-users (inc i) (count invite-users))
+                                  next-invite-users (vec (concat before after))
+                                  fixed-next-invite-users (if (zero? (count next-invite-users))
+                                                            [(assoc default-user-row :type (:type user-data))]
+                                                            next-invite-users)]
+                                (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}]])]
           [:button.mlb-reset.add-button
             {:on-click
               #(dis/dispatch!

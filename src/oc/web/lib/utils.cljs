@@ -122,10 +122,10 @@
       (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
 
       (pos? hours-interval)
-      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+      (str hours-interval (if short? "h" (str " " (pluralize "hour" hours-interval) " ago")))
 
       (pos? minutes-interval)
-      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+      (str minutes-interval (if short? "m" (str " " (pluralize "minute" minutes-interval) " ago")))
 
       :else
       (if short? "now" "Just now"))))
