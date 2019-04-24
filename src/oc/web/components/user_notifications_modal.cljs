@@ -18,7 +18,7 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:user-settings] (or panel :profile)]))
+  (dis/dispatch! [:input [:user-settings] (or panel :notifications)]))
 
 (defn real-close []
   (dis/dispatch! [:input [:user-settings] nil]))
