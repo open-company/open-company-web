@@ -104,7 +104,7 @@
         delete (utils/link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defn post-new?
+(defn post-unseen?
   "An entry is new if its uuid is contained in container's unseen."
   [entry changes]
   (let [board-uuid (:board-uuid entry)
@@ -112,6 +112,16 @@
         board-unseen (:unseen board-change-data)
         user-id (jwt/user-id)]
     (and (utils/in? board-unseen (:uuid entry))
+         (not= (:user-id (:publisher entry)) user-id))))
+
+(defn post-unread?
+  "An entry is new if its uuid is contained in container's unread."
+  [entry changes]
+  (let [board-uuid (:board-uuid entry)
+        board-change-data (get changes board-uuid {})
+        board-unread (:unread board-change-data)
+        user-id (jwt/user-id)]
+    (and (utils/in? board-unread (:uuid entry))
          (not= (:user-id (:publisher entry)) user-id))))
 
 (defn body-for-stream-view [inner-html]
@@ -145,7 +155,8 @@
         body-thumbnail (html/first-body-thumbnail (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
-      (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+      (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+      (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
       (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)

@@ -129,7 +129,8 @@
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :new-item (:new activity-data)
+                                :unseen-item (:unseen activity-data)
+                                :unread-item (:unread activity-data)
                                 :expandable is-published?})
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]

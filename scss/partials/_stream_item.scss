@@ -44,7 +44,7 @@ div.stream-item {
     cursor: pointer;
   }
 
-  &.new-item {
+  &.unread-item {
     background-color: white;
     border-left: 4px solid white;
 
@@ -148,18 +148,9 @@ div.stream-item {
         }
       }
 
-      div.must-see-tag, div.new-tag {
+      div.must-see-tag {
         margin-top: 2px;
       }
-
-      // div.separator {
-      //   width: 3px;
-      //   height: 3px;
-      //   border-radius: 4px;
-      //   background-color: $light_ui_grey;
-      //   margin: 6px 8px 0px;
-      //   float: left;
-      // }
     }
   }
 
