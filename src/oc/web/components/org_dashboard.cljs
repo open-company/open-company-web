@@ -249,9 +249,7 @@
           ;; Show mobile navigation
           (and is-mobile?
                mobile-navigation-sidebar)
-          (navigation-sidebar)
-          (router/current-activity-id)
-          (post-modal))
+          (navigation-sidebar))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)

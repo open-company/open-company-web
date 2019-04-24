@@ -20,6 +20,7 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
+            [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
@@ -97,89 +98,91 @@
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (when-not is-mobile?
             (navigation-sidebar))
-          ;; Show the board always on desktop and
+          ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           (when (or (not is-tablet-or-mobile?)
                     (not mobile-navigation-sidebar))
             [:div.board-container.group
-              ;; Board name row: board name, settings button and say something button
-              [:div.board-name-container.group
-                ;; Board name and settings button
-                [:div.board-name
-                  (when (router/current-board-slug)
-                    [:div.board-name-with-icon
-                      [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access board-data) "private")
-                                                                (not is-drafts-board))
-                                                  :public (= (:access board-data) "public")})
-                         :dangerouslySetInnerHTML (utils/emojify (cond
-                                                   is-all-posts
-                                                   "All posts"
+              (when-not current-activity-id
+                ;; Board name row: board name, settings button and say something button
+                [:div.board-name-container.group
+                  ;; Board name and settings button
+                  
+                  [:div.board-name
+                    (when (router/current-board-slug)
+                      [:div.board-name-with-icon
+                        [:div.board-name-with-icon-internal
+                          {:class (utils/class-set {:private (and (= (:access board-data) "private")
+                                                                  (not is-drafts-board))
+                                                    :public (= (:access board-data) "public")})
+                           :dangerouslySetInnerHTML (utils/emojify (cond
+                                                     is-all-posts
+                                                     "All posts"
 
-                                                   is-must-see
-                                                   "Must see"
+                                                     is-must-see
+                                                     "Must see"
 
-                                                   :default
-                                                   (:name board-data)))}]])
-                  (when (and (= (:access board-data) "private")
-                             (not is-drafts-board))
-                    [:div.private-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-                               "Only visible to you"
-                               "Only visible to invited team members")}])
-                  (when (= (:access board-data) "public")
-                    [:div.public-board
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title "Visible to the world, including search engines"}])
-                  (when should-show-settings-bt
-                    [:div.board-settings-container
-                      ;; Settings button
-                      [:button.mlb-reset.board-settings-bt
-                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                                                     :default
+                                                     (:name board-data)))}]])
+                    (when (and (= (:access board-data) "private")
+                               (not is-drafts-board))
+                      [:div.private-board
+                        {:data-toggle "tooltip"
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title (str (:name board-data) " settings")
-                         :on-click #(do
-                                      (when (:show-section-settings-tooltip qsg-data)
-                                        (qsg-actions/dismiss-section-settings-tooltip))
-                                      (dis/dispatch! [:input [:show-section-editor] true]))}]
-                    (when (:show-section-settings-tooltip qsg-data)
-                      [:div.section-settings-tooltip-container.group
-                        [:div.section-settings-tooltip-top-arrow]
-                        [:button.mlb-reset.section-settings-tooltip-dismiss
-                          {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
-                        [:div.section-settings-tooltips
-                          [:div.section-settings-tooltip
-                            "You can make changes to a section at any time."]
-                          [:button.mlb-reset.section-settings-bt
-                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
-                            "OK, got it"]]])])]
-                ; (when-not is-mobile?
-                ;   (let [default-sort (= @board-sort :default)]
-                ;     [:div.board-sort.group
-                ;       {:ref :board-sort-menu}
-                ;       [:button.mlb-reset.board-sort-bt
-                ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                ;         (if default-sort "Recent activity" "Recently posted")]
-                ;       [:div.board-sort-menu
-                ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when default-sort "active")
-                ;            :on-click #(reset! board-sort :defautl)}
-                ;           "Recent activity"]
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when-not default-sort "active")
-                ;            :on-click #(reset! board-sort :own)}
-                ;           "Recently posted"]]]))
-                ]
+                         :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+                                 "Only visible to you"
+                                 "Only visible to invited team members")}])
+                    (when (= (:access board-data) "public")
+                      [:div.public-board
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :data-container "body"
+                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                         :title "Visible to the world, including search engines"}])
+                    (when should-show-settings-bt
+                      [:div.board-settings-container
+                        ;; Settings button
+                        [:button.mlb-reset.board-settings-bt
+                          {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                           :title (str (:name board-data) " settings")
+                           :on-click #(do
+                                        (when (:show-section-settings-tooltip qsg-data)
+                                          (qsg-actions/dismiss-section-settings-tooltip))
+                                        (dis/dispatch! [:input [:show-section-editor] true]))}]
+                      (when (:show-section-settings-tooltip qsg-data)
+                        [:div.section-settings-tooltip-container.group
+                          [:div.section-settings-tooltip-top-arrow]
+                          [:button.mlb-reset.section-settings-tooltip-dismiss
+                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
+                          [:div.section-settings-tooltips
+                            [:div.section-settings-tooltip
+                              "You can make changes to a section at any time."]
+                            [:button.mlb-reset.section-settings-bt
+                              {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
+                              "OK, got it"]]])])]
+                  ; (when-not is-mobile?
+                  ;   (let [default-sort (= @board-sort :default)]
+                  ;     [:div.board-sort.group
+                  ;       {:ref :board-sort-menu}
+                  ;       [:button.mlb-reset.board-sort-bt
+                  ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                  ;         (if default-sort "Recent activity" "Recently posted")]
+                  ;       [:div.board-sort-menu
+                  ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                  ;         [:div.board-sort-menu-item
+                  ;           {:class (when default-sort "active")
+                  ;            :on-click #(reset! board-sort :defautl)}
+                  ;           "Recent activity"]
+                  ;         [:div.board-sort-menu-item
+                  ;           {:class (when-not default-sort "active")
+                  ;            :on-click #(reset! board-sort :own)}
+                  ;           "Recently posted"]]]))
+                  ])
               (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                     non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                            "decisions to keep you and your team pulling in the same direction.")
@@ -215,6 +218,9 @@
                 ;; No boards
                 (zero? (count (:boards org-data)))
                 (empty-org)
+                ;; Expanded post
+                (router/current-activity-id)
+                (expanded-post)
                 ;; Empty board
                 empty-board?
                 (empty-board)

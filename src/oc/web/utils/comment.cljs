@@ -26,7 +26,7 @@
                             :unwrapTags #js ["div" "label" "font" "h1" "h2" "h3" "h4" "h5" "div" "p" "ul" "ol" "li"
                                              "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                              "details" "summary" "nav" "abbr" "a"]}
-                :placeholder #js {:text "Add a comment..."
+                :placeholder #js {:text "Type reply here..."
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
                                   #js {

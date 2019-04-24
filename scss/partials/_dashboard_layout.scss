@@ -22,8 +22,8 @@ div.dashboard-layout {
     margin: 0 auto;
     width: auto;
     width: 100%;
-    max-width: calc(100% - 216px);
-    margin-left: 200px;
+    max-width: calc(100% - #{$left_navigation_sidebar_width}px);
+    margin-left: #{$left_navigation_sidebar_width}px;
     transition: margin-left 180ms ease-in, width 180ms ease-in, max-width 180ms ease-in;
 
     &.hide-left-navbar {

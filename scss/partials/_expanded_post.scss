@@ -1,0 +1,125 @@
+div.expanded-post {
+  width: 640px;
+  margin: 0 auto;
+
+  div.expanded-post-header {
+    height: 32px;
+
+    button.back-to-board {
+      float: left;
+      height: 32px;
+      border: 1px solid $ultra_light_grey;
+      border-radius: 4px;
+      padding: 7px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+
+      div.back-to-board-inner {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+        line-height: 18px;
+        margin-left: 8px;
+      }
+
+      div.back-arrow {
+        content: " ";
+        width: 16px;
+        height: 10px;
+        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+        background-repeat: no-repeat;
+        background-size: 10px 16px;
+        background-position: center;
+      }
+    }
+
+    div.more-menu {
+      float: right;
+    }
+  }
+
+  div.expanded-post-headline {
+    @include activity-title(36px, 47px);
+    margin-top: 16px;
+  }
+
+  div.expanded-post-author {
+    @include user-profile(24);
+    margin-top: 16px;
+    height: 24px;
+
+    div.user-avatar-img-container {
+      float: left;
+      margin-right: 8px;
+    }
+
+    div.expanded-post-author-inner {
+      @include OC_Body_Book();
+      font-size: 12px;
+      color: rgba($light_navy, 0.5);
+      line-height: 24px;
+    }
+  }
+
+  div.expanded-post-body {
+    @include activity-body(18, 24, 24, $deep_navy);
+    margin-top: 16px;
+  }
+
+  div.expanded-post-footer {
+    margin-top: 24px;
+    height: 26px;
+
+    div.is-comments {
+      margin-right: 16px;
+      float: left;
+    }
+
+    div.reactions {
+      float: left;
+      margin-right: 16px;
+
+      div.reactions-picker-container {
+        div.emoji-mart {
+          bottom: unset;
+          top: 0;
+          left: calc(100% + 8px);
+
+          @include mobile(){
+            bottom: unset;
+            right: unset;
+            top: unset;
+            left: unset;
+          }
+        }
+      }
+    }
+  }
+
+  div.expanded-post-comments {
+    padding-bottom: 0;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid $ultra_light_grey;
+
+    div.stream-comments {
+      width: 100%;
+    }
+  }
+
+  div.expanded-post-fixed-add-comment {
+    position: fixed;
+    bottom: 0;
+    left: #{$left_navigation_sidebar_width}px;
+    width: calc(100vw - #{$left_navigation_sidebar_width}px);
+    background-color: white;
+    min-height: 71px;
+
+    div.expanded-post-fixed-add-comment-inner {
+      width: 640px;
+      margin: 24px auto;
+    }
+  }
+}
