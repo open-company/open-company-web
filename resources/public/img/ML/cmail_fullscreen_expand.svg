@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Post-creation" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.5">
-        <g id="Create-(bottom-minimizedl)" transform="translate(-1000.000000, -650.000000)" fill="#FFFFFF" fill-rule="nonzero">
-            <g id="Group-14" transform="translate(726.000000, 632.000000)">
-                <g id="Group-8" transform="translate(244.000000, 18.000000)">
-                    <path d="M39.4393398,1.5 L36.75,1.5 C36.3357864,1.5 36,1.16421356 36,0.75 C36,0.335786438 36.3357864,0 36.75,0 L41.25,0 C41.6642136,0 42,0.335786438 42,0.75 L42,5.25 C42,5.66421356 41.6642136,6 41.25,6 C40.8357864,6 40.5,5.66421356 40.5,5.25 L40.5,2.56066017 L32.5606602,10.5 L35.25,10.5 C35.6642136,10.5 36,10.8357864 36,11.25 C36,11.6642136 35.6642136,12 35.25,12 L30.75,12 C30.3357864,12 30,11.6642136 30,11.25 L30,6.75 C30,6.33578644 30.3357864,6 30.75,6 C31.1642136,6 31.5,6.33578644 31.5,6.75 L31.5,9.43933983 L39.4393398,1.5 Z" id="Combined-Shape"></path>
+    <g id="Post-authoring" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Alt-compose-(cmail-section-picker)-Copy" transform="translate(-1162.000000, -318.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <g id="Group-11" transform="translate(632.000000, 296.000000)">
+                <g id="Group-14" transform="translate(520.000000, 12.000000)">
+                    <path d="M19.4393398,11.5 L16.75,11.5 C16.3357864,11.5 16,11.1642136 16,10.75 C16,10.3357864 16.3357864,10 16.75,10 L21.25,10 C21.6642136,10 22,10.3357864 22,10.75 L22,15.25 C22,15.6642136 21.6642136,16 21.25,16 C20.8357864,16 20.5,15.6642136 20.5,15.25 L20.5,12.5606602 L12.5606602,20.5 L15.25,20.5 C15.6642136,20.5 16,20.8357864 16,21.25 C16,21.6642136 15.6642136,22 15.25,22 L10.75,22 C10.3357864,22 10,21.6642136 10,21.25 L10,16.75 C10,16.3357864 10.3357864,16 10.75,16 C11.1642136,16 11.5,16.3357864 11.5,16.75 L11.5,19.4393398 L19.4393398,11.5 Z" id="Combined-Shape"></path>
                 </g>
             </g>
         </g>

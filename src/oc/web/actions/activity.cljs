@@ -1,6 +1,7 @@
 (ns oc.web.actions.activity
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -863,11 +864,18 @@
 (defn- cmail-fullscreen-save [fullscreen?]
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
+(defn- add-no-scroll []
+  (dommy/add-class! (sel1 [:body]) :no-scroll))
+
+(defn- remove-no-scroll []
+  (dommy/remove-class! (sel1 [:body]) :no-scroll))
+
 (defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:collapse false
-                             :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
+  (let [cmail-default-state {:fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (when (:fullscreen cmail-default-state)
+      (add-no-scroll))
     (when-not (:auto cmail-state)
       (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
@@ -876,16 +884,16 @@
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
   (dis/dispatch! [:input [:cmail-data] nil])
-  (dis/dispatch! [:input [:cmail-state] nil]))
+  (dis/dispatch! [:input [:cmail-state] nil])
+  (remove-no-scroll))
 
 (defn cmail-toggle-fullscreen []
-  (cmail-fullscreen-save (not (:fullscreen (:cmail-state @dis/app-state))))
-  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse false
-                                                    :fullscreen (not (:fullscreen %))})]))
-
-(defn cmail-toggle-collapse []
-  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse (not (:collapse %))
-                                                    :fullscreen (:fullscreen %)})]))
+  (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
+    (cmail-fullscreen-save next-fullscreen-value)
+    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])
+    (if next-fullscreen-value
+      (add-no-scroll)
+      (remove-no-scroll))))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
