@@ -96,7 +96,6 @@
                                  has-bot?)
         disallow-public-share? (and (:content-visibility org-data)
                                     (:disallow-public-share (:content-visibility org-data)))]
-    (js/console.log "DBG audience" @(::url-audience s))
     [:div.activity-share-modal-container
       {:class (utils/class-set {:will-appear (or @(::dismiss s) (not @(:first-render-done s)))
                                 :appear (and (not @(::dismiss s)) @(:first-render-done s))})}
