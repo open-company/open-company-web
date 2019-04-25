@@ -141,7 +141,7 @@
         uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
     [:div.invite-settings-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click dismiss-modal}]
       [:div.invite-settings
         [:div.invite-settings-header
           [:div.invite-settings-header-title
@@ -167,7 +167,7 @@
                          ; (reset! (::rand s) (int (rand 10000)))
                          (dis/dispatch! [:input [:invite-users]
                           (vec (repeat default-row-num (assoc default-user-row :type @(::inviting-from s))))])
-                         (dismiss-modal s))}
+                         (dismiss-modal))}
             "Back"]]
         [:div.invite-settings-body
           [:div.invite-via
