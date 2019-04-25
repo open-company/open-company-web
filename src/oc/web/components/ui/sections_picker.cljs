@@ -82,5 +82,5 @@
                               (on-change b))}
                 [:div.sections-picker-section-name
                   [:span.name (:name b)]
-                  (str " (" (or (:entry-count b) 0) ")")]
+                  [:span.count (str " (" (or (:entry-count b) 0) ")")]]
                 [:div.sections-picker-circle]]))]]]))
