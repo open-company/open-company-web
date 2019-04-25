@@ -56,6 +56,7 @@
       {:class dom-node-class
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
+      [:div.activity-share-container]
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
           {:on-click close-expanded-post}

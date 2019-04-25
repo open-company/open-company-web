@@ -2,6 +2,13 @@ div.expanded-post {
   width: 640px;
   margin: 0 auto;
 
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      top: -21px;
+      right: 0;
+    }
+  }
+
   div.expanded-post-header {
     height: 32px;
 
