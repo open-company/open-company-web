@@ -82,7 +82,8 @@ div.stream-item {
   div.activity-share-container {
     div.activity-share-modal-container {
       right: -9px;
-      margin-top: -16px;
+      top: unset;
+      bottom: 6px;
     }
   }
 
