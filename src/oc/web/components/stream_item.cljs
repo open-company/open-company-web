@@ -152,7 +152,6 @@
                                     (not (utils/input-clicked? e)))
                            (routing-actions/open-post-modal activity-data))))))
        :id dom-element-id}
-      [:div.activity-share-container]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image publisher)
@@ -263,6 +262,7 @@
                           {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                           "OK, got it"]]])])
               [:div.menu-container
+                [:div.activity-share-container]
                 (when (and is-published?
                            (not is-mobile?))
                   (more-menu activity-data dom-element-id
