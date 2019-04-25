@@ -229,7 +229,6 @@ nav.oc-navbar {
             float: unset;
           }
 
-
           div.qsg-tooltip-container {
             border: 1px solid rgba($carrot_gold, 0.5);
             background-color: #FDF6E4;
@@ -299,6 +298,20 @@ nav.oc-navbar {
                 @include OC_Body_Bold();
                 font-size: 16px;
               }
+            }
+          }
+
+          div.user-menu-button.green-dot {
+            position: relative;
+            &:after {
+              content: "";
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              background-color: $carrot_green;
+              position: absolute;
+              top: 0;
+              right: 0;
             }
           }
         }

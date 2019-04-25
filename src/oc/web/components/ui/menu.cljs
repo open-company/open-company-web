@@ -23,16 +23,11 @@
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn real-menu-close []
-  (dis/dispatch! [:input [:expanded-user-menu] false]))
-
 (defn menu-toggle []
   (dis/dispatch! [:update [:expanded-user-menu] not]))
 
 (defn menu-close [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-menu-close)))
+  (dis/dispatch! [:input [:expanded-user-menu] false]))
 
 (defn logout-click [s e]
   (.preventDefault e)
@@ -101,33 +96,17 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :qsg)
-                  ;; Locals
-                  (rum/local false ::unmounting)
-                  (rum/local false ::unmounted)
                   ;; Mixins
                   mixins/no-scroll-mixin
-                  mixins/first-render-mixin
-                  {:did-mount (fn [s]
-                   (whats-new/init ".whats-new")
-                   s)
-                   :did-update (fn [s]
-                    (when (and @(::unmounting s)
-                               (compare-and-set! (::unmounted s) false true))
-                      (utils/after 180 real-menu-close))
-                    s)}
   [s]
   (let [{:keys [expanded-user-menu org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         qsg-data (drv/react s :qsg)
-        show-reminders? (utils/link-for (:links org-data) "reminders")
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))]
+        show-reminders? (utils/link-for (:links org-data) "reminders")]
     [:div.menu
-      {:class (utils/class-set {:expanded-user-menu expanded-user-menu
-                                :appear appear-class})
+      {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
                     (menu-close s))}
       [:button.mlb-reset.modal-close-bt
