@@ -21,13 +21,8 @@
 (defn show-modal [& [panel]]
   (dis/dispatch! [:input [:org-settings] (or panel :main)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (dis/dispatch! [:input [:org-settings] nil]))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (defn form-is-clean? [s]
   (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
@@ -112,13 +107,10 @@
   (drv/drv :org-avatar-editing)
   (drv/drv :org-settings-team-management)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
       (org-actions/get-org org-data)
@@ -126,11 +118,6 @@
     (reset-form s)
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
-    s)
-   :did-update (fn [s]
-    (when (and @(::unmounting s)
-               (compare-and-set! (::unmounted s) false true))
-      (utils/after 180 real-close))
     s)
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
@@ -146,9 +133,6 @@
     s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
         org-avatar-editing (drv/react s :org-avatar-editing)
         qsg-data (drv/react s :qsg)
         org-data-for-avatar (merge org-data org-avatar-editing)
@@ -161,9 +145,8 @@
                     (drv/react s :org-settings-team-management)
         content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-modal
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click dismiss-modal}]
       [:div.org-settings-modal-container
         [:div.org-settings-header
           [:div.org-settings-header-title
@@ -179,7 +162,7 @@
             "Save"]
           [:button.mlb-reset.cancel-bt
             {:on-click #(if (form-is-clean? s)
-                          (dismiss-modal s)
+                          (dismiss-modal)
                           (reset-form s))}
             "Back"]]
         [:div.org-settings-body

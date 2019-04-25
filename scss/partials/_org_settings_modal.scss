@@ -11,16 +11,8 @@ div.org-settings-modal {
   text-transform: none;
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
-  opacity: 0;
+  opacity: 1;
   transition: opacity 180ms ease-in;
-
-  &.appear {
-    opacity: 1;
-
-    div.org-settings-modal-container {
-      right: 0;
-    }
-  }
 
   button.modal-close-bt {
     position: absolute;
@@ -34,7 +26,7 @@ div.org-settings-modal {
     position: absolute;
     top: 0;
     height: 100vh;
-    right: -320px;
+    right: 0;
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
