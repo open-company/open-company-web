@@ -8,13 +8,13 @@ div.expanded-post {
     button.back-to-board {
       float: left;
       height: 32px;
-      border: 1px solid $ultra_light_grey;
       border-radius: 4px;
       padding: 7px 16px;
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
+      background-color: $ultra_light_grey;
 
       div.back-to-board-inner {
         @include OC_Body_Book();
