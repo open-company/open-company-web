@@ -37,6 +37,11 @@ div.expanded-post {
 
     div.more-menu {
       float: right;
+
+      ul.more-menu-list {
+        top: 24px;
+        height: 118px;
+      }
     }
   }
 
