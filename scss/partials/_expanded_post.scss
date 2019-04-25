@@ -121,6 +121,7 @@ div.expanded-post {
     width: calc(100vw - #{$left_navigation_sidebar_width}px);
     background-color: white;
     min-height: 71px;
+    border-top: 1px solid $ultra_light_grey;
 
     div.expanded-post-fixed-add-comment-inner {
       width: 640px;
