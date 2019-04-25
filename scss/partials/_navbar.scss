@@ -305,13 +305,14 @@ nav.oc-navbar {
             position: relative;
             &:after {
               content: "";
-              width: 8px;
-              height: 8px;
+              width: 12px;
+              height: 12px;
               border-radius: 50%;
               background-color: $carrot_green;
               position: absolute;
               top: 0;
               right: 0;
+              border: 2px solid #FBFAF9;
             }
           }
         }
