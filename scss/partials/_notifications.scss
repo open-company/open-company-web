@@ -38,9 +38,40 @@ div.notifications {
       }
 
       button.notification-dismiss-bt {
-        // background-image: cdnUrl("/img/ML/close_notification_black.svg");
-        content: "Ok";
         color: white;
+      }
+    }
+
+    @include big_web() {
+      &:not(.server-error).light-theme {
+        background-color: white;
+
+        span.slack-icon {
+          background-image: cdnUrl("/img/ML/slack_normal.svg");
+        }
+
+        div.notification-title {
+          color: $light_navy;
+        }
+
+        div.notification-description {
+          color: $light_navy;
+
+          &.oc-mentions span.oc-mention[data-found="true"] {
+            color: $light_navy;
+          }
+        }
+
+        button.notification-button {
+          &.solid-green {
+            color: $carrot_green;
+            background-color: $feint_emerald;
+          }
+
+          &.default-link {
+            color: $light_navy;
+          }
+        }
       }
     }
 
@@ -130,11 +161,6 @@ div.notifications {
       height: 24px;
       padding: 0;
       margin: 0;
-      // background-size: 12px 12px;
-      // background-image: cdnUrl("/img/ML/close_notification_white.svg");
-      // background-position: center;
-      // background-repeat: no-repeat;
-      content: "Ok";
       color: $carrot_green;
     }
 
