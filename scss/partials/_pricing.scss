@@ -56,7 +56,7 @@ div.pricing-wrap {
         color: $deep_navy;
         font-size: 30px;
         line-height: 38px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;
@@ -128,7 +128,7 @@ div.pricing-wrap {
           }
 
           div.tear-subtitle {
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 20px;
             color: $deep_navy;
             line-height: 26px;
@@ -165,7 +165,7 @@ div.pricing-wrap {
 
           div.tear-feature {
             max-width: 200px;
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 20px;
             color: $deep_navy;
             text-align: center;
@@ -399,7 +399,7 @@ div.pricing-wrap {
         }
 
         div.faq-row-answer {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 20px;
           color: $deep_navy;
           margin-top: 8px;

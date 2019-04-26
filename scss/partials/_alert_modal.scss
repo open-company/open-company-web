@@ -81,7 +81,7 @@ div.alert-modal-container {
       }
 
       div.alert-modal-message {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 16px;
         color: $oc_gray_7;
         margin-top: 8px;

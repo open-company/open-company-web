@@ -80,7 +80,7 @@ div.slack-lander-wrap {
         color: $ui_grey;
         font-size: 30px;
         line-height: 38px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         margin: 24px auto 0px;
         z-index: 2;
         position: relative;

@@ -26,7 +26,7 @@ html {
 }
 
 html, body {
-  @include OC_Body_Medium();
+  @include OC_Body_Bold();
   font-size: 16px;
   width: 100%;
   color: $oc_gray_5;
@@ -82,7 +82,7 @@ div.fullscreen-page {
 }
 
 h1, h2, h3, h4, h5, h6, .oc-header {
-  @include OC_Body_Medium();
+  @include OC_Body_Bold();
 }
 
 a {
@@ -156,7 +156,7 @@ div#wrap {
 button.slack-button {
   height: 40px;
   font-size: 15px;
-  @include OC_Body_Medium();
+  @include OC_Body_Bold();
   padding: 8px 5px 5px 5px;
   border-radius: 5px;
   border: 1px solid rgba(78,90,107,0.4);

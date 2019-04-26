@@ -133,7 +133,7 @@ div.search-box {
     background-color: transparent;
     text-align: left;
     padding: 0 0 0 24px;
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 14px;
     color: $deep_navy;
     width: 118px;
@@ -275,7 +275,7 @@ div.search-results {
           overflow: hidden;
           text-overflow: ellipsis;
           color: $deep_navy;
-          @include OC_Body_Medium();
+          @include OC_Body_Bold();
           font-size: 14px;
           max-width: 100%;
           white-space: nowrap;
@@ -285,7 +285,7 @@ div.search-results {
           overflow: hidden;
           text-overflow: ellipsis;
           color: $ui_grey;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 12px;
         }
 
@@ -350,7 +350,7 @@ div.search-results {
     div.message {
       margin: auto;
       width: 100%;
-      @include OC_Body_Medium();
+      @include OC_Body_Book();
       font-size: 14px;
       color: $deep_navy;
     }

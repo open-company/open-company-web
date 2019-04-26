@@ -114,7 +114,7 @@ div.sections-picker {
         }
 
         div.sections-picker-section-name {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $ui_grey;
           float: left;

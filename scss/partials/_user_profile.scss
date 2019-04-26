@@ -120,7 +120,7 @@ div.user-profile {
       }
 
       div.user-profile-header-role {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 18px;
         color: $light_ui_grey;
         margin-left: 64px;
@@ -195,7 +195,7 @@ div.user-profile {
       button {
         float: right;
         margin-left: 24px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
       }
 
@@ -360,7 +360,7 @@ div.user-profile {
 
               div.enable-slack {
                 display: block;
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 13px;
                 color: $deep_navy;
                 margin-top: 8px;
@@ -389,7 +389,7 @@ div.user-profile {
               button.user-type-btn {
                 width: 100%;
                 text-align: left;
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 18px;
                 color: $deep_navy;
@@ -407,7 +407,7 @@ div.user-profile {
 
               li {
                 width: 100%;
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 20px;
                 color: $deep_navy;
@@ -423,7 +423,7 @@ div.user-profile {
               outline: none;
               padding: 10px 16px;
               position: relative;
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 15px;
               color: $deep_navy;
 
@@ -432,7 +432,7 @@ div.user-profile {
               }
 
               @include placeholder() {
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 16px;
                 color: $carrot_light_gray;
               }
