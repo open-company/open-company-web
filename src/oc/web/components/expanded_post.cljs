@@ -8,6 +8,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -37,6 +38,7 @@
   (mention-mixins/oc-mentions-hover)
   {:did-mount (fn [s]
     (save-fixed-comment-height s)
+    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)

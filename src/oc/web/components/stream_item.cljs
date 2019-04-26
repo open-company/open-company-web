@@ -30,9 +30,6 @@
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]))
 
-(defn item-ready [s]
-  (reset! (::item-ready s) true))
-
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
@@ -48,29 +45,21 @@
                          (drv/drv :comments-data)
                          (drv/drv :show-post-added-tooltip)
                          ;; Locals
-                         (rum/local false ::truncated)
-                         (rum/local false ::item-ready)
                          (rum/local false ::should-scroll-to-comments)
                          (rum/local false ::should-scroll-to-card)
-                         (rum/local false ::more-menu-open)
-                         (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin "activity-body" (* 30 3))
-                         am/truncate-comments-mixin
+                         ; (am/truncate-element-mixin "activity-body" (* 30 3))
+                         ; am/truncate-comments-mixin
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
-                           (item-ready s)
                            (let [activity-uuid (:uuid (first (:rum/args s)))]
                              (when (= (router/current-activity-id) activity-uuid)
                                (activity-actions/send-item-read activity-uuid)))
-                           s)
-                          :did-remount (fn [_ s]
-                           (item-ready s)
                            s)
                           :after-render (fn [s]
                            (let [activity-data (first (:rum/args s))
@@ -97,7 +86,7 @@
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        truncated? @(::truncated s)
+        ; truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
         comments-drv (drv/react s :comments-data)
@@ -205,20 +194,8 @@
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            [:div.stream-item-body-container
-              [:div.stream-item-body
-                {:class (utils/class-set {:wrt-item-ready @(::item-ready s)})}
-                [:div.stream-item-body-inner.to-truncate.oc-mentions.oc-mentions-hover
-                  {:ref "activity-body"
-                   :data-itemuuid (:uuid activity-data)
-                   :class (utils/class-set {:hide-images truncated?
-                                            :wrt-truncated truncated?})
-                   :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-                [:div.stream-item-body-inner.no-truncate.oc-mentions.oc-mentions-hover
-                  {:ref "full-activity-body"
-                   :data-itemuuid (:uuid activity-data)
-                   :class (utils/class-set {:wrt-truncated truncated?})
-                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
+            [:div.stream-item-body
+              (:abstract activity-data)]]
           (when (and ls/oc-enable-transcriptions
                      (:video-transcript activity-data))
             [:div.stream-item-transcript

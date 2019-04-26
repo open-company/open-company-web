@@ -626,6 +626,7 @@
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
 (def default-headline "Untitled post")
+(def default-abstract "Summarize why this post matters…")
 
 (def default-drafts-board-name "Drafts")
 
@@ -715,3 +716,8 @@
             (reset! timeout nil)
             (reset! last-call now)
             (apply f args)))))))
+
+(defn observe []
+  (if (.-attachEvent js/window)
+    (fn [el e handler] (.attachEvent el (str "on" e) handler))
+    (fn [el e handler] (.addEventListener el e handler))))

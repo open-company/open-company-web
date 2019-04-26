@@ -209,7 +209,7 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
-(def entry-allowed-keys [:headline :body :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 

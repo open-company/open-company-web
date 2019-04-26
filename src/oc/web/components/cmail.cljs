@@ -88,6 +88,11 @@
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})]))))
 
+(defn- abstract-on-change [state]
+  (let [abstract (rum/ref-node state "abstract")]
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.-value abstract)
+                                                     :has-changes true})])))
+
 ;; Headline setup and paste handler
 
 (defn- setup-headline [state]
@@ -113,6 +118,7 @@
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
+  (abstract-on-change s)
   (body-on-change s))
 
 (defn- clean-body [s]
@@ -126,6 +132,9 @@
 
 (defn- fix-headline [cmail-data]
   (utils/trim (:headline cmail-data)))
+
+(defn- fix-abstract [cmail-data]
+  (utils/trim (:abstract cmail-data)))
 
 (defn- is-publishable? [s cmail-data]
   (and (seq (:board-slug cmail-data))
@@ -172,9 +181,10 @@
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         fixed-headline (fix-headline cmail-data)
+        fixed-abstract (fix-abstract cmail-data)
         published? (= (:status cmail-data) "published")]
       (if (is-publishable? s cmail-data)
-        (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
+        (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline :abstract fixed-abstract})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
           (qsg-actions/finish-create-post-trail)
@@ -278,6 +288,7 @@
                    (rum/local true ::show-placeholder)
                    (rum/local nil ::initial-uuid)
                    (rum/local nil ::headline-input-listener)
+                   (rum/local nil ::abstract-input-listener)
                    (rum/local nil ::uploading-media)
                    (rum/local false ::saving)
                    (rum/local false ::publishing)
@@ -291,6 +302,7 @@
                    (rum/local false ::deleting)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
+                   (mixins/autoresize-textarea "abstract")
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -374,6 +386,9 @@
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
+                    (when @(::abstract-input-listener s)
+                      (events/unlistenByKey @(::abstract-input-listener s))
+                      (reset! (::abstract-input-listener s) nil))
                     (remove-autosave s)
                     s)}
   [s]
@@ -524,6 +539,26 @@
                                   (when (:video-id cmail-data)
                                     (activity-actions/remove-video :cmail-data cmail-data))
                                   (reset! (::record-video s) false))})))
+          ;; Abstract
+          [:div.cmail-content-abstract-title
+            "Why it matters"
+            (when (seq (:abstract cmail-data))
+              [:span.abstract-counter
+                (str (count (:abstract cmail-data)) "/280 characters")])]
+          [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+            {:class utils/hide-class
+             :ref "abstract"
+             :rows 1
+             :placeholder utils/default-abstract
+             :value (:abstract cmail-data)
+             :max-length 280
+             :on-change #(abstract-on-change s)
+             ; :on-click    #(abstract-on-change s)
+             :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.cmail-content-headline]))))}]
+          [:div.cmail-content-separator]
           ; Headline element
           [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
             {:class utils/hide-class
