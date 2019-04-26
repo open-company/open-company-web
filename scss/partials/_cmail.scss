@@ -325,11 +325,6 @@ div.cmail-outer {
           opacity: 0.7;
           cursor: not-allowed;
         }
-
-        &:not(.disabled):hover {
-          background-color: $carrot_orange;
-          color: white;
-        }
       }
 
       button.right-button {
