@@ -50,16 +50,18 @@
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         ; (am/truncate-element-mixin "activity-body" (* 30 3))
-                         ; am/truncate-comments-mixin
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
-                           (let [activity-uuid (:uuid (first (:rum/args s)))]
+                           (let [activity-data (first (:rum/args s))
+                                 activity-uuid (:uuid activity-data)]
                              (when (= (router/current-activity-id) activity-uuid)
-                               (activity-actions/send-item-read activity-uuid)))
+                               (activity-actions/send-item-read activity-uuid))
+                             (when-not (seq (:abstract activity-data))
+                               (js/console.log "DBG truncate-body" (rum/ref-node s :abstract))
+                               (au/truncate-body (rum/ref-node s :abstract) 72)))
                            s)
                           :after-render (fn [s]
                            (let [activity-data (first (:rum/args s))
@@ -194,8 +196,13 @@
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            [:div.stream-item-body
-              (:abstract activity-data)]]
+            (let [has-abstract (seq (:abstract activity-data))]
+              [:div.stream-item-body
+                {:class (when-not has-abstract "truncate-body")
+                 :ref :abstract
+                 :dangerouslySetInnerHTML {:__html (if has-abstract
+                                                     (:abstract activity-data)
+                                                     (:body activity-data))}}])]
           (when (and ls/oc-enable-transcriptions
                      (:video-transcript activity-data))
             [:div.stream-item-transcript

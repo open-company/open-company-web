@@ -337,6 +337,19 @@ div.stream-item {
         color: $deep_navy;
         @include OC_Body_Book();
         line-height: 24px;
+        max-height: 72px;
+        overflow: hidden;
+
+        h2 {
+          color: $deep_navy;
+          @include OC_Body_Book();
+          font-size: 18px;
+          line-height: 24px;
+        }
+
+        img, iframe {
+          display: none;
+        }
       }
     }
 
