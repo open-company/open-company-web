@@ -60,7 +60,6 @@
                              (when (= (router/current-activity-id) activity-uuid)
                                (activity-actions/send-item-read activity-uuid))
                              (when-not (seq (:abstract activity-data))
-                               (js/console.log "DBG truncate-body" (rum/ref-node s :abstract))
                                (au/truncate-body (rum/ref-node s :abstract) 72)))
                            s)
                           :after-render (fn [s]
