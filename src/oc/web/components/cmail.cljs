@@ -550,7 +550,7 @@
              :ref "abstract"
              :rows 1
              :placeholder utils/default-abstract
-             :value (:abstract cmail-data)
+             :value (or (:abstract cmail-data) "")
              :max-length 280
              :on-change #(abstract-on-change s)
              ; :on-click    #(abstract-on-change s)
