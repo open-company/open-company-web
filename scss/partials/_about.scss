@@ -136,7 +136,7 @@ div.about-wrap {
             }
 
             div.user-position {
-              @include OC_Body_Medium();
+              @include OC_Body_Bold();
               font-size: 14px;
               color: $deep_navy;
               margin-top: 8px;
@@ -245,7 +245,7 @@ div.about-wrap {
           }
 
           p {
-            @include OC_Body_Medium();
+            @include OC_Body_Bold();
             font-size: 30px;
             color: $deep_navy;
             text-align: left;
@@ -271,7 +271,7 @@ div.about-wrap {
             }
 
             span.oblique {
-              @include OC_Body_Medium_Italic();
+              @include OC_Body_Bold_Italic();
             }
 
             span.heavy {
@@ -339,7 +339,7 @@ div.about-wrap {
               }
 
               div.about-bottom-copy-description {
-                @include OC_Body_Medium();
+                @include OC_Body_Bold();
                 font-size: 20px;
                 line-height: 26px;
                 color: $deep_navy;
@@ -372,7 +372,7 @@ div.about-wrap {
       }
 
       div.about-alignment {
-        @include OC_Body_Medium();
+        @include OC_Body_Bold();
         font-size: 34px;
         color: $deep_navy;
         margin: 80px auto 0px;

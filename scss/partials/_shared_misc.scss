@@ -161,7 +161,7 @@ section.testimonials-section {
   }
 
   div.testimonials-section-subtitle {
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 24px;
     line-height: 32px;
     color: $deep_navy;
@@ -299,7 +299,7 @@ section.testimonials-section {
       }
 
       div.testimonial-quote {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 18px;
         color: $deep_navy;
         line-height: 22px;
@@ -330,7 +330,7 @@ section.testimonials-section {
         }
 
         div.testimonial-role {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 14px;
           color: rgba($deep_navy, 0.6);
           line-height: 19px;
@@ -742,7 +742,7 @@ section.home-keep-aligned {
                 }
 
                 div.slack-email-switch-bottom-panel-copy {
-                  @include OC_Body_Medium();
+                  @include OC_Body_Book();
                   font-size: 16px;
                   color: $deep_navy;
                   line-height: 20px;
@@ -767,7 +767,7 @@ section.home-keep-aligned {
                 }
 
                 div.slack-email-switch-bottom-panel-role {
-                  @include OC_Body_Medium();
+                  @include OC_Body_Book();
                   font-size: 14px;
                   color: $deep_navy; 
                 }
@@ -1099,7 +1099,7 @@ section.home-keep-aligned {
               }
 
               div.slack-email-switch-bottom-panel-copy {
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 16px;
                 color: $deep_navy;
                 line-height: 20px;
@@ -1124,7 +1124,7 @@ section.home-keep-aligned {
               }
 
               div.slack-email-switch-bottom-panel-role {
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 14px;
                 color: $deep_navy; 
               }
@@ -1145,7 +1145,7 @@ section.home-keep-aligned {
         }
 
         div.keep-aligned-section-copy-subtitle {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 24px;
           color: $deep_navy;
           line-height: 32px;

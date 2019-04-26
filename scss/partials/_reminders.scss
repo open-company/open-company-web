@@ -211,7 +211,7 @@ div.reminders-container {
           }
 
           div.empty-reminders-description {
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 14px;
             color: $ui_grey;
             margin-top: 4px;
@@ -278,7 +278,7 @@ div.reminders-container {
               }
 
               div.reminder-title {
-                @include OC_Body_Medium();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $deep_navy;
                 line-height: 32px;
@@ -297,7 +297,7 @@ div.reminders-container {
                 span.dot {
                   color: $light_ui_grey;
                   font-size: 16px;
-                  @include OC_Body_Medium();
+                  @include OC_Body_Bold();
                 }
               }
 
@@ -308,7 +308,7 @@ div.reminders-container {
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 margin-left: 16px;
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 32px;
                 color: $grey_num_1;
@@ -381,7 +381,7 @@ div.reminders-container {
 
             @include placeholder(){
               color: rgba($deep_navy, 0.5);
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 14px;
               line-height: 22px;
             }
@@ -464,7 +464,7 @@ div.reminders-container {
             margin-top: 8px;
             outline: none;
             position: relative;
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 14px;
             line-height: 22px;
             cursor: pointer;
@@ -523,7 +523,7 @@ div.reminders-container {
               height: 32px;
               padding: 0;
               color: $carrot_orange_2;
-              @include OC_Body_Medium();
+              @include OC_Body_Bold();
               font-size: 14px;
 
               @include mobile() {
@@ -532,7 +532,7 @@ div.reminders-container {
             }
 
             &.cancel-bt {
-              @include OC_Body_Medium();
+              @include OC_Body_Bold();
               font-size: 14px;
               color: $ui_grey;
               padding: 0;

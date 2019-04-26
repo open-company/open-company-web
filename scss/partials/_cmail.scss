@@ -188,7 +188,7 @@ div.cmail-outer {
         display: inline-block;
         width: 40px;
         height: 20px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         color: white;
         font-size: 12px;
         line-height: 20px;
@@ -229,7 +229,7 @@ div.cmail-outer {
         @include tablet() {
           margin-left: 0;
           margin-top: 0;
-          @include OC_Body_Medium();
+          @include OC_Body_Bold();
           font-size: 14px;
         }
       }
@@ -324,11 +324,6 @@ div.cmail-outer {
         &.disabled {
           opacity: 0.7;
           cursor: not-allowed;
-        }
-
-        &:not(.disabled):hover {
-          background-color: $carrot_orange;
-          color: white;
         }
       }
 
@@ -555,7 +550,7 @@ div.cmail-outer {
           margin: 8px 0px 0px;
           cursor: text;
           color: $deep_navy;
-          @include OC_Body_Medium();
+          @include OC_Body_Bold();
           height: auto;
 
           @include big_web() {
@@ -648,7 +643,7 @@ div.cmail-outer {
           width: calc(100% - 40px);
 
           div.edit-tooltip {
-            @include OC_Body_Medium();
+            @include OC_Body_Bold();
             font-size: 14px;
             color: $deep_navy;
             line-height: 18px;
@@ -785,7 +780,7 @@ div.cmail-outer {
 
       div.saving-saved {
         height: 35px;
-        @include OC_Body_Medium();
+        @include OC_Body_Bold();
         color: $light_ui_grey;
         font-size: 14px;
         line-height: 46px;

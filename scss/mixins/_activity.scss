@@ -112,7 +112,7 @@ $h2_top_margin: 24;
     padding-top: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
-    @include OC_Body_Medium();
+    @include OC_Body_Bold();
     color: $ui_grey;
     font-size: 12px;
     white-space: nowrap;
@@ -293,7 +293,7 @@ $h2_top_margin: 24;
   }
 
   b, strong{
-    @include OC_Body_Medium();
+    @include OC_Body_Bold();
     color: $color;
     letter-spacing: normal !important;
   }
@@ -423,7 +423,7 @@ $h2_top_margin: 24;
 
     label.media-attachment-title {
       font-size: 13px;
-      @include OC_Body_Medium();
+      @include OC_Body_Bold();
       color: $carrot_dark_gray;
       margin-left: 8px;
     }

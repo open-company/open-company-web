@@ -149,7 +149,7 @@ div.activity-share-modal-container {
       div.mediums-box {
         
         div.medium {
-          @include OC_Body_Medium();
+          @include OC_Body_Bold();
           color: $carrot_dark_gray;
           font-size: 16px;
 
@@ -195,7 +195,7 @@ div.activity-share-modal-container {
               }
 
               div.labels {
-                @include OC_Body_Medium();
+                @include OC_Body_Bold();
                 font-size: 15px;
                 color: $deep_navy;
                 padding-top: 8px;
@@ -210,7 +210,7 @@ div.activity-share-modal-container {
                   min-height: 77px;
                   border-radius: 4px;
                   background-color: white;
-                  @include OC_Body_Medium();
+                  @include OC_Body_Bold();
                   font-size: 14px;
                   color: $oc_gray_7;
                   padding: 0.4rem 0.8rem;
@@ -223,7 +223,7 @@ div.activity-share-modal-container {
                   height: 40px;
                   border-radius: 4px;
                   background-color: white;
-                  @include OC_Body_Medium();
+                  @include OC_Body_Bold();
                   font-size: 14px;
                   color: $oc_gray_7;
                   padding: 0.4rem 0.8rem;
@@ -281,14 +281,6 @@ div.activity-share-modal-container {
         min-height: calc(100vh - 56px);
       }
 
-      div.url-audience-description {
-        @include OC_Body_Medium();
-        font-size: 12px;
-        line-height: 18px;
-        color: $ui_grey;
-        margin-top: 24px;
-      }
-
       button.checkbox-row {
         height: 18px;
         cursor: pointer;
@@ -304,7 +296,7 @@ div.activity-share-modal-container {
           display: block;
           float: left;
           line-height: 18px;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 12px;
           color: $deep_navy;
           margin-left: 8px;

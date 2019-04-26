@@ -148,7 +148,7 @@ div.notifications {
       &.oc-mentions span.oc-mention[data-found="true"] {
         background-color: transparent !important;
         color: white !important;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
       }
 
       a {

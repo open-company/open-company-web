@@ -52,7 +52,7 @@ div.ph-banner {
     }
 
     div.ph-banner-copy {
-      @include OC_Body_Medium();
+      @include OC_Body_Bold();
       color: white;
       font-size: 16px;
       text-align: left;

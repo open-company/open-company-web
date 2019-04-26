@@ -116,7 +116,7 @@ div.org-settings {
 
       div.org-url {
         margin-left: 64px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 18px;
         color: $light_ui_grey;
         text-overflow: ellipsis;
@@ -140,7 +140,7 @@ div.org-settings {
 
         &.cancel-btn {
           background-color: transparent;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 16px;
           color: $ui_grey;
         }
@@ -185,7 +185,7 @@ div.org-settings {
           outline: none;
           padding: 10px 16px;
           position: relative;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 16px;
           color: $carrot_dark_gray;
           resize: none;
@@ -205,7 +205,7 @@ div.org-settings {
           }
 
           @include placeholder() {
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 16px;
             color: $light_ui_grey;
           }
@@ -252,7 +252,7 @@ div.org-settings {
               td {
                 padding: 16px 0;
                 border-bottom: 1px solid rgba($carrot_light_gray_1, 0.2);
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 16px;
                 color: $deep_navy;
               }
@@ -270,7 +270,7 @@ div.org-settings {
 
             .org-settings-list-item-name {
               float: left;
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 16px;
               color: $carrot_dark_gray;
             }
@@ -293,13 +293,13 @@ div.org-settings {
 
         .org-settings-label {
           width: 100%;
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 15px;
           color: $deep_navy;
           margin-bottom: 8px;
 
           label {
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 15px;
             color: $deep_navy;
             margin-bottom: 0px;

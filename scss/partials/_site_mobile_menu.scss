@@ -35,7 +35,7 @@ div.site-mobile-menu {
       padding: 12px 0px;
 
       a {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 28px;
         color: $ui_grey;
         
