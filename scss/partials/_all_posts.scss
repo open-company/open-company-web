@@ -58,7 +58,7 @@ div.all-posts {
           width: 100%;
           color: rgba($oc_gray_7, 0.5);
           font-size: 16px;
-          @include OC_Body_Medium();
+          @include OC_Body_Bold();
           text-align: center;
 
           @include mobile() {

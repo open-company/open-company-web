@@ -75,7 +75,7 @@ div.oc-mention-panel {
         max-width: 100%;
         height: 18px;
         line-height: 18px;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         color: white;
         font-size: 12px;
         opacity: 0.8;
@@ -145,7 +145,7 @@ div.oc-mention-popup {
   }
 
   div.oc-mention-popup-subline {
-    @include OC_Body_Medium();
+    @include OC_Body_Book();
     font-size: 12px !important;
     color: rgba(white, 0.8) !important;
     text-align: left;

@@ -42,7 +42,7 @@
 
 div.fsp-picker {
   background-color: $carrot_modal_bg !important;
-  @include OC_Body_Medium();
+  @include OC_Body_Book();
 
   div.fsp-modal {
     background-color: white;
@@ -249,7 +249,7 @@ div.fsp-picker {
             div.fsp-text__title.fsp-source-auth__el {
               color: transparent;
               position: relative;
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
 
               &:after {
                 content: "Select a file to upload";
@@ -292,7 +292,7 @@ div.fsp-picker {
             div.fsp-drop-area__title.fsp-text__title {
               color: transparent;
               position: relative;
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
 
               &:after {
                 content: "Select a file to upload";

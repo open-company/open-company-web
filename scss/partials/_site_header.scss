@@ -429,7 +429,7 @@ nav.site-navbar {
       }
 
       a {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         padding: 0px 12px;
         display: inline-block;
         font-size: 18px;
