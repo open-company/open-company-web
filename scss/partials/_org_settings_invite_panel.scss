@@ -6,7 +6,7 @@ div.org-settings div.org-settings-inner {
 
       div.invite-from-label {
         float: left;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 15px;
         color: $ui_grey;
         line-height: 24px;
@@ -41,7 +41,7 @@ div.org-settings div.org-settings-inner {
         margin-top: 0;
 
         span.slack-copy {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 13px;
           color: $deep_navy;
           line-height: 24px;
@@ -51,7 +51,7 @@ div.org-settings div.org-settings-inner {
         }
 
         button.add-slack-team {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 13px;
           color: $deep_navy;
           line-height: 24px;
@@ -84,7 +84,7 @@ div.org-settings div.org-settings-inner {
 
       button.add-button {
         color: $carrot_green;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 13px;
         padding: 0px;
       }
@@ -99,7 +99,7 @@ div.org-settings div.org-settings-inner {
         tbody, thead {
 
           tr th {
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 15px;
             color: $deep_navy;
           }
@@ -137,7 +137,7 @@ div.org-settings div.org-settings-inner {
 
             div.slack-users-dropdown div.slack-users-dropdown-list div.user {
               @include user-profile(24);
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 15px;
               color: $deep_navy;
 
@@ -156,7 +156,7 @@ div.org-settings div.org-settings-inner {
                 text-align: left;
                 border: 1px solid rgba($carrot_light_gray_1, 0.5);
                 border-radius: 4px;
-                @include OC_Body_Medium();
+                @include OC_Body_Book();
                 font-size: 15px;
                 color: $deep_navy;
                 background-color: white;

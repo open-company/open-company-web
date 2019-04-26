@@ -44,7 +44,7 @@ div.media-video-modal-container {
     background-color: white;
     border: 1px solid rgba(177,184,192,0.50);
     padding: 10px 17px;
-    @include OC_Body_Medium();
+    @include OC_Body_Bold();
     font-size: 14px;
     line-height: 24px;
     color: $deep_navy;
@@ -58,7 +58,7 @@ div.media-video-modal-container {
   }
 
   span.middle-or {
-    @include OC_Body_Medium();
+    @include OC_Body_Bold();
     font-size: 14px;
     color: $deep_navy;
     margin-left: 16px;

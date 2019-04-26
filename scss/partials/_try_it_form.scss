@@ -11,7 +11,7 @@ div.try-it-combo-field {
       border-bottom-left-radius: 100px;
       width: 322px;
       height: 48px;
-      @include OC_Body_Medium();
+      @include OC_Body_Book();
       font-size: 16px;
       color: $carrot_dark_brown;
       padding: 11px 20px 10px;
@@ -108,7 +108,7 @@ div.get-started-button {
       color: white;
 
       span.login {
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         text-decoration: underline;
       }
     }

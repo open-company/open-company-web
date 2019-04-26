@@ -84,7 +84,7 @@ div.org-settings div.org-settings-inner {
 
       div.org-settings-list-item {
         div.org-settings-list-item-name {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 16px;
           color: $carrot_dark_gray;
         }
@@ -143,7 +143,7 @@ div.org-settings div.org-settings-inner {
           width: 390px;
 
           @include placeholder(){
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             color: $ui_grey;
             font-size: 16px;
           }
@@ -301,7 +301,7 @@ div.org-settings div.org-settings-inner {
           }
 
           div.org-settings-list-item-desc {
-            @include OC_Body_Medium();
+            @include OC_Body_Book();
             font-size: 14px;
             color: $deep_navy;
             line-height: 20px;
@@ -309,7 +309,7 @@ div.org-settings div.org-settings-inner {
             float: none;
 
             div.slack-org-self-join {
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 12px;
               color: $deep_navy;
               opacity: 0.5;
@@ -318,7 +318,7 @@ div.org-settings div.org-settings-inner {
             }
 
             div.slack-org-bot-switch {
-              @include OC_Body_Medium();
+              @include OC_Body_Book();
               font-size: 13px;
               color: $deep_navy;
               margin-top: 16px;
@@ -413,7 +413,7 @@ div.org-settings div.org-settings-inner {
       margin-left: 0px;
       height: 32px;
       background-color: transparent;
-      @include OC_Body_Medium();
+      @include OC_Body_Book();
       font-size: 16px;
       color: $grey_num_1;
       padding: 0;

@@ -35,7 +35,7 @@ div.carrot-box-container {
     }
 
     div.thanks-headline {
-      @include OC_Body_Medium();
+      @include OC_Body_Bold();
       font-size: 32px;
       color: $carrot_gray;
 
@@ -45,7 +45,7 @@ div.carrot-box-container {
     }
 
     div.thanks-subheadline {
-      @include OC_Body_Medium();
+      @include OC_Body_Bold();
       font-size: 16px;
       color: $oc_gray_7;
 
@@ -55,7 +55,7 @@ div.carrot-box-container {
     }
 
     div.carrot-early-access-top {
-      @include OC_Body_Medium();
+      @include OC_Body_Bold();
       font-size: 16px;
       margin-top: 20px;
     }

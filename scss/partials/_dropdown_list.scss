@@ -41,7 +41,7 @@ div.dropdown-list-container {
         padding: 5px 12px 3px;
         margin: 3px 0;
         cursor: pointer;
-        @include OC_Body_Medium();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_light_gray_3;
         cursor: pointer;
@@ -95,7 +95,7 @@ div.dropdown-list-container {
         }
 
         span.dropdown-list-item-label {
-          @include OC_Body_Medium();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $carrot_light_gray_3;
           max-width: 100%;

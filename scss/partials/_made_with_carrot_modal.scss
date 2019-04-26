@@ -69,7 +69,7 @@ div.made-with-carrot-modal-container {
       }
 
       div.made-wih-carrot-subtitle {
-        @include OC_Body_Medium();
+        @include OC_Body_Bold();
         font-size: 20px;
         color: #4D4D4D;
         margin: 32px auto;
