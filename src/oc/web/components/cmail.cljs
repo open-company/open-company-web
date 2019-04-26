@@ -354,16 +354,11 @@
                                 (real-close)
                                 (utils/after
                                  180
-                                 #(let [from-ap (or (:from-all-posts @router/path)
-                                                    (= (router/current-board-slug) "all-posts"))
-                                        go-to-ap (and (not (:new-section cmail-data))
-                                                      from-ap)]
+                                 #(let [org-slug (router/current-org-slug)
+                                        board-slug (:board-slug cmail-data)
+                                        post-url (oc-urls/entry org-slug board-slug (:uuid cmail-data))]
                                     ;; Redirect to AP if coming from it or if the post is not published
-                                    (router/nav!
-                                      (if go-to-ap
-                                        (oc-urls/all-posts (router/current-org-slug))
-                                        (oc-urls/board (router/current-org-slug)
-                                         (:board-slug cmail-data)))))))
+                                    (router/nav! post-url))))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
