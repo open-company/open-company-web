@@ -96,8 +96,6 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :qsg)
-                  ;; Mixins
-                  mixins/no-scroll-mixin
   [s]
   (let [{:keys [expanded-user-menu org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
