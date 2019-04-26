@@ -76,6 +76,9 @@
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+      (when (seq (:abstract activity-data))
+        [:div.expanded-post-abstract
+          (:abstract activity-data)])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
