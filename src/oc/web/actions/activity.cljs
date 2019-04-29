@@ -709,7 +709,7 @@
     (ws-cc/item-seen publisher-id container-id activity-id)
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
-(defn- send-item-read
+(defn send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
   [activity-id]
@@ -719,7 +719,8 @@
               container-id (:board-uuid activity-data)
               user-name (jwt/get-key :name)
               avatar-url (jwt/get-key :avatar-url)]
-    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)
+    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])))
 
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
@@ -931,3 +932,14 @@
                                 {:fullscreen true :auto true}
                                 {})]
       (cmail-show fixed-activity-data initial-cmail-state))))
+
+(defn mark-unread [activity-data]
+  (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
+    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
+    (api/mark-unread mark-unread-link
+     (fn [{:keys [error success]}]
+      (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
+                                               :description (when error "Please try again")
+                                               :dismiss true
+                                               :expire 5
+                                               :id (if success :mark-unread-success :mark-unread-error)})))))

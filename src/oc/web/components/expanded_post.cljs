@@ -50,6 +50,7 @@
   (mention-mixins/oc-mentions-hover)
   {:did-mount (fn [s]
     (save-fixed-comment-height s)
+    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -98,8 +99,7 @@
                           :height (:height video-size)
                           :lazy (not video-player-show)
                           :video-image (:video-image activity-data)
-                          :video-processed (:video-processed activity-data)
-                          :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})])
+                          :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
         (:headline activity-data)]
       [:div.expanded-post-author

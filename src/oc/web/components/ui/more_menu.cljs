@@ -70,6 +70,7 @@
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
+        mark-unread-link (utils/link-for (:links activity-data) "mark-unread")
         editable-boards (drv/react s :editable-boards)]
     (when (or edit-link
               share-link
@@ -127,7 +128,15 @@
                               (when (fn? will-close)
                                 (will-close))
                               (activity-actions/activity-share-show activity-data share-container-id))}
-                "Share"])])
+                "Share"])
+            (when mark-unread-link
+              [:li.unread
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/mark-unread activity-data))}
+                "Mark unread"])])
         (when (and external-share
                    share-link
                    (not (responsive/is-tablet-or-mobile?)))

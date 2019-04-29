@@ -28,6 +28,8 @@
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
+(def ^:private change-endpoint ls/change-server-domain)
+
 (def ^:private search-endpoint ls/search-server-domain)
 
 (def ^:private reminders-endpoint ls/reminder-server-domain)
@@ -186,6 +188,8 @@
 (def ^:private pay-http (partial req pay-endpoint))
 
 (def ^:private interaction-http (partial req interaction-endpoint))
+
+(def ^:private change-http (partial req change-endpoint))
 
 (def ^:private search-http (partial req search-endpoint))
 
@@ -837,7 +841,7 @@
     (reminders-http (method-for-link roster-link) (relative-href roster-link)
      {:headers (headers-for-link roster-link)}
      callback)
-    (handle-missing-link "ger-reminders-roster" roster-link callback)))
+    (handle-missing-link "get-reminders-roster" roster-link callback)))
 
 ;; WRT
 
@@ -848,3 +852,12 @@
 (defn request-reads-count [item-ids]
   (when (seq item-ids)
     (ws-cc/who-read-count item-ids)))
+
+;; Change service http
+
+(defn mark-unread [mark-unread-link callback]
+  (if mark-unread-link
+    (change-http (method-for-link mark-unread-link) (relative-href mark-unread-link)
+     {:headers (headers-for-link mark-unread-link)}
+     callback)
+    (handle-missing-link "mark-unread" mark-unread-link callback)))
