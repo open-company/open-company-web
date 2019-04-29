@@ -7,17 +7,15 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :team)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:org-settings] nil]))
+  (nav-actions/show-org-settings nil))
 
 (defn dismiss-modal [& [s]]
   (if s
@@ -100,7 +98,7 @@
           [:div.team-management-header-title
             "Integrations"]
           [:button.mlb-reset.save-bt
-            {:on-click #(show-modal :invite)}
+            {:on-click #(nav-actions/show-org-settings :invite)}
             "Invite"]
           [:button.mlb-reset.cancel-bt
             {:on-click #(dismiss-modal s)}

@@ -17,17 +17,16 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.org-settings :as org-settings]
-            [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn real-menu-close []
-  (dis/dispatch! [:input [:expanded-user-menu] false]))
+  ; (dis/dispatch! [:input [:expanded-user-menu] false])
+  (nav-actions/menu-close))
 
-(defn menu-toggle []
-  (dis/dispatch! [:update [:expanded-user-menu] not]))
+; (defn menu-toggle []
+;   (dis/dispatch! [:update [:expanded-user-menu] not]))
 
 (defn menu-close [& [s]]
   (if s
@@ -42,39 +41,32 @@
 (defn user-profile-click [s e]
   (.preventDefault e)
   (qsg-actions/next-profile-photo-trail)
-  (if (responsive/is-tablet-or-mobile?)
-    (user-profile/show-modal :profile)
-    (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
+  (nav-actions/show-user-settings :profile)
   (menu-close s))
 
 (defn notifications-settings-click [s e]
   (.preventDefault e)
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
+  (nav-actions/show-user-settings :notifications))
 
 (defn team-settings-click [s e qsg-data]
   (.preventDefault e)
   (when (= (:step qsg-data) :company-logo-2)
     (qsg-actions/next-company-logo-trail))
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
+  (nav-actions/show-org-settings :org))
 
 (defn manage-team-click [s e]
   (.preventDefault e)
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
+  (nav-actions/show-org-settings :team))
 
 (defn invite-team-click [s e  qsg-data]
   (.preventDefault e)
   (when (= (:step qsg-data) :invite-team-2)
     (qsg-actions/finish-invite-team-trail))
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
+  (nav-actions/show-org-settings :invite))
 
 (defn integrations-click [s e]
   (.preventDefault e)
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :integrations)))
+  (nav-actions/show-org-settings :integrations))
 
 (defn sign-in-sign-up-click [s e]
   (menu-close s)
@@ -94,7 +86,6 @@
   (.preventDefault e)
   (when (= (:step qsg-data) :create-reminder-2)
     (qsg-actions/finish-create-reminder-trail))
-  (menu-close s)
   (nav-actions/show-reminders))
 
 (rum/defcs menu < rum/reactive
@@ -209,10 +200,8 @@
         ;       "Billing"]])
         [:div.oc-menu-separator]
         [:a.whats-new-link
-          (if is-mobile?
-            {:href "https://whats-new.carrot.io/"
-             :target "_blank"}
-            {:on-click (partial whats-new-click s)})
+          {:href "https://whats-new.carrot.io/"
+           :target "_blank"}
           [:div.oc-menu-item.whats-new
             "What’s New"]]
         (when (and (not is-mobile?)

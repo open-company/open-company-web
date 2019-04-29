@@ -12,16 +12,13 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.utils.user :as user-utils]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.components.org-settings :as org-settings]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:user-settings] (or panel :notifications)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:user-settings] nil]))
+  (nav-actions/show-user-settings nil))
 
 (defn dismiss-modal [& [s]]
   (if s
@@ -42,7 +39,7 @@
 (defn add-slack-clicked [current-user-data]
   (let [switch-cb (fn []
                    (dismiss-modal)
-                   (utils/after 150 #(org-settings/show-modal :main)))]
+                   (utils/after 150 #(nav-actions/show-org-settings :main)))]
     (if (:has-changes current-user-data)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "user-profile-unsaved-edits"

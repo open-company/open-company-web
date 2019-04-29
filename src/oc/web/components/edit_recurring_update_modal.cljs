@@ -15,11 +15,9 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:show-reminders] (or panel :new)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:show-reminders] nil]))
+  ; (dis/dispatch! [:input [:show-reminders] nil])
+  (nav-actions/close-reminders))
 
 (defn dismiss-modal [& [s]]
   (if s
@@ -82,6 +80,11 @@
                (not (utils/event-inside? e (rum/ref-node s :on-bt))))
       (reset! (::frequency-dropdown s) false)
       (reset! (::on-dropdown s) false))))
+  {:did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)}
   [s]
   (let [appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
@@ -116,7 +119,7 @@
             [:button.mlb-reset.save-bt
               {:on-click #(when-not save-disabled?
                             (reminder-actions/save-reminder reminder-data)
-                            (show-modal :reminders))
+                            (nav-actions/close-reminders))
                :class (when save-disabled? "disabled")}
               "Save"])
           [:button.mlb-reset.cancel-bt

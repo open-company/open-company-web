@@ -148,8 +148,8 @@
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
-   :org-settings        [[:base] (fn [base] (:org-settings base))]
-   :user-settings       [[:base] (fn [base] (:user-settings base))]
+   ; :org-settings        [[:base] (fn [base] (:org-settings base))]
+   ; :user-settings       [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
@@ -176,7 +176,6 @@
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
-   :show-reminders      [[:base] (fn [base] (:show-reminders base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
@@ -265,12 +264,12 @@
    :section-editing     [[:base]
                           (fn [base]
                             (:section-editing base))]
-   :show-section-editor [[:base]
-                          (fn [base]
-                            (:show-section-editor base))]
-   :show-section-add    [[:base]
-                          (fn [base]
-                            (:show-section-add base))]
+   ; :show-section-editor [[:base]
+   ;                        (fn [base]
+   ;                          (:show-section-editor base))]
+   ; :show-section-add    [[:base]
+   ;                        (fn [base]
+   ;                          (:show-section-add base))]
    :show-sections-picker [[:base]
                           (fn [base]
                             (:show-sections-picker base))]
@@ -294,8 +293,9 @@
                                                                  :mobile-navigation-sidebar
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
-                                                                 :user-settings
-                                                                 :org-settings
+                                                                 ; :user-settings
+                                                                 ; :org-settings
+                                                                 :panel-stack
                                                                  :search-active
                                                                  :mobile-user-notifications])]
                               (-> navbar-data
@@ -330,35 +330,35 @@
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
-                            :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :expanded-user-menu :jwt :wrt-show :show-reminders]
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data
+                            :ap-initial-at :show-sections-picker :entry-editing
+                            :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
-                                 ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing expanded-user-menu jwt wrt-show show-reminders]
+                                 ap-initial-at show-sections-picker entry-editing jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :container-data container-data
                                :board-data board-data
                                :posts-data filtered-posts
-                               :org-settings-data (:org-settings base)
-                               :show-reminders show-reminders
-                               :user-settings (:user-settings base)
+                               ; :org-settings-data (:org-settings base)
+                               ; :show-reminders show-reminders
+                               ; :user-settings (:user-settings base)
+                               :panel-stack (:panel-stack base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at
-                               :show-section-editor show-section-editor
-                               :show-section-add show-section-add
+                               ; :show-section-editor show-section-editor
+                               ; :show-section-add show-section-add
                                :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :expanded-user-menu expanded-user-menu
+                               ; :expanded-user-menu expanded-user-menu
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :wrt-activity-data (when wrt-show

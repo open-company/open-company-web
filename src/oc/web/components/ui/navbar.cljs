@@ -120,8 +120,8 @@
                                   (menu/menu-close)
                                   (when (or org-settings
                                           user-settings)
-                                    (dis/dispatch! [:input [:user-settings] nil])
-                                    (dis/dispatch! [:input [:org-settings] nil]))
+                                    (nav-actions/show-user-settings nil)
+                                    (nav-actions/show-org-settings nil))
                                   (user-actions/show-mobile-user-notifications))}])
                 (when can-compose?
                   [:button.mlb-reset.mobile-compose-bt
@@ -147,7 +147,7 @@
                                        (qsg-actions/next-company-logo-trail))
                                      (when (= (:step qsg-data) :create-reminder-1)
                                        (qsg-actions/next-create-reminder-trail))
-                                     (menu/menu-toggle)
+                                     (nav-actions/menu-toggle)
                                      ;; Dismiss the QSG tooltip is it's open
                                      (when (:show-qsg-tooltip? qsg-data)
                                        (qsg-actions/dismiss-qsg-tooltip)))})

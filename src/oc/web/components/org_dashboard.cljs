@@ -108,7 +108,8 @@
                 wrt-activity-data
                 wrt-read-data
                 force-login-wall
-                expanded-user-menu]} (drv/react s :org-dashboard-data)
+                expanded-user-menu
+                panel-stack]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -167,7 +168,8 @@
                         (not show-activity-removed)
                         loading?)
         is-showing-mobile-search (and is-mobile? search-active?)
-        qsg-data (drv/react s :qsg)]
+        qsg-data (drv/react s :qsg)
+        open-panel (last panel-stack)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -183,7 +185,7 @@
         (login-overlays-handler)
         (cond
           ;; User menu
-          expanded-user-menu
+          (= open-panel :menu)
           (menu)
           ;; Activity removed
           show-activity-removed
@@ -192,44 +194,44 @@
           show-activity-not-found
           (activity-not-found)
           ;; Org settings
-          (and org-settings-data (= org-settings-data :main))
+          (= open-panel :org)
           (org-settings-modal)
           ;; Integrations settings
-          (and org-settings-data (= org-settings-data :integrations))
+          (= open-panel :integrations)
           (integrations-settings-modal)
           ;; Invite settings
-          (and org-settings-data (= org-settings-data :invite))
+          (= open-panel :invite)
           (invite-settings-modal)
           ;; Team management
-          (and org-settings-data (= org-settings-data :team))
+          (= open-panel :team)
           (team-management-modal)
           ;; Billing
-          org-settings-data
+          (= open-panel :billing)
           (org-settings)
           ;; User settings
-          (and user-settings (= user-settings :profile))
+          (= open-panel :profile)
           (user-profile-modal)
           ;; User notifications
-          (and user-settings (= user-settings :notifications))
+          (= open-panel :notifications)
           (user-notifications-modal)
           ;; Reminders list
-          (and show-reminders (= show-reminders :reminders))
+          (= open-panel :reminders)
           (recurring-updates-modal)
           ;; Edit a reminder
-          show-reminders
+          (and open-panel (clojure.string/starts-with? (name open-panel) "reminder-"))
           (edit-recurring-update-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
           ;; Mobile create a new section
-          show-section-editor
+          (= open-panel :section-edit)
           (section-editor board-data
            (fn [sec-data note]
             (if sec-data
-              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-editor] false]))
-              (dis/dispatch! [:input [:show-section-editor] false]))))
+              (section-actions/section-save sec-data note #(nav-actions/hide-section-editor))
+              (nav-actions/hide-section-editor))))
           ;; Mobile edit current section data
-          show-section-add
+          (= open-panel :section-add)
           (section-editor nil show-section-add-cb)
           ;; Activity share for mobile
           (and is-mobile?
@@ -282,9 +284,7 @@
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
                               (not mobile-navigation-sidebar)
-                              (not org-settings-data)
-                              (not user-settings)
-                              (not expanded-user-menu)
+                              (not open-panel)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]

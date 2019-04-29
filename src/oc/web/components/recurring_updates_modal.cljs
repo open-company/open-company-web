@@ -6,14 +6,12 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:show-reminders] (or panel :reminders)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:show-reminders] nil]))
+  (nav-actions/close-reminders))
 
 (defn dismiss-modal [& [s]]
   (if s
@@ -32,7 +30,12 @@
   {:did-mount (fn [s]
     (reminder-actions/load-reminders-roster)
     (reminder-actions/load-reminders)
-    s)}
+    s)
+   :did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)}
   [s]
   (let [appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
@@ -49,7 +52,7 @@
           [:div.recurring-updates-modal-header-title
             "Recurring updates"]
           [:button.mlb-reset.new-recurring-update-bt
-            {:on-click #(show-modal :new)}
+            {:on-click #(reminder-actions/new-reminder)}
             "New"]]
         [:div.recurring-updates-list
           (for [reminder reminders-list

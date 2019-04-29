@@ -10,8 +10,8 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
-            [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -22,8 +22,7 @@
 ;; Dismiss modal
 
 (defn dismiss []
-  (dis/dispatch! [:input [:show-section-editor] false])
-  (dis/dispatch! [:input [:show-section-add] false]))
+  (nav-actions/pop-panel))
 
 (defn dismiss-modal [& [s]]
   (if s
@@ -380,7 +379,7 @@
                           [:div.name
                             "Looks like you'll need to invite more people to your team before you can add them. You can do that in "
                             [:a
-                              {:on-click #(org-settings/show-modal :invite)}
+                              {:on-click #(nav-actions/show-org-settings :invite)}
                               "Carrot team settings"]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")

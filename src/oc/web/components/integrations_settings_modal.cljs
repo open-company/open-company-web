@@ -8,14 +8,12 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :integrations)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:org-settings] nil]))
+  (nav-actions/show-org-settings nil))
 
 (defn dismiss-modal [& [s]]
   (if s

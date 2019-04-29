@@ -14,6 +14,7 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -153,7 +154,7 @@
                            :on-click #(do
                                         (when (:show-section-settings-tooltip qsg-data)
                                           (qsg-actions/dismiss-section-settings-tooltip))
-                                        (dis/dispatch! [:input [:show-section-editor] true]))}]
+                                        (nav-actions/show-section-editor))}]
                       (when (:show-section-settings-tooltip qsg-data)
                         [:div.section-settings-tooltip-container.group
                           [:div.section-settings-tooltip-top-arrow]

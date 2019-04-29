@@ -13,16 +13,14 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :main)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:org-settings] nil]))
+  (nav-actions/show-org-settings nil))
 
 (defn dismiss-modal [& [s]]
   (if s

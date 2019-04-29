@@ -444,11 +444,6 @@
     (when (> (- now latest-auth-settings) reload-time)
       (auth-settings-get))))
 
-;; User profile tab
-
-(defn change-user-profile-panel [panel]
-  (dis/dispatch! [:input [:user-settings] panel]))
-
 ;; User notifications
 
 (defn read-notifications []

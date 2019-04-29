@@ -14,6 +14,7 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
@@ -25,11 +26,8 @@
 
 ;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :main)]))
-
 (defn dismiss-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] nil]))
+  (nav-actions/show-org-settings nil))
 
 (rum/defc org-settings-tabs
   [org-data active-tab]
@@ -40,14 +38,14 @@
         {:class (when (= :main active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :main))}
+           :on-click #(do (utils/event-stop %) (nav-actions/show-org-settings :org))}
           "SETTINGS"]])
     (when (utils/is-admin? org-data)
       [:div.org-settings-tab
         {:class (when (= :team active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :team))}
+           :on-click #(do (utils/event-stop %) (nav-actions/show-org-settings :team))}
           "MANAGE TEAM"]])
     (when (utils/is-admin-or-author? org-data)
       [:div.org-settings-tab
@@ -56,7 +54,7 @@
           {:href "#"
            :on-click (fn [e]
                        (utils/event-stop e)
-                       (show-modal :invite))}
+                       (nav-actions/show-org-settings :invite))}
           "INVITE PEOPLE"]])])
 
 (defn close-clicked [s]

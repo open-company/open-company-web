@@ -18,11 +18,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:user-settings] (or panel :profile)]))
-
 (defn real-close []
-  (dis/dispatch! [:input [:user-settings] nil]))
+  (nav-actions/show-user-settings nil))
 
 (defn dismiss-modal [& [s]]
   (if s

@@ -156,12 +156,12 @@
           [:div.user-profile-bottom-line]
           [:div.user-profile-tab-header
             {:class (when (= tab :profile) "active")
-             :on-click #(user-actions/change-user-profile-panel :profile)}
+             :on-click #(nav-actions/show-user-settings :profile)}
             [:a.user-profile-tab-link
               "PERSONAL PROFILE"]]
           [:div.user-profile-tab-header
             {:class (when (= tab :notifications) "active")
-             :on-click #(user-actions/change-user-profile-panel :notifications)}
+             :on-click #(nav-actions/show-user-settings :notifications)}
             [:a.user-profile-tab-link
               "NOTIFICATIONS"]]]
         (if (= tab :notifications)

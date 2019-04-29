@@ -10,7 +10,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
-            [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.json :refer (json->cljs)]
