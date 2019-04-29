@@ -18,17 +18,15 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.routing :as routing-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.stream-comments :refer (stream-comments)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
-            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
 (defn item-ready [s]
   (reset! (::item-ready s) true))
