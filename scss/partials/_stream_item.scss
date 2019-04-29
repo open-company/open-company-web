@@ -84,13 +84,6 @@ div.stream-item {
     }
   }  
 
-  div.activity-share-container {
-    div.activity-share-modal-container {
-      right: -9px;
-      margin-top: 0;
-    }
-  }
-
   div.stream-item-header {
     position: relative;
 
@@ -579,6 +572,13 @@ div.stream-item {
       @include mobile() {
         margin-top: 16px;
         height: 24px;
+      }
+    }
+
+    div.activity-share-container {
+      div.activity-share-modal-container {
+        right: -9px;
+        margin-top: -280px;
       }
     }
 
