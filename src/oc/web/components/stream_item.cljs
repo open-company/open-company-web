@@ -30,6 +30,20 @@
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]))
 
+(defn- check-item-ready
+  "After component is mounted/re-mounted "
+  [s]
+  (let [activity-data (first (:rum/args s))
+        $item-body (js/$ (rum/ref-node s :abstract))
+        comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+    (when (or (.hasClass $item-body "ddd-truncated")
+              (pos? (count (:attachments activity-data)))
+              (pos? (count comments-data))
+              (:body-thumbnail activity-data)
+              (:fixed-video-id activity-data))
+      (reset! (::truncated s) true))
+    (reset! (::item-ready s) true)))
+
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
@@ -38,6 +52,16 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- item-mounted [s]
+  (let [activity-data (first (:rum/args s))
+        activity-uuid (:uuid activity-data)
+        comments-data @(drv/get-ref s :comments-data)]
+    (when (= (router/current-activity-id) activity-uuid)
+      (activity-actions/send-item-read activity-uuid))
+    (when-not (seq (:abstract activity-data))
+      (au/truncate-body (rum/ref-node s :abstract) 72))
+    (comment-actions/get-comments-if-needed activity-data comments-data)))
+
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
@@ -45,8 +69,8 @@
                          (drv/drv :comments-data)
                          (drv/drv :show-post-added-tooltip)
                          ;; Locals
-                         (rum/local false ::should-scroll-to-comments)
-                         (rum/local false ::should-scroll-to-card)
+                         (rum/local false ::truncated)
+                         (rum/local false ::item-ready)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
@@ -55,39 +79,17 @@
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
-                           (let [activity-data (first (:rum/args s))
-                                 activity-uuid (:uuid activity-data)]
-                             (when (= (router/current-activity-id) activity-uuid)
-                               (activity-actions/send-item-read activity-uuid))
-                             (when-not (seq (:abstract activity-data))
-                               (au/truncate-body (rum/ref-node s :abstract) 72)))
+                           (item-mounted s)
+                           (check-item-ready s)
                            s)
-                          :after-render (fn [s]
-                           (let [activity-data (first (:rum/args s))
-                                 comments-data @(drv/get-ref s :comments-data)]
-                             (comment-actions/get-comments-if-needed activity-data comments-data)
-                             (when @(::should-scroll-to-comments s)
-                               (let [actual-comments-count (count (au/get-comments activity-data comments-data))
-                                     dom-node (rum/dom-node s)]
-                                ;; Commet out the scroll to comments for the moment
-                                (utils/scroll-to-y
-                                 (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions"))))
-                                  206) 180)
-                                (when (zero? actual-comments-count)
-                                  (.focus (.find (js/$ dom-node) "div.add-comment"))))
-                               (reset! (::should-scroll-to-comments s) false)))
-                           (when @(::should-scroll-to-card s)
-                             (utils/after 180
-                              #(let [dom-node (rum/dom-node s)]
-                                 (when-not (au/is-element-top-in-viewport? dom-node 32)
-                                   (utils/scroll-to-y
-                                    (- (.-top (.offset (js/$ dom-node))) responsive/navbar-height 16) 80))))
-                             (reset! (::should-scroll-to-card s) false))
+                          :did-remount (fn [_ s]
+                           (item-mounted s)
+                           (check-item-ready s)
                            s)}
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        ; truncated? @(::truncated s)
+        truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
         comments-drv (drv/react s :comments-data)
@@ -197,7 +199,10 @@
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             (let [has-abstract (seq (:abstract activity-data))]
               [:div.stream-item-body
-                {:class (when-not has-abstract "truncate-body")
+                {:class (utils/class-set {:no-abstract (not has-abstract)
+                                          :item-ready @(::item-ready s)
+                                          :truncated truncated?})
+                 :data-itemuuid (:uuid activity-data)
                  :ref :abstract
                  :dangerouslySetInnerHTML {:__html (if has-abstract
                                                      (:abstract activity-data)
