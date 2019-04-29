@@ -52,6 +52,22 @@ div.expanded-post {
     }
   }
 
+  div.ziggeo-player {
+    margin-top: 16px;
+    width: 638px;
+    height: 478px;
+    position: relative;
+
+    video {
+      max-height: 478px;
+    }
+
+    @include tablet(){
+      width: 100vw;
+      height: calc(100vw *  0.75);
+    }
+  }
+
   div.expanded-post-headline {
     @include activity-title(36px, 47px);
     margin-top: 16px;

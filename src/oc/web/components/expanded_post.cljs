@@ -1,7 +1,9 @@
 (ns oc.web.components.expanded-post
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
@@ -11,6 +13,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -25,6 +28,14 @@
     (when-not (= @(::comment-height s) cur-height)
       (reset! (::comment-height s) cur-height))))
 
+(defn win-width []
+  (or (.-clientWidth (.-documentElement js/document))
+      (.-innerWidth js/window)))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :activity-data)
@@ -34,6 +45,7 @@
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
+  (rum/local 0 ::mobile-video-height)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   {:did-mount (fn [s]
@@ -53,7 +65,17 @@
         back-to-label (str "Back to "
                        (if is-all-posts?
                          "All Posts"
-                         (:board-name activity-data)))]
+                         (:board-name activity-data)))
+        has-video (seq (:fixed-video-id activity-data))
+        uploading-video (dis/uploading-video-data (:video-id activity-data))
+        is-publisher? (= (:user-id publisher) (jwt/user-id))
+        video-player-show (and is-publisher? uploading-video)
+        video-size (when has-video
+                     (if is-mobile?
+                       {:width (win-width)
+                        :height @(::mobile-video-height s)}
+                       {:width 638
+                        :height (utils/calc-video-height 638)}))]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
@@ -68,6 +90,17 @@
         (more-menu activity-data dom-element-id
          {:external-share (not is-mobile?)
           :tooltip-position "bottom"})]
+      (when has-video
+        [:div.group
+          {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
+           :ref :ziggeo-player}
+          (ziggeo-player {:video-id (:fixed-video-id activity-data)
+                          :width (:width video-size)
+                          :height (:height video-size)
+                          :lazy (not video-player-show)
+                          :video-image (:video-image activity-data)
+                          :video-processed (:video-processed activity-data)
+                          :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})])
       [:div.expanded-post-headline
         (:headline activity-data)]
       [:div.expanded-post-author
