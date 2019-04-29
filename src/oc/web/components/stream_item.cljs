@@ -161,7 +161,6 @@
                              (not is-mobile?))
                    (activity-actions/activity-edit activity-data))
        :id dom-element-id}
-      [:div.activity-share-container]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image publisher)
@@ -311,6 +310,7 @@
                 (if expanded?
                   "Show less"
                   "Show more")]]
+            [:div.activity-share-container]
             (when (and is-published?
                        (not is-mobile?))
               (more-menu activity-data dom-element-id
