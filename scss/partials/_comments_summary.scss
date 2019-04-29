@@ -12,6 +12,7 @@ div.is-comments {
 
     &.show-border {
       div.is-comments-author {
+        background-color: white;
         border: 2px solid white;
       }
     }
@@ -20,7 +21,7 @@ div.is-comments {
       float: left;
       width: 28px;
       height: 28px;
-      background-color: white;
+      background-color: transparent;
       border: 2px solid transparent;
       border-radius: 50%;
       margin-left: -10px;
