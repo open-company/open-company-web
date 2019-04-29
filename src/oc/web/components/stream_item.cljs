@@ -39,58 +39,49 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- check-item-ready
+  "After component is mounted/re-mounted add ready state and check if the content is truncated"
+  [s]
+  (let [activity-data (first (:rum/args s))
+        $item-body (js/$ (rum/ref-node s :abstract))
+        comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+    (when (or (.hasClass $item-body "ddd-truncated")
+              (pos? (count (:attachments activity-data)))
+              (pos? (count comments-data))
+              (:body-thumbnail activity-data)
+              (:fixed-video-id activity-data))
+      (reset! (::truncated s) true))
+    (reset! (::item-ready s) true)))
+
+(defn- item-mounted [s]
+  (let [activity-data (first (:rum/args s))
+        activity-uuid (:uuid activity-data)
+        comments-data @(drv/get-ref s :comments-data)]
+    (comment-actions/get-comments-if-needed activity-data comments-data)))
+
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
-                         (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
                          (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
-                         (rum/local false ::should-scroll-to-comments)
-                         (rum/local false ::should-scroll-to-card)
-                         (rum/local false ::more-menu-open)
-                         (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin "activity-body" (* 30 3))
-                         am/truncate-comments-mixin
+                         (am/truncate-element-mixin "activity-body" (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
-                           (item-ready s)
-                           (let [activity-uuid (:uuid (first (:rum/args s)))]
-                             (when (= (router/current-activity-id) activity-uuid)
-                               (activity-actions/send-item-read activity-uuid)))
+                           (item-mounted s)
+                           (check-item-ready s)
                            s)
                           :did-remount (fn [_ s]
-                           (item-ready s)
-                           s)
-                          :after-render (fn [s]
-                           (let [activity-data (first (:rum/args s))
-                                 comments-data @(drv/get-ref s :comments-data)]
-                             (comment-actions/get-comments-if-needed activity-data comments-data)
-                             (when @(::should-scroll-to-comments s)
-                               (let [actual-comments-count (count (au/get-comments activity-data comments-data))
-                                     dom-node (rum/dom-node s)]
-                                ;; Commet out the scroll to comments for the moment
-                                (utils/scroll-to-y
-                                 (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions"))))
-                                  206) 180)
-                                (when (zero? actual-comments-count)
-                                  (.focus (.find (js/$ dom-node) "div.add-comment"))))
-                               (reset! (::should-scroll-to-comments s) false)))
-                           (when @(::should-scroll-to-card s)
-                             (utils/after 180
-                              #(let [dom-node (rum/dom-node s)]
-                                 (when-not (au/is-element-top-in-viewport? dom-node 32)
-                                   (utils/scroll-to-y
-                                    (- (.-top (.offset (js/$ dom-node))) responsive/navbar-height 16) 80))))
-                             (reset! (::should-scroll-to-card s) false))
+                           (item-mounted s)
+                           (check-item-ready s)
                            s)}
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
@@ -98,12 +89,9 @@
         truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
-        comments-drv (drv/react s :comments-data)
-        comments-data (au/get-comments activity-data comments-drv)
+        _ (drv/react s :comments-data)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
-        is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
@@ -205,18 +193,11 @@
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             [:div.stream-item-body-container
               [:div.stream-item-body
-                {:class (utils/class-set {:wrt-item-ready @(::item-ready s)})}
-                [:div.stream-item-body-inner.to-truncate.oc-mentions.oc-mentions-hover
-                  {:ref "activity-body"
-                   :data-itemuuid (:uuid activity-data)
-                   :class (utils/class-set {:hide-images truncated?
-                                            :wrt-truncated truncated?})
-                   :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-                [:div.stream-item-body-inner.no-truncate.oc-mentions.oc-mentions-hover
-                  {:ref "full-activity-body"
-                   :data-itemuuid (:uuid activity-data)
-                   :class (utils/class-set {:wrt-truncated truncated?})
-                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
+                {:class (utils/class-set {:item-ready @(::item-ready s)
+                                          :truncated truncated?})
+                 :data-itemuuid (:uuid activity-data)
+                 :ref "activity-body"
+                 :dangerouslySetInnerHTML {:__html (:body activity-data)}}]]]
           (when (and ls/oc-enable-transcriptions
                      (:video-transcript activity-data))
             [:div.stream-item-transcript
