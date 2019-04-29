@@ -59,7 +59,7 @@
   (notification-actions/show-notification
    {:title "Image upload error"
     :description "An error occurred while processing your company avatar. Please retry."
-    :expire 5
+    :expire 3
     :id :org-avatar-upload-failed
     :dismiss true})
   (when img
@@ -98,7 +98,7 @@
   (notification-actions/show-notification
    {:title (if success? "Email domain successfully removed" "Error")
     :description (when-not success? "An error occurred while removing the email domain, please try again.")
-    :expire 5
+    :expire 3
     :id (if success? :email-domain-remove-success :email-domain-remove-error)
     :dismiss true}))
 
