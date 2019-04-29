@@ -52,10 +52,7 @@
 
 (defn- item-mounted [s]
   (let [activity-data (first (:rum/args s))
-        activity-uuid (:uuid activity-data)
         comments-data @(drv/get-ref s :comments-data)]
-    (when (= (router/current-activity-id) activity-uuid)
-      (activity-actions/send-item-read activity-uuid))
     (comment-actions/get-comments-if-needed activity-data comments-data)))
 
 (rum/defcs stream-item < rum/reactive
