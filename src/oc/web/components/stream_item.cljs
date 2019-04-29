@@ -56,14 +56,11 @@
         comments-data @(drv/get-ref s :comments-data)]
     (when (= (router/current-activity-id) activity-uuid)
       (activity-actions/send-item-read activity-uuid))
-    (when-not (seq (:abstract activity-data))
-      (au/truncate-body (rum/ref-node s :abstract) 72))
     (comment-actions/get-comments-if-needed activity-data comments-data)))
 
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
-                         (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
                          (drv/drv :show-post-added-tooltip)
                          ;; Locals
@@ -72,6 +69,7 @@
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
+                         (am/truncate-element-mixin :abstract (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
@@ -90,12 +88,9 @@
         truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
-        comments-drv (drv/react s :comments-data)
-        comments-data (au/get-comments activity-data comments-drv)
+        _ (drv/react s :comments-data)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
-        is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
