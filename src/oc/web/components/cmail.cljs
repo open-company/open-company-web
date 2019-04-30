@@ -20,29 +20,15 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.abstract-field :refer (abstract-field)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
-(def abstract-max-length 20) ;;280
-
-(defn- body-element []
-  (sel1 [:div.abstract-editor]))
-
 (defn- cleaned-body []
-  (let [body-el (body-element)]
+  (let [body-el (sel1 [:div.rich-body-editor])]
     (when body-el
       (utils/clean-body-html (.-innerHTML body-el)))))
-
-(defn- abstract-element []
-  (sel1 [:div.abstract-editor]))
-
-(defn- cleaned-abstract []
-  (let [abstract-el (abstract-element)]
-    (when abstract-el
-      (.-innerHTML abstract-el))))
 
 (defn real-close []
   (activity-actions/cmail-hide))
@@ -56,10 +42,8 @@
 
 (defn autosave [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
-        section-editing @(drv/get-ref s :section-editing)
-        updated-cmail-data (merge cmail-data {:abstract (cleaned-abstract)
-                                              :body (cleaned-body)})]
-    (activity-actions/entry-save-on-exit :cmail-data updated-cmail-data section-editing)))
+        section-editing @(drv/get-ref s :section-editing)]
+    (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
 
 ;; Close dismiss handling
 
@@ -105,7 +89,9 @@
                                                        :has-changes true})]))))
 
 (defn- abstract-on-change [state]
-  (dis/dispatch! [:input [:cmail-data :has-changes] true]))
+  (let [abstract (rum/ref-node state "abstract")]
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.-value abstract)
+                                                     :has-changes true})])))
 
 ;; Headline setup and paste handler
 
@@ -151,15 +137,11 @@
   (utils/trim (:abstract cmail-data)))
 
 (defn- is-publishable? [s cmail-data]
-  ;; Check headline
-  (when (and (seq (:board-slug cmail-data))
+  (and (seq (:board-slug cmail-data))
        (or (and @(::record-video s)
                 @(::video-uploading s))
            (not @(::record-video s)))
-       (not (zero? (count (fix-headline cmail-data)))))
-    ;; Check also the abstract length as second to avoid slowness
-    (let [abstract-el (abstract-element)]
-      (<= (count (.-innerText abstract-el)) abstract-max-length))))
+       (not (zero? (count (fix-headline cmail-data))))))
 
 (defn video-record-clicked [s]
   (nux-actions/dismiss-edit-tooltip)
@@ -302,7 +284,6 @@
                    (drv/drv :show-edit-tooltip)
                    ;; Locals
                    (rum/local "" ::initial-body)
-                   (rum/local "" ::initial-abstract)
                    (rum/local "" ::initial-headline)
                    (rum/local true ::show-placeholder)
                    (rum/local nil ::initial-uuid)
@@ -321,6 +302,7 @@
                    (rum/local false ::deleting)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
+                   (mixins/autoresize-textarea "abstract")
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -330,14 +312,10 @@
                           initial-headline (utils/emojify
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
-                                               ""))
-                          initial-abstract (if (seq (:abstract cmail-data))
-                                             (:abstract cmail-data)
-                                             "")]
+                                               ""))]
                       (when-not (seq (:uuid cmail-data))
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
-                      (reset! (::initial-abstract s) initial-abstract)
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*"))))
@@ -476,9 +454,9 @@
               {:class (when long-tooltip "long-tooltip")}
               [:button.mlb-reset.close-bt
                 {:on-click #(do
-                              (if (au/has-content? (merge cmail-data
-                                                     {:body (cleaned-body)
-                                                      :abstract (cleaned-abstract)}))
+                              (if (au/has-content? (assoc cmail-data
+                                                     :body
+                                                     (cleaned-body)))
                                 (autosave s)
                                 (do
                                   (reset! (::deleting s) true)
@@ -556,6 +534,26 @@
                                   (when (:video-id cmail-data)
                                     (activity-actions/remove-video :cmail-data cmail-data))
                                   (reset! (::record-video s) false))})))
+          ;; Abstract
+          [:div.cmail-content-abstract-title
+            "Why it matters"
+            (when (seq (:abstract cmail-data))
+              [:span.abstract-counter
+                (str (count (:abstract cmail-data)) "/280 characters")])]
+          [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+            {:class utils/hide-class
+             :ref "abstract"
+             :rows 1
+             :placeholder utils/default-abstract
+             :value (or (:abstract cmail-data) "")
+             :max-length 280
+             :on-change #(abstract-on-change s)
+             ; :on-click    #(abstract-on-change s)
+             :on-key-press (fn [e]
+                           (when (= (.-key e) "Enter")
+                             (utils/event-stop e)
+                             (utils/to-end-of-content-editable (sel1 [:div.cmail-content-headline]))))}]
+          [:div.cmail-content-separator]
           ; Headline element
           [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
             {:class utils/hide-class
@@ -570,14 +568,6 @@
                              (utils/event-stop e)
                              (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (abstract-field {:on-change (partial abstract-on-change s)
-                           :use-inline-media-picker false
-                           :initial-abstract @(::initial-abstract s)
-                           :max-length abstract-max-length
-                           :on-enter-press-cb (fn [_]
-                                                (let [body-el (body-element)]
-                                                  (utils/to-end-of-content-editable body-el)))
-                           :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
           (rich-body-editor {:on-change (partial body-on-change s)
                              :use-inline-media-picker false
                              :multi-picker-container-selector "div#cmail-footer-multi-picker"

@@ -137,21 +137,10 @@ div.cmail-outer {
         overflow-y: scroll;
         max-height: calc(100vh - 108px);
 
-        div.abstract-editor-container {
-          margin: 32px 0 0;
-
-          div.abstract-editor {
-            @include activity-abstract(18px, 26px);
-            min-height: 26px;
-          }
-        }
-
         div.rich-body-editor-container {
-          margin: 44px 0 0;
+          
 
           div.rich-body-editor {
-            @include activity-body(18, 24, 24, $deep_navy);
-
             @media screen and (min-height: 556px) {
               max-height: initial;
             }
@@ -486,30 +475,33 @@ div.cmail-outer {
         }
       }
 
-      div.abstract-editor-container {
-        position: relative;
-        height: auto;
+      div.cmail-content-abstract-title {
+        @include OC_Body_Bold();
+        font-size: 12px;
+        color: $deep_navy;
+
+        span.abstract-counter {
+          display: inline;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: $ui_grey;
+          margin-left: 8px;
+        }
+      }
+
+      textarea.cmail-content-abstract {
+        @include activity-abstract();
+        height: 18px;
+        width: 100%;
         margin: 16px 0 0;
-        padding-bottom: 16px;
-        border-bottom: 1px solid $ultra_light_grey;
+        padding: 0;
+        border: none;
+        resize: none;
+        outline: none;
+        overflow: hidden;
 
-        div.abstract-editor {
-          @include activity-abstract();
-          min-height: 22px;
-          width: 100%;
-          padding: 0;
-          border: none;
-          resize: none;
-          outline: none;
-          overflow: hidden;
-
-          @include placeholder(){
-            color: #99A0A7;
-          }
-
-          &.exceeded-max-length {
-            color: $carrot_orange;
-          }
+        @include placeholder(){
+          color: #99A0A7;
         }
       }
 
