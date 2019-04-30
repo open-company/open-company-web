@@ -36,7 +36,7 @@
           user-data (:user-data edit-user-profile)]
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
-(defn add-slack-clicked [current-user-data]
+(defn close-clicked [current-user-data]
   (let [switch-cb (fn []
                    (dismiss-modal)
                    (utils/after 150 #(nav-actions/show-org-settings :main)))]
@@ -103,7 +103,7 @@
     [:div.user-notifications-modal-container
       {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click #(close-clicked current-user-data)}]
       [:div.user-notifications-modal
         [:div.user-notifications-header
           [:div.user-notifications-header-title
@@ -120,9 +120,7 @@
               "Saved!"
               "Save")]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(if (:has-changes current-user-data)
-                          (user-actions/user-profile-reset)
-                          (dismiss-modal))}
+            {:on-click #(close-clicked current-user-data)}
             "Back"]]
         [:div.user-notifications-body
           [:div.user-profile-modal-fields

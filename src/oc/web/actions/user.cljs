@@ -392,7 +392,7 @@
            (notification-actions/show-notification
             {:title "Image upload error"
              :description "An error occurred while processing your image. Please retry."
-             :expire 5
+             :expire 3
              :id :user-avatar-upload-failed
              :dismiss true}))
          (do
@@ -401,7 +401,7 @@
            (notification-actions/show-notification
             {:title "Image update succeeded"
              :description "Your image was succesfully updated."
-             :expire 5
+             :expire 3
              :dismiss true})))))))
 
 (defn user-profile-reset []
@@ -416,7 +416,7 @@
          (notification-actions/show-notification
           {:title (if success "Verification email re-sent!" "An error occurred")
            :description (when-not success "Please try again.")
-           :expire 5
+           :expire 3
            :primary-bt-title "OK"
            :primary-bt-dismiss true
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
@@ -473,7 +473,7 @@
           :mention-author (:author fixed-notification)
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
-          :expire 5})))))
+          :expire 3})))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))

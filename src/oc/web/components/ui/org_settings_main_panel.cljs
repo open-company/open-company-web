@@ -116,7 +116,7 @@
                  :type "text"
                  :auto-capitalize "none"
                  :value (:domain um-domain-invite)
-                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :pattern utils/valid-domain-pattern
                  :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
                  :placeholder "Domain, e.g. @acme.com"}]
               [:button.mlb-reset.add-email-domain-bt

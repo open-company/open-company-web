@@ -209,7 +209,7 @@
                       [:input.org-settings-field.email-field
                         {:type "text"
                          :class (when (:error user-data) "error")
-                         :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+                         :pattern utils/valid-email-pattern
                          :placeholder "email@example.com"
                          :on-change #(dis/dispatch!
                                       [:input

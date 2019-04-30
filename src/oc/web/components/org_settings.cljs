@@ -93,7 +93,7 @@
   (notification-actions/show-notification
    {:title "Image upload error"
     :description "An error occurred while processing your company avatar. Please retry."
-    :expire 5
+    :expire 3
     :id :org-avatar-upload-failed
     :dismiss true})
   (when img
