@@ -25,10 +25,12 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
+(defn- body-element []
+  (sel1 [:div.rich-body-editor]))
+
 (defn- cleaned-body []
-  (let [body-el (sel1 [:div.rich-body-editor])]
-    (when body-el
-      (utils/clean-body-html (.-innerHTML body-el)))))
+  (when-let [body-el (body-element)]
+    (utils/clean-body-html (.-innerHTML body-el))))
 
 (defn real-close []
   (activity-actions/cmail-hide))
@@ -300,6 +302,7 @@
                    (rum/local false ::video-picking-cover)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
+                   (rum/local false ::abstract-focused)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
@@ -410,45 +413,6 @@
                                 :showing-qsg (:visible qsg-data)})}
       [:div.cmail-container
         [:div.cmail-header
-          (when (and (not= (:status cmail-data) "published")
-                     is-mobile?)
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.mobile-saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.mobile-saving-saved "Saved"])))
-          [:div.board-name
-            {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
-                          (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-             :class (when show-sections-picker "open")}
-            [:div.board-name-inner
-              (:board-name cmail-data)]]
-          (when show-sections-picker
-            [:div.section-picker-container
-              {:ref :picker-container}
-              (sections-picker (:board-slug cmail-data)
-               (fn [board-data note]
-                 (dis/dispatch! [:input [:show-sections-picker] false])
-                 (when (and board-data
-                            (seq (:name board-data)))
-                  (dis/dispatch! [:input [:cmail-data]
-                   (merge cmail-data {:board-slug (:slug board-data)
-                                      :board-name (:name board-data)
-                                      :has-changes true
-                                      :invite-note note})]))))])
-          [:div.must-see-toggle-container
-            {:class (when (:must-see cmail-data) "on")}
-            [:div.must-see-toggle
-              {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Must See"}
-              [:span.must-see-toggle-circle]]]
-          (when (:must-see cmail-data)
-            [:div.must-see-tag
-              "Must see"])
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
               {:class (when long-tooltip "long-tooltip")}
@@ -484,6 +448,48 @@
                :title (if (:fullscreen cmail-state)
                         "Shrink"
                         "Expand")}]]
+          [:div.cmail-header-vertical-separator]
+          (when (and (not= (:status cmail-data) "published")
+                     is-mobile?)
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.mobile-saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.mobile-saving-saved "Saved"])))
+          [:div.cmail-header-board-must-see-container.group
+            {:class (when (:must-see cmail-data) "must-see-on")}
+            [:div.board-name
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
+               :class (when show-sections-picker "open")}
+              [:div.board-name-inner
+                (:board-name cmail-data)]]
+            (when show-sections-picker
+              [:div.section-picker-container
+                {:ref :picker-container}
+                (sections-picker (:board-slug cmail-data)
+                 (fn [board-data note]
+                   (dis/dispatch! [:input [:show-sections-picker] false])
+                   (when (and board-data
+                              (seq (:name board-data)))
+                    (dis/dispatch! [:input [:cmail-data]
+                     (merge cmail-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)
+                                        :has-changes true
+                                        :invite-note note})]))))])
+            [:div.must-see-toggle-container
+              {:class (when (:must-see cmail-data) "on")}
+              [:div.must-see-toggle
+                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-trigger "hover"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title "Must See"}
+                [:span.must-see-toggle-circle]]]
+            (when (:must-see cmail-data)
+              [:div.must-see-tag
+                "Must see"])]
           [:button.mlb-reset.post-button
             {:ref "post-btn"
              :on-click #(post-clicked s)
@@ -534,26 +540,6 @@
                                   (when (:video-id cmail-data)
                                     (activity-actions/remove-video :cmail-data cmail-data))
                                   (reset! (::record-video s) false))})))
-          ;; Abstract
-          [:div.cmail-content-abstract-title
-            "Why it matters"
-            (when (seq (:abstract cmail-data))
-              [:span.abstract-counter
-                (str (count (:abstract cmail-data)) "/280 characters")])]
-          [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
-            {:class utils/hide-class
-             :ref "abstract"
-             :rows 1
-             :placeholder utils/default-abstract
-             :value (or (:abstract cmail-data) "")
-             :max-length 280
-             :on-change #(abstract-on-change s)
-             ; :on-click    #(abstract-on-change s)
-             :on-key-press (fn [e]
-                           (when (= (.-key e) "Enter")
-                             (utils/event-stop e)
-                             (utils/to-end-of-content-editable (sel1 [:div.cmail-content-headline]))))}]
-          [:div.cmail-content-separator]
           ; Headline element
           [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
             {:class utils/hide-class
@@ -566,10 +552,30 @@
              :on-key-press (fn [e]
                            (when (= (.-key e) "Enter")
                              (utils/event-stop e)
-                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
+                             (utils/to-end-of-content-editable (body-element))))
              :dangerouslySetInnerHTML @(::initial-headline s)}]
+          ;; Abstract
+          [:div.cmail-content-abstract-container
+            [:div.cmail-content-abstract-counter
+              {:class (when @(::abstract-focused s) "show-counter")}
+              (str "Character limit " (count (or (:abstract cmail-data) "")) "/" utils/max-abstrct-length)]
+            [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+              {:class utils/hide-class
+               :ref "abstract"
+               :rows 1
+               :placeholder utils/default-abstract
+               :value (or (:abstract cmail-data) "")
+               :max-length utils/max-abstrct-length
+               :on-change #(abstract-on-change s)
+               :on-focus #(reset! (::abstract-focused s) true)
+               :on-blur #(reset! (::abstract-focused s) false)
+               ; :on-click    #(abstract-on-change s)
+               :on-key-press (fn [e]
+                             (when (= (.-key e) "Enter")
+                               (utils/event-stop e)
+                               (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
           (rich-body-editor {:on-change (partial body-on-change s)
-                             :use-inline-media-picker false
+                             :use-inline-media-picker true
                              :multi-picker-container-selector "div#cmail-footer-multi-picker"
                              :initial-body @(::initial-body s)
                              :show-placeholder @(::show-placeholder s)

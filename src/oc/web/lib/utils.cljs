@@ -635,7 +635,10 @@
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
 (def default-headline "Untitled post")
-(def default-abstract "Summarize why this post matters…")
+
+(def default-abstract "Post preview: summarize why this post matters…")
+
+(def max-abstrct-length 280)
 
 (def default-drafts-board-name "Drafts")
 
