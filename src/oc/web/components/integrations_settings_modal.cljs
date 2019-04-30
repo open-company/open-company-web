@@ -66,7 +66,7 @@
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-              {:on-click #(team-actions/slack-team-add cur-user-data (str (router/get-token) "?org-settings=main"))}
+              {:on-click #(team-actions/slack-team-add cur-user-data (str (router/get-token) "?org-settings=integrations"))}
               [:div.slack-icon]
               "Add to Slack"])
           (when-not (zero? slack-teams-count)
@@ -125,5 +125,5 @@
                       [:div.bot-line
                         "Carrot bot is currently off. "
                         [:button.mlb-reset.turn-on-bot-bt
-                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
+                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
                           "Turn it on?"]])]))])]]]))
