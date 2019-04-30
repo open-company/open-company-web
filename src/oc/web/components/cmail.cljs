@@ -508,98 +508,99 @@
             (if (= (:status cmail-data) "published")
               "SAVE"
               "POST")]]
-        [:div.cmail-content
-          {:class (when show-edit-tooltip "showing-edit-tooltip")}
-          (when (and is-mobile?
-                     show-edit-tooltip)
-            (edit-tooltip s))
-          ;; Video elements
-          ; FIXME: disable video on mobile for now
-          (when-not is-mobile?
-            (when (and (:fixed-video-id cmail-data)
-                       (not @(::record-video s)))
-              (ziggeo-player {:video-id (:fixed-video-id cmail-data)
-                              :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
-                              :width (:width video-size)
-                              :height (:height video-size)
-                              :video-processed (:video-processed cmail-data)})))
-          ; FIXME: disable video on mobile for now
-          (when-not is-mobile?
-            (when @(::record-video s)
-              (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
-                                :upload-started-cb #(do
-                                                      (activity-actions/uploading-video % :cmail-data)
-                                                      (reset! (::video-picking-cover s) false)
-                                                      (reset! (::video-uploading s) true))
-                                :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
-                                :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
-                                :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
+        [:div.cmail-content-outer
+          [:div.cmail-content
+            {:class (when show-edit-tooltip "showing-edit-tooltip")}
+            (when (and is-mobile?
+                       show-edit-tooltip)
+              (edit-tooltip s))
+            ;; Video elements
+            ; FIXME: disable video on mobile for now
+            (when-not is-mobile?
+              (when (and (:fixed-video-id cmail-data)
+                         (not @(::record-video s)))
+                (ziggeo-player {:video-id (:fixed-video-id cmail-data)
+                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
-                                :remove-recorder-cb (fn []
-                                  (when (:video-id cmail-data)
-                                    (activity-actions/remove-video :cmail-data cmail-data))
-                                  (reset! (::record-video s) false))})))
-          ; Headline element
-          [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
-            {:class utils/hide-class
-             :content-editable true
-             :ref "headline"
-             :placeholder utils/default-headline
-             :on-paste    #(headline-on-paste s %)
-             :on-key-down #(headline-on-change s)
-             :on-click    #(headline-on-change s)
-             :on-key-press (fn [e]
-                           (when (= (.-key e) "Enter")
-                             (utils/event-stop e)
-                             (utils/to-end-of-content-editable (body-element))))
-             :dangerouslySetInnerHTML @(::initial-headline s)}]
-          ;; Abstract
-          [:div.cmail-content-abstract-container
-            [:div.cmail-content-abstract-counter
-              {:class (when @(::abstract-focused s) "show-counter")}
-              (str "Character limit " (count (or (:abstract cmail-data) "")) "/" utils/max-abstrct-length)]
-            [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+                                :video-processed (:video-processed cmail-data)})))
+            ; FIXME: disable video on mobile for now
+            (when-not is-mobile?
+              (when @(::record-video s)
+                (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
+                                  :upload-started-cb #(do
+                                                        (activity-actions/uploading-video % :cmail-data)
+                                                        (reset! (::video-picking-cover s) false)
+                                                        (reset! (::video-uploading s) true))
+                                  :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                                  :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
+                                  :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
+                                  :width (:width video-size)
+                                  :height (:height video-size)
+                                  :remove-recorder-cb (fn []
+                                    (when (:video-id cmail-data)
+                                      (activity-actions/remove-video :cmail-data cmail-data))
+                                    (reset! (::record-video s) false))})))
+            ; Headline element
+            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
               {:class utils/hide-class
-               :ref "abstract"
-               :rows 1
-               :placeholder utils/default-abstract
-               :value (or (:abstract cmail-data) "")
-               :max-length utils/max-abstrct-length
-               :on-change #(abstract-on-change s)
-               :on-focus #(reset! (::abstract-focused s) true)
-               :on-blur #(reset! (::abstract-focused s) false)
-               ; :on-click    #(abstract-on-change s)
+               :content-editable true
+               :ref "headline"
+               :placeholder utils/default-headline
+               :on-paste    #(headline-on-paste s %)
+               :on-key-down #(headline-on-change s)
+               :on-click    #(headline-on-change s)
                :on-key-press (fn [e]
                              (when (= (.-key e) "Enter")
                                (utils/event-stop e)
-                               (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
-          (rich-body-editor {:on-change (partial body-on-change s)
-                             :use-inline-media-picker true
-                             :multi-picker-container-selector "div#cmail-footer-multi-picker"
-                             :initial-body @(::initial-body s)
-                             :show-placeholder @(::show-placeholder s)
-                             :show-h2 true
-                             :dispatch-input-key :cmail-data
-                             :start-video-recording-cb #(video-record-clicked s)
-                             :upload-progress-cb (fn [is-uploading?]
-                                                   (reset! (::uploading-media s) is-uploading?))
-                             :media-config ["photo" "video"]
-                             :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
-          (when (and ls/oc-enable-transcriptions
-                     (:fixed-video-id cmail-data)
-                     (:video-processed cmail-data))
-            [:div.cmail-data-transcript
-              [:textarea.video-transcript
-                {:ref "transcript-edit"
-                 :on-input #(ui-utils/resize-textarea (.-target %))
-                 :default-value (:video-transcript cmail-data)}]])
-          ; Attachments
-          (stream-attachments (:attachments cmail-data) nil
-           #(activity-actions/remove-attachment :cmail-data %))
-          (when (and (not is-mobile?)
-                     show-edit-tooltip)
-            (edit-tooltip s))]
+                               (utils/to-end-of-content-editable (body-element))))
+               :dangerouslySetInnerHTML @(::initial-headline s)}]
+            ;; Abstract
+            [:div.cmail-content-abstract-container
+              [:div.cmail-content-abstract-counter
+                {:class (when @(::abstract-focused s) "show-counter")}
+                (str "Character limit " (count (or (:abstract cmail-data) "")) "/" utils/max-abstrct-length)]
+              [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+                {:class utils/hide-class
+                 :ref "abstract"
+                 :rows 1
+                 :placeholder utils/default-abstract
+                 :value (or (:abstract cmail-data) "")
+                 :max-length utils/max-abstrct-length
+                 :on-change #(abstract-on-change s)
+                 :on-focus #(reset! (::abstract-focused s) true)
+                 :on-blur #(reset! (::abstract-focused s) false)
+                 ; :on-click    #(abstract-on-change s)
+                 :on-key-press (fn [e]
+                               (when (= (.-key e) "Enter")
+                                 (utils/event-stop e)
+                                 (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
+            (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker true
+                               :multi-picker-container-selector "div#cmail-footer-multi-picker"
+                               :initial-body @(::initial-body s)
+                               :show-placeholder @(::show-placeholder s)
+                               :show-h2 true
+                               :dispatch-input-key :cmail-data
+                               :start-video-recording-cb #(video-record-clicked s)
+                               :upload-progress-cb (fn [is-uploading?]
+                                                     (reset! (::uploading-media s) is-uploading?))
+                               :media-config ["photo" "video"]
+                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
+            (when (and ls/oc-enable-transcriptions
+                       (:fixed-video-id cmail-data)
+                       (:video-processed cmail-data))
+              [:div.cmail-data-transcript
+                [:textarea.video-transcript
+                  {:ref "transcript-edit"
+                   :on-input #(ui-utils/resize-textarea (.-target %))
+                   :default-value (:video-transcript cmail-data)}]])
+            ; Attachments
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))
+            (when (and (not is-mobile?)
+                       show-edit-tooltip)
+              (edit-tooltip s))]]
       [:div.cmail-footer
         [:div.cmail-footer-multi-picker
           {:id "cmail-footer-multi-picker"}]

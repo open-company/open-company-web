@@ -9,6 +9,8 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.section-editor :refer (section-editor)]))
 
+(def distance-from-bottom 80)
+
 (defn calc-max-height [s]
   (let [win-height (or (.-clientHeight (.-documentElement js/document))
                        (.-innerHeight js/window))
@@ -17,7 +19,7 @@
         body-rect (.getBoundingClientRect (.-body js/document))
         elem-rect (.getBoundingClientRect dom-node)
         offset-top (- (.-top elem-rect) (+ (.-top body-rect) scroll-top))]
-    (reset! (::container-max-height s) (- win-height offset-top 8))))
+    (reset! (::container-max-height s) (- win-height offset-top 8 distance-from-bottom))))
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive
