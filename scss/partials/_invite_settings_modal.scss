@@ -67,6 +67,7 @@ div.invite-settings-modal {
         @include OC_Body_Bold();
         font-size: 14px;
         color: white;
+        line-height: 18px;
         float: right;
         border-radius: 6px;
       }
@@ -201,6 +202,10 @@ div.invite-settings-modal {
 
           div.user-name-dropdown {
             width: calc(100% - 24px);
+
+            div.slack-users-dropdown-list {
+              top: 34px;
+            }
           }
 
           button.remove-user {

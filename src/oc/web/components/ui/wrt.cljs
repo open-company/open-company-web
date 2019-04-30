@@ -156,7 +156,7 @@
                                          {:title (str "Reminder sent to " (utils/name-or-email u) ".")
                                           :id (str "wrt-share-" (utils/name-or-email u))
                                           :dismiss true
-                                          :expire 5}))))}
+                                          :expire 3}))))}
                         "Send post"])]])]])]]))
 
 (defn- under-middle-screen? [el]

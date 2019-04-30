@@ -69,7 +69,7 @@
   (notification-actions/show-notification
     {:title "Image upload error"
      :description "An error occurred while processing your image. Please retry."
-     :expire 5
+     :expire 3
      :dismiss true}))
 
 (defn success-cb
@@ -162,7 +162,7 @@
         timezones (.names (.-tz js/moment))]
     [:div.user-profile-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click #(close-cb current-user-data)}]
       [:div.user-profile-modal
         [:div.user-profile-header
           [:div.user-profile-header-title
@@ -174,20 +174,11 @@
                             (dismiss-modal)))
              :class (when @(::show-success s) "no-disable")
              :disabled @(::loading s)}
-            (when (:loading current-user-data)
-              (small-loading))
             (if @(::show-success s)
               "Saved!"
               "Save")]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(if (:has-changes current-user-data)
-                        (do
-                          (reset! (::name-error s) false)
-                          (reset! (::email-error s) false)
-                          (reset! (::password-error s) false)
-                          (reset! (::current-password-error s) false)
-                          (user-actions/user-profile-reset))
-                        (real-close-cb current-user-data))}
+            {:on-click #(close-cb current-user-data)}
             "Back"]]
         [:div.user-profile-body
           [:div.user-profile-avatar.qsg-profile-photo-3

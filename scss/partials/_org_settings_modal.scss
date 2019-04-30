@@ -136,6 +136,14 @@ div.org-settings-modal {
         font-size: 14px;
         color: $light_navy;
         margin-top: 16px;
+
+        i.mdi-information-outline {
+          margin-left: 6px;
+
+          &:before {
+            font-size: 14px;
+          }
+        }
       }
 
       input.org-settings-field {
