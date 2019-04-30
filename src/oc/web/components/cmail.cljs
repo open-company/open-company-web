@@ -19,7 +19,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
@@ -505,8 +504,6 @@
              :on-click #(post-clicked s)
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
-            (when working?
-              (small-loading))
             (if (= (:status cmail-data) "published")
               "SAVE"
               "POST")]]
