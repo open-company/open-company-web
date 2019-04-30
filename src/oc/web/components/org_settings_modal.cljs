@@ -14,6 +14,7 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
@@ -29,6 +30,22 @@
   (if s
     (reset! (::unmounting s) true)
     (real-close)))
+
+(defn close-clicked [s]
+  (let [org-editing @(drv/get-ref s :org-editing)]
+    (if (:has-changes org-editing)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "org-settings-unsaved-edits"
+                        :message "Leave without saving your changes?"
+                        :link-button-title "Stay"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
+                        :solid-button-cb #(do
+                                            (alert-modal/hide-alert)
+                                            (dismiss-modal s))}]
+        (alert-modal/show-alert alert-data))
+      (dismiss-modal))))
 
 (defn form-is-clean? [s]
   (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
@@ -168,7 +185,7 @@
     [:div.org-settings-modal
       {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click #(close-clicked s)}]
       [:div.org-settings-modal-container
         [:div.org-settings-header
           [:div.org-settings-header-title
@@ -183,9 +200,7 @@
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(if (form-is-clean? s)
-                          (dismiss-modal s)
-                          (reset-form s))}
+            {:on-click #(close-clicked s)}
             "Back"]]
         [:div.org-settings-body
           [:div.org-settings-header-avatar.qsg-company-logo-3.group

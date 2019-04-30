@@ -57,10 +57,12 @@ div.slack-users-dropdown {
     left: 260px;
     overflow-y: auto;
     border-radius: 4px;
+    padding: 4px 0;
+    border: 1px solid $ultra_light_grey;
 
     div.user {
       width: 100%;
-      padding: 7px 8px;
+      padding: 4px 8px;
       cursor: pointer;
       height: 32px;
       text-overflow: ellipsis;
@@ -79,7 +81,9 @@ div.slack-users-dropdown {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+        line-height: 24px;
         margin-left: 4px;
+        float: left;
 
         span.slack-org {
           @include OC_Body_Book();

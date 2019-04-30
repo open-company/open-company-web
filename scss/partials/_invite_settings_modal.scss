@@ -210,6 +210,10 @@ div.invite-settings-modal {
 
           div.user-name-dropdown {
             width: calc(100% - 24px);
+
+            div.slack-users-dropdown-list {
+              top: 34px;
+            }
           }
 
           button.remove-user {
