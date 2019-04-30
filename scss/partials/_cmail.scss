@@ -873,10 +873,10 @@ div.cmail-outer {
 
       div.saving-saved {
         height: 35px;
-        @include OC_Body_Bold();
-        color: $light_ui_grey;
+        @include OC_Body_Book();
+        color: $ui_grey;
         font-size: 14px;
-        line-height: 46px;
+        line-height: 41px;
         margin: 0px 16px 0px 0px;
         float: right;
       }

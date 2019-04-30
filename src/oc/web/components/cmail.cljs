@@ -25,6 +25,8 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
+(def abstract-show-counter-from 200)
+
 (defn- body-element []
   (sel1 [:div.rich-body-editor]))
 
@@ -557,9 +559,11 @@
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             ;; Abstract
             [:div.cmail-content-abstract-container
-              [:div.cmail-content-abstract-counter
-                {:class (when @(::abstract-focused s) "show-counter")}
-                (str "Character limit " (count (or (:abstract cmail-data) "")) "/" utils/max-abstrct-length)]
+              (let [abstract-length (count (or (:abstract cmail-data) ""))
+                    should-show-counter? (and @(::abstract-focused s) (> abstract-length abstract-show-counter-from))]
+                [:div.cmail-content-abstract-counter
+                  {:class (when should-show-counter? "show-counter")}
+                  (str "Character limit " abstract-length "/" utils/max-abstrct-length)])
               [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
                 {:class utils/hide-class
                  :ref "abstract"
