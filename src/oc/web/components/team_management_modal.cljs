@@ -189,7 +189,7 @@
                                              slack-display-name)]]
               [:div.team-management-users-item.group
                 {:key (str "org-settings-team-" (:user-id user))
-                 :class (when pending? "pending-user")}
+                 :class (when pending? "is-pending-user")}
                 (user-avatar-image user)
                 [:div.user-name
                   [:div.user-name-label
@@ -216,7 +216,6 @@
                          :data-container "body"
                          :title (str "Resend invitation via " (if (seq fixed-display-name) "slack" "email"))}
                         "resend"]
-                      " or "
                       [:button.mlb-reset.remove-pending-bt
                         {:on-click remove-fn
                          :data-toggle "tooltip"
