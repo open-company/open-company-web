@@ -203,7 +203,7 @@
 
 (defn entry-save-on-exit
   [edit-key entry-map section-editing]
-  (let [cache-key (get-entry-cache-key (:uuid activity-data))]
+  (let [cache-key (get-entry-cache-key (:uuid entry-map))]
     ;; Save the entry in the local cache without auto-saving or
     ;; we it will be picked up it won't be autosaved
     (uc/set-item cache-key (dissoc entry-map :auto-saving)
