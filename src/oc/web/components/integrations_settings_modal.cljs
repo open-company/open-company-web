@@ -109,15 +109,16 @@
                     (when (seq slack-domain)
                       [:div.linked-to
                         (str slack-domain ".slack.com")])
-                    [:div.self-join
-                      "Slack members can self-join this as: "
-                      [:select.self-join-select
-                        [:option
-                          "Admin"]
-                        [:option
-                          "Contributor"]
-                        [:option
-                          "Viewer"]]]
+                    (comment ;; TODO: commented this out, we need to add this feature
+                      [:div.self-join
+                        "Slack members can self-join this as: "
+                        [:select.self-join-select
+                          [:option
+                            "Admin"]
+                          [:option
+                            "Contributor"]
+                          [:option
+                            "Viewer"]]])
                     (if has-bot?
                       [:div.bot-line
                         "Carrot bot is currently on."]
