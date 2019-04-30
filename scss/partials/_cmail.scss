@@ -51,12 +51,16 @@ div.cmail-outer {
     }
 
     div.cmail-container {
-      width: 100%;
-      min-height: 100%;
+      width: 100vw;
+      height: 100vh;
       top: 0;
       left: 0;
       background-color: #FBFAF9;
       position: absolute;
+      padding-top: 56px;
+      padding-bottom: 52px;
+      overflow-x: hidden;
+      overflow-y: auto;
 
       @include tablet() {
         margin-left: 0;
@@ -70,6 +74,10 @@ div.cmail-outer {
       div.cmail-header {
         background-color: #FBFAF9;
         border-bottom: 1px solid #EEEAE9;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
 
         div.close-bt-container {
           position: absolute;
@@ -147,14 +155,13 @@ div.cmail-outer {
       }
 
       div.cmail-content {
-        max-height: initial;
-        min-height: initial;
-        overflow-x: hidden;
-        overflow-y: scroll;
-        max-height: calc(100vh - 108px);
         width: 640px;
         margin: 0 auto;
         padding: 66px 0 24px;
+        min-height: 240px;
+        max-height: unset;
+        overflow-x: auto;
+        overflow-y: auto;
 
         div.cmail-content-abstract-container {
           margin-top: 24px;
@@ -180,6 +187,11 @@ div.cmail-outer {
       div.cmail-footer {
         width: 640px;
         margin: 0 auto;
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        margin-left: -320px;
+        background-color: #FBFAF9;
       }
     }
   }
@@ -639,7 +651,7 @@ div.cmail-outer {
 
           @media screen and (min-height: 556px) {
             min-height: 182px;
-            max-height: calc(100vh - 315px);
+            max-height: calc(100vh - 359px);
           }
 
           @include tablet() {
