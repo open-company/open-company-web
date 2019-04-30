@@ -3,7 +3,7 @@
             [oc.web.dispatcher :as dis]))
 
 ;; Default time to disappeara notification
-(def default-expiration-time 5)
+(def default-expiration-time 3)
 
 (defn show-notification [notification-data]
   (let [expiration-time (or (:expire notification-data) default-expiration-time)

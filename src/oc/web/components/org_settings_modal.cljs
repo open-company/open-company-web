@@ -13,6 +13,8 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
@@ -28,6 +30,22 @@
   (if s
     (reset! (::unmounting s) true)
     (real-close)))
+
+(defn close-clicked [s]
+  (let [org-editing @(drv/get-ref s :org-editing)]
+    (if (:has-changes org-editing)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "org-settings-unsaved-edits"
+                        :message "Leave without saving your changes?"
+                        :link-button-title "Stay"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Lose changes"
+                        :solid-button-cb #(do
+                                            (alert-modal/hide-alert)
+                                            (dismiss-modal s))}]
+        (alert-modal/show-alert alert-data))
+      (dismiss-modal))))
 
 (defn form-is-clean? [s]
   (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
@@ -59,7 +77,7 @@
   (notification-actions/show-notification
    {:title "Image upload error"
     :description "An error occurred while processing your company avatar. Please retry."
-    :expire 5
+    :expire 3
     :id :org-avatar-upload-failed
     :dismiss true})
   (when img
@@ -98,7 +116,7 @@
   (notification-actions/show-notification
    {:title (if success? "Email domain successfully removed" "Error")
     :description (when-not success? "An error occurred while removing the email domain, please try again.")
-    :expire 5
+    :expire 3
     :id (if success? :email-domain-remove-success :email-domain-remove-error)
     :dismiss true}))
 
@@ -127,6 +145,9 @@
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
     s)
+   :did-mount (fn [s]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+    s)
    :did-update (fn [s]
     (when (and @(::unmounting s)
                (compare-and-set! (::unmounted s) false true))
@@ -153,6 +174,7 @@
         qsg-data (drv/react s :qsg)
         org-data-for-avatar (merge org-data org-avatar-editing)
         org-editing (drv/react s :org-editing)
+        is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         {:keys [query-params
                 um-domain-invite
                 add-email-domain-team-error
@@ -163,7 +185,7 @@
     [:div.org-settings-modal
       {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click #(close-clicked s)}]
       [:div.org-settings-modal-container
         [:div.org-settings-header
           [:div.org-settings-header-title
@@ -178,9 +200,7 @@
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(if (form-is-clean? s)
-                          (dismiss-modal s)
-                          (reset-form s))}
+            {:on-click #(close-clicked s)}
             "Back"]]
         [:div.org-settings-body
           [:div.org-settings-header-avatar.qsg-company-logo-3.group
@@ -204,7 +224,13 @@
             [:div.org-settings-desc
               (str ls/web-server-domain "/" (:slug org-data))]
             [:div.org-settings-label
-              "Allowed email domains"]
+              "Allowed email domains"
+              [:i.mdi.mdi-information-outline
+                {:title "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."
+                 :data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
             [:input.org-settings-field
               {:type "text"
                :placeholder "@domain.com"
@@ -248,8 +274,10 @@
                              "links allow them to read the post without first logging in. A login is still required "
                              "to access additional posts. If you turn off secure links, your team will always need to "
                              "be logged in to view posts.")
-                     :data-toggle "tooltip"
-                     :data-placement "top"}]]]
+                     :data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
               [:div.org-settings-advanced-row.public-sections.group
                 (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                   :disabled false
