@@ -83,7 +83,7 @@
                      (utils/after 180 hide-wrt))
                    s)}
 
-  [s activity-data read-data show-above]
+  [s activity-data read-data]
   (let [item-id (:uuid activity-data)
         seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
@@ -100,18 +100,22 @@
         current-user-data (drv/react s :current-user-data)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
+        seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
         appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
                           (not @(::unmounted s)))]
     [:div.wrt-popup-container
       {:class (utils/class-set {:appear appear-class})
-       :on-click #(dismiss-modal s)}
+       :on-click #(if @(::list-view-dropdown-open s)
+                    (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
+                      (reset! (::list-view-dropdown-open s) false))
+                    (when-not (utils/event-inside? % (rum/ref-node s :wrt-popup))
+                      (dismiss-modal s)))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(dismiss-modal s)}]
       [:div.wrt-popup
-        {:class (utils/class-set {:top show-above
-                                  :loading (not (:reads read-data))})
-         :on-click #(.stopPropagation %)}
+        {:class (utils/class-set {:loading (not (:reads read-data))})
+         :ref :wrt-popup}
         [:div.wrt-popup-header
           [:span.wrt-popup-header-title
             "Who viewed this post"]]
@@ -120,7 +124,38 @@
           (when is-mobile?
             (small-loading))
           [:div.wrt-popup-inner
+            [:div.wrt-chart-container
+              [:div.wrt-chart
+                [:svg
+                  {:width "116px"
+                   :height "116px"
+                   :viewBox "0 0 116 116"
+                   :version "1.1"
+                   :xmlns "http://www.w3.org/2000/svg"
+                   :xmlnsXlink "http://www.w3.org/1999/xlink"}
+                  [:circle.wrt-donut-ring
+                    {:cx "58px"
+                     :cy "58px"
+                     :r "50px"
+                     :fill "transparent"
+                     :stroke "#ECECEC"
+                     :stroke-width "16px"}]
+                  [:circle.wrt-donut-segment
+                    {:cx "58"
+                     :cy "58"
+                     :r "50"
+                     :fill "transparent"
+                     :stroke "#3FBD7C"
+                     :stroke-width "16"
+                     :class (when @(:first-render-done s) (str "wrt-donut-segment-" seen-percent))}]
+                  [:g.wrt-chart-text
+                    [:text.wrt-chart-number
+                      {:x "50%" :y "50%"}
+                      (str seen-percent "%")]]]]
+              [:div.wrt-chart-label
+                (str (count seen-users) " of " (count all-users) " people viewed this post.")]]
             [:div.wrt-popup-tabs
+              {:ref :wrt-pop-up-tabs}
               [:div.wrt-popup-tabs-select
                 {:on-click #(swap! (::list-view-dropdown-open s) not)}
                 (dropdown-label @list-view (count all-users))]
@@ -183,18 +218,8 @@
     (>= fixed-top-position (/ win-height 2))))
 
 (rum/defcs wrt-count < rum/reactive
-                       ;; Locals
-                       (rum/local false ::under-middle-screen)
                        ;; Derivatives
                        (drv/drv :wrt-show)
-                       {:did-mount (fn [s]
-                        (when-not (responsive/is-tablet-or-mobile?)
-                          (reset! (::under-middle-screen s) (under-middle-screen? (rum/dom-node s))))
-                        s)
-                        :did-remount (fn [_ s]
-                        (when-not (responsive/is-tablet-or-mobile?)
-                          (reset! (::under-middle-screen s) (under-middle-screen? (rum/dom-node s))))
-                        s)}
 
   [s activity-data read-data]
   (let [item-id (:uuid activity-data)
@@ -217,4 +242,4 @@
           "0 Viewers")]
       (when (and (not is-mobile?)
                  (= wrt-show item-id))
-        (wrt activity-data read-data @(::under-middle-screen s)))]))
+        (wrt activity-data read-data))]))
