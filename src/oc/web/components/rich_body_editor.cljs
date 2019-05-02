@@ -12,8 +12,10 @@
             [oc.web.utils.mention :as mention-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.multi-picker :refer (multi-picker)]
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [cljsjs.medium-editor]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
@@ -85,10 +87,14 @@
 ;; Video
 
 (defn add-video [s editable]
-  (let [editable (or editable (get-media-picker-extension s))]
-    (.saveSelection editable))
-  (dis/dispatch! [:input [:media-input :media-video] true])
-  (reset! (::media-video s) true))
+  (let [options (first (:rum/args s))]
+    (when-not (:use-inline-media-picker options)
+      (let [editable (or editable (get-media-picker-extension s))]
+        (.saveSelection editable)))
+    (dis/dispatch! [:input [:media-input :media-video] true])
+    (reset! (::media-video s) true)
+    (when (:use-inline-media-picker options)
+      (reset! (::showing-media-video-modal s) true))))
 
 (defn get-video-thumbnail [video]
   (cond
@@ -273,7 +279,8 @@
         placeholder (or (:placeholder options) "What would you like to share?")
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
-                           :useInlinePlusButton (:use-inline-media-picker options)
+                           :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
+                                                         :alwaysExpanded (:use-inline-media-picker options)}
                            :saveSelectionClickElementId default-mutli-picker-button-id
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
@@ -361,11 +368,18 @@
                                (rum/local false ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
+                               (rum/local false ::showing-media-video-modal)
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
                                (drv/drv :team-roster)
                                (mention-mixins/oc-mentions-hover)
+                               (on-window-click-mixin (fn [s e]
+                                (when (and @(::showing-media-video-modal s)
+                                           (not (utils/event-inside? e (sel1 [:button.media.media-video])))
+                                           (not (utils/event-inside? e (rum/ref-node s :video-container))))
+                                  (media-video-add s @(::media-picker-ext s) nil)
+                                  (reset! (::showing-media-video-modal s) false))))
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
@@ -402,23 +416,32 @@
              multi-picker-container-selector
              dispatch-input-key
              start-video-recording-cb]}]
-  [:div.rich-body-editor-container
-    (when multi-picker-container-selector
-      (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
-        (rum/portal
-         (multi-picker
-          {:toggle-button-id default-mutli-picker-button-id
-           :add-photo-cb #(add-photo s nil)
-           :add-video-cb #(add-video s nil)
-           :add-attachment-cb #(add-attachment s nil)
-           :start-video-recording-cb #(do
-                                        (.removeSelection (get-media-picker-extension s))
-                                        (start-video-recording-cb %))})
-         multi-picker-container)))
-    [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
-      {:ref "body"
-       :content-editable (not nux)
-       :class (str classes
-               (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
-                                 :uploading @(::upload-lock s)}))
-       :dangerouslySetInnerHTML (utils/emojify initial-body)}]])
+  [:div.rich-body-editor-outer-container
+    [:div.rich-body-editor-container
+      (when multi-picker-container-selector
+        (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
+          (rum/portal
+           (multi-picker
+            {:toggle-button-id default-mutli-picker-button-id
+             :add-attachment-cb #(add-attachment s nil)
+             :start-video-recording-cb #(do
+                                          (.removeSelection (get-media-picker-extension s))
+                                          (start-video-recording-cb %))})
+           multi-picker-container)))
+      [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
+        {:ref "body"
+         :content-editable (not nux)
+         :class (str classes
+                 (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                                   :uploading @(::upload-lock s)}))
+         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
+    (when @(::showing-media-video-modal s)
+      [:div.video-container
+        {:ref :video-container}
+        (media-video-modal {:record-video-cb #(do
+                                                (media-video-add s @(::media-picker-ext s) nil)
+                                                (reset! (::showing-media-video-modal s) false)
+                                                (start-video-recording-cb %))
+                            :dismiss-cb #(do
+                                          (media-video-add s @(::media-picker-ext s) nil)
+                                          (reset! (::showing-media-video-modal s) false))})])])

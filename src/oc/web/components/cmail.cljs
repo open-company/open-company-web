@@ -603,14 +603,6 @@
                        show-edit-tooltip)
               (edit-tooltip s))]]
       [:div.cmail-footer
-        [:div.cmail-footer-multi-picker
-          {:id "cmail-footer-multi-picker"}]
-        (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                       :width 24
-                       :height 24
-                       :position "top"
-                       :default-field-selector "div.cmail-content div.rich-body-editor"
-                       :container-selector "div.cmail-content"})
         [:div.cmail-footer-right
           [:div.delete-button-container
             [:button.mlb-reset.delete-button
@@ -619,7 +611,15 @@
                :data-placement "top"
                :data-trigger "hover"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :on-click #(delete-clicked s % cmail-data)}]]]
+               :on-click #(delete-clicked s % cmail-data)}]]
+          [:div.cmail-footer-multi-picker
+            {:id "cmail-footer-multi-picker"}]
+          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                         :width 24
+                         :height 24
+                         :position "top"
+                         :default-field-selector "div.cmail-content div.rich-body-editor"
+                         :container-selector "div.cmail-content"})]
         (when (and (not= (:status cmail-data) "published")
                    (not is-mobile?))
           (if (or (:has-changes cmail-data)
