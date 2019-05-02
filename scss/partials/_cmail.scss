@@ -198,11 +198,13 @@ div.cmail-outer {
       }
 
       div.cmail-footer {
-        width: 100%;
+        width: 240px;
         margin: 0 auto;
         position: absolute;
         bottom: 0;
-        background-color: #FBFAF9;
+        right: 0;
+        left: unset;
+        background-color: transparent;
       }
     }
   }
