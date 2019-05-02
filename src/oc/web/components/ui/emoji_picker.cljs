@@ -107,7 +107,7 @@
                           ::ff-window-click
                           ::ff-keypress))}
   [s {:keys [add-emoji-cb position width height container-selector force-enabled default-field-selector
-             will-open-picker will-close-picker]
+             will-open-picker will-close-picker tooltip-position]
       :as arg
       :or {position "top"
            width 25
@@ -123,7 +123,7 @@
       [:button.emoji-button.btn-reset
         {:type "button"
          :title "Insert emoji"
-         :data-placement "top"
+         :data-placement (or tooltip-position "top")
          :data-container "body"
          :data-toggle "tooltip"
          :disabled (and (not default-field-selector) (not force-enabled) @(::disabled s))

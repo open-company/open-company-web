@@ -143,6 +143,82 @@ div.cmail-outer {
           }
         }
 
+        div.cmail-header-right-buttons {
+          position: absolute;
+          width: 102px;
+          height: 24px;
+          right: 88px;
+          top: 16px;
+
+          div.delete-button-container {
+            float: left;
+            margin-left: 16px;
+
+            button.delete-button {
+              width: 22px;
+              height: 24px;
+              background-image: cdnUrl("/img/ML/cmail_delete.svg");
+              background-size: 14px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              opacity: 0.4;
+              padding: 0;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+          }
+
+          button.attachment-button {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $deep_navy;
+            position: relative;
+            float: left;
+            margin-left: 16px;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            opacity: 0.4;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            &:hover, &.active {
+              opacity: 1;
+            }
+          }
+
+          div.emoji-picker {
+            float: left;
+            margin-left: 0;
+
+            button.emoji-button {
+              width: 24px;
+              height: 24px;
+              background-position: center;
+              background-size: 16px 16px;
+              padding: 0px;
+              position: absolute;
+              top: 0px;
+              left: 0px;
+              cursor: pointer;
+            }
+
+            @include tablet() {
+              display: none;
+            }
+
+            div.picker-container {
+              right: -16px;
+              left: unset;
+              top: 28px;
+            }
+          }
+        }
+
         button.post-button {
           float: unset;
           position: absolute;
@@ -779,41 +855,6 @@ div.cmail-outer {
         display: none;
       }
 
-      div.cmail-footer-multi-picker {
-        float: right;
-
-        div.multi-picker-container {
-          margin-top: 10px;
-          margin-right: 16px;
-        }
-      }
-
-      div.emoji-picker {
-        float: right;
-        margin-right: 16px;
-        margin-top: 8px;
-
-        button.emoji-button {
-          width: 24px;
-          height: 24px;
-          background-position: center;
-          background-size: 16px 16px;
-          padding: 0px;
-          position: absolute;
-          top: 0px;
-          left: 0px;
-          cursor: pointer;
-        }
-
-        @include tablet() {
-          display: none;
-        }
-
-        div.picker-container {
-          left: -8px;
-        }
-      }
-
       div.saving-saved {
         height: 35px;
         @include OC_Body_Book();
@@ -839,6 +880,7 @@ div.cmail-outer {
             background-repeat: no-repeat;
             margin-top: 10px;
             opacity: 0.4;
+            padding: 0;
 
             &:hover {
               opacity: 1;
@@ -848,6 +890,54 @@ div.cmail-outer {
           .tooltip {
             width: 122px;
             margin-left: -24px;
+          }
+        }
+
+        button.attachment-button {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          position: relative;
+          float: right;
+          margin-right: 16px;
+          padding: 0;
+          width: 24px;
+          height: 35px;
+          opacity: 0.4;
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 14px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
+
+          &:hover, &.active {
+            opacity: 1;
+          }
+        }
+
+        div.emoji-picker {
+          float: right;
+          margin-right: 16px;
+          margin-top: 8px;
+
+          button.emoji-button {
+            width: 24px;
+            height: 24px;
+            background-position: center;
+            background-size: 16px 16px;
+            padding: 0px;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            cursor: pointer;
+          }
+
+          @include tablet() {
+            display: none;
+          }
+
+          div.picker-container {
+            right: -16px;
+            left: unset;
           }
         }
       }

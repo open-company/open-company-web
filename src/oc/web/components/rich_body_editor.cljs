@@ -14,7 +14,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.multi-picker :refer (multi-picker)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [cljsjs.medium-editor]
             [goog.dom :as gdom]
@@ -239,8 +238,6 @@
         on-change (:on-change options)]
     (on-change)))
 
-(def default-mutli-picker-button-id "entry-edit-multi-picker-bt")
-
 (defn- file-dnd-handler [s editor-ext file]
   (if (< (gobj/get file "size") (* 5 1000 1000))
     (if (.match (.-type file) "image")
@@ -281,7 +278,7 @@
         media-picker-opts {:buttons (clj->js media-config)
                            :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
                                                          :alwaysExpanded (:use-inline-media-picker options)}
-                           :saveSelectionClickElementId default-mutli-picker-button-id
+                           ; :saveSelectionClickElementId default-mutli-picker-button-id
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
@@ -413,21 +410,11 @@
              classes
              show-placeholder
              upload-progress-cb
-             multi-picker-container-selector
              dispatch-input-key
+             attachment-dom-selector
              start-video-recording-cb]}]
   [:div.rich-body-editor-outer-container
     [:div.rich-body-editor-container
-      (when multi-picker-container-selector
-        (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
-          (rum/portal
-           (multi-picker
-            {:toggle-button-id default-mutli-picker-button-id
-             :add-attachment-cb #(add-attachment s nil)
-             :start-video-recording-cb #(do
-                                          (.removeSelection (get-media-picker-extension s))
-                                          (start-video-recording-cb %))})
-           multi-picker-container)))
       [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
         {:ref "body"
          :content-editable (not nux)
