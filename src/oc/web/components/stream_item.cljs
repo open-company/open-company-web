@@ -43,7 +43,7 @@
   "After component is mounted/re-mounted add ready state and check if the content is truncated"
   [s]
   (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s :abstract))
+        $item-body (js/$ (rum/ref-node s "activity-body"))
         comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
     (when (or (.hasClass $item-body "ddd-truncated")
               (pos? (count (:attachments activity-data)))
