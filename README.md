@@ -174,6 +174,47 @@ cljs.user=> (utils/vec-dissoc [:a :b :c] :a)
 [:b :c]
 ```
 
+#### Cider
+
+For cider users, the steps are just slightly different. Within emacs:
+
+```console
+M-x cider-jack-in-cljs
+```
+
+When prompted to select a ClojureScript REPL type, choose `custom` (we will
+start our own). Wait for the REPL to connect, and again it will prompt you to
+enter the custom form to start the ClojureScript REPL. Just press enter. You now
+have a running Clojure REPL with all the required middleware.
+
+From here on out, the process is very similar to starting things up from the terminal.
+At the REPL, we're going to start the `boot dev` task as a future process:
+
+```console
+user=> (in-ns 'boot.user)
+#namespace[boot.user]
+boot.user=> (def p (future (boot (dev))))
+```
+
+Once that's finished compiling, open your browser window: [http://localhost:3559/](http://localhost:3559/)
+
+Now you're ready to start the ClojureScript REPL:
+
+```console
+boot.user=> (start-repl)
+```
+
+Wait for compilation to finish, and you should be dropped into the `cljs.user` namespace. If not, try
+refreshing the browser. Sometimes it needs a gentle nudge.
+
+Let's test it out:
+
+```console
+cljs.user=> (js/alert "Hello, browser!")
+```
+
+If all's well, you should see an alert box appear in the browser.
+
 ## Technical Design
 
 Documentation of the technical design is [here](./docs/TECHNICAL_DESIGN.md).
