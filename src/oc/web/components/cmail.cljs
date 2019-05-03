@@ -671,7 +671,7 @@
                                :start-video-recording-cb #(video-record-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video"]
+                               :media-config ["gif" "photo" "video"]
                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
             (when (and ls/oc-enable-transcriptions
                        (:fixed-video-id cmail-data)

@@ -1,5 +1,6 @@
 (ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
+            [oops.core :refer [oget]]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
@@ -7,19 +8,36 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.mention :as mention-utils]
+            [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [cljsjs.medium-editor]
+            [cljsjs.react-giphy-selector]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
-            [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]))
+
+;; Gif handling
+
+(defn add-gif [s editable]
+  (reset! (::showing-gif-selector s) true))
+
+(defn media-gif-add [s editable gif-data]
+  (if (nil? gif-data)
+    (.addGIF editable nil nil nil nil)
+    (.addGIF
+     editable
+     (oget gif-data [:images :original :gif_url])
+     (oget gif-data [:images :fixed_width_still :gif_url])
+     (oget gif-data [:images :original :width])
+     (oget gif-data [:images :original :height]))))
 
 ;; Attachment
 
@@ -43,12 +61,12 @@
 
 (defn attachment-upload-success-cb [state editable res]
   (reset! (::media-attachment-did-success state) true)
-  (let [url (gobj/get res "url")]
+  (let [url (oget res :url)]
     (if-not url
       (attachment-upload-failed-cb state editable)
-      (let [size (gobj/get res "size")
-            mimetype (gobj/get res "mimetype")
-            filename (gobj/get res "filename")
+      (let [size (oget res :size)
+            mimetype (oget res :mimetype)
+            filename (oget res :filename)
             createdat (utils/js-date)
             prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
             subtitle (str prefix (filesize size :binary false :format "%.2f" ))
@@ -177,7 +195,7 @@
        ;; success-cb
        (fn [res]
          (reset! (::media-photo-did-success s) true)
-         (let [url (gobj/get res "url")
+         (let [url (oget res :url)
                img   (gdom/createDom "img")]
            (set! (.-onload img) #(img-on-load s editable url img))
            (set! (.-onerror img) #(img-on-load s editable nil nil))
@@ -186,8 +204,8 @@
            (set! (.-src img) url)
            (reset! (::media-photo s) {:res res :url url})
            ;; if the image is a vector image
-           (if (or (= (string/lower (gobj/get res "mimetype")) "image/svg+xml")
-                   (string/ends-with? (string/lower (gobj/get res "filename")) ".svg"))
+           (if (or (= (string/lower (oget res :mimetype)) "image/svg+xml")
+                   (string/ends-with? (string/lower (oget res :filename)) ".svg"))
              ;l use the same url for the thumbnail since the size doesn't matter
              (do
                (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
@@ -224,6 +242,8 @@
 
 (defn on-picker-click [s editable type]
   (cond
+    (= type "gif")
+    (add-gif s editable)
     (= type "photo")
     (add-photo s editable)
     (= type "video")
@@ -239,7 +259,7 @@
     (on-change)))
 
 (defn- file-dnd-handler [s editor-ext file]
-  (if (< (gobj/get file "size") (* 5 1000 1000))
+  (if (< (oget file :size) (* 5 1000 1000))
     (if (.match (.-type file) "image")
       (iu/upload-file! file
         (fn [url]
@@ -247,9 +267,9 @@
           (utils/after 500 #(utils/to-end-of-content-editable (rum/ref-node s "body")))))
       (iu/upload-file! file
         (fn [url]
-          (let [size (gobj/get file "size")
-                mimetype (gobj/get file "type")
-                filename (gobj/get file "name")
+          (let [size (oget file :size)
+                mimetype (oget file :type)
+                filename (oget file :name)
                 createdat (utils/js-date)
                 prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
                 subtitle (str prefix (filesize size :binary false :format "%.2f" ))
@@ -366,6 +386,7 @@
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
                                (rum/local false ::showing-media-video-modal)
+                               (rum/local false ::showing-gif-selector)
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
@@ -376,7 +397,12 @@
                                            (not (utils/event-inside? e (sel1 [:button.media.media-video])))
                                            (not (utils/event-inside? e (rum/ref-node s :video-container))))
                                   (media-video-add s @(::media-picker-ext s) nil)
-                                  (reset! (::showing-media-video-modal s) false))))
+                                  (reset! (::showing-media-video-modal s) false))
+                                (when (and @(::showing-gif-selector s)
+                                           (not (utils/event-inside? e (sel1 [:button.media.media-gif])))
+                                           (not (utils/event-inside? e (rum/ref-node s :giphy-picker))))
+                                  (media-gif-add s @(::media-picker-ext s) nil)
+                                  (reset! (::showing-gif-selector s) false))))
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
@@ -431,4 +457,24 @@
                                                 (start-video-recording-cb %))
                             :dismiss-cb #(do
                                           (media-video-add s @(::media-picker-ext s) nil)
-                                          (reset! (::showing-media-video-modal s) false))})])])
+                                          (reset! (::showing-media-video-modal s) false))})])
+    (when @(::showing-gif-selector s)
+      [:div.giphy-picker
+        {:ref :giphy-picker}
+        (react-utils/build (.-Selector js/ReactGiphySelector)
+         {:apiKey ls/giphy-api-key
+          :queryInputPlaceholder "Search for GIF"
+          :resultColumns 1
+          :className "giphy-picker"
+          :queryFormClassName "giphy-picker-form"
+          :queryFormInputClassName "giphy-picker-form-input"
+          :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
+          :queryFormSubmitContent "Seach"
+          :searchResultsClassName "giphy-picker-results-container"
+          :searchResultClassName "giphy-picker-results-item"
+          :suggestionsClassName "giphy-picker-suggestions"
+          :suggestionClassName "giphy-picker-suggestions-suggestion"
+          :loaderClassName "giphy-picker-loader"
+          :onGifSelected (fn [gif-obj]
+                          (reset! (::showing-gif-selector s) false)
+                          (media-gif-add s @(::media-picker-ext s) gif-obj))})])])

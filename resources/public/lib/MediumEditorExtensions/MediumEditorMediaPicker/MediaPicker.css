@@ -95,6 +95,15 @@ div.medium-editor-media-picker div.media-picker-container.expanded button.media-
   opacity: 1;
 }
 
+div.medium-editor-media-picker div.media-picker-container button.media-gif {
+  background-image: url("/img/ML/media_gif.png");
+  background-size: 24px 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-gif:hover {
+  opacity: 1;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media-video {
   background-image: url("/img/ML/media_video.png");
   background-size: 18px 12px;

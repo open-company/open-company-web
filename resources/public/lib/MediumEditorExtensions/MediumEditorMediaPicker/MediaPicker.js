@@ -222,6 +222,17 @@ function PlaceCaretAtEnd(el) {
       $(event.target).tooltip("hide");
     },
 
+    gifClick: function(event){
+      if (this.inlinePlusButtonOptions.alwaysExpanded) {
+        this.hidePlaceholder();
+        this.saveSelection();
+      }
+      this.collapse();
+      this._waitingCB = true;
+      this.delegate("onPickerClick", "gif");
+      $(event.target).tooltip("hide");
+    },
+
     photoClick: function(event){
       if (this.inlinePlusButtonOptions.alwaysExpanded) {
         this.hidePlaceholder();
@@ -231,6 +242,10 @@ function PlaceCaretAtEnd(el) {
       this._waitingCB = true;
       this.delegate("onPickerClick", "photo");
       $(event.target).tooltip("hide");
+    },
+
+    addGIF: function(gifUrl, gifStillThumbnail, width, height){
+      this.addPhoto(gifUrl, gifStillThumbnail, width, height);
     },
 
     addPhoto: function(photoUrl, photoThumbnail, width, height){
@@ -569,6 +584,11 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-' + idx);
           this.addButtonTooltip(button, "Add update");
           this.on(button, 'click', this.entryClick.bind(this));
+        } else if (opt === 'gif') {
+          button.classList.add('media-gif');
+          button.classList.add('media-' + idx);
+          this.addButtonTooltip(button, "Add GIF");
+          this.on(button, 'click', this.gifClick.bind(this));
         } else if (opt === 'photo') {
           button.classList.add('media-photo');
           button.classList.add('media-' + idx);
