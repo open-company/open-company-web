@@ -205,7 +205,7 @@
                                     parameters))
   (sentry/capture-error-with-message (str "Client API error on: " callee-name))
   (sentry/clear-extra-context!)
-  (notification-actions/show-notification (assoc utils/internal-error :expire 5))
+  (notification-actions/show-notification (assoc utils/internal-error :expire 3))
   (when (fn? callback)
     (callback {:success false :status 0})))
 
