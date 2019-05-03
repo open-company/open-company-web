@@ -1,6 +1,6 @@
 (ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
-            [oops.core :refer [oget]]
+            [oops.core :refer [oget oget+]]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
@@ -32,12 +32,20 @@
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
     (.addGIF editable nil nil nil nil)
-    (.addGIF
-     editable
-     (oget gif-data [:images :original :gif_url])
-     (oget gif-data [:images :fixed_width_still :gif_url])
-     (oget gif-data [:images :original :width])
-     (oget gif-data [:images :original :height]))))
+    (let [original (oget+ gif-data [:images :original])
+          original-url (or (oget+ original "?url")
+                           (oget+ original "?gif_url"))
+          fixed-width-still (oget+ gif-data [:images :fixed_width_still])
+          fixed-width-still-url (or (oget+ fixed-width-still "?url")
+                                    (oget+ fixed-width-still "?gif_url"))
+          original-width (oget+ original :width)
+          original-height (oget+ original :height)]
+      (.addGIF
+       editable
+       original-url
+       fixed-width-still-url
+       original-width
+       original-height))))
 
 ;; Attachment
 
@@ -465,7 +473,8 @@
          {:apiKey ls/giphy-api-key
           :queryInputPlaceholder "Search for GIF"
           :resultColumns 1
-          :className "giphy-picker"
+          :preloadTrending true
+          :containerClassName "giphy-picker-container"
           :queryFormClassName "giphy-picker-form"
           :queryFormInputClassName "giphy-picker-form-input"
           :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
