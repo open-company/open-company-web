@@ -26,7 +26,7 @@
     [rum "0.11.2" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.3.1-alpha"] ; Chains of derived data https://github.com/martinklepsch/derivatives
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
-    
+
     ;; ClojureScript libraries
     [cljs-http "0.1.44"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
@@ -67,11 +67,11 @@
 
     ;; ------- Deps for project repl ------------------
     ;; The following dependencies are from: https://github.com/adzerk-oss/boot-cljs-repl
-    [adzerk/boot-cljs-repl   "0.3.3"] ;; latest release
-    [com.cemerick/piggieback "0.2.2"  :scope "test"]
-    [weasel                  "0.7.0"  :scope "test"]
-    [org.clojure/tools.nrepl "0.2.13" :scope "test"]
-    [cljsjs/babel-polyfill "6.20.0-2" :scope "test"]
+    [adzerk/boot-cljs-repl   "0.4.0"]
+    [cider/piggieback        "0.3.9"]
+    [weasel                  "0.7.0"]
+    [nrepl                   "0.4.5"]
+    ;; [cljsjs/babel-polyfill "6.20.0-2" :scope "test"]
     ;; ------------------------------------------------
 
 ])
@@ -210,7 +210,7 @@
                                  :parallel-build true
                                  :preloads '[devtools.preload]})))
 
-(deftask dev-advanced 
+(deftask dev-advanced
   "Advanced build to be used in development to find compilation/externs errors."
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
