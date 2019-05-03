@@ -89,7 +89,8 @@
             back-to-label]]
         (more-menu activity-data dom-element-id
          {:external-share (not is-mobile?)
-          :tooltip-position "bottom"})]
+          :tooltip-position "bottom"
+          :show-unread true})]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))

@@ -712,7 +712,7 @@
 (defn send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
-  [activity-id]
+  [activity-id & [show-notification]]
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               org-id (:uuid (dis/org-data))
@@ -720,7 +720,12 @@
               user-name (jwt/get-key :name)
               avatar-url (jwt/get-key :avatar-url)]
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)
-    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])))
+    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
+    (when show-notification
+      (notification-actions/show-notification {:title "Post marked as read"
+                                               :dismiss true
+                                               :expire 3
+                                               :id :mark-read-success}))))
 
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
@@ -941,5 +946,5 @@
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
                                                :description (when error "Please try again")
                                                :dismiss true
-                                               :expire 5
+                                               :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))

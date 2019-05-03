@@ -87,8 +87,8 @@ div.more-menu {
   ul.more-menu-list {
     position: absolute;
     bottom: 32px;
-    left: calc(100% - 161px);
-    width: 115px;
+    left: calc(100% - 120px);
+    width: 74px;
     outline: none;
     z-index: 110;
     background-color: white;
@@ -98,6 +98,11 @@ div.more-menu {
     margin: 0;
     padding: 8px 0;
     list-style-type: none;
+
+    &.has-read-unread {
+      left: calc(100% - 166px);
+      width: 120px;
+    }
 
     @include mobile() {
       top: 40px;

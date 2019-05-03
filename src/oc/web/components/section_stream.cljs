@@ -32,9 +32,8 @@
                             (drv/drv :org-data)
                             ;; Mixins
                             mixins/first-render-mixin
-                            ;; Remove read sent from FoC
-                            ; (mixins/wrt-stream-item-mixin "div.stream-item-body.item-ready:not(.truncated)"
-                            ;  wrt-stream-item-mixin-cb)
+                            (mixins/wrt-stream-item-mixin "div.stream-item-body.item-ready:not(.truncated)"
+                             wrt-stream-item-mixin-cb)
                             section-mixins/container-nav-in
 
   [s]

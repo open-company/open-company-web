@@ -66,7 +66,7 @@
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                          s)}
   [s activity-data share-container-id
-   {:keys [will-open will-close external-share tooltip-position]}]
+   {:keys [will-open will-close external-share tooltip-position show-unread]}]
   (let [delete-link (utils/link-for (:links activity-data) "delete")
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
@@ -98,6 +98,7 @@
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
+            {:class (when mark-unread-link "has-read-unread")}
             (when edit-link
               [:li.edit
                 {:on-click #(do
@@ -130,13 +131,21 @@
                               (activity-actions/activity-share-show activity-data share-container-id))}
                 "Share"])
             (when mark-unread-link
-              [:li.unread
-                {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
-                              (activity-actions/mark-unread activity-data))}
-                "Mark unread"])])
+              (if show-unread
+                [:li.unread
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/mark-unread activity-data))}
+                  "Mark unread"]
+                [:li.read
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/send-item-read (:uuid activity-data) true))}
+                  "Mark as read"]))])
         (when (and external-share
                    share-link
                    (not (responsive/is-tablet-or-mobile?)))
