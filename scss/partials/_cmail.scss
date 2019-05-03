@@ -168,6 +168,10 @@ div.cmail-outer {
                 opacity: 1;
               }
             }
+
+            .tooltip {
+              margin-left: -32px;
+            }
           }
 
           button.attachment-button {
@@ -902,7 +906,7 @@ div.cmail-outer {
           margin-right: 16px;
           padding: 0;
           width: 24px;
-          height: 35px;
+          height: 40px;
           opacity: 0.4;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
           background-size: 14px 16px;

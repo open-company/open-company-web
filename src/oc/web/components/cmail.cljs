@@ -695,7 +695,7 @@
                 {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :data-container "body"
+                 :data-trigger "hover"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :on-click #(delete-clicked s % cmail-data)}]]
             [:button.mlb-reset.attachment-button
