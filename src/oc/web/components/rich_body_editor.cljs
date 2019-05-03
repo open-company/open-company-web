@@ -32,14 +32,14 @@
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
     (.addGIF editable nil nil nil nil)
-    (let [original (oget+ gif-data [:images :original])
+    (let [original (oget+ gif-data ["images" "original"])
           original-url (or (oget+ original "?url")
                            (oget+ original "?gif_url"))
-          fixed-width-still (oget+ gif-data [:images :fixed_width_still])
+          fixed-width-still (oget+ gif-data ["images" "fixed_width_still"])
           fixed-width-still-url (or (oget+ fixed-width-still "?url")
                                     (oget+ fixed-width-still "?gif_url"))
-          original-width (oget+ original :width)
-          original-height (oget+ original :height)]
+          original-width (oget+ original "width")
+          original-height (oget+ original "height")]
       (.addGIF
        editable
        original-url
