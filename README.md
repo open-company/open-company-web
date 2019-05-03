@@ -160,7 +160,7 @@ boot repl -c
 At this point, you can start a weasel server to connect to the browser window:
 
 ```console
-cljs.user=> (start-repl)
+boot.user=> (start-repl)
 ```
 
 If the REPL doesn't connect to the browser window, refresh the page in the browser.
