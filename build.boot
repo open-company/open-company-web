@@ -71,7 +71,6 @@
     [cider/piggieback        "0.3.9"]
     [weasel                  "0.7.0"]
     [nrepl                   "0.4.5"]
-    ;; [cljsjs/babel-polyfill "6.20.0-2" :scope "test"]
     ;; ------------------------------------------------
 
 ])
