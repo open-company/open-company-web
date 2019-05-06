@@ -81,37 +81,30 @@
                  :title "Log in to view all posts"}
                 [:span
                   [:span.login-as
-                    "Login as " (:first-name id-token)]
+                    "Log in as " (:first-name id-token)]
                   (user-avatar-image id-token)]]]
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
                 {:on-click #(router/nav! oc-urls/home)}
-                "Learn more"]
+                "learn more about Carrot"]
+              [:span.or " or "]
               [:button.mlb-reset.login-bt
                 {:on-click #(user-actions/show-login :login-with-email)}
                 "Login"]])])
       (when activity-data
         [:div.activity-content-outer
-          [:div.activity-content-header
-            [:div.activity-content-header-author
-              (user-avatar-image (:publisher activity-data))
-              [:div.name
-                {:class utils/hide-class}
-                (:name (:publisher activity-data))]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since t)])]]]
           [:div.activity-content
             (when (:headline activity-data)
               [:div.activity-title
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
                  :class utils/hide-class}])
+            [:div.activity-content-author
+              (user-avatar-image (:publisher activity-data))
+              [:div.name
+                {:class utils/hide-class}
+                (str (:name (:publisher activity-data)) " in "
+                 (:board-name activity-data) " on "
+                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
             (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
@@ -136,23 +129,20 @@
               (reactions activity-data)
               (when is-mobile?
                 (comments-summary activity-data true))]
+            (when (or comments-data
+                      (:can-comment activity-data))
+              [:div.comments-separator])
             (when comments-data
               (stream-comments activity-data comments-data true))
             (when (:can-comment activity-data)
-              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])
+              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
+            [:div.secure-activity-footer
+              (if id-token
+                [:button.mlb-reset.secure-activity-footer-bt
+                  {:on-click #(user-actions/show-login :login-with-email)}
+                  "Log in required to access all posts"]
+                [:div.sent-via-carrot
+                  "Sent via Carrot"])]])
       (when-not activity-data
         [:div.secure-activity-container
-          (loading {:loading true})])
-      [:div.secure-activity-footer
-        (if id-token
-          [:button.mlb-reset.secure-activity-footer-bt.with-id-token
-            {:on-click #(user-actions/show-login :login-with-email)}
-            [:span.pre-login-span "Log in to view all posts."]
-            [:span.green-user-button.group
-              (user-avatar-image id-token)
-              [:span.inner "Log in as " (:first-name id-token)]]]
-          [:button.mlb-reset.secure-activity-footer-bt
-            {:on-click #(router/nav! oc-urls/home)}
-            [:span
-              "Learn more about Carrot"
-              [:div.right-arrow]]])]]))
+          (loading {:loading true})])]))
