@@ -233,6 +233,25 @@ div.edit-recurring-update-modal-container {
           display: none;
         }
       }
+
+      div.edit-recurring-update-footer {
+        margin-top: 16px;
+        height: 24px;
+        border-top: 1px solid rgba($deep_tan, 0.3);
+        padding-top: 16px;
+
+        button.delete-bt {
+          height: 18px;
+          float: left;
+          width: 160px;
+          color: $carrot_orange_2;
+          @include OC_Body_Book();
+          font-size: 14px;
+          text-align: left;
+          margin: 0;
+          padding: 0;
+        }
+      }
     }
   }
 }
