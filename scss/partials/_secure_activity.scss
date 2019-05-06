@@ -158,10 +158,17 @@ div.secure-activity-container {
         }
       }
 
+      div.activity-abstract {
+        margin: 16px 0 32px;
+        cursor: text;
+        @include activity-abstract(18px, 24px);
+        @include OC_Body_Bold();
+      }
+
       div.activity-body {
         border: none;
         outline: none;
-        margin: 32px 0 0;
+        margin: 16px 0 0;
         cursor: text;
         @include activity-body(18, 24, 24, $deep_navy); 
         color: $deep_navy;
