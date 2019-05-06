@@ -24,7 +24,7 @@
 (defn close-expanded-post []
   (routing-actions/dismiss-post-modal))
 
-(defn save-fixed-comment-height [s]
+(defn save-fixed-comment-height! [s]
   (let [cur-height (.outerHeight (js/$ (rum/ref-node s :expanded-post-fixed-add-comment)))]
     (when-not (= @(::comment-height s) cur-height)
       (reset! (::comment-height s) cur-height))))
@@ -33,7 +33,7 @@
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
 
-(defn calc-video-height [s]
+(defn set-mobile-video-height! [s]
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
@@ -68,7 +68,7 @@
   (mention-mixins/oc-mentions-hover)
   interactable-images-mixin
   {:did-mount (fn [s]
-                (save-fixed-comment-height s)
+                (save-fixed-comment-height! s)
                 s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -139,5 +139,5 @@
      [:div.expanded-post-fixed-add-comment
       {:ref :expanded-post-fixed-add-comment}
       [:div.expanded-post-fixed-add-comment-inner
-       (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height s) 300))
+       (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height! s) 300))
          (str "expanded-post-fixed-add-comment-" (:uuid activity-data)))]]]))
