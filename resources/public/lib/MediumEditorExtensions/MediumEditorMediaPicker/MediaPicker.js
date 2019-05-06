@@ -78,7 +78,7 @@ function PlaceCaretAtEnd(el) {
         if (this.useInlinePlusButton) {
           that.on(element, 'click', that.togglePicker.bind(that));
           that.on(element, 'keyup', that.togglePicker.bind(that));
-          // that.on(element, 'focus', that.onFocus.bind(that));
+          that.on(element, 'focus', that.onFocus.bind(that));
           that.on(element, 'editableInput', that.togglePicker.bind(that));
         }
         // that.on(element, 'blur', that.hide.bind(that));
