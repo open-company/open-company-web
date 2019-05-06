@@ -1,5 +1,6 @@
 (ns oc.web.components.expanded-post
   (:require [rum.core :as rum]
+            [dommy.core :as dom]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -36,6 +37,23 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn wrap-img-tags-in-anchors!
+  "Wraps all `img` tags within the post's body in anchor tags to allow for opening in a new tab."
+  [s]
+  (let [body (rum/ref s "post-body")
+        imgs (dom/sel body "img")]
+    (doseq [img  imgs
+            :let [anchor (dom/create-element "a")
+                  href   (.-src img)]]
+      (dom/set-attr! anchor :href href :target "_blank")
+      (dom/insert-before! anchor img)
+      (dom/remove! img)
+      (dom/replace-contents! anchor img))
+    s))
+
+(def interactable-images-mixin
+  {:did-mount wrap-img-tags-in-anchors!})
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :activity-data)
@@ -48,9 +66,10 @@
   (rum/local 0 ::mobile-video-height)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
+  interactable-images-mixin
   {:did-mount (fn [s]
-    (save-fixed-comment-height s)
-    s)}
+                (save-fixed-comment-height s)
+                s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
         comments-drv (drv/react s :comments-data)
@@ -62,9 +81,9 @@
         is-mobile? (responsive/is-mobile-size?)
         is-all-posts? (= (router/current-board-slug) "all-posts")
         back-to-label (str "Back to "
-                       (if is-all-posts?
-                         "All Posts"
-                         (:board-name activity-data)))
+                           (if is-all-posts?
+                             "All Posts"
+                             (:board-name activity-data)))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
         is-publisher? (= (:user-id publisher) (jwt/user-id))
@@ -76,48 +95,49 @@
                        {:width 638
                         :height (utils/calc-video-height 638)}))]
     [:div.expanded-post
-      {:class dom-node-class
-       :id dom-element-id
-       :style {:padding-bottom (str @(::comment-height s) "px")}}
-      [:div.activity-share-container]
-      [:div.expanded-post-header.group
-        [:button.mlb-reset.back-to-board
-          {:on-click close-expanded-post}
-          [:div.back-arrow]
-          [:div.back-to-board-inner
-            back-to-label]]
-        (more-menu activity-data dom-element-id
-         {:external-share (not is-mobile?)
-          :tooltip-position "bottom"})]
-      (when has-video
-        [:div.group
-          {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
-           :ref :ziggeo-player}
-          (ziggeo-player {:video-id (:fixed-video-id activity-data)
-                          :width (:width video-size)
-                          :height (:height video-size)
-                          :lazy (not video-player-show)
-                          :video-image (:video-image activity-data)
-                          :video-processed (:video-processed activity-data)
-                          :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})])
-      [:div.expanded-post-headline
-        (:headline activity-data)]
-      [:div.expanded-post-author
-        (user-avatar-image publisher)
-        [:div.expanded-post-author-inner
-          (str (:name publisher) " in "
-               (:board-name activity-data) " on "
-               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
-      [:div.expanded-post-body.oc-mentions.oc-mentions-hover
-        {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
-      (stream-attachments (:attachments activity-data))
-      [:div.expanded-post-footer
-        (comments-summary activity-data true)
-        (reactions activity-data)]
-      [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data)]
-      [:div.expanded-post-fixed-add-comment
-        {:ref :expanded-post-fixed-add-comment}
-        [:div.expanded-post-fixed-add-comment-inner
-          (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height s) 300))
-           (str "expanded-post-fixed-add-comment-" (:uuid activity-data)))]]]))
+     {:class dom-node-class
+      :id dom-element-id
+      :style {:padding-bottom (str @(::comment-height s) "px")}}
+     [:div.activity-share-container]
+     [:div.expanded-post-header.group
+      [:button.mlb-reset.back-to-board
+       {:on-click close-expanded-post}
+       [:div.back-arrow]
+       [:div.back-to-board-inner
+        back-to-label]]
+      (more-menu activity-data dom-element-id
+                 {:external-share (not is-mobile?)
+                  :tooltip-position "bottom"})]
+     (when has-video
+       [:div.group
+        {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
+         :ref :ziggeo-player}
+        (ziggeo-player {:video-id (:fixed-video-id activity-data)
+                        :width (:width video-size)
+                        :height (:height video-size)
+                        :lazy (not video-player-show)
+                        :video-image (:video-image activity-data)
+                        :video-processed (:video-processed activity-data)
+                        :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})])
+     [:div.expanded-post-headline
+      (:headline activity-data)]
+     [:div.expanded-post-author
+      (user-avatar-image publisher)
+      [:div.expanded-post-author-inner
+       (str (:name publisher) " in "
+            (:board-name activity-data) " on "
+            (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+     [:div.expanded-post-body.oc-mentions.oc-mentions-hover
+      {:ref "post-body"
+       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+     (stream-attachments (:attachments activity-data))
+     [:div.expanded-post-footer
+      (comments-summary activity-data true)
+      (reactions activity-data)]
+     [:div.expanded-post-comments.group
+      (stream-comments activity-data comments-data)]
+     [:div.expanded-post-fixed-add-comment
+      {:ref :expanded-post-fixed-add-comment}
+      [:div.expanded-post-fixed-add-comment-inner
+       (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height s) 300))
+         (str "expanded-post-fixed-add-comment-" (:uuid activity-data)))]]]))
