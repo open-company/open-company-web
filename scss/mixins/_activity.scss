@@ -327,11 +327,6 @@ $h2_top_margin: 24;
     text-decoration: underline;
   }
 
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
   .emojione {
     @include emoji-size($font-size - 2);
   }
@@ -348,14 +343,23 @@ $h2_top_margin: 24;
     margin-bottom: 0px;
   }
 
-  iframe, img {
+  img {
+      display: block;
+      margin: 0 auto;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 400px;
+  }
+
+  iframe {
     margin: 0 auto;
     display: block;
     width: 100% !important;
   }
 
   @include tablet() {
-    iframe.carrot-no-preview, img.carrot-no-preview {
+    iframe.carrot-no-preview {
       width: calc(100% + 32px) !important;
       margin: 0 0 0 -16px;
       max-width: calc(100% + 32px);
