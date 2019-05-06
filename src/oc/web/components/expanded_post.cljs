@@ -46,6 +46,7 @@
             :let [anchor (dom/create-element "a")
                   href   (.-src img)]]
       (dom/set-attr! anchor :href href :target "_blank")
+      (dom/add-class! anchor :interactable-image)
       (dom/insert-before! anchor img)
       (dom/remove! img)
       (dom/replace-contents! anchor img))
