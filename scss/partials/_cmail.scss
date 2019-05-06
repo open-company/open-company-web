@@ -109,7 +109,7 @@ div.cmail-outer {
           position: absolute;
           left: 50%;
           top: 12px;
-          margin-left: -84px;
+          margin-left: -104px;
 
           div.board-name {
             background-image: cdnUrl("/img/ML/select_arrows.svg");
@@ -172,12 +172,20 @@ div.cmail-outer {
         overflow-x: auto;
         overflow-y: auto;
 
+        div.cmail-content-headline {
+          font-size: 32px;
+          line-height: 40px;
+          min-height: 40px;
+        }
+
         div.cmail-content-abstract-container {
           margin-top: 24px;
           padding-bottom: 32px;
 
+
           textarea.cmail-content-abstract {
             background-color: #FBFAF9;
+            @include activity-abstract(18px, 26px);
           }
         }
 
@@ -186,6 +194,8 @@ div.cmail-outer {
 
           div.rich-body-editor {
             min-height: calc(100vh - 342px);
+            @include activity-body(18, 26, 26, $deep_navy);
+
             @media screen and (min-height: 556px) {
               max-height: initial;
             }
@@ -254,7 +264,7 @@ div.cmail-outer {
       div.cmail-header-board-must-see-container {
         float: left;
         height: 32px;
-        width: 168px;
+        width: 208px;
         position: relative;
 
         &.must-see-on {
@@ -262,7 +272,7 @@ div.cmail-outer {
         }
 
         div.board-name {
-          width: 120px;
+          width: 160px;
           height: 32px;
           cursor: pointer;
           position: relative;
@@ -274,7 +284,7 @@ div.cmail-outer {
           padding: 7px 8px;
           background-image: cdnUrl("/img/ML/select_arrows_white.svg");
           background-size: 8px 10px;
-          background-position: top 11px right 4px;
+          background-position: top 11px right 8px;
           background-repeat: no-repeat;
           background-color: rgba(white, 0.2);
           border-radius: 4px;
@@ -286,7 +296,7 @@ div.cmail-outer {
           div.board-name-inner {
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: calc(100% - 8px);
+            max-width: calc(100% - 16px);
             white-space: nowrap;
           }
 
@@ -301,7 +311,7 @@ div.cmail-outer {
         div.sections-picker {
           position: absolute;
           top: 40px;
-          left: -40px;
+          left: -20px;
           z-index: #{$navbar_zindex + 156};
           max-height: 370px;
           overflow: auto;

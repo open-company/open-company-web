@@ -327,11 +327,11 @@
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
-                    (when-let [headline-el (rum/ref-node s "headline")]
-                      (utils/to-end-of-content-editable headline-el))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                     (when ls/oc-enable-transcriptions
                       (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
+                    (when-let [body-el (body-element)]
+                      (utils/to-end-of-content-editable body-el))
                     s)
                    :did-remount (fn [_ s]
                     (when ls/oc-enable-transcriptions
