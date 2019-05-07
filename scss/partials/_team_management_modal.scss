@@ -207,6 +207,11 @@ div.team-management-modal {
             line-height: 24px;
             color: $light_navy;
 
+            span.self-user-type {
+              text-transform: capitalize;
+              padding: 0 7px;
+            }
+
             div.dropdown {
               height: 24px;
 
@@ -215,6 +220,7 @@ div.team-management-modal {
                 line-height: 24px;
                 padding-right: 16px;
                 width: 90px;
+                text-align: right;
               }
 
               ul.user-type-dropdown-menu {
