@@ -98,7 +98,7 @@
       [:div.team-management
         [:div.team-management-header
           [:div.team-management-header-title
-            "Integrations"]
+            "Manage team"]
           [:button.mlb-reset.save-bt
             {:on-click #(show-modal :invite)}
             "Invite"]
