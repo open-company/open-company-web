@@ -158,6 +158,12 @@ div.team-management-modal {
             width: calc(100% - 122px);
             height: 24px;
 
+            div.tooltip {
+              i.mdi.mdi-slack:before {
+                font-size: 17px;
+              }
+            }
+
             div.user-name-label {
               @include OC_Body_Book();
               font-size: 14px;

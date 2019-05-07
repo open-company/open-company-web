@@ -201,8 +201,7 @@
                                               :removing removing?})
                      :data-toggle "tooltip"
                      :data-html "true"
-                     :data-placement "top"
-                     :data-container "body"}
+                     :data-placement "top"}
                     display-name
                     (when current-user
                       [:span.current-user " (you)"])]
