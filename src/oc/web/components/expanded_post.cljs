@@ -10,6 +10,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
@@ -37,6 +38,12 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- load-comments [s]
+  (let [activity-data @(drv/get-ref s :activity-data)
+        activity-uuid (:uuid activity-data)
+        comments-data @(drv/get-ref s :comments-data)]
+    (comment-actions/get-comments-if-needed activity-data comments-data)))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :activity-data)
@@ -52,6 +59,10 @@
   (mention-mixins/oc-mentions-hover)
   {:did-mount (fn [s]
     (save-fixed-comment-height s)
+    (load-comments s)
+    s)
+   :did-remount (fn [_ s]
+    (load-comments s)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
