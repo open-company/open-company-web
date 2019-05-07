@@ -56,7 +56,7 @@
 ;; Section settings
 
 (defn show-section-editor []
-  (push-panel :section-editor))
+  (push-panel :section-edit))
 
 (defn hide-section-editor []
   (pop-panel))

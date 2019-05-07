@@ -110,14 +110,4 @@
                      :data-title (utils/tooltip-date (:created-at n))}
                     (utils/time-since (:created-at n) [:short])]]
                 [:div.user-notification-body.oc-mentions.oc-mentions-hover
-                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
-                ; (when (:unread n)
-                ;   [:button.mlb-reset.read-bt
-                ;     {:title "Mark as read"
-                ;      :ref :read-bt
-                ;      :data-toggle "tooltip"
-                ;      :data-placement "top"
-                ;      :data-container "body"
-                ;      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                ;      :on-click #(user-actions/read-notification n)}])
-                ]))]]]))
+                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))]]]))

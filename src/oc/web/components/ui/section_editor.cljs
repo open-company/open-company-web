@@ -313,7 +313,7 @@
                        (pos? (count slack-users))
                        (pos? (count slack-orgs)))
               [:div.section-editor-enable-slack-bot.group
-                "Automatically share posts to Slack?"
+                "Automatically share posts to Slack? "
                 [:button.mlb-reset.enable-slack-bot-bt
                   {:on-click (fn [_]
                                (org-actions/bot-auth team-data cur-user-data (router/get-token)))}

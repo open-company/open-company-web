@@ -32,22 +32,19 @@
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
 (defn close-clicked [current-user-data]
-  (let [switch-cb (fn []
-                   (dismiss-modal)
-                   (utils/after 150 dismiss-modal))]
-    (if (:has-changes current-user-data)
-      (let [alert-data {:icon "/img/ML/trash.svg"
-                        :action "user-profile-unsaved-edits"
-                        :message "Leave without saving your changes?"
-                        :link-button-title "Stay"
-                        :link-button-cb #(alert-modal/hide-alert)
-                        :solid-button-style :red
-                        :solid-button-title "Lose changes"
-                        :solid-button-cb (fn []
-                                          (alert-modal/hide-alert)
-                                          (switch-cb))}]
-        (alert-modal/show-alert alert-data))
-      (switch-cb))))
+  (if (:has-changes current-user-data)
+    (let [alert-data {:icon "/img/ML/trash.svg"
+                      :action "user-profile-unsaved-edits"
+                      :message "Leave without saving your changes?"
+                      :link-button-title "Stay"
+                      :link-button-cb #(alert-modal/hide-alert)
+                      :solid-button-style :red
+                      :solid-button-title "Lose changes"
+                      :solid-button-cb (fn []
+                                        (alert-modal/hide-alert)
+                                        (dismiss-modal))}]
+      (alert-modal/show-alert alert-data))
+    (dismiss-modal)))
 
 (rum/defcs user-notifications-modal <
   rum/reactive

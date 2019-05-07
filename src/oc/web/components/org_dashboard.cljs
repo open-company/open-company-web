@@ -101,8 +101,6 @@
                 entry-edit-dissmissing
                 is-showing-alert
                 media-input
-                show-section-editor
-                show-section-add
                 show-section-add-cb
                 entry-editing-board-slug
                 mobile-navigation-sidebar
@@ -172,7 +170,9 @@
                         loading?)
         is-showing-mobile-search (and is-mobile? search-active?)
         qsg-data (drv/react s :qsg)
-        open-panel (last panel-stack)]
+        open-panel (last panel-stack)
+        show-section-editor (= open-panel :section-edit)
+        show-section-add (= open-panel :section-add)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -229,14 +229,14 @@
           made-with-carrot-modal-data
           (made-with-carrot-modal)
           ;; Mobile create a new section
-          (= open-panel :section-edit)
+          show-section-editor
           (section-editor board-data
            (fn [sec-data note]
             (if sec-data
               (section-actions/section-save sec-data note #(nav-actions/hide-section-editor))
               (nav-actions/hide-section-editor))))
           ;; Mobile edit current section data
-          (= open-panel :section-add)
+          show-section-add
           (section-editor nil show-section-add-cb)
           ;; Activity share for mobile
           (and is-mobile?
