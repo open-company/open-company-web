@@ -39,10 +39,8 @@
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (defn- load-comments [s]
-  (let [activity-data @(drv/get-ref s :activity-data)
-        activity-uuid (:uuid activity-data)
-        comments-data @(drv/get-ref s :comments-data)]
-    (comment-actions/get-comments-if-needed activity-data comments-data)))
+  (let [activity-data @(drv/get-ref s :activity-data)]
+    (comment-actions/get-comments activity-data)))
 
 (rum/defcs expanded-post <
   rum/reactive
