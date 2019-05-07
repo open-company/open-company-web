@@ -135,9 +135,9 @@
     ;; Derivatives
     (drv/drv :org-data)
     (drv/drv :org-editing)
-    (drv/drv :org-settings)
     (drv/drv :alert-modal)
     (drv/drv :org-editing)
+    (drv/drv :current-panel)
     (drv/drv :invite-data)
     (drv/drv :org-avatar-editing)
     (drv/drv :qsg)
@@ -157,7 +157,7 @@
       s)}
   [s]
   (let [org-editing (drv/react s :org-editing)
-        settings-tab (drv/react s :org-settings)
+        settings-tab (drv/react s :current-panel)
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)
         main-tab? (= settings-tab :main)

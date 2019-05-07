@@ -26,7 +26,6 @@
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
                     (drv/drv :qsg)
-                    (drv/drv :expanded-user-menu)
                     (ui-mixins/render-on-resize nil)
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
@@ -39,15 +38,17 @@
                 current-user-data
                 show-login-overlay
                 mobile-navigation-sidebar
-                expanded-user-menu
                 orgs-dropdown-visible
-                user-settings
-                org-settings
                 search-active
                 mobile-user-notifications
-                show-whats-new-green-dot]
+                show-whats-new-green-dot
+                panel-stack]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
+         current-panel (last panel-stack)
+         expanded-user-menu (= current-panel :menu)
+         org-settings (#{:org :interations :team :invite :billing} current-panel)
+         user-settings (#{:profile :notifications} current-panel)
          mobile-ap-active? (and (not expanded-user-menu)
                                 (not orgs-dropdown-visible)
                                 (not org-settings)

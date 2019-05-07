@@ -148,8 +148,6 @@
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
-   ; :org-settings        [[:base] (fn [base] (:org-settings base))]
-   ; :user-settings       [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
@@ -159,7 +157,8 @@
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
    :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
-   :expanded-user-menu  [[:base] (fn [base] (:expanded-user-menu base))]
+   :panel-stack         [[:base] (fn [base] (:panel-stack base))]
+   :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -264,12 +263,6 @@
    :section-editing     [[:base]
                           (fn [base]
                             (:section-editing base))]
-   ; :show-section-editor [[:base]
-   ;                        (fn [base]
-   ;                          (:show-section-editor base))]
-   ; :show-section-add    [[:base]
-   ;                        (fn [base]
-   ;                          (:show-section-add base))]
    :show-sections-picker [[:base]
                           (fn [base]
                             (:show-sections-picker base))]
@@ -288,13 +281,10 @@
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :navbar-data         [[:base :org-data :board-data :current-user-data]
                           (fn [base org-data board-data current-user-data]
-                            (let [navbar-data (select-keys base [:expanded-user-menu
-                                                                 :show-login-overlay
+                            (let [navbar-data (select-keys base [:show-login-overlay
                                                                  :mobile-navigation-sidebar
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
-                                                                 ; :user-settings
-                                                                 ; :org-settings
                                                                  :panel-stack
                                                                  :search-active
                                                                  :mobile-user-notifications
@@ -342,9 +332,6 @@
                                :container-data container-data
                                :board-data board-data
                                :posts-data filtered-posts
-                               ; :org-settings-data (:org-settings base)
-                               ; :show-reminders show-reminders
-                               ; :user-settings (:user-settings base)
                                :panel-stack (:panel-stack base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
@@ -352,14 +339,11 @@
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at
-                               ; :show-section-editor show-section-editor
-                               ; :show-section-add show-section-add
                                :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               ; :expanded-user-menu expanded-user-menu
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :wrt-activity-data (when wrt-show

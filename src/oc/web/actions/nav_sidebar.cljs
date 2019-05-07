@@ -14,6 +14,7 @@
 ;; :integrations
 ;; :team
 ;; :invite
+;; :billing
 ;; :profile
 ;; :notifications
 ;; :reminders
@@ -65,9 +66,7 @@
    (fn [sec-data note]
      (if sec-data
        (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-add] false]))
-       ; (dis/dispatch! [:input [:show-section-add] false])
        (pop-panel)))])
-  ; (dis/dispatch! [:input [:show-section-add] true])
   (push-panel :section-add)
   (close-navigation-sidebar))
 
@@ -76,9 +75,7 @@
    (fn [sec-data note]
      (callback sec-data note)
      (dis/dispatch! [:input [:show-section-add-cb] nil])
-     ; (dis/dispatch! [:input [:show-section-add] false])
      (pop-panel))])
-  ; (dis/dispatch! [:input [:show-section-add] true])
   (push-panel :section-add))
 
 (defn hide-section-add []
@@ -87,30 +84,18 @@
 ;; Reminders
 
 (defn show-reminders []
-  ; (dis/dispatch! [:input [:show-reminders] :reminders])
-  ; (dis/dispatch! [:input [:back-to-menu] (:expanded-user-menu @dis/app-state)])
-  ; (dis/dispatch! [:input [:expanded-user-menu] false])
   (push-panel :reminders)
   (close-navigation-sidebar))
 
 (defn show-new-reminder []
-  ; (dis/dispatch! [:input [:show-reminders] :new])
-  ; (dis/dispatch! [:input [:back-to-menu] (:expanded-user-menu @dis/app-state)])
-  ; (dis/dispatch! [:input [:expanded-user-menu] false])
   (push-panel :reminder-new)
   (close-navigation-sidebar))
 
 (defn edit-reminder [reminder-uuid]
-  ; (dis/dispatch! [:input [:show-reminders] reminder-uuid])
-  ; (dis/dispatch! [:input [:back-to-menu] (:expanded-user-menu @dis/app-state)])
-  ; (dis/dispatch! [:input [:expanded-user-menu] false])
   (push-panel (keyword (str "reminder-" reminder-uuid)))
   (close-navigation-sidebar))
 
 (defn close-reminders []
-  ; (dis/dispatch! [:input [:expanded-user-menu] (:back-to-menu @dis/app-state)])
-  ; (dis/dispatch! [:input [:back-to-menu] false])
-  ; (dis/dispatch! [:input [:show-reminders] nil])
   (pop-panel))
 
 ;; Menu
@@ -127,32 +112,12 @@
 ;; Show panels
 
 (defn show-org-settings [panel]
-  ;; When closing org settings
-  ; (when-not panel
-  ;   (dis/dispatch! [:input [:expanded-user-menu] (:back-to-menu @dis/app-state)])
-  ;   (dis/dispatch! [:input [:back-to-menu] false]))
-  ; ;; Set new panel
-  ; (dis/dispatch! [:input [:org-settings] panel])
-  ; ;; When opening panel
-  ; (when panel
-  ;   (dis/dispatch! [:input [:back-to-menu] (:expanded-user-menu @dis/app-state)])
-  ;   (dis/dispatch! [:input [:expanded-user-menu] false]))
   (if panel
     (push-panel panel)
     (pop-panel))
   (close-navigation-sidebar))
 
 (defn show-user-settings [panel]
-  ;; When closing org settings
-  ; (when-not panel
-  ;   (dis/dispatch! [:input [:expanded-user-menu] (:back-to-menu @dis/app-state)])
-  ;   (dis/dispatch! [:input [:back-to-menu] false]))
-  ; ;; Set new panel
-  ; (dis/dispatch! [:input [:user-settings] panel])
-  ; ;; When opening panel
-  ; (when panel
-  ;   (dis/dispatch! [:input [:back-to-menu] (:expanded-user-menu @dis/app-state)])
-  ;   (dis/dispatch! [:input [:expanded-user-menu] false]))
   (if panel
     (push-panel panel)
     (pop-panel))
