@@ -18,13 +18,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (nav-actions/show-user-settings nil))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (defn real-close-cb [editing-user-data & [mobile-back-bt]]
   (when (:has-changes editing-user-data)
@@ -132,8 +127,6 @@
   (drv/drv :current-user-data)
   (drv/drv :edit-user-profile-avatar)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::loading)
   (rum/local false ::show-success)
   (rum/local false ::name-error)
@@ -142,13 +135,7 @@
   (rum/local false ::current-password-error)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
-  {:did-update (fn [s]
-    (when (and @(::unmounting s)
-               (compare-and-set! (::unmounted s) false true))
-      (utils/after 180 real-close))
-    s)
-   :after-render (fn [s]
+  {:after-render (fn [s]
     (when-not (utils/is-test-env?)
       (doto (js/$ "[data-toggle=\"tooltip\"]")
         (.tooltip "fixTitle")
@@ -163,10 +150,7 @@
         (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
     new-state)}
   [s]
-  (let [appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
+  (let [edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
         is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")
         qsg-data (drv/react s :qsg)
         user-profile-data (drv/react s :edit-user-profile)
@@ -174,7 +158,6 @@
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         timezones (.names (.-tz js/moment))]
     [:div.user-profile-modal-container
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-cb current-user-data)}]
       [:div.user-profile-modal

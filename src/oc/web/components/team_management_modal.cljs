@@ -14,13 +14,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (nav-actions/show-org-settings nil))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (defn user-action [team-id user action method other-link-params remove-cb]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
@@ -51,20 +46,12 @@
   (drv/drv :org-data)
   (drv/drv :invite-data)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::resending-invite)
   (rum/local "" ::query)
   (rum/local #{} ::removing)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
-  {:did-update (fn [s]
-   (when (and @(::unmounting s)
-              (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 real-close))
-   s)
-   :after-render (fn [s]
+  {:after-render (fn [s]
     (doto (js/$ "[data-toggle=\"tooltip\"]")
      (.tooltip "fixTitle")
      (.tooltip "hide"))
@@ -75,10 +62,7 @@
           (reset! (::resending-invite s) false))))
     s)}
   [s]
-  (let [appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        org-data (drv/react s :org-data)
+  (let [org-data (drv/react s :org-data)
         invite-users-data (drv/react s :invite-data)
         team-data (:team-data invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
@@ -90,9 +74,8 @@
         sorted-users (reverse (sort-by utils/name-or-email filtered-users))
         team-roster (:team-roster invite-users-data)]
     [:div.team-management-modal
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click dismiss-modal}]
       [:div.team-management
         [:div.team-management-header
           [:div.team-management-header-title
@@ -101,7 +84,7 @@
             {:on-click #(nav-actions/show-org-settings :invite)}
             "Invite"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(dismiss-modal s)}
+            {:on-click dismiss-modal}
             "Back"]]
         [:div.team-management-body
           [:div.team-management-body-title

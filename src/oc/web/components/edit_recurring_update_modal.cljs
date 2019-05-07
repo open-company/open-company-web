@@ -15,14 +15,8 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn real-close []
-  ; (dis/dispatch! [:input [:show-reminders] nil])
+(defn dismiss-modal []
   (nav-actions/close-reminders))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 ;; New/Edit reminder
 
@@ -65,14 +59,11 @@
   (drv/drv :reminder-edit)
   (drv/drv :reminders-roster)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::assignee-dropdown)
   (rum/local false ::frequency-dropdown)
   (rum/local false ::on-dropdown)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
   (mixins/on-window-click-mixin (fn [s e]
     (when (and (not (utils/event-inside? e (rum/ref-node s :frequency-dd-node)))
                (not (utils/event-inside? e (rum/ref-node s :frequency-bt)))
@@ -80,16 +71,8 @@
                (not (utils/event-inside? e (rum/ref-node s :on-bt))))
       (reset! (::frequency-dropdown s) false)
       (reset! (::on-dropdown s) false))))
-  {:did-update (fn [s]
-   (when (and @(::unmounting s)
-              (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 real-close))
-   s)}
   [s]
-  (let [appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        reminder-data (drv/react s :reminder-edit)
+  (let [reminder-data (drv/react s :reminder-edit)
         reminders-roster (drv/react s :reminders-roster)
         users-list (:users-list reminders-roster)
         ;; on label and value stuff
@@ -104,9 +87,8 @@
         occurrence-label-value (:occurrence-value reminder-data)
         self-assignee? (= (jwt/user-id) (:user-id (:assignee reminder-data)))]
     [:div.edit-recurring-update-modal-container
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click (fn [_] (cancel-clicked reminder-data #(dismiss-modal s)))}]
+        {:on-click (fn [_] (cancel-clicked reminder-data dismiss-modal))}]
       [:div.edit-recurring-update-modal
         [:div.edit-recurring-update-modal-header
           [:div.edit-recurring-update-modal-header-title

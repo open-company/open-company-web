@@ -10,43 +10,25 @@
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (nav-actions/close-reminders))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (rum/defcs recurring-updates-modal <
   rum/reactive
   (drv/drv :reminders-data)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
-  ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   {:did-mount (fn [s]
     (reminder-actions/load-reminders-roster)
     (reminder-actions/load-reminders)
-    s)
-   :did-update (fn [s]
-   (when (and @(::unmounting s)
-              (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 real-close))
-   s)}
+    s)}
   [s]
-  (let [appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        reminders-data (drv/react s :reminders-data)
+  (let [reminders-data (drv/react s :reminders-data)
         reminders-list (:items reminders-data)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.recurring-updates-modal-container
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click dismiss-modal}]
       [:div.recurring-updates-modal
         [:div.recurring-updates-modal-header
           [:div.recurring-updates-modal-header-title

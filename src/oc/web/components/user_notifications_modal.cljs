@@ -17,13 +17,8 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (nav-actions/show-user-settings nil))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (defn change! [s k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
@@ -39,7 +34,7 @@
 (defn close-clicked [current-user-data]
   (let [switch-cb (fn []
                    (dismiss-modal)
-                   (utils/after 150 #(nav-actions/show-org-settings :main)))]
+                   (utils/after 150 dismiss-modal))]
     (if (:has-changes current-user-data)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "user-profile-unsaved-edits"
@@ -62,23 +57,15 @@
   (drv/drv :edit-user-profile)
   (drv/drv :current-user-data)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::loading)
   (rum/local false ::show-success)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
   {:after-render (fn [s]
    (when-not (utils/is-test-env?)
      (doto (js/$ "[data-toggle=\"tooltip\"]")
        (.tooltip "fixTitle")
        (.tooltip "hide")))
-   s)
-  :did-update (fn [s]
-   (when (and @(::unmounting s)
-              (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 real-close))
    s)
   :did-remount (fn [old-state new-state]
    (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
@@ -89,10 +76,7 @@
        (utils/after 2500 (fn [] (reset! (::show-success new-state) false)))))
    new-state)}
   [s]
-  (let [appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        org-data (drv/react s :org-data)
+  (let [org-data (drv/react s :org-data)
         user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         error (:error user-profile-data)
@@ -101,7 +85,6 @@
         team-roster (drv/react s :team-roster)
         slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
     [:div.user-notifications-modal-container
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked current-user-data)}]
       [:div.user-notifications-modal

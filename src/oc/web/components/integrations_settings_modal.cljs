@@ -12,13 +12,8 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
 
-(defn real-close []
+(defn dismiss-modal []
   (nav-actions/show-org-settings nil))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (rum/defcs integrations-settings-modal <
   ;; Mixins
@@ -27,39 +22,27 @@
   (drv/drv :team-data)
   (drv/drv :current-user-data)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::saving)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
-  {:did-update (fn [s]
-   (when (and @(::unmounting s)
-              (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 real-close))
-   s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
         team-data (drv/react s :team-data)
         cur-user-data (drv/react s :current-user-data)
         slack-teams (:slack-orgs team-data)
         slack-teams-count (count slack-teams)]
     [:div.integrations-settings-modal
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click dismiss-modal}]
       [:div.integrations-settings
         [:div.integrations-settings-header
           [:div.integrations-settings-header-title
             "Integrations"]
           [:button.mlb-reset.save-bt
-            {:on-click #(dismiss-modal s)}
+            {:on-click dismiss-modal}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(dismiss-modal s)}
+            {:on-click dismiss-modal}
             "Back"]]
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})

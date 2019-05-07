@@ -21,13 +21,8 @@
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (nav-actions/show-org-settings nil))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (defn close-clicked [s]
   (let [org-editing @(drv/get-ref s :org-editing)]
@@ -41,7 +36,7 @@
                         :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
-                                            (dismiss-modal s))}]
+                                            (dismiss-modal))}]
         (alert-modal/show-alert alert-data))
       (dismiss-modal))))
 
@@ -128,13 +123,10 @@
   (drv/drv :org-avatar-editing)
   (drv/drv :org-settings-team-management)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
       (org-actions/get-org org-data)
@@ -145,11 +137,6 @@
     s)
    :did-mount (fn [s]
     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-    s)
-   :did-update (fn [s]
-    (when (and @(::unmounting s)
-               (compare-and-set! (::unmounted s) false true))
-      (utils/after 180 real-close))
     s)
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
@@ -165,9 +152,6 @@
     s)}
   [s]
   (let [org-data (drv/react s :org-data)
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
         org-avatar-editing (drv/react s :org-avatar-editing)
         qsg-data (drv/react s :qsg)
         org-data-for-avatar (merge org-data org-avatar-editing)
@@ -181,7 +165,6 @@
                     (drv/react s :org-settings-team-management)
         content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-modal
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s)}]
       [:div.org-settings-modal-container
