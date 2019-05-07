@@ -226,6 +226,7 @@
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
             "Chat with us"]]
+        [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out
             {:href oc-urls/logout :on-click (partial logout-click s)}
