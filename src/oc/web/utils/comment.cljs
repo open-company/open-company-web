@@ -1,5 +1,6 @@
 (ns oc.web.utils.comment
   (:require [cljsjs.medium-editor]
+            [defun.core :refer (defun-)]
             [goog.object :as gobj]
             [cuerdas.core :as string]
             [oc.web.api :as api]
@@ -95,3 +96,11 @@
     ;; Load the whole list of comments if..
     (when should-load-comments?
       (get-comments activity-data))))
+
+(defun- sort-comments
+  ([comments :guard nil?]
+   [])
+  ([comments :guard map?]
+   (sort-comments (vals comments)))
+  ([comments :guard sequential?]
+   (vec (sort-by :created-at comments))))
