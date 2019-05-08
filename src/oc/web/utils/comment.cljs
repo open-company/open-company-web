@@ -87,7 +87,9 @@
   (let [comments-link (utils/link-for (:links activity-data) "comments")
         activity-uuid (:uuid activity-data)
         comments-data (get all-comments-data activity-uuid)
-        should-load-comments? (and ;; there are comments to load,
+        should-load-comments? (and ;; there is a comments link
+                                   (map? comments-link)
+                                   ;; there are comments to load,
                                    (pos? (:count comments-link))
                                    ;; they are not already loading,
                                    (not (:loading comments-data))
