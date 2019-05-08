@@ -8,6 +8,7 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -48,7 +49,8 @@
         team-data (drv/react s :team-data)
         cur-user-data (drv/react s :current-user-data)
         slack-teams (:slack-orgs team-data)
-        slack-teams-count (count slack-teams)]
+        slack-teams-count (count slack-teams)
+        is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.integrations-settings-modal
       {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
@@ -66,7 +68,7 @@
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-              {:on-click #(team-actions/slack-team-add cur-user-data (str (router/get-token) "?org-settings=main"))}
+              {:on-click #(team-actions/slack-team-add cur-user-data (str (router/get-token) "?org-settings=integrations"))}
               [:div.slack-icon]
               "Add to Slack"])
           (when-not (zero? slack-teams-count)
@@ -109,20 +111,28 @@
                     (when (seq slack-domain)
                       [:div.linked-to
                         (str slack-domain ".slack.com")])
-                    [:div.self-join
-                      "Slack members can self-join this as: "
-                      [:select.self-join-select
-                        [:option
-                          "Admin"]
-                        [:option
-                          "Contributor"]
-                        [:option
-                          "Viewer"]]]
+                    (comment ;; TODO: commented this out, we need to add this feature
+                      [:div.self-join
+                        "Slack members can self-join this as: "
+                        [:select.self-join-select
+                          [:option
+                            "Admin"]
+                          [:option
+                            "Contributor"]
+                          [:option
+                            "Viewer"]]])
                     (if has-bot?
                       [:div.bot-line
-                        "Carrot bot is currently on."]
+                        "Carrot bot is currently " [:strong "on"] "."]
                       [:div.bot-line
-                        "Carrot bot is currently off. "
+                        "Carrot bot is currently " [:strong "off"] ". "
                         [:button.mlb-reset.turn-on-bot-bt
-                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=main"))}
-                          "Turn it on?"]])]))])]]]))
+                          {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
+                          "Turn it on?"]
+                        [:i.mdi.mdi-information-outline
+                          {:title "The Carrot bot integrates Carrot with Slack to allow invites, shares, digests and notifications to use Slack rather than email."
+                           :data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                           :data-placement "top"
+                           :data-container "body"
+                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]
+                          ])]))])]]]))
