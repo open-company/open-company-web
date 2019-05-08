@@ -132,6 +132,10 @@ div.team-management-modal {
               margin-top: 7px;
             }
 
+            div.small-loading {
+              margin-top: 7px;
+            }
+
             div.user-name {
               line-height: 19px;
 
@@ -147,6 +151,17 @@ div.team-management-modal {
           }
 
           @include user_profile(24);
+
+          div.small-loading {
+            margin-right: 0;
+            float: left;
+
+            div.small-loading-inner {
+              width: 20px;
+              height: 20px;
+              background-size: 20px 20px;
+            }
+          }
 
           div.user-avatar-img-container {
             float: left;
