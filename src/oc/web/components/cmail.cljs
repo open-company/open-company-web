@@ -472,9 +472,10 @@
         working? (or (and published?
                           @(::saving s))
                      (and (not published?)
-                          @(::publishing s)))]
+                          @(::publishing s)))
+        is-fullscreen? (:fullscreen cmail-state)]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen (:fullscreen cmail-state)
+      {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :showing-qsg (:visible qsg-data)})}
       [:div.cmail-container
         [:div.cmail-header
@@ -497,8 +498,7 @@
                                   (qsg-actions/turn-on-show-guide)
                                   (activity-actions/cmail-hide))))
                  :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "top"
-                 :data-trigger "hover"
+                 :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title (if long-tooltip
                           "Save & Close"
@@ -507,10 +507,9 @@
             [:button.mlb-reset.fullscreen-bt
               {:on-click #(activity-actions/cmail-toggle-fullscreen)
                :data-toggle "tooltip"
-               :data-placement "top"
-               :data-trigger "hover"
+               :data-placement "auto"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:fullscreen cmail-state)
+               :title (if is-fullscreen?
                         "Shrink"
                         "Expand")}]]
           [:div.cmail-header-vertical-separator]
@@ -547,15 +546,14 @@
               [:div.must-see-toggle
                 {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
                  :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-trigger "hover"
+                 :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title "Must See"}
                 [:span.must-see-toggle-circle]]]
             (when (:must-see cmail-data)
               [:div.must-see-tag
                 "Must see"])]
-          (when (:fullscreen cmail-state)
+          (when is-fullscreen?
             [:div.cmail-header-right-buttons
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                              :width 24
@@ -567,7 +565,7 @@
               [:button.mlb-reset.attachment-button
                 {:on-click #(add-attachment s)
                  :data-toggle "tooltip"
-                 :data-placement "bottom"
+                 :data-placement "auto"
                  :data-container "body"
                  :title "Add attachment"}]
               [:div.delete-button-container
@@ -689,7 +687,7 @@
                        show-edit-tooltip)
               (edit-tooltip s))]]
       [:div.cmail-footer
-        (when-not (:fullscreen cmail-state)
+        (when-not is-fullscreen?
           [:div.cmail-footer-right
             [:div.delete-button-container
               [:button.mlb-reset.delete-button

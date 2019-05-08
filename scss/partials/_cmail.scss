@@ -86,6 +86,10 @@ div.cmail-outer {
             background-color: $ultra_light_grey;
             background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
           }
+
+          .tooltip {
+            margin-top: 0;
+          }
         }
 
         div.fullscreen-bt-container {
@@ -97,6 +101,10 @@ div.cmail-outer {
           button.fullscreen-bt {
             background-color: $ultra_light_grey;
             background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse.svg");
+          }
+
+          .tooltip {
+            margin-top: 0;
           }
         }
 
@@ -145,14 +153,15 @@ div.cmail-outer {
 
         div.cmail-header-right-buttons {
           position: absolute;
-          width: 102px;
-          height: 24px;
-          right: 88px;
-          top: 16px;
+          height: 32px;
+          right: 96px;
+          top: 12px;
+          padding: 4px 20px 4px 0px;
+          border-right: 1px solid $ultra_light_grey;
 
           div.delete-button-container {
             float: left;
-            margin-left: 16px;
+            margin-left: 8px;
 
             button.delete-button {
               width: 22px;
@@ -176,7 +185,7 @@ div.cmail-outer {
             color: $deep_navy;
             position: relative;
             float: left;
-            margin-left: 16px;
+            margin-left: 8px;
             padding: 0;
             width: 24px;
             height: 24px;
@@ -348,7 +357,7 @@ div.cmail-outer {
         position: relative;
 
         &.must-see-on {
-          width: 258px;
+          width: 300px;
         }
 
         div.board-name {
@@ -453,9 +462,7 @@ div.cmail-outer {
 
         div.must-see-tag {
           float: left;
-          margin-right: 8px;
-          margin-left: 8px;
-          margin-top: 7px;
+          margin: 7px 0 0 16px;
           background-color: white;
         }
       }
