@@ -125,7 +125,7 @@
                         {:will-mount (fn [s]
                           (check-pagination s)
                           s)
-                         :did-remount (fn [s]
+                         :did-remount (fn [_ s]
                           (when (or (= (router/current-board-slug) "all-posts")
                                     (= (router/current-board-slug) "must-see"))
                             (check-pagination s))

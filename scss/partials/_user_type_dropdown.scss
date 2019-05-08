@@ -4,15 +4,18 @@ div.dropdown{
   button.user-type-btn {
     position: relative;
     cursor: pointer;
-    padding-right: 25px;
+    padding: 0 24px 0 0;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: right;
 
     &:after {
       content: "";
       width: 8px;
       height: 10px;
       position: absolute;
-      right: 4px;
-      top: 25%;
+      right: 8px;
+      top: 11px;
       background-image: cdnUrl("/img/ML/select_arrows.svg");
       background-size: 8px 10px;
       background-position: center;
