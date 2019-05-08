@@ -96,7 +96,7 @@
                                   :loading (not (:reads read-data))})
          :on-click #(.stopPropagation %)}
         [:div.wrt-popup-header
-          [:span.wrt-popup-header-title
+          [:div.wrt-popup-header-title
             "Who viewed this post"]]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
@@ -187,13 +187,13 @@
     [:div.wrt-count-container
       {:on-mouse-over #(when (and (not is-mobile?)
                                   (not (:reads read-data)))
-                        (activity-actions/request-reads-data item-id))
-       :on-click #(do
-                    (when (not (:reads read-data))
-                      (activity-actions/request-reads-data item-id))
-                    (show-wrt item-id))}
+                        (activity-actions/request-reads-data item-id))}
       [:div.wrt-count
         {:ref :wrt-count
+         :on-click #(do
+                    (when (not (:reads read-data))
+                      (activity-actions/request-reads-data item-id))
+                    (show-wrt item-id))
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " Viewer" (when (not= read-count 1) "s"))

@@ -43,7 +43,7 @@
     (reminder-actions/update-reminder (:uuid reminder-data) (merge v {:has-changes true}))))
 
 (defn- delete-reminder-clicked [s]
-  (let [reminder-data (first (:rum/args s))
+  (let [reminder-data @(drv/get-ref s :reminder-edit)
         alert-data {:icon "/img/ML/trash.svg"
                       :action "reminder-delete"
                       :message "Delete this reminder?"
@@ -200,4 +200,9 @@
                               :on-change (fn [item]
                                            (update-reminder s {occurrence-field-name (:value item)
                                                                :occurrence-value (get-in reminder-utils/occurrence-values [(:frequency reminder-data) (:value item)])})
-                                           (reset! (::on-dropdown s) false))})])]]]))
+                                           (reset! (::on-dropdown s) false))})])
+          (when (utils/link-for (:links reminder-data) "delete")
+            [:div.edit-recurring-update-footer.group
+              [:button.mlb-reset.delete-bt
+                {:on-click #(delete-reminder-clicked s)}
+                "Delete recurring update"]])]]]))

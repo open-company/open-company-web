@@ -81,7 +81,7 @@
       [:div.team-management
         [:div.team-management-header
           [:div.team-management-header-title
-            "Integrations"]
+            "Manage team"]
           [:button.mlb-reset.save-bt
             {:on-click #(show-modal :invite)}
             "Invite"]
@@ -131,17 +131,18 @@
                                                       :solid-button-cb
                                                        #(do
                                                          (real-remove-fn s author user (:team-id team-data)
-                                                          (fn []
-                                                            (notification-actions/show-notification
-                                                             {:title (if pending?
-                                                                       "Invitation cancelled"
-                                                                       "Member removed from team")
-                                                              :primary-bt-title "OK"
-                                                              :primary-bt-dismiss true
-                                                              :expire 10
-                                                              :id (if pending?
-                                                                   :cancel-invitation
-                                                                   :member-removed-from-team)})))
+                                                          (fn [{:keys [success]}]
+                                                            (when success
+                                                              (notification-actions/show-notification
+                                                               {:title (if pending?
+                                                                         "Invitation cancelled"
+                                                                         "Member removed from team")
+                                                                :primary-bt-title "OK"
+                                                                :primary-bt-dismiss true
+                                                                :expire 10
+                                                                :id (if pending?
+                                                                     :cancel-invitation
+                                                                     :member-removed-from-team)}))))
                                                          (alert-modal/hide-alert))}]
                                       (alert-modal/show-alert alert-data)))
                         roster-user (first (filterv #(= (:user-id %) (:user-id user)) (:users team-roster)))
@@ -173,7 +174,9 @@
               [:div.team-management-users-item.group
                 {:key (str "org-settings-team-" (:user-id user))
                  :class (when pending? "is-pending-user")}
-                (user-avatar-image user)
+                (if removing?
+                  (small-loading)
+                  (user-avatar-image user))
                 [:div.user-name
                   [:div.user-name-label
                     {:title (str "<span>" (:email user)
@@ -184,8 +187,7 @@
                                               :removing removing?})
                      :data-toggle "tooltip"
                      :data-html "true"
-                     :data-placement "top"
-                     :data-container "body"}
+                     :data-placement "top"}
                     display-name
                     (when current-user
                       [:span.current-user " (you)"])]
@@ -206,15 +208,16 @@
                          :data-container "body"
                          :title "Cancel invitation"}
                         "cancel"]
-                      ")"])
-                  (when removing?
-                    (small-loading))]
+                      ")"])]
                 [:div.user-role
-                  (user-type-dropdown {:user-id (:user-id user)
-                                       :user-type user-type
-                                       :on-change #(team-actions/switch-user-type user user-type % user author)
-                                       :hide-admin (not (jwt/is-admin? (:team-id org-data)))
-                                       :on-remove (if (and (not= "pending" (:status user))
-                                                           (not= (:user-id user) (:user-id cur-user-data)))
-                                                    remove-fn
-                                                    nil)})]])]]]]))
+                  (if current-user
+                    [:span.self-user-type (name user-type)]
+                    (user-type-dropdown {:user-id (:user-id user)
+                                         :user-type user-type
+                                         :disabled? removing?
+                                         :on-change #(team-actions/switch-user-type user user-type % user author)
+                                         :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                         :on-remove (if (and (not= "pending" (:status user))
+                                                             (not= (:user-id user) (:user-id cur-user-data)))
+                                                      remove-fn
+                                                      nil)}))]])]]]]))

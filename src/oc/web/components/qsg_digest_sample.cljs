@@ -27,7 +27,7 @@
              "for everyone to get caught up quickly each morning.")]
           [:button.mlb-reset.qsg-digest-sample-bt
             {:on-click #(qsg-actions/dismiss-digest-sample)}
-            "Ok, got it"]]
+            "OK, got it"]]
         [:div.qsg-digest-sample-right
           [:div.qsg-digest-sample-carion-items
             {:class (utils/class-set {:second-image @(::show-second-image s)})}

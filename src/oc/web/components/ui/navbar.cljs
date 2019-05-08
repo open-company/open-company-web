@@ -168,5 +168,5 @@
                               "You can find the quickstart guide here anytime."]
                             [:button.mlb-reset.qsg-tooltip-bt
                               {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
-                              "Ok, got it"]]])]]]
+                              "OK, got it"]]])]]]
                 (login-button)))]]]]))
