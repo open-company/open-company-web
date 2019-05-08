@@ -108,7 +108,7 @@
             [:select.field-value
               {:value (:digest-medium current-user-data)
                :disabled (not slack-enabled?)
-               :on-change #(change! s :digest-medium "email")}
+               :on-change #(change! s :digest-medium (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Via email"]
@@ -122,7 +122,7 @@
             [:div.field-label "Comments and mentions"]
             [:select.field-value
               {:value (:notification-medium current-user-data)
-               :on-change #(change! s :notification-medium "email")}
+               :on-change #(change! s :notification-medium (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Via email"]
@@ -137,7 +137,7 @@
             [:div.field-label "Reminders"]
             [:select.field-value
               {:value (:reminder-medium current-user-data)
-               :on-change #(change! s :reminder-medium "email")}
+               :on-change #(change! s :reminder-medium (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Via email"]

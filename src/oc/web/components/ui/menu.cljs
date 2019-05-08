@@ -89,7 +89,11 @@
         is-mobile? (responsive/is-mobile-size?)
         qsg-data (drv/react s :qsg)
         show-reminders? (utils/link-for (:links org-data) "reminders")
-        expanded-user-menu (= (last panel-stack) :menu)]
+        expanded-user-menu (= (last panel-stack) :menu)
+        org-slug (router/current-org-slug)
+        is-admin-or-author? (#{:admin :author} user-role)
+        show-invite-people? (and org-slug
+                                 is-admin-or-author?)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -130,10 +134,12 @@
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        [:div.oc-menu-separator]
+        (when (or (= user-role :admin)
+                  show-invite-people?)
+          [:div.oc-menu-separator])
         (when (and (not is-mobile?)
                    (= user-role :admin)
-                   (router/current-org-slug))
+                   org-slug)
           [:a.qsg-company-logo-2
             {:href "#"
              :on-click #(team-settings-click s % qsg-data)}
@@ -142,7 +148,7 @@
             [:div.oc-menu-item.digest-settings
               "Admin Settings"]])
         (when (and (not is-mobile?)
-                   (router/current-org-slug))
+                   show-invite-people?)
           [:a.qsg-invite-team-2
             {:href "#"
              :on-click #(invite-team-click s %  qsg-data)}
@@ -151,7 +157,7 @@
             [:div.oc-menu-item.invite-team
               "Invite people"]])
         (when (and (not is-mobile?)
-                   (router/current-org-slug)
+                   org-slug
                    (= user-role :admin))
           [:a
             {:href "#"
@@ -159,14 +165,14 @@
             [:div.oc-menu-item.manage-team
               "Manage team"]])
         (when (and (not is-mobile?)
-                   (router/current-org-slug)
+                   org-slug
                    (= user-role :admin))
           [:a
             {:href "#"
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
-        ; (when (and (router/current-org-slug)
+        ; (when (and org-slug
         ;            (= user-role :admin))
         ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
         ;     [:div.oc-menu-item
@@ -187,7 +193,8 @@
         [:a
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
-            "Support"]]
+            "Chat with us"]]
+        [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out
             {:href oc-urls/logout :on-click (partial logout-click s)}

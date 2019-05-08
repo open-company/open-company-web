@@ -89,7 +89,7 @@ div.team-management-modal {
         background-repeat: no-repeat;
         padding-left: 19px;
         background-color: $ultra_light_grey;
-        board-radius: 4px;
+        border-radius: 4px;
 
         input {
           height: 32px;
@@ -124,6 +124,10 @@ div.team-management-modal {
               margin-top: 7px;
             }
 
+            div.small-loading {
+              margin-top: 7px;
+            }
+
             div.user-name {
               line-height: 19px;
 
@@ -140,6 +144,17 @@ div.team-management-modal {
 
           @include user_profile(24);
 
+          div.small-loading {
+            margin-right: 0;
+            float: left;
+
+            div.small-loading-inner {
+              width: 20px;
+              height: 20px;
+              background-size: 20px 20px;
+            }
+          }
+
           div.user-avatar-img-container {
             float: left;
           }
@@ -147,8 +162,14 @@ div.team-management-modal {
           div.user-name {
             margin-left: 8px;
             float: left;
-            width: calc(100% - 122px);
+            width: calc(100% - 118px);
             height: 24px;
+
+            div.tooltip {
+              i.mdi.mdi-slack:before {
+                font-size: 17px;
+              }
+            }
 
             div.user-name-label {
               @include OC_Body_Book();
@@ -186,27 +207,36 @@ div.team-management-modal {
                 color: $carrot_orange;
                 padding: 0;
                 display: inline;
+                margin-left: 6px;
               }
             }
           }
 
           div.user-role {
             float: right;
-            max-width: calc(100% - 122px);
             height: 24px;
             @include OC_Body_Book();
             font-size: 12px;
             line-height: 24px;
             color: $light_navy;
 
+            span.self-user-type {
+              text-transform: capitalize;
+              padding: 0 7px;
+            }
+
             div.dropdown {
               height: 24px;
 
               button.user-type-btn.dropdown-toggle {
                 height: 24px;
-                line-height: 24px;
-                padding-right: 16px;
-                width: 90px;
+                width: 82px;
+
+                &:after {
+                  top: 7px;
+                  right: 0px;
+                  padding-right: 16px;
+                }
               }
 
               ul.user-type-dropdown-menu {
