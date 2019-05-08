@@ -195,11 +195,11 @@
                   (when removing?
                     (small-loading))]
                 [:td.role
-                  (user-type-dropdown {:user-id (:user-id user)
-                                       :user-type user-type
-                                       :on-change #(team-actions/switch-user-type user user-type % user author)
-                                       :hide-admin (not (jwt/is-admin? (:team-id org-data)))
-                                       :on-remove (if (and (not= "pending" (:status user))
-                                                           (not= (:user-id user) (:user-id cur-user-data)))
-                                                    remove-fn
-                                                    nil)})]])]]]]))
+                  (if current-user
+                    [:span.self-user-type
+                      (name user-type)]
+                    (user-type-dropdown {:user-id (:user-id user)
+                                         :user-type user-type
+                                         :on-change #(team-actions/switch-user-type user user-type % user author)
+                                         :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                         :on-remove (when (not= "pending" (:status user)) remove-fn)}))]])]]]]))

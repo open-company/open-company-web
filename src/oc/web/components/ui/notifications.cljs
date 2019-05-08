@@ -94,7 +94,7 @@
                       (when (fn? dismiss)
                         (dismiss %)))
          :ref :dismiss-bt}
-        "Ok"])
+        "OK"])
     [:div.notification-title.group
       {:class (when-not (seq description) "no-description")}
       (when slack-icon

@@ -98,11 +98,6 @@ div.wrt-popup-container {
       margin: 24px;
     }
 
-    &.top {
-      top: unset;
-      bottom: 100%;
-    }
-
     div.wrt-popup-tabs {
       margin-top: 8px;
       width: 100%;
@@ -119,7 +114,7 @@ div.wrt-popup-container {
         font-size: 14px;
         background-image: cdnUrl("/img/ML/select_arrows.svg");
         background-size: 8px 10px;
-        background-position: top 11px right 4px;
+        background-position: top 11px right 8px;
         background-repeat: no-repeat;
       }
 

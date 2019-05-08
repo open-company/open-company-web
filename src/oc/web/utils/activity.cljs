@@ -7,7 +7,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.comment :as comment-utils]))
 
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
@@ -166,7 +167,8 @@
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
       (assoc :has-thumbnail body-thumbnail)
-      (assoc :body-thumbnail body-thumbnail))))
+      (assoc :body-thumbnail body-thumbnail)
+      (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."
