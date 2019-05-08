@@ -5,14 +5,15 @@
             [oc.web.lib.utils :as utils]))
 
 (rum/defc user-type-dropdown < rum/static
-  [{:keys [user-id user-type on-change hide-admin on-remove]}]
+  [{:keys [user-id user-type on-change hide-admin on-remove disabled?]}]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
       [:button.btn-reset.user-type-btn.dropdown-toggle
         {:id user-dropdown-id
          :data-toggle "dropdown"
          :aria-haspopup true
-         :aria-expanded false}
+         :aria-expanded false
+         :disabled disabled?}
         (case user-type
           :admin
           "Admin"

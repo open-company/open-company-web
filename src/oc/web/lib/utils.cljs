@@ -349,9 +349,9 @@
     (= :admin user-type)))
 
 (defn is-admin-or-author?
-  [org-data]
+  [org-data & [board-data]]
   (let [user-data (jwt/get-contents)
-        user-type (get-user-type user-data org-data)]
+        user-type (get-user-type user-data org-data board-data)]
     (or (= :admin user-type)
         (= :author user-type))))
 

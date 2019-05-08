@@ -85,35 +85,17 @@ div.wrt-popup-container {
       background-color: #FBFAF9;
       padding: 12px 16px;
 
-      @include mobile() {
-
-        button.wrt-close-bt {
-          width: 24px;
-          height: 24px;
-          background-image: cdnUrl("/img/ML/section_add_mobile_close.svg");
-          background-size: 14px 14px;
-          background-repeat: no-repeat;
-          background-position: center;
-          float: left;
-        }
-
-        span.wrt-popup-header-title {
-          @include OC_Body_Bold();
-          font-size: 14px;
-          color: $deep_navy;
-          line-height: 32px;
-          float: left;
-        }
+      div.wrt-popup-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
       }
     }
 
     div.small-loading {
       margin: 24px;
-    }
-
-    &.top {
-      top: unset;
-      bottom: 100%;
     }
 
     div.wrt-popup-tabs {
@@ -132,7 +114,7 @@ div.wrt-popup-container {
         font-size: 14px;
         background-image: cdnUrl("/img/ML/select_arrows.svg");
         background-size: 8px 10px;
-        background-position: top 11px right 4px;
+        background-position: top 11px right 8px;
         background-repeat: no-repeat;
       }
 
@@ -156,7 +138,7 @@ div.wrt-popup-container {
       background-repeat: no-repeat;
       padding-left: 19px;
       background-color: $ultra_light_grey;
-      board-radius: 4px;
+      border-radius: 4px;
 
       input.wrt-popup-query {
         width: calc(100% - 19px);
@@ -171,6 +153,7 @@ div.wrt-popup-container {
         background-color: $ultra_light_grey;
         color: $deep_navy;
         outline: none;
+        border-radius: 4px;
 
         @include placeholder(){
           color: rgba($deep_navy, 0.4);
