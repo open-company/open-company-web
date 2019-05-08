@@ -10,6 +10,8 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.comment :as comment-actions]
+            [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
@@ -36,12 +38,17 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- load-comments [s]
+  (let [activity-data @(drv/get-ref s :activity-data)]
+    (comment-actions/get-comments activity-data)))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :activity-data)
   (drv/drv :comments-data)
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
+  (drv/drv :activities-read)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -51,6 +58,10 @@
   {:did-mount (fn [s]
     (save-fixed-comment-height s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
+    (load-comments s)
+    s)
+   :did-remount (fn [_ s]
+    (load-comments s)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -75,7 +86,10 @@
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
                        {:width 638
-                        :height (utils/calc-video-height 638)}))]
+                        :height (utils/calc-video-height 638)}))
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        activities-read (drv/react s :activities-read)
+        reads-data (get activities-read (:uuid activity-data))]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
@@ -117,7 +131,9 @@
       (stream-attachments (:attachments activity-data))
       [:div.expanded-post-footer
         (comments-summary activity-data true)
-        (reactions activity-data)]
+        (reactions activity-data)
+        (when user-is-part-of-the-team
+          (wrt-count activity-data reads-data))]
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data)]
       [:div.expanded-post-fixed-add-comment

@@ -13,6 +13,12 @@ div.stream-item {
         background-color: #F5F5F5;
         border-left: 4px solid #F5F5F5;
 
+        div.stream-item-footer div.menu-container {
+          div.more-menu {
+            display: block;
+          }
+        }
+
         div.stream-item-body-ext {
           div.stream-item-footer {
             div.stream-item-comments-summary {
@@ -92,17 +98,6 @@ div.stream-item {
 
     @include mobile() {
       width: 100%;
-    }
-    
-    div.more-menu {
-      float: right;
-
-      @include mobile() {
-        ul.more-menu-list {
-          left: unset;
-          right: 16px;
-        }
-      }
     }
 
     div.stream-header-head-author {
@@ -507,6 +502,21 @@ div.stream-item {
               background-color: $carrot_green;
               @include OC_Body_Bold();
               font-size: 16px;
+            }
+          }
+        }
+      }
+
+      div.menu-container {
+        div.more-menu {
+          @include big_web() {
+            display: none;
+          }
+
+          @include mobile() {
+            ul.more-menu-list {
+              left: unset;
+              right: 16px;
             }
           }
         }
