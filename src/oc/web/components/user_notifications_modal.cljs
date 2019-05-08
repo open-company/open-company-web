@@ -155,7 +155,7 @@
                   "Via Slack"])
               [:option
                 {:value "in-app"}
-                "In-app"]]]
+                "In-app only"]]]
           [:div.user-profile-modal-fields
             [:div.field-label "Reminders"]
             [:select.field-value
@@ -170,4 +170,4 @@
                   "Via Slack"])
               [:option
                 {:value "in-app"}
-                "In-app"]]]]]]))
+                "In-app only"]]]]]]))
