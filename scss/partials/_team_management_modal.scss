@@ -155,7 +155,7 @@ div.team-management-modal {
           div.user-name {
             margin-left: 8px;
             float: left;
-            width: calc(100% - 122px);
+            width: calc(100% - 118px);
             height: 24px;
 
             div.tooltip {
@@ -200,13 +200,13 @@ div.team-management-modal {
                 color: $carrot_orange;
                 padding: 0;
                 display: inline;
+                margin-left: 6px;
               }
             }
           }
 
           div.user-role {
             float: right;
-            max-width: calc(100% - 122px);
             height: 24px;
             @include OC_Body_Book();
             font-size: 12px;
@@ -223,12 +223,12 @@ div.team-management-modal {
 
               button.user-type-btn.dropdown-toggle {
                 height: 24px;
-                line-height: 24px;
-                padding-right: 16px;
-                width: 90px;
+                width: 82px;
 
-                &:disabled {
-                  text-align: right;
+                &:after {
+                  top: 7px;
+                  right: 0px;
+                  padding-right: 16px;
                 }
               }
 

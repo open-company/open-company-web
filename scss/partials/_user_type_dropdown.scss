@@ -4,7 +4,10 @@ div.dropdown{
   button.user-type-btn {
     position: relative;
     cursor: pointer;
-    padding-right: 25px;
+    padding: 0 24px 0 0;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: right;
 
     &:after {
       content: "";
