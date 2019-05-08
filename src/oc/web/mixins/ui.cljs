@@ -242,3 +242,23 @@
       (events/unlistenByKey (:on-resize-listener s))
       (dissoc s :on-resize-listener))
     s))})
+
+(defn autoresize-textarea [ref & [initially-focused]]
+  (letfn [(init-textarea [el]
+            (let [observe (utils/observe)
+                  resize-fn (fn []
+                              (set! (.-height (.-style el)) "auto")
+                              (set! (.-height (.-style el)) (str (.-scrollHeight el) "px")))
+                  delayed-resize-fn (fn [] (utils/after 0 resize-fn))]
+            (observe el "change" resize-fn)
+            (observe el "cut" delayed-resize-fn)
+            (observe el "paste" delayed-resize-fn)
+            (observe el "drop" delayed-resize-fn)
+            (observe el "keydown" delayed-resize-fn)
+            (when initially-focused
+              (.focus el))
+            (resize-fn)))]
+    {:did-mount (fn [s]
+      (when-let [el (rum/ref-node s ref)]
+        (init-textarea el))
+      s)}))

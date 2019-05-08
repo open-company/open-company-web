@@ -636,6 +636,10 @@
 
 (def default-headline "Untitled post")
 
+(def default-abstract "Post preview: summarize why this post matters…")
+
+(def max-abstrct-length 280)
+
 (def default-drafts-board-name "Drafts")
 
 (def default-drafts-board-slug "drafts")
@@ -724,3 +728,8 @@
             (reset! timeout nil)
             (reset! last-call now)
             (apply f args)))))))
+
+(defn observe []
+  (if (.-attachEvent js/window)
+    (fn [el e handler] (.attachEvent el (str "on" e) handler))
+    (fn [el e handler] (.addEventListener el e handler))))

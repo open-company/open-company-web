@@ -57,6 +57,7 @@
   (mention-mixins/oc-mentions-hover)
   {:did-mount (fn [s]
     (save-fixed-comment-height s)
+    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
     (load-comments s)
     s)
    :did-remount (fn [_ s]
@@ -122,6 +123,9 @@
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+      (when (seq (:abstract activity-data))
+        [:div.expanded-post-abstract
+          (:abstract activity-data)])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
