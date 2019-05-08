@@ -42,7 +42,7 @@
 (defn close-clicked [current-user-data]
   (let [switch-cb (fn []
                    (dismiss-modal)
-                   (utils/after 150 #(org-settings/show-modal :main)))]
+                   (utils/after 150 #(org-settings/show-modal nil)))]
     (if (:has-changes current-user-data)
       (let [alert-data {:icon "/img/ML/trash.svg"
                         :action "user-profile-unsaved-edits"
