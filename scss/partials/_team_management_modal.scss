@@ -226,7 +226,10 @@ div.team-management-modal {
                 line-height: 24px;
                 padding-right: 16px;
                 width: 90px;
-                text-align: right;
+
+                &:disabled {
+                  text-align: right;
+                }
               }
 
               ul.user-type-dropdown-menu {
