@@ -114,14 +114,12 @@
 (def activities-read-key
   [:activities-read])
 
-(defn get-posts-for-board [activity-id posts-data board-slug]
+(defn get-posts-for-board [posts-data board-slug]
   (let [posts-list (vals posts-data)
-        filter-fn (if (seq activity-id)
-                    #(= (:uuid %) activity-id)
-                    (if (= board-slug utils/default-drafts-board-slug)
-                      #(not= (:status %) "published")
-                      #(and (= (:board-slug %) board-slug)
-                            (= (:status %) "published"))))]
+        filter-fn (if (= board-slug utils/default-drafts-board-slug)
+                    #(not= (:status %) "published")
+                    #(and (= (:board-slug %) board-slug)
+                          (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
 ;; Functions needed by derivatives
@@ -160,6 +158,8 @@
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
+   :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
+   :expanded-user-menu  [[:base] (fn [base] (:expanded-user-menu base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -174,7 +174,6 @@
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :show-reminders      [[:base] (fn [base] (:show-reminders base))]
@@ -221,10 +220,9 @@
                              (let [org-slug (:slug org-data)
                                    all-boards-slug (map :slug (:boards org-data))
                                    container-slug (:board route)
-                                   activity-id (:activity route)
                                    is-board? ((set all-boards-slug) container-slug)]
                               (if is-board?
-                                (get-posts-for-board activity-id posts-data container-slug)
+                                (get-posts-for-board posts-data container-slug)
                                 (let [container-key (container-key org-slug container-slug)
                                       items-list (:posts-list (get-in base container-key))]
                                   (zipmap items-list (map #(get posts-data %) items-list)))))))]
@@ -291,7 +289,7 @@
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :navbar-data         [[:base :org-data :board-data :current-user-data]
                           (fn [base org-data board-data current-user-data]
-                            (let [navbar-data (select-keys base [:mobile-menu-open
+                            (let [navbar-data (select-keys base [:expanded-user-menu
                                                                  :show-login-overlay
                                                                  :mobile-navigation-sidebar
                                                                  :current-user-data
@@ -334,10 +332,10 @@
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
                             :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :jwt :wrt-show :show-reminders]
+                            :expanded-user-menu :jwt :wrt-show :show-reminders]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
                                  ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing mobile-menu-open jwt wrt-show show-reminders]
+                                 entry-editing expanded-user-menu jwt wrt-show show-reminders]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -360,7 +358,7 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open
+                               :expanded-user-menu expanded-user-menu
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :wrt-activity-data (when wrt-show
@@ -519,20 +517,21 @@
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
      (if is-board?
-       (get-posts-for-board nil posts-data posts-filter)
+       (get-posts-for-board posts-data posts-filter)
        (let [container-key (container-key org-slug posts-filter)
              items-list (:posts-list (get-in data container-key))]
         (zipmap items-list (map #(get posts-data %) items-list))))))
-  ([data org-slug posts-filter activity-id]
-    (let [org-data (org-data data org-slug)
-          all-boards-slug (map :slug (:boards org-data))
-          is-board? ((set all-boards-slug) posts-filter)
-          posts-data (get-in data (posts-data-key org-slug))]
-     (if is-board?
-       (get-posts-for-board activity-id posts-data posts-filter)
-       (let [container-key (container-key org-slug posts-filter)
-             items-list (:posts-list (get-in data container-key))]
-        (zipmap items-list (map #(get posts-data %) items-list)))))))
+  ; ([data org-slug posts-filter activity-id]
+  ;   (let [org-data (org-data data org-slug)
+  ;         all-boards-slug (map :slug (:boards org-data))
+  ;         is-board? ((set all-boards-slug) posts-filter)
+  ;         posts-data (get-in data (posts-data-key org-slug))]
+  ;    (if is-board?
+  ;      (get-posts-for-board activity-id posts-data posts-filter)
+  ;      (let [container-key (container-key org-slug posts-filter)
+  ;            items-list (:posts-list (get-in data container-key))]
+  ;       (zipmap items-list (map #(get posts-data %) items-list))))))
+  )
 
 (defn draft-posts-data
   ([]

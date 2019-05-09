@@ -88,7 +88,7 @@
              :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "More"}])
         (cond
           @(::move-activity s)
@@ -100,7 +100,6 @@
             (when edit-link
               [:li.edit
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
@@ -109,7 +108,6 @@
             (when delete-link
               [:li.delete
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
@@ -118,7 +116,6 @@
             (when edit-link
               [:li.move
                {:on-click #(do
-                             (utils/event-stop %)
                              (reset! (::showing-menu s) false)
                              (reset! (::move-activity s) true))}
                "Move"])
@@ -126,7 +123,6 @@
                        share-link)
               [:li.share
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
@@ -145,5 +141,5 @@
                           (activity-actions/activity-share-show activity-data share-container-id))
              :data-toggle "tooltip"
              :data-placement (or tooltip-position "top")
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])])))

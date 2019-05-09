@@ -93,12 +93,10 @@
                          (on-intermediate-change (.. % -target -value)))
                        (reset! (::slack-user s) (.. % -target -value)))
          :disabled disabled
-         :placeholder (if (pos? (count all-sorted-users)) "Select User..." "No more members to add")}]
+         :placeholder (if (pos? (count all-sorted-users)) "Select a person to invite..." "No more members to add")}]
       (when-not disabled
-        [:i.fa
-          {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))
-                                    :fa-angle-up @(::show-users-dropdown s)})
-           :on-click #(when-not disabled
+        [:div.arrows
+          {:on-click #(when-not disabled
                         (let [next-value (not @(::show-users-dropdown s))]
                           (reset! (::typing s) false)
                           (reset! (::show-users-dropdown s) next-value)

@@ -31,7 +31,7 @@
     (user-actions/user-profile-reset))
   (dismiss-modal)
   (when mobile-back-bt
-    (nav-actions/mobile-menu-toggle)))
+    (nav-actions/menu-toggle)))
 
 (def default-user-profile (oc.web.stores.user/random-user-image))
 
@@ -71,7 +71,7 @@
   (notification-actions/show-notification
     {:title "Image upload error"
      :description "An error occurred while processing your image. Please retry."
-     :expire 5
+     :expire 3
      :dismiss true}))
 
 (defn success-cb

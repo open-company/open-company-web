@@ -1170,8 +1170,6 @@
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione.css"}]
           ;; Emojone Sprites CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emoji-mart.css"}]
-          ;; CarrotKit Font
-          [:link {:type "text/css" :rel "stylesheet" :href "/css/fonts/CarrotKit.css"}]
           ;; MediumEditorTCMention css
           [:link {:type "text/css" :rel "stylesheet" :href "/lib/MediumEditorExtensions/MediumEditorTCMention/mention-panel.min.css"}]
           ;; MediumEditorMediaPicker
@@ -1270,8 +1268,6 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
-          ;; CarrotKit Font
-          [:link {:type "text/css" :rel "stylesheet" :href (cdn "/css/fonts/CarrotKit.css")}]
           ;; jQuery needed by Bootstrap JavaScript
           jquery
           ;; Automatically load the needed polyfill depending on

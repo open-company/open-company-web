@@ -55,8 +55,4 @@
         [:button.mlb-reset.mlb-default
           {:on-click #(do (utils/event-stop %) (move-post s))
            :disabled (not @(::selected-board s))}
-          "Apply"]
-        [:button.mlb-reset.mlb-link-black
-          {:on-click #(when (fn? dismiss-cb)
-                        (dismiss-cb))}
-          "Cancel"]]]))
+          "Move post"]]]))

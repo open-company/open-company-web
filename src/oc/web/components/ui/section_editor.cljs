@@ -12,13 +12,23 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.org-settings :as org-settings]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
+
+;; Dismiss modal
+
+(defn dismiss []
+  (dis/dispatch! [:input [:show-section-editor] false])
+  (dis/dispatch! [:input [:show-section-add] false]))
+
+(defn dismiss-modal [& [s]]
+  (if s
+    (reset! (::unmounting s) true)
+    (dismiss)))
 
 ;; Private section users search helpers
 
@@ -67,10 +77,6 @@
     (assoc :authors (map #(if (map? %) (:user-id %) %) (:authors section-data)))
     (assoc :viewers (map #(if (map? %) (:user-id %) %) (:viewers section-data)))))
 
-(defn dismiss []
-  (dis/dispatch! [:input [:show-section-editor] false])
-  (dis/dispatch! [:input [:show-section-add] false]))
-
 (defn check-section-name-error [s]
   (let [section-editing @(drv/get-ref s :section-editing)
         org-data @(drv/get-ref s :org-data)
@@ -93,63 +99,72 @@
             (reset! (::pre-flight-check s) true))
           (reset! (::pre-flight-check s) false))))))
 
-(rum/defcs section-editor < rum/reactive
-                            ;; Locals
-                            (rum/local "" ::query)
-                            (rum/local false ::show-access-list)
-                            (rum/local false ::show-search-results)
-                            (rum/local nil ::show-edit-user-dropdown)
-                            (rum/local nil ::show-edit-user-top)
-                            (rum/local "" ::initial-section-name)
-                            (rum/local false ::editing-existing-section)
-                            (rum/local false ::slack-enabled)
-                            (rum/local "" ::section-name)
-                            (rum/local false ::pre-flight-check)
-                            (rum/local false ::pre-flight-ok)
-                            (rum/local nil ::section-name-check-timeout)
-                            (rum/local false ::saving)
-                            ;; Mixins
-                            mixins/no-scroll-mixin
-                            (on-window-click-mixin (fn [s e]
-                             (when-not (utils/event-inside? e (rum/dom-node s))
-                               (dismiss))))
-                            ;; Derivatives
-                            (drv/drv :qsg)
-                            (drv/drv :org-data)
-                            (drv/drv :board-data)
-                            (drv/drv :section-editing)
-                            (drv/drv :team-data)
-                            (drv/drv :team-channels)
-                            (drv/drv :team-roster)
-                            (drv/drv :current-user-data)
-                            {:will-mount (fn [s]
-                              (let [initial-section-data (first (:rum/args s))
-                                    new-section (nil? initial-section-data)
-                                    fixed-section-data (if new-section
-                                                        utils/default-section
-                                                        (section-for-editing initial-section-data))]
-                                (when (string? (:name fixed-section-data))
-                                  (reset! (::section-name s) (clojure.string/trim (:name fixed-section-data))))
-                                (reset! (::editing-existing-section s) (not new-section))
-                                (when-not (empty? (:name fixed-section-data))
-                                  (reset! (::initial-section-name s) (:name fixed-section-data)))
-                                (dis/dispatch! [:input [:section-editing] fixed-section-data])
-                                (reset! (::slack-enabled s)
-                                 (not (empty? (:channel-id (:slack-mirror fixed-section-data))))))
-                              s)
-                             :will-update (fn [s]
-                              (let [section-editing @(drv/get-ref s :section-editing)]
-                                (when @(::pre-flight-check s)
-                                  (when-not (:pre-flight-loading section-editing)
-                                    (reset! (::pre-flight-check s) false)
-                                    (when (and (not (:section-name-error section-editing))
-                                               (not (:section-error section-editing)))
-                                      (reset! (::pre-flight-ok s) true))))
-                                ;; Re-enable the save button after a save failure
-                                (when (and @(::saving s)
-                                           (not (:loading section-editing)))
-                                  (reset! (::saving s) false)))
-                              s)}
+(rum/defcs section-editor <
+  rum/reactive
+  ;; Locals
+  (rum/local "" ::query)
+  (rum/local false ::show-access-list)
+  (rum/local false ::show-search-results)
+  (rum/local nil ::show-edit-user-dropdown)
+  (rum/local nil ::show-edit-user-top)
+  (rum/local "" ::initial-section-name)
+  (rum/local false ::editing-existing-section)
+  (rum/local false ::slack-enabled)
+  (rum/local "" ::section-name)
+  (rum/local false ::pre-flight-check)
+  (rum/local false ::pre-flight-ok)
+  (rum/local nil ::section-name-check-timeout)
+  (rum/local false ::saving)
+  (rum/local false ::unmounting)
+  (rum/local false ::unmounted)
+  ;; Mixins
+  mixins/no-scroll-mixin
+  mixins/first-render-mixin
+  (mixins/on-window-click-mixin (fn [s e]
+   (when-not (utils/event-inside? e (rum/dom-node s))
+     (dismiss-modal s))))
+  ;; Derivatives
+  (drv/drv :qsg)
+  (drv/drv :org-data)
+  (drv/drv :board-data)
+  (drv/drv :section-editing)
+  (drv/drv :team-data)
+  (drv/drv :team-channels)
+  (drv/drv :team-roster)
+  (drv/drv :current-user-data)
+  {:will-mount (fn [s]
+   (let [initial-section-data (first (:rum/args s))
+         new-section (nil? initial-section-data)
+         fixed-section-data (if new-section
+                            utils/default-section
+                            (section-for-editing initial-section-data))]
+     (when (string? (:name fixed-section-data))
+       (reset! (::section-name s) (clojure.string/trim (:name fixed-section-data))))
+     (reset! (::editing-existing-section s) (not new-section))
+     (when-not (empty? (:name fixed-section-data))
+       (reset! (::initial-section-name s) (:name fixed-section-data)))
+     (dis/dispatch! [:input [:section-editing] fixed-section-data])
+     (reset! (::slack-enabled s)
+      (not (empty? (:channel-id (:slack-mirror fixed-section-data))))))
+  s)
+  :will-update (fn [s]
+   (let [section-editing @(drv/get-ref s :section-editing)]
+     (when @(::pre-flight-check s)
+       (when-not (:pre-flight-loading section-editing)
+         (reset! (::pre-flight-check s) false)
+         (when (and (not (:section-name-error section-editing))
+                    (not (:section-error section-editing)))
+           (reset! (::pre-flight-ok s) true))))
+     ;; Re-enable the save button after a save failure
+     (when (and @(::saving s)
+                (not (:loading section-editing)))
+       (reset! (::saving s) false)))
+   s)
+  :did-update (fn [s]
+   (when (and @(::unmounting s)
+             (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 dismiss))
+   s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
         no-drafts-boards (filter #(and (not (:draft %)) (not= (:slug %) utils/default-drafts-board-slug)) (:boards org-data))
@@ -173,8 +188,14 @@
         last-section-standing (= (count no-drafts-boards) 1)
         qsg-data (drv/react s :qsg)
         disallow-public-board? (and (:content-visibility org-data)
-                                    (:disallow-public-board (:content-visibility org-data)))]
+                                    (:disallow-public-board (:content-visibility org-data)))
+        appear-class (and @(:first-render-done s)
+                          (not @(::unmounting s))
+                          (not @(::unmounted s)))]
     [:div.section-editor-container
+      {:class (utils/class-set {:appear appear-class})}
+      [:button.mlb-reset.modal-close-bt
+        {:on-click #(on-change nil)}]
       [:div.section-editor.group
         {:on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
@@ -183,15 +204,36 @@
                        (reset! (::show-search-results s) false))
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-private-users"))
                        (reset! (::show-edit-user-dropdown s) nil)))}
-        [:button.mlb-reset.settings-modal-close
-          {:on-click #(on-change nil)}]
         [:div.section-editor-header
-          [:div.section-editor-header-left
+          [:div.section-editor-header-title
             {:dangerouslySetInnerHTML
               (utils/emojify
                (if @(::editing-existing-section s)
                  "Section settings"
-                 "New section"))}]]
+                 "Create section"))}]
+          (let [disable-bt (or @(::saving s)
+                               (< (count @(::section-name s)) section-actions/min-section-name-length)
+                               @(::pre-flight-check s)
+                               (:pre-flight-loading section-editing)
+                               (seq (:section-name-error section-editing)))]
+            [:button.mlb-reset.save-bt
+              {:on-click (fn [_]
+                          (when (and (not disable-bt)
+                                     (compare-and-set! (::saving s) false true))
+                            (let [section-node (rum/ref-node s "section-name")
+                                  section-name (.-innerText section-node)
+                                  personal-note-node (rum/ref-node s "personal-note")
+                                  personal-note (when personal-note-node (.-innerText personal-note-node))
+                                  success-cb #(when (fn? on-change)
+                                                (on-change % personal-note))]
+                              (when (not @(::editing-existing-section s))
+                                (qsg-actions/finish-add-section-trail))
+                              (section-actions/section-save-create section-editing section-name success-cb))))
+               :class (when disable-bt "disabled")}
+              "Save"])
+          [:button.mlb-reset.cancel-bt
+            {:on-click #(on-change nil)}
+            "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
             [:span.section-name "Section name"]]
@@ -222,44 +264,8 @@
             [:div.section-editor-error-label
               (str (or (:section-name-error section-editing)
                        (:section-error section-editing)))])
-          (when show-slack-channels?
-            [:div.section-editor-add-label
-              "Auto-share to Slack"
-              (when show-slack-channels?
-                [:span.info])
-              (when show-slack-channels?
-                (carrot-switch {:selected @(::slack-enabled s)
-                                  :did-change-cb #(do
-                                                    (reset! (::slack-enabled s) %)
-                                                    (when-not %
-                                                      (dis/dispatch!
-                                                       [:input
-                                                        [:section-editing :slack-mirror]
-                                                        nil])))}))])
-          (if show-slack-channels?
-            [:div.section-editor-add-slack-channel.group
-              {:class (when-not @(::slack-enabled s) "disabled")}
-              (slack-channels-dropdown {:initial-value (when channel-name (str "#" channel-name))
-                                        :on-change (fn [team channel]
-                                                     (dis/dispatch!
-                                                      [:input
-                                                       [:section-editing :slack-mirror]
-                                                       {:channel-id (:id channel)
-                                                        :channel-name (:name channel)
-                                                        :slack-org-id (:slack-org-id team)}]))})]
-            ;; If they don't have bot installed already but have slack org associated to the team
-            ;; and user has a slack user (if not they can't add the bot) let's prompt to add the bot
-            (when (and (not (jwt/team-has-bot? (:team-id team-data)))
-                       (pos? (count slack-users))
-                       (pos? (count slack-orgs)))
-              [:div.section-editor-enable-slack-bot.group
-                "Automatically share posts to Slack?"
-                [:button.mlb-reset.enable-slack-bot-bt
-                  {:on-click (fn [_]
-                               (org-actions/bot-auth team-data cur-user-data (router/get-token)))}
-                  "Add Carrot bot"]]))
           [:div.section-editor-add-label
-            "Who can view this section?"]
+            "Section security"]
           [:div.section-editor-add-access
             {:class (when @(::show-access-list s) "expanded")
              :on-click #(do
@@ -294,11 +300,47 @@
                                 (reset! (::show-access-list s) false)
                                 (dis/dispatch! [:input [:section-editing :access] "public"]))}
                   public-access])])
+          (when show-slack-channels?
+            [:div.section-editor-add-label.top-separator
+              "Auto-share to Slack"
+              (when show-slack-channels?
+                [:span.info])
+              (when show-slack-channels?
+                (carrot-switch {:selected @(::slack-enabled s)
+                                  :did-change-cb #(do
+                                                    (reset! (::slack-enabled s) %)
+                                                    (when-not %
+                                                      (dis/dispatch!
+                                                       [:input
+                                                        [:section-editing :slack-mirror]
+                                                        nil])))}))])
+          (if show-slack-channels?
+            [:div.section-editor-add-slack-channel.group
+              {:class (when-not @(::slack-enabled s) "disabled")}
+              (slack-channels-dropdown {:initial-value (when channel-name (str "#" channel-name))
+                                        :on-change (fn [team channel]
+                                                     (dis/dispatch!
+                                                      [:input
+                                                       [:section-editing :slack-mirror]
+                                                       {:channel-id (:id channel)
+                                                        :channel-name (:name channel)
+                                                        :slack-org-id (:slack-org-id team)}]))})]
+            ;; If they don't have bot installed already but have slack org associated to the team
+            ;; and user has a slack user (if not they can't add the bot) let's prompt to add the bot
+            (when (and (not (jwt/team-has-bot? (:team-id team-data)))
+                       (pos? (count slack-users))
+                       (pos? (count slack-orgs)))
+              [:div.section-editor-enable-slack-bot.group
+                "Automatically share posts to Slack?"
+                [:button.mlb-reset.enable-slack-bot-bt
+                  {:on-click (fn [_]
+                               (org-actions/bot-auth team-data cur-user-data (router/get-token)))}
+                  "Add Carrot bot"]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
               "Public sections are visible to the world, including search engines."])
           (when (= (:access section-editing) "private")
-            [:div.section-editor-add-label
+            [:div.section-editor-add-label.top-separator
               "Add members to this private section"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
@@ -478,7 +520,7 @@
                                                        :expire 10
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
-                                                   (dismiss))})))
+                                                   (dismiss-modal s))})))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
@@ -486,29 +528,4 @@
                          "You cannot delete the last remaining section."
                          "Delete this section and all its posts.")
                  :class (when last-section-standing "disabled")}
-                "Delete section"])
-            (let [disable-bt (or @(::saving s)
-                                 (< (count @(::section-name s)) section-actions/min-section-name-length)
-                                 @(::pre-flight-check s)
-                                 (:pre-flight-loading section-editing)
-                                 (seq (:section-name-error section-editing)))]
-              [:button.mlb-reset.create-bt
-                {:on-click (fn [_]
-                            (when (and (not disable-bt)
-                                       (compare-and-set! (::saving s) false true))
-                              (let [section-node (rum/ref-node s "section-name")
-                                    section-name (.-innerText section-node)
-                                    personal-note-node (rum/ref-node s "personal-note")
-                                    personal-note (when personal-note-node (.-innerText personal-note-node))
-                                    success-cb #(when (fn? on-change)
-                                                  (on-change % personal-note))]
-                                (when (not @(::editing-existing-section s))
-                                  (qsg-actions/finish-add-section-trail))
-                                (section-actions/section-save-create section-editing section-name success-cb))))
-                 :class (when disable-bt "disabled")}
-                (if @(::editing-existing-section s)
-                  "Save"
-                  "Done")])
-            [:button.mlb-reset.cancel-bt
-              {:on-click #(on-change nil)}
-              "Cancel"]]]]]))
+                "Delete section"])]]]]))

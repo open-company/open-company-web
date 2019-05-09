@@ -51,15 +51,17 @@
                          (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))
         short-label? (and (responsive/is-mobile-size?)
-                          (> (count (:reactions entry-data)) 3))]
+                          (> (count (:reactions entry-data)) 3))
+        faces-to-render (take max-face-pile comments-authors)]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
       [:div.is-comments
         ; Comments authors heads
         [:div.is-comments-authors.group
-          {:style {:width (str (if (pos? face-pile-count) (+ 10 (* 18 face-pile-count)) 0) "px")}}
-          (for [user-data (take max-face-pile comments-authors)]
+          {:style {:width (str (if (pos? face-pile-count) (+ 10 (* 18 face-pile-count)) 0) "px")}
+           :class (when (> (count faces-to-render) 1) "show-border")}
+          (for [user-data faces-to-render]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]

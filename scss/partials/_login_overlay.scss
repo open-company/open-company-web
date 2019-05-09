@@ -76,7 +76,7 @@ div.login-overlay-container {
       }
 
       div.sign-in-cta {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 32px;
         color: $deep_navy;
         text-transform: none;
@@ -114,7 +114,7 @@ div.login-overlay-container {
         @include tablet(){
           display: block;
           float: right;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 15px;
           height: 40px;
           width: 40px;
@@ -153,7 +153,7 @@ div.login-overlay-container {
       text-align: center;
 
       div.signin-with-slack-content, div.signin-with-google-content {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $deep_navy;
         width: 100%;
@@ -211,7 +211,7 @@ div.login-overlay-container {
         top: 0px;
         left: 71px;
         text-align: center;
-        @include avenir_R();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $light_ui_grey;
         margin: 0 auto;
@@ -233,7 +233,7 @@ div.login-overlay-container {
         label.sign-in-label {
           margin: 0px;
           padding: 0px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 12px;
           color: $deep_navy;
         }
@@ -250,7 +250,7 @@ div.login-overlay-container {
           outline: none;
           padding: 10px 16px;
           position: relative;
-          @include avenir_BOOK();
+          @include OC_Body_Book();
           font-size: 16px;
           color: $oc_gray_7;
           line-height: 24px;
@@ -259,7 +259,7 @@ div.login-overlay-container {
           margin-top: 4px;
 
           @include placeholder() {
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 16px;
             color: $carrot_light_gray;
           }
@@ -278,12 +278,12 @@ div.login-overlay-container {
           float: right;
 
           a {
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 12px;
             line-height: 1.5;
             letter-spacing: 1px;
             color: $light_ui_grey;
-            @include avenir_H();
+            @include OC_Body_Bold();
             text-decoration: underline;
             &:hover {
               text-decoration: underline;
@@ -306,7 +306,7 @@ div.login-overlay-container {
         height: 48px;
         background-color: $sea_blue;
         color: white;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         border-radius: 6px;
 
@@ -318,13 +318,13 @@ div.login-overlay-container {
 
       div.footer-link {
         margin-top: 20px;
-        @include avenir_R();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $deep_navy;
         text-align: center;
 
         a {
-          @include avenir_R();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $carrot_green;
           margin-left: 8px;
@@ -341,7 +341,7 @@ div.login-overlay-container {
         font-size: 20px;
         line-height: 1.2;
         color: $carrot_text_blue;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-weight: 400;
       }
 
@@ -351,7 +351,7 @@ div.login-overlay-container {
         label.password-reset-label {
           font-size: 12px;
           color: $deep_navy;
-          @include avenir_H();
+          @include OC_Body_Bold();
           margin: 0px;
           padding: 0px;
         }
@@ -362,7 +362,7 @@ div.login-overlay-container {
       div.slack-disclaimer {
         font-size: 14px;
         color: $oc_gray_7;
-        @include avenir_M();
+        @include OC_Body_Bold();
         letter-spacing: 0.4px;
         text-align: center;
         padding: 20px 20px 0;
@@ -388,7 +388,7 @@ div.login-overlay-container {
 
       a {
         color: $carrot_light_gray;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
 
         span.blue-link {

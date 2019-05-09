@@ -15,7 +15,7 @@ div.sections-picker {
 
     div.sections-picker-header-left {
       float: left;
-      @include avenir_B();
+      @include OC_Body_Black();
       font-size: 13px;
       color: $ui_grey;
       text-transform: uppercase;
@@ -99,7 +99,7 @@ div.sections-picker {
 
         &.active {
           div.sections-picker-section-name {
-            @include avenir_H();
+            @include OC_Body_Bold();
             color: $deep_navy;
           }
         }
@@ -110,20 +110,29 @@ div.sections-picker {
           height: 16px;
           border: 1px solid $light_ui_grey;
           border-radius: 50%;
+          margin-top: 2px;
         }
 
         div.sections-picker-section-name {
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $ui_grey;
           float: left;
           width: 150px;
 
           span.name {
-            max-width: 126px;
+            max-width: 116px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: block;
+            float: left;
+          }
+
+          span.count {
+            margin-left: 8px;
+            display: block;
+            float: left;
           }
 
           @include mobile() {

@@ -18,7 +18,7 @@ div.about-wrap {
       // }
 
       h1.about {
-        @include PTSerif()
+        @include OC_Title()
         font-size: 60px;
         line-height: 78px;
         color: $deep_navy;
@@ -125,7 +125,7 @@ div.about-wrap {
             }
 
             div.user-name {
-              @include PTSerif()
+              @include OC_Title()
               font-size: 20px;
               color: $deep_navy;
               margin-top: 24px;
@@ -136,7 +136,7 @@ div.about-wrap {
             }
 
             div.user-position {
-              @include avenir_R();
+              @include OC_Body_Bold();
               font-size: 14px;
               color: $deep_navy;
               margin-top: 8px;
@@ -178,7 +178,7 @@ div.about-wrap {
       }
       
       h3.about-copy-header {
-        @include PTSerif()
+        @include OC_Title()
         color: $deep_navy;
         font-size: 60px;
         line-height: 78px;
@@ -226,7 +226,7 @@ div.about-wrap {
           }
 
           div.about-copy-title {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 30px;
             color: $deep_navy;
             text-align: left;
@@ -245,7 +245,7 @@ div.about-wrap {
           }
 
           p {
-            @include avenir_R();
+            @include OC_Body_Bold();
             font-size: 30px;
             color: $deep_navy;
             text-align: left;
@@ -271,11 +271,11 @@ div.about-wrap {
             }
 
             span.oblique {
-              @include avenir_O();
+              @include OC_Body_Bold_Italic();
             }
 
             span.heavy {
-              @include avenir_H();
+              @include OC_Body_Bold();
             }
           }
         }
@@ -298,7 +298,7 @@ div.about-wrap {
             div.about-bottom-copy-left {
               float: left;
               width: 42%;
-              @include PTSerif()
+              @include OC_Title()
               font-size: 30px;
               line-height: 40px;
               color: $deep_navy;
@@ -339,7 +339,7 @@ div.about-wrap {
               }
 
               div.about-bottom-copy-description {
-                @include avenir_R();
+                @include OC_Body_Bold();
                 font-size: 20px;
                 line-height: 26px;
                 color: $deep_navy;
@@ -352,7 +352,7 @@ div.about-wrap {
                 margin-top: 16px;
                 color: $carrot_green;
                 text-transform: uppercase;
-                @include avenir_B();
+                @include OC_Body_Black();
                 font-size: 14px;
                 letter-spacing: 0.5;
               }
@@ -362,7 +362,7 @@ div.about-wrap {
                 margin-right: 16px;
                 color: rgba($deep_navy, 0.5);
                 text-transform: uppercase;
-                @include avenir_B();
+                @include OC_Body_Black();
                 font-size: 14px;
                 letter-spacing: 0.5; 
               }
@@ -372,7 +372,7 @@ div.about-wrap {
       }
 
       div.about-alignment {
-        @include avenir_M();
+        @include OC_Body_Bold();
         font-size: 34px;
         color: $deep_navy;
         margin: 80px auto 0px;

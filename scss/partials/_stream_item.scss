@@ -1,17 +1,47 @@
 div.stream-item {
   width: #{$board_container_width}px;
-  margin: 12px 0px 16px;
-  border: 1px solid $ultra_light_grey;
-  border-radius: 6px;
-  padding: 24px 32px;
-  background-color: white;
+  margin: 0;
+  padding: 24px 40px;
+  border-bottom: 1px solid $ultra_light_grey;
+  border-left: 4px solid transparent;
+
+  &.expandable {
+    cursor: pointer;
+
+    @include big_web() {
+      &:hover {
+        background-color: #F5F5F5;
+        border-left: 4px solid #F5F5F5;
+
+        div.stream-item-footer div.menu-container {
+          div.more-menu {
+            display: block;
+          }
+        }
+
+        div.stream-item-body-ext {
+          div.stream-item-footer {
+            div.stream-item-comments-summary {
+              div.is-comments {
+                div.is-comments-authors.show-borders {
+                  div.is-comments-author {
+                    background-color: #F5F5F5;
+                    border: 2px solid #F5F5F5;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   @include mobile() {
     width: 100%;
     padding: 16px;
     margin: 0;
     border: none;
-    border-bottom: 1px solid $ultra_light_grey;
     border-radius: 0;
   }
 
@@ -19,70 +49,49 @@ div.stream-item {
     cursor: pointer;
   }
 
-  &.new-item {
-    div.new-tag {
-      display: inline-block;
+  &.unread-item {
+    background-color: white;
+    border-left: 4px solid white;
+
+    @include big_web(){
+      &:hover {
+        background-color: white;
+        border-left: 4px solid white;        
+      }
     }
 
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 52px);
-          @include mobile() {
-            max-width: 100%;
-          }
+    &.must-see-item {
+      border-left: 4px solid $sea_blue;
+
+      @include big_web(){
+        &:hover {
+          border-left: 4px solid $sea_blue;
         }
       }
     }
   }
 
   &.must-see-item {
+    border-left: 4px solid transparent;
+
+    @include big_web(){
+      &:hover {
+        border-left: 4px solid transparent;
+      }
+    }
+
     div.must-see-tag {
       display: inline-block;
     }
-
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 94px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
-    }
   }
 
-  &.must-see-item.new-item {
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 138px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      right: -9px;
+      top: unset;
+      bottom: 6px;
     }
   }
-
-  &.show-continue-reading:not(.single-post-view) {
-    button.expand-button {
-      display: flex;
-    }
-  }
-
-  &:not(.show-continue-reading):not(.single-post-view) {
-    button.expand-button {
-      display: none;
-    }
-
-    @include mobile(){
-      div.stream-item-bottom-footer {
-        display: none;
-      }
-    }
-  }  
 
   div.stream-item-header {
     position: relative;
@@ -90,30 +99,24 @@ div.stream-item {
     @include mobile() {
       width: 100%;
     }
-    
-    div.more-menu {
-      float: right;
-
-      @include mobile() {
-        ul.more-menu-list {
-          left: unset;
-          right: 16px;
-        }
-      }
-    }
 
     div.stream-header-head-author {
-      float: left;
-      width: 567px;
+      width: 100%;
 
-      @include activity-author(32);
+      @include activity-author(24);
+
+      div.user-avatar-img-container {
+        margin-right: 8px;
+      }
 
       @include mobile() {
         width: calc(100% - 46px);
       }
 
       div.name {
-        height: 20px;
+        height: 24px;
+        float: left;
+        max-width: 70%;
 
         @include mobile() {
           width: auto;
@@ -123,93 +126,25 @@ div.stream-item {
           display: inline-block;
           text-overflow: ellipsis;
           overflow: hidden;
-          line-height: 20px;
+          line-height: 24px;
           margin-right: 8px;
         }
       }
 
       div.time-since {
-        float: left;
+        float: right;
+        max-width: 30%;
+        height: 24px;
+        line-height: 24px;
+        text-align: right;
+
         @include mobile() {
           width: auto;
         }
       }
 
-      div.separator {
-        width: 3px;
-        height: 3px;
-        border-radius: 4px;
-        background-color: $light_ui_grey;
-        margin: 6px 8px 0px;
-        float: left;
-      }
-
-      div.stream-item-wrt {
-        float: left;
-        position: relative;
-
-        div.post-added-tooltip-container {
-          border: 1px solid rgba($carrot_gold, 0.5);
-          background-color: #FDF6E4;
-          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-          width: 300px;
-          border-radius: 6px;
-          padding: 24px 20px;
-          margin: 12px 0 0;
-          position: absolute;
-          left: calc(50% - 150px);
-          top: 18px;
-          text-align: center;
-          z-index: 5;
-
-          div.post-added-tooltip-top-arrow {
-            position: absolute;
-            top: -12px;
-            width: 24px;
-            height: 12px;
-            margin-left: -12px;
-            left: 50%;
-            background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
-            background-position: center;
-            background-size: 24px 12px;
-            background-repeat: no-repeat;
-          }
-
-          button.post-added-tooltip-dismiss {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
-            background-size: 8px 8px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-
-          div.post-added-tooltips {
-
-            div.post-added-tooltip {
-              @include avenir_R();
-              font-size: 16px;
-              color: $deep_navy;
-              line-height: 20px;
-            }
-
-            button.post-added-bt {
-              width: auto;
-              margin-top: 16px;
-              height: 32px;
-              width: 96px;
-              background-color: transparent;
-              border-radius: 6px;
-              color: white;
-              background-color: $carrot_green;
-              @include avenir_H();
-              font-size: 16px;
-            }
-          }
-        }
+      div.must-see-tag {
+        margin-top: 2px;
       }
     }
   }
@@ -324,6 +259,7 @@ div.stream-item {
         right: 0;
         top: 50%;
         cursor: pointer;
+        border-radius: 4px;
 
         &.video {
           &:hover:after {
@@ -354,7 +290,7 @@ div.stream-item {
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 400px;
+        width: 484px;
         min-height: 98px;
 
         @include mobile() {
@@ -383,10 +319,7 @@ div.stream-item {
 
       div.stream-item-headline {
         @include activity-title();
-        @include avenir_H();
-        font-size: 22px;
         color: $deep_navy;
-        line-height: 28px;
         display: inline;
         @include mobile() {
           margin-top: 16px;
@@ -411,15 +344,10 @@ div.stream-item {
             margin-top: 8px;
 
             &.to-truncate{
-              @include activity-body(16, 22, 22, $deep_navy);
+              @include activity-body(18, 24, 24, $deep_navy);
               color: $deep_navy;
-              @include avenir_R();
-              line-height: 22px;
-
-              @include mobile() {
-                @include activity-body(18, 24, 24, $deep_navy); 
-                line-height: 24px;
-              }
+              @include OC_Body_Book();
+              line-height: 24px;
 
               &.hide-images {
                 img {
@@ -429,16 +357,11 @@ div.stream-item {
             }
 
             &.no-truncate {
-              @include activity-body(16, 22, 22, $deep_navy);
+              @include activity-body(18, 24, 24, $deep_navy);
               color: $deep_navy;
-              @include avenir_R();
-              line-height: 22px;
+              @include OC_Body_Book();
+              line-height: 24px;
               display: none;
-
-              @include mobile() {
-                @include activity-body(18, 24, 24, $deep_navy); 
-                line-height: 24px;
-              }
             }
 
             &>*:first-child {
@@ -463,14 +386,14 @@ div.stream-item {
       padding: 24px;
 
       div.stream-item-transcript-header {
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 12px;
         color: $light_ui_grey;
       }
 
       div.stream-item-transcript-content {
         margin-top: 24px;
-        @include avenir_BOOK();
+        @include OC_Body_Book();
         font-size: 16px;
         color: $deep_navy;
       }
@@ -486,7 +409,7 @@ div.stream-item {
         button.edit-draft-bt {
           text-align: left;
           padding: 0px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $carrot_green;
         }
@@ -497,7 +420,7 @@ div.stream-item {
         button.delete-draft-bt {
           text-align: right;
           padding: 0px;
-          @include avenir_R();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $ui_grey;
         }
@@ -506,17 +429,26 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
-        cursor: pointer;
 
         @include mobile() {
           max-width: calc(50% - 16px);
           overflow: hidden;
           text-overflow: ellipsis;
         }
+
+        div.is-comments {
+          div.is-comments-authors {
+            div.is-comment-author {
+              background-color: $ultra_light_grey;
+              border: 2px solid $ultra_light_grey;
+            }
+          }
+        }
       }
 
       div.reactions {
         float: left;
+        margin-right: 16px;
 
         div.reactions-picker-container {
           div.emoji-mart {
@@ -529,6 +461,90 @@ div.stream-item {
               right: unset;
               top: unset;
               left: unset;
+            }
+          }
+        }
+      }
+
+      div.stream-item-wrt {
+        float: left;
+        position: relative;
+        margin-top: 4px;
+
+        div.post-added-tooltip-container {
+          border: 1px solid rgba($carrot_gold, 0.5);
+          background-color: #FDF6E4;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+          width: 300px;
+          border-radius: 6px;
+          padding: 24px 20px;
+          margin: 12px 0 0;
+          position: absolute;
+          left: calc(50% - 150px);
+          top: 18px;
+          text-align: center;
+          z-index: 5;
+
+          div.post-added-tooltip-top-arrow {
+            position: absolute;
+            top: -12px;
+            width: 24px;
+            height: 12px;
+            margin-left: -12px;
+            left: 50%;
+            background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
+            background-position: center;
+            background-size: 24px 12px;
+            background-repeat: no-repeat;
+          }
+
+          button.post-added-tooltip-dismiss {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
+            background-size: 8px 8px;
+            background-position: center;
+            background-repeat: no-repeat;
+          }
+
+          div.post-added-tooltips {
+
+            div.post-added-tooltip {
+              @include OC_Body_Book();
+              font-size: 16px;
+              color: $deep_navy;
+              line-height: 20px;
+            }
+
+            button.post-added-bt {
+              width: auto;
+              margin-top: 16px;
+              height: 32px;
+              width: 96px;
+              background-color: transparent;
+              border-radius: 6px;
+              color: white;
+              background-color: $carrot_green;
+              @include OC_Body_Bold();
+              font-size: 16px;
+            }
+          }
+        }
+      }
+
+      div.menu-container {
+        div.more-menu {
+          @include big_web() {
+            display: none;
+          }
+
+          @include mobile() {
+            ul.more-menu-list {
+              left: unset;
+              right: 16px;
             }
           }
         }
@@ -550,83 +566,6 @@ div.stream-item {
 
     div.stream-body-comments {
       height: 100%;
-    }
-  }
-
-  div.stream-item-bottom-footer {
-    margin-top: 16px;
-    border-top: 1px solid $ultra_light_grey;
-    padding-top: 12px;
-    height: 36px;
-
-    @include mobile() {
-      border-top: 0px solid transparent;
-      padding-top: 0;
-      height: 32px;
-    }
-
-    &.expanded {
-      margin-top: 0;
-      border-top: 0px solid transparent;
-
-      @include mobile() {
-        margin-top: 16px;
-        height: 24px;
-      }
-    }
-
-    div.activity-share-container {
-      div.activity-share-modal-container {
-        right: -9px;
-        margin-top: -280px;
-      }
-    }
-
-    button.expand-button {
-      padding: 0;
-      height: 24px;
-      color: $carrot_green;
-      @include avenir_H();
-      font-size: 14px;
-      justify-content: center;
-      align-items: center;
-      display: none;
-      float: none;
-      opacity: 1;
-      float: left;
-      width: 100px;
-      margin-top: 0;
-
-      @include mobile(){
-        width: 100%;
-      }
-
-      @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
-
-      span.expand-icon {
-        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-        background-size: 14px 8px;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 14px;
-        height: 8px;
-        transition: rotate 180ms;
-        margin-right: 8px;
-        display: block;
-      }
-
-      &.expanded {
-        color: $ui_grey;
-
-        span.expand-icon {
-          background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
-        }
-      }
-    }
-
-    div.more-menu {
-      float: right;
-      margin-top: -4px;
     }
   }
 }

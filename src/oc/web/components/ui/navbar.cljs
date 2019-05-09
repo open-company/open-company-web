@@ -16,7 +16,6 @@
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
@@ -27,12 +26,8 @@
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
                     (drv/drv :qsg)
+                    (drv/drv :expanded-user-menu)
                     (ui-mixins/render-on-resize nil)
-                    (rum/local false ::expanded-user-menu)
-                    (on-window-click-mixin (fn [s e]
-                     (when (and (not (utils/event-inside? e (rum/ref-node s "user-menu")))
-                                (not (utils/event-inside? e (sel1 [:a.whats-new-link]))))
-                       (reset! (::expanded-user-menu s) false))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
@@ -44,7 +39,7 @@
                 current-user-data
                 show-login-overlay
                 mobile-navigation-sidebar
-                mobile-menu-open
+                expanded-user-menu
                 orgs-dropdown-visible
                 user-settings
                 org-settings
@@ -52,7 +47,7 @@
                 mobile-user-notifications]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
-         mobile-ap-active? (and (not mobile-menu-open)
+         mobile-ap-active? (and (not expanded-user-menu)
                                 (not orgs-dropdown-visible)
                                 (not org-settings)
                                 (not user-settings)
@@ -64,7 +59,7 @@
         qsg-data (drv/react s :qsg)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
-                                :mobile-menu-open mobile-menu-open
+                                :expanded-user-menu expanded-user-menu
                                 :has-prior-updates (and (router/current-org-slug)
                                                         (pos?
                                                          (:count
@@ -86,9 +81,11 @@
                               [:span.public-icon]
                               (= (router/current-board-slug) "must-see")
                               [:span.must-see-icon])]
-              [:button.mlb-reset.mobile-navigation-sidebar-ham-bt
+              [:button.mlb-reset.navigation-sidebar-ham-bt
                 {:class (utils/class-set {:active mobile-ap-active?})
-                 :on-click nav-actions/mobile-nav-sidebar}
+                 :on-click #(if is-mobile?
+                              (nav-actions/mobile-nav-sidebar)
+                              (dis/dispatch! [:update [:hide-left-navbar] not]))}
                 board-icon
                 [:span.board-name
                   {:class (when board-icon "has-icon")}
@@ -110,7 +107,7 @@
               [:div.mobile-right-nav
                 [:button.mlb-reset.search-bt
                   {:on-click #(do
-                                (menu/mobile-menu-close)
+                                (menu/menu-close)
                                 (search-actions/active)
                                 (user-actions/hide-mobile-user-notifications)
                                 (utils/after 500 search-actions/focus))
@@ -120,7 +117,7 @@
                     {:class (utils/class-set {:active mobile-user-notifications})
                      :on-click #(do
                                   (search-actions/inactive)
-                                  (menu/mobile-menu-close)
+                                  (menu/menu-close)
                                   (when (or org-settings
                                           user-settings)
                                     (dis/dispatch! [:input [:user-settings] nil])
@@ -150,7 +147,7 @@
                                        (qsg-actions/next-company-logo-trail))
                                      (when (= (:step qsg-data) :create-reminder-1)
                                        (qsg-actions/next-create-reminder-trail))
-                                     (swap! (::expanded-user-menu s) not)
+                                     (menu/menu-toggle)
                                      ;; Dismiss the QSG tooltip is it's open
                                      (when (:show-qsg-tooltip? qsg-data)
                                        (qsg-actions/dismiss-qsg-tooltip)))})
@@ -169,10 +166,5 @@
                               "You can find the quickstart guide here anytime."]
                             [:button.mlb-reset.qsg-tooltip-bt
                               {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
-                              "Ok, got it"]]])]
-                    (when @(::expanded-user-menu s)
-                      (menu/menu))]]
-                (login-button)))]]]
-      (when is-mobile?
-        ;; Render the menu here only on mobile so it can expand the navbar
-        (menu/menu))]))
+                              "OK, got it"]]])]]]
+                (login-button)))]]]]))

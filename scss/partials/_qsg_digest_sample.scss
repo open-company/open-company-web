@@ -30,7 +30,7 @@ div.qsg-digest-sample {
       height: 398px;
       
       div.qsg-digest-sample-title {
-        @include PTSerif();
+        @include OC_Title();
         font-size: 36px;
         color: $deep_navy;
         line-height: 40px;
@@ -38,7 +38,7 @@ div.qsg-digest-sample {
       }
 
       div.qsg-digest-sample-desc {
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 16px;
         line-height: 20px;
         margin-top: 16px;
@@ -50,7 +50,7 @@ div.qsg-digest-sample {
         padding: 0 23px;
         background-color: $carrot_green;
         border-radius: 6px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: white;
         margin-top: 16px;

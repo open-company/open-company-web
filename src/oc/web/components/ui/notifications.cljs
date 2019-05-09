@@ -93,8 +93,10 @@
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
                         (dismiss %)))
-         :ref :dismiss-bt}])
+         :ref :dismiss-bt}
+        "OK"])
     [:div.notification-title.group
+      {:class (when-not (seq description) "no-description")}
       (when slack-icon
         [:span.slack-icon])
       title]

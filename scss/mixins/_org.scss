@@ -44,7 +44,7 @@
       span.org-name {
         display: inline-block;
         float: left;
-        margin: -#{($max_logo_height / 2) + ($max_logo_height / 4)}px 0 0 #{$max_logo_height + 8}px;
+        margin: -#{$max_logo_height * 0.87}px 0 0 #{$max_logo_height + 8}px;
       }
     }
 
@@ -59,10 +59,11 @@
       object-fit: contain;
       border-radius: 4px;
       vertical-align: middle;
+      background-color: white;
     }
 
     span.org-name {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 16px;
       line-height: 22px;
       color: $deep_navy;

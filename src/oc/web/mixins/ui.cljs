@@ -183,12 +183,8 @@
          mounted-kw :wrt-mixin-is-mounted
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
-                         (when       ;; element is the initially visible body
-                                (and (.contains (.-classList el) "to-truncate")
-                                     ;; but item is not truncated
-                                     (not (.contains (.-classList el) "ddd-truncated"))
-                                     ;; and the element is visible in the viewport
-                                     (au/is-element-visible? el))
+                         ;; when the element is visible in the viewport
+                         (when (au/is-element-visible? el)
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s & [_]]
                          (when @(get s mounted-kw)
@@ -232,4 +228,17 @@
     (do
       (events/unlistenByKey (:on-click-out-listener s))
       (dissoc s :on-click-out-listener))
+    s))})
+
+(defn on-window-resize-mixin [callback]
+  {:did-mount (fn [s]
+   (let [on-resize-listener (events/listen (.getElementById js/document "app") EventType/RESIZE
+                             (fn [e]
+                              (callback s e)))]
+    (assoc s :on-resize-listener on-resize-listener)))
+   :will-unmount (fn [s]
+   (if (:on-resize-listener s)
+    (do
+      (events/unlistenByKey (:on-resize-listener s))
+      (dissoc s :on-resize-listener))
     s))})

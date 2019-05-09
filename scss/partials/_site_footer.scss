@@ -72,7 +72,7 @@
 
       div.footer-communication-copy {
         margin-top: 15px;
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 16px;
         color: $deep_navy;
 
@@ -84,12 +84,12 @@
       div.footer-small-links {
         margin-top: 15px;
         color: $carrot_dark_gray;
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 16px;
 
         a {
           margin: 0px 5px;
-          @include avenir_R();
+          @include OC_Body_Book();
           color: $carrot_green;
           font-size: 16px;
           text-decoration: none;
@@ -107,7 +107,7 @@
 
       div.copyright {
         font-size: 14px;
-        @include avenir_M();
+        @include OC_Body_Book();
         color: $ui_grey;
         margin-top: 40px;
         max-width: 180px;
@@ -119,7 +119,7 @@
 
       div.tos-and-pp {
         font-size: 14px;
-        @include avenir_M();
+        @include OC_Body_Book();
         color: $ui_grey;
         max-width: 180px;
 
@@ -187,7 +187,7 @@
         }
 
         div.column-title {
-          @include avenir_M();
+          @include OC_Body_Bold();
           color: $light_ui_grey;
           font-size: 16px;
           margin-bottom: 20px;
@@ -208,7 +208,7 @@
           }
 
           a {
-            @include avenir_M();
+            @include OC_Body_Book();
             color: $deep_navy;
             font-size: 16px;
 

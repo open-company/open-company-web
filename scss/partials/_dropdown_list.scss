@@ -41,7 +41,7 @@ div.dropdown-list-container {
         padding: 5px 12px 3px;
         margin: 3px 0;
         cursor: pointer;
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_light_gray_3;
         cursor: pointer;
@@ -66,7 +66,7 @@ div.dropdown-list-container {
         }
 
         &.select {
-          @include avenir_H();
+          @include OC_Body_Bold();
           text-decoration: none;
           color: $carrot_dark_gray_2;
         }
@@ -95,7 +95,7 @@ div.dropdown-list-container {
         }
 
         span.dropdown-list-item-label {
-          @include avenir_M();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $carrot_light_gray_3;
           max-width: 100%;

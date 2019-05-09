@@ -6,7 +6,7 @@ div.org-settings div.org-settings-inner {
 
       div.invite-from-label {
         float: left;
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 15px;
         color: $ui_grey;
         line-height: 24px;
@@ -17,7 +17,7 @@ div.org-settings div.org-settings-inner {
         float: left;
         margin-left: 8px;
         cursor: pointer;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 15px;
         color: $ui_grey;
         height: 24px;
@@ -41,7 +41,7 @@ div.org-settings div.org-settings-inner {
         margin-top: 0;
 
         span.slack-copy {
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 13px;
           color: $deep_navy;
           line-height: 24px;
@@ -51,7 +51,7 @@ div.org-settings div.org-settings-inner {
         }
 
         button.add-slack-team {
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 13px;
           color: $deep_navy;
           line-height: 24px;
@@ -84,7 +84,7 @@ div.org-settings div.org-settings-inner {
 
       button.add-button {
         color: $carrot_green;
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 13px;
         padding: 0px;
       }
@@ -99,7 +99,7 @@ div.org-settings div.org-settings-inner {
         tbody, thead {
 
           tr th {
-            @include avenir_M();
+            @include OC_Body_Book();
             font-size: 15px;
             color: $deep_navy;
           }
@@ -137,7 +137,7 @@ div.org-settings div.org-settings-inner {
 
             div.slack-users-dropdown div.slack-users-dropdown-list div.user {
               @include user-profile(24);
-              @include avenir_M();
+              @include OC_Body_Book();
               font-size: 15px;
               color: $deep_navy;
 
@@ -156,7 +156,7 @@ div.org-settings div.org-settings-inner {
                 text-align: left;
                 border: 1px solid rgba($carrot_light_gray_1, 0.5);
                 border-radius: 4px;
-                @include avenir_M();
+                @include OC_Body_Book();
                 font-size: 15px;
                 color: $deep_navy;
                 background-color: white;
@@ -222,7 +222,7 @@ div.org-settings div.org-settings-inner {
         height: 32px;
         border-radius: 16px;
         border: 1px solid rgba($carrot_light_gray, 0.5);
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: $carrot_light_gray;
         text-align: center;
@@ -232,7 +232,7 @@ div.org-settings div.org-settings-inner {
 
     button.save-btn {
       width: 164px !important;
-      @include avenir_H();
+      @include OC_Body_Bold();
 
       &.no-disable, &.no-disable[disabled] {
         opacity: 1 !important;

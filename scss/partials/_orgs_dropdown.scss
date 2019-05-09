@@ -102,7 +102,7 @@ div.orgs-dropdown {
 
             &.force-label {
               span.org-name {
-                @include avenir_M();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $deep_navy;
                 margin-left: 8px;

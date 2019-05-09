@@ -62,7 +62,7 @@ div.home-wrap {
 
       h1.headline {
         font-size: 64px;
-        @include PTSerif()
+        @include OC_Title()
         color: $deep_navy;
         margin: 0 auto 24px;
         z-index: 2;
@@ -84,7 +84,7 @@ div.home-wrap {
         color: $deep_navy;
         font-size: 26px;
         line-height: 36px;
-        @include avenir_R();
+        @include OC_Body_Bold();
         margin: 0 auto;
         z-index: 2;
         position: relative;

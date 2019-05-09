@@ -15,15 +15,15 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
+            [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.reminders :refer (reminders)]
+            [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
-            [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -31,11 +31,19 @@
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
             [oc.web.components.qsg-digest-sample :refer (qsg-digest-sample)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
+            [oc.web.components.user-profile-modal :refer (user-profile-modal)]
+            [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
-            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]))
+            [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
+            [oc.web.components.team-management-modal :refer (team-management-modal)]
+            [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
+            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
+            [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
+            [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
+            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
 
 (defn refresh-board-data [s]
   (when (and (not (router/current-activity-id))
@@ -94,12 +102,13 @@
                 entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
-                mobile-menu-open
+                expanded-user-menu
                 show-cmail
                 showing-mobile-user-notifications
                 wrt-activity-data
                 wrt-read-data
-                force-login-wall]} (drv/react s :org-dashboard-data)
+                force-login-wall
+                expanded-user-menu]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -173,6 +182,9 @@
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
+          ;; User menu
+          expanded-user-menu
+          (menu)
           ;; Activity removed
           show-activity-removed
           (activity-removed)
@@ -180,14 +192,32 @@
           show-activity-not-found
           (activity-not-found)
           ;; Org settings
+          (and org-settings-data (= org-settings-data :main))
+          (org-settings-modal)
+          ;; Integrations settings
+          (and org-settings-data (= org-settings-data :integrations))
+          (integrations-settings-modal)
+          ;; Invite settings
+          (and org-settings-data (= org-settings-data :invite))
+          (invite-settings-modal)
+          ;; Team management
+          (and org-settings-data (= org-settings-data :team))
+          (team-management-modal)
+          ;; Billing
           org-settings-data
           (org-settings)
-          ;; Reminders
-          show-reminders
-          (reminders)
           ;; User settings
-          user-settings
-          (user-profile)
+          (and user-settings (= user-settings :profile))
+          (user-profile-modal)
+          ;; User notifications
+          (and user-settings (= user-settings :notifications))
+          (user-notifications-modal)
+          ;; Reminders list
+          (and show-reminders (= show-reminders :reminders))
+          (recurring-updates-modal)
+          ;; Edit a reminder
+          show-reminders
+          (edit-recurring-update-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
           (made-with-carrot-modal)
@@ -254,7 +284,7 @@
                               (not mobile-navigation-sidebar)
                               (not org-settings-data)
                               (not user-settings)
-                              (not mobile-menu-open)
+                              (not expanded-user-menu)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]

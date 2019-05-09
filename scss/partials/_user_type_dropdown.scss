@@ -4,16 +4,22 @@ div.dropdown{
   button.user-type-btn {
     position: relative;
     cursor: pointer;
-    padding-right: 25px;
+    padding: 0 24px 0 0;
+    font-size: 12px;
+    line-height: 24px;
+    text-align: right;
 
     &:after {
-      color: $oc_gray_7;
-      font-size: 23px;
-      font-family: "Material Design Icons";
-      content: "\F35D";
+      content: "";
+      width: 8px;
+      height: 10px;
       position: absolute;
-      top: -6px;
-      right: 0px;
+      right: 8px;
+      top: 11px;
+      background-image: cdnUrl("/img/ML/select_arrows.svg");
+      background-size: 8px 10px;
+      background-position: center;
+      background-repeat: no-repeat;
     }
   }
 
@@ -21,9 +27,6 @@ div.dropdown{
     padding: 0;
     width: 144px;
     min-width: 144px;
-    @include avenir_R();
-    font-size: 16px;
-    color: $oc_gray_7;
     background-color: white;
     border: none;
     padding: 0.5rem 0;
@@ -31,25 +34,32 @@ div.dropdown{
     top: 0px;
     left: -20px;
     box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.2), 0 5px 12.5px 0.5px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    border-radius: 4px;
+    padding: 8px 0;
 
     li {
       cursor: pointer;
       width: 144px;
       height: 32px;
-      padding: 6px 24px;
+      padding: 4px 16px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $ui_grey;
+      background-color: transparent;
+
+      &.selected {
+        color: $deep_navy;
+        background-color: transparent;
+      }
 
       &:hover {
         text-decoration: underline;
-      }
-
-      &:hover, &.active {
-        background-color: white;
-        color: $oc_gray_7;
+        background-color: transparent;
       }
 
       &.remove-li {
         color: $carrot_orange;
+        background-color: transparent;
         border-top: 1px solid rgba($carrot_light_gray_1, 0.2);
       }
     }

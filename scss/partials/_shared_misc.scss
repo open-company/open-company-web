@@ -57,7 +57,7 @@ div.homepage-testimonials-container {
 
   div.homepage-testimonials-copy {
     text-align: center;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 14px;
     color: rgba($deep_navy, 0.5);
     line-height: 19px;
@@ -144,7 +144,7 @@ section.testimonials-section {
   }
 
   div.testimonials-section-title {
-    @include PTSerif()
+    @include OC_Title()
     color: $deep_navy;
     font-size: 40px;
     line-height: 38px;
@@ -161,7 +161,7 @@ section.testimonials-section {
   }
 
   div.testimonials-section-subtitle {
-    @include avenir_R();
+    @include OC_Body_Book();
     font-size: 24px;
     line-height: 32px;
     color: $deep_navy;
@@ -299,7 +299,7 @@ section.testimonials-section {
       }
 
       div.testimonial-quote {
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 18px;
         color: $deep_navy;
         line-height: 22px;
@@ -321,7 +321,7 @@ section.testimonials-section {
         }
 
         div.testimonial-name {
-          @include PTSerif()
+          @include OC_Title()
           font-size: 18px;
           color: $deep_navy;
           line-height: 20px;
@@ -330,7 +330,7 @@ section.testimonials-section {
         }
 
         div.testimonial-role {
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 14px;
           color: rgba($deep_navy, 0.6);
           line-height: 19px;
@@ -368,7 +368,7 @@ section.keep-aligned {
   }
 
   div.keep-aligned-title {
-    @include PTSerif()
+    @include OC_Title()
     font-size: 50px;
     color: $deep_navy;
     text-align: center;
@@ -410,7 +410,7 @@ button.get-started-button {
   border-radius: 8px;
   background-color: $carrot_orange;
   color: white;
-  @include avenir_H();
+  @include OC_Body_Bold();
   font-size: 20px;
   line-height: 27px;
   margin: 48px auto 0;
@@ -439,7 +439,7 @@ section.home-keep-aligned {
   }
 
   h2.keep-aligned-title {
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 38px;
     line-height: 42px;
     color: $deep_navy;
@@ -742,7 +742,7 @@ section.home-keep-aligned {
                 }
 
                 div.slack-email-switch-bottom-panel-copy {
-                  @include avenir_M();
+                  @include OC_Body_Book();
                   font-size: 16px;
                   color: $deep_navy;
                   line-height: 20px;
@@ -761,13 +761,13 @@ section.home-keep-aligned {
 
                 div.slack-email-switch-bottom-panel-name {
                   margin-top: 8px;
-                  @include PTSerif();
+                  @include OC_Title();
                   font-size: 14px;
                   color: $deep_navy;
                 }
 
                 div.slack-email-switch-bottom-panel-role {
-                  @include avenir_R();
+                  @include OC_Body_Book();
                   font-size: 14px;
                   color: $deep_navy; 
                 }
@@ -974,7 +974,7 @@ section.home-keep-aligned {
           margin-top: 40px;
 
           div.slack-email-title {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 14px;
             color: $ui_grey;
             float: left;
@@ -1099,7 +1099,7 @@ section.home-keep-aligned {
               }
 
               div.slack-email-switch-bottom-panel-copy {
-                @include avenir_M();
+                @include OC_Body_Book();
                 font-size: 16px;
                 color: $deep_navy;
                 line-height: 20px;
@@ -1118,13 +1118,13 @@ section.home-keep-aligned {
 
               div.slack-email-switch-bottom-panel-name {
                 margin-top: 8px;
-                @include PTSerif();
+                @include OC_Title();
                 font-size: 14px;
                 color: $deep_navy;
               }
 
               div.slack-email-switch-bottom-panel-role {
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 14px;
                 color: $deep_navy; 
               }
@@ -1133,7 +1133,7 @@ section.home-keep-aligned {
         }
 
         div.keep-aligned-section-copy-title {
-          @include PTSerif();
+          @include OC_Title();
           font-size: 60px;
           color: $deep_navy;
           line-height: 66px;
@@ -1145,7 +1145,7 @@ section.home-keep-aligned {
         }
 
         div.keep-aligned-section-copy-subtitle {
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 24px;
           color: $deep_navy;
           line-height: 32px;
@@ -1164,7 +1164,7 @@ section.home-keep-aligned {
 
           button.create-team-bt {
             padding: 0;
-            @include avenir_B();
+            @include OC_Body_Black();
             font-size: 14px;
             height: 19px;
             line-height: 19px;
@@ -1281,7 +1281,7 @@ section.carrot-in-action {
   }
 
   div.carrot-in-action-title {
-    @include PTSerif();
+    @include OC_Title();
     font-size: 40px;
     line-height: 52px;
     color: $deep_navy;
@@ -1302,7 +1302,7 @@ button.show-animation-bt {
   border-radius: 8px;
   width: 320px;
   height: 64px;
-  @include avenir_H();
+  @include OC_Body_Bold();
   font-size: 20px;
   line-height: 27px;
   color: $carrot_green;

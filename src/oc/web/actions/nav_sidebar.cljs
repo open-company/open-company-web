@@ -1,5 +1,6 @@
 (ns oc.web.actions.nav-sidebar
-  (:require [oc.web.router :as router]
+  (:require [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.qsg :as qsg-actions]
@@ -57,11 +58,10 @@
 (defn close-reminders []
   (dis/dispatch! [:input [:show-reminders] nil]))
 
-;; Mobile menu
+;; Menu
 
-(defn mobile-menu-toggle []
-  (when (responsive/is-mobile-size?)
-    (dis/dispatch! [:update [:mobile-menu-open] not])))
+(defn menu-toggle []
+  (dis/dispatch! [:update [:expanded-user-menu] not]))
 
-(defn mobile-menu-close []
-  (dis/dispatch! [:input [:mobile-menu-open] false]))
+(defn menu-close []
+  (dis/dispatch! [:input [:expanded-user-menu] false]))

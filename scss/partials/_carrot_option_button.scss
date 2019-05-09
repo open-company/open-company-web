@@ -1,0 +1,20 @@
+div.carrot-option-button {
+  display: block-inline;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  background-image: cdnUrl("/img/ML/carrot_option_button.svg");
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  &.selected {
+    background-image: cdnUrl("/img/ML/carrot_option_button_selected.svg");
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

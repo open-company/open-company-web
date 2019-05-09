@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="10px" height="12px" viewBox="0 0 10 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 52.1 (67048) - http://www.bohemiancoding.com/sketch -->
-    <title>Group 4</title>
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <g id="Mobile-updates" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Mobile-Nav-tap-updates-(private)" transform="translate(-155.000000, -83.000000)" stroke="#34414F" stroke-width="1.5">
-            <g id="Group-16" transform="translate(125.000000, 78.000000)">
-                <g id="Group-5" transform="translate(30.000000, 0.000000)">
-                    <g id="Group-3">
-                        <g id="Group-13">
-                            <g id="Group-4" transform="translate(0.000000, 5.000000)">
-                                <path d="M1.75,1.99810135 L1.75,6.00189865 C1.75,6.69590227 2.30561015,7.25 2.99810135,7.25 L7.00189865,7.25 C7.69590227,7.25 8.25,6.69438985 8.25,6.00189865 L8.25,1.99810135 C8.25,1.30409773 7.69438985,0.75 7.00189865,0.75 L2.99810135,0.75 C2.30409773,0.75 1.75,1.30561015 1.75,1.99810135 Z" id="Rectangle-18"></path>
-                                <path d="M0.75,5.50473881 L0.75,10.4952612 C0.75,10.9160518 1.08307556,11.25 1.49710104,11.25 L8.50289896,11.25 C8.91385817,11.25 9.25,10.9123584 9.25,10.4952612 L9.25,5.50473881 C9.25,5.08394819 8.91692444,4.75 8.50289896,4.75 L1.49710104,4.75 C1.08614183,4.75 0.75,5.08764159 0.75,5.50473881 Z" id="Rectangle-19" fill="#FFFFFF"></path>
+    <g id="Megaflow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Invited-to-section-success" transform="translate(-189.000000, -307.000000)" fill="#C2C3C6">
+            <g id="BG">
+                <g id="Side-nav-labels" transform="translate(0.000000, 56.000000)">
+                    <g id="Group-10">
+                        <g id="Group-6" transform="translate(0.000000, 183.000000)">
+                            <g id="Group-4" transform="translate(0.000000, 23.000000)">
+                                <g id="Group-35" transform="translate(0.000000, 8.000000)">
+                                    <path d="M190.25,40.6000949 C190.25,38.611707 191.928668,37 194,37 C196.070686,37 197.75,38.6126661 197.75,40.6001538 L197.75,42.1000006 C198.440479,42.1006877 199,42.6361175 199,43.3018883 L199,47.7981117 C199,48.4618963 198.440929,49 197.748669,49 L190.251331,49 C189.56024,49 189,48.4643101 189,47.7981117 L189,43.3018883 C189,42.638529 189.558355,42.1006896 190.25,42.1000007 L190.25,40.6000949 Z M191.5,42.1 L196.5,42.1 L196.5,40.6001538 C196.5,39.2753205 195.380239,38.2 194,38.2 C192.619056,38.2 191.5,39.2744177 191.5,40.6000949 L191.5,42.1 Z" id="Combined-Shape"></path>
+                                </g>
                             </g>
                         </g>
                     </g>

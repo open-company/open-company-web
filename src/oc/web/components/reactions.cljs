@@ -111,8 +111,7 @@
             [:button.reaction-btn.btn-reset.can-react.reaction-picker
               {:key (str "reaction-" (:uuid entry-data) "-picker")
                :on-click #(reset! (::show-picker s) (not @(::show-picker s)))}
-              [:span.reaction]
-              [:div.count "+"]])]
+              [:span.reaction]])]
        (when @(::show-picker s)
          [:div.reactions-picker-container
            (when (responsive/is-tablet-or-mobile?)

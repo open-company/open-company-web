@@ -96,14 +96,14 @@ div.activity-removed-container {
 
     div.activity-removed-title {
       margin-top: 24px;
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 22px;
       color: $deep_navy;
     }
 
     div.activity-removed-description {
       margin-top: 4px;
-      @include avenir_R();
+      @include OC_Body_Bold();
       font-size: 16px;
       color: $deep_navy;
     }
@@ -115,7 +115,7 @@ div.activity-removed-container {
       color: white;
       border-radius: 6px;
       background-color: $carrot_green;
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 14px;
     }
   }

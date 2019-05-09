@@ -112,7 +112,7 @@
                                        :tooltip tooltip}))
                       (:items roster-data))
         users-list (vec (map #(-> %
-                                (assoc :name (utils/name-or-email %))
+                                (assoc :name (str (utils/name-or-email %) (when (= (:user-id %) (jwt/user-id)) " (you)")))
                                 (select-keys [:name :user-id :disabled :tooltip])
                                 (rename-keys {:name :label :user-id :value})
                                 (assoc :user-map %))

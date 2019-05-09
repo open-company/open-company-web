@@ -42,7 +42,7 @@ div.qsg-container {
 
     div.qsg-title {
       text-align: left;
-      @include PTSerif();
+      @include OC_Title();
       font-size: 16px;
       line-height: 20px;
       height: 20px;
@@ -69,7 +69,7 @@ div.qsg-container {
     padding: 17px 16px;
 
     div.qsg-top-title {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 14px;
       line-height: 18px;
       color: white;
@@ -112,7 +112,7 @@ div.qsg-container {
       margin-top: 16px;
       text-transform: uppercase;
       color: rgba(255,255,255,0.4);
-      @include avenir_B();
+      @include OC_Body_Black();
       line-height: 14px;
       font-size: 10px;
     }
@@ -129,7 +129,7 @@ div.qsg-container {
         height: 19px;
         width: 100%;
         color: rgba(255, 255, 255, 0.9);
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 14px;
         line-height: 19px;
         padding: 0 0 0 24px;
@@ -200,7 +200,7 @@ div.qsg-container {
       position: relative;
 
       div.qsg-carrot-video-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: white;
       }
@@ -221,7 +221,7 @@ div.qsg-container {
         margin-top: 8px;
         color: $carrot_green;
         padding: 0 0 0 19px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
         position: relative;
@@ -247,7 +247,7 @@ div.qsg-container {
       position: relative;
 
       div.qsg-using-slack-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         color: white;
       }
@@ -268,7 +268,7 @@ div.qsg-container {
         margin-top: 8px;
         color: $carrot_green;
         padding: 0 0 0 19px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         line-height: 16px;
         position: relative;
@@ -293,7 +293,7 @@ div.qsg-container {
       width: 100%;
       border-radius: 6px;
       background-color: rgba(255, 255, 255, 0.1);
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 12px;
       line-height: 18px;
       color: white;

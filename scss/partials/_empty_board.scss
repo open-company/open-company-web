@@ -1,5 +1,5 @@
 div.empty-board {
-  margin: 4px auto;
+  margin: 124px auto 0;
   float: left;
   text-align: center;
   width: 100%;
@@ -13,16 +13,7 @@ div.empty-board {
 
   div.empty-board-grey-box {
     width: 100%;
-    background-image: cdnUrl("/img/ML/empty_state_background.svg");
-    background-position: center;
-    background-size: 720px 400px;
-    background-repeat: no-repeat;
-    border-radius: 6px;
-    height: 400px;
-    padding: 80px 100px;
-    text-align: center;
-    border-collapse: collapse;
-    margin: 8px auto 0;
+    margin: 0 auto;
 
     @include mobile() {
       width: 100%;
@@ -36,47 +27,52 @@ div.empty-board {
     div.empty-board-illustration {
       width: 56px;
       height: 56px;
+      background-color: #F3F0EF;
+      border-radius: 8px;
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 56px 56px;
+      background-size: 24px 20px;
       margin: 0 auto;
+      background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
 
-      &.ap-section {
-        background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
-      }
+      // &.ap-section {
+      //   background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
+      // }
 
-      &.must-see {
-        background-image: cdnUrl("/img/ML/empty_state_ms.svg");
-      }
+      // &.must-see {
+      //   background-image: cdnUrl("/img/ML/empty_state_ms.svg");
+      // }
 
-      &.drafts {
-        background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-      }
+      // &.drafts {
+      //   background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+      // }
     }
 
     div.empty-board-title {
-      @include avenir_H();
+      @include OC_Body_Bold();
       font-size: 16px;
       color: $deep_navy;
+      line-height: 20px;
       margin: 16px auto 0;
     }
 
     div.empty-board-subtitle {
-      @include avenir_M();
+      @include OC_Body_Book();
       font-size: 14px;
       color: $ui_grey;
-      margin: 4px auto 0;
+      line-height: 18px;
+      margin: 6px auto 0;
     }
 
     button.create-new-post-bt {
-      width: 168px;
+      width: 160px;
       height: 40px;
-      background-color: $coral;
-      color: $carrot_orange;
-      @include avenir_H();
+      background-color: $carrot_green;
+      color: white;
+      @include OC_Body_Bold();
       font-size: 14px;
-      border-radius: 100px;
-      margin: 20px auto 0;
+      border-radius: 6px;
+      margin: 21px auto 0;
     }
   }
 }

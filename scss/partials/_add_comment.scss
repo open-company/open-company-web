@@ -1,7 +1,6 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
-  margin-top: 16px;
 
   @include tablet() {
     padding: 0;
@@ -20,62 +19,67 @@ div.add-comment-box-container {
       box-shadow: none;
     }
 
-    &.show-buttons {
+    // &.show-buttons {
 
-      div.add-comment-internal {
-        min-height: unset;
-        border: 1px solid $light_ui_grey;
-        padding: 9px 16px 32px 16px;
+    //   div.add-comment-internal {
+    //     min-height: unset;
+    //     border: 1px solid $light_ui_grey;
+    //     padding: 9px 16px 32px 16px;
 
-        div.add-comment {
-          min-height: 29px;
+    //     div.add-comment {
+    //       min-height: 29px;
 
-          @include tablet() {
-            height: auto;
-            width: auto;
-          }
-        }
+    //       @include tablet() {
+    //         height: auto;
+    //         width: auto;
+    //       }
+    //     }
 
-        div.emoji-picker {
-          display: block;
-        }
-      }
+    //     div.emoji-picker {
+    //       display: block;
+    //     }
+    //   }
+    // }
+
+    @include user-profile(24);
+
+    div.user-avatar-img-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
     }
 
     div.add-comment-internal{
-      min-height: 49px;
-      width: 100%;
-      background-color: white;
-      border-radius: 4px;
-      border: 1px solid $medium_light_grey;
-      padding: 9px 16px;
+      position: absolute;
+      bottom: 0;
+      left: 40px;
+      width: calc(100% - 24px - 16px - 50px);
       position: relative;
-
-      &:hover {
-        border: 1px solid $light_ui_grey;
-      }
+      max-height: 200px;
+      overflow-x: hidden;
+      overflow-y: auto;
 
       div.add-comment {
         resize: none;
         border: none;
         outline: none;
-        @include avenir_R();
+        @include OC_Body_Book();
         color: $deep_navy;
         font-size: 16px;
         cursor: text;
-        height: 27px;
+        line-height: 27px;
         min-height: initial;
         white-space: pre-wrap;
         word-wrap: break-word;
-        padding: 4px 0px 0px 0px;
+        padding: 0;
         margin: 0px;
         height: auto;
         min-height: 27px;
 
         &.medium-editor-placeholder:after {
-          @include avenir_R();
+          @include OC_Body_Book();
+          font-size: 16px;
           color: rgba($ui_grey, 0.5);
-          margin-left: 0px;
         }
 
         @include tablet() {
@@ -97,21 +101,46 @@ div.add-comment-box-container {
         }
       }
 
-      div.emoji-picker {
-        position: absolute;
-        top: unset;
-        bottom: 0px;
-        right: 0px;
-        display: none;
+      // div.emoji-picker {
+      //   position: absolute;
+      //   top: unset;
+      //   bottom: 0px;
+      //   right: 0px;
+      //   display: none;
 
-        div.picker-container {
-          left: unset;
-          right: -5px;
-          top: 24px;
-        }
+      //   div.picker-container {
+      //     left: unset;
+      //     right: -5px;
+      //     top: 24px;
+      //   }
 
-        @include tablet() {
-          display: none;
+      //   @include tablet() {
+      //     display: none;
+      //   }
+      // }
+    }
+
+    button.send-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 50px;
+      height: 24px;
+      padding: 0;
+      margin: 0;
+      text-align: right;
+      color: $carrot_green;
+      @include OC_Body_Bold();
+      font-size: 16px;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 1 !important;
+
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
         }
       }
     }
@@ -128,7 +157,7 @@ div.add-comment-box-container {
         padding: 10px 24px;
         text-align: center;
         color: $ui_grey;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
 
         &:disabled {
@@ -144,9 +173,9 @@ div.add-comment-box-container {
         background-color: $carrot_green;
         text-align: center;
         color: white;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
-        border-radius: 100px;
+        border-radius: 6px;
 
         &:disabled {
           background-color: $light_ui_grey;

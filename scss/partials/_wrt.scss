@@ -8,336 +8,293 @@ div.wrt-count-container {
   }
 
   div.wrt-count {
-    @include avenir_M();
+    @include OC_Body_Book();
     font-size: 12px;
     color: $ui_grey;
     cursor: pointer;
-    padding-left: 12px;
+    padding-left: 16px;
     position: relative;
 
     &:before {
       content: "";
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       position: absolute;
-      top: 3px;
+      top: 4px;
       left: 0;
       background-image: cdnUrl("/img/ML/viewers_icon.svg");
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 8px 8px;
+      background-size: 10px 10px;
     }
   }
 }
 
-div.wrt-popup {
-  width: 360px;
-  background-color: white;
-  border-radius: 6px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0px;
-  border: 1px solid $deep_tan;
-  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.1);
-  position: absolute;
-  top: 100%;
-  left: 0px;
-  z-index: 2;
-  max-height: calc(50vh - #{$navbar_height}px);
-  z-index: 10;
+div.wrt-popup-container {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 0;
+  transition: opacity 180ms ease-in;
 
-  &.loading{
-    border: 0;
-    height: 0;
-    box-shadow: none;
+  &.appear {
+    opacity: 1;
+
+    div.wrt-popup {
+      right: 0;
+    }
   }
 
-  div.wrt-popup-header {
-    display: none;
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
 
-    @include mobile() {
-      width: 100%;
+  div.wrt-popup {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: -320px;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    &.loading{
+      border: 0;
+      height: 0;
+      box-shadow: none;
+    }
+
+    div.wrt-popup-header {
+      width: calc(100% + 48px);
       height: 56px;
-      box-shadow: 0 2px 6px 0 rgba(0,0,0,0.10);
-      padding: 17px 16px;
-      display: block;
+      margin-left: -24px;
+      background-color: #FBFAF9;
+      padding: 12px 16px;
 
-      button.wrt-close-bt {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/section_add_mobile_close.svg");
-        background-size: 14px 14px;
-        background-repeat: no-repeat;
-        background-position: center;
-        float: left;
-      }
-
-      span.wrt-popup-header-title {
-        margin-left: 16px;
-        line-height: 24px;
-        @include avenir_H();
-        font-size: 16px;
+      div.wrt-popup-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
         color: $deep_navy;
-        white-space: nowrap;
-        max-width: calc(100% - 64px);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: inline-block;
-      }
-    }
-  }
-
-  div.small-loading {
-    margin: 24px;
-  }
-
-  &.top {
-    top: unset;
-    bottom: 100%;
-  }
-
-  div.wrt-popup-tabs {
-    margin-top: 8px;
-    width: 100%;
-    height: 41px;
-    border-bottom: 1px solid $ultra_light_grey;
-    padding: 0px 24px;
-
-    button.wrt-popup-tab {
-      height: 41px;
-      border-bottom: 1px solid transparent;
-      @include avenir_B();
-      font-size: 13px;
-      color: $deep_navy;
-      line-height: 33px;
-      text-transform: uppercase;
-      float: left;
-      margin-right: 24px;
-      padding-bottom: 8px;
-
-      &.active {
-        border-bottom: 1px solid $carrot_orange;
-        color: $carrot_orange;
-      }
-    }
-
-    button.search-bt {
-      width: 32px;
-      height: 32px;
-      float: right;
-      background-image: cdnUrl("/img/ML/search_lens.svg");
-      background-size: 16px 16px;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-
-    &.search-active {
-      &:before {
-        content: "";
-        width: 32px;
-        height: 40px;
+        line-height: 32px;
         float: left;
-        background-image: cdnUrl("/img/ML/search_lens_dark.svg");
-        background-size: 16px 16px;
-        background-repeat: no-repeat;
-        background-position: center 9px;
       }
+    }
+
+    div.small-loading {
+      margin: 24px;
+    }
+
+    div.wrt-popup-tabs {
+      margin-top: 8px;
+      width: 100%;
+      position: relative;
+
+      div.wrt-popup-tabs-select {
+        width: 100%;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        color: $deep_navy;
+        padding: 7px 8px;
+        border-radius: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        background-image: cdnUrl("/img/ML/select_arrows.svg");
+        background-size: 8px 10px;
+        background-position: top 11px right 8px;
+        background-repeat: no-repeat;
+      }
+
+      div.dropdown-list-container {
+        width: 100%;
+        left: 0;
+        top: 24px;
+
+        div.triangle{
+          display: none;
+        }
+      }
+    }
+
+    div.wrt-popup-search-container {
+      margin-top: 8px;
+      width: 100%;
+      background-image: cdnUrl("/img/ML/wrt_search_lens.svg");
+      background-size: 11px 12px;
+      background-position: top 11px left 8px;
+      background-repeat: no-repeat;
+      padding-left: 19px;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
 
       input.wrt-popup-query {
-        width: calc(100% - 32px - 24px - 16px);
+        width: calc(100% - 19px);
         margin-right: 16px;
-        height: 36px;
+        float: right;
+        height: 32px;
         border: none;
         outline: none;
-        padding: 6px 14px;
-        @include avenir_M();
-        font-size: 15px;
+        padding: 7px 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        background-color: $ultra_light_grey;
         color: $deep_navy;
         outline: none;
-        float: right;
+        border-radius: 4px;
 
         @include placeholder(){
-          color: $ui_grey;
+          color: rgba($deep_navy, 0.4);
         }
-      }
-
-      button.close-search-bt {
-        width: 24px;
-        height: 40px;
-        float: right;
-        background-image: cdnUrl("/img/ML/close_search_bt.svg");
-        background-size: 12px 12px;
-        background-repeat: no-repeat;
-        background-position: center 12px;
       }
     }
-  }
 
-  div.wrt-popup-list {
-    margin: 16px 0px 0px 0px;
-    width: 100%;
-    padding: 0px 24px;
-
-    div.wrt-popup-list-row {
-      padding: 0px 0px 16px;
-      margin: 16px 0px 0px;
-      height: 48px;
+    div.wrt-popup-list {
+      margin: 16px 0 0;
       width: 100%;
-      border-bottom: 1px solid $ultra_light_grey;
+      padding: 0;
 
-      &:last-child {
-        border-bottom: 1px solid transparent;
-      }
+      div.wrt-popup-list-row {
+        margin: 8px 0 0;
+        height: 24px;
+        width: 100%;
 
-      div.wrt-popup-list-row-avatar {
-        float: left;
-        position: relative;
-        width: 32px;
-        height: 32px;
-
-        @include user_profile(32);
-
-        &.seen:after {
-          position: absolute;
-          width: 12px;
-          height: 12px;
-          background-image: cdnUrl("/img/ML/green_checkmark.svg");
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: 12px 12px;
-          content: "";
-          bottom: 0px;
-          right: 0px;
-        }
-      }
-
-      $row_right_label_max_width: 110px;
-
-      div.wrt-popup-list-row-name {
-        float: left;
-        margin-left: 16px;
-        @include avenir_R();
-        font-size: 14px;
-        color: $deep_navy;
-        line-height: 32px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: calc(100% - 32px - 16px - 8px - $row_right_label_max_width);
-      }
-
-      &:hover {
-        div.wrt-popup-list-row-seen {
-          button.send-reminder-bt {
-            display: block;
-          }
-          span.unopened-label {
-            display: none;
-          }
-        }
-      }
-
-      div.wrt-popup-list-row-seen {
-        @include avenir_R();
-        font-size: 14px;
-        color: $deep_navy;
-        float: right;
-        text-align: right;
-        max-width: $row_right_label_max_width;
-        line-height: 32px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-
-        span.unopened-label {
-          float: right;
-          @include avenir_R();
-          font-size: 14px;
-          color: $deep_navy;
-        }
-
-        &.seen {
-          color: $light_ui_grey;
-        }
-
-        button.send-reminder-bt {
-          background-position: right 9px;
-          background-repeat: no-repeat;
+        div.wrt-popup-list-row-avatar {
+          float: left;
+          position: relative;
           width: 24px;
           height: 24px;
-          float: right;
-          display: none;
-          opacity: 0.6;
-          background-image: cdnUrl("/img/ML/send_reminder.svg");
-          background-size: 14px 14px;
 
-          @include mobile() {
-            display: block;
-            float: right;
-            margin-left: 8px;
-          }
+          @include user_profile(24);
 
-          &:hover {
-            opacity: 1;
-          }
+          // &.seen:after {
+          //   position: absolute;
+          //   width: 12px;
+          //   height: 12px;
+          //   background-image: cdnUrl("/img/ML/green_checkmark.svg");
+          //   background-position: center;
+          //   background-repeat: no-repeat;
+          //   background-size: 12px 12px;
+          //   content: "";
+          //   bottom: 0px;
+          //   right: 0px;
+          // }
         }
-      }
 
-      &.empty-list {
-        text-align: center;
+        $row_right_label_max_width: 110px;
 
-        div.empty-copy {
-          height: 32px;
-          text-align: left;
-          padding-left: 32px;
-          @include avenir_R();
+        div.wrt-popup-list-row-name {
+          float: left;
+          margin-left: 8px;
+          @include OC_Body_Book();
           font-size: 14px;
+          color: $light_navy;
+          line-height: 24px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: calc(100% - 32px - 16px - 8px - $row_right_label_max_width);
+        }
+
+        div.wrt-popup-list-row-seen {
+          @include OC_Body_Book();
+          font-size: 12px;
           color: $ui_grey;
+          float: right;
+          text-align: right;
+          max-width: $row_right_label_max_width;
           line-height: 32px;
-          position: relative;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
 
-          &:before {
-            content: "";
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 23px;
-            height: 29px;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: 23px 29px;
+          &.seen {
+            color: $light_ui_grey;
           }
 
-          &.empty-search:before {
-            width: 310px;
-            height: 32px;
-            background-size: 310px 32px;
-            background-image: cdnUrl("/img/ML/wrt_empty_search.svg");
-          }
+          button.send-reminder-bt {
+            height: 24px;
+            float: right;
+            color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 12px;
+            padding: 0;
 
-          &.no-viewed {
-            width: 234px;
-            margin-left: 38px;
-            &:before {
-              background-image: cdnUrl("/img/ML/no_viewed.svg");
-            }
-          }
-
-          &.no-unseen{
-            width: 214px;
-            margin-left: 48px;
-            &:before {
-              background-image: cdnUrl("/img/ML/no_unseen.svg");
+            &:hover {
+              opacity: 1;
             }
           }
         }
+
+        // &.empty-list {
+        //   text-align: center;
+
+        //   div.empty-copy {
+        //     height: 32px;
+        //     text-align: left;
+        //     padding-left: 32px;
+        //     @include OC_Body_Book();
+        //     font-size: 14px;
+        //     color: $ui_grey;
+        //     line-height: 32px;
+        //     position: relative;
+
+        //     &:before {
+        //       content: "";
+        //       position: absolute;
+        //       top: 0px;
+        //       left: 0px;
+        //       width: 23px;
+        //       height: 29px;
+        //       background-position: center;
+        //       background-repeat: no-repeat;
+        //       background-size: 23px 29px;
+        //     }
+
+        //     &.empty-search:before {
+        //       width: 250px;
+        //       height: 32px;
+        //       background-size: 310px 32px;
+        //       background-position: left 0 top 0;
+        //       background-image: cdnUrl("/img/ML/wrt_empty_search.svg");
+        //     }
+
+        //     &.no-viewed {
+        //       width: 234px;
+        //       margin-left: 38px;
+        //       &:before {
+        //         background-image: cdnUrl("/img/ML/no_viewed.svg");
+        //       }
+        //     }
+
+        //     &.no-unseen{
+        //       width: 214px;
+        //       margin-left: 48px;
+        //       &:before {
+        //         background-image: cdnUrl("/img/ML/no_unseen.svg");
+        //       }
+        //     }
+        //   }
+        // }
       }
     }
   }
 }
 
 /* If WRT is direct child of org-dashboard it means it's for mobile*/
-div.org-dashboard > div.wrt-popup {
+div.org-dashboard > div.wrt-popup-container div.wrt-popup {
   display: none;
 
   @include mobile() {
