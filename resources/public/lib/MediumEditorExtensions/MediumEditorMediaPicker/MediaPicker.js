@@ -245,11 +245,14 @@ function PlaceCaretAtEnd(el) {
     },
 
     addGIF: function(gifUrl, gifStillThumbnail, width, height){
-      this.addPhoto(gifUrl, gifStillThumbnail, width, height);
+      this.addImage(gifUrl, gifStillThumbnail, width, height, "image/gif");
     },
 
     addPhoto: function(photoUrl, photoThumbnail, width, height){
-      log("addPhoto", photoUrl, photoThumbnail, width, height);
+      this.addImage(photoUrl, photoThumbnail, width, height, "image/*");
+    },
+
+    addImage: function(photoUrl, photoThumbnail, width, height, mediaType){
       if (this._lastSelection) {
         rangy.restoreSelection(this._lastSelection);
         this._lastSelection = undefined;
@@ -290,7 +293,7 @@ function PlaceCaretAtEnd(el) {
         var img = this.document.createElement("img");
         img.src = photoUrl;
         img.className = "carrot-no-preview";
-        img.dataset.mediaType = "image";
+        img.dataset.mediaType = mediaType;
         img.dataset.thumbnail = photoThumbnail;
         img.width = width;
         img.height = height;
