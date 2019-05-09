@@ -281,18 +281,6 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts {
-    margin-bottom: 0px;
-  }
-
-  a.must-see {
-    margin-bottom: 16px;
-
-    &.showing-drafts {
-      margin-bottom: 0px;
-    }
-  }
-
   a.all-posts, a.drafts, a.must-see {
     display: block;
     background-color: transparent;
@@ -386,7 +374,6 @@ div.left-navigation-sidebar {
   }
 
   a.drafts {
-    margin-bottom: 16px;
 
     @include mobile() {
       margin-bottom: 0px;
@@ -414,6 +401,7 @@ div.left-navigation-sidebar {
       margin: 0;
       height: 15px;
       margin-bottom: 8px;
+      margin-top: 16px;
       width: 100%;
 
       @include mobile() {

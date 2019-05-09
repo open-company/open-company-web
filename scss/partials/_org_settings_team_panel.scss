@@ -127,6 +127,11 @@ div.org-settings {
               text-align: right;
               width: 144px;
               color: $ui_grey;
+
+              span.self-user-type {
+                text-transform: capitalize;
+                padding: 0 7px;
+              }
             }
 
             td {
