@@ -69,9 +69,13 @@
       (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
-(defn all-posts-get [org-data ap-initial-at]
+(defn all-posts-get [org-data ap-initial-at & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
+    (api/get-all-posts activity-link ap-initial-at
+     (fn [resp]
+       (all-posts-get-finish ap-initial-at resp)
+       (when (fn? finish-cb)
+        (finish-cb resp))))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
@@ -640,7 +644,15 @@
         (when (or (= change-type :add)
                   (= change-type :delete))
           (when (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at)))
+            (all-posts-get (dis/org-data) (dis/ap-initial-at)
+             ;; In case another user is adding a new post
+             ;; mark it as unread directly
+             (when (and (= change-type :add)
+                        (not= (:user-id data) (jwt/user-id)))
+               (fn [{:keys [success]}]
+                 (when success
+                   (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
+                                                                           :board-uuid section-uuid}]))))))
           (when (= (router/current-board-slug) "must-see")
             (must-see-get (dis/org-data))))
         ;; Refresh the activity in case of an item update
