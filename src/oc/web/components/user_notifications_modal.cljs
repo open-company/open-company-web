@@ -135,7 +135,7 @@
               (when slack-enabled?
                 [:option
                   {:value "slack"}
-                  "Via slack"])]
+                  "Via Slack"])]
             [:div.field-description
               "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
