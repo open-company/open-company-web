@@ -23,12 +23,7 @@
   {:did-mount (fn [s]
     (reminder-actions/load-reminders-roster)
     (reminder-actions/load-reminders)
-    s)
-   :did-update (fn [s]
-   (when (and @(::unmounting s)
-              (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 real-close))
-   s)}
+    s)}
   [s]
   (let [reminders-data (drv/react s :reminders-data)
         reminders-list (:items reminders-data)
