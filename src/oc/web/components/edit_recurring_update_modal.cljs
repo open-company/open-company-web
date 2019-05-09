@@ -75,7 +75,15 @@
       (reset! (::frequency-dropdown s) false)
       (reset! (::on-dropdown s) false))))
   [s]
-  (let [reminder-data (drv/react s :reminder-edit)
+  {:did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)}
+  (let [appear-class (and @(:first-render-done s)
+                          (not @(::unmounting s))
+                          (not @(::unmounted s)))
+        reminder-data (drv/react s :reminder-edit)
         reminders-roster (drv/react s :reminders-roster)
         users-list (:users-list reminders-roster)
         ;; on label and value stuff
