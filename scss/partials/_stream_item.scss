@@ -330,47 +330,8 @@ div.stream-item {
 
         div.stream-item-body {
 
-          &.expanded {
-            div.stream-item-body-inner.to-truncate {
+          .carrot-no-preview {
               display: none;
-            }
-
-            div.stream-item-body-inner.no-truncate {
-              display: block;
-            }
-          }
-
-          div.stream-item-body-inner {
-            margin-top: 8px;
-
-            &.to-truncate{
-              @include activity-body(18, 24, 24, $deep_navy);
-              color: $deep_navy;
-              @include OC_Body_Book();
-              line-height: 24px;
-
-              &.hide-images {
-                img {
-                  display: none;
-                }
-              }
-            }
-
-            &.no-truncate {
-              @include activity-body(18, 24, 24, $deep_navy);
-              color: $deep_navy;
-              @include OC_Body_Book();
-              line-height: 24px;
-              display: none;
-            }
-
-            &>*:first-child {
-              margin-top: 0px;
-            }
-
-            div.carrot-no-preview, a.carrot-no-preview {
-              display: none;
-            }
           }
         }
       }

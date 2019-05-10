@@ -32,7 +32,12 @@
   {:did-mount (fn [s]
     (reminder-actions/load-reminders-roster)
     (reminder-actions/load-reminders)
-    s)}
+    s)
+   :did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)}
   [s]
   (let [appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
