@@ -83,6 +83,11 @@
       (reset! (::frequency-dropdown s) false)
       (reset! (::on-dropdown s) false))))
   [s]
+  {:did-update (fn [s]
+   (when (and @(::unmounting s)
+              (compare-and-set! (::unmounted s) false true))
+     (utils/after 180 real-close))
+   s)}
   (let [appear-class (and @(:first-render-done s)
                           (not @(::unmounting s))
                           (not @(::unmounted s)))
