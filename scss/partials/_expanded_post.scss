@@ -102,6 +102,15 @@ div.expanded-post {
   div.expanded-post-body {
     @include activity-body(18, 24, 24, $deep_navy);
     margin-top: 16px;
+
+
+    .interactable-image {
+      cursor: zoom-in;
+
+      img:hover {
+          opacity: 0.9;
+      }
+    }
   }
 
   div.expanded-post-footer {

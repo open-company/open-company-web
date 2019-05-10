@@ -1,5 +1,6 @@
 (ns oc.web.components.expanded-post
   (:require [rum.core :as rum]
+            [dommy.core :as dom]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -25,7 +26,7 @@
 (defn close-expanded-post []
   (routing-actions/dismiss-post-modal))
 
-(defn save-fixed-comment-height [s]
+(defn save-fixed-comment-height! [s]
   (let [cur-height (.outerHeight (js/$ (rum/ref-node s :expanded-post-fixed-add-comment)))]
     (when-not (= @(::comment-height s) cur-height)
       (reset! (::comment-height s) cur-height))))
@@ -34,9 +35,27 @@
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
 
-(defn calc-video-height [s]
+(defn set-mobile-video-height! [s]
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
+
+(defn wrap-img-tags-in-anchors!
+  "Wraps all `img` tags within the post's body in anchor tags to allow for opening in a new tab."
+  [s]
+  (let [body (rum/ref s "post-body")
+        imgs (dom/sel body "img")]
+    (doseq [img  imgs
+            :let [anchor (dom/create-element "a")
+                  href   (.-src img)]]
+      (dom/set-attr! anchor :href href :target "_blank")
+      (dom/add-class! anchor :interactable-image)
+      (dom/insert-before! anchor img)
+      (dom/remove! img)
+      (dom/replace-contents! anchor img))
+    s))
+
+(def interactable-images-mixin
+  {:did-mount wrap-img-tags-in-anchors!})
 
 (defn- load-comments [s]
   (let [activity-data @(drv/get-ref s :activity-data)]
@@ -55,8 +74,9 @@
   (rum/local 0 ::mobile-video-height)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
+  interactable-images-mixin
   {:did-mount (fn [s]
-    (save-fixed-comment-height s)
+    (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
     (load-comments s)
     s)
@@ -74,9 +94,9 @@
         is-mobile? (responsive/is-mobile-size?)
         is-all-posts? (= (router/current-board-slug) "all-posts")
         back-to-label (str "Back to "
-                       (if is-all-posts?
-                         "All Posts"
-                         (:board-name activity-data)))
+                           (if is-all-posts?
+                             "All Posts"
+                             (:board-name activity-data)))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
         is-publisher? (= (:user-id publisher) (jwt/user-id))
@@ -127,7 +147,8 @@
         [:div.expanded-post-abstract
           (:abstract activity-data)])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
-        {:dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+        {:ref "post-body"
+         :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
       [:div.expanded-post-footer
         (comments-summary activity-data true)
@@ -139,5 +160,5 @@
       [:div.expanded-post-fixed-add-comment
         {:ref :expanded-post-fixed-add-comment}
         [:div.expanded-post-fixed-add-comment-inner
-          (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height s) 300))
+          (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height! s) 300))
            (str "expanded-post-fixed-add-comment-" (:uuid activity-data)))]]]))
