@@ -342,8 +342,8 @@ div.stream-item {
           line-height: 24px;
         }
 
-        img, iframe {
-          display: none;
+        .carrot-no-preview {
+            display: none;
         }
       }
     }
