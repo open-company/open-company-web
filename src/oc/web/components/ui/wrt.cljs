@@ -13,20 +13,14 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn show-wrt
-  "Show WRT for the given activity item."
+  "Show WRT popup panel for the given activity item."
   [activity-uuid]
   (dis/dispatch! [:input [:wrt-show] activity-uuid]))
 
 (defn hide-wrt
-  "Hide WRT, if an activity id is passed hide only if
-  that's the current activity we are showing WRT for,
-  user to prevent race conditions with mouse over/enter/leave/click events.
-  If nothing is passed hide WRT for any activity."
-  [& [activity-uuid]]
-  (if activity-uuid
-    (when (= (:wrt-show @dis/app-state) activity-uuid)
-      (dis/dispatch! [:input [:wrt-show] nil]))
-    (dis/dispatch! [:input [:wrt-show] nil])))
+  "Hide WRT popup panel"
+  []
+  (dis/dispatch! [:input [:wrt-show] nil]))
 
 (defn- filter-by-query [user query]
   (let [complete-name (or (:name user) (str (:first-name user) " " (:last-name user)))]
