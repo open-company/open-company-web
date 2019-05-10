@@ -103,9 +103,6 @@
         is-mobile? (responsive/is-mobile-size?)
         qsg-data (drv/react s :qsg)
         show-reminders? (utils/link-for (:links org-data) "reminders")
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
         org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
