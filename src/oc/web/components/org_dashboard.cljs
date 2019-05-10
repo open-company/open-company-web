@@ -80,10 +80,10 @@
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
-                             (whats-new/init ".whats-new")
+                             (whats-new/init)
                              s)
                             :did-remount (fn [s]
-                             (whats-new/init ".whats-new")
+                             (whats-new/init)
                              s)}
   [s]
   (let [{:keys [orgs

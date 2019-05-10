@@ -82,6 +82,12 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :qsg)
+  {:did-mount (fn [s]
+   (whats-new/check-whats-new-badge)
+   s)
+   :did-remount (fn [_ s]
+   (whats-new/check-whats-new-badge)
+    s)}
   [s]
   (let [{:keys [panel-stack org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
