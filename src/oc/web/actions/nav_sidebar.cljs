@@ -2,6 +2,7 @@
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
@@ -45,12 +46,16 @@
 ;; Push panel
 
 (defn- push-panel [panel]
+  (when (zero? (count (get @dis/app-state :panel-stack [])))
+    (dom-utils/lock-page-scroll))
   (dis/dispatch! [:update [:panel-stack] #(vec (conj (or % []) panel))]))
 
 (defn- pop-panel []
   (let [panel-stack (:panel-stack @dis/app-state)]
     (when (pos? (count panel-stack))
       (dis/dispatch! [:update [:panel-stack] pop]))
+    (when (= (count panel-stack) 1)
+      (dom-utils/unlock-page-scroll))
     (peek panel-stack)))
 
 ;; Section settings

@@ -7,11 +7,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.utils.user :as user-utils]
-            [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
@@ -56,8 +54,6 @@
   ;; Locals
   (rum/local false ::loading)
   (rum/local false ::show-success)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:after-render (fn [s]
    (when-not (utils/is-test-env?)
      (doto (js/$ "[data-toggle=\"tooltip\"]")

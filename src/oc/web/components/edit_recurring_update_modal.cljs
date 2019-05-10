@@ -63,7 +63,6 @@
   (rum/local false ::frequency-dropdown)
   (rum/local false ::on-dropdown)
   ;; Mixins
-  mixins/no-scroll-mixin
   (mixins/on-window-click-mixin (fn [s e]
     (when (and (not (utils/event-inside? e (rum/ref-node s :frequency-dd-node)))
                (not (utils/event-inside? e (rum/ref-node s :frequency-bt)))

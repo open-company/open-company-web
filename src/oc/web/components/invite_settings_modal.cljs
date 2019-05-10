@@ -5,7 +5,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
@@ -108,8 +107,6 @@
   (rum/local 0 ::sending)
   (rum/local 0 ::initial-sending)
   (rum/local false ::email-focused)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:will-mount (fn [s]
                  (setup-initial-rows s)
                  (nux-actions/dismiss-post-added-tooltip)

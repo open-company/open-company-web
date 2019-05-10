@@ -5,7 +5,6 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -49,8 +48,6 @@
   (rum/local false ::resending-invite)
   (rum/local "" ::query)
   (rum/local #{} ::removing)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:after-render (fn [s]
     (doto (js/$ "[data-toggle=\"tooltip\"]")
      (.tooltip "fixTitle")

@@ -5,7 +5,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -24,8 +23,6 @@
   (drv/drv :current-user-data)
   ;; Locals
   (rum/local false ::saving)
-  ;; Mixins
-  mixins/no-scroll-mixin
   [s]
   (let [org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)

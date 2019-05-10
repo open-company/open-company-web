@@ -3,7 +3,6 @@
             [cuerdas.core :as s]
             [goog.object :as googobj]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
@@ -133,8 +132,6 @@
   (rum/local false ::email-error)
   (rum/local false ::password-error)
   (rum/local false ::current-password-error)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:after-render (fn [s]
     (when-not (utils/is-test-env?)
       (doto (js/$ "[data-toggle=\"tooltip\"]")

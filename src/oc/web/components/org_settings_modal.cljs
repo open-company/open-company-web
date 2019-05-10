@@ -6,7 +6,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
@@ -125,8 +124,6 @@
   ;; Locals
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
       (org-actions/get-org org-data)

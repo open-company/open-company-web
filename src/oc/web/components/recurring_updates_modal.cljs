@@ -4,7 +4,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.reminder :as reminder-actions]
@@ -16,8 +15,6 @@
 (rum/defcs recurring-updates-modal <
   rum/reactive
   (drv/drv :reminders-data)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:did-mount (fn [s]
     (reminder-actions/load-reminders-roster)
     (reminder-actions/load-reminders)

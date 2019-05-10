@@ -109,8 +109,6 @@
   (rum/local false ::pre-flight-ok)
   (rum/local nil ::section-name-check-timeout)
   (rum/local false ::saving)
-  ;; Mixins
-  mixins/no-scroll-mixin
   (mixins/on-window-click-mixin (fn [s e]
    (when-not (utils/event-inside? e (rum/dom-node s))
      (dismiss-modal))))
