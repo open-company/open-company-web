@@ -93,16 +93,10 @@
                 container-data
                 posts-data
                 ap-initial-at
-                user-settings
-                org-settings-data
-                show-reminders
                 made-with-carrot-modal-data
                 is-sharing-activity
-                entry-edit-dissmissing
                 is-showing-alert
-                media-input
                 show-section-add-cb
-                entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
                 show-cmail
@@ -172,7 +166,11 @@
         qsg-data (drv/react s :qsg)
         open-panel (last panel-stack)
         show-section-editor (= open-panel :section-edit)
-        show-section-add (= open-panel :section-add)]
+        show-section-add (= open-panel :section-add)
+        show-reminders? (= open-panel :reminders)
+        show-reminder-edit? (and open-panel
+                                 (clojure.string/starts-with? (name open-panel) "reminder-"))
+        show-reminders-view? (or show-reminders? show-reminder-edit?)]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -220,10 +218,10 @@
           (= open-panel :notifications)
           (user-notifications-modal)
           ;; Reminders list
-          (= open-panel :reminders)
+          show-reminders?
           (recurring-updates-modal)
           ;; Edit a reminder
-          (and open-panel (clojure.string/starts-with? (name open-panel) "reminder-"))
+          show-reminder-edit?
           (edit-recurring-update-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
@@ -285,7 +283,7 @@
                        (not show-section-editor)
                        (not show-cmail)
                        (not wrt-activity-data)
-                       (not show-reminders)))
+                       (not show-reminders-view?)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
