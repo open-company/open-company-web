@@ -44,7 +44,7 @@ div.wrt-popup-container {
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
   opacity: 1;
-  transition: opacity 180ms ease-in;
+  cursor: auto;
 
   button.modal-close-bt {
     position: absolute;
@@ -170,19 +170,6 @@ div.wrt-popup-container {
           height: 24px;
 
           @include user_profile(24);
-
-          // &.seen:after {
-          //   position: absolute;
-          //   width: 12px;
-          //   height: 12px;
-          //   background-image: cdnUrl("/img/ML/green_checkmark.svg");
-          //   background-position: center;
-          //   background-repeat: no-repeat;
-          //   background-size: 12px 12px;
-          //   content: "";
-          //   bottom: 0px;
-          //   right: 0px;
-          // }
         }
 
         $row_right_label_max_width: 110px;
@@ -229,7 +216,8 @@ div.wrt-popup-container {
             }
           }
         }
-
+        // Keeping the empty list placeholder as most probably we will replace it
+        // with something
         // &.empty-list {
         //   text-align: center;
 
