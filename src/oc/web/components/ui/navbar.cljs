@@ -44,7 +44,8 @@
                 user-settings
                 org-settings
                 search-active
-                mobile-user-notifications]
+                mobile-user-notifications
+                show-whats-new-green-dot]
          :as navbar-data} (drv/react s :navbar-data)
          is-mobile? (responsive/is-mobile-size?)
          mobile-ap-active? (and (not expanded-user-menu)
@@ -135,8 +136,9 @@
                               (= (:step qsg-data) :invite-team-1)
                               (= (:step qsg-data) :create-reminder-1))
                       (qsg-breadcrumb qsg-data))
-                    [:div
-                      {:ref "user-menu"}
+                    [:div.user-menu-button
+                      {:ref "user-menu"
+                       :class (when show-whats-new-green-dot "green-dot")}
                       (user-avatar
                        {:click-cb #(do
                                      (when (= (:step qsg-data) :profile-photo-1)

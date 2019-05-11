@@ -34,12 +34,13 @@ div.user-notifications {
     &.new:after {
       position: absolute;
       content: "";
-      width: 8px;
-      height: 8px;
+      width: 12px;
+      height: 12px;
       top: 0px;
       right: 0px;
       background-color: $carrot_green;
       border-radius: 50%;
+      border: 2px solid #FBFAF9;
     }
   }
 

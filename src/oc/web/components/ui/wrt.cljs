@@ -28,11 +28,6 @@
       (dis/dispatch! [:input [:wrt-show] nil]))
     (dis/dispatch! [:input [:wrt-show] nil])))
 
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (hide-wrt)))
-
 (defn- filter-by-query [user query]
   (let [complete-name (or (:name user) (str (:first-name user) " " (:last-name user)))]
     (or (string/includes? (string/lower (:email user)) query)
@@ -64,23 +59,15 @@
                  (rum/local "" ::query)
                  (rum/local false ::list-view-dropdown-open)
                  (rum/local :all ::list-view) ;; :seen :unseen
-                 (rum/local false ::unmounting)
-                 (rum/local false ::unmounted)
                  (drv/drv :current-user-data)
 
                  mixins/no-scroll-mixin
-                 mixins/first-render-mixin
 
                  {:after-render (fn [s]
                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                    (when @(::search-active s)
                       (when (compare-and-set! (::search-focused s) false true)
                         (.focus (rum/ref-node s :search-field))))
-                   s)
-                  :did-update (fn [s]
-                   (when (and @(::unmounting s)
-                              (compare-and-set! (::unmounted s) false true))
-                     (utils/after 180 hide-wrt))
                    s)}
 
   [s activity-data read-data show-above]
@@ -99,15 +86,11 @@
                          :unseen unseen-users)
         current-user-data (drv/react s :current-user-data)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
-        is-mobile? (responsive/is-tablet-or-mobile?)
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))]
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-popup-container
-      {:class (utils/class-set {:appear appear-class})
-       :on-click #(dismiss-modal s)}
+       {:on-click hide-wrt}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click hide-wrt}]
       [:div.wrt-popup
         {:class (utils/class-set {:top show-above
                                   :loading (not (:reads read-data))})
