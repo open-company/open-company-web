@@ -1,0 +1,11 @@
+div#HW_frame_cont {
+  width: 320px;
+  height: 100vh !important;
+  top: 0 !important;
+  left: unset !important;
+  right: 0;
+
+  iframe {
+    height: 100% !important;
+  }
+}
