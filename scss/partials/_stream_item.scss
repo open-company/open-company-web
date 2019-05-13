@@ -116,6 +116,7 @@ div.stream-item {
         height: 24px;
         float: left;
         max-width: 70%;
+        color: rgba($deep_navy, 0.5);
 
         @include mobile() {
           width: auto;
