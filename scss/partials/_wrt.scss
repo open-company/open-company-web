@@ -272,19 +272,3 @@ div.wrt-popup-container {
     }
   }
 }
-
-/* If WRT is direct child of org-dashboard it means it's for mobile*/
-div.org-dashboard > div.wrt-popup-container div.wrt-popup {
-  display: none;
-
-  @include mobile() {
-    position: fixed;
-    top: 0;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-    display: block;
-    border-radius: 0px;
-    max-height: initial;
-  }
-}
