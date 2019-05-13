@@ -172,6 +172,7 @@
    :current-user-data   [[:base]
                           (fn [base]
                             (if (and (not (:jwt base))
+                                     (:id-token base)
                                      (router/current-secure-activity-id))
                               (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
                               (:current-user-data base)))]
