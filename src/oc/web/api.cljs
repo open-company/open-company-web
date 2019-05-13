@@ -855,9 +855,10 @@
 
 ;; Change service http
 
-(defn mark-unread [mark-unread-link callback]
+(defn mark-unread [mark-unread-link container-id callback]
   (if mark-unread-link
     (change-http (method-for-link mark-unread-link) (relative-href mark-unread-link)
-     {:headers (headers-for-link mark-unread-link)}
+     {:headers (headers-for-link mark-unread-link)
+      :body container-id}
      callback)
     (handle-missing-link "mark-unread" mark-unread-link callback)))

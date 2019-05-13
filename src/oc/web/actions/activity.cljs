@@ -953,7 +953,7 @@
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
     (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
-    (api/mark-unread mark-unread-link
+    (api/mark-unread mark-unread-link (:board-uuid activity-data)
      (fn [{:keys [error success]}]
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
                                                :description (when error "Please try again")
