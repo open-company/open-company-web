@@ -22,6 +22,7 @@
 ;; :reminder-{uuid}/:reminder-new
 ;; :section-add
 ;; :section-edit
+;; :wrt-{uuid}
 
 (defn close-navigation-sidebar []
   (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
@@ -127,3 +128,12 @@
     (push-panel panel)
     (pop-panel))
   (close-navigation-sidebar))
+
+;; WRT
+
+(defn show-wrt [activity-uuid]
+  (push-panel (keyword (str "wrt-" activity-uuid)))
+  (close-navigation-sidebar))
+
+(defn hide-wrt []
+  (pop-panel))
