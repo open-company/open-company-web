@@ -118,9 +118,6 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
-                        ;; Remove read sent from FoC
-                        ; (mixins/wrt-stream-item-mixin "div.stream-item-body.item-ready:not(.truncated)"
-                        ;  wrt-stream-item-mixin-cb)
                         section-mixins/container-nav-in
 
                         {:will-mount (fn [s]
