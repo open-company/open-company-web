@@ -6,6 +6,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notifications-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
@@ -15,12 +16,12 @@
 (defn show-wrt
   "Show WRT popup panel for the given activity item."
   [activity-uuid]
-  (dis/dispatch! [:input [:wrt-show] activity-uuid]))
+  (nav-actions/show-wrt activity-uuid))
 
 (defn hide-wrt
   "Hide WRT popup panel"
   []
-  (dis/dispatch! [:input [:wrt-show] nil]))
+  (nav-actions/hide-wrt))
 
 (defn- filter-by-query [user query]
   (let [complete-name (or (:name user) (str (:first-name user) " " (:last-name user)))]
@@ -47,13 +48,16 @@
     :unseen "Unopened"))
 
 (rum/defcs wrt < rum/reactive
+                 ;; Derivatives
+                 (drv/drv :wrt-read-data)
+                 (drv/drv :wrt-activity-data)
+                 (drv/drv :current-user-data)
                  ;; Locals
                  (rum/local false ::search-active)
                  (rum/local false ::search-focused)
                  (rum/local "" ::query)
                  (rum/local false ::list-view-dropdown-open)
                  (rum/local :all ::list-view) ;; :seen :unseen
-                 (drv/drv :current-user-data)
 
                  mixins/no-scroll-mixin
 
@@ -64,8 +68,10 @@
                         (.focus (rum/ref-node s :search-field))))
                    s)}
 
-  [s activity-data read-data show-above]
-  (let [item-id (:uuid activity-data)
+  [s]
+  (let [activity-data (drv/react s :wrt-activity-data)
+        read-data (drv/react s :wrt-read-data)
+        item-id (:uuid activity-data)
         seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
         unseen-users (vec (sort-by utils/name-or-email (:unreads read-data)))
@@ -86,8 +92,7 @@
       [:button.mlb-reset.modal-close-bt
         {:on-click hide-wrt}]
       [:div.wrt-popup
-        {:class (utils/class-set {:top show-above
-                                  :loading (not (:reads read-data))})
+        {:class (utils/class-set {:loading (not (:reads read-data))})
          :on-click #(.stopPropagation %)}
         [:div.wrt-popup-header
           [:div.wrt-popup-header-title
@@ -191,7 +196,4 @@
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " Viewer" (when (not= read-count 1) "s"))
-          "0 Viewers")]
-      (when (and (not is-mobile?)
-                 (= wrt-show item-id))
-        (wrt activity-data read-data @(::under-middle-screen s)))]))
+          "0 Viewers")]]))

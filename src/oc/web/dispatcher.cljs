@@ -1,6 +1,8 @@
 (ns oc.web.dispatcher
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
+            [clojure.string :as s]
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
@@ -321,6 +323,20 @@
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
+   :wrt-read-data         [[:panel-stack]
+                            (fn [panel-stack]
+                              (when (and panel-stack
+                                         (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                            wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
+                                  (activity-read-data wrt-uuid))))]
+   :wrt-activity-data     [[:panel-stack]
+                            (fn [panel-stack]
+                              (when (and panel-stack
+                                         (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                            wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
+                                  (activity-data-get wrt-uuid))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data
                             :ap-initial-at :show-sections-picker :entry-editing
                             :jwt :wrt-show]
@@ -346,10 +362,6 @@
                                :activity-share-container (:activity-share-container base)
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
-                               :wrt-activity-data (when wrt-show
-                                                   (activity-data-get wrt-show))
-                               :wrt-read-data (when wrt-show
-                                                (activity-read-data wrt-show))
                                :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
