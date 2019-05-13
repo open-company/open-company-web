@@ -303,7 +303,8 @@
                                                                  :user-settings
                                                                  :org-settings
                                                                  :search-active
-                                                                 :mobile-user-notifications])]
+                                                                 :mobile-user-notifications
+                                                                 :show-whats-new-green-dot])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
