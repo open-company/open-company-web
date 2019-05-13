@@ -2,6 +2,7 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [clojure.string :as s]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
@@ -101,7 +102,6 @@
                 activity-share-container
                 show-cmail
                 showing-mobile-user-notifications
-                wrt-activity-data
                 wrt-read-data
                 force-login-wall
                 panel-stack]} (drv/react s :org-dashboard-data)
@@ -169,8 +169,10 @@
         show-section-add (= open-panel :section-add)
         show-reminders? (= open-panel :reminders)
         show-reminder-edit? (and open-panel
-                                 (clojure.string/starts-with? (name open-panel) "reminder-"))
-        show-reminders-view? (or show-reminders? show-reminder-edit?)]
+                                 (s/starts-with? (name open-panel) "reminder-"))
+        show-reminders-view? (or show-reminders? show-reminder-edit?)
+        show-wrt-view? (and open-panel
+                            (s/starts-with? (name open-panel) "wrt-"))]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -240,10 +242,9 @@
           (and is-mobile?
                is-sharing-activity)
           (activity-share)
-          ;; Mobile WRT
-          (and is-mobile?
-               wrt-activity-data)
-          (wrt wrt-activity-data wrt-read-data)
+          ;; WRT
+          show-wrt-view?
+          (wrt)
           ;; Search results
           is-showing-mobile-search
           (search-box)
@@ -276,14 +277,11 @@
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
+        ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
-                  (and ; (router/current-activity-id)
-                       (not is-sharing-activity)
-                       (not show-section-add)
-                       (not show-section-editor)
+                  (and (not is-sharing-activity)
                        (not show-cmail)
-                       (not wrt-activity-data)
-                       (not show-reminders-view?)))
+                       (not open-panel)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
