@@ -12,6 +12,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
             [oc.web.components.qsg :refer (qsg)]
+            [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
@@ -79,6 +80,10 @@
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
+                             (whats-new/init)
+                             s)
+                            :did-remount (fn [s]
+                             (whats-new/init)
                              s)}
   [s]
   (let [{:keys [orgs
@@ -107,8 +112,7 @@
                 showing-mobile-user-notifications
                 wrt-activity-data
                 wrt-read-data
-                force-login-wall
-                expanded-user-menu]} (drv/react s :org-dashboard-data)
+                force-login-wall]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -178,12 +182,14 @@
                                   :activity-not-found show-activity-not-found
                                   :activity-removed show-activity-removed
                                   :showing-qsg (:visible qsg-data)
-                                  :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)})}
+                                  :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)
+                                  :show-menu expanded-user-menu})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
           ;; User menu
-          expanded-user-menu
+          (and is-mobile?
+               expanded-user-menu)
           (menu)
           ;; Activity removed
           show-activity-removed
@@ -264,6 +270,8 @@
         ;; cmail editor
         (when show-cmail
           (cmail))
+        (when-not is-mobile?
+          (menu))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
