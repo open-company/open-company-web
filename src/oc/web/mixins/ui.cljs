@@ -34,6 +34,9 @@
       state)})
 
 (def first-render-mixin
+  "This mixin will add a :first-render-done atom to your component state. It will
+   be false when the component is not mounted, and true when it is. Very useful for
+   appear or disappear animations or to track down the component state."
   {:init (fn [state]
            (assoc state :first-render-done (atom false)))
    :after-render

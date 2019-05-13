@@ -18,20 +18,9 @@
   (dis/dispatch! [:input [:wrt-show] activity-uuid]))
 
 (defn hide-wrt
-  "Hide WRT, if an activity id is passed hide only if
-  that's the current activity we are showing WRT for,
-  user to prevent race conditions with mouse over/enter/leave/click events.
-  If nothing is passed hide WRT for any activity."
-  [& [activity-uuid]]
-  (if activity-uuid
-    (when (= (:wrt-show @dis/app-state) activity-uuid)
-      (dis/dispatch! [:input [:wrt-show] nil]))
-    (dis/dispatch! [:input [:wrt-show] nil])))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (hide-wrt)))
+  "Hide WRT"
+  []
+  (dis/dispatch! [:input [:wrt-show] nil]))
 
 (defn- filter-by-query [user query]
   (let [complete-name (or (:name user) (str (:first-name user) " " (:last-name user)))]
@@ -64,8 +53,6 @@
                  (rum/local "" ::query)
                  (rum/local false ::list-view-dropdown-open)
                  (rum/local :all ::list-view) ;; :seen :unseen
-                 (rum/local false ::unmounting)
-                 (rum/local false ::unmounted)
                  (drv/drv :current-user-data)
 
                  mixins/no-scroll-mixin
@@ -76,11 +63,6 @@
                    (when @(::search-active s)
                       (when (compare-and-set! (::search-focused s) false true)
                         (.focus (rum/ref-node s :search-field))))
-                   s)
-                  :did-update (fn [s]
-                   (when (and @(::unmounting s)
-                              (compare-and-set! (::unmounted s) false true))
-                     (utils/after 180 hide-wrt))
                    s)}
 
   [s activity-data read-data]
@@ -100,19 +82,15 @@
         current-user-data (drv/react s :current-user-data)
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        seen-percent (int (* (/ (count seen-users) (count all-users)) 100))
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))]
+        seen-percent (int (* (/ (count seen-users) (count all-users)) 100))]
     [:div.wrt-popup-container
-      {:class (utils/class-set {:appear appear-class})
-       :on-click #(if @(::list-view-dropdown-open s)
+      {:on-click #(if @(::list-view-dropdown-open s)
                     (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
                       (reset! (::list-view-dropdown-open s) false))
                     (when-not (utils/event-inside? % (rum/ref-node s :wrt-popup))
-                      (dismiss-modal s)))}
+                      (hide-wrt)))}
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(dismiss-modal s)}]
+        {:on-click hide-wrt}]
       [:div.wrt-popup
         {:class (utils/class-set {:loading (not (:reads read-data))})
          :ref :wrt-popup}
