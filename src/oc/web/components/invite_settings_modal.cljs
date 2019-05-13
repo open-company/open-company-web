@@ -19,13 +19,8 @@
 (defn show-modal [& [panel]]
   (dis/dispatch! [:input [:org-settings] (or panel :invite)]))
 
-(defn real-close []
+(defn dismiss-modal []
   (dis/dispatch! [:input [:org-settings] nil]))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (real-close)))
 
 (defn close-clicked [s]
   (let [invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-data)))
@@ -41,7 +36,7 @@
                         :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
-                                            (dismiss-modal s))}]
+                                            (dismiss-modal))}]
         (alert-modal/show-alert alert-data))
       (dismiss-modal))))
 
@@ -109,8 +104,6 @@
   (drv/drv :org-data)
   (drv/drv :invite-data)
   ;; Locals
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   (rum/local nil ::inviting-from)
   (rum/local (int (rand 10000)) ::rand)
   (rum/local "Send" ::send-bt-cta)
@@ -119,7 +112,6 @@
   (rum/local false ::email-focused)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
   {:will-mount (fn [s]
                  (setup-initial-rows s)
                  (nux-actions/dismiss-post-added-tooltip)
@@ -157,18 +149,9 @@
                                                                            :primary-bt-inline true
                                                                            :id :invites-sent}))
                                 (reset! (::send-bt-cta s) "Send"))))))))
-                  s)
-     :did-update (fn [s]
-                   (setup-initial-rows s)
-                   (when (and @(::unmounting s)
-                             (compare-and-set! (::unmounted s) false true))
-                     (utils/after 180 real-close))
-                   s)}
+                  s)}
   [s]
-  (let [appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))
-        org-data (drv/react s :org-data)
+  (let [org-data (drv/react s :org-data)
         invite-users-data (drv/react s :invite-data)
         team-data (:team-data invite-users-data)
         invite-users (:invite-users invite-users-data)
@@ -176,7 +159,6 @@
         team-roster (:team-roster invite-users-data)
         uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
     [:div.invite-settings-modal
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s)}]
       [:div.invite-settings
