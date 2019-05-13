@@ -31,6 +31,16 @@ div.org-dashboard {
     }
   }
 
+  div.menu {
+    display: none;
+  }
+
+  &.show-menu {
+    div.menu {
+      display: block;
+    }
+  }
+
   &.showing-digest-sample, &.showing-qsg.showing-digest-sample {
     div.page {
       overflow: hidden;
