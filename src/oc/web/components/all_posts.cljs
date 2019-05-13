@@ -66,9 +66,6 @@
 (defn- ap-seen-mixin-cb [_ item-uuid]
   (activity-actions/ap-seen-events-gate item-uuid))
 
-(defn- wrt-stream-item-mixin-cb [_ item-uuid]
-  (activity-actions/wrt-events-gate item-uuid))
-
 (defn- sorted-posts [posts]
   (activity-utils/get-sorted-activities posts))
 
