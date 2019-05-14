@@ -638,7 +638,7 @@
 
 (def default-abstract "Post preview: summarize why this post matters…")
 
-(def max-abstrct-length 280)
+(def max-abstract-length 280)
 
 (def default-drafts-board-name "Drafts")
 
