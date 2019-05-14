@@ -336,8 +336,7 @@
   (if board-link
     (storage-http (method-for-link board-link) (relative-href board-link)
       {:headers (headers-for-link board-link)}
-      (fn [{:keys [status body success]}]
-        (callback status body success)))
+      callback)
     (handle-missing-link "get-board" board-link callback)))
 
 (defn patch-board [board-patch-link data note callback]

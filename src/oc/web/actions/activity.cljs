@@ -637,24 +637,26 @@
       (let [change-data (:data data)
             activity-uuid (:item-id change-data)
             section-uuid (:container-id change-data)
-            change-type (:change-type change-data)]
+            change-type (:change-type change-data)
+            ;; In case another user is adding a new post mark it as unread
+            ;; directly to avoid delays in the newly added post propagation
+            dispatch-unread (when (and (= change-type :add)
+                                       (not= (:user-id data) (jwt/user-id)))
+                              (fn [{:keys [success]}]
+                                (when success
+                                  (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
+                                                                                          :board-uuid section-uuid}]))))]
         (when (= change-type :delete)
           (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
         (when (or (= change-type :add)
                   (= change-type :delete))
-          (when (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at)
-             ;; In case another user is adding a new post
-             ;; mark it as unread directly
-             (when (and (= change-type :add)
-                        (not= (:user-id data) (jwt/user-id)))
-               (fn [{:keys [success]}]
-                 (when success
-                   (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
-                                                                           :board-uuid section-uuid}]))))))
-          (when (= (router/current-board-slug) "must-see")
-            (must-see-get (dis/org-data))))
+          (cond
+            ;; All posts
+            (= (router/current-board-slug) "all-posts")
+            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread))
+            :else
+            (sa/section-change section-uuid dispatch-unread))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid)))))
