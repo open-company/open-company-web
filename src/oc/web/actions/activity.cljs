@@ -710,7 +710,7 @@
     (ws-cc/item-seen publisher-id container-id activity-id)
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
-(defn- send-item-read
+(defn send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
   [activity-id]
