@@ -9,6 +9,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.utils.comment :as comment-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
@@ -39,6 +40,9 @@
                              (mention-mixins/oc-mentions-hover)
                              {:did-mount (fn [s]
                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                               (let [activity-data @(drv/get-ref s :secure-activity-data)
+                                     comments-data @(drv/get-ref s :comments-data)]
+                                (comment-utils/get-comments-if-needed activity-data comments-data))
                                s)
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
@@ -133,7 +137,7 @@
               (reactions activity-data)
               (when is-mobile?
                 (comments-summary activity-data true))]
-            (when (or comments-data
+            (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])
             (when comments-data
