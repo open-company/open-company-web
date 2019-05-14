@@ -21,14 +21,9 @@
 
 ;; Dismiss modal
 
-(defn dismiss []
+(defn dismiss-modal []
   (dis/dispatch! [:input [:show-section-editor] false])
   (dis/dispatch! [:input [:show-section-add] false]))
-
-(defn dismiss-modal [& [s]]
-  (if s
-    (reset! (::unmounting s) true)
-    (dismiss)))
 
 ;; Private section users search helpers
 
@@ -115,14 +110,11 @@
   (rum/local false ::pre-flight-ok)
   (rum/local nil ::section-name-check-timeout)
   (rum/local false ::saving)
-  (rum/local false ::unmounting)
-  (rum/local false ::unmounted)
   ;; Mixins
   mixins/no-scroll-mixin
-  mixins/first-render-mixin
   (mixins/on-window-click-mixin (fn [s e]
    (when-not (utils/event-inside? e (rum/dom-node s))
-     (dismiss-modal s))))
+     (dismiss-modal))))
   ;; Derivatives
   (drv/drv :qsg)
   (drv/drv :org-data)
@@ -159,11 +151,6 @@
      (when (and @(::saving s)
                 (not (:loading section-editing)))
        (reset! (::saving s) false)))
-   s)
-  :did-update (fn [s]
-   (when (and @(::unmounting s)
-             (compare-and-set! (::unmounted s) false true))
-     (utils/after 180 dismiss))
    s)}
   [s initial-section-data on-change from-section-picker]
   (let [org-data (drv/react s :org-data)
@@ -188,12 +175,8 @@
         last-section-standing (= (count no-drafts-boards) 1)
         qsg-data (drv/react s :qsg)
         disallow-public-board? (and (:content-visibility org-data)
-                                    (:disallow-public-board (:content-visibility org-data)))
-        appear-class (and @(:first-render-done s)
-                          (not @(::unmounting s))
-                          (not @(::unmounted s)))]
+                                    (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
-      {:class (utils/class-set {:appear appear-class})}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(on-change nil)}]
       [:div.section-editor.group
@@ -520,7 +503,7 @@
                                                        :expire 10
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
-                                                   (dismiss-modal s))})))
+                                                   (dismiss-modal))})))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"

@@ -163,22 +163,7 @@
                    :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                             :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
                                             :editing is-editing?
-                                            utils/hide-class true})}]
-                (when (and (not is-editing?)
-                           (not (:is-emoji comment-data))
-                           (or (:can-react comment-data)
-                               (pos? (:count reaction-data))))
-                  [:button.mlb-reset.stream-comment-reaction
-                    {:class (utils/class-set {:reacted (:reacted reaction-data)
-                                              :can-react (:can-react comment-data)})
-                     :on-click #(comment-actions/comment-reaction-toggle activity-data comment-data
-                                 reaction-data (not (:reacted reaction-data)))}
-                      (when (or (pos? (:count reaction-data))
-                                (:can-react comment-data))
-                        [:div.stream-comment-reaction-icon])
-                      (when (pos? (:count reaction-data))
-                        [:div.stream-comment-reaction-count
-                          (:count reaction-data)])])]
+                                            utils/hide-class true})}]]
               (when is-editing?
                 [:div.stream-comment-footer.group
                   [:div.save-cancel-edit-buttons
