@@ -333,13 +333,24 @@ div.stream-item {
         }
       }
 
-      div.stream-item-body-container {
+      div.stream-item-body {
+        margin-top: 8px;
+        @include activity-body(18, 24, 24, $deep_navy);
+        color: $deep_navy;
+        @include OC_Body_Book();
+        line-height: 24px;
+        max-height: 72px;
+        overflow: hidden;
 
-        div.stream-item-body {
+        h2 {
+          color: $deep_navy;
+          @include OC_Body_Book();
+          font-size: 18px;
+          line-height: 24px;
+        }
 
-          .carrot-no-preview {
-              display: none;
-          }
+        .carrot-no-preview {
+            display: none;
         }
       }
     }
