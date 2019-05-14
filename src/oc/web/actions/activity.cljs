@@ -641,7 +641,7 @@
             ;; In case another user is adding a new post mark it as unread
             ;; directly to avoid delays in the newly added post propagation
             dispatch-unread (when (and (= change-type :add)
-                                       (not= (:user-id data) (jwt/user-id)))
+                                       (not= (:user-id change-data) (jwt/user-id)))
                               (fn [{:keys [success]}]
                                 (when success
                                   (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
