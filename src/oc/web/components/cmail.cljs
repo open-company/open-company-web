@@ -645,14 +645,14 @@
                     should-show-counter? (and @(::abstract-focused s) (> abstract-length abstract-show-counter-from))]
                 [:div.cmail-content-abstract-counter
                   {:class (when should-show-counter? "show-counter")}
-                  (str "Character limit " abstract-length "/" utils/max-abstrct-length)])
+                  (str "Character limit " abstract-length "/" utils/max-abstract-length)])
               [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
                 {:class utils/hide-class
                  :ref "abstract"
                  :rows 1
                  :placeholder utils/default-abstract
                  :value (or (:abstract cmail-data) "")
-                 :max-length utils/max-abstrct-length
+                 :max-length utils/max-abstract-length
                  :on-change #(abstract-on-change s)
                  :on-focus #(reset! (::abstract-focused s) true)
                  :on-blur #(reset! (::abstract-focused s) false)

@@ -243,7 +243,10 @@
       (dissoc s :on-resize-listener))
     s))})
 
-(defn autoresize-textarea [ref & [initially-focused]]
+(defn autoresize-textarea
+  "Given a React reference to a component node, listens on all the events on that textarea element
+   and resize its frame to make sure it doesn't scroll and the no extra blank space."
+  [ref & [initially-focused]]
   (letfn [(init-textarea [el]
             (let [observe (utils/observe)
                   resize-fn (fn []
