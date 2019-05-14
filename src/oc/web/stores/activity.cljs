@@ -408,7 +408,7 @@
   (let [board-uuid (:board-uuid activity-data)
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
-        section-cache-change-key (vec (conj (dispatcher/change-cache-data-key org-slug) [board-uuid :unread]))
+        section-cache-change-key (vec (concat (dispatcher/change-cache-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread true)
         temp-val (get-in db section-change-key)]
@@ -422,7 +422,7 @@
   (let [board-uuid (:board-uuid activity-data)
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
-        section-cache-change-key (vec (conj (dispatcher/change-cache-data-key org-slug) [board-uuid :unread]))
+        section-cache-change-key (vec (concat (dispatcher/change-cache-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread false)
         temp-val (get-in db section-change-key)]
