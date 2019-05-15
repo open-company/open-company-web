@@ -124,7 +124,7 @@
             (when (= (:step qsg-data) :profile-photo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.personal-profile
-              "My Profile"]])
+              "My profile"]])
         (when (jwt/jwt)
           [:a
             {:href "#"
@@ -152,7 +152,7 @@
             (when (= (:step qsg-data) :company-logo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.digest-settings
-              "Admin Settings"]])
+              "Admin settings"]])
         (when (and (not is-mobile?)
                    show-invite-people?)
           [:a.qsg-invite-team-2
@@ -190,14 +190,14 @@
              :target "_blank"}
             {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
-            "What’s New"]]
+            "What’s new"]]
         (when (and (not is-mobile?)
                    (jwt/jwt)
                    (= user-role :admin))
           [:a
             {:on-click (partial show-qsg-click s)}
             [:div.oc-menu-item.show-qsg
-              "Quickstart Guide"]])
+              "Quickstart guide"]])
         [:a
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
@@ -207,7 +207,7 @@
           [:a.sign-out
             {:href oc-urls/logout :on-click (partial logout-click s)}
             [:div.oc-menu-item.logout
-              "Sign Out"]]
+              "Sign out"]]
           [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
             [:div.oc-menu-item
-              "Sign In / Sign Up"]])]]))
+              "Sign in / Sign up"]])]]))
