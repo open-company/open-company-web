@@ -9,9 +9,6 @@
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn dismiss-modal []
-  (nav-actions/close-reminders))
-
 (rum/defcs recurring-updates-modal <
   rum/reactive
   (drv/drv :reminders-data)
@@ -25,7 +22,7 @@
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.recurring-updates-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click nav-actions/close-all-panels}]
       [:div.recurring-updates-modal
         [:div.recurring-updates-modal-header
           [:div.recurring-updates-modal-header-title

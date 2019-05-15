@@ -15,9 +15,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn dismiss-modal []
-  (nav-actions/show-user-settings nil))
-
 (defn change! [s k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
   (dis/dispatch! [:input [:edit-user-profile :has-changes] true]))
@@ -29,7 +26,7 @@
           user-data (:user-data edit-user-profile)]
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
-(defn close-clicked [current-user-data]
+(defn close-clicked [current-user-data dismiss-action]
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "user-profile-unsaved-edits"
@@ -40,9 +37,9 @@
                       :solid-button-title "Lose changes"
                       :solid-button-cb (fn []
                                         (alert-modal/hide-alert)
-                                        (dismiss-modal))}]
+                                        (dismiss-action))}]
       (alert-modal/show-alert alert-data))
-    (dismiss-modal)))
+    (dismiss-action)))
 
 (rum/defcs user-notifications-modal <
   rum/reactive
@@ -79,7 +76,7 @@
         slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
     [:div.user-notifications-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-clicked current-user-data)}]
+        {:on-click #(close-clicked current-user-data nav-actions/close-all-panels)}]
       [:div.user-notifications-modal
         [:div.user-notifications-header
           [:div.user-notifications-header-title
@@ -87,7 +84,7 @@
           [:button.mlb-reset.save-bt
             {:on-click #(if (:has-changes current-user-data)
                           (save-clicked s)
-                          (dismiss-modal))
+                          (nav-actions/show-user-settings nil))
              :class (when @(::show-success s) "no-disable")
              :disabled @(::loading s)}
              (when (:loading current-user-data)
@@ -96,7 +93,7 @@
               "Saved!"
               "Save")]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(close-clicked current-user-data)}
+            {:on-click (fn [_] (close-clicked current-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]
         [:div.user-notifications-body
           [:div.user-profile-modal-fields

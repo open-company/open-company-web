@@ -19,7 +19,6 @@
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
@@ -231,10 +230,10 @@
           ;; Mobile create a new section
           show-section-editor
           (section-editor board-data
-           (fn [sec-data note]
+           (fn [sec-data dismiss-action]
             (if sec-data
-              (section-actions/section-save sec-data note #(nav-actions/hide-section-editor))
-              (nav-actions/hide-section-editor))))
+              (section-actions/section-save sec-data nil dismiss-action)
+              (dismiss-action))))
           ;; Mobile edit current section data
           show-section-add
           (section-editor nil show-section-add-cb)

@@ -12,9 +12,6 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
 
-(defn dismiss-modal []
-  (nav-actions/show-org-settings nil))
-
 (rum/defcs integrations-settings-modal <
   ;; Mixins
   rum/reactive
@@ -32,16 +29,16 @@
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.integrations-settings-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click nav-actions/close-all-panels}]
       [:div.integrations-settings
         [:div.integrations-settings-header
           [:div.integrations-settings-header-title
             "Integrations"]
           [:button.mlb-reset.save-bt
-            {:on-click dismiss-modal}
+            {:on-click #(nav-actions/show-org-settings nil)}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click dismiss-modal}
+            {:on-click #(nav-actions/show-org-settings nil)}
             "Back"]]
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})

@@ -15,9 +15,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn dismiss-modal []
-  (nav-actions/close-reminders))
-
 ;; New/Edit reminder
 
 (defn cancel-clicked [reminder-data dismiss-action]
@@ -87,7 +84,7 @@
         self-assignee? (= (jwt/user-id) (:user-id (:assignee reminder-data)))]
     [:div.edit-recurring-update-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click (fn [_] (cancel-clicked reminder-data dismiss-modal))}]
+        {:on-click (fn [_] (cancel-clicked reminder-data nav-actions/close-all-panels))}]
       [:div.edit-recurring-update-modal
         [:div.edit-recurring-update-modal-header
           [:div.edit-recurring-update-modal-header-title

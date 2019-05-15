@@ -13,9 +13,6 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
 
-(defn dismiss-modal []
-  (nav-actions/show-org-settings nil))
-
 (defn user-action [team-id user action method other-link-params remove-cb]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
   (team-actions/user-action team-id user action method other-link-params nil remove-cb))
@@ -72,7 +69,7 @@
         team-roster (:team-roster invite-users-data)]
     [:div.team-management-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click nav-actions/close-all-panels}]
       [:div.team-management
         [:div.team-management-header
           [:div.team-management-header-title
@@ -81,7 +78,7 @@
             {:on-click #(nav-actions/show-org-settings :invite)}
             "Invite"]
           [:button.mlb-reset.cancel-bt
-            {:on-click dismiss-modal}
+            {:on-click #(nav-actions/show-org-settings nil)}
             "Back"]]
         [:div.team-management-body
           [:div.team-management-body-title

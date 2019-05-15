@@ -46,18 +46,32 @@
 
 ;; Push panel
 
-(defn- push-panel [panel]
+(defn- push-panel
+  "Push a panel at the top of the stack."
+  [panel]
   (when (zero? (count (get @dis/app-state :panel-stack [])))
     (dom-utils/lock-page-scroll))
   (dis/dispatch! [:update [:panel-stack] #(vec (conj (or % []) panel))]))
 
-(defn- pop-panel []
+(defn- pop-panel
+  "Pop the panel at the top of stack from it and return it."
+  []
   (let [panel-stack (:panel-stack @dis/app-state)]
     (when (pos? (count panel-stack))
       (dis/dispatch! [:update [:panel-stack] pop]))
     (when (= (count panel-stack) 1)
       (dom-utils/unlock-page-scroll))
     (peek panel-stack)))
+
+(defn close-all-panels
+  "Remove all the panels from the stack and return the stack itself.
+   The return value is never used, but it's being returned to be consistent with
+   the pop-panel function."
+  []
+  (let [panel-stack (:panel-stack @dis/app-state)]
+    (dis/dispatch! [:input [:panel-stack] []])
+    (dom-utils/unlock-page-scroll)
+    panel-stack))
 
 ;; Section settings
 
@@ -69,10 +83,10 @@
 
 (defn show-section-add []
   (dis/dispatch! [:input [:show-section-add-cb]
-   (fn [sec-data note]
+   (fn [sec-data dismiss-action]
      (if sec-data
-       (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-add] false]))
-       (pop-panel)))])
+       (section-actions/section-save sec-data nil dismiss-action)
+       dismiss-action))])
   (push-panel :section-add)
   (close-navigation-sidebar))
 

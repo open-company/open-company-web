@@ -20,10 +20,7 @@
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(defn dismiss-modal []
-  (nav-actions/show-org-settings nil))
-
-(defn close-clicked [s]
+(defn close-clicked [s dismiss-action]
   (let [org-editing @(drv/get-ref s :org-editing)]
     (if (:has-changes org-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
@@ -35,9 +32,9 @@
                         :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
-                                            (dismiss-modal))}]
+                                            (dismiss-action))}]
         (alert-modal/show-alert alert-data))
-      (dismiss-modal))))
+      (dismiss-action))))
 
 (defn form-is-clean? [s]
   (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
@@ -163,7 +160,7 @@
         content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-clicked s)}]
+        {:on-click #(close-clicked s nav-actions/close-all-panels)}]
       [:div.org-settings-modal-container
         [:div.org-settings-header
           [:div.org-settings-header-title
@@ -178,7 +175,7 @@
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(close-clicked s)}
+            {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
             "Back"]]
         [:div.org-settings-body
           [:div.org-settings-header-avatar.qsg-company-logo-3.group

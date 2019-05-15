@@ -19,11 +19,6 @@
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
-;; Dismiss modal
-
-(defn dismiss-modal []
-  (nav-actions/hide-section-editor))
-
 ;; Private section users search helpers
 
 (defn filter-user-by-query
@@ -111,7 +106,7 @@
   (rum/local false ::saving)
   (mixins/on-window-click-mixin (fn [s e]
    (when-not (utils/event-inside? e (rum/dom-node s))
-     (dismiss-modal))))
+     (nav-actions/hide-section-editor))))
   ;; Derivatives
   (drv/drv :qsg)
   (drv/drv :org-data)
@@ -175,7 +170,7 @@
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(on-change nil)}]
+        {:on-click #(on-change nil nav-actions/close-all-panels)}]
       [:div.section-editor.group
         {:on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
@@ -212,7 +207,7 @@
                :class (when disable-bt "disabled")}
               "Save"])
           [:button.mlb-reset.cancel-bt
-            {:on-click #(on-change nil)}
+            {:on-click #(on-change nil nav-actions/hide-section-editor)}
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
@@ -500,7 +495,7 @@
                                                        :expire 10
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
-                                                   (dismiss-modal))})))
+                                                   (nav-actions/hide-section-editor))})))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
