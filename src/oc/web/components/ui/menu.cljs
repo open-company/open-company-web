@@ -19,7 +19,6 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.org-settings :as org-settings]
             [oc.web.components.user-profile :as user-profile]
-            [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
