@@ -1,5 +1,4 @@
 @mixin carrot-fallback($max_logo_height) {
-  position: relative;
   width: #{$max_logo_height}px;
   height: #{$max_logo_height}px;
 
@@ -28,27 +27,30 @@
 @mixin org-avatar($max_logo_height: 42, $show-border: true){
   div.org-avatar-container {
     line-height: 0;
+    position: relative;
+    height: #{$max_logo_height}px;
+    min-width: #{$max_logo_height}px;
 
     &.no-avatar {
       @include mobile() {
         @include carrot-fallback($max_logo_height);
       }
-    }
-
-    &.force-label {
-      img.org-avatar-img {
-        display: inline-block;
-        float: left;
-      }
 
       span.org-name {
-        display: inline-block;
-        float: left;
-        margin: -#{$max_logo_height * 0.87}px 0 0 #{$max_logo_height + 8}px;
+        max-width: calc(14vw + #{$max_logo_height}px + 8px);
+        left: 0;
+
+        @include mobile(){
+          left: 9px;
+        }
       }
     }
 
     img.org-avatar-img{
+      position: absolute;
+      top: 0;
+      left: 0;
+
       @if $show-border == true {
         border: 1px solid $ultra_light_grey;
         padding: 4px;
@@ -65,27 +67,18 @@
     span.org-name {
       @include OC_Body_Bold();
       font-size: 16px;
-      line-height: 22px;
+      line-height: #{$max_logo_height}px;
       color: $deep_navy;
       text-align: left;
       white-space: pre;
       text-overflow: ellipsis;
       overflow: hidden;
-      width: 100%;
-      max-width: 250px;
-
-      &.no-logo {
-        @include mobile(){
-          margin-left: 9px;
-          margin-top: 4px;
-        }
-
-        @include big_web(){
-          margin-top: #{($max_logo_height - 26) / 2}px;
-          margin-left: 0px;
-        }
-
-      }
+      width: auto;
+      max-width: 14vw;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: #{$max_logo_height + 8}px;
     }
   }
 }

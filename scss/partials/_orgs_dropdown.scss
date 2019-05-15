@@ -104,6 +104,13 @@ div.orgs-dropdown {
           div.org-avatar-container {
             width: 120px;
 
+            &.no-avatar {
+              div.org-name {
+                margin-left: 32px !important;
+                margin-top: 6px !important;
+              }
+            }
+
             &.force-label {
               span.org-name {
                 @include OC_Body_Bold();
@@ -119,11 +126,6 @@ div.orgs-dropdown {
                 max-width: 88px;
                 width: auto !important;
                 margin-top: 6px;
-
-                &.no-logo {
-                  margin-left: 32px !important;
-                  margin-top: 6px !important;
-                }
               }
             }
           }

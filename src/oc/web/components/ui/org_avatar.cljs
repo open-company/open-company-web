@@ -21,8 +21,7 @@
          :on-error #(reset! (::img-load-failed s) true)}])
     (when show-org-name?
       [:span.org-name
-        {:class (when-not show-org-avatar? "no-logo")
-         :dangerouslySetInnerHTML (utils/emojify (:name org-data))}])])
+        {:dangerouslySetInnerHTML (utils/emojify (:name org-data))}])])
 
 (rum/defcs org-avatar
   "Org avatar component, params:
