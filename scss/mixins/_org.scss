@@ -53,7 +53,7 @@
 
       @if $show-border == true {
         border: 1px solid $ultra_light_grey;
-        padding: 4px;
+        padding: #{$max_logo_height / 10}px; // Let's use a padding of 1/10
       }
 
       width: #{$max_logo_height}px;
