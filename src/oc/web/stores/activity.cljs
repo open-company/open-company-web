@@ -175,7 +175,7 @@
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
-  (let [change-data (dispatcher/change-cache-data db)
+  (let [change-data (dispatcher/change-data db)
         fixed-activity-data (au/fix-entry activity-data board-data change-data)
         activity-key (dispatcher/activity-key
                       org-slug
@@ -408,13 +408,11 @@
   (let [board-uuid (:board-uuid activity-data)
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
-        section-cache-change-key (vec (concat (dispatcher/change-cache-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread true)
         temp-val (get-in db section-change-key)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
-      (update-in section-cache-change-key #(vec (conj (or % []) activity-uuid)))
       (assoc-in activity-key next-activity-data))))
 
 (defmethod dispatcher/action :mark-read
@@ -422,11 +420,9 @@
   (let [board-uuid (:board-uuid activity-data)
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
-        section-cache-change-key (vec (concat (dispatcher/change-cache-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread false)
         temp-val (get-in db section-change-key)]
     (-> db
       (update-in section-change-key (fn [unreads] (vec (filter #(not= % activity-uuid) (or unreads [])))))
-      (update-in section-cache-change-key (fn [unreads] (vec (filter #(not= % activity-uuid) (or unreads [])))))
       (assoc-in activity-key next-activity-data))))
