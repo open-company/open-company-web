@@ -103,7 +103,6 @@ var OCWebPrintAsciiArt = function(){};
 var OCWebConfigLogLevel = function(){};
 var OCWebPrintRouterPath = function(){};
 var OCWebPrintChangeData = function(){};
-var OCWebPrintChangeCacheData = function(){};
 var OCWebForceRefreshToken = function(){};
 var OCWebPrintFilteredPostsData = function(){};
 var OCWebPrintPostsData = function(){};

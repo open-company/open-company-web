@@ -32,7 +32,7 @@
   "After component is mounted/re-mounted "
   [s]
   (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s :abstract))
+        $item-body (js/$ (rum/ref-node s "activity-body"))
         comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
     (when (or (.hasClass $item-body "ddd-truncated")
               (pos? (count (:attachments activity-data)))
@@ -158,7 +158,8 @@
         (when (and is-published?
                    is-mobile?)
           (more-menu activity-data dom-element-id
-           {:external-share (not is-mobile?)}))]
+           {:external-share (not is-mobile?)
+            :show-unread (not (:unread activity-data))}))]
       [:div.must-see-tag.mobile-only "Must see"]
       [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
@@ -244,4 +245,5 @@
                 (when (and is-published?
                            (not is-mobile?))
                   (more-menu activity-data dom-element-id
-                   {:external-share (not is-mobile?)}))]])]]))
+                   {:external-share (not is-mobile?)
+                    :show-unread (not (:unread activity-data))}))]])]]))

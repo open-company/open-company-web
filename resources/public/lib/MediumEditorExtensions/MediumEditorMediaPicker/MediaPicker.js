@@ -595,7 +595,7 @@ function PlaceCaretAtEnd(el) {
         } else if (opt === 'photo') {
           button.classList.add('media-photo');
           button.classList.add('media-' + idx);
-          this.addButtonTooltip(button, "Add picture");
+          this.addButtonTooltip(button, "Add image");
           this.on(button, 'click', this.photoClick.bind(this));
         } else if (opt === 'video') {
           button.classList.add('media-video');
