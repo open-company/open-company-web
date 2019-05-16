@@ -230,9 +230,9 @@
           ;; Mobile create a new section
           show-section-editor
           (section-editor board-data
-           (fn [sec-data dismiss-action]
+           (fn [sec-data note dismiss-action]
             (if sec-data
-              (section-actions/section-save sec-data nil dismiss-action)
+              (section-actions/section-save sec-data note dismiss-action)
               (dismiss-action))))
           ;; Mobile edit current section data
           show-section-add

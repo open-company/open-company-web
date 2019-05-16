@@ -83,17 +83,17 @@
 
 (defn show-section-add []
   (dis/dispatch! [:input [:show-section-add-cb]
-   (fn [sec-data dismiss-action]
+   (fn [sec-data note dismiss-action]
      (if sec-data
-       (section-actions/section-save sec-data nil dismiss-action)
-       dismiss-action))])
+       (section-actions/section-save sec-data note dismiss-action)
+       (dismiss-action)))])
   (push-panel :section-add)
   (close-navigation-sidebar))
 
 (defn show-section-add-with-callback [callback]
   (dis/dispatch! [:input [:show-section-add-cb]
-   (fn [sec-data note]
-     (callback sec-data note)
+   (fn [sec-data note dismiss-action]
+     (callback sec-data note dismiss-action)
      (dis/dispatch! [:input [:show-section-add-cb] nil])
      (pop-panel))])
   (push-panel :section-add))

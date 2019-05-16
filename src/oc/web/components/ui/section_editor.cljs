@@ -170,7 +170,7 @@
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(on-change nil nav-actions/close-all-panels)}]
+        {:on-click #(on-change nil nil nav-actions/close-all-panels)}]
       [:div.section-editor.group
         {:on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
@@ -200,14 +200,14 @@
                                   personal-note-node (rum/ref-node s "personal-note")
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
-                                                (on-change % personal-note))]
+                                                (on-change % personal-note nav-actions/hide-section-editor))]
                               (when (not @(::editing-existing-section s))
                                 (qsg-actions/finish-add-section-trail))
                               (section-actions/section-save-create section-editing section-name success-cb))))
                :class (when disable-bt "disabled")}
               "Save"])
           [:button.mlb-reset.cancel-bt
-            {:on-click #(on-change nil nav-actions/hide-section-editor)}
+            {:on-click #(on-change nil nil nav-actions/hide-section-editor)}
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
