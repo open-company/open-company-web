@@ -268,7 +268,7 @@ div.cmail-outer {
         position: relative;
 
         &.must-see-on {
-          width: 258px;
+          width: 298px;
         }
 
         div.board-name {
@@ -365,6 +365,7 @@ div.cmail-outer {
               background-position: center;
               background-repeat: no-repeat;
               transition: margin-left 180ms ease-in, background-color 180ms ease-in;
+              box-shadow: 0 2px 2px 0 rgba(0,0,0,0.12);
             }
           }
         }
@@ -392,8 +393,11 @@ div.cmail-outer {
         margin-left: 8px;
 
         &.disabled {
-          opacity: 0.7;
           cursor: not-allowed;
+
+          &:hover {
+            opacity: 1;
+          }
         }
       }
 
@@ -577,7 +581,7 @@ div.cmail-outer {
           height: 26px;
           position: absolute;
           right: 0;
-          top: -30px;
+          top: -38px;
           @include OC_Body_Bold();
           font-size: 12px;
           line-height: 16px;
@@ -607,8 +611,8 @@ div.cmail-outer {
         }
 
         textarea.cmail-content-abstract {
-          @include activity-abstract();
-          height: 18px;
+          @include activity-abstract(18px, 26px);
+          height: 26px;
           width: 100%;
           
           border: none;
@@ -645,9 +649,9 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(16, 22, 22, $deep_navy);
-            font-size: 16px;
-            line-height: 22px;
+            @include activity-body(18, 26, 26, $deep_navy);
+            font-size: 18px;
+            line-height: 26px;
           }
 
           @media screen and (min-height: 556px) {
