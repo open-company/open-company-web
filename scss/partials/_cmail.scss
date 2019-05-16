@@ -69,7 +69,7 @@ div.cmail-outer {
 
       div.cmail-header {
         background-color: #FBFAF9;
-        border-bottom: 1px solid #EEEAE9;
+        border-bottom: 1px solid $ultra_light_grey;
         position: absolute;
         top: 0;
         left: 0;
@@ -94,7 +94,7 @@ div.cmail-outer {
 
         div.fullscreen-bt-container {
           position: absolute;
-          left: 56px;
+          left: 48px;
           top: 12px;
           float: unset;
 
@@ -172,6 +172,7 @@ div.cmail-outer {
               background-repeat: no-repeat;
               opacity: 0.4;
               padding: 0;
+              display: block;
 
               &:hover {
                 opacity: 1;
@@ -652,7 +653,8 @@ div.cmail-outer {
         &:empty:before {
           content: attr(placeholder);
           display: inline-block;
-          color: $light_ui_grey !important;
+          color: $grey_num_1 !important;
+          opacity: 1;
           font-style: none;
           height: 28px;
         }
@@ -708,7 +710,8 @@ div.cmail-outer {
           overflow: hidden;
 
           @include placeholder(){
-            color: #99A0A7;
+            color: $grey_num_1;
+            opacity: 1;
             text-decoration: none;
             text-transform: none;
           }

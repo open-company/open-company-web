@@ -258,7 +258,8 @@ $h2_top_margin: 24;
     @include OC_Body_Book();
     font-size: #{$font-size}px;
     line-height: #{$separator}px;
-    color: $carrot_light_gray_1;
+    color: $grey_num_1;
+    opacity: 1;
     font-style: none !important;
   }
 
