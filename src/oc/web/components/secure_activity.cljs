@@ -89,7 +89,7 @@
                   (user-avatar-image id-token)]]]
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
-                {:on-click #(router/nav! oc-urls/home)}
+                {:on-click #(router/redirect! oc-urls/home)}
                 "learn more about Carrot"]
               [:span.or " or "]
               [:button.mlb-reset.login-bt
@@ -149,8 +149,9 @@
                 [:button.mlb-reset.secure-activity-footer-bt
                   {:on-click #(user-actions/show-login :login-with-email)}
                   "Log in required to access all posts"]
-                [:div.sent-via-carrot
-                  "Sent via Carrot"])]])
+                [:a.sent-via-carrot
+                  {:href oc-urls/home}
+                  "Learn more about Carrot"])]])
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))
