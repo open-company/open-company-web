@@ -109,13 +109,6 @@ div.orgs-dropdown {
           div.org-avatar-container {
             width: 120px;
 
-            &.no-avatar {
-              span.org-name {
-                left: 32px;
-                max-width: 88px;
-              }
-            }
-
             span.org-name {
               @include OC_Body_Bold();
               font-size: 14px;

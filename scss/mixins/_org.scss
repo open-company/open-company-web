@@ -1,30 +1,42 @@
-@mixin carrot-fallback($max_logo_height) {
-  width: #{$max_logo_height}px;
-  height: #{$max_logo_height}px;
+@mixin carrot-fallback($max_logo_height, $show_border) {
 
   &:before {
     content: "";
-    width: #{$max_logo_height * (66 / 119)}px;
-    height: #{$max_logo_height}px;
-    background-image: cdnUrl("/img/ML/carrot_logo.svg");
     background-repeat: no-repeat;
-    background-size: #{$max_logo_height * (66 / 119)}px #{$max_logo_height}px;
+    background-image: cdnUrl("/img/ML/carrot_logo.svg");
     background-position: center;
     position: absolute;
-    top: 0px;
-    left: 3px;
+    width: #{$max_logo_height}px;
+    height: #{$max_logo_height}px;
+    top: 0;
+    left: 0;
+
+    @if $show_border == true {
+      $logo_padding: $max_logo_height / 10;
+      $logo_height: $max_logo_height - ($logo_padding * 2);
+      $logo_width: $logo_height * (66 / 119);
+
+      border: 1px solid $ultra_light_grey;
+      background-size: #{$logo_width}px #{$logo_height}px;
+    } @else {
+      $logo_width: $max_logo_height * (66 / 119);
+
+      background-size: #{$logo_width}px #{$max_logo_height}px;
+    }
   }
 
   img.org-avatar-img {
     display: none;
   }
 
-  span.org-name {
-    display: none !important;
+  @include mobile() {
+    span.org-name {
+      display: none !important;
+    }
   }
 }
 
-@mixin org-avatar($max_logo_height: 42, $show-border: true){
+@mixin org-avatar($max_logo_height: 42, $show_border: true){
   div.org-avatar-container {
     line-height: 0;
     position: relative;
@@ -32,13 +44,9 @@
     min-width: #{$max_logo_height}px;
 
     &.no-avatar {
-      @include mobile() {
-        @include carrot-fallback($max_logo_height);
-      }
+      @include carrot-fallback($max_logo_height, $show_border);
 
       span.org-name {
-        max-width: calc(14vw + #{$max_logo_height}px + 8px);
-        left: 0;
 
         @include mobile(){
           left: 9px;
@@ -51,7 +59,7 @@
       top: 0;
       left: 0;
 
-      @if $show-border == true {
+      @if $show_border == true {
         border: 1px solid $ultra_light_grey;
         padding: #{$max_logo_height / 10}px; // Let's use a padding of 1/10
       }
