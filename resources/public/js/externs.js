@@ -109,6 +109,7 @@ var OCWebPrintUserNotifications = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};
 var OCWebPrintQSGData = function(){};
+var OCWebPrintPanelStack = function(){};
 // Cljs utility externs
 var OCWebUtils = {};
 OCWebUtils.app_state = function(){};

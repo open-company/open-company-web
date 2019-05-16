@@ -744,6 +744,9 @@
 (defn print-qsg-data []
   (:qsg @app-state))
 
+(defn print-panel-stack []
+  (:panel-stack @app-state))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -764,6 +767,7 @@
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
 (set! (.-OCWebPrintQSGData js/window) print-qsg-data)
+(set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:app_state app-state
                                     :deref cljs.core.deref
