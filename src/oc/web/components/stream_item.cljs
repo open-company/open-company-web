@@ -1,9 +1,7 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :refer-macros (sel1)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
+            [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -25,8 +23,7 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
 (defn- check-item-ready
   "After component is mounted/re-mounted "
@@ -121,11 +118,14 @@
                        (activity-actions/activity-edit activity-data)
                        (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
                              stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
-                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)]
+                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
+                             attachments-el (rum/ref-node s :stream-item-attachments)]
                          (when (and ;; More menu wasn't clicked
                                     (not (utils/event-inside? e more-menu-el))
                                     ;; WRT wasn't clicked 
                                     (not (utils/event-inside? e stream-item-wrt-el))
+                                    ;; Attachments wasn't clicked
+                                    (not (utils/event-inside? e attachments-el))
                                     ;; Emoji picker wasn't clicked
                                     (not (utils/event-inside? e emoji-picker))
                                     ;; a button wasn't clicked
@@ -195,7 +195,6 @@
                 "This transcript was automatically generated and may not be accurate"]
               [:div.stream-item-transcript-content
                 (:video-transcript activity-data)]])]
-          (stream-attachments activity-attachments)
           (if is-drafts-board
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
@@ -230,6 +229,21 @@
                         [:button.mlb-reset.post-added-bt
                           {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                           "OK, got it"]]])])
+              (when (seq activity-attachments)
+                [:div.stream-item-attachments
+                  {:ref :stream-item-attachments}
+                  [:div.stream-item-attachments-count
+                    (count activity-attachments) " Attachment" (when (> (count activity-attachments) 1) "s")]
+                  [:div.stream-item-attachments-list
+                    (for [atc activity-attachments]
+                      [:a.stream-item-attachments-item
+                        {:href (:file-url atc)
+                         :target "_blank"}
+                        [:div.stream-item-attachments-item-desc
+                          [:span.file-name
+                            (:file-name atc)]
+                          [:span.file-size
+                            (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])
               [:div.time-since
                 (let [t (or (:published-at activity-data) (:created-at activity-data))]
                   [:time
