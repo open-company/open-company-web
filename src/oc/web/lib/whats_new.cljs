@@ -17,7 +17,7 @@
                      (js/parseInt (.text $el) 10))]
     (if (or (nil? parsed-val)
             (js/isNaN parsed-val)) ;; whatsnew not yet initialized, retry
-      (reset! latest-timeout (utils/after 1000 #(check-whats-new-badge)))
+      (reset! latest-timeout (utils/after 1000 check-whats-new-badge))
       (dis/dispatch! [:input [:show-whats-new-green-dot] (pos? parsed-val)]))))
 
 (defn- initialize
@@ -36,7 +36,7 @@
                             :translations {:title "What's New"
                                            :footer "👉 Show me more new stuff"}})]
         (.init js/Headway headway-config)
-        (reset! latest-timeout (utils/after 1000 #(check-whats-new-badge)))))
+        (reset! latest-timeout (utils/after 1000 check-whats-new-badge))))
     (reset! latest-timeout (utils/after 1000 #(initialize whats-new-selector)))))
 
 (defn init

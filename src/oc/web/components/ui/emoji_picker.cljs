@@ -18,8 +18,9 @@
   (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0))
 
 (defn remove-markers [s]
-  (when @(::caret-pos s)
-    (.removeMarkers js/rangy @(::caret-pos s))))
+  (when-let  [caret-pos @(::caret-pos s)]
+    (when (= (:type caret-pos) "rangy")
+      (.removeMarkers js/rangy (:selection caret-pos)))))
 
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
@@ -32,17 +33,25 @@
 
 (defn save-caret-position [s]
   (remove-markers s)
-  (let [caret-pos (::caret-pos s)]
-    (if (emojiable-active?)
+  (let [caret-pos (::caret-pos s)
+        emojiable-active (emojiable-active?)
+        active-element (.-activeElement js/document)]
+    (if emojiable-active
       (do
-        (reset! (::last-active-element s) (.-activeElement js/document))
-        (reset! caret-pos (.saveSelection js/rangy js/window)))
+        (reset! (::last-active-element s) active-element)
+        (reset! caret-pos
+         (if (#{"TEXTAREA" "INPUT"} (.-tagName active-element))
+           {:type "default" :selection (js/OCStaticTextareaSaveSelection)}
+           {:type "rangy" :selection (.saveSelection js/rangy js/window)})))
       (reset! caret-pos nil))))
 
-(defn replace-with-emoji [caret-pos emoji]
-  (when @caret-pos
-    (.restoreSelection js/rangy @caret-pos)
-    (js/pasteHtmlAtCaret (gobj/get emoji "native") (.getSelection js/rangy js/window) false)))
+(defn replace-with-emoji [s emoji]
+  (when-let [caret-pos @(::caret-pos s)]
+    (if (= (:type caret-pos) "rangy")
+      (do (.restoreSelection js/rangy (:selection caret-pos))
+          (js/pasteHtmlAtCaret (gobj/get emoji "native") (.getSelection js/rangy js/window) false))
+      (do (js/OCStaticTextareaRestoreSelection (:selection caret-pos))
+          (js/pasteTextAtSelection @(::last-active-element s) (gobj/get emoji "native"))))))
 
 (defn check-focus [s _]
   (let [container-selector (or (:container-selector (first (:rum/args s))) "document.body")
@@ -107,7 +116,7 @@
                           ::ff-window-click
                           ::ff-keypress))}
   [s {:keys [add-emoji-cb position width height container-selector force-enabled default-field-selector
-             will-open-picker will-close-picker]
+             will-open-picker will-close-picker tooltip-position]
       :as arg
       :or {position "top"
            width 25
@@ -123,7 +132,7 @@
       [:button.emoji-button.btn-reset
         {:type "button"
          :title "Insert emoji"
-         :data-placement "top"
+         :data-placement (or tooltip-position "top")
          :data-container "body"
          :data-toggle "tooltip"
          :disabled (and (not default-field-selector) (not force-enabled) @(::disabled s))
@@ -152,7 +161,7 @@
                            (save-caret-position s))
                          (let [add-emoji? (boolean @(::caret-pos s))]
                            (when add-emoji?
-                             (replace-with-emoji caret-pos emoji)
+                             (replace-with-emoji s emoji)
                              (remove-markers s)
                              (.focus @last-active-element))
                            (when (fn? will-close-picker)

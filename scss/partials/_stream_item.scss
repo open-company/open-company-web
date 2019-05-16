@@ -23,7 +23,7 @@ div.stream-item {
           border-left: 4px solid #F5F5F5;
         }
 
-        div.stream-item-footer div.menu-container {
+        div.stream-item-header {
           div.more-menu {
             display: block;
           }
@@ -119,8 +119,7 @@ div.stream-item {
   div.activity-share-container {
     div.activity-share-modal-container {
       right: -9px;
-      top: unset;
-      bottom: 6px;
+      margin-top: 32px;
     }
   }
 
@@ -148,6 +147,7 @@ div.stream-item {
         height: 24px;
         float: left;
         max-width: 70%;
+        color: rgba($deep_navy, 0.5);
 
         @include mobile() {
           width: auto;
@@ -162,20 +162,23 @@ div.stream-item {
         }
       }
 
-      div.time-since {
-        float: right;
-        max-width: 30%;
-        height: 24px;
-        line-height: 24px;
-        text-align: right;
-
-        @include mobile() {
-          width: auto;
-        }
-      }
-
       div.must-see-tag {
         margin-top: 2px;
+      }
+    }
+
+    div.more-menu {
+      height: 24px;
+
+      @include big_web() {
+        display: none;
+      }
+
+      @include mobile() {
+        ul.more-menu-list {
+          left: unset;
+          right: 16px;
+        }
       }
     }
   }
@@ -538,18 +541,18 @@ div.stream-item {
         }
       }
 
-      div.menu-container {
-        div.more-menu {
-          @include big_web() {
-            display: none;
-          }
+      div.time-since {
+        float: right;
+        max-width: 30%;
+        height: 24px;
+        line-height: 24px;
+        text-align: right;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: rgba($deep_navy, 0.5);
 
-          @include mobile() {
-            ul.more-menu-list {
-              left: unset;
-              right: 16px;
-            }
-          }
+        @include mobile() {
+          width: auto;
         }
       }
     }

@@ -3,17 +3,18 @@ div.wrt-count-container {
 
   &:hover {
     div.wrt-count.has-read-list {
-      color: $deep_navy;
+      opacity: 1;
     }
   }
 
   div.wrt-count {
     @include OC_Body_Book();
     font-size: 12px;
-    color: $ui_grey;
+    color: $deep_navy;
     cursor: pointer;
     padding-left: 16px;
     position: relative;
+    opacity: 0.5;
 
     &:before {
       content: "";
