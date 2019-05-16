@@ -32,7 +32,7 @@
   "After component is mounted/re-mounted "
   [s]
   (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s :abstract))
+        $item-body (js/$ (rum/ref-node s "activity-body"))
         comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
     (when (or (.hasClass $item-body "ddd-truncated")
               (pos? (count (:attachments activity-data)))
@@ -144,21 +144,12 @@
                (:name publisher)
                " in "
                (:board-name activity-data))]
-            [:div.must-see-tag.big-web-tablet-only "Must see"]]
-          [:div.time-since
-            (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (str "Posted on " (utils/tooltip-date (:published-at activity-data)))}
-                (utils/foc-date-time t)])]]
-        (when (and is-published?
-                   is-mobile?)
+            [:div.must-see-tag.big-web-tablet-only "Must see"]]]
+        [:div.activity-share-container]
+        (when is-published?
           (more-menu activity-data dom-element-id
-           {:external-share (not is-mobile?)}))]
+           {:external-share (not is-mobile?)
+            :show-unread (not (:unread activity-data))}))]
       [:div.must-see-tag.mobile-only "Must see"]
       [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
@@ -239,9 +230,13 @@
                         [:button.mlb-reset.post-added-bt
                           {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                           "OK, got it"]]])])
-              [:div.menu-container
-                [:div.activity-share-container]
-                (when (and is-published?
-                           (not is-mobile?))
-                  (more-menu activity-data dom-element-id
-                   {:external-share (not is-mobile?)}))]])]]))
+              [:div.time-since
+                (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                  [:time
+                    {:date-time t
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-title (str "Posted on " (utils/tooltip-date (:published-at activity-data)))}
+                    (utils/foc-date-time t)])]])]]))

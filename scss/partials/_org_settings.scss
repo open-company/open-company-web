@@ -347,7 +347,7 @@ div.org-settings-tabs {
       margin: 0;
       padding: 0;
       cursor: pointer;
-      @include OC_Body_Black();
+      @include OC_Body_Bold();
       font-size: 13px;
       color: $ui_grey;
       text-decoration: none;

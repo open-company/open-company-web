@@ -230,7 +230,7 @@ div.not-found, div.server-error{
     h1 {
       color: $oc_gray_6;
       font-size: 150px;
-      @include OC_Body_Black();
+      @include OC_Body_Bold();
     }
 
     a.login {
