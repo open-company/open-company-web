@@ -5,9 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.section :as section-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
-            [oc.web.components.ui.section-editor :refer (section-editor)]))
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
 
 (def distance-from-bottom 80)
 
@@ -56,33 +54,15 @@
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.sections-picker.group
       {:style container-style}
-      [:div.sections-picker-header
-        [:div.sections-picker-header-left
-          (if moving?
-            "Move to"
-            "Post to")]
-        [:div.sections-picker-header-right
-          [:button.mlb-reset.add-new-section-bt
-            {:on-click #(section-actions/show-section-add-with-callback on-change)
-             :title "Create a new section"
-             :aria-label "Create a new section"
-             :data-toggle (if is-mobile? "" "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-trigger "hover"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
       [:div.sections-picker-content
         {:style scroller-style}
-        [:div.sections-picker-group
-          (when (pos? (count sorted-all-sections))
-            (for [b sorted-all-sections
-                  :let [active (= (:slug b) active-slug)]]
-              [:div.sections-picker-section.group
-                {:key (str "sections-picker-" (:uuid b))
-                 :class (when active "active")
-                 :on-click #(when (fn? on-change)
-                              (on-change b))}
-                [:div.sections-picker-section-name
-                  [:span.name (:name b)]
-                  [:span.count (str " (" (or (:entry-count b) 0) ")")]]
-                [:div.sections-picker-circle]]))]]]))
+        (when (pos? (count sorted-all-sections))
+          (for [b sorted-all-sections
+                :let [active (= (:slug b) active-slug)]]
+            [:div.sections-picker-section.group
+              {:key (str "sections-picker-" (:uuid b))
+               :class (when active "active")
+               :on-click #(when (fn? on-change)
+                            (on-change b))}
+              [:div.sections-picker-section-name
+                (:name b)]]))]]))
