@@ -472,7 +472,7 @@ div.cmail-outer {
           color: white;
           width: 40px;
           height: 24px;
-          @include OC_Body_Black();
+          @include OC_Body_Bold();
           font-size: 14px;
           float: right;
           margin: 0 2px 0 0 ;

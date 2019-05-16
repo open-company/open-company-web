@@ -220,7 +220,7 @@ div.fsp-picker {
               opacity: 0.9;
               background-color: transparent;
               color: $carrot_dark_gray;
-              @include OC_Body_Black();
+              @include OC_Body_Bold();
 
               &:disabled {
                 cursor: not-allowed;
