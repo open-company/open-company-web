@@ -12,7 +12,7 @@ div.sections-picker {
     overflow-y: auto;
 
     div.sections-picker-section {
-      padding: 16px;
+      padding: 8px 16px;
       cursor: pointer;
 
       @include big_web() {

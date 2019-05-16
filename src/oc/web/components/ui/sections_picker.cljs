@@ -52,14 +52,14 @@
                           {:max-height (str (- @(::container-max-height s) 55) "px")}
                           {})
         is-mobile? (responsive/is-tablet-or-mobile?)]
-    [:div.sections-picker.group
+    [:div.sections-picker
       {:style container-style}
       [:div.sections-picker-content
         {:style scroller-style}
         (when (pos? (count sorted-all-sections))
           (for [b sorted-all-sections
                 :let [active (= (:slug b) active-slug)]]
-            [:div.sections-picker-section.group
+            [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
                :class (when active "active")
                :on-click #(when (fn? on-change)
