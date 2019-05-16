@@ -587,7 +587,7 @@ div.left-navigation-sidebar {
 
       span.compose-green-icon {
         width: 12px;
-        height: 12px;
+        height: 22px;
         background-image: cdnUrl("/img/ML/white_pen.svg");
         background-size: 12px 12px;
         background-position: center;
@@ -597,8 +597,10 @@ div.left-navigation-sidebar {
       span.compose-green-label {
         @include OC_Body_Bold();
         font-size: 16px;
+        line-height: 22px;
         color: white;
         margin-left: 8px;
+        margin-top: 1px;
       }
     }
   }
