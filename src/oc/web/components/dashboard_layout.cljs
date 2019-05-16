@@ -189,6 +189,7 @@
                                            "decisions to keep you and your team pulling in the same direction.")
                     is-second-user (= add-post-tooltip :is-second-user)]
                 (when (and (not is-drafts-board)
+                           (not current-activity-id)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
@@ -220,7 +221,7 @@
                 (zero? (count (:boards org-data)))
                 (empty-org)
                 ;; Expanded post
-                (router/current-activity-id)
+                current-activity-id
                 (expanded-post)
                 ;; Empty board
                 empty-board?
