@@ -47,7 +47,7 @@ div.expanded-post {
 
       ul.more-menu-list {
         top: 24px;
-        height: 118px;
+        bottom: unset;
       }
     }
   }
@@ -97,6 +97,8 @@ div.expanded-post {
     font-size: 18px;
     color: $deep_navy;
     line-height: 24px;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   div.expanded-post-body {
