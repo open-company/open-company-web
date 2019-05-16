@@ -263,7 +263,7 @@ div.onboard-lander {
       height: 15px;
       margin: 12px auto 0;
       text-align: center;
-      @include OC_Body_Black();
+      @include OC_Body_Bold();
       font-size: 11px;
       letter-spacing: 0.42px;
       color: $light_ui_grey;
