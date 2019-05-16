@@ -28,8 +28,11 @@
           [:div.recurring-updates-modal-header-title
             "Recurring updates"]
           [:button.mlb-reset.new-recurring-update-bt
-            {:on-click #(reminder-actions/new-reminder)}
-            "New"]]
+            {:on-click reminder-actions/new-reminder}
+            "New"]
+          [:button.mlb-reset.cancel-bt
+            {:on-click nav-actions/close-reminders}
+            "Back"]]
         [:div.recurring-updates-list
           (for [reminder reminders-list
                 :let [patch-link (utils/link-for (:links reminder) "partial-update")
