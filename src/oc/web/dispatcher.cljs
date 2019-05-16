@@ -110,9 +110,6 @@
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
-(defn change-cache-data-key [org-slug]
-  (vec (conj (org-key org-slug) :change-cache-data)))
-
 (def activities-read-key
   [:activities-read])
 
@@ -240,10 +237,6 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (change-data-key org-slug))))]
-   :change-cache-data   [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when (and base org-slug)
-                              (get-in base (change-cache-data-key org-slug))))]
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
@@ -640,15 +633,6 @@
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
 
-(defn change-cache-data
-  "Get change data."
-  ([]
-    (change-cache-data @app-state))
-  ([data]
-    (change-cache-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (change-cache-data-key org-slug))))
-
 (defun activity-read-data
   "Get the read counts of all the items."
   ([]
@@ -705,9 +689,6 @@
 
 (defn print-activity-read-data []
   (get-in @app-state activities-read-key))
-
-(defn print-change-cache-data []
-  (get-in @app-state (change-cache-data-key (router/current-org-slug))))
 
 (defn print-board-data []
   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug))))
@@ -769,7 +750,6 @@
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
 (set! (.-OCWebPrintActivitiesReadData js/window) print-activity-read-data)
-(set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintContainerData js/window) print-container-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
