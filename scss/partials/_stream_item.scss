@@ -5,6 +5,10 @@ div.stream-item {
   border-top: 1px solid $ultra_light_grey;
   border-left: 4px solid transparent;
 
+  &:last-child {
+    border-bottom: 1px solid $ultra_light_grey;
+  }
+
   &.expandable {
     cursor: pointer;
 
@@ -12,11 +16,6 @@ div.stream-item {
       &:hover {
         background-color: #F5F5F5;
         border-left: 4px solid #F5F5F5;
-        border-top: 1px solid #F5F5F5;
-
-        & + div.stream-item {
-          border-top: 1px solid #F5F5F5;
-        }
 
         div.stream-item-footer div.menu-container {
           div.more-menu {
