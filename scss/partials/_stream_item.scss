@@ -2,7 +2,7 @@ div.stream-item {
   width: #{$board_container_width}px;
   margin: 0;
   padding: 24px 40px;
-  border-bottom: 1px solid $ultra_light_grey;
+  border-top: 1px solid $ultra_light_grey;
   border-left: 4px solid transparent;
 
   &.expandable {
@@ -12,6 +12,11 @@ div.stream-item {
       &:hover {
         background-color: #F5F5F5;
         border-left: 4px solid #F5F5F5;
+        border-top: 1px solid #F5F5F5;
+
+        & + div.stream-item {
+          border-top: 1px solid #F5F5F5;
+        }
 
         div.stream-item-header {
           div.more-menu {
@@ -62,10 +67,12 @@ div.stream-item {
 
     &.must-see-item {
       border-left: 4px solid $sea_blue;
+      margin-top: 2px;
 
       @include big_web(){
         &:hover {
           border-left: 4px solid $sea_blue;
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         }
       }
     }
@@ -329,13 +336,24 @@ div.stream-item {
         }
       }
 
-      div.stream-item-body-container {
+      div.stream-item-body {
+        margin-top: 8px;
+        @include activity-body(18, 24, 24, $deep_navy);
+        color: $deep_navy;
+        @include OC_Body_Book();
+        line-height: 24px;
+        max-height: 72px;
+        overflow: hidden;
 
-        div.stream-item-body {
+        h2 {
+          color: $deep_navy;
+          @include OC_Body_Book();
+          font-size: 18px;
+          line-height: 24px;
+        }
 
-          .carrot-no-preview {
-              display: none;
-          }
+        .carrot-no-preview {
+          display: none;
         }
       }
     }

@@ -99,6 +99,11 @@ div.more-menu {
     padding: 8px 0;
     list-style-type: none;
 
+    &.has-read-unread {
+      left: calc(100% - 166px);
+      width: 120px;
+    }
+
     @include mobile() {
       top: 40px;
       bottom: unset;

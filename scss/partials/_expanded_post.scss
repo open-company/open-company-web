@@ -90,6 +90,16 @@ div.expanded-post {
     }
   }
 
+  div.expanded-post-abstract {
+    margin: 16px 0 24px;
+    @include OC_Body_Bold();
+    font-size: 18px;
+    color: $deep_navy;
+    line-height: 24px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
   div.expanded-post-body {
     @include activity-body(18, 24, 24, $deep_navy);
     margin-top: 16px;

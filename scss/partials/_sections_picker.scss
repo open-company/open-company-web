@@ -15,7 +15,7 @@ div.sections-picker {
 
     div.sections-picker-header-left {
       float: left;
-      @include OC_Body_Black();
+      @include OC_Body_Bold();
       font-size: 13px;
       color: $ui_grey;
       text-transform: uppercase;

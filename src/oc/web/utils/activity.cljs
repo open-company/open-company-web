@@ -120,10 +120,8 @@
   [entry changes]
   (let [board-uuid (:board-uuid entry)
         board-change-data (get changes board-uuid {})
-        board-unread (:unread board-change-data)
-        user-id (jwt/user-id)]
-    (and (utils/in? board-unread (:uuid entry))
-         (not= (:user-id (:publisher entry)) user-id))))
+        board-unread (:unread board-change-data)]
+    (utils/in? board-unread (:uuid entry))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)

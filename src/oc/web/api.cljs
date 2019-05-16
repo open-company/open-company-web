@@ -28,6 +28,8 @@
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
 
+(def ^:private change-endpoint ls/change-server-domain)
+
 (def ^:private search-endpoint ls/search-server-domain)
 
 (def ^:private reminders-endpoint ls/reminder-server-domain)
@@ -187,6 +189,8 @@
 
 (def ^:private interaction-http (partial req interaction-endpoint))
 
+(def ^:private change-http (partial req change-endpoint))
+
 (def ^:private search-http (partial req search-endpoint))
 
 (def ^:private reminders-http (partial req reminders-endpoint))
@@ -209,7 +213,7 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
-(def entry-allowed-keys [:headline :body :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
@@ -332,8 +336,7 @@
   (if board-link
     (storage-http (method-for-link board-link) (relative-href board-link)
       {:headers (headers-for-link board-link)}
-      (fn [{:keys [status body success]}]
-        (callback status body success)))
+      callback)
     (handle-missing-link "get-board" board-link callback)))
 
 (defn patch-board [board-patch-link data note callback]
@@ -837,7 +840,7 @@
     (reminders-http (method-for-link roster-link) (relative-href roster-link)
      {:headers (headers-for-link roster-link)}
      callback)
-    (handle-missing-link "ger-reminders-roster" roster-link callback)))
+    (handle-missing-link "get-reminders-roster" roster-link callback)))
 
 ;; WRT
 
@@ -848,3 +851,13 @@
 (defn request-reads-count [item-ids]
   (when (seq item-ids)
     (ws-cc/who-read-count item-ids)))
+
+;; Change service http
+
+(defn mark-unread [mark-unread-link container-id callback]
+  (if mark-unread-link
+    (change-http (method-for-link mark-unread-link) (relative-href mark-unread-link)
+     {:headers (headers-for-link mark-unread-link)
+      :body container-id}
+     callback)
+    (handle-missing-link "mark-unread" mark-unread-link callback)))

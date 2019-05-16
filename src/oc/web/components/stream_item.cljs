@@ -28,22 +28,11 @@
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
-(defn item-ready [s]
-  (reset! (::item-ready s) true))
-
-(defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
-      (.-innerWidth js/window)))
-
-(defn calc-video-height [s]
-  (when (responsive/is-tablet-or-mobile?)
-    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
-
 (defn- check-item-ready
-  "After component is mounted/re-mounted add ready state and check if the content is truncated"
+  "After component is mounted/re-mounted "
   [s]
   (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s :abstract))
+        $item-body (js/$ (rum/ref-node s "activity-body"))
         comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
     (when (or (.hasClass $item-body "ddd-truncated")
               (pos? (count (:attachments activity-data)))
@@ -53,9 +42,16 @@
       (reset! (::truncated s) true))
     (reset! (::item-ready s) true)))
 
+(defn win-width []
+  (or (.-clientWidth (.-documentElement js/document))
+      (.-innerWidth js/window)))
+
+(defn calc-video-height [s]
+  (when (responsive/is-tablet-or-mobile?)
+    (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
+
 (defn- item-mounted [s]
   (let [activity-data (first (:rum/args s))
-        activity-uuid (:uuid activity-data)
         comments-data @(drv/get-ref s :comments-data)]
     (comment-actions/get-comments-if-needed activity-data comments-data)))
 
@@ -70,7 +66,7 @@
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin "activity-body" (* 24 3))
+                         (am/truncate-element-mixin :abstract (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
@@ -152,7 +148,8 @@
         [:div.activity-share-container]
         (when is-published?
           (more-menu activity-data dom-element-id
-           {:external-share (not is-mobile?)}))]
+           {:external-share (not is-mobile?)
+            :show-unread (not (:unread activity-data))}))]
       [:div.must-see-tag.mobile-only "Must see"]
       [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
@@ -181,13 +178,16 @@
               {:ref "activity-headline"
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            [:div.stream-item-body-container
+            (let [has-abstract (seq (:abstract activity-data))]
               [:div.stream-item-body
-                {:class (utils/class-set {:item-ready @(::item-ready s)
+                {:class (utils/class-set {:no-abstract (not has-abstract)
+                                          :item-ready @(::item-ready s)
                                           :truncated truncated?})
                  :data-itemuuid (:uuid activity-data)
-                 :ref "activity-body"
-                 :dangerouslySetInnerHTML {:__html (:body activity-data)}}]]]
+                 :ref :abstract
+                 :dangerouslySetInnerHTML {:__html (if has-abstract
+                                                     (:abstract activity-data)
+                                                     (:body activity-data))}}])]
           (when (and ls/oc-enable-transcriptions
                      (:video-transcript activity-data))
             [:div.stream-item-transcript

@@ -55,7 +55,7 @@
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :show-section-add)
-                                (drv/drv :change-cache-data)
+                                (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :editable-boards)
                                 (drv/drv :mobile-navigation-sidebar)
@@ -92,7 +92,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        change-data (drv/react s :change-cache-data)
+        change-data (drv/react s :change-data)
         current-user-data (drv/react s :current-user-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
