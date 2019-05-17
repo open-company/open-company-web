@@ -6,7 +6,7 @@
 
 (defn routing [route-path]
   (dis/dispatch! [:routing route-path])
-  (dis/dispatch! [:container/status (dis/change-cache-data) true]))
+  (dis/dispatch! [:container/status (dis/change-data) true]))
 
 (defn maybe-404 []
   (if (jwt/jwt)

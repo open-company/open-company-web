@@ -21,7 +21,7 @@ div.org-settings {
         table.org-settings-table.org-settings-team-table {
           thead tr {
             th {
-              @include OC_Body_Black();
+              @include OC_Body_Bold();
               font-size: 13px;
               color: $ui_grey;
             }

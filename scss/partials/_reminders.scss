@@ -128,7 +128,7 @@ div.reminders-container {
 
         div.reminders-header-tab {
           position: relative;
-          @include OC_Body_Black();
+          @include OC_Body_Bold();
           font-size: 13px;
           color: $ui_grey;
           text-transform: uppercase;

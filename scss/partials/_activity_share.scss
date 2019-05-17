@@ -110,7 +110,7 @@ div.activity-share-modal-container {
 
       div.activity-share-medium-selector {
         height: 33px;
-        @include OC_Body_Black();
+        @include OC_Body_Bold();
         font-size: 13px;
         line-height: 24px;
         text-align: left;

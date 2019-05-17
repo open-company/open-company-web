@@ -357,9 +357,9 @@ div.left-navigation-sidebar {
 
     div.drafts-icon {
       background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-      background-size: 16px 14px;
+      background-size: 12px 16px;
       background-repeat: no-repeat;
-      background-position: center 6px;
+      background-position: center 3px;
       width: 16px;
       height: 23px;
       float: left;
@@ -587,7 +587,7 @@ div.left-navigation-sidebar {
 
       span.compose-green-icon {
         width: 12px;
-        height: 12px;
+        height: 22px;
         background-image: cdnUrl("/img/ML/white_pen.svg");
         background-size: 12px 12px;
         background-position: center;
@@ -597,8 +597,10 @@ div.left-navigation-sidebar {
       span.compose-green-label {
         @include OC_Body_Bold();
         font-size: 16px;
+        line-height: 22px;
         color: white;
         margin-left: 8px;
+        margin-top: 1px;
       }
     }
   }

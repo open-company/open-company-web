@@ -20,24 +20,26 @@
                                                 (reset! (::showing-media-video-modal s) false)
                                                 (start-video-recording-cb %))
                             :dismiss-cb #(reset! (::showing-media-video-modal s) false)})])
-    [:button.mlb-reset.multi-picker-choice.choice-images
-      {:on-click #(add-photo-cb %)
-       :data-toggle "tooltip"
-       :data-placement "top"
-       :data-container "body"
-       :title "Insert image"}
-      [:div.multi-picker-choice-icon]]
-    [:button.mlb-reset.multi-picker-choice.choice-media
-      {:on-click #(do
-                   (add-video-cb %)
-                   (reset! (::showing-media-video-modal s) true))
-       :ref :video-button
-       :data-toggle "tooltip"
-       :data-placement "top"
-       :data-container "body"
-       :title "Embed video"
-       :class (when @(::showing-media-video-modal s) "active")}
-      [:div.multi-picker-choice-icon]]
+    (when (fn? add-photo-cb)
+      [:button.mlb-reset.multi-picker-choice.choice-images
+        {:on-click #(add-photo-cb %)
+         :data-toggle "tooltip"
+         :data-placement "top"
+         :data-container "body"
+         :title "Insert image"}
+        [:div.multi-picker-choice-icon]])
+    (when (fn? add-video-cb)
+      [:button.mlb-reset.multi-picker-choice.choice-media
+        {:on-click #(do
+                     (add-video-cb %)
+                     (reset! (::showing-media-video-modal s) true))
+         :ref :video-button
+         :data-toggle "tooltip"
+         :data-placement "top"
+         :data-container "body"
+         :title "Embed video"
+         :class (when @(::showing-media-video-modal s) "active")}
+        [:div.multi-picker-choice-icon]])
     [:button.mlb-reset.multi-picker-choice.choice-attachment
       {:on-click #(add-attachment-cb %)
        :data-toggle "tooltip"

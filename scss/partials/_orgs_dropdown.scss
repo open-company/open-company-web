@@ -12,6 +12,10 @@ div.orgs-dropdown {
     margin: 0;
     @include org-avatar(32);
 
+    div.org-avatar {
+      height: 32px;
+    }
+
     &.dropdown-toggle{
 
       div.org-avatar {

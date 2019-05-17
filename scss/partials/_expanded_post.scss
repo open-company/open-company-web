@@ -44,11 +44,6 @@ div.expanded-post {
 
     div.more-menu {
       float: right;
-
-      ul.more-menu-list {
-        top: 24px;
-        height: 118px;
-      }
     }
   }
 
@@ -86,9 +81,19 @@ div.expanded-post {
     div.expanded-post-author-inner {
       @include OC_Body_Book();
       font-size: 12px;
-      color: rgba($light_navy, 0.5);
+      color: rgba($deep_navy, 0.5);
       line-height: 24px;
     }
+  }
+
+  div.expanded-post-abstract {
+    margin: 16px 0 24px;
+    @include OC_Body_Bold();
+    font-size: 18px;
+    color: $deep_navy;
+    line-height: 24px;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   div.expanded-post-body {

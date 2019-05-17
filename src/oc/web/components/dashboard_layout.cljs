@@ -14,6 +14,7 @@
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.all-posts :refer (all-posts)]
@@ -153,7 +154,7 @@
                            :on-click #(do
                                         (when (:show-section-settings-tooltip qsg-data)
                                           (qsg-actions/dismiss-section-settings-tooltip))
-                                        (dis/dispatch! [:input [:show-section-editor] true]))}]
+                                        (nav-actions/show-section-editor))}]
                       (when (:show-section-settings-tooltip qsg-data)
                         [:div.section-settings-tooltip-container.group
                           [:div.section-settings-tooltip-top-arrow]
@@ -188,6 +189,7 @@
                                            "decisions to keep you and your team pulling in the same direction.")
                     is-second-user (= add-post-tooltip :is-second-user)]
                 (when (and (not is-drafts-board)
+                           (not current-activity-id)
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
@@ -219,7 +221,7 @@
                 (zero? (count (:boards org-data)))
                 (empty-org)
                 ;; Expanded post
-                (router/current-activity-id)
+                current-activity-id
                 (expanded-post)
                 ;; Empty board
                 empty-board?

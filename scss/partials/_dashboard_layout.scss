@@ -192,7 +192,6 @@ div.dashboard-layout {
         padding: 0px 0px 8px;
         position: relative;
         height: 40px;
-        border-bottom: 1px solid #EEEAE9;
 
         @include mobile() {
           display: none;
@@ -310,7 +309,6 @@ div.dashboard-layout {
               background-color: transparent;
               width: 48px;
               height: 25px;
-              opacity: 0.8;
               padding: 0 0 0 16px;
               margin: 0 0 0 16px;
               position: relative;
@@ -340,10 +338,6 @@ div.dashboard-layout {
 
                 // Remove to show settings button on mobile
                 display: none;
-              }
-
-              &:hover {
-                opacity: 1;
               }
             }
 

@@ -77,6 +77,7 @@
   interactable-images-mixin
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
+    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
     (load-comments s)
     s)
    :did-remount (fn [_ s]
@@ -122,7 +123,8 @@
             back-to-label]]
         (more-menu activity-data dom-element-id
          {:external-share (not is-mobile?)
-          :tooltip-position "bottom"})]
+          :tooltip-position "bottom"
+          :show-unread true})]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
@@ -132,8 +134,7 @@
                           :height (:height video-size)
                           :lazy (not video-player-show)
                           :video-image (:video-image activity-data)
-                          :video-processed (:video-processed activity-data)
-                          :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})])
+                          :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
         (:headline activity-data)]
       [:div.expanded-post-author
@@ -142,6 +143,9 @@
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+      (when (seq (:abstract activity-data))
+        [:div.expanded-post-abstract
+          (:abstract activity-data)])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]

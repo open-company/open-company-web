@@ -2,7 +2,7 @@ div.stream-item {
   width: #{$board_container_width}px;
   margin: 0;
   padding: 24px 40px;
-  border-bottom: 1px solid $ultra_light_grey;
+  border-top: 1px solid $ultra_light_grey;
   border-left: 4px solid transparent;
 
   &.expandable {
@@ -12,8 +12,13 @@ div.stream-item {
       &:hover {
         background-color: #F5F5F5;
         border-left: 4px solid #F5F5F5;
+        border-top: 1px solid #F5F5F5;
 
-        div.stream-item-footer div.menu-container {
+        & + div.stream-item {
+          border-top: 1px solid #F5F5F5;
+        }
+
+        div.stream-item-header {
           div.more-menu {
             display: block;
           }
@@ -62,10 +67,12 @@ div.stream-item {
 
     &.must-see-item {
       border-left: 4px solid $sea_blue;
+      margin-top: 2px;
 
       @include big_web(){
         &:hover {
           border-left: 4px solid $sea_blue;
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         }
       }
     }
@@ -88,8 +95,7 @@ div.stream-item {
   div.activity-share-container {
     div.activity-share-modal-container {
       right: -9px;
-      top: unset;
-      bottom: 6px;
+      margin-top: 32px;
     }
   }
 
@@ -117,6 +123,7 @@ div.stream-item {
         height: 24px;
         float: left;
         max-width: 70%;
+        color: rgba($deep_navy, 0.5);
 
         @include mobile() {
           width: auto;
@@ -131,20 +138,23 @@ div.stream-item {
         }
       }
 
-      div.time-since {
-        float: right;
-        max-width: 30%;
-        height: 24px;
-        line-height: 24px;
-        text-align: right;
-
-        @include mobile() {
-          width: auto;
-        }
-      }
-
       div.must-see-tag {
         margin-top: 2px;
+      }
+    }
+
+    div.more-menu {
+      height: 24px;
+
+      @include big_web() {
+        display: none;
+      }
+
+      @include mobile() {
+        ul.more-menu-list {
+          left: unset;
+          right: 16px;
+        }
       }
     }
   }
@@ -326,13 +336,24 @@ div.stream-item {
         }
       }
 
-      div.stream-item-body-container {
+      div.stream-item-body {
+        margin-top: 8px;
+        @include activity-body(18, 24, 24, $deep_navy);
+        color: $deep_navy;
+        @include OC_Body_Book();
+        line-height: 24px;
+        max-height: 72px;
+        overflow: hidden;
 
-        div.stream-item-body {
+        h2 {
+          color: $deep_navy;
+          @include OC_Body_Book();
+          font-size: 18px;
+          line-height: 24px;
+        }
 
-          .carrot-no-preview {
-              display: none;
-          }
+        .carrot-no-preview {
+          display: none;
         }
       }
     }
@@ -496,18 +517,18 @@ div.stream-item {
         }
       }
 
-      div.menu-container {
-        div.more-menu {
-          @include big_web() {
-            display: none;
-          }
+      div.time-since {
+        float: right;
+        max-width: 30%;
+        height: 24px;
+        line-height: 24px;
+        text-align: right;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: rgba($deep_navy, 0.5);
 
-          @include mobile() {
-            ul.more-menu-list {
-              left: unset;
-              right: 16px;
-            }
-          }
+        @include mobile() {
+          width: auto;
         }
       }
     }

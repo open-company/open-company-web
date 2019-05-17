@@ -5,6 +5,7 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -13,22 +14,85 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
-            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [goog.dom :as gdom]
+            [goog.Uri :as guri]
+            [goog.object :as gobj]
+            [clojure.contrib.humanize :refer (filesize)]))
+
+;; Attachments handling
+
+(defn media-attachment-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s]
+  (when-not @(::media-attachment-did-success s)
+    (reset! (::media-attachment s) false)))
+
+(defn attachment-upload-failed-cb [state]
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "attachment-upload-error"
+                    :title "Sorry!"
+                    :message "An error occurred with your file."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)
+    (utils/after 10 #(do
+                       (reset! (::media-attachment-did-success state) false)
+                       (media-attachment-dismiss-picker state)))))
+
+(defn attachment-upload-success-cb [state res]
+  (reset! (::media-attachment-did-success state) true)
+  (let [url (gobj/get res "url")]
+    (if-not url
+      (attachment-upload-failed-cb state)
+      (let [size (gobj/get res "size")
+            mimetype (gobj/get res "mimetype")
+            filename (gobj/get res "filename")
+            createdat (utils/js-date)
+            prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+            subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+            icon (au/icon-for-mimetype mimetype)
+            attachment-data {:file-name filename
+                             :file-type mimetype
+                             :file-size size
+                             :file-url url}]
+        (reset! (::media-attachment state) false)
+        (activity-actions/add-attachment :cmail-data attachment-data)
+        (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
+
+(defn attachment-upload-error-cb [state res error]
+  (attachment-upload-failed-cb state))
+
+(defn add-attachment [s]
+  (reset! (::media-attachment s) true)
+  (iu/upload!
+   nil
+   (partial attachment-upload-success-cb s)
+   nil
+   (partial attachment-upload-error-cb s)
+   (fn []
+     (utils/after 400 #(media-attachment-dismiss-picker s)))))
+
+;; Data handling
+
+(def abstract-show-counter-from 200)
+
+(defn- body-element []
+  (sel1 [:div.rich-body-editor]))
 
 (defn- cleaned-body []
-  (let [body-el (sel1 [:div.rich-body-editor])]
-    (when body-el
-      (utils/clean-body-html (.-innerHTML body-el)))))
+  (when-let [body-el (body-element)]
+    (utils/clean-body-html (.-innerHTML body-el))))
 
 (defn real-close []
   (activity-actions/cmail-hide))
@@ -88,6 +152,11 @@
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})]))))
 
+(defn- abstract-on-change [state]
+  (let [abstract (rum/ref-node state "abstract")]
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.-value abstract)
+                                                     :has-changes true})])))
+
 ;; Headline setup and paste handler
 
 (defn- setup-headline [state]
@@ -113,6 +182,7 @@
 
 (defn add-emoji-cb [s]
   (headline-on-change s)
+  (abstract-on-change s)
   (body-on-change s))
 
 (defn- clean-body [s]
@@ -126,6 +196,9 @@
 
 (defn- fix-headline [cmail-data]
   (utils/trim (:headline cmail-data)))
+
+(defn- fix-abstract [cmail-data]
+  (utils/trim (:abstract cmail-data)))
 
 (defn- is-publishable? [s cmail-data]
   (and (seq (:board-slug cmail-data))
@@ -172,9 +245,10 @@
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         fixed-headline (fix-headline cmail-data)
+        fixed-abstract (fix-abstract cmail-data)
         published? (= (:status cmail-data) "published")]
       (if (is-publishable? s cmail-data)
-        (let [_ (dis/dispatch! [:input [:cmail-data :headline] fixed-headline])
+        (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline :abstract fixed-abstract})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
           (qsg-actions/finish-create-post-trail)
@@ -278,6 +352,7 @@
                    (rum/local true ::show-placeholder)
                    (rum/local nil ::initial-uuid)
                    (rum/local nil ::headline-input-listener)
+                   (rum/local nil ::abstract-input-listener)
                    (rum/local nil ::uploading-media)
                    (rum/local false ::saving)
                    (rum/local false ::publishing)
@@ -289,8 +364,12 @@
                    (rum/local false ::video-picking-cover)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
+                   (rum/local false ::abstract-focused)
+                   (rum/local false ::media-attachment-did-success)
+                   (rum/local nil ::media-attachment)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
+                   (mixins/autoresize-textarea "abstract")
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -311,11 +390,12 @@
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
-                    (when-let [headline-el (rum/ref-node s "headline")]
-                      (utils/to-end-of-content-editable headline-el))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                     (when ls/oc-enable-transcriptions
                       (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
+                    (utils/after 500
+                     #(when-let [body-el (body-element)]
+                        (utils/to-end-of-content-editable body-el)))
                     s)
                    :did-remount (fn [_ s]
                     (when ls/oc-enable-transcriptions
@@ -369,6 +449,9 @@
                     (when @(::headline-input-listener s)
                       (events/unlistenByKey @(::headline-input-listener s))
                       (reset! (::headline-input-listener s) nil))
+                    (when @(::abstract-input-listener s)
+                      (events/unlistenByKey @(::abstract-input-listener s))
+                      (reset! (::abstract-input-listener s) nil))
                     (remove-autosave s)
                     s)}
   [s]
@@ -389,51 +472,13 @@
         working? (or (and published?
                           @(::saving s))
                      (and (not published?)
-                          @(::publishing s)))]
+                          @(::publishing s)))
+        is-fullscreen? (:fullscreen cmail-state)]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen (:fullscreen cmail-state)
+      {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :showing-qsg (:visible qsg-data)})}
       [:div.cmail-container
         [:div.cmail-header
-          (when (and (not= (:status cmail-data) "published")
-                     is-mobile?)
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.mobile-saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.mobile-saving-saved "Saved"])))
-          [:div.board-name
-            {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
-                          (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-             :class (when show-sections-picker "open")}
-            [:div.board-name-inner
-              (:board-name cmail-data)]]
-          (when show-sections-picker
-            [:div.section-picker-container
-              {:ref :picker-container}
-              (sections-picker (:board-slug cmail-data)
-               (fn [board-data note]
-                 (dis/dispatch! [:input [:show-sections-picker] false])
-                 (when (and board-data
-                            (seq (:name board-data)))
-                  (dis/dispatch! [:input [:cmail-data]
-                   (merge cmail-data {:board-slug (:slug board-data)
-                                      :board-name (:name board-data)
-                                      :has-changes true
-                                      :invite-note note})]))))])
-          [:div.must-see-toggle-container
-            {:class (when (:must-see cmail-data) "on")}
-            [:div.must-see-toggle
-              {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title "Must See"}
-              [:span.must-see-toggle-circle]]]
-          (when (:must-see cmail-data)
-            [:div.must-see-tag
-              "Must see"])
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
               {:class (when long-tooltip "long-tooltip")}
@@ -453,8 +498,7 @@
                                   (qsg-actions/turn-on-show-guide)
                                   (activity-actions/cmail-hide))))
                  :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "top"
-                 :data-trigger "hover"
+                 :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title (if long-tooltip
                           "Save & Close"
@@ -463,12 +507,76 @@
             [:button.mlb-reset.fullscreen-bt
               {:on-click #(activity-actions/cmail-toggle-fullscreen)
                :data-toggle "tooltip"
-               :data-placement "top"
-               :data-trigger "hover"
+               :data-placement "auto"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:fullscreen cmail-state)
+               :title (if is-fullscreen?
                         "Shrink"
                         "Expand")}]]
+          [:div.cmail-header-vertical-separator]
+          (when (and (not= (:status cmail-data) "published")
+                     is-mobile?)
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.mobile-saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.mobile-saving-saved "Saved"])))
+          [:div.cmail-header-board-must-see-container.group
+            {:class (when (:must-see cmail-data) "must-see-on")}
+            [:div.board-name
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
+               :class (when show-sections-picker "open")}
+              [:div.board-name-inner
+                (:board-name cmail-data)]]
+            (when show-sections-picker
+              [:div.section-picker-container
+                {:ref :picker-container}
+                (sections-picker (:board-slug cmail-data)
+                 (fn [board-data note dismiss-action]
+                   (dis/dispatch! [:input [:show-sections-picker] false])
+                   (when (and board-data
+                              (seq (:name board-data)))
+                    (dis/dispatch! [:input [:cmail-data]
+                     (merge cmail-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)
+                                        :has-changes true
+                                        :invite-note note})])
+                    (dismiss-action))))])
+            [:div.must-see-toggle-container
+              {:class (when (:must-see cmail-data) "on")}
+              [:div.must-see-toggle
+                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                 :data-toggle "tooltip"
+                 :data-placement "auto"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :title "Must See"}
+                [:span.must-see-toggle-circle]]]
+            (when (:must-see cmail-data)
+              [:div.must-see-tag
+                "Must see"])]
+          (when is-fullscreen?
+            [:div.cmail-header-right-buttons
+              (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                             :width 24
+                             :height 24
+                             :position "bottom"
+                             :tooltip-position "bottom"
+                             :default-field-selector "div.cmail-content div.rich-body-editor"
+                             :container-selector "div.cmail-content"})
+              [:button.mlb-reset.attachment-button
+                {:on-click #(add-attachment s)
+                 :data-toggle "tooltip"
+                 :data-placement "auto"
+                 :data-container "body"
+                 :title "Add attachment"}]
+              [:div.delete-button-container
+                [:button.mlb-reset.delete-button
+                  {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                   :data-toggle "tooltip"
+                   :data-placement "bottom"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                   :on-click #(delete-clicked s % cmail-data)}]]])
           [:button.mlb-reset.post-button
             {:ref "post-btn"
              :on-click #(post-clicked s)
@@ -482,101 +590,125 @@
              :on-click #(post-clicked s)
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
-            (when working?
-              (small-loading))
             (if (= (:status cmail-data) "published")
               "SAVE"
               "POST")]]
-        [:div.cmail-content
-          {:class (when show-edit-tooltip "showing-edit-tooltip")}
-          (when (and is-mobile?
-                     show-edit-tooltip)
-            (edit-tooltip s))
-          ;; Video elements
-          ; FIXME: disable video on mobile for now
-          (when-not is-mobile?
-            (when (and (:fixed-video-id cmail-data)
-                       (not @(::record-video s)))
-              (ziggeo-player {:video-id (:fixed-video-id cmail-data)
-                              :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
-                              :width (:width video-size)
-                              :height (:height video-size)
-                              :video-processed (:video-processed cmail-data)})))
-          ; FIXME: disable video on mobile for now
-          (when-not is-mobile?
-            (when @(::record-video s)
-              (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
-                                :upload-started-cb #(do
-                                                      (activity-actions/uploading-video % :cmail-data)
-                                                      (reset! (::video-picking-cover s) false)
-                                                      (reset! (::video-uploading s) true))
-                                :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
-                                :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
-                                :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
+        [:div.cmail-content-outer
+          [:div.cmail-content
+            {:class (when show-edit-tooltip "showing-edit-tooltip")}
+            (when (and is-mobile?
+                       show-edit-tooltip)
+              (edit-tooltip s))
+            ;; Video elements
+            ; FIXME: disable video on mobile for now
+            (when-not is-mobile?
+              (when (and (:fixed-video-id cmail-data)
+                         (not @(::record-video s)))
+                (ziggeo-player {:video-id (:fixed-video-id cmail-data)
+                                :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
-                                :remove-recorder-cb (fn []
-                                  (when (:video-id cmail-data)
-                                    (activity-actions/remove-video :cmail-data cmail-data))
-                                  (reset! (::record-video s) false))})))
-          ; Headline element
-          [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
-            {:class utils/hide-class
-             :content-editable true
-             :ref "headline"
-             :placeholder utils/default-headline
-             :on-paste    #(headline-on-paste s %)
-             :on-key-down #(headline-on-change s)
-             :on-click    #(headline-on-change s)
-             :on-key-press (fn [e]
-                           (when (= (.-key e) "Enter")
-                             (utils/event-stop e)
-                             (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))
-             :dangerouslySetInnerHTML @(::initial-headline s)}]
-          (rich-body-editor {:on-change (partial body-on-change s)
-                             :use-inline-media-picker false
-                             :multi-picker-container-selector "div#cmail-footer-multi-picker"
-                             :initial-body @(::initial-body s)
-                             :show-placeholder @(::show-placeholder s)
-                             :show-h2 true
-                             :dispatch-input-key :cmail-data
-                             :start-video-recording-cb #(video-record-clicked s)
-                             :upload-progress-cb (fn [is-uploading?]
-                                                   (reset! (::uploading-media s) is-uploading?))
-                             :media-config ["photo" "video"]
-                             :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
-          (when (and ls/oc-enable-transcriptions
-                     (:fixed-video-id cmail-data)
-                     (:video-processed cmail-data))
-            [:div.cmail-data-transcript
-              [:textarea.video-transcript
-                {:ref "transcript-edit"
-                 :on-input #(ui-utils/resize-textarea (.-target %))
-                 :default-value (:video-transcript cmail-data)}]])
-          ; Attachments
-          (stream-attachments (:attachments cmail-data) nil
-           #(activity-actions/remove-attachment :cmail-data %))
-          (when (and (not is-mobile?)
-                     show-edit-tooltip)
-            (edit-tooltip s))]
+                                :video-processed (:video-processed cmail-data)})))
+            ; FIXME: disable video on mobile for now
+            (when-not is-mobile?
+              (when @(::record-video s)
+                (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
+                                  :upload-started-cb #(do
+                                                        (activity-actions/uploading-video % :cmail-data)
+                                                        (reset! (::video-picking-cover s) false)
+                                                        (reset! (::video-uploading s) true))
+                                  :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
+                                  :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
+                                  :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
+                                  :width (:width video-size)
+                                  :height (:height video-size)
+                                  :remove-recorder-cb (fn []
+                                    (when (:video-id cmail-data)
+                                      (activity-actions/remove-video :cmail-data cmail-data))
+                                    (reset! (::record-video s) false))})))
+            ; Headline element
+            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
+              {:class utils/hide-class
+               :content-editable true
+               :ref "headline"
+               :placeholder utils/default-headline
+               :on-paste    #(headline-on-paste s %)
+               :on-key-down #(headline-on-change s)
+               :on-click    #(headline-on-change s)
+               :on-key-press (fn [e]
+                             (when (= (.-key e) "Enter")
+                               (utils/event-stop e)
+                               (utils/to-end-of-content-editable (body-element))))
+               :dangerouslySetInnerHTML @(::initial-headline s)}]
+            ;; Abstract
+            [:div.cmail-content-abstract-container
+              (let [abstract-length (count (or (:abstract cmail-data) ""))
+                    should-show-counter? (and @(::abstract-focused s) (> abstract-length abstract-show-counter-from))]
+                [:div.cmail-content-abstract-counter
+                  {:class (when should-show-counter? "show-counter")}
+                  (str "Character limit " abstract-length "/" utils/max-abstract-length)])
+              [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+                {:class utils/hide-class
+                 :ref "abstract"
+                 :rows 1
+                 :placeholder utils/default-abstract
+                 :value (or (:abstract cmail-data) "")
+                 :max-length utils/max-abstract-length
+                 :on-change #(abstract-on-change s)
+                 :on-focus #(reset! (::abstract-focused s) true)
+                 :on-blur #(reset! (::abstract-focused s) false)
+                 ; :on-click    #(abstract-on-change s)
+                 :on-key-press (fn [e]
+                               (when (= (.-key e) "Enter")
+                                 (utils/event-stop e)
+                                 (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
+            (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker true
+                               :initial-body @(::initial-body s)
+                               :show-placeholder @(::show-placeholder s)
+                               :show-h2 true
+                               :dispatch-input-key :cmail-data
+                               :start-video-recording-cb #(video-record-clicked s)
+                               :upload-progress-cb (fn [is-uploading?]
+                                                     (reset! (::uploading-media s) is-uploading?))
+                               :media-config ["photo" "video"]
+                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
+            (when (and ls/oc-enable-transcriptions
+                       (:fixed-video-id cmail-data)
+                       (:video-processed cmail-data))
+              [:div.cmail-data-transcript
+                [:textarea.video-transcript
+                  {:ref "transcript-edit"
+                   :on-input #(ui-utils/resize-textarea (.-target %))
+                   :default-value (:video-transcript cmail-data)}]])
+            ; Attachments
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))
+            (when (and (not is-mobile?)
+                       show-edit-tooltip)
+              (edit-tooltip s))]]
       [:div.cmail-footer
-        [:div.cmail-footer-multi-picker
-          {:id "cmail-footer-multi-picker"}]
-        (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                       :width 24
-                       :height 24
-                       :position "top"
-                       :default-field-selector "div.cmail-content div.rich-body-editor"
-                       :container-selector "div.cmail-content"})
-        [:div.cmail-footer-right
-          [:div.delete-button-container
-            [:button.mlb-reset.delete-button
-              {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+        (when-not is-fullscreen?
+          [:div.cmail-footer-right
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :on-click #(delete-clicked s % cmail-data)}]]
+            [:button.mlb-reset.attachment-button
+              {:on-click #(add-attachment s)
                :data-toggle "tooltip"
                :data-placement "top"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :on-click #(delete-clicked s % cmail-data)}]]]
+               :data-container "body"
+               :title "Add attachment"}]
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :width 24
+                           :height 24
+                           :position "top"
+                           :default-field-selector "div.cmail-content div.rich-body-editor"
+                           :container-selector "div.cmail-content"})])
         (when (and (not= (:status cmail-data) "published")
                    (not is-mobile?))
           (if (or (:has-changes cmail-data)
