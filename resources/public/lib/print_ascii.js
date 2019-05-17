@@ -1,22 +1,32 @@
 function OCWebHelp(){
-  console.log("OpenCompany Web help:\n" +
-              "OCWebPrintAppState(): print the whole app-state,\n" +
-              "OCWebPrintOrgData(): to print the current org data,\n" +
-              "OCWebPrintTeamData(): to print the current team data,\n" +
-              "OCWebPrintTeamRoster(): to print the current team roster of users,\n" +
-              "OCWebPrintChangeData(): to print the current change data,\n" +
-              "OCWebPrintBoardData(): to print the current board data,\n" +
-              "OCWebPrintActivityData(): to print the current activity data,\n" +
-              "OCWebPrintSecureStoryData(): to print the current story in a secure link,\n" +
-              "OCWebPrintReactionsData(): to print the current activity reactions data,\n" +
-              "OCWebPrintCommentsData(): to print the current activity comments data,\n" +
-              "OCWebPrintActivityCommentsData(): to print the current activity comments data,\n" +
-              "OCWebPrintJWTContents(): to print the content of the JWT.\n" +
-              "OCWebHelp(): print this help,\n" +
-              "OCWebPrintAsciiArt(): print beautiful ASCII art,\n" +
-              "OCWebConfigLogLevel(\"debug\"): to change log level.\n" +
-              "OCWebPrintRouterPath(): to print the current router setup,\n" +
-              "OCWebForceRefreshToken(): force a JWT token refresh with our auth server.")
+  console.log("OpenCompany Web console functions:\n\n" +
+              "OCWebConfigLogLevel(\"debug\"): to change log level\n" +
+              "OCWebForceRefreshToken(): force a JWT token refresh with our auth server\n" +
+              "OCWebPrintActivityCommentsData(): to print the current activity comments data\n" +
+              "OCWebPrintActivityData(): to print the current activity data\n" +
+              "OCWebPrintActivityReadData()\n" +
+              "OCWebPrintAppState(): print the whole app-state\n" +
+              "OCWebPrintAsciiArt(): print beautiful ASCII art\n" +
+              "OCWebPrintBoardData(): to print the current section's data\n" +
+              "OCWebPrintChangeData(): to print the current change data\n" +
+              "OCWebPrintCommentsData(): to print the current activity comments data\n" +
+              "OCWebPrintContainerData()\n" +
+              "OCWebPrintEntryEditingData()\n" +
+              "OCWebPrintFilteredPostsData()\n" +
+              "OCWebPrintJWTContents(): to print the content of the JWT\n" +
+              "OCWebPrintOrgData(): to print the current org data\n" +
+              "OCWebPrintPanelStack(): to print the right side panel state\n" +
+              "OCWebPrintPostsData()\n"+
+              "OCWebPrintQSGData(): to print the quick state guide data\n" +
+              "OCWebPrintReactionsData(): to print the current activity reactiosn data\n" +
+              "OCWebPrintRemindersData()\n" +
+              "OCWebPrintRemindersEditData()\n" +
+              "OCWebPrintRouterPath(): to print the current router setup\n" +
+              "OCWebPrintSecureActivityData()\n" +
+              "OCWebPrintTeamData(): to print the current team data\n" +
+              "OCWebPrintTeamRoster(): to print the current team roster of users\n" +
+              "OCWebPrintUserNotifications()\n\n" +
+              "OCWebHelp(): print this help\n")
 }
 
 function printArt(){
