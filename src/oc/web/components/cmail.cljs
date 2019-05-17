@@ -541,7 +541,8 @@
                                         :board-name (:name board-data)
                                         :has-changes true
                                         :invite-note note})])
-                    (dismiss-action))))])
+                    (when (fn? dismiss-action)
+                      (dismiss-action)))))])
             [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
