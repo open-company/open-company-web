@@ -4,22 +4,14 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
-
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:show-reminders] (or panel :reminders)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:show-reminders] nil]))
 
 (rum/defcs recurring-updates-modal <
   rum/reactive
   (drv/drv :reminders-data)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:did-mount (fn [s]
     (reminder-actions/load-reminders-roster)
     (reminder-actions/load-reminders)
@@ -30,14 +22,17 @@
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.recurring-updates-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click nav-actions/close-all-panels}]
       [:div.recurring-updates-modal
         [:div.recurring-updates-modal-header
           [:div.recurring-updates-modal-header-title
             "Recurring updates"]
           [:button.mlb-reset.new-recurring-update-bt
-            {:on-click #(show-modal :new)}
-            "New"]]
+            {:on-click reminder-actions/new-reminder}
+            "New"]
+          [:button.mlb-reset.cancel-bt
+            {:on-click nav-actions/close-reminders}
+            "Back"]]
         [:div.recurring-updates-list
           (for [reminder reminders-list
                 :let [patch-link (utils/link-for (:links reminder) "partial-update")

@@ -16,7 +16,7 @@ div.secure-activity-container {
     top: 0px;
     width: 100%;
     padding: 12px 16px;
-    border-bottom: 1px solid #eeeae9;
+    border-bottom: 1px solid $ultra_light_grey;
     background-color: inherit;
     text-align: center;
     z-index: 10;
@@ -38,6 +38,7 @@ div.secure-activity-container {
         span.org-name {
           @include OC_Body_Bold();
           font-size: 18px;
+          max-width: calc(50vw - 56px - 32px);
         }
       }
     }
@@ -123,6 +124,7 @@ div.secure-activity-container {
 
     div.activity-content {
       position: relative;
+      min-height: calc(100vh - 201px);
 
       div.ziggeo-player {
         margin-top: 16px;
