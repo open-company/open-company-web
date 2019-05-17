@@ -5,19 +5,13 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]))
-
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :team)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:org-settings] nil]))
 
 (defn user-action [team-id user action method other-link-params remove-cb]
   (.tooltip (js/$ "[data-toggle=\"tooltip\"]") "hide")
@@ -51,8 +45,6 @@
   (rum/local false ::resending-invite)
   (rum/local "" ::query)
   (rum/local #{} ::removing)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:after-render (fn [s]
     (doto (js/$ "[data-toggle=\"tooltip\"]")
      (.tooltip "fixTitle")
@@ -77,16 +69,16 @@
         team-roster (:team-roster invite-users-data)]
     [:div.team-management-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click nav-actions/close-all-panels}]
       [:div.team-management
         [:div.team-management-header
           [:div.team-management-header-title
             "Manage team"]
           [:button.mlb-reset.save-bt
-            {:on-click #(show-modal :invite)}
+            {:on-click #(nav-actions/show-org-settings :invite)}
             "Invite"]
           [:button.mlb-reset.cancel-bt
-            {:on-click dismiss-modal}
+            {:on-click #(nav-actions/show-org-settings nil)}
             "Back"]]
         [:div.team-management-body
           [:div.team-management-body-title

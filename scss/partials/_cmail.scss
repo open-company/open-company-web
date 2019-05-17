@@ -69,7 +69,7 @@ div.cmail-outer {
 
       div.cmail-header {
         background-color: #FBFAF9;
-        border-bottom: 1px solid #EEEAE9;
+        border-bottom: 1px solid $ultra_light_grey;
         position: absolute;
         top: 0;
         left: 0;
@@ -94,7 +94,7 @@ div.cmail-outer {
 
         div.fullscreen-bt-container {
           position: absolute;
-          left: 56px;
+          left: 48px;
           top: 12px;
           float: unset;
 
@@ -144,7 +144,7 @@ div.cmail-outer {
               background-color: $ultra_light_grey;
 
               span.must-see-toggle-circle {
-                background-color: $ui_grey;
+                background-color: $deep_navy;
                 background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
               }
             }
@@ -172,6 +172,7 @@ div.cmail-outer {
               background-repeat: no-repeat;
               opacity: 0.4;
               padding: 0;
+              display: block;
 
               &:hover {
                 opacity: 1;
@@ -454,6 +455,7 @@ div.cmail-outer {
               background-position: center;
               background-repeat: no-repeat;
               transition: margin-left 180ms ease-in, background-color 180ms ease-in;
+              box-shadow: 0 2px 2px 0 rgba(0,0,0,0.12);
             }
           }
         }
@@ -479,8 +481,11 @@ div.cmail-outer {
         margin-left: 8px;
 
         &.disabled {
-          opacity: 0.7;
           cursor: not-allowed;
+
+          &:hover {
+            opacity: 1;
+          }
         }
       }
 
@@ -648,7 +653,8 @@ div.cmail-outer {
         &:empty:before {
           content: attr(placeholder);
           display: inline-block;
-          color: $light_ui_grey !important;
+          color: $grey_num_1 !important;
+          opacity: 1;
           font-style: none;
           height: 28px;
         }
@@ -664,7 +670,7 @@ div.cmail-outer {
           height: 26px;
           position: absolute;
           right: 0;
-          top: -30px;
+          top: -38px;
           @include OC_Body_Bold();
           font-size: 12px;
           line-height: 16px;
@@ -694,8 +700,8 @@ div.cmail-outer {
         }
 
         textarea.cmail-content-abstract {
-          @include activity-abstract();
-          height: 18px;
+          @include activity-abstract(18px, 26px);
+          height: 26px;
           width: 100%;
           
           border: none;
@@ -704,7 +710,8 @@ div.cmail-outer {
           overflow: hidden;
 
           @include placeholder(){
-            color: #99A0A7;
+            color: $grey_num_1;
+            opacity: 1;
             text-decoration: none;
             text-transform: none;
           }
@@ -733,9 +740,9 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(16, 22, 22, $deep_navy);
-            font-size: 16px;
-            line-height: 22px;
+            @include activity-body(18, 26, 26, $deep_navy);
+            font-size: 18px;
+            line-height: 26px;
           }
 
           @media screen and (min-height: 556px) {

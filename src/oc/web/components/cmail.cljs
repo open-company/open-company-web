@@ -532,7 +532,7 @@
               [:div.section-picker-container
                 {:ref :picker-container}
                 (sections-picker (:board-slug cmail-data)
-                 (fn [board-data note]
+                 (fn [board-data note dismiss-action]
                    (dis/dispatch! [:input [:show-sections-picker] false])
                    (when (and board-data
                               (seq (:name board-data)))
@@ -540,7 +540,9 @@
                      (merge cmail-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)
                                         :has-changes true
-                                        :invite-note note})]))))])
+                                        :invite-note note})])
+                    (when (fn? dismiss-action)
+                      (dismiss-action)))))])
             [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle

@@ -5,7 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.section-editor :refer (section-editor)]))
 
@@ -63,7 +63,7 @@
             "Post to")]
         [:div.sections-picker-header-right
           [:button.mlb-reset.add-new-section-bt
-            {:on-click #(section-actions/show-section-add-with-callback on-change)
+            {:on-click #(nav-actions/show-section-add-with-callback on-change)
              :title "Create a new section"
              :aria-label "Create a new section"
              :data-toggle (if is-mobile? "" "tooltip")

@@ -74,7 +74,7 @@
       (login-overlays-handler)
       (when activity-data
         [:div.activity-header.group
-          (org-avatar org-data activity-link (if is-mobile? :never :always) (not is-mobile?))
+          (org-avatar org-data activity-link (if is-mobile? :never :always))
           (if id-token
             [:div.activity-header-right
               [:button.mlb-reset.login-as-bt

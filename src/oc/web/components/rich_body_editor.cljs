@@ -425,10 +425,6 @@
     (when @(::showing-media-video-modal s)
       [:div.video-container
         {:ref :video-container}
-        (media-video-modal {:record-video-cb #(do
-                                                (media-video-add s @(::media-picker-ext s) nil)
-                                                (reset! (::showing-media-video-modal s) false)
-                                                (start-video-recording-cb %))
-                            :dismiss-cb #(do
+        (media-video-modal {:dismiss-cb #(do
                                           (media-video-add s @(::media-picker-ext s) nil)
                                           (reset! (::showing-media-video-modal s) false))})])])

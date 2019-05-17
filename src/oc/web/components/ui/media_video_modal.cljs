@@ -113,11 +113,13 @@
                                (drv/drv :current-user-data)
                                ;; Mixins
                                first-render-mixin
-  [s {:keys [dismiss-modal-cb record-video-cb]}]
+  [s {:keys [dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
         valid-url (valid-video-url? @(::video-url s))]
     [:div.media-video-modal-container
       {:class (when @(::video-url-focused s) "video-url-focused")}
+      [:div.media-video-modal-title
+        "Embed video"]
       [:input.media-video-modal-input
           {:type "text"
            :value @(::video-url s)
@@ -126,15 +128,11 @@
            :on-focus #(reset! (::video-url-focused s) true)
            :on-blur #(when (clojure.string/blank? @(::video-url s))
                        (reset! (::video-url-focused s) false))
-           :placeholder "Paste link from Youtube, Vimeo, or Loom"}]
+           :placeholder "Paste the video link…"}]
       [:button.mlb-reset.embed-video-bt
         {:class (when-not valid-url "disabled")
          :on-click #(when valid-url
                       (video-add-click s))}
         "Embed video"]
-      [:span.middle-or
-        "Or"]
-      [:button.mlb-reset.record-video-bt
-        {:on-click #(record-video-cb %)}
-        [:span.white-video-icon]
-        "Record a video"]]))
+      [:div.media-video-description
+        "Works with Loom, Youtube, and Vimeo"]]))
