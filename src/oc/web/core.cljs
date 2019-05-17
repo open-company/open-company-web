@@ -176,9 +176,6 @@
                       (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
-                        ; :org-settings org-settings
-                        ; :user-settings user-settings
-                        ; :show-reminders reminders
                         :panel-stack panel-stack
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
