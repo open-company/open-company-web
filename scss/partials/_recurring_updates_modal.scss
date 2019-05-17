@@ -58,6 +58,16 @@ div.recurring-updates-modal-container {
         line-height: 18px;
         border-radius: 6px; 
       }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+        margin-right: 8px;
+      }
     }
 
     div.recurring-updates-list {

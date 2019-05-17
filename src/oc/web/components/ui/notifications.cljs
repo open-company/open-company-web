@@ -114,27 +114,12 @@
 (rum/defcs notifications < rum/static
                            rum/reactive
                            (drv/drv :notifications-data)
-                           (drv/drv :expanded-user-menu)
-                           (drv/drv :org-settings)
-                           (drv/drv :user-settings)
-                           (drv/drv :show-reminders)
-                           (drv/drv :show-section-add)
-                           (drv/drv :show-section-editor)
+                           (drv/drv :panel-stack)
   [s]
   (let [notifications-data (drv/react s :notifications-data)
-        expanded-user-menu (drv/react s :expanded-user-menu)
-        org-settings (drv/react s :org-settings)
-        user-settings (drv/react s :user-settings)
-        show-reminders (drv/react s :show-reminders)
-        show-section-editor (drv/react s :show-section-editor)
-        show-section-add (drv/react s :show-section-add)
-        light-theme (or expanded-user-menu
-                        org-settings
-                        user-settings
-                        show-reminders
-                        show-section-editor
-                        show-section-add)]
+        panel-stack (drv/react s :panel-stack)
+        has-open-panel? (pos? (count panel-stack))]
     [:div.notifications
       (for [idx (range (count notifications-data))
             :let [n (nth notifications-data idx)]]
-        (rum/with-key (notification n light-theme) (str "notif-" (:id n))))]))
+        (rum/with-key (notification n has-open-panel?) (str "notif-" (:id n))))]))
