@@ -5,24 +5,18 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.user-type-dropdown :refer (user-type-dropdown)]
             [oc.web.components.ui.slack-users-dropdown :refer (slack-users-dropdown)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :invite)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:org-settings] nil]))
-
-(defn close-clicked [s]
+(defn close-clicked [s dismiss-action]
   (let [invite-users (filterv #(not (:error %)) (:invite-users @(drv/get-ref s :invite-data)))
         has-unsent-invites (and (pos? (count invite-users))
                                 (some #(seq (:user %)) invite-users))]
@@ -36,9 +30,9 @@
                         :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
-                                            (dismiss-modal))}]
+                                            (dismiss-action))}]
         (alert-modal/show-alert alert-data))
-      (dismiss-modal))))
+      (dismiss-action))))
 
 (def default-user-type "email")
 (def default-row-num 1)
@@ -110,8 +104,6 @@
   (rum/local 0 ::sending)
   (rum/local 0 ::initial-sending)
   (rum/local false ::email-focused)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:will-mount (fn [s]
                  (setup-initial-rows s)
                  (nux-actions/dismiss-post-added-tooltip)
@@ -160,7 +152,7 @@
         uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
     [:div.invite-settings-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-clicked s)}]
+        {:on-click #(close-clicked s nav-actions/close-all-panels)}]
       [:div.invite-settings
         [:div.invite-settings-header
           [:div.invite-settings-header-title
@@ -182,7 +174,7 @@
                 send-cta
                 (str send-cta " " valid-users-count " Invite" (when needs-plural "s"))))]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(close-clicked s)}
+            {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
             "Back"]]
         [:div.invite-settings-body
           [:div.invite-via

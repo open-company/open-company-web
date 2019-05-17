@@ -153,23 +153,17 @@
   (timbre/debug "Change status received:" change-data)
   (if change-data
     (let [org-data (dispatcher/org-data db)
-          old-change-data (dispatcher/change-data db)
           current-board-slug (:board (:router-path db))
           current-board-uuid (:uuid (dispatcher/board-data db))
           filtered-change-data (if (= current-board-slug "all-posts")
                                  {} ;; ignore all changes if we are on AP
                                  (into {} (filter (fn [[buid _]](not= buid current-board-uuid)) change-data)))
-          new-change-data (if (or replace-change-data?
-                                  (empty? old-change-data))
-                            change-data
-                            (merge old-change-data filtered-change-data))
-          old-change-cache-data (dispatcher/change-cache-data db)
-          new-change-cache-data (merge old-change-cache-data change-data)
+          old-change-data (dispatcher/change-data db)
+          new-change-data (merge old-change-data change-data)
           next-db (fix-org-section-data db org-data new-change-data)]
       (timbre/debug "Change status data:" new-change-data)
       (-> next-db
         (fix-posts-new-label new-change-data)
-        (assoc-in (dispatcher/change-cache-data-key (:slug org-data)) new-change-cache-data)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 
@@ -188,12 +182,8 @@
   (let [item-id (:item-id change-data)
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
-        change-cache-key (dispatcher/change-cache-data-key org-slug)
-        old-change-data (get-in db change-key)
-        old-change-cache-data (get-in db change-cache-key)]
-    (-> db
-      (assoc-in change-key (update-unseen-remove old-change-data item-id container-id change-data))
-      (assoc-in change-key (update-unseen-remove old-change-cache-data item-id container-id change-data)))))
+        old-change-data (get-in db change-key)]
+    (assoc-in db change-key (update-unseen-remove old-change-data item-id container-id change-data))))
 
 (defn update-unseen-add [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
@@ -210,12 +200,8 @@
   (let [item-id (:item-id change-data)
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
-        change-cache-key (dispatcher/change-cache-data-key org-slug)
-        old-change-data (get-in db change-key)
-        old-change-cache-data (get-in db change-cache-key)]
-    (-> db
-     (assoc-in change-key (update-unseen-add old-change-data item-id container-id change-data))
-     (assoc-in change-cache-key (update-unseen-add old-change-cache-data item-id container-id change-data)))))
+        old-change-data (get-in db change-key)]
+    (assoc-in db change-key (update-unseen-add old-change-data item-id container-id change-data))))
 
 ;; Section store specific reducers
 (defmethod reducer :default [db payload]

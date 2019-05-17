@@ -17,16 +17,11 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.org-settings :as org-settings]
-            [oc.web.components.user-profile :as user-profile]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn menu-toggle []
-  (dis/dispatch! [:update [:expanded-user-menu] not]))
-
 (defn menu-close [& [s]]
-  (dis/dispatch! [:input [:expanded-user-menu] false]))
+  (nav-actions/menu-close))
 
 (defn logout-click [s e]
   (.preventDefault e)
@@ -36,39 +31,31 @@
 (defn user-profile-click [s e]
   (.preventDefault e)
   (qsg-actions/next-profile-photo-trail)
-  (if (responsive/is-tablet-or-mobile?)
-    (user-profile/show-modal :profile)
-    (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :profile)))
-  (menu-close s))
+  (nav-actions/show-user-settings :profile))
 
 (defn notifications-settings-click [s e]
   (.preventDefault e)
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(user-profile/show-modal :notifications)))
+  (nav-actions/show-user-settings :notifications))
 
 (defn team-settings-click [s e qsg-data]
   (.preventDefault e)
   (when (= (:step qsg-data) :company-logo-2)
     (qsg-actions/next-company-logo-trail))
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :main)))
+  (nav-actions/show-org-settings :org))
 
 (defn manage-team-click [s e]
   (.preventDefault e)
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :team)))
+  (nav-actions/show-org-settings :team))
 
 (defn invite-team-click [s e  qsg-data]
   (.preventDefault e)
   (when (= (:step qsg-data) :invite-team-2)
     (qsg-actions/finish-invite-team-trail))
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :invite)))
+  (nav-actions/show-org-settings :invite))
 
 (defn integrations-click [s e]
   (.preventDefault e)
-  (menu-close s)
-  (utils/after (+ utils/oc-animation-duration 100) #(org-settings/show-modal :integrations)))
+  (nav-actions/show-org-settings :integrations))
 
 (defn sign-in-sign-up-click [s e]
   (menu-close s)
@@ -88,7 +75,6 @@
   (.preventDefault e)
   (when (= (:step qsg-data) :create-reminder-2)
     (qsg-actions/finish-create-reminder-trail))
-  (menu-close s)
   (nav-actions/show-reminders))
 
 (rum/defcs menu < rum/reactive
@@ -102,12 +88,13 @@
    (whats-new/check-whats-new-badge)
     s)}
   [s]
-  (let [{:keys [expanded-user-menu org-data board-data]} (drv/react s :navbar-data)
+  (let [{:keys [panel-stack org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
         qsg-data (drv/react s :qsg)
         show-reminders? (utils/link-for (:links org-data) "reminders")
+        expanded-user-menu (= (last panel-stack) :menu)
         org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
@@ -136,7 +123,7 @@
             (when (= (:step qsg-data) :profile-photo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.personal-profile
-              "My Profile"]])
+              "My profile"]])
         (when (jwt/jwt)
           [:a
             {:href "#"
@@ -164,7 +151,7 @@
             (when (= (:step qsg-data) :company-logo-2)
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.digest-settings
-              "Admin Settings"]])
+              "Admin settings"]])
         (when (and (not is-mobile?)
                    show-invite-people?)
           [:a.qsg-invite-team-2
@@ -200,16 +187,16 @@
           (if is-mobile?
             {:href "https://whats-new.carrot.io/"
              :target "_blank"}
-            {:on-click (partial whats-new-click s)})
+            {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
-            "What’s New"]]
+            "What’s new"]]
         (when (and (not is-mobile?)
                    (jwt/jwt)
                    (= user-role :admin))
           [:a
             {:on-click (partial show-qsg-click s)}
             [:div.oc-menu-item.show-qsg
-              "Quickstart Guide"]])
+              "Quickstart guide"]])
         [:a
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
@@ -219,7 +206,7 @@
           [:a.sign-out
             {:href oc-urls/logout :on-click (partial logout-click s)}
             [:div.oc-menu-item.logout
-              "Sign Out"]]
+              "Sign out"]]
           [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
             [:div.oc-menu-item
-              "Sign In / Sign Up"]])]]))
+              "Sign in / Sign up"]])]]))

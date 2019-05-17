@@ -66,9 +66,6 @@
 (defn- ap-seen-mixin-cb [_ item-uuid]
   (activity-actions/ap-seen-events-gate item-uuid))
 
-(defn- wrt-stream-item-mixin-cb [_ item-uuid]
-  (activity-actions/wrt-events-gate item-uuid))
-
 (defn- sorted-posts [posts]
   (activity-utils/get-sorted-activities posts))
 
@@ -118,8 +115,6 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
-                        (mixins/wrt-stream-item-mixin "div.stream-item-body.item-ready.no-abstract:not(.truncated)"
-                         wrt-stream-item-mixin-cb)
                         section-mixins/container-nav-in
 
                         {:will-mount (fn [s]

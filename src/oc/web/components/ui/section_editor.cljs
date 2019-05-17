@@ -10,20 +10,14 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
-            [oc.web.components.org-settings :as org-settings]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
-
-;; Dismiss modal
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:show-section-editor] false])
-  (dis/dispatch! [:input [:show-section-add] false]))
 
 ;; Private section users search helpers
 
@@ -110,11 +104,9 @@
   (rum/local false ::pre-flight-ok)
   (rum/local nil ::section-name-check-timeout)
   (rum/local false ::saving)
-  ;; Mixins
-  mixins/no-scroll-mixin
   (mixins/on-window-click-mixin (fn [s e]
    (when-not (utils/event-inside? e (rum/dom-node s))
-     (dismiss-modal))))
+     (nav-actions/hide-section-editor))))
   ;; Derivatives
   (drv/drv :qsg)
   (drv/drv :org-data)
@@ -178,7 +170,7 @@
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(on-change nil)}]
+        {:on-click #(on-change nil nil nav-actions/close-all-panels)}]
       [:div.section-editor.group
         {:on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
@@ -208,14 +200,14 @@
                                   personal-note-node (rum/ref-node s "personal-note")
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
-                                                (on-change % personal-note))]
+                                                (on-change % personal-note nav-actions/hide-section-editor))]
                               (when (not @(::editing-existing-section s))
                                 (qsg-actions/finish-add-section-trail))
                               (section-actions/section-save-create section-editing section-name success-cb))))
                :class (when disable-bt "disabled")}
               "Save"])
           [:button.mlb-reset.cancel-bt
-            {:on-click #(on-change nil)}
+            {:on-click #(on-change nil nil nav-actions/hide-section-editor)}
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
@@ -314,7 +306,7 @@
                        (pos? (count slack-users))
                        (pos? (count slack-orgs)))
               [:div.section-editor-enable-slack-bot.group
-                "Automatically share posts to Slack?"
+                "Automatically share posts to Slack? "
                 [:button.mlb-reset.enable-slack-bot-bt
                   {:on-click (fn [_]
                                (org-actions/bot-auth team-data cur-user-data (router/get-token)))}
@@ -363,7 +355,7 @@
                           [:div.name
                             "Looks like you'll need to invite more people to your team before you can add them. You can do that in "
                             [:a
-                              {:on-click #(org-settings/show-modal :invite)}
+                              {:on-click #(nav-actions/show-org-settings :invite)}
                               "Carrot team settings"]
                             "."]])])])))
           (when (and (= (:access section-editing) "private")
@@ -503,7 +495,7 @@
                                                        :expire 10
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
-                                                   (dismiss-modal))})))
+                                                   (nav-actions/hide-section-editor))})))
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
