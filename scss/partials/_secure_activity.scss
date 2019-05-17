@@ -38,6 +38,7 @@ div.secure-activity-container {
         span.org-name {
           @include OC_Body_Bold();
           font-size: 18px;
+          max-width: calc(50vw - 56px - 32px);
         }
       }
     }
@@ -123,6 +124,7 @@ div.secure-activity-container {
 
     div.activity-content {
       position: relative;
+      min-height: calc(100vh - 201px);
 
       div.ziggeo-player {
         margin-top: 16px;
