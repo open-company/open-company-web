@@ -500,6 +500,7 @@ div.stream-item {
           border: 1px solid $mid_light_grey;
           padding: 8px 0;
           display: none;
+          z-index: 2;
 
           a.stream-item-attachments-item {
             padding: 8px 16px;
