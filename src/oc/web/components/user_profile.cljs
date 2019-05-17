@@ -94,7 +94,7 @@
                           (drv/drv :org-data)
                           (drv/drv :alert-modal)
                           (drv/drv :edit-user-profile)
-                          (drv/drv :user-settings)
+                          (drv/drv :current-panel)
                           (drv/drv :edit-user-profile-avatar)
                           (drv/drv :qsg)
                           ;; Locals
@@ -118,7 +118,7 @@
   [s]
   (let [user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
-        tab (drv/react s :user-settings)
+        tab (drv/react s :current-panel)
         org-data (drv/react s :org-data)
         edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
@@ -156,12 +156,12 @@
           [:div.user-profile-bottom-line]
           [:div.user-profile-tab-header
             {:class (when (= tab :profile) "active")
-             :on-click #(user-actions/change-user-profile-panel :profile)}
+             :on-click #(nav-actions/show-user-settings :profile)}
             [:a.user-profile-tab-link
               "PERSONAL PROFILE"]]
           [:div.user-profile-tab-header
             {:class (when (= tab :notifications) "active")
-             :on-click #(user-actions/change-user-profile-panel :notifications)}
+             :on-click #(nav-actions/show-user-settings :notifications)}
             [:a.user-profile-tab-link
               "NOTIFICATIONS"]]]
         (if (= tab :notifications)

@@ -5,6 +5,7 @@
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [taoensso.timbre :as timbre]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -13,6 +14,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
+            [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
@@ -22,7 +24,66 @@
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
+            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [goog.dom :as gdom]
+            [goog.Uri :as guri]
+            [goog.object :as gobj]
+            [clojure.contrib.humanize :refer (filesize)]))
+
+;; Attachments handling
+
+(defn media-attachment-dismiss-picker
+  "Called every time the image picke close, reset to inital state."
+  [s]
+  (when-not @(::media-attachment-did-success s)
+    (reset! (::media-attachment s) false)))
+
+(defn attachment-upload-failed-cb [state]
+  (let [alert-data {:icon "/img/ML/error_icon.png"
+                    :action "attachment-upload-error"
+                    :title "Sorry!"
+                    :message "An error occurred with your file."
+                    :solid-button-title "OK"
+                    :solid-button-cb #(alert-modal/hide-alert)}]
+    (alert-modal/show-alert alert-data)
+    (utils/after 10 #(do
+                       (reset! (::media-attachment-did-success state) false)
+                       (media-attachment-dismiss-picker state)))))
+
+(defn attachment-upload-success-cb [state res]
+  (reset! (::media-attachment-did-success state) true)
+  (let [url (gobj/get res "url")]
+    (if-not url
+      (attachment-upload-failed-cb state)
+      (let [size (gobj/get res "size")
+            mimetype (gobj/get res "mimetype")
+            filename (gobj/get res "filename")
+            createdat (utils/js-date)
+            prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+            subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+            icon (au/icon-for-mimetype mimetype)
+            attachment-data {:file-name filename
+                             :file-type mimetype
+                             :file-size size
+                             :file-url url}]
+        (reset! (::media-attachment state) false)
+        (activity-actions/add-attachment :cmail-data attachment-data)
+        (utils/after 1000 #(reset! (::media-attachment-did-success state) false))))))
+
+(defn attachment-upload-error-cb [state res error]
+  (attachment-upload-failed-cb state))
+
+(defn add-attachment [s]
+  (reset! (::media-attachment s) true)
+  (iu/upload!
+   nil
+   (partial attachment-upload-success-cb s)
+   nil
+   (partial attachment-upload-error-cb s)
+   (fn []
+     (utils/after 400 #(media-attachment-dismiss-picker s)))))
+
+;; Data handling
 
 (def abstract-show-counter-from 200)
 
@@ -304,6 +365,8 @@
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
                    (rum/local false ::abstract-focused)
+                   (rum/local false ::media-attachment-did-success)
+                   (rum/local nil ::media-attachment)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
@@ -409,9 +472,10 @@
         working? (or (and published?
                           @(::saving s))
                      (and (not published?)
-                          @(::publishing s)))]
+                          @(::publishing s)))
+        is-fullscreen? (:fullscreen cmail-state)]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen (:fullscreen cmail-state)
+      {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :showing-qsg (:visible qsg-data)})}
       [:div.cmail-container
         [:div.cmail-header
@@ -434,8 +498,7 @@
                                   (qsg-actions/turn-on-show-guide)
                                   (activity-actions/cmail-hide))))
                  :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "top"
-                 :data-trigger "hover"
+                 :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title (if long-tooltip
                           "Save & Close"
@@ -444,10 +507,9 @@
             [:button.mlb-reset.fullscreen-bt
               {:on-click #(activity-actions/cmail-toggle-fullscreen)
                :data-toggle "tooltip"
-               :data-placement "top"
-               :data-trigger "hover"
+               :data-placement "auto"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if (:fullscreen cmail-state)
+               :title (if is-fullscreen?
                         "Shrink"
                         "Expand")}]]
           [:div.cmail-header-vertical-separator]
@@ -470,7 +532,7 @@
               [:div.section-picker-container
                 {:ref :picker-container}
                 (sections-picker (:board-slug cmail-data)
-                 (fn [board-data note]
+                 (fn [board-data note dismiss-action]
                    (dis/dispatch! [:input [:show-sections-picker] false])
                    (when (and board-data
                               (seq (:name board-data)))
@@ -478,20 +540,43 @@
                      (merge cmail-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)
                                         :has-changes true
-                                        :invite-note note})]))))])
+                                        :invite-note note})])
+                    (dismiss-action))))])
             [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
                 {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
                  :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-trigger "hover"
+                 :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title "Must See"}
                 [:span.must-see-toggle-circle]]]
             (when (:must-see cmail-data)
               [:div.must-see-tag
                 "Must see"])]
+          (when is-fullscreen?
+            [:div.cmail-header-right-buttons
+              (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                             :width 24
+                             :height 24
+                             :position "bottom"
+                             :tooltip-position "bottom"
+                             :default-field-selector "div.cmail-content div.rich-body-editor"
+                             :container-selector "div.cmail-content"})
+              [:button.mlb-reset.attachment-button
+                {:on-click #(add-attachment s)
+                 :data-toggle "tooltip"
+                 :data-placement "auto"
+                 :data-container "body"
+                 :title "Add attachment"}]
+              [:div.delete-button-container
+                [:button.mlb-reset.delete-button
+                  {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                   :data-toggle "tooltip"
+                   :data-placement "bottom"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                   :on-click #(delete-clicked s % cmail-data)}]]])
           [:button.mlb-reset.post-button
             {:ref "post-btn"
              :on-click #(post-clicked s)
@@ -579,7 +664,6 @@
                                  (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
-                               :multi-picker-container-selector "div#cmail-footer-multi-picker"
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
@@ -604,23 +688,27 @@
                        show-edit-tooltip)
               (edit-tooltip s))]]
       [:div.cmail-footer
-        [:div.cmail-footer-multi-picker
-          {:id "cmail-footer-multi-picker"}]
-        (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                       :width 24
-                       :height 24
-                       :position "top"
-                       :default-field-selector "div.cmail-content div.rich-body-editor"
-                       :container-selector "div.cmail-content"})
-        [:div.cmail-footer-right
-          [:div.delete-button-container
-            [:button.mlb-reset.delete-button
-              {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+        (when-not is-fullscreen?
+          [:div.cmail-footer-right
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :on-click #(delete-clicked s % cmail-data)}]]
+            [:button.mlb-reset.attachment-button
+              {:on-click #(add-attachment s)
                :data-toggle "tooltip"
                :data-placement "top"
-               :data-trigger "hover"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :on-click #(delete-clicked s % cmail-data)}]]]
+               :data-container "body"
+               :title "Add attachment"}]
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :width 24
+                           :height 24
+                           :position "top"
+                           :default-field-selector "div.cmail-content div.rich-body-editor"
+                           :container-selector "div.cmail-content"})])
         (when (and (not= (:status cmail-data) "published")
                    (not is-mobile?))
           (if (or (:has-changes cmail-data)

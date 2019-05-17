@@ -57,14 +57,14 @@
   (doseq [section sections
           :when (not (is-currently-shown? section))]
     (api/get-board (utils/link-for (:links section) ["item" "self"] "GET")
-      (fn [status body success]
+      (fn [{:keys [status body success]}]
         (when success
           (section-get-finish (json->cljs body)))))))
 
 (declare refresh-org-data)
 
 (defn section-change
-  [section-uuid]
+  [section-uuid & [finish-cb]]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)]
@@ -73,8 +73,10 @@
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
         (api/get-board (utils/link-for (:links current-section-data) "self")
-                       (fn [status body success]
-                         (when success (section-get-finish (json->cljs body)))))
+                       (fn [{:keys [status body success] :as resp}]
+                         (when success (section-get-finish (json->cljs body)))
+                         (when (fn? finish-cb)
+                           (finish-cb resp))))
         ;; Reload a secondary board data
         (let [sections (:boards (dispatcher/org-data))
               filtered-sections (filter #(= (:uuid %) section-uuid) sections)]
@@ -85,7 +87,7 @@
 (defn section-get
   [link]
   (api/get-board link
-    (fn [status body success]
+    (fn [{:keys [status body success]}]
       (when success (section-get-finish (json->cljs body))))))
 
 (defn section-delete [section-slug & callback]
@@ -255,11 +257,3 @@
        (when-not success
          (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
-
-(defn show-section-add-with-callback [callback]
-  (dispatcher/dispatch! [:input [:show-section-add-cb]
-   (fn [sec-data note]
-     (callback sec-data note)
-     (dispatcher/dispatch! [:input [:show-section-add-cb] nil])
-     (dispatcher/dispatch! [:input [:show-section-add] false]))])
-  (dispatcher/dispatch! [:input [:show-section-add] true]))

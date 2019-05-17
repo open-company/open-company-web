@@ -6,27 +6,12 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notifications-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
-
-(defn show-wrt
-  "Show WRT for the given activity item."
-  [activity-uuid]
-  (dis/dispatch! [:input [:wrt-show] activity-uuid]))
-
-(defn hide-wrt
-  "Hide WRT, if an activity id is passed hide only if
-  that's the current activity we are showing WRT for,
-  user to prevent race conditions with mouse over/enter/leave/click events.
-  If nothing is passed hide WRT for any activity."
-  [& [activity-uuid]]
-  (if activity-uuid
-    (when (= (:wrt-show @dis/app-state) activity-uuid)
-      (dis/dispatch! [:input [:wrt-show] nil]))
-    (dis/dispatch! [:input [:wrt-show] nil])))
 
 (defn- filter-by-query [user query]
   (let [complete-name (or (:name user) (str (:first-name user) " " (:last-name user)))]
@@ -53,13 +38,16 @@
     :unseen "Unopened"))
 
 (rum/defcs wrt < rum/reactive
+                 ;; Derivatives
+                 (drv/drv :wrt-read-data)
+                 (drv/drv :wrt-activity-data)
+                 (drv/drv :current-user-data)
                  ;; Locals
                  (rum/local false ::search-active)
                  (rum/local false ::search-focused)
                  (rum/local "" ::query)
                  (rum/local false ::list-view-dropdown-open)
                  (rum/local :all ::list-view) ;; :seen :unseen
-                 (drv/drv :current-user-data)
 
                  mixins/no-scroll-mixin
 
@@ -70,8 +58,10 @@
                         (.focus (rum/ref-node s :search-field))))
                    s)}
 
-  [s activity-data read-data show-above]
-  (let [item-id (:uuid activity-data)
+  [s]
+  (let [activity-data (drv/react s :wrt-activity-data)
+        read-data (drv/react s :wrt-read-data)
+        item-id (:uuid activity-data)
         seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
         unseen-users (vec (sort-by utils/name-or-email (:unreads read-data)))
@@ -88,20 +78,18 @@
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-popup-container
-       {:on-click hide-wrt}
+       {:on-click nav-actions/hide-wrt}
       [:button.mlb-reset.modal-close-bt
-        {:on-click hide-wrt}]
+        {:on-click nav-actions/hide-wrt}]
       [:div.wrt-popup
-        {:class (utils/class-set {:top show-above
-                                  :loading (not (:reads read-data))})
+        {:class (utils/class-set {:loading (not (:reads read-data))})
          :on-click #(.stopPropagation %)}
         [:div.wrt-popup-header
           [:div.wrt-popup-header-title
             "Who viewed this post"]]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
-          (when is-mobile?
-            (small-loading))
+          (small-loading)
           [:div.wrt-popup-inner
             [:div.wrt-popup-tabs
               [:div.wrt-popup-tabs-select
@@ -193,11 +181,8 @@
          :on-click #(do
                     (when (not (:reads read-data))
                       (activity-actions/request-reads-data item-id))
-                    (show-wrt item-id))
+                    (nav-actions/show-wrt item-id))
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " Viewer" (when (not= read-count 1) "s"))
-          "0 Viewers")]
-      (when (and (not is-mobile?)
-                 (= wrt-show item-id))
-        (wrt activity-data read-data @(::under-middle-screen s)))]))
+          "0 Viewers")]]))

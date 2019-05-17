@@ -7,21 +7,13 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.utils.user :as user-utils]
-            [oc.web.mixins.ui :refer (no-scroll-mixin)]
-            [oc.web.components.org-settings :as org-settings]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
-
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:user-settings] (or panel :notifications)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:user-settings] nil]))
 
 (defn change! [s k v]
   (dis/dispatch! [:input [:edit-user-profile k] v])
@@ -34,7 +26,7 @@
           user-data (:user-data edit-user-profile)]
       (user-actions/user-profile-save current-user-data edit-user-profile))))
 
-(defn close-clicked [current-user-data]
+(defn close-clicked [current-user-data dismiss-action]
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
                       :action "user-profile-unsaved-edits"
@@ -45,9 +37,9 @@
                       :solid-button-title "Lose changes"
                       :solid-button-cb (fn []
                                         (alert-modal/hide-alert)
-                                        (dismiss-modal))}]
+                                        (dismiss-action))}]
       (alert-modal/show-alert alert-data))
-    (dismiss-modal)))
+    (dismiss-action)))
 
 (rum/defcs user-notifications-modal <
   rum/reactive
@@ -59,8 +51,6 @@
   ;; Locals
   (rum/local false ::loading)
   (rum/local false ::show-success)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:after-render (fn [s]
    (when-not (utils/is-test-env?)
      (doto (js/$ "[data-toggle=\"tooltip\"]")
@@ -86,7 +76,7 @@
         slack-enabled? (user-utils/user-has-slack-with-bot? current-user-data bots-data team-roster)]
     [:div.user-notifications-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-clicked current-user-data)}]
+        {:on-click #(close-clicked current-user-data nav-actions/close-all-panels)}]
       [:div.user-notifications-modal
         [:div.user-notifications-header
           [:div.user-notifications-header-title
@@ -94,7 +84,7 @@
           [:button.mlb-reset.save-bt
             {:on-click #(if (:has-changes current-user-data)
                           (save-clicked s)
-                          (dismiss-modal))
+                          (nav-actions/show-user-settings nil))
              :class (when @(::show-success s) "no-disable")
              :disabled @(::loading s)}
              (when (:loading current-user-data)
@@ -103,7 +93,7 @@
               "Saved!"
               "Save")]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(close-clicked current-user-data)}
+            {:on-click (fn [_] (close-clicked current-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]
         [:div.user-notifications-body
           [:div.user-profile-modal-fields

@@ -54,8 +54,7 @@
                                 (drv/drv :qsg)
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                (drv/drv :show-section-add)
-                                (drv/drv :change-cache-data)
+                                (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :editable-boards)
                                 (drv/drv :mobile-navigation-sidebar)
@@ -92,7 +91,7 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        change-data (drv/react s :change-cache-data)
+        change-data (drv/react s :change-data)
         current-user-data (drv/react s :current-user-data)
         mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
@@ -129,10 +128,10 @@
         [:button.btn-reset.mobile-menu.group
           {:on-click #(do
                        (when is-mobile?
-                         (dis/dispatch! [:input [:user-settings] nil])
-                         (dis/dispatch! [:input [:org-settings] nil]))
+                         (nav-actions/show-org-settings nil)
+                         (nav-actions/show-user-settings nil))
                        (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                       (menu/menu-toggle))}
+                       (nav-actions/menu-toggle))}
           (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
@@ -166,7 +165,6 @@
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
-            {:class (when (drv/react s :show-section-add) "show-section-add")}
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:span "Sections"]

@@ -6,7 +6,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
@@ -14,19 +13,14 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :main)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:org-settings] nil]))
-
-(defn close-clicked [s]
+(defn close-clicked [s dismiss-action]
   (let [org-editing @(drv/get-ref s :org-editing)]
     (if (:has-changes org-editing)
       (let [alert-data {:icon "/img/ML/trash.svg"
@@ -38,9 +32,9 @@
                         :solid-button-title "Lose changes"
                         :solid-button-cb #(do
                                             (alert-modal/hide-alert)
-                                            (dismiss-modal))}]
+                                            (dismiss-action))}]
         (alert-modal/show-alert alert-data))
-      (dismiss-modal))))
+      (dismiss-action))))
 
 (defn form-is-clean? [s]
   (let [has-org-edit-changes (:has-changes @(drv/get-ref s :org-editing))
@@ -127,8 +121,6 @@
   ;; Locals
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
       (org-actions/get-org org-data)
@@ -168,7 +160,7 @@
         content-visibility-data (or (:content-visibility org-editing) {})]
     [:div.org-settings-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-clicked s)}]
+        {:on-click #(close-clicked s nav-actions/close-all-panels)}]
       [:div.org-settings-modal-container
         [:div.org-settings-header
           [:div.org-settings-header-title
@@ -183,7 +175,7 @@
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(close-clicked s)}
+            {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
             "Back"]]
         [:div.org-settings-body
           [:div.org-settings-header-avatar.qsg-company-logo-3.group
