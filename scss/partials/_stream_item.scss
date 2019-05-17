@@ -1,9 +1,16 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin: 0;
-  padding: 24px 40px;
   border-top: 1px solid $ultra_light_grey;
-  border-left: 4px solid transparent;
+
+  &:last-child {
+    border-bottom: 1px solid $ultra_light_grey;
+  }
+
+  div.stream-item-inner {
+    border-left: 4px solid transparent;
+    padding: 24px 40px;
+  }
 
   &.expandable {
     cursor: pointer;
@@ -11,11 +18,9 @@ div.stream-item {
     @include big_web() {
       &:hover {
         background-color: #F5F5F5;
-        border-left: 4px solid #F5F5F5;
-        border-top: 1px solid #F5F5F5;
 
-        & + div.stream-item {
-          border-top: 1px solid #F5F5F5;
+        div.stream-item-inner {
+          border-left: 4px solid #F5F5F5;
         }
 
         div.stream-item-header {
@@ -44,10 +49,13 @@ div.stream-item {
 
   @include mobile() {
     width: 100%;
-    padding: 16px;
     margin: 0;
     border: none;
     border-radius: 0;
+
+    div.stream-item-inner {
+      padding: 16px;
+    }
   }
 
   &.draft {
@@ -56,34 +64,50 @@ div.stream-item {
 
   &.unread-item {
     background-color: white;
-    border-left: 4px solid white;
+
+    div.stream-item-inner {
+      border-left: 4px solid white;
+    }
 
     @include big_web(){
       &:hover {
         background-color: white;
-        border-left: 4px solid white;        
+
+        div.stream-item-inner{
+          border-left: 4px solid white;
+        }
       }
     }
 
     &.must-see-item {
-      border-left: 4px solid $sea_blue;
       margin-top: 2px;
+
+      div.stream-item-inner {
+        border-left: 4px solid $sea_blue;
+      }
 
       @include big_web(){
         &:hover {
-          border-left: 4px solid $sea_blue;
           box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+
+          div.stream-item-inner {
+            border-left: 4px solid $sea_blue;
+          }
         }
       }
     }
   }
 
   &.must-see-item {
-    border-left: 4px solid transparent;
+    div.stream-item-inner {
+      border-left: 4px solid transparent;
+    }
 
     @include big_web(){
       &:hover {
-        border-left: 4px solid transparent;
+        div.stream-item-inner {
+          border-left: 4px solid transparent;
+        }
       }
     }
 
