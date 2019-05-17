@@ -3,7 +3,6 @@
             [cuerdas.core :as s]
             [goog.object :as googobj]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
@@ -18,16 +17,10 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:user-settings] (or panel :profile)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:user-settings] nil]))
-
-(defn real-close-cb [editing-user-data & [mobile-back-bt]]
+(defn real-close-cb [editing-user-data dismiss-action mobile-back-bt]
   (when (:has-changes editing-user-data)
     (user-actions/user-profile-reset))
-  (dismiss-modal)
+  (dismiss-action)
   (when mobile-back-bt
     (nav-actions/menu-toggle)))
 
@@ -49,7 +42,7 @@
                                       :container "body"})
         (.tooltip $header-avatar "destroy")))))
 
-(defn close-cb [current-user-data & [mobile-back-bt]]
+(defn close-cb [current-user-data dismiss-action & [mobile-back-bt]]
   (dis/dispatch! [:input [:latest-entry-point] 0])
   (if (:has-changes current-user-data)
     (let [alert-data {:icon "/img/ML/trash.svg"
@@ -61,9 +54,9 @@
                       :solid-button-title "Lose changes"
                       :solid-button-cb #(do
                                           (alert-modal/hide-alert)
-                                          (real-close-cb current-user-data mobile-back-bt))}]
+                                          (real-close-cb current-user-data dismiss-action mobile-back-bt))}]
       (alert-modal/show-alert alert-data))
-    (real-close-cb current-user-data mobile-back-bt)))
+    (real-close-cb current-user-data dismiss-action mobile-back-bt)))
 
 (defn error-cb [res error]
   (notification-actions/show-notification
@@ -136,8 +129,6 @@
   (rum/local false ::email-error)
   (rum/local false ::password-error)
   (rum/local false ::current-password-error)
-  ;; Mixins
-  mixins/no-scroll-mixin
   {:after-render (fn [s]
     (when-not (utils/is-test-env?)
       (doto (js/$ "[data-toggle=\"tooltip\"]")
@@ -162,7 +153,7 @@
         timezones (.names (.-tz js/moment))]
     [:div.user-profile-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click #(close-cb current-user-data)}]
+        {:on-click #(close-cb current-user-data nav-actions/close-all-panels)}]
       [:div.user-profile-modal
         [:div.user-profile-header
           [:div.user-profile-header-title
@@ -171,14 +162,14 @@
             {:on-click #(when-not @(::loading s)
                           (if (:has-changes current-user-data)
                             (save-clicked s)
-                            (dismiss-modal)))
+                            (nav-actions/show-user-settings nil)))
              :class (when @(::show-success s) "no-disable")
              :disabled @(::loading s)}
             (if @(::show-success s)
               "Saved!"
               "Save")]
           [:button.mlb-reset.cancel-bt
-            {:on-click #(close-cb current-user-data)}
+            {:on-click (fn [_] (close-cb current-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]
         [:div.user-profile-body
           [:div.user-profile-avatar.qsg-profile-photo-3
