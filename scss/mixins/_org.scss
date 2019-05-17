@@ -47,18 +47,11 @@
       @include carrot-fallback($max_logo_height, $show_border);
 
       span.org-name {
-
-        @include mobile(){
-          left: 9px;
-        }
+        margin-left: #{$max_logo_height + 8}px;
       }
     }
 
     img.org-avatar-img{
-      position: absolute;
-      top: 0;
-      left: 0;
-
       @if $show_border == true {
         border: 1px solid $ultra_light_grey;
         padding: #{$max_logo_height / 10}px; // Let's use a padding of 1/10
@@ -70,6 +63,7 @@
       border-radius: 4px;
       vertical-align: middle;
       background-color: white;
+      float: left;
     }
 
     span.org-name {
@@ -84,9 +78,8 @@
       width: auto;
       max-width: 14vw;
       display: block;
-      position: absolute;
-      top: 0;
-      left: #{$max_logo_height + 8}px;
+      margin-left: 8px;
+      float: left;
     }
   }
 }
