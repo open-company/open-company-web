@@ -1,7 +1,5 @@
 (ns oc.web.components.stream-comments
   (:require [rum.core :as rum]
-            [cljsjs.emoji-mart]
-            [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
@@ -10,6 +8,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
+            [oc.web.components.reactions :refer (reactions)]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -82,8 +81,8 @@
     (set! (.-scrollTop scrolling-node) (.-scrollHeight scrolling-node))))
 
 (defn emoji-picked-cb [s comment-data emoji]
-  (js/console.log "DBG emoji-picked-cb" emoji (gobj/get emoji "native"))
-  (comment-actions/react-from-picker (first (:rum/args s)) comment-data (gobj/get emoji "native")))
+  (js/console.log "DBG emoji-picked-cb" emoji (get emoji "native"))
+  (comment-actions/react-from-picker (first (:rum/args s)) comment-data (get emoji "native")))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
@@ -159,12 +158,7 @@
                             {:on-click #(do
                                          (reset! (::showing-menu s) false)
                                          (delete-clicked % activity-data comment-data))}
-                            "Delete"])])])
-                (when (:can-react comment-data)
-                  (react-utils/build (.-Picker js/EmojiMart)
-                   {:native true
-                    :onClick (fn [emoji event]
-                               (emoji-picked-cb s comment-data emoji))}))]
+                            "Delete"])])])]
               [:div.stream-comment-content
                 [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
@@ -177,7 +171,7 @@
                                             :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
                                             :editing is-editing?
                                             utils/hide-class true})}]]
-              (when is-editing?
+              (if is-editing?
                 [:div.stream-comment-footer.group
                   [:div.save-cancel-edit-buttons
                     [:button.mlb-reset.mlb-link-green
@@ -187,5 +181,8 @@
                     [:button.mlb-reset.mlb-link-black
                       {:on-click #(cancel-edit % s comment-data)
                        :title "Cancel edit"}
-                      "Cancel"]]])]])]
+                      "Cancel"]]]
+                (when (:can-react comment-data)
+                  [:div.stream-comment-reactions-footer.group
+                    (reactions comment-data false true)]))]])]
       [:div.stream-comments-empty])])

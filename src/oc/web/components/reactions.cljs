@@ -37,7 +37,7 @@
                             (.tooltip "fixTitle")
                             (.tooltip "hide")))
                         s)}
-  [s entry-data hide-last-reaction?]
+  [s entry-data hide-last-reaction? is-comment?]
   (let [reactions-data (if hide-last-reaction?
                          (vec (take (dec default-reaction-number) (:reactions entry-data)))
                          (vec (:reactions entry-data)))
@@ -54,6 +54,9 @@
         [:div.reactions-list
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))
+                  :when (or (not is-comment?)
+                            (and is-comment?
+                                 (> (:count (get reactions-data idx {})) 0)))
                   :let [reaction-data (get reactions-data idx)
                         is-loading (utils/in? reactions-loading (:reaction reaction-data))
                         reacted (:reacted reaction-data)
