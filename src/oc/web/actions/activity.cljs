@@ -13,6 +13,7 @@
             [oc.web.lib.user-cache :as uc]
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
@@ -881,18 +882,12 @@
 (defn- cmail-fullscreen-save [fullscreen?]
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
-(defn- add-no-scroll []
-  (dommy/add-class! (sel1 [:body]) :no-scroll))
-
-(defn- remove-no-scroll []
-  (dommy/remove-class! (sel1 [:body]) :no-scroll))
-
 (defn cmail-show [initial-entry-data & [cmail-state]]
   (let [cmail-default-state {:fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
     (when (:fullscreen cmail-default-state)
-      (add-no-scroll))
+      (dom-utils/lock-page-scroll))
     (when-not (:auto cmail-state)
       (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
@@ -902,15 +897,15 @@
   (cook/remove-cookie! (edit-open-cookie))
   (dis/dispatch! [:input [:cmail-data] nil])
   (dis/dispatch! [:input [:cmail-state] nil])
-  (remove-no-scroll))
+  (dom-utils/unlock-page-scroll))
 
 (defn cmail-toggle-fullscreen []
   (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
     (cmail-fullscreen-save next-fullscreen-value)
     (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])
     (if next-fullscreen-value
-      (add-no-scroll)
-      (remove-no-scroll))))
+      (dom-utils/lock-page-scroll)
+      (dom-utils/unlock-page-scroll))))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))

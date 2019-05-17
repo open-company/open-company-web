@@ -2,6 +2,7 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [clojure.string :as s]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
@@ -18,7 +19,6 @@
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
-            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
@@ -93,26 +93,17 @@
                 container-data
                 posts-data
                 ap-initial-at
-                user-settings
-                org-settings-data
-                show-reminders
                 made-with-carrot-modal-data
                 is-sharing-activity
-                entry-edit-dissmissing
                 is-showing-alert
-                media-input
-                show-section-editor
-                show-section-add
                 show-section-add-cb
-                entry-editing-board-slug
                 mobile-navigation-sidebar
                 activity-share-container
-                expanded-user-menu
                 show-cmail
                 showing-mobile-user-notifications
-                wrt-activity-data
                 wrt-read-data
-                force-login-wall]} (drv/react s :org-dashboard-data)
+                force-login-wall
+                panel-stack]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -171,7 +162,16 @@
                         (not show-activity-removed)
                         loading?)
         is-showing-mobile-search (and is-mobile? search-active?)
-        qsg-data (drv/react s :qsg)]
+        qsg-data (drv/react s :qsg)
+        open-panel (last panel-stack)
+        show-section-editor (= open-panel :section-edit)
+        show-section-add (= open-panel :section-add)
+        show-reminders? (= open-panel :reminders)
+        show-reminder-edit? (and open-panel
+                                 (s/starts-with? (name open-panel) "reminder-"))
+        show-reminders-view? (or show-reminders? show-reminder-edit?)
+        show-wrt-view? (and open-panel
+                            (s/starts-with? (name open-panel) "wrt-"))]
     ;; Show loading if
     (if is-loading
       [:div.org-dashboard
@@ -183,13 +183,13 @@
                                   :activity-removed show-activity-removed
                                   :showing-qsg (:visible qsg-data)
                                   :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)
-                                  :show-menu expanded-user-menu})}
+                                  :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
           ;; User menu
           (and is-mobile?
-               expanded-user-menu)
+               (= open-panel :menu))
           (menu)
           ;; Activity removed
           show-activity-removed
@@ -198,31 +198,31 @@
           show-activity-not-found
           (activity-not-found)
           ;; Org settings
-          (and org-settings-data (= org-settings-data :main))
+          (= open-panel :org)
           (org-settings-modal)
           ;; Integrations settings
-          (and org-settings-data (= org-settings-data :integrations))
+          (= open-panel :integrations)
           (integrations-settings-modal)
           ;; Invite settings
-          (and org-settings-data (= org-settings-data :invite))
+          (= open-panel :invite)
           (invite-settings-modal)
           ;; Team management
-          (and org-settings-data (= org-settings-data :team))
+          (= open-panel :team)
           (team-management-modal)
           ;; Billing
-          org-settings-data
+          (= open-panel :billing)
           (org-settings)
           ;; User settings
-          (and user-settings (= user-settings :profile))
+          (= open-panel :profile)
           (user-profile-modal)
           ;; User notifications
-          (and user-settings (= user-settings :notifications))
+          (= open-panel :notifications)
           (user-notifications-modal)
           ;; Reminders list
-          (and show-reminders (= show-reminders :reminders))
+          show-reminders?
           (recurring-updates-modal)
           ;; Edit a reminder
-          show-reminders
+          show-reminder-edit?
           (edit-recurring-update-modal)
           ;; Made with carrot modal
           made-with-carrot-modal-data
@@ -230,10 +230,10 @@
           ;; Mobile create a new section
           show-section-editor
           (section-editor board-data
-           (fn [sec-data note]
+           (fn [sec-data note dismiss-action]
             (if sec-data
-              (section-actions/section-save sec-data note #(dis/dispatch! [:input [:show-section-editor] false]))
-              (dis/dispatch! [:input [:show-section-editor] false]))))
+              (section-actions/section-save sec-data note dismiss-action)
+              (dismiss-action))))
           ;; Mobile edit current section data
           show-section-add
           (section-editor nil show-section-add-cb)
@@ -241,10 +241,9 @@
           (and is-mobile?
                is-sharing-activity)
           (activity-share)
-          ;; Mobile WRT
-          (and is-mobile?
-               wrt-activity-data)
-          (wrt wrt-activity-data wrt-read-data)
+          ;; WRT
+          show-wrt-view?
+          (wrt)
           ;; Search results
           is-showing-mobile-search
           (search-box)
@@ -270,19 +269,18 @@
         ;; cmail editor
         (when show-cmail
           (cmail))
+        ;; Menu always rendered if not on mobile since we need the
+        ;; selector for whats-new widget to be present
         (when-not is-mobile?
           (menu))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
+        ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
-                  (and ; (router/current-activity-id)
-                       (not is-sharing-activity)
-                       (not show-section-add)
-                       (not show-section-editor)
+                  (and (not is-sharing-activity)
                        (not show-cmail)
-                       (not wrt-activity-data)
-                       (not show-reminders)))
+                       (not open-panel)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
@@ -290,9 +288,7 @@
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
                               (not mobile-navigation-sidebar)
-                              (not org-settings-data)
-                              (not user-settings)
-                              (not expanded-user-menu)
+                              (not open-panel)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]

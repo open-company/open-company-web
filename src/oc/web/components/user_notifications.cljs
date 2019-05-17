@@ -10,8 +10,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.user-notifications-modal :as user-notifications-modal]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn- has-new-content? [notifications-data]
   (some :unread notifications-data))
@@ -55,7 +54,7 @@
             [:button.mlb-reset.notification-settings-bt
               {:on-click #(do
                             (close-tray s)
-                            (user-notifications-modal/show-modal))
+                            (nav-actions/show-user-settings :notifications))
                :data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
                :data-container "body"
@@ -111,14 +110,4 @@
                      :data-title (utils/tooltip-date (:created-at n))}
                     (utils/time-since (:created-at n) [:short])]]
                 [:div.user-notification-body.oc-mentions.oc-mentions-hover
-                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
-                ; (when (:unread n)
-                ;   [:button.mlb-reset.read-bt
-                ;     {:title "Mark as read"
-                ;      :ref :read-bt
-                ;      :data-toggle "tooltip"
-                ;      :data-placement "top"
-                ;      :data-container "body"
-                ;      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                ;      :on-click #(user-actions/read-notification n)}])
-                ]))]]]))
+                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))]]]))
