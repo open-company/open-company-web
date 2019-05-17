@@ -5,18 +5,12 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]))
-
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :integrations)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:org-settings] nil]))
 
 (rum/defcs integrations-settings-modal <
   ;; Mixins
@@ -26,8 +20,6 @@
   (drv/drv :current-user-data)
   ;; Locals
   (rum/local false ::saving)
-  ;; Mixins
-  mixins/no-scroll-mixin
   [s]
   (let [org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)
@@ -37,16 +29,16 @@
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.integrations-settings-modal
       [:button.mlb-reset.modal-close-bt
-        {:on-click dismiss-modal}]
+        {:on-click nav-actions/close-all-panels}]
       [:div.integrations-settings
         [:div.integrations-settings-header
           [:div.integrations-settings-header-title
             "Integrations"]
           [:button.mlb-reset.save-bt
-            {:on-click dismiss-modal}
+            {:on-click #(nav-actions/show-org-settings nil)}
             "Save"]
           [:button.mlb-reset.cancel-bt
-            {:on-click dismiss-modal}
+            {:on-click #(nav-actions/show-org-settings nil)}
             "Back"]]
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})

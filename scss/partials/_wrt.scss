@@ -45,7 +45,7 @@ div.wrt-popup-container {
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
   opacity: 1;
-  transition: opacity 180ms ease-in;
+  cursor: auto;
 
   button.modal-close-bt {
     position: absolute;
@@ -65,12 +65,6 @@ div.wrt-popup-container {
     overflow-x: hidden;
     overflow-y: scroll;
 
-    &.loading{
-      border: 0;
-      height: 0;
-      box-shadow: none;
-    }
-
     div.wrt-popup-header {
       width: calc(100% + 48px);
       height: 56px;
@@ -88,7 +82,7 @@ div.wrt-popup-container {
     }
 
     div.small-loading {
-      margin: 24px;
+      margin: 16px 0;
     }
 
     div.wrt-popup-tabs {
@@ -171,19 +165,6 @@ div.wrt-popup-container {
           height: 24px;
 
           @include user_profile(24);
-
-          // &.seen:after {
-          //   position: absolute;
-          //   width: 12px;
-          //   height: 12px;
-          //   background-image: cdnUrl("/img/ML/green_checkmark.svg");
-          //   background-position: center;
-          //   background-repeat: no-repeat;
-          //   background-size: 12px 12px;
-          //   content: "";
-          //   bottom: 0px;
-          //   right: 0px;
-          // }
         }
 
         $row_right_label_max_width: 110px;
@@ -230,7 +211,8 @@ div.wrt-popup-container {
             }
           }
         }
-
+        // Keeping the empty list placeholder as most probably we will replace it
+        // with something
         // &.empty-list {
         //   text-align: center;
 
@@ -283,21 +265,5 @@ div.wrt-popup-container {
         // }
       }
     }
-  }
-}
-
-/* If WRT is direct child of org-dashboard it means it's for mobile*/
-div.org-dashboard > div.wrt-popup-container div.wrt-popup {
-  display: none;
-
-  @include mobile() {
-    position: fixed;
-    top: 0;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-    display: block;
-    border-radius: 0px;
-    max-height: initial;
   }
 }
