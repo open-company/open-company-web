@@ -88,6 +88,10 @@ div.org-settings-modal {
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
+
+          div.org-avatar-container {
+            display: none;
+          }
         }
 
         @include org-avatar(32);

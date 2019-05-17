@@ -86,7 +86,8 @@
    (fn [sec-data note dismiss-action]
      (if sec-data
        (section-actions/section-save sec-data note dismiss-action)
-       (dismiss-action)))])
+       (when (fn? dismiss-action)
+        (dismiss-action))))])
   (push-panel :section-add)
   (close-navigation-sidebar))
 

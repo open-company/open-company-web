@@ -301,6 +301,7 @@ div.dashboard-layout {
           div.board-settings-container {
             float: left;
             position: relative;
+            height: 32px;
 
             button.board-settings-bt {
               background-image: cdnUrl("/img/ML/section_settings_gear.svg");
@@ -311,7 +312,7 @@ div.dashboard-layout {
               width: 48px;
               height: 25px;
               padding: 0 0 0 16px;
-              margin: 0 0 0 16px;
+              margin: 3px 0 0 16px;
               position: relative;
               border-left: 1px solid $ultra_light_grey;
 
