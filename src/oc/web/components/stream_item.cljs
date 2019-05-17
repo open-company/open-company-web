@@ -167,10 +167,11 @@
                                :video-processed (:video-processed activity-data)
                                :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})]
               (when (:body-thumbnail activity-data)
-                [:div.body-thumbnail
-                  {:class (:type (:body-thumbnail activity-data))
-                   :data-image (:thumbnail (:body-thumbnail activity-data))
-                   :style {:background-image (str "url(\"" (:thumbnail (:body-thumbnail activity-data)) "\")")}}]))
+                [:div.body-thumbnail-wrapper
+                  {:class (:type (:body-thumbnail activity-data))}
+                  [:img.body-thumbnail
+                    {:data-image (:thumbnail (:body-thumbnail activity-data))
+                     :src (:thumbnail (:body-thumbnail activity-data))}]]))
             [:div.stream-body-left.group
               {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
                                         :has-video (:fixed-video-id activity-data)

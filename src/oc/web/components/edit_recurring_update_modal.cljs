@@ -15,12 +15,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:show-reminders] (or panel :new)]))
-
-(defn dismiss-modal []
-  (dis/dispatch! [:input [:show-reminders] nil]))
-
 ;; New/Edit reminder
 
 (defn cancel-clicked [reminder-data dismiss-action]
@@ -66,7 +60,6 @@
   (rum/local false ::frequency-dropdown)
   (rum/local false ::on-dropdown)
   ;; Mixins
-  mixins/no-scroll-mixin
   (mixins/on-window-click-mixin (fn [s e]
     (when (and (not (utils/event-inside? e (rum/ref-node s :frequency-dd-node)))
                (not (utils/event-inside? e (rum/ref-node s :frequency-bt)))
@@ -91,7 +84,7 @@
         self-assignee? (= (jwt/user-id) (:user-id (:assignee reminder-data)))]
     [:div.edit-recurring-update-modal-container
       [:button.mlb-reset.modal-close-bt
-        {:on-click (fn [_] (cancel-clicked reminder-data dismiss-modal))}]
+        {:on-click (fn [_] (cancel-clicked reminder-data nav-actions/close-all-panels))}]
       [:div.edit-recurring-update-modal
         [:div.edit-recurring-update-modal-header
           [:div.edit-recurring-update-modal-header-title
@@ -104,7 +97,7 @@
             [:button.mlb-reset.save-bt
               {:on-click #(when-not save-disabled?
                             (reminder-actions/save-reminder reminder-data)
-                            (show-modal :reminders))
+                            (nav-actions/close-reminders))
                :class (when save-disabled? "disabled")}
               "Save"])
           [:button.mlb-reset.cancel-bt

@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="8px" height="8px" viewBox="0 0 8 8" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+<svg width="10px" height="10px" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <g id="Archiving" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="New-post-(archivable-in-new-post)" transform="translate(-448.000000, -212.000000)" fill="#888D94">
-            <path d="M449.8,214.071459 C449.8,212.927424 450.784974,212 452,212 C453.215026,212 454.2,212.927424 454.2,214.071459 C454.2,214.556933 454.115203,215.301799 453.885447,215.998488 C454.686611,216.304556 456,216.800293 456,217.996194 L456,218.799054 C456,219.241076 454.273975,220 452,220 C449.726025,220 448,219.239568 448,218.799054 L448,217.996194 C448,216.796167 449.314124,216.304986 450.114892,215.999517 C449.88488,215.302533 449.8,214.557172 449.8,214.071459 Z" id="Combined-Shape"></path>
+    <g id="Post-stream" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="FoC:-activity-notifier" transform="translate(-718.000000, -324.000000)" fill="#34414F">
+            <g id="Group-3" transform="translate(620.000000, 316.000000)">
+                <g id="Group-18-Copy-2" transform="translate(44.000000, 0.000000)">
+                    <g id="Group-6">
+                        <path d="M56.25,10.5893243 C56.25,9.15927999 57.4812169,8 59,8 C60.5187831,8 61.75,9.15927999 61.75,10.5893243 C61.75,11.1961664 61.6440039,12.1272483 61.3568094,12.9981097 C62.3582639,13.3806945 64,14.0003662 64,15.4952421 L64,16.4988173 C64,17.0513451 61.8424683,17.9999997 59,18 C56.1575317,18.0000003 54,17.0494601 54,16.4988173 L54,15.4952421 C54,13.9952087 55.642655,13.3812319 56.6436151,12.9993966 C56.3561006,12.1281657 56.25,11.1964653 56.25,10.5893243 Z" id="Combined-Shape"></path>
+                    </g>
+                </g>
+            </g>
         </g>
     </g>
 </svg>
