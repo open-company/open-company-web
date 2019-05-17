@@ -64,12 +64,6 @@ div.wrt-popup-container {
     overflow-x: hidden;
     overflow-y: scroll;
 
-    &.loading{
-      border: 0;
-      height: 0;
-      box-shadow: none;
-    }
-
     div.wrt-popup-header {
       width: calc(100% + 48px);
       height: 56px;
@@ -87,7 +81,7 @@ div.wrt-popup-container {
     }
 
     div.small-loading {
-      margin: 24px;
+      margin: 16px 0;
     }
 
     div.wrt-popup-tabs {

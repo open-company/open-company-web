@@ -13,16 +13,6 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn show-wrt
-  "Show WRT popup panel for the given activity item."
-  [activity-uuid]
-  (nav-actions/show-wrt activity-uuid))
-
-(defn hide-wrt
-  "Hide WRT popup panel"
-  []
-  (nav-actions/hide-wrt))
-
 (defn- filter-by-query [user query]
   (let [complete-name (or (:name user) (str (:first-name user) " " (:last-name user)))]
     (or (string/includes? (string/lower (:email user)) query)
@@ -88,9 +78,9 @@
         sorted-filtered-users (sort-users (:user-id current-user-data) filtered-users)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-popup-container
-       {:on-click hide-wrt}
+       {:on-click nav-actions/hide-wrt}
       [:button.mlb-reset.modal-close-bt
-        {:on-click hide-wrt}]
+        {:on-click nav-actions/hide-wrt}]
       [:div.wrt-popup
         {:class (utils/class-set {:loading (not (:reads read-data))})
          :on-click #(.stopPropagation %)}
@@ -99,8 +89,7 @@
             "Who viewed this post"]]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
-          (when is-mobile?
-            (small-loading))
+          (small-loading)
           [:div.wrt-popup-inner
             [:div.wrt-popup-tabs
               [:div.wrt-popup-tabs-select
@@ -192,7 +181,7 @@
          :on-click #(do
                     (when (not (:reads read-data))
                       (activity-actions/request-reads-data item-id))
-                    (show-wrt item-id))
+                    (nav-actions/show-wrt item-id))
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " Viewer" (when (not= read-count 1) "s"))
