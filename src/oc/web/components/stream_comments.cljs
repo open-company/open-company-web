@@ -1,15 +1,19 @@
 (ns oc.web.components.stream-comments
   (:require [rum.core :as rum]
+            [cljsjs.emoji-mart]
+            [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
+            [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn stop-editing [s]
@@ -76,6 +80,10 @@
 (defn scroll-to-bottom [s]
   (let [scrolling-node (rum/dom-node s)]
     (set! (.-scrollTop scrolling-node) (.-scrollHeight scrolling-node))))
+
+(defn emoji-picked-cb [s comment-data emoji]
+  (js/console.log "DBG emoji-picked-cb" emoji (gobj/get emoji "native"))
+  (comment-actions/react-from-picker (first (:rum/args s)) comment-data (gobj/get emoji "native")))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
@@ -151,7 +159,12 @@
                             {:on-click #(do
                                          (reset! (::showing-menu s) false)
                                          (delete-clicked % activity-data comment-data))}
-                            "Delete"])])])]
+                            "Delete"])])])
+                (when (:can-react comment-data)
+                  (react-utils/build (.-Picker js/EmojiMart)
+                   {:native true
+                    :onClick (fn [emoji event]
+                               (emoji-picked-cb s comment-data emoji))}))]
               [:div.stream-comment-content
                 [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
