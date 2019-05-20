@@ -95,18 +95,13 @@
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
-                             (rum/local false ::show-picker)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              (on-window-click-mixin (fn [s e]
                               (when (and @(::showing-menu s)
                                         (not (utils/event-inside? e
                                               (rum/ref-node s (str "comment-more-menu-" @(::showing-menu s))))))
-                                (reset! (::showing-menu s) false))
-                              (when (and @(::show-picker s)
-                                         (not (utils/event-inside? e
-                                               (.get (js/$ [:div.emoji-mart] (rum/dom-node s)) 0))))
-                                (reset! (::show-picker s) nil))))
+                                (reset! (::showing-menu s) false))))
                              {:after-render (fn [s]
                                (let [activity-uuid (:uuid (first (:rum/args s)))
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
@@ -190,15 +185,5 @@
                       "Cancel"]]]
                 (when (:can-react comment-data)
                   [:div.stream-comment-reactions-footer.group
-                    (reactions comment-data false true)
-                    [:button.mlb-reset.add-reaction-bt
-                      {:on-click #(reset! (::show-picker s) (:uuid comment-data))}
-                      "React"]
-                    (when (= @(::show-picker s) (:uuid comment-data))
-                      (react-utils/build (.-Picker js/EmojiMart)
-                       {:native true
-                        :onClick (fn [emoji event]
-                                   (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-                                     (comment-actions/react-from-picker activity-data comment-data (gobj/get emoji "native")))
-                                   (reset! (::show-picker s) false))}))]))]])]
+                    (reactions comment-data false activity-data)]))]])]
       [:div.stream-comments-empty])])

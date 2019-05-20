@@ -7,6 +7,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.utils.reaction :as reaction-utils]
+            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.reaction :as reaction-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [cljsjs.react]
@@ -26,14 +27,16 @@
                             (.tooltip "fixTitle")
                             (.tooltip "hide")))
                         s)}
-  [s entry-data hide-last-reaction? never-show-picker-button?]
+  [s entity-data hide-last-reaction? optional-activity-data]
+  ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
+  ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
+  ;; entity-data is the activity-data
   (let [reactions-data (if hide-last-reaction?
-                         (vec (take (dec default-reaction-number) (:reactions entry-data)))
-                         (vec (:reactions entry-data)))
-        reactions-loading (:reactions-loading entry-data)
-        react-link (utils/link-for (:links entry-data) "react")
-        should-show-picker? (and (not never-show-picker-button?)
-                                 (not hide-last-reaction?)
+                         (vec (take (dec default-reaction-number) (:reactions entity-data)))
+                         (vec (:reactions entity-data)))
+        reactions-loading (:reactions-loading entity-data)
+        react-link (utils/link-for (:links entity-data) "react")
+        should-show-picker? (and (not hide-last-reaction?)
                                  react-link
                                  (< (count reactions-data) default-reaction-number))
         is-mobile? (responsive/is-tablet-or-mobile?)]
@@ -70,7 +73,7 @@
                             reaction-data)]]
 
               [:button.reaction-btn.btn-reset
-                {:key (str "reaction-" (:uuid entry-data) "-" idx)
+                {:key (str "reaction-" (:uuid entity-data) "-" idx)
                  :class (utils/class-set {:reacted (:reacted r)
                                           :can-react (not read-only-reaction)
                                           :has-reactions (pos? (:count r))
@@ -91,7 +94,9 @@
                                           (not (js/isIE)))
                                  ;;TODO: animate reaction
                                  )
-                               (reaction-actions/reaction-toggle entry-data r (not reacted))))}
+                               (if optional-activity-data
+                                (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
+                                (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
                 [:span.reaction
                   {:class (when (pos? (:count r)) "has-count")}
                   (:reaction r)]
@@ -99,7 +104,7 @@
                   (:count r)]]))
           (when should-show-picker?
             [:button.reaction-btn.btn-reset.can-react.reaction-picker
-              {:key (str "reaction-" (:uuid entry-data) "-picker")
+              {:key (str "reaction-" (:uuid entity-data) "-picker")
                :on-click #(reset! (::show-picker s) (not @(::show-picker s)))}
               [:span.reaction]])]
        (when @(::show-picker s)
@@ -113,5 +118,7 @@
                {:native true
                 :onClick (fn [emoji event]
                            (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") reactions-data)
-                             (reaction-actions/react-from-picker entry-data (gobj/get emoji "native")))
+                             (if optional-activity-data
+                               (comment-actions/react-from-picker optional-activity-data entity-data (gobj/get emoji "native"))
+                               (reaction-actions/react-from-picker entity-data (gobj/get emoji "native"))))
                            (reset! (::show-picker s) false))}))])])))
