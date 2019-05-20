@@ -9,17 +9,85 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment {
-      padding: 0px 0px 16px;
+      padding: 16px;
+      position: relative;
 
-      &:last-child {
-        padding: 0;
+      @include big_web() {
+        &:hover {
+          background-color: rgba($ultra_light_grey, 0.3);
+
+          div.stream-comment-floating-buttons {
+            display: block;
+          }
+        }
       }
 
-      &:hover, &.showing-more-menu {
-        div.stream-comment-header {
-          div.stream-comment-more-menu-container {
-            button.comment-more-menu {
-              display: block;
+      div.stream-comment-floating-buttons {
+        position: absolute;
+        right: 16px;
+        top: -13px;
+        height: 26px;
+        width: 69px;
+        display: none;
+
+        &.can-edit {
+          width: 104px;
+        }
+
+        div.emoji-mart {
+          right: 0;
+          left: unset;
+          position: absolute;
+          top: 34px;
+        }
+
+        div.stream-comment-floating-buttons-inner {
+          & > button {
+            background-color: #3FBD7C;
+            width: 35px;
+            height: 26px;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-right: 1px solid #61C98F;
+            margin: 0;
+            padding: 0;
+
+            &:last-child {
+              width: 34px;
+              border-right: none;
+            }
+
+
+            @include big_web() {
+              &:hover {
+                background-color: #3CA473;
+              }
+            }
+
+
+            &:first-child {
+              border-top-left-radius: 4px;
+              border-bottom-left-radius: 4px;
+            }
+
+            &:last-child {
+              border-top-right-radius: 4px;
+              border-bottom-right-radius: 4px;
+            }
+
+            &.edit-bt {
+              background-image: cdnUrl("/img/ML/comment_edit_pen.svg");
+              background-size: 12px 12px;
+            }
+
+            &.share-bt {
+              background-image: cdnUrl("/img/ML/comment_share.svg");
+              background-size: 14px 12px;
+            }
+
+            &.react-bt {
+              background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
+              background-size: 14px 14px;
             }
           }
         }
@@ -42,7 +110,6 @@ div.stream-comments {
         div.stream-comment-author-right {
           float: left;
           max-width: 80%;
-          // height: 24px;
 
           div.stream-comment-author-name {
             @include OC_Body_Bold();
@@ -60,90 +127,6 @@ div.stream-comments {
             float: left;
             margin-left: 8px;
             line-height: 14px;
-          }
-        }
-
-        div.stream-comment-more-menu-container {
-          position: relative;
-          float: right;
-          margin-left: 8px;
-
-          button.comment-more-menu {
-            width: 20px;
-            height: 20px;
-            padding: 2px 0 16px 0;
-            display: block;
-            background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-            background-position: 50% 3px;
-            background-size: 20px 4px;
-            background-repeat: no-repeat;
-            opacity: 0.4;
-            display: none;
-
-            &:hover, &:hover, &.active {
-              opacity: 1;
-            }
-
-            @include tablet() {
-              display: block;
-            }
-          }
-
-          div.stream-comment-more-menu {
-            position: absolute;
-            top: -8px;
-            right: 100%;
-            background-color: white;
-            width: 136px;
-            border: 1px solid $deep_tan;
-            box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
-            outline: none;
-            z-index: 110;
-            border-radius: 5px;
-            margin: 0;
-            padding: 24px;
-
-            @include preload_image(cdnUrl("/img/ML/more_menu_edit_black.svg"));
-            @include preload_image(cdnUrl("/img/ML/more_menu_delete_black.svg"), "before");
-
-            div.stream-comment-more-menu-item {
-              height: 18px;
-              @include OC_Body_Bold();
-              font-size: 14px;
-              color: $deep_navy;
-              cursor: pointer;
-              padding-left: 32px;
-              position: relative;
-              margin-top: 16px;
-
-              &:before {
-                content: "";
-                position: absolute;
-                top: 0px;
-                left: 0px;
-                width: 18px;
-                height: 18px;
-                background-repeat: no-repeat;
-                background-size: 18px 18px;
-                background-position: center;
-              }
-
-              &:first-child {
-                margin-top: 0px;
-              }
-
-              &.edit {
-                &:before {
-                  background-image: cdnUrl("/img/ML/more_menu_edit_black.svg");
-                }
-              }
-
-              &.delete {
-                &:before {
-                  background-image: cdnUrl("/img/ML/more_menu_delete_black.svg");
-                }
-              }
-            }
           }
         }
       }
@@ -212,11 +195,6 @@ div.stream-comments {
             font-size: 50px;
             height: 50px;
             line-height: 50px;
-
-            // & > * {
-            //   line-height: 20px;
-            //   margin-top: 20px;
-            // }
           }
 
           a {

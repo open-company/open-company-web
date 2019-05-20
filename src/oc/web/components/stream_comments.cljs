@@ -61,6 +61,7 @@
           (.preventDefault e))
         (when (= "Escape" (.-key e))
           (cancel-edit e s comment-data)))))
+    (reset! (::showing-menu s) false)
     (reset! (::medium-editor s) medium-editor)
     (reset! (::editing? s) (:uuid comment-data))
     (utils/after 600 #(utils/to-end-of-content-editable (rum/ref-node s (str "comment-body-" (:uuid comment-data)))))))
@@ -95,13 +96,14 @@
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
+                             (rum/local nil ::show-picker)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              (on-window-click-mixin (fn [s e]
-                              (when (and @(::showing-menu s)
-                                        (not (utils/event-inside? e
-                                              (rum/ref-node s (str "comment-more-menu-" @(::showing-menu s))))))
-                                (reset! (::showing-menu s) false))))
+                              (when (and @(::show-picker s)
+                                         (not (utils/event-inside? e
+                                          (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
+                                (reset! (::show-picker s) nil))))
                              {:after-render (fn [s]
                                (let [activity-uuid (:uuid (first (:rum/args s)))
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
@@ -119,10 +121,43 @@
         (for [idx (range (count comments-data))
               :let [comment-data (nth comments-data idx)
                     is-editing? (= @(::editing? s) (:uuid comment-data))
-                    showing-more-menu (= @(::showing-menu s) (:uuid comment-data))]]
+                    can-show-edit-bt? (or (and (:can-edit comment-data)
+                                               (not (:is-emoji comment-data)))
+                                          (:can-delete comment-data))]]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data) "-" (:updated-at comment-data))
-             :class (when showing-more-menu "showing-more-menu")}
+             :on-mouse-leave #(reset! (::show-picker s) nil)}
+            (when-not is-editing?
+              [:div.stream-comment-floating-buttons
+                {:class (when can-show-edit-bt? "can-edit")}
+                [:div.stream-comment-floating-buttons-inner
+                  (when can-show-edit-bt?
+                    [:button.mlb-reset.edit-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :title "Edit"
+                       :on-click (fn [_]
+                                  (start-editing s comment-data))}])
+                  [:button.mlb-reset.share-bt
+                    {:data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-container "body"
+                     :title "Share"}]
+                  [:button.mlb-reset.react-bt
+                    {:data-toggle "tooltip"
+                     :data-placement "top"
+                     :data-container "body"
+                     :title "React"
+                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}]]
+                (when (= @(::show-picker s) (:uuid comment-data))
+                  (react-utils/build (.-Picker js/EmojiMart)
+                   {:native true
+                    :onClick (fn [emoji event]
+                               (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                 (comment-actions/react-from-picker activity-data comment-data
+                                  (gobj/get emoji "native")))
+                               (reset! (::show-picker s) nil))}))])
             [:div.stream-comment-author-avatar
               (user-avatar-image (:author comment-data))]
 
@@ -133,37 +168,12 @@
                   [:div.stream-comment-author-name
                     (:name (:author comment-data))]
                   [:div.stream-comment-author-timestamp
-                    (utils/time-since (:created-at comment-data))]]
-                (when (and (not is-editing?)
-                           (or (and (:can-edit comment-data)
-                                    (not (:is-emoji comment-data)))
-                               (:can-delete comment-data)))
-                  [:div.stream-comment-more-menu-container
-                    {:ref (str "comment-more-menu-" (:uuid comment-data))}
-                    [:button.comment-more-menu.mlb-reset
-                      {:class (when showing-more-menu "active")
-                       :on-click (fn [e]
-                                  (utils/event-stop e)
-                                  (reset! (::showing-menu s) (:uuid comment-data)))}]
-                    (when showing-more-menu
-                      [:div.stream-comment-more-menu
-                        (when (and (:can-edit comment-data)
-                                   (not (:is-emoji comment-data)))
-                          [:div.stream-comment-more-menu-item.edit
-                            {:on-click #(do
-                                          (reset! (::showing-menu s) false)
-                                          (start-editing s comment-data))}
-                            "Edit"])
-                        (when (:can-delete comment-data)
-                          [:div.stream-comment-more-menu-item.delete
-                            {:on-click #(do
-                                         (reset! (::showing-menu s) false)
-                                         (delete-clicked % activity-data comment-data))}
-                            "Delete"])])])]
+                    (utils/time-since (:created-at comment-data))]]]
               [:div.stream-comment-content
                 [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref (str "comment-body-" (:uuid comment-data))
+                   :content-editable is-editing?
                    :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
                                 (when (> (.-length $body) 0)
                                   (.restore (.data $body "dotdotdot"))
@@ -183,7 +193,8 @@
                       {:on-click #(cancel-edit % s comment-data)
                        :title "Cancel edit"}
                       "Cancel"]]]
-                (when (:can-react comment-data)
+                (when (and (:can-react comment-data)
+                           (seq (:reactions comment-data)))
                   [:div.stream-comment-reactions-footer.group
                     (reactions comment-data false activity-data)]))]])]
       [:div.stream-comments-empty])])

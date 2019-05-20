@@ -153,7 +153,8 @@ div.expanded-post {
     border-top: 1px solid $ultra_light_grey;
 
     div.stream-comments {
-      width: 100%;
+      width: calc(100% + 32px);
+      margin-left: -16px;
     }
   }
 
