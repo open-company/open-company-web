@@ -6,24 +6,13 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
+            [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.reaction :as reaction-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
             [goog.object :as gobj]))
-
-(defn can-pick-reaction
-  "Given an emoji and the list of the current reactions
-   check if the user can react.
-   A user can react if:
-   - the reaction is NOT already in the reactions list
-   - the reaction is already in the reactions list and its not reacted"
-  [emoji reactions-data]
-  (let [reaction-map (first (filter #(= (:reaction %) emoji) reactions-data))]
-    (or (not reaction-map)
-        (and (map? reaction-map)
-             (not (:reacted reaction-map))))))
 
 (def default-reaction-number 5)
 
@@ -37,13 +26,14 @@
                             (.tooltip "fixTitle")
                             (.tooltip "hide")))
                         s)}
-  [s entry-data hide-last-reaction? is-comment?]
+  [s entry-data hide-last-reaction? never-show-picker-button?]
   (let [reactions-data (if hide-last-reaction?
                          (vec (take (dec default-reaction-number) (:reactions entry-data)))
                          (vec (:reactions entry-data)))
         reactions-loading (:reactions-loading entry-data)
         react-link (utils/link-for (:links entry-data) "react")
-        should-show-picker? (and (not hide-last-reaction?)
+        should-show-picker? (and (not never-show-picker-button?)
+                                 (not hide-last-reaction?)
                                  react-link
                                  (< (count reactions-data) default-reaction-number))
         is-mobile? (responsive/is-tablet-or-mobile?)]
@@ -54,9 +44,6 @@
         [:div.reactions-list
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))
-                  :when (or (not is-comment?)
-                            (and is-comment?
-                                 (> (:count (get reactions-data idx {})) 0)))
                   :let [reaction-data (get reactions-data idx)
                         is-loading (utils/in? reactions-loading (:reaction reaction-data))
                         reacted (:reacted reaction-data)
@@ -125,6 +112,6 @@
              (react-utils/build (.-Picker js/EmojiMart)
                {:native true
                 :onClick (fn [emoji event]
-                           (when (can-pick-reaction (gobj/get emoji "native") reactions-data)
+                           (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") reactions-data)
                              (reaction-actions/react-from-picker entry-data (gobj/get emoji "native")))
                            (reset! (::show-picker s) false))}))])])))
