@@ -121,15 +121,16 @@
         (for [idx (range (count comments-data))
               :let [comment-data (nth comments-data idx)
                     is-editing? (= @(::editing? s) (:uuid comment-data))
-                    can-show-edit-bt? (or (and (:can-edit comment-data)
+                    can-show-edit-bt? (and (:can-edit comment-data)
                                                (not (:is-emoji comment-data)))
-                                          (:can-delete comment-data))]]
+                    can-show-delete-bt? (:can-delete comment-data)]]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data) "-" (:updated-at comment-data))
              :on-mouse-leave #(reset! (::show-picker s) nil)}
             (when-not is-editing?
               [:div.stream-comment-floating-buttons
-                {:class (when can-show-edit-bt? "can-edit")}
+                {:class (utils/class-set {:can-edit can-show-edit-bt?
+                                          :can-delete can-show-delete-bt?})}
                 [:div.stream-comment-floating-buttons-inner
                   (when can-show-edit-bt?
                     [:button.mlb-reset.edit-bt
@@ -139,6 +140,14 @@
                        :title "Edit"
                        :on-click (fn [_]
                                   (start-editing s comment-data))}])
+                  (when can-show-delete-bt?
+                    [:button.mlb-reset.delete-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :title "Delete"
+                       :on-click (fn [_]
+                                  (delete-clicked s activity-data comment-data))}])
                   [:button.mlb-reset.share-bt
                     {:data-toggle "tooltip"
                      :data-placement "top"

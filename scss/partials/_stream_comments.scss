@@ -30,8 +30,12 @@ div.stream-comments {
         width: 69px;
         display: none;
 
-        &.can-edit {
+        &.can-edit, &.can-delete {
           width: 104px;
+        }
+
+        &.can-edit.can-delete {
+          width: 139px; 
         }
 
         div.emoji-mart {
@@ -78,6 +82,11 @@ div.stream-comments {
             &.edit-bt {
               background-image: cdnUrl("/img/ML/comment_edit_pen.svg");
               background-size: 12px 12px;
+            }
+
+            &.delete-bt {
+              background-image: cdnUrl("/img/ML/comment_delete_can.svg");
+              background-size: 12px 14px;
             }
 
             &.share-bt {
