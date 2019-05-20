@@ -693,6 +693,9 @@
 (defn input-clicked? [e]
   (element-clicked? e "INPUT"))
 
+(defn anchor-clicked? [e]
+  (element-clicked? e "A"))
+
 (defn debounced-fn
   "Debounce function: give a function and a wait time call it immediately
   and avoid calling it again for the wait time.

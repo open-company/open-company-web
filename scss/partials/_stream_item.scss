@@ -1,9 +1,16 @@
 div.stream-item {
   width: #{$board_container_width}px;
   margin: 0;
-  padding: 24px 40px;
   border-top: 1px solid $ultra_light_grey;
-  border-left: 4px solid transparent;
+
+  &:last-child {
+    border-bottom: 1px solid $ultra_light_grey;
+  }
+
+  div.stream-item-inner {
+    border-left: 4px solid transparent;
+    padding: 24px 40px;
+  }
 
   &.expandable {
     cursor: pointer;
@@ -11,11 +18,9 @@ div.stream-item {
     @include big_web() {
       &:hover {
         background-color: #F5F5F5;
-        border-left: 4px solid #F5F5F5;
-        border-top: 1px solid #F5F5F5;
 
-        & + div.stream-item {
-          border-top: 1px solid #F5F5F5;
+        div.stream-item-inner {
+          border-left: 4px solid #F5F5F5;
         }
 
         div.stream-item-header {
@@ -44,10 +49,13 @@ div.stream-item {
 
   @include mobile() {
     width: 100%;
-    padding: 16px;
     margin: 0;
     border: none;
     border-radius: 0;
+
+    div.stream-item-inner {
+      padding: 16px;
+    }
   }
 
   &.draft {
@@ -56,34 +64,50 @@ div.stream-item {
 
   &.unread-item {
     background-color: white;
-    border-left: 4px solid white;
+
+    div.stream-item-inner {
+      border-left: 4px solid white;
+    }
 
     @include big_web(){
       &:hover {
         background-color: white;
-        border-left: 4px solid white;        
+
+        div.stream-item-inner{
+          border-left: 4px solid white;
+        }
       }
     }
 
     &.must-see-item {
-      border-left: 4px solid $sea_blue;
       margin-top: 2px;
+
+      div.stream-item-inner {
+        border-left: 4px solid $sea_blue;
+      }
 
       @include big_web(){
         &:hover {
-          border-left: 4px solid $sea_blue;
           box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+
+          div.stream-item-inner {
+            border-left: 4px solid $sea_blue;
+          }
         }
       }
     }
   }
 
   &.must-see-item {
-    border-left: 4px solid transparent;
+    div.stream-item-inner {
+      border-left: 4px solid transparent;
+    }
 
     @include big_web(){
       &:hover {
-        border-left: 4px solid transparent;
+        div.stream-item-inner {
+          border-left: 4px solid transparent;
+        }
       }
     }
 
@@ -183,13 +207,6 @@ div.stream-item {
       display: block;
     }
 
-    div.stream-attachments {
-      @include mobile() {
-        position: relative;
-        bottom: unset;
-      }
-    }
-
     &.expanded {
       div.thumbnail-container {
         cursor: default;
@@ -215,7 +232,7 @@ div.stream-item {
           }
         }
 
-        div.body-thumbnail {
+        div.body-thumbnail-wrapper {
           display: none;
         }
       }
@@ -258,7 +275,7 @@ div.stream-item {
         }
       }
 
-      div.body-thumbnail {
+      div.body-thumbnail-wrapper {
         width: 136px;
         height: 102px;
         background-repeat: no-repeat;
@@ -269,7 +286,16 @@ div.stream-item {
         right: 0;
         top: 50%;
         cursor: pointer;
-        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img.body-thumbnail {
+          border-radius: 4px;
+          object-fit: contain;
+          max-width: 136px;
+          max-height: 102px;
+        }
 
         &.video {
           &:hover:after {
@@ -344,6 +370,8 @@ div.stream-item {
         line-height: 24px;
         max-height: 72px;
         overflow: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
 
         h2 {
           color: $deep_navy;
@@ -448,10 +476,100 @@ div.stream-item {
         }
       }
 
+      div.stream-item-attachments {
+        float: left;
+        margin-right: 16px;
+        height: 26px;
+        position: relative;
+
+        &:hover {
+          div.stream-item-attachments-count {
+            opacity: 1;
+          }
+
+          div.stream-item-attachments-list {
+            display: block;
+          }
+        }
+
+        div.stream-item-attachments-count {
+          position: relative;
+          padding-left: 22px;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: $deep_navy;
+          opacity: 0.5;
+          margin-top: 4px;
+
+          &:before {
+            content: " ";
+            width: 14px;
+            height: 16px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+        }
+
+        div.stream-item-attachments-list {
+          position: absolute;
+          top: 26px;
+          left: calc(50% - 120px);
+          width: 240px;
+          max-height: 200px;
+          background-color: white;
+          border-radius: 4px;
+          border: 1px solid $mid_light_grey;
+          padding: 8px 0;
+          display: none;
+          z-index: 2;
+
+          a.stream-item-attachments-item {
+            padding: 8px 16px;
+            height: 34px;
+            display: block;
+
+            &:active, &:hover {
+              background-color: #EBF8F1;
+              div.stream-item-attachments-item-desc {
+                color: $carrot_green;
+              }
+            }
+
+            div.stream-item-attachments-item-desc {
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: rgba($light_navy, 0.5);
+              white-space: nowrap;
+              max-width: 100%;
+
+              span.file-name {
+                display: inline-block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-transform: capitalize;
+                max-width: calc(100% - 80px);
+              }
+
+              span.file-size {
+                white-space: nowrap;
+                overflow: hidden;
+                display: inline-block;
+                margin-left: 8px;
+              }
+            }
+          }
+        }
+      }
+
       div.stream-item-wrt {
         float: left;
         position: relative;
         margin-top: 4px;
+        margin-right: 16px;
 
         div.post-added-tooltip-container {
           border: 1px solid rgba($carrot_gold, 0.5);
