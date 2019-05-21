@@ -294,9 +294,10 @@ div.secure-activity-container {
       border-top: 1px solid $ultra_light_grey;
       padding-bottom: 30px;
 
-      div.sent-via-carrot {
+      a.sent-via-carrot {
         margin: 0 auto;
         height: 18px;
+        display: block;
         @include OC_Body_Book();
         font-size: 14px;
         color: rgba($light_navy, 0.5);

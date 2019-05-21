@@ -207,13 +207,6 @@ div.stream-item {
       display: block;
     }
 
-    div.stream-attachments {
-      @include mobile() {
-        position: relative;
-        bottom: unset;
-      }
-    }
-
     &.expanded {
       div.thumbnail-container {
         cursor: default;
@@ -483,10 +476,100 @@ div.stream-item {
         }
       }
 
+      div.stream-item-attachments {
+        float: left;
+        margin-right: 16px;
+        height: 26px;
+        position: relative;
+
+        &:hover {
+          div.stream-item-attachments-count {
+            opacity: 1;
+          }
+
+          div.stream-item-attachments-list {
+            display: block;
+          }
+        }
+
+        div.stream-item-attachments-count {
+          position: relative;
+          padding-left: 22px;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: $deep_navy;
+          opacity: 0.5;
+          margin-top: 4px;
+
+          &:before {
+            content: " ";
+            width: 14px;
+            height: 16px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+        }
+
+        div.stream-item-attachments-list {
+          position: absolute;
+          top: 26px;
+          left: calc(50% - 120px);
+          width: 240px;
+          max-height: 200px;
+          background-color: white;
+          border-radius: 4px;
+          border: 1px solid $mid_light_grey;
+          padding: 8px 0;
+          display: none;
+          z-index: 2;
+
+          a.stream-item-attachments-item {
+            padding: 8px 16px;
+            height: 34px;
+            display: block;
+
+            &:active, &:hover {
+              background-color: #EBF8F1;
+              div.stream-item-attachments-item-desc {
+                color: $carrot_green;
+              }
+            }
+
+            div.stream-item-attachments-item-desc {
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: rgba($light_navy, 0.5);
+              white-space: nowrap;
+              max-width: 100%;
+
+              span.file-name {
+                display: inline-block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-transform: capitalize;
+                max-width: calc(100% - 80px);
+              }
+
+              span.file-size {
+                white-space: nowrap;
+                overflow: hidden;
+                display: inline-block;
+                margin-left: 8px;
+              }
+            }
+          }
+        }
+      }
+
       div.stream-item-wrt {
         float: left;
         position: relative;
         margin-top: 4px;
+        margin-right: 16px;
 
         div.post-added-tooltip-container {
           border: 1px solid rgba($carrot_gold, 0.5);
