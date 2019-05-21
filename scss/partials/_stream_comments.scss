@@ -22,6 +22,46 @@ div.stream-comments {
         }
       }
 
+      &.showing-picker {
+        div.stream-comment-floating-buttons {
+          background-color: rgba($ultra_light_grey, 0.3);
+          display: block;
+        }
+      }
+
+      &.editing {
+        @include big_web() {
+          &:hover {
+            background-color: initial;
+          }
+        }
+        div.stream-comment-floating-buttons div.stream-comment-floating-buttons-inner:hover {
+          display: none;
+        }
+
+        div.stream-comment-header {
+          display: none;
+        }
+
+        div.stream-comment-content {
+          div.stream-comment-body, div.stream-comment-body.medium-editor-element {
+            // editing comment
+            display: block;
+            margin-top: 0;
+            border-radius: 4px;
+            border: 1px solid $mid_light_grey;
+            background-color: white;
+            outline: none;
+            padding: 4px;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+
+            &:focus, &:active {
+              outline: none;
+            }
+          }
+        }
+      }
+
       div.stream-comment-floating-buttons {
         position: absolute;
         right: 16px;
@@ -178,17 +218,6 @@ div.stream-comments {
             color: $deep_navy;
           }
 
-          &.medium-editor-element {
-            // editing comment
-            border-radius: 4px;
-            border: 1px solid $ui_grey;
-            box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
-            border: 2px solid $light_ui_grey;
-            background-color: white;
-            outline: none;
-            padding: 4px;
-          }
-
           * {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -215,19 +244,6 @@ div.stream-comments {
       div.stream-comment-reactions-footer {
         height: 24px;
         margin-top: 8px;
-
-        button.add-reaction-bt {
-          float: left;
-          margin-left: 16px;
-          padding: 0;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: $deep_navy;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
       }
 
       div.stream-comment-footer {
@@ -237,10 +253,24 @@ div.stream-comments {
 
       div.save-cancel-edit-buttons {
         float: right;
-        padding-top: 8px;
+        padding-top: 16px;
 
         button {
           float: right;
+          @include OC_Body_Book();
+          font-size: 14px;
+          padding: 0;
+          height: 18px;
+          line-height: 18px;
+
+          &.cancel-bt {
+            color: rgba($deep_navy, 0.5);
+            margin-right: 16px;
+          }
+
+          &.save-bt {
+            color: $carrot_green;
+          }
         }
       }
     }

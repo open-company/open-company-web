@@ -125,8 +125,9 @@
                                                (not (:is-emoji comment-data)))
                     can-show-delete-bt? (:can-delete comment-data)]]
           [:div.stream-comment
-            {:key (str "stream-comment-" (:created-at comment-data) "-" (:updated-at comment-data))
-             :on-mouse-leave #(reset! (::show-picker s) nil)}
+            {:key (str "stream-comment-" (:created-at comment-data))
+             :class (utils/class-set {:editing is-editing?
+                                      :showing-picker @(::show-picker s)})}
             (when-not is-editing?
               [:div.stream-comment-floating-buttons
                 {:class (utils/class-set {:can-edit can-show-edit-bt?
@@ -189,16 +190,15 @@
                                   (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
                    :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                             :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
-                                            :editing is-editing?
                                             utils/hide-class true})}]]
               (if is-editing?
                 [:div.stream-comment-footer.group
                   [:div.save-cancel-edit-buttons
-                    [:button.mlb-reset.mlb-link-green
+                    [:button.mlb-reset.save-bt
                       {:on-click #(edit-finished % s comment-data)
                        :title "Save edit"}
                       "Save"]
-                    [:button.mlb-reset.mlb-link-black
+                    [:button.mlb-reset.cancel-bt
                       {:on-click #(cancel-edit % s comment-data)
                        :title "Cancel edit"}
                       "Cancel"]]]
