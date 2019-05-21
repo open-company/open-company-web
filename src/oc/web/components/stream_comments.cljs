@@ -55,8 +55,8 @@
       js/window
       EventType/KEYDOWN
       (fn [e]
-        (when (and (= "Enter" (.-key e))
-                   (not (.-shiftKey e)))
+        (when (and (.-metaKey e)
+                   (= "Enter" (.-key e)))
           (edit-finished e s comment-data)
           (.preventDefault e))
         (when (= "Escape" (.-key e))

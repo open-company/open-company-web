@@ -31,6 +31,13 @@
     (when (zero? (count (.-innerText add-comment-node)))
       (comment-actions/add-comment-blur))))
 
+(defn- send-clicked [s]
+  (let [add-comment-div (rum/ref-node s "add-comment")
+        comment-body (cu/add-comment-content add-comment-div)
+        activity-data (first (:rum/args s))]
+    (set! (.-innerHTML add-comment-div) "")
+    (comment-actions/add-comment activity-data comment-body)))
+
 (rum/defcs add-comment < rum/reactive
                          rum/static
                          ;; Mixins
@@ -76,9 +83,16 @@
                                (events/listen
                                 js/window
                                 EventType/KEYDOWN
-                                #(when (and (= (.-key %) "Escape")
-                                            (= (.-activeElement js/document) add-comment-node))
-                                   (.blur add-comment-node))))
+                                (fn [e]
+                                  (js/console.log "DBG KEYDOWN" (.-key e) "meta?" (.-metaKey e) "focus?" (= (.-activeElement js/document) add-comment-node))
+                                  (when (and (= (.-key e) "Escape")
+                                             (= (.-activeElement js/document) add-comment-node))
+                                    (.blur add-comment-node))
+                                  (when (and (= (.-activeElement js/document) add-comment-node)
+                                             (.-metaKey e)
+                                             (= (.-key e) "Enter"))
+                                    (js/console.log "DBG   send-clicked")
+                                    (send-clicked s)))))
                              (when should-focus-field?
                                (.focus add-comment-node)
                                (utils/after 0
@@ -115,9 +129,6 @@
             :class utils/hide-class
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
         [:button.mlb-reset.send-btn
-          {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
-                            comment-body (cu/add-comment-content add-comment-div)]
-                        (set! (.-innerHTML add-comment-div) "")
-                        (comment-actions/add-comment activity-data comment-body))
+          {:on-click #(send-clicked s)
            :disabled @(::add-button-disabled s)}
           "Send"]]]))
