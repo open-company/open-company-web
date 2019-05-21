@@ -117,6 +117,13 @@ div.expanded-post {
     div.is-comments {
       margin-right: 16px;
       float: left;
+
+      div.is-comments-authors.show-border {
+        div.is-comments-author {
+          background-color: $oc_gray_8;
+          border: 2px solid $oc_gray_8;
+        }
+      }
     }
 
     div.reactions {
