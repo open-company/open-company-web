@@ -10,7 +10,6 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
-            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn enable-add-comment? [s]
@@ -22,12 +21,6 @@
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
-(defn editable-input-change [s editable event]
-  (enable-add-comment? s)
-  (let [on-change-cb (second (:rum/args s))]
-    (when (fn? on-change-cb)
-     (on-change-cb))))
-
 (defn focus-add-comment [s]
   (enable-add-comment? s)
   (comment-actions/add-comment-focus (:uuid (first (:rum/args s)))))
@@ -35,8 +28,7 @@
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "add-comment")]
     (enable-add-comment? s)
-    (when (and (zero? (count (.-innerText add-comment-node)))
-               (not @(::emoji-picker-open s)))
+    (when (zero? (count (.-innerText add-comment-node)))
       (comment-actions/add-comment-blur))))
 
 (rum/defcs add-comment < rum/reactive
@@ -55,7 +47,6 @@
                          (rum/local nil ::esc-key-listener)
                          (rum/local nil ::focus-listener)
                          (rum/local nil ::blur-listener)
-                         (rum/local false ::emoji-picker-open)
                          (rum/local "" ::initial-add-comment)
                          {:will-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
@@ -74,7 +65,7 @@
                              (reset! (::medium-editor s) medium-editor)
                              (.subscribe medium-editor
                               "editableInput"
-                              (partial editable-input-change s))
+                              #(enable-add-comment? s))
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
                                #(focus-add-comment s)))
@@ -111,65 +102,22 @@
                              (events/unlistenByKey @(::blur-listener s))
                              (reset! (::blur-listener s) nil))
                            s)}
-  [s activity-data on-change-cb]
-  (let [ ;add-comment-focus (= (drv/react s :add-comment-focus) (:uuid activity-data))
-        _ (drv/react s :add-comment-data)
+  [s activity-data]
+  (let [_ (drv/react s :add-comment-data)
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
       [:div.add-comment-box
-        ; {:class (utils/class-set {:show-buttons add-comment-focus})}
         (user-avatar-image current-user-data)
         [:div.add-comment-internal
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover
            {:ref "add-comment"
             :content-editable true
             :class utils/hide-class
-            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
-          ; (when (and (not (js/isIE))
-          ;            (not (responsive/is-tablet-or-mobile?)))
-          ;   (emoji-picker {:width 32
-          ;                  :height 32
-          ;                  :position "bottom"
-          ;                  :add-emoji-cb (fn [active-element emoji already-added?]
-          ;                                  (let [add-comment (rum/ref-node s "add-comment")]
-          ;                                    (.focus add-comment)
-          ;                                    (utils/after 100
-          ;                                     #(do
-          ;                                        (when-not already-added?
-          ;                                          (js/pasteHtmlAtCaret
-          ;                                           (.-native emoji)
-          ;                                           (.getSelection js/window)
-          ;                                           false))
-          ;                                        (enable-add-comment? s)))))
-          ;                  :force-enabled true
-          ;                  :will-open-picker #(reset! (::emoji-picker-open s) true)
-          ;                  :will-close-picker #(do
-          ;                                        (reset! (::emoji-picker-open s) false)
-          ;                                        (when-not add-comment-focus
-          ;                                          (disable-add-comment-if-needed s)))
-          ;                  :container-selector "div.add-comment-box"}))
-          ]
+            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
         [:button.mlb-reset.send-btn
           {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
                             comment-body (cu/add-comment-content add-comment-div)]
                         (set! (.-innerHTML add-comment-div) "")
                         (comment-actions/add-comment activity-data comment-body))
            :disabled @(::add-button-disabled s)}
-          "Send"]
-        ; (when add-comment-focus
-        ;   [:div.add-comment-footer.group
-        ;     [:button.mlb-reset.reply-btn
-        ;       {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
-        ;                         comment-body (cu/add-comment-content add-comment-div)]
-        ;                     (set! (.-innerHTML add-comment-div) "")
-        ;                     (comment-actions/add-comment activity-data comment-body))
-        ;        :disabled @(::add-button-disabled s)}
-        ;       "Comment"]
-        ;     [:button.mlb-reset.cancel-btn
-        ;       {:on-click #(let [add-comment-div (rum/ref-node s "add-comment")
-        ;                         comment-body (cu/add-comment-content add-comment-div)]
-        ;                     (comment-actions/add-comment-cancel activity-data)
-        ;                     (set! (.-innerHTML add-comment-div) "")
-        ;                     (comment-actions/add-comment-blur))}
-        ;       "Cancel"]])
-        ]]))
+          "Send"]]]))
