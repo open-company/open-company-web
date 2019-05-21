@@ -132,34 +132,29 @@
               [:div.stream-comment-floating-buttons
                 {:class (utils/class-set {:can-edit can-show-edit-bt?
                                           :can-delete can-show-delete-bt?})}
-                [:div.stream-comment-floating-buttons-inner
-                  (when can-show-edit-bt?
-                    [:button.mlb-reset.edit-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :title "Edit"
-                       :on-click (fn [_]
-                                  (start-editing s comment-data))}])
-                  (when can-show-delete-bt?
-                    [:button.mlb-reset.delete-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :data-container "body"
-                       :title "Delete"
-                       :on-click (fn [_]
-                                  (delete-clicked s activity-data comment-data))}])
-                  [:button.mlb-reset.share-bt
+                (when can-show-edit-bt?
+                  [:button.mlb-reset.edit-bt
                     {:data-toggle "tooltip"
                      :data-placement "top"
-                     :data-container "body"
-                     :title "Share"}]
-                  [:button.mlb-reset.react-bt
+                     :title "Edit"
+                     :on-click (fn [_]
+                                (start-editing s comment-data))}])
+                (when can-show-delete-bt?
+                  [:button.mlb-reset.delete-bt
                     {:data-toggle "tooltip"
                      :data-placement "top"
-                     :data-container "body"
-                     :title "React"
-                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}]]
+                     :title "Delete"
+                     :on-click (fn [_]
+                                (delete-clicked s activity-data comment-data))}])
+                ; [:button.mlb-reset.share-bt
+                ;   {:data-toggle "tooltip"
+                ;    :data-placement "top"
+                ;    :title "Share"}]
+                [:button.mlb-reset.react-bt
+                  {:data-toggle "tooltip"
+                   :data-placement "top"
+                   :title "Add reaction"
+                   :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
                 (when (= @(::show-picker s) (:uuid comment-data))
                   (react-utils/build (.-Picker js/EmojiMart)
                    {:native true

@@ -71,15 +71,15 @@ div.stream-comments {
         right: 16px;
         top: -13px;
         height: 26px;
-        width: 69px;
+        width: 34px; // FIXME With share change to 69px;
         display: none;
 
         &.can-edit, &.can-delete {
-          width: 104px;
+          width: 69px; // FIXME With share change to 104px;
         }
 
         &.can-edit.can-delete {
-          width: 139px; 
+          width: 104px; // FIXME With share change to 139px;
         }
 
         div.emoji-mart {
@@ -89,59 +89,84 @@ div.stream-comments {
           top: 34px;
         }
 
-        div.stream-comment-floating-buttons-inner {
-          & > button {
-            background-color: #3FBD7C;
-            width: 35px;
-            height: 26px;
-            background-position: center;
-            background-repeat: no-repeat;
-            border-right: 1px solid #61C98F;
-            margin: 0;
-            padding: 0;
+        .tooltip {
+          z-index: 1500;
 
-            &:last-child {
-              width: 34px;
-              border-right: none;
+          &:last-child {
+            width: 86px;
+          }
+
+          &.in {
+            opacity: 1;
+          }
+
+          // Change Bootstrap tooltip style
+          .tooltip-arrow {
+            display: block;
+          }
+
+          .tooltip-inner {
+            background-color: $deep_navy;
+            white-space:pre-wrap;
+            max-width: none;
+            text-align: left;
+            opacity: 1;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: white;
+            line-height: 18px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            box-shadow: none;
+            border: none;
+          }
+        }
+        & > button {
+          background-color: #3FBD7C;
+          width: 35px;
+          height: 26px;
+          background-position: center;
+          background-repeat: no-repeat;
+          border-right: 1px solid #61C98F;
+          margin: 0;
+          padding: 0;
+
+          &:last-of-type {
+            width: 34px;
+            border-right: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+          }
+
+          &:first-of-type {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+          }
+
+          @include big_web() {
+            &:hover {
+              background-color: #3CA473;
             }
+          }
 
+          &.edit-bt {
+            background-image: cdnUrl("/img/ML/comment_edit_pen.svg");
+            background-size: 12px 12px;
+          }
 
-            @include big_web() {
-              &:hover {
-                background-color: #3CA473;
-              }
-            }
+          &.delete-bt {
+            background-image: cdnUrl("/img/ML/comment_delete_can.svg");
+            background-size: 12px 14px;
+          }
 
+          &.share-bt {
+            background-image: cdnUrl("/img/ML/comment_share.svg");
+            background-size: 14px 12px;
+          }
 
-            &:first-child {
-              border-top-left-radius: 4px;
-              border-bottom-left-radius: 4px;
-            }
-
-            &:last-child {
-              border-top-right-radius: 4px;
-              border-bottom-right-radius: 4px;
-            }
-
-            &.edit-bt {
-              background-image: cdnUrl("/img/ML/comment_edit_pen.svg");
-              background-size: 12px 12px;
-            }
-
-            &.delete-bt {
-              background-image: cdnUrl("/img/ML/comment_delete_can.svg");
-              background-size: 12px 14px;
-            }
-
-            &.share-bt {
-              background-image: cdnUrl("/img/ML/comment_share.svg");
-              background-size: 14px 12px;
-            }
-
-            &.react-bt {
-              background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
-              background-size: 14px 14px;
-            }
+          &.react-bt {
+            background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
+            background-size: 14px 14px;
           }
         }
       }
