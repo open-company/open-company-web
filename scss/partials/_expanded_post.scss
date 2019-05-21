@@ -156,20 +156,9 @@ div.expanded-post {
       width: calc(100% + 32px);
       margin-left: -16px;
     }
-  }
 
-  div.expanded-post-fixed-add-comment {
-    position: fixed;
-    bottom: 0;
-    left: #{$left_navigation_sidebar_width}px;
-    width: calc(100vw - #{$left_navigation_sidebar_width}px);
-    background-color: white;
-    min-height: 71px;
-    border-top: 1px solid $ultra_light_grey;
-
-    div.expanded-post-fixed-add-comment-inner {
-      width: 640px;
-      margin: 24px auto;
+    div.add-comment-box-container {
+      margin-top: 8px;
     }
   }
 }
