@@ -127,7 +127,19 @@
                       {:x "50%" :y "50%"}
                       (str seen-percent "%")]]]]
               [:div.wrt-chart-label
-                (str (count seen-users) " of " (count all-users) " people viewed this post.")]]
+                (if (= (count all-users) (count seen-users))
+                  "👏 Everyone has seen this post!"
+                  (str (count seen-users)
+                       " of "
+                       (count all-users)
+                       " people viewed this "
+                       (when (:private-access? read-data)
+                         "private ")
+                       "post."))
+                (when (:private-access? read-data)
+                  [:button.mlb-reset.manage-section-bt
+                    {:on-click #(nav-actions/show-section-editor)}
+                    "Manage section members?"])]]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}
               [:div.wrt-popup-tabs-select
@@ -158,32 +170,34 @@
             [:div.wrt-popup-list
               (for [u sorted-filtered-users]
                 [:div.wrt-popup-list-row
-                  {:key (str "wrt-popup-row-" (:user-id u))}
+                  {:key (str "wrt-popup-row-" (:user-id u))
+                   :class (when (:seen u) "seen")}
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
                   [:div.wrt-popup-list-row-name
                     (utils/name-or-email u)]
                   [:div.wrt-popup-list-row-seen
-                    {:class (when (:seen u) "seen")}
                     (if (:seen u)
                       ;; Show time the read happened
-                      (utils/time-since (:read-at u))
-                      ;; Send reminder button
-                      [:button.mlb-reset.send-reminder-bt
-                        {:on-click #(let [email-share {:medium :email
-                                                       :note "When you have a moment, please check out this post."
-                                                       :subject (str "Just a reminder: " (:headline activity-data))
-                                                       :to [(:email u)]}]
-                                      ;; Show the share popup
-                                      (activity-actions/activity-share activity-data [email-share]
-                                       (fn []
-                                        (notifications-actions/show-notification
-                                         {:title (str "Reminder sent to " (utils/name-or-email u) ".")
-                                          :id (str "wrt-share-" (utils/name-or-email u))
-                                          :dismiss true
-                                          :expire 3}))))}
-                        "Send post"])]])]])]]))
+                      (str "Viewed " (string/lower (utils/time-since (:read-at u))))
+                      "Unopened")]
+                  ;; Send reminder button
+                  (when-not (:seen u)
+                    [:button.mlb-reset.send-reminder-bt
+                      {:on-click #(let [email-share {:medium :email
+                                                     :note "When you have a moment, please check out this post."
+                                                     :subject (str "Just a reminder: " (:headline activity-data))
+                                                     :to [(:email u)]}]
+                                    ;; Show the share popup
+                                    (activity-actions/activity-share activity-data [email-share]
+                                     (fn []
+                                      (notifications-actions/show-notification
+                                       {:title (str "Reminder sent to " (utils/name-or-email u) ".")
+                                        :id (str "wrt-share-" (utils/name-or-email u))
+                                        :dismiss true
+                                        :expire 3}))))}
+                      "Notify"])])]])]]))
 
 (defn- under-middle-screen? [el]
   (let [el-offset-top (aget (.offset (js/$ el)) "top")

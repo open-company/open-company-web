@@ -120,8 +120,6 @@ div.wrt-popup-container {
 
       div.wrt-chart-container {
         margin-bottom: 24px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid $ultra_light_grey;
 
         div.wrt-chart {
           width: 116px;
@@ -162,6 +160,19 @@ div.wrt-popup-container {
           @include OC_Body_Book();
           font-size: 14px;
           color: $deep_navy;
+          line-height: 18px;
+
+          button.manage-section-bt {
+            display: block;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            height: 18px;
+            color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 14px;
+            text-align: center;
+          }
         }
       }
 
@@ -229,20 +240,44 @@ div.wrt-popup-container {
       }
 
       div.wrt-popup-list {
-        margin: 16px 0 0;
+        margin: 24px 0 0 -24px;
         width: 100%;
         padding: 0;
+        width: calc(100% + 48px);
 
         div.wrt-popup-list-row {
-          margin: 8px 0 0;
-          height: 24px;
-          width: 100%;
+          margin: 0;
+          height: 52px;
+          padding: 8px 24px;
+
+          @include big_web() {
+            &:hover {
+              background-color: $another_ui_grey;
+            }
+          }
+
+          &.seen {
+            div.wrt-popup-list-row-name, div.wrt-popup-list-row-seen {
+              width: calc(100% - 24px - 8px);
+            }
+          }
+
+          &:not(.seen) {
+            @include big_web() {
+              &:hover {
+                button.send-reminder-bt {
+                  display: block;
+                }
+              }
+            }
+          }
 
           div.wrt-popup-list-row-avatar {
             float: left;
             position: relative;
             width: 24px;
             height: 24px;
+            margin-top: 6px;
 
             @include user_profile(24);
           }
@@ -255,41 +290,35 @@ div.wrt-popup-container {
             @include OC_Body_Book();
             font-size: 14px;
             color: $light_navy;
-            line-height: 24px;
+            line-height: 18px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: calc(100% - 32px - 16px - 8px - $row_right_label_max_width);
+            width: calc(100% - 24px - 8px - 43px);
           }
 
           div.wrt-popup-list-row-seen {
+            float: left;
+            margin-left: 8px;
             @include OC_Body_Book();
             font-size: 12px;
-            color: $ui_grey;
-            float: right;
-            text-align: right;
-            max-width: $row_right_label_max_width;
-            line-height: 32px;
+            color: rgba($deep_navy, 0.5);
+            line-height: 18px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            width: calc(100% - 24px - 8px - 43px);
+          }
 
-            &.seen {
-              color: $light_ui_grey;
-            }
-
-            button.send-reminder-bt {
-              height: 24px;
-              float: right;
-              color: $carrot_green;
-              @include OC_Body_Book();
-              font-size: 12px;
-              padding: 0;
-
-              &:hover {
-                opacity: 1;
-              }
-            }
+          button.send-reminder-bt {
+            height: 24px;
+            float: right;
+            color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 12px;
+            padding: 0;
+            margin-top: -14px;
+            display: none;
           }
         }
       }
