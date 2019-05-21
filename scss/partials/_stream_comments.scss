@@ -19,6 +19,10 @@ div.stream-comments {
           div.stream-comment-floating-buttons {
             display: block;
           }
+
+          div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
+            display: block;
+          }
         }
       }
 
@@ -156,7 +160,7 @@ div.stream-comments {
 
       div.stream-comment-header {
 
-        div.stream-comment-author-right {
+        div.stream-comment-author-right  {
           float: left;
           max-width: 80%;
 
@@ -176,6 +180,7 @@ div.stream-comments {
             float: left;
             margin-left: 8px;
             line-height: 14px;
+            display: none;
           }
         }
       }

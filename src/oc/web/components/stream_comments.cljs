@@ -178,7 +178,7 @@
                   [:div.stream-comment-author-name
                     (:name (:author comment-data))]
                   [:div.stream-comment-author-timestamp
-                    (utils/time-since (:created-at comment-data))]]]
+                    (utils/foc-date-time (:created-at comment-data))]]]
               [:div.stream-comment-content
                 [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
