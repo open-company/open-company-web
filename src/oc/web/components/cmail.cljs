@@ -329,11 +329,14 @@
     [:button.mlb-reset.edit-tooltip-dismiss
       {:on-click #(nux-actions/dismiss-edit-tooltip)}]
     [:div.edit-tooltips
+      [:div.edit-tooltip-title
+        "Great impact with rich content!"]
       [:div.edit-tooltip
-        (str
-         "Share something with your team, like an announcement, update, or decision. "
-         (when-not (responsive/is-tablet-or-mobile?)
-           "Use the buttons below to add images, video, or attachments."))]]])
+        "Add images, attachments, or embed video to create context rich communication for you and your team."]
+      [:button.mlb-reset.got-it-bt
+        {:on-click #(nux-actions/dismiss-edit-tooltip)}
+        "OK, got it"]
+      [:div.edit-tooltip-letter]]])
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -587,11 +590,12 @@
               "SAVE"
               "POST")]]
         [:div.cmail-content-outer
+          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
+          (when (and (or is-mobile?
+                         is-fullscreen?)
+                     show-edit-tooltip)
+            (edit-tooltip s))
           [:div.cmail-content
-            {:class (when show-edit-tooltip "showing-edit-tooltip")}
-            (when (and is-mobile?
-                       show-edit-tooltip)
-              (edit-tooltip s))
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -676,10 +680,7 @@
                    :default-value (:video-transcript cmail-data)}]])
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))
-            (when (and (not is-mobile?)
-                       show-edit-tooltip)
-              (edit-tooltip s))]]
+             #(activity-actions/remove-attachment :cmail-data %))]]
       [:div.cmail-footer
         (when-not is-fullscreen?
           [:div.cmail-footer-right
@@ -708,4 +709,8 @@
                   (:auto-saving cmail-data))
             [:div.saving-saved "Saving..."]
             (when (false? (:auto-saving cmail-data))
-              [:div.saving-saved "Saved"])))]]]))
+              [:div.saving-saved "Saved"])))]
+     (when (and (not is-mobile?)
+                     show-edit-tooltip
+                     (not is-fullscreen?))
+            (edit-tooltip s))]]))
