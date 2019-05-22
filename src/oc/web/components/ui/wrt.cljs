@@ -128,15 +128,21 @@
                       {:x "50%" :y "50%"}
                       (str seen-percent "%")]]]]
               [:div.wrt-chart-label
-                (if (= (count all-users) (count seen-users))
+                (case (count seen-users)
+                  (count all-users)
                   "👏 Everyone has seen this post!"
+                  1
+                  "1 person has viewed this post."
+                  0
+                  "No one has viewed this post."
+                  ; else
                   (str (count seen-users)
-                       " of "
-                       (count all-users)
-                       " people viewed this "
-                       (when (:private-access? read-data)
-                         "private ")
-                       "post."))
+                   " of "
+                   (count all-users)
+                   " people viewed this "
+                   (when (:private-access? read-data)
+                     "private ")
+                   "post."))
                 (when (:private-access? read-data)
                   [:button.mlb-reset.manage-section-bt
                     {:on-click #(nav-actions/show-section-editor)}
@@ -170,7 +176,8 @@
                    :on-change #(reset! query (.. % -target -value))}]])
             [:div.wrt-popup-list
               (for [u sorted-filtered-users
-                    :let [user-sending-notice (get @(::sending-notice s) (:user-id u))]]
+                    :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
+                          is-self-user?       (= (:user-id current-user-data) (:user-id u))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                    :class (when (:seen u) "seen")}
@@ -178,7 +185,9 @@
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
                   [:div.wrt-popup-list-row-name
-                    (utils/name-or-email u)]
+                    (utils/name-or-email u)
+                    (when is-self-user?
+                      " (you)")]
                   [:div.wrt-popup-list-row-seen
                     (if (:seen u)
                       ;; Show time the read happened
@@ -214,7 +223,9 @@
                                                              (str "Sent via Slack")))]
                                           (swap! (::sending-notice s) assoc (:user-id u) user-label)
                                           (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u))))))))}
-                      "Notify"])])]])]]))
+                      (if is-self-user?
+                        "Remind me"
+                        "Notify")])])]])]]))
 
 (defn- under-middle-screen? [el]
   (let [el-offset-top (aget (.offset (js/$ el)) "top")
