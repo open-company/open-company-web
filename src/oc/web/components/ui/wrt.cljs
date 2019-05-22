@@ -5,10 +5,10 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
+            [oc.web.lib.json :refer (json->cljs)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.notifications :as notifications-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -48,6 +48,7 @@
                  (rum/local "" ::query)
                  (rum/local false ::list-view-dropdown-open)
                  (rum/local :all ::list-view) ;; :seen :unseen
+                 (rum/local {} ::sending-notice)
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
@@ -168,7 +169,8 @@
                                  (reset-search s))
                    :on-change #(reset! query (.. % -target -value))}]])
             [:div.wrt-popup-list
-              (for [u sorted-filtered-users]
+              (for [u sorted-filtered-users
+                    :let [user-sending-notice (get @(::sending-notice s) (:user-id u))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                    :class (when (:seen u) "seen")}
@@ -181,22 +183,37 @@
                     (if (:seen u)
                       ;; Show time the read happened
                       (str "Viewed " (string/lower (utils/time-since (:read-at u))))
-                      "Unopened")]
+                      (if (and user-sending-notice
+                               (not= user-sending-notice :loading))
+                        user-sending-notice
+                        "Unopened"))]
                   ;; Send reminder button
-                  (when-not (:seen u)
+                  (when (and (not (:seen u))
+                             (not user-sending-notice))
                     [:button.mlb-reset.send-reminder-bt
-                      {:on-click #(let [email-share {:medium :email
-                                                     :note "When you have a moment, please check out this post."
-                                                     :subject (str "Just a reminder: " (:headline activity-data))
-                                                     :to [(:email u)]}]
-                                    ;; Show the share popup
-                                    (activity-actions/activity-share activity-data [email-share]
-                                     (fn []
-                                      (notifications-actions/show-notification
-                                       {:title (str "Reminder sent to " (utils/name-or-email u) ".")
-                                        :id (str "wrt-share-" (utils/name-or-email u))
-                                        :dismiss true
-                                        :expire 3}))))}
+                      {:on-click (fn [_]
+                                   (let [wrt-share {:note "When you have a moment, please check out this post."
+                                                    :subject (str "Just a reminder: " (:headline activity-data))
+                                                    :user-id (:user-id u)}]
+                                     (swap! (::sending-notice s) assoc (:user-id u) :loading)
+                                     ;; Show the share popup
+                                     (activity-actions/activity-share activity-data [wrt-share]
+                                      (fn [{:keys [body]}]
+                                        (let [resp (first body)
+                                              medium (:medium resp)
+                                              slack-org (when (= medium "slack")
+                                                          (:slack-org-id (:channel resp)))
+                                              slack-user (when slack-org
+                                                           (get (:slack-users u) (keyword slack-org)))
+                                              user-label (if (= medium "email")
+                                                           (str "Sent to: " (first (:to resp)))
+                                                           (if (and slack-user
+                                                                    (seq (:display-name slack-user))
+                                                                    (not= (:display-name slack-user) "-"))
+                                                             (str "Sent to: @" (:display-name slack-user))
+                                                             (str "Sent via Slack")))]
+                                          (swap! (::sending-notice s) assoc (:user-id u) user-label)
+                                          (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u))))))))}
                       "Notify"])])]])]]))
 
 (defn- under-middle-screen? [el]
