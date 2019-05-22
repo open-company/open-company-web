@@ -294,7 +294,7 @@ div.wrt-popup-container {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width: calc(100% - 24px - 8px - 43px);
+            width: calc(100% - 24px - 8px - 43px - 20px);
           }
 
           div.wrt-popup-list-row-seen {
@@ -307,7 +307,7 @@ div.wrt-popup-container {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width: calc(100% - 24px - 8px - 43px);
+            width: calc(100% - 24px - 8px - 43px - 20px);
           }
 
           button.send-reminder-bt {
