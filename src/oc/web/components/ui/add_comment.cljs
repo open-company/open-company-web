@@ -84,14 +84,12 @@
                                 js/window
                                 EventType/KEYDOWN
                                 (fn [e]
-                                  (js/console.log "DBG KEYDOWN" (.-key e) "meta?" (.-metaKey e) "focus?" (= (.-activeElement js/document) add-comment-node))
                                   (when (and (= (.-key e) "Escape")
                                              (= (.-activeElement js/document) add-comment-node))
                                     (.blur add-comment-node))
                                   (when (and (= (.-activeElement js/document) add-comment-node)
                                              (.-metaKey e)
                                              (= (.-key e) "Enter"))
-                                    (js/console.log "DBG   send-clicked")
                                     (send-clicked s)))))
                              (when should-focus-field?
                                (.focus add-comment-node)
