@@ -123,11 +123,13 @@
                     is-editing? (= @(::editing? s) (:uuid comment-data))
                     can-show-edit-bt? (and (:can-edit comment-data)
                                                (not (:is-emoji comment-data)))
-                    can-show-delete-bt? (:can-delete comment-data)]]
+                    can-show-delete-bt? (:can-delete comment-data)
+                    showing-picker? (and (seq @(::show-picker s))
+                                         (= @(::show-picker s) (:uuid comment-data)))]]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))
              :class (utils/class-set {:editing is-editing?
-                                      :showing-picker @(::show-picker s)})}
+                                      :showing-picker showing-picker?})}
             (when-not is-editing?
               [:div.stream-comment-floating-buttons
                 {:class (utils/class-set {:can-edit can-show-edit-bt?
@@ -155,8 +157,7 @@
                    :data-placement "top"
                    :title "Add reaction"
                    :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                (when (and (seq @(::show-picker s))
-                           (= @(::show-picker s) (:uuid comment-data)))
+                (when showing-picker?
                   (react-utils/build (.-Picker js/EmojiMart)
                    {:native true
                     :onClick (fn [emoji event]
