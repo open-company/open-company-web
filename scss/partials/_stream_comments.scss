@@ -213,6 +213,7 @@ div.stream-comments {
       div.stream-comment-content {
         text-align: left;
         position: relative;
+        margin-top: 4px;
 
         div.stream-comment-body {
           @include OC_Body_Book();
@@ -260,7 +261,7 @@ div.stream-comments {
           }
 
           &.emoji-comment {
-            font-size: 50px;
+            font-size: 40px;
             height: 50px;
             line-height: 50px;
           }
