@@ -124,23 +124,24 @@
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
                                      current-local-state @(::last-focused-state s)
                                      is-self-focused? (= focused-uuid activity-uuid)
-                                     comments-data (second (:rim/args s))]
+                                     comments-data (second (:rum/args s))]
                                   (when (not= current-local-state is-self-focused?)
                                     (reset! (::last-focused-state s) is-self-focused?)
                                     (when is-self-focused?
                                       (scroll-to-bottom s)))
+                                 (timbre/info "comment-scroll after-render comments-data" comments-data "comment-id" (router/current-comment-id))
                                  (when (and comments-data
                                             (router/current-comment-id)
                                             (not @(::initial-comment-scroll s)))
-                                   (timbre/info "comment-scroll comments-data loaded comment-id is here not already scrolled")
+                                   (timbre/info "comment-scroll   looking for dom node")
                                    (when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
-                                     (timbre/info "comment-scroll    comment-node" comment-node)
+                                     (timbre/info "comment-scroll     comment-node" comment-node)
                                      (reset! (::initial-comment-scroll s) true)
                                      (reset! (::highlight-comment-url s) true)
                                      (utils/scroll-to-element comment-node)
                                      (utils/after 5000
                                       (fn []
-                                       (timbre/info "comment-scroll       reset highlight")
+                                       (timbre/info "comment-scroll        reset highlight")
                                        (reset! (::highlight-comment-url s) false))))))
                                s)}
   [s activity-data comments-data collapse-comments]
