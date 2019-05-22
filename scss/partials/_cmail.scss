@@ -9,10 +9,6 @@ div.cmail-outer {
   border-top-right-radius: 8px;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
 
-  &.showing-qsg {
-    right: 244px;
-  }
-
   @include tablet() {
     position: relative;
     bottom: unset;

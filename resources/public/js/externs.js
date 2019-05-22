@@ -97,7 +97,6 @@ var OCWebPrintJWTContents = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintPanelStack = function(){};
 var OCWebPrintPostsData = function(){};
-var OCWebPrintQSGData = function(){};
 var OCWebPrintReactionsData = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};

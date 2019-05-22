@@ -10,13 +10,11 @@
             [oc.web.stores.user :as user-store]
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.search :refer (search-box)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.login-button :refer (login-button)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
             [oc.web.components.user-notifications :refer (user-notifications)]
@@ -25,7 +23,6 @@
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
-                    (drv/drv :qsg)
                     (ui-mixins/render-on-resize nil)
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
@@ -57,8 +54,7 @@
                                 (not mobile-user-notifications))
          user-role (user-store/user-role org-data current-user-data)
          can-compose? (or (= user-role :admin)
-                          (= user-role :author))
-        qsg-data (drv/react s :qsg)]
+                          (= user-role :author))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -68,8 +64,7 @@
                                                           (utils/link-for (:links org-data) "collection" "GET"))))
                                 :showing-orgs-dropdown orgs-dropdown-visible
                                 :can-edit-board (and (router/current-org-slug)
-                                                     (not (:read-only org-data)))
-                                :showing-qsg (:visible qsg-data)})}
+                                                     (not (:read-only org-data)))})}
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
       [:div.oc-navbar-header.group
@@ -131,43 +126,10 @@
               (if (jwt/jwt)
                 [:div.group
                   (user-notifications)
-                  [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1.qsg-invite-team-1.qsg-create-reminder-1
-                    (when (or (= (:step qsg-data) :profile-photo-1)
-                              (= (:step qsg-data) :company-logo-1)
-                              (= (:step qsg-data) :invite-team-1)
-                              (= (:step qsg-data) :create-reminder-1))
-                      (qsg-breadcrumb qsg-data))
+                  [:div.user-menu
                     [:div.user-menu-button
                       {:ref "user-menu"
                        :class (when show-whats-new-green-dot "green-dot")}
                       (user-avatar
-                       {:click-cb #(do
-                                     (when (= (:step qsg-data) :profile-photo-1)
-                                       (qsg-actions/next-profile-photo-trail))
-                                     (when (= (:step qsg-data) :invite-team-1)
-                                        (qsg-actions/next-invite-team-trail))
-                                     (when (= (:step qsg-data) :company-logo-1)
-                                       (qsg-actions/next-company-logo-trail))
-                                     (when (= (:step qsg-data) :create-reminder-1)
-                                       (qsg-actions/next-create-reminder-trail))
-                                     (nav-actions/menu-toggle)
-                                     ;; Dismiss the QSG tooltip is it's open
-                                     (when (:show-qsg-tooltip? qsg-data)
-                                       (qsg-actions/dismiss-qsg-tooltip)))})
-                      (when (:show-qsg-tooltip? qsg-data)
-                        [:div.qsg-tooltip-container.group
-                          [:div.qsg-tooltip-top-arrow]
-                          [:button.mlb-reset.qsg-tooltip-dismiss
-                            {:on-click #(qsg-actions/dismiss-qsg-tooltip)}]
-                          [:div.qsg-tooltips
-                            [:div.qsg-tooltip-title
-                              (str
-                               "Quickstart guide"
-                               (when (> (:overall-progress qsg-data) 95)
-                                 " complete!"))]
-                            [:div.qsg-tooltip
-                              "You can find the quickstart guide here anytime."]
-                            [:button.mlb-reset.qsg-tooltip-bt
-                              {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
-                              "OK, got it"]]])]]]
+                       {:click-cb #(nav-actions/menu-toggle)})]]]
                 (login-button)))]]]]))

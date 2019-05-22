@@ -8,7 +8,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
@@ -108,7 +107,6 @@
    (when-not (utils/event-inside? e (rum/dom-node s))
      (nav-actions/hide-section-editor))))
   ;; Derivatives
-  (drv/drv :qsg)
   (drv/drv :org-data)
   (drv/drv :board-data)
   (drv/drv :section-editing)
@@ -165,7 +163,6 @@
                        (some #{current-user-id} (:authors section-editing))
                        (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)
-        qsg-data (drv/react s :qsg)
         disallow-public-board? (and (:content-visibility org-data)
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
@@ -201,8 +198,6 @@
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
                                                 (on-change % personal-note nav-actions/hide-section-editor))]
-                              (when (not @(::editing-existing-section s))
-                                (qsg-actions/finish-add-section-trail))
                               (section-actions/section-save-create section-editing section-name success-cb))))
                :class (when disable-bt "disabled")}
               "Save"])

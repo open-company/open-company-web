@@ -11,7 +11,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -24,14 +23,12 @@
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
-                              (drv/drv :qsg)
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :team-data)
@@ -91,8 +88,7 @@
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))
-        qsg-data (drv/react s :qsg)]
+                                     (not (:read-only board-data)))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -151,21 +147,7 @@
                            :data-container "body"
                            :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                            :title (str (:name board-data) " settings")
-                           :on-click #(do
-                                        (when (:show-section-settings-tooltip qsg-data)
-                                          (qsg-actions/dismiss-section-settings-tooltip))
-                                        (nav-actions/show-section-editor))}]
-                      (when (:show-section-settings-tooltip qsg-data)
-                        [:div.section-settings-tooltip-container.group
-                          [:div.section-settings-tooltip-top-arrow]
-                          [:button.mlb-reset.section-settings-tooltip-dismiss
-                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
-                          [:div.section-settings-tooltips
-                            [:div.section-settings-tooltip
-                              "You can make changes to a section at any time."]
-                            [:button.mlb-reset.section-settings-bt
-                              {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
-                              "OK, got it"]]])])]
+                           :on-click #(nav-actions/show-section-editor)}]])]
                   ; (when-not is-mobile?
                   ;   (let [default-sort (= @board-sort :default)]
                   ;     [:div.board-sort.group
@@ -193,9 +175,7 @@
                            add-post-tooltip)
                   [:div.add-post-tooltip-container.group
                     [:button.mlb-reset.add-post-tooltip-dismiss
-                      {:on-click #(do
-                                    (nux-actions/dismiss-add-post-tooltip)
-                                    (qsg-actions/turn-on-show-guide))}]
+                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
                     [:div.add-post-tooltips
                       {:class (when is-second-user "second-user")}
                       [:div.add-post-tooltip-box-mobile]

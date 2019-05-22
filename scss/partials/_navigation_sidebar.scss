@@ -454,10 +454,6 @@ div.left-navigation-sidebar {
       background-size: 12px 12px;
       @include OC_Body_Bold();
 
-      &.qsg-add-section-1 {
-        position: relative;
-      }
-
       @include mobile() {
         display: none;
       }
