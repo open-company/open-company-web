@@ -155,7 +155,8 @@
                    :data-placement "top"
                    :title "Add reaction"
                    :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                (when (= @(::show-picker s) (:uuid comment-data))
+                (when (and (seq @(::show-picker s))
+                           (= @(::show-picker s) (:uuid comment-data)))
                   (react-utils/build (.-Picker js/EmojiMart)
                    {:native true
                     :onClick (fn [emoji event]
