@@ -136,10 +136,10 @@
                                    (timbre/info "comment-scroll   looking for dom node")
                                    (when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
                                      (timbre/info "comment-scroll     comment-node" comment-node)
+                                     (reset! (::initial-comment-scroll s) true)
                                      (utils/after 2000 (fn []
-                                      (reset! (::initial-comment-scroll s) true)
                                       (reset! (::highlight-comment-url s) true)
-                                      (utils/scroll-to-element comment-node)
+                                      (utils/scroll-to-element (rum/ref-node s (str "stream-comment-" (router/current-comment-id))))
                                       (utils/after 5000(fn []
                                        (timbre/info "comment-scroll        reset highlight")
                                        (reset! (::highlight-comment-url s) false))))))))
