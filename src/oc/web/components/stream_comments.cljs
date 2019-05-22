@@ -109,6 +109,7 @@
                              (rum/local [] ::expanded-comments)
                              (rum/local nil ::show-picker)
                              (rum/local {} ::comment-url-copy)
+                             (rum/local false ::highlight-comment-url)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              (on-window-click-mixin (fn [s e]
@@ -120,7 +121,11 @@
                                (when (router/current-comment-id)
                                  (utils/after 1000
                                   #(when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
-                                     (utils/scroll-to-element comment-node))))
+                                     (reset! (::highlight-comment-url s) true)
+                                     (utils/scroll-to-element comment-node)
+                                     (utils/after 5000
+                                      (fn []
+                                       (reset! (::highlight-comment-url s) false))))))
                                s)
                               :after-render (fn [s]
                                (let [activity-uuid (:uuid (first (:rum/args s)))
@@ -147,80 +152,82 @@
              :ref (str "stream-comment-" (:uuid comment-data))
              :class (utils/class-set {:editing is-editing?
                                       :showing-picker @(::show-picker s)
-                                      :highlighted (= (:uuid comment-data) (router/current-comment-id))})}
-            (when-not is-editing?
-              [:div.stream-comment-floating-buttons
-                {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                          :can-delete can-show-delete-bt?
-                                          :can-share (seq (:url comment-data))})}
-                (when can-show-edit-bt?
-                  [:button.mlb-reset.edit-bt
+                                      :highlighted (and @(::highlight-comment-url s)
+                                                        (= (:uuid comment-data) (router/current-comment-id)))})}
+            [:div.stream-comment-inner
+              (when-not is-editing?
+                [:div.stream-comment-floating-buttons
+                  {:class (utils/class-set {:can-edit can-show-edit-bt?
+                                            :can-delete can-show-delete-bt?
+                                            :can-share (seq (:url comment-data))})}
+                  (when can-show-edit-bt?
+                    [:button.mlb-reset.edit-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :title "Edit"
+                       :on-click (fn [_]
+                                  (start-editing s comment-data))}])
+                  (when can-show-delete-bt?
+                    [:button.mlb-reset.delete-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :title "Delete"
+                       :on-click (fn [_]
+                                  (delete-clicked s activity-data comment-data))}])
+                  (when (:url comment-data)
+                    [:button.mlb-reset.share-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :on-click #(copy-comment-url (:url comment-data))
+                       :title "Share"}])
+                  [:button.mlb-reset.react-bt
                     {:data-toggle "tooltip"
                      :data-placement "top"
-                     :title "Edit"
-                     :on-click (fn [_]
-                                (start-editing s comment-data))}])
-                (when can-show-delete-bt?
-                  [:button.mlb-reset.delete-bt
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :title "Delete"
-                     :on-click (fn [_]
-                                (delete-clicked s activity-data comment-data))}])
-                (when (:url comment-data)
-                  [:button.mlb-reset.share-bt
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :on-click #(copy-comment-url (:url comment-data))
-                     :title "Share"}])
-                [:button.mlb-reset.react-bt
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :title "Add reaction"
-                   :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                (when (= @(::show-picker s) (:uuid comment-data))
-                  (react-utils/build (.-Picker js/EmojiMart)
-                   {:native true
-                    :onClick (fn [emoji event]
-                               (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-                                 (comment-actions/react-from-picker activity-data comment-data
-                                  (gobj/get emoji "native")))
-                               (reset! (::show-picker s) nil))}))])
-            [:div.stream-comment-author-avatar
-              (user-avatar-image (:author comment-data))]
-            [:div.stream-comment-right
-              [:div.stream-comment-header.group
-                {:class utils/hide-class}
-                [:div.stream-comment-author-right
-                  [:div.stream-comment-author-name
-                    (:name (:author comment-data))]
-                  [:div.stream-comment-author-timestamp
-                    (utils/foc-date-time (:created-at comment-data))]]]
-              [:div.stream-comment-content
-                [:div.stream-comment-body.oc-mentions.oc-mentions-hover
-                  {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
-                   :ref (str "comment-body-" (:uuid comment-data))
-                   :content-editable is-editing?
-                   :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
-                                (when (> (.-length $body) 0)
-                                  (.restore (.data $body "dotdotdot"))
-                                  (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
-                   :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
-                                            :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
-                                            utils/hide-class true})}]]
-              (if is-editing?
-                [:div.stream-comment-footer.group
-                  [:div.save-cancel-edit-buttons
-                    [:button.mlb-reset.save-bt
-                      {:on-click #(edit-finished % s comment-data)
-                       :title "Save edit"}
-                      "Save"]
-                    [:button.mlb-reset.cancel-bt
-                      {:on-click #(cancel-edit % s comment-data)
-                       :title "Cancel edit"}
-                      "Cancel"]]]
-                (when (and (:can-react comment-data)
-                           (seq (:reactions comment-data)))
-                  [:div.stream-comment-reactions-footer.group
-                    (reactions comment-data false activity-data)]))]])]
+                     :title "Add reaction"
+                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
+                  (when (= @(::show-picker s) (:uuid comment-data))
+                    (react-utils/build (.-Picker js/EmojiMart)
+                     {:native true
+                      :onClick (fn [emoji event]
+                                 (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                   (comment-actions/react-from-picker activity-data comment-data
+                                    (gobj/get emoji "native")))
+                                 (reset! (::show-picker s) nil))}))])
+              [:div.stream-comment-author-avatar
+                (user-avatar-image (:author comment-data))]
+              [:div.stream-comment-right
+                [:div.stream-comment-header.group
+                  {:class utils/hide-class}
+                  [:div.stream-comment-author-right
+                    [:div.stream-comment-author-name
+                      (:name (:author comment-data))]
+                    [:div.stream-comment-author-timestamp
+                      (utils/foc-date-time (:created-at comment-data))]]]
+                [:div.stream-comment-content
+                  [:div.stream-comment-body.oc-mentions.oc-mentions-hover
+                    {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
+                     :ref (str "comment-body-" (:uuid comment-data))
+                     :content-editable is-editing?
+                     :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
+                                  (when (> (.-length $body) 0)
+                                    (.restore (.data $body "dotdotdot"))
+                                    (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
+                     :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
+                                              :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
+                                              utils/hide-class true})}]]
+                (if is-editing?
+                  [:div.stream-comment-footer.group
+                    [:div.save-cancel-edit-buttons
+                      [:button.mlb-reset.save-bt
+                        {:on-click #(edit-finished % s comment-data)
+                         :title "Save edit"}
+                        "Save"]
+                      [:button.mlb-reset.cancel-bt
+                        {:on-click #(cancel-edit % s comment-data)
+                         :title "Cancel edit"}
+                        "Cancel"]]]
+                  (when (and (:can-react comment-data)
+                             (seq (:reactions comment-data)))
+                    [:div.stream-comment-reactions-footer.group
+                      (reactions comment-data false activity-data)]))]]])]
       [:div.stream-comments-empty])])

@@ -9,15 +9,19 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment {
-      padding: 8px 16px;
       position: relative;
+      transition: background-color 280ms ease-in;
 
       &.highlighted {
         background-color: #FFF7DD;
       }
 
+      div.stream-comment-inner {
+        padding: 8px 16px;
+      }
+
       @include big_web() {
-        &:not(.highlighted):hover {
+        &:not(.highlighted):hover div.stream-comment-inner {
           background-color: rgba($ultra_light_grey, 0.3);
 
           div.stream-comment-floating-buttons {
@@ -39,7 +43,7 @@ div.stream-comments {
 
       &.editing {
         @include big_web() {
-          &:not(.highlighted):hover {
+          &:not(.highlighted):hover div.stream-comment-inner {
             background-color: initial;
           }
         }
