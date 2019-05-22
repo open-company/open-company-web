@@ -73,4 +73,4 @@
 (def ws-monitor-interval 30)
 
 ;; Giphy
-(def giphy-api-key "NVG5g5bBYiltVqpS4nOsDkYk5kfTC9Sd")
+(def giphy-api-key "M2FfNXledXWbpa7FZkg2vvUD8kHMTQVF")
