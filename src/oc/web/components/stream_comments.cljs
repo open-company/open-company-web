@@ -3,6 +3,7 @@
             [cljsjs.emoji-mart]
             [goog.object :as gobj]
             [goog.events :as events]
+            [taoensso.timbre :as timbre]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
@@ -110,6 +111,7 @@
                              (rum/local nil ::show-picker)
                              (rum/local {} ::comment-url-copy)
                              (rum/local false ::highlight-comment-url)
+                             (rum/local false ::initial-comment-scroll)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              (on-window-click-mixin (fn [s e]
@@ -117,25 +119,29 @@
                                          (not (utils/event-inside? e
                                           (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
                                 (reset! (::show-picker s) nil))))
-                             {:did-mount (fn [s]
-                               (when (router/current-comment-id)
-                                 (utils/after 1000
-                                  #(when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
+                             {:after-render (fn [s]
+                               (let [activity-uuid (:uuid (first (:rum/args s)))
+                                     focused-uuid @(drv/get-ref s :add-comment-focus)
+                                     current-local-state @(::last-focused-state s)
+                                     is-self-focused? (= focused-uuid activity-uuid)
+                                     comments-data (second (:rim/args s))]
+                                  (when (not= current-local-state is-self-focused?)
+                                    (reset! (::last-focused-state s) is-self-focused?)
+                                    (when is-self-focused?
+                                      (scroll-to-bottom s)))
+                                 (when (and comments-data
+                                            (router/current-comment-id)
+                                            (not @(::initial-comment-scroll s)))
+                                   (timbre/info "comment-scroll comments-data loaded comment-id is here not already scrolled")
+                                   (when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
+                                     (timbre/info "comment-scroll    comment-node" comment-node)
+                                     (reset! (::initial-comment-scroll s) true)
                                      (reset! (::highlight-comment-url s) true)
                                      (utils/scroll-to-element comment-node)
                                      (utils/after 5000
                                       (fn []
+                                       (timbre/info "comment-scroll       reset highlight")
                                        (reset! (::highlight-comment-url s) false))))))
-                               s)
-                              :after-render (fn [s]
-                               (let [activity-uuid (:uuid (first (:rum/args s)))
-                                     focused-uuid @(drv/get-ref s :add-comment-focus)
-                                     current-local-state @(::last-focused-state s)
-                                     is-self-focused? (= focused-uuid activity-uuid)]
-                                  (when (not= current-local-state is-self-focused?)
-                                    (reset! (::last-focused-state s) is-self-focused?)
-                                    (when is-self-focused?
-                                      (scroll-to-bottom s))))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments
