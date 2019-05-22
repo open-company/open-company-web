@@ -5,6 +5,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
@@ -87,6 +89,15 @@
 (defn emoji-picked-cb [s comment-data emoji]
   (comment-actions/react-from-picker (first (:rum/args s)) comment-data (get emoji "native")))
 
+(defn- copy-comment-url [comment-url]
+  (let [input-field (.createElement js/document "input")]
+    (set! (.-style input-field) "position:absolute;top:-999999px;left:-999999px;")
+    (set! (.-value input-field) comment-url)
+    (.appendChild (.-body js/document) input-field)
+    (.select input-field)
+    (utils/copy-to-clipboard input-field)
+    (.removeChild (.-body js/document) input-field)))
+
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
                              (drv/drv :team-roster)
@@ -97,6 +108,7 @@
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
                              (rum/local nil ::show-picker)
+                             (rum/local {} ::comment-url-copy)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              (on-window-click-mixin (fn [s e]
@@ -104,7 +116,13 @@
                                          (not (utils/event-inside? e
                                           (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
                                 (reset! (::show-picker s) nil))))
-                             {:after-render (fn [s]
+                             {:did-mount (fn [s]
+                               (when (router/current-comment-id)
+                                 (utils/after 1000
+                                  #(when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
+                                     (utils/scroll-to-element comment-node))))
+                               s)
+                              :after-render (fn [s]
                                (let [activity-uuid (:uuid (first (:rum/args s)))
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
                                      current-local-state @(::last-focused-state s)
@@ -126,12 +144,15 @@
                     can-show-delete-bt? (:can-delete comment-data)]]
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))
+             :ref (str "stream-comment-" (:uuid comment-data))
              :class (utils/class-set {:editing is-editing?
-                                      :showing-picker @(::show-picker s)})}
+                                      :showing-picker @(::show-picker s)
+                                      :highlighted (= (:uuid comment-data) (router/current-comment-id))})}
             (when-not is-editing?
               [:div.stream-comment-floating-buttons
                 {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                          :can-delete can-show-delete-bt?})}
+                                          :can-delete can-show-delete-bt?
+                                          :can-share (seq (:url comment-data))})}
                 (when can-show-edit-bt?
                   [:button.mlb-reset.edit-bt
                     {:data-toggle "tooltip"
@@ -146,10 +167,12 @@
                      :title "Delete"
                      :on-click (fn [_]
                                 (delete-clicked s activity-data comment-data))}])
-                ; [:button.mlb-reset.share-bt
-                ;   {:data-toggle "tooltip"
-                ;    :data-placement "top"
-                ;    :title "Share"}]
+                (when (:url comment-data)
+                  [:button.mlb-reset.share-bt
+                    {:data-toggle "tooltip"
+                     :data-placement "top"
+                     :on-click #(copy-comment-url (:url comment-data))
+                     :title "Share"}])
                 [:button.mlb-reset.react-bt
                   {:data-toggle "tooltip"
                    :data-placement "top"
@@ -165,7 +188,6 @@
                                (reset! (::show-picker s) nil))}))])
             [:div.stream-comment-author-avatar
               (user-avatar-image (:author comment-data))]
-
             [:div.stream-comment-right
               [:div.stream-comment-header.group
                 {:class utils/hide-class}

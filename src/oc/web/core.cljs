@@ -227,6 +227,7 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         entry (:entry (:params params))
+        comment (:comment (:params params))
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
@@ -235,10 +236,11 @@
      (vec
       (remove
        nil?
-       [org board (when entry entry) route]))
+       [org board (when entry entry) (when comment comment) route]))
      {:org org
       :board board
       :activity entry
+      :comment comment
       :query-params query-params})
     (check-nux query-params)
     (post-routing)
@@ -610,6 +612,14 @@
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
       (entry-handler target params))
 
+    (defroute comment-route (urls/comment-url ":org" ":board" ":entry" ":comment") {:as params}
+      (timbre/info "Routing comment-route" (urls/comment-url ":org" ":board" ":entry" ":comment"))
+      (entry-handler target params))
+
+    (defroute comment-slash-route (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/") {:as params}
+      (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/"))
+      (entry-handler target params))
+
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
       ;; render component
@@ -682,6 +692,9 @@
                                  ; Entry route
                                  entry-route
                                  entry-slash-route
+                                 ;; Comment route
+                                 comment-route
+                                 comment-slash-route
                                  ;; Not found
                                  not-found-route]))
 

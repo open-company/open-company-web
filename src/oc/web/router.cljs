@@ -113,6 +113,9 @@
 (defn current-secure-activity-id []
   (:secure-id @path))
 
+(defn current-comment-id []
+  (:comment @path))
+
 (defn query-params []
   (:query-params @path))
 

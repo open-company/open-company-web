@@ -12,8 +12,12 @@ div.stream-comments {
       padding: 8px 16px;
       position: relative;
 
+      &.highlighted {
+        background-color: #FFF7DD;
+      }
+
       @include big_web() {
-        &:hover {
+        &:not(.highlighted):hover {
           background-color: rgba($ultra_light_grey, 0.3);
 
           div.stream-comment-floating-buttons {
@@ -35,7 +39,7 @@ div.stream-comments {
 
       &.editing {
         @include big_web() {
-          &:hover {
+          &:not(.highlighted):hover {
             background-color: initial;
           }
         }
@@ -71,15 +75,19 @@ div.stream-comments {
         right: 16px;
         top: -13px;
         height: 26px;
-        width: 34px; // FIXME With share change to 69px;
+        width: 34px;
         display: none;
 
-        &.can-edit, &.can-delete {
-          width: 69px; // FIXME With share change to 104px;
+        &.can-share, &.can-edit, &.can-delete {
+          width: 69px;
         }
 
-        &.can-edit.can-delete {
-          width: 104px; // FIXME With share change to 139px;
+        &.can-edit.can-delete, &.can-edit.can-share, &.can-delete.can-share {
+          width: 104px;
+        }
+
+        &.can-edit.can-delete.can-share {
+          width: 139px;
         }
 
         div.emoji-mart {

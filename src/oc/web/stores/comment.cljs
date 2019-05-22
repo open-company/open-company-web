@@ -2,7 +2,9 @@
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun-)]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.utils.comment :as comment-utils]))
 
@@ -17,11 +19,11 @@
          (not (.match plain-text is-text-message?)))))
 
 (defun- parse-comment
-  ([comments :guard sequential?]
-    (map parse-comment comments))
-  ([comment-map :guard nil?]
+  ([org-data activity-data comments :guard sequential?]
+    (map #(parse-comment org-data activity-data %) comments))
+  ([org-data activity-data comment-map :guard nil?]
     {})
-  ([comment-map :guard map?]
+  ([org-data :guard map? activity-data :guard map? comment-map :guard map?]
     (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
           delete-comment-link (utils/link-for (:links comment-map) "delete")
           can-react? (utils/link-for (:links comment-map) "react"  "POST")]
@@ -29,7 +31,9 @@
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
         (assoc :can-delete (boolean delete-comment-link))
-        (assoc :can-react can-react?)))))
+        (assoc :can-react can-react?)
+        (assoc :url (str ls/web-server-domain (oc-urls/comment-url (:slug org-data) (:board-slug activity-data)
+                                               (:uuid activity-data) (:uuid comment-map))))))))
 
 (defmethod dispatcher/action :add-comment-change
   [db [_ org-slug activity-uuid comment-body]]
@@ -51,7 +55,9 @@
         user-data (if (jwt/jwt)
                     (jwt/get-contents)
                     (jwt/get-id-token-contents))
-        new-comment-data (parse-comment {:body comment-body
+        new-comment-data (parse-comment (dispatcher/org-data db)
+                                        activity-data
+                                        {:body comment-body
                                          :created-at (utils/as-of-now)
                                          :author {:name (:name user-data)
                                                   :avatar-url (:avatar-url user-data)
@@ -70,7 +76,9 @@
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error comments-key body activity-uuid]}]]
-  (let [cleaned-comments (map parse-comment (:items (:collection body)))
+  (let [org-data (dispatcher/org-data db)
+        activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
+        cleaned-comments (map #(parse-comment org-data activity-data %) (:items (:collection body)))
         sorted-comments (comment-utils/sort-comments cleaned-comments)
         pre-comments-key (vec (butlast comments-key))]
     (-> db
@@ -130,7 +138,10 @@
 
 (defmethod dispatcher/action :ws-interaction/comment-update
   [db [_ comments-key interaction-data]]
-  (let [comment-data (:interaction interaction-data)
+  (let [activity-uuid (:resource-uuid interaction-data)
+        org-data (dispatcher/org-data db)
+        activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
+        comment-data (:interaction interaction-data)
         item-uuid (:uuid comment-data)
         comments-data (get-in db comments-key)
         comment-idx (utils/index-of comments-data #(= item-uuid (:uuid %)))]
@@ -146,7 +157,7 @@
                 new-comment-data (if (contains? update-comment-data :reactions)
                                    update-comment-data
                                    (assoc update-comment-data :reactions (:reactions old-comment-data)))
-                new-comments-data (assoc comments-data comment-idx (parse-comment new-comment-data))]
+                new-comments-data (assoc comments-data comment-idx (parse-comment org-data activity-data new-comment-data))]
             (assoc-in db comments-key new-comments-data))
           db))
       db)))
