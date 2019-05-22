@@ -129,20 +129,20 @@
                                     (reset! (::last-focused-state s) is-self-focused?)
                                     (when is-self-focused?
                                       (scroll-to-bottom s)))
-                                 (timbre/info "comment-scroll after-render comments-data" comments-data "comment-id" (router/current-comment-id))
+                                 (timbre/info "comment-scroll after-render comments-data" (boolean comments-data) "comment-id" (router/current-comment-id))
                                  (when (and comments-data
                                             (router/current-comment-id)
                                             (not @(::initial-comment-scroll s)))
                                    (timbre/info "comment-scroll   looking for dom node")
                                    (when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
                                      (timbre/info "comment-scroll     comment-node" comment-node)
-                                     (reset! (::initial-comment-scroll s) true)
-                                     (reset! (::highlight-comment-url s) true)
-                                     (utils/scroll-to-element comment-node)
-                                     (utils/after 5000
-                                      (fn []
+                                     (utils/after 2000 (fn []
+                                      (reset! (::initial-comment-scroll s) true)
+                                      (reset! (::highlight-comment-url s) true)
+                                      (utils/scroll-to-element comment-node)
+                                      (utils/after 5000(fn []
                                        (timbre/info "comment-scroll        reset highlight")
-                                       (reset! (::highlight-comment-url s) false))))))
+                                       (reset! (::highlight-comment-url s) false))))))))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments
