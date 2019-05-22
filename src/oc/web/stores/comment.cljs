@@ -175,7 +175,9 @@
     ;; If the entry is present in the local state
     (let [; get the comment data from the ws message
           activity-uuid (:resource-uuid interaction-data)
-          comment-data (parse-comment (:interaction interaction-data))
+          org-data (dispatcher/org-data db)
+          activity-data (dispatcher/activity-data (:slug org-data) activity-uuid db)
+          comment-data (parse-comment org-data activity-data (:interaction interaction-data))
           created-at (:created-at comment-data)
           all-old-comments-data (dispatcher/activity-comments-data activity-uuid)
           old-comments-data (filterv :links all-old-comments-data)
