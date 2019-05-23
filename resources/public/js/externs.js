@@ -69,6 +69,7 @@ var AutoList = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};
+MediaPicker.addGIF = function(){};
 MediaPicker.addPhoto = function(){};
 MediaPicker.addVideo = function(){};
 MediaPicker.addChart = function(){};
