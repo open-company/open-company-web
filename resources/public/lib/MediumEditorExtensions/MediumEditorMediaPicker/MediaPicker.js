@@ -222,6 +222,17 @@ function PlaceCaretAtEnd(el) {
       $(event.target).tooltip("hide");
     },
 
+    gifClick: function(event){
+      if (this.inlinePlusButtonOptions.alwaysExpanded) {
+        this.hidePlaceholder();
+        this.saveSelection();
+      }
+      this.collapse();
+      this._waitingCB = true;
+      this.delegate("onPickerClick", "gif");
+      $(event.target).tooltip("hide");
+    },
+
     photoClick: function(event){
       if (this.inlinePlusButtonOptions.alwaysExpanded) {
         this.hidePlaceholder();
@@ -233,8 +244,15 @@ function PlaceCaretAtEnd(el) {
       $(event.target).tooltip("hide");
     },
 
+    addGIF: function(gifUrl, gifStillThumbnail, width, height){
+      this.addImage(gifUrl, gifStillThumbnail, width, height, "image/gif");
+    },
+
     addPhoto: function(photoUrl, photoThumbnail, width, height){
-      log("addPhoto", photoUrl, photoThumbnail, width, height);
+      this.addImage(photoUrl, photoThumbnail, width, height, "image/*");
+    },
+
+    addImage: function(photoUrl, photoThumbnail, width, height, mediaType){
       if (this._lastSelection) {
         rangy.restoreSelection(this._lastSelection);
         this._lastSelection = undefined;
@@ -275,7 +293,7 @@ function PlaceCaretAtEnd(el) {
         var img = this.document.createElement("img");
         img.src = photoUrl;
         img.className = "carrot-no-preview";
-        img.dataset.mediaType = "image";
+        img.dataset.mediaType = mediaType;
         img.dataset.thumbnail = photoThumbnail;
         img.width = width;
         img.height = height;
@@ -569,6 +587,11 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-' + idx);
           this.addButtonTooltip(button, "Add update");
           this.on(button, 'click', this.entryClick.bind(this));
+        } else if (opt === 'gif') {
+          button.classList.add('media-gif');
+          button.classList.add('media-' + idx);
+          this.addButtonTooltip(button, "Add GIF");
+          this.on(button, 'click', this.gifClick.bind(this));
         } else if (opt === 'photo') {
           button.classList.add('media-photo');
           button.classList.add('media-' + idx);
