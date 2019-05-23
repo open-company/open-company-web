@@ -40,7 +40,6 @@
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
-                              (drv/drv :mobile-navigation-sidebar)
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
                               ;; Locals
@@ -85,7 +84,6 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         ; board-sort (::board-sort s)
         show-drafts (pos? (:count drafts-link))
-        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and (router/current-board-slug)
@@ -101,146 +99,144 @@
             (navigation-sidebar))
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
-          (when (or (not is-tablet-or-mobile?)
-                    (not mobile-navigation-sidebar))
-            [:div.board-container.group
-              (when-not current-activity-id
-                ;; Board name row: board name, settings button and say something button
-                [:div.board-name-container.group
-                  ;; Board name and settings button
-                  
-                  [:div.board-name
-                    (when (router/current-board-slug)
-                      [:div.board-name-with-icon
-                        [:div.board-name-with-icon-internal
-                          {:class (utils/class-set {:private (and (= (:access board-data) "private")
-                                                                  (not is-drafts-board))
-                                                    :public (= (:access board-data) "public")})
-                           :dangerouslySetInnerHTML (utils/emojify (cond
-                                                     is-all-posts
-                                                     "All posts"
+          [:div.board-container.group
+            (when-not current-activity-id
+              ;; Board name row: board name, settings button and say something button
+              [:div.board-name-container.group
+                ;; Board name and settings button
+                
+                [:div.board-name
+                  (when (router/current-board-slug)
+                    [:div.board-name-with-icon
+                      [:div.board-name-with-icon-internal
+                        {:class (utils/class-set {:private (and (= (:access board-data) "private")
+                                                                (not is-drafts-board))
+                                                  :public (= (:access board-data) "public")})
+                         :dangerouslySetInnerHTML (utils/emojify (cond
+                                                   is-all-posts
+                                                   "All posts"
 
-                                                     is-must-see
-                                                     "Must see"
+                                                   is-must-see
+                                                   "Must see"
 
-                                                     :default
-                                                     (:name board-data)))}]])
-                    (when (and (= (:access board-data) "private")
-                               (not is-drafts-board))
-                      [:div.private-board
-                        {:data-toggle "tooltip"
+                                                   :default
+                                                   (:name board-data)))}]])
+                  (when (and (= (:access board-data) "private")
+                             (not is-drafts-board))
+                    [:div.private-board
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+                               "Only visible to you"
+                               "Only visible to invited team members")}])
+                  (when (= (:access board-data) "public")
+                    [:div.public-board
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title "Visible to the world, including search engines"}])
+                  (when should-show-settings-bt
+                    [:div.board-settings-container
+                      ;; Settings button
+                      [:button.mlb-reset.board-settings-bt
+                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
                          :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-                                 "Only visible to you"
-                                 "Only visible to invited team members")}])
-                    (when (= (:access board-data) "public")
-                      [:div.public-board
-                        {:data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                         :title "Visible to the world, including search engines"}])
-                    (when should-show-settings-bt
-                      [:div.board-settings-container
-                        ;; Settings button
-                        [:button.mlb-reset.board-settings-bt
-                          {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                           :data-placement "top"
-                           :data-container "body"
-                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                           :title (str (:name board-data) " settings")
-                           :on-click #(do
-                                        (when (:show-section-settings-tooltip qsg-data)
-                                          (qsg-actions/dismiss-section-settings-tooltip))
-                                        (nav-actions/show-section-editor))}]
-                      (when (:show-section-settings-tooltip qsg-data)
-                        [:div.section-settings-tooltip-container.group
-                          [:div.section-settings-tooltip-top-arrow]
-                          [:button.mlb-reset.section-settings-tooltip-dismiss
-                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
-                          [:div.section-settings-tooltips
-                            [:div.section-settings-tooltip
-                              "You can make changes to a section at any time."]
-                            [:button.mlb-reset.section-settings-bt
-                              {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
-                              "OK, got it"]]])])]
-                  ; (when-not is-mobile?
-                  ;   (let [default-sort (= @board-sort :default)]
-                  ;     [:div.board-sort.group
-                  ;       {:ref :board-sort-menu}
-                  ;       [:button.mlb-reset.board-sort-bt
-                  ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                  ;         (if default-sort "Recent activity" "Recently posted")]
-                  ;       [:div.board-sort-menu
-                  ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                  ;         [:div.board-sort-menu-item
-                  ;           {:class (when default-sort "active")
-                  ;            :on-click #(reset! board-sort :defautl)}
-                  ;           "Recent activity"]
-                  ;         [:div.board-sort-menu-item
-                  ;           {:class (when-not default-sort "active")
-                  ;            :on-click #(reset! board-sort :own)}
-                  ;           "Recently posted"]]]))
-                  ])
-              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-                    non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
-                                           "decisions to keep you and your team pulling in the same direction.")
-                    is-second-user (= add-post-tooltip :is-second-user)]
-                (when (and (not is-drafts-board)
-                           (not current-activity-id)
-                           add-post-tooltip)
-                  [:div.add-post-tooltip-container.group
-                    [:button.mlb-reset.add-post-tooltip-dismiss
-                      {:on-click #(do
-                                    (nux-actions/dismiss-add-post-tooltip)
-                                    (qsg-actions/turn-on-show-guide))}]
-                    [:div.add-post-tooltips
-                      {:class (when is-second-user "second-user")}
-                      [:div.add-post-tooltip-box-mobile]
-                      [:div.add-post-tooltip-title
-                        (str "Welcome to Carrot, " (:first-name current-user-data) "!")]
-                        [:div.add-post-tooltip
-                          (if is-admin-or-author
-                            (if is-second-user
-                              non-admin-tooltip
-                              "Create a test post now to see how it works. You can delete it anytime.")
-                            non-admin-tooltip)
-                          (when (and is-admin-or-author
-                                     (not is-second-user))
-                            [:button.mlb-reset.add-post-bt
-                              {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-                              [:span.add-post-bt-pen]
-                              "Create your first post"])]
-                      [:div.add-post-tooltip-box
-                        {:class (when is-second-user "second-user")}]]]))
-              ;; Board content: empty org, all posts, empty board, drafts view, entries view
+                         :title (str (:name board-data) " settings")
+                         :on-click #(do
+                                      (when (:show-section-settings-tooltip qsg-data)
+                                        (qsg-actions/dismiss-section-settings-tooltip))
+                                      (nav-actions/show-section-editor))}]
+                    (when (:show-section-settings-tooltip qsg-data)
+                      [:div.section-settings-tooltip-container.group
+                        [:div.section-settings-tooltip-top-arrow]
+                        [:button.mlb-reset.section-settings-tooltip-dismiss
+                          {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
+                        [:div.section-settings-tooltips
+                          [:div.section-settings-tooltip
+                            "You can make changes to a section at any time."]
+                          [:button.mlb-reset.section-settings-bt
+                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
+                            "OK, got it"]]])])]
+                ; (when-not is-mobile?
+                ;   (let [default-sort (= @board-sort :default)]
+                ;     [:div.board-sort.group
+                ;       {:ref :board-sort-menu}
+                ;       [:button.mlb-reset.board-sort-bt
+                ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                ;         (if default-sort "Recent activity" "Recently posted")]
+                ;       [:div.board-sort-menu
+                ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                ;         [:div.board-sort-menu-item
+                ;           {:class (when default-sort "active")
+                ;            :on-click #(reset! board-sort :defautl)}
+                ;           "Recent activity"]
+                ;         [:div.board-sort-menu-item
+                ;           {:class (when-not default-sort "active")
+                ;            :on-click #(reset! board-sort :own)}
+                ;           "Recently posted"]]]))
+                ])
+            (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
+                  non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+                                         "decisions to keep you and your team pulling in the same direction.")
+                  is-second-user (= add-post-tooltip :is-second-user)]
+              (when (and (not is-drafts-board)
+                         (not current-activity-id)
+                         add-post-tooltip)
+                [:div.add-post-tooltip-container.group
+                  [:button.mlb-reset.add-post-tooltip-dismiss
+                    {:on-click #(do
+                                  (nux-actions/dismiss-add-post-tooltip)
+                                  (qsg-actions/turn-on-show-guide))}]
+                  [:div.add-post-tooltips
+                    {:class (when is-second-user "second-user")}
+                    [:div.add-post-tooltip-box-mobile]
+                    [:div.add-post-tooltip-title
+                      (str "Welcome to Carrot, " (:first-name current-user-data) "!")]
+                      [:div.add-post-tooltip
+                        (if is-admin-or-author
+                          (if is-second-user
+                            non-admin-tooltip
+                            "Create a test post now to see how it works. You can delete it anytime.")
+                          non-admin-tooltip)
+                        (when (and is-admin-or-author
+                                   (not is-second-user))
+                          [:button.mlb-reset.add-post-bt
+                            {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+                            [:span.add-post-bt-pen]
+                            "Create your first post"])]
+                    [:div.add-post-tooltip-box
+                      {:class (when is-second-user "second-user")}]]]))
+            ;; Board content: empty org, all posts, empty board, drafts view, entries view
+            (cond
+              ;; No boards
+              (zero? (count (:boards org-data)))
+              (empty-org)
+              ;; Expanded post
+              current-activity-id
+              (expanded-post)
+              ;; Empty board
+              empty-board?
+              (empty-board)
+              ;; All Posts
+              (and (or is-all-posts
+                       is-must-see)
+                   ;; Commenting out grid view switcher for now
+                   ; (= @board-switch :stream)
+                   )
+              (rum/with-key (all-posts)
+               (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
+              ;; Layout boards activities
+              :else
               (cond
-                ;; No boards
-                (zero? (count (:boards org-data)))
-                (empty-org)
-                ;; Expanded post
-                current-activity-id
-                (expanded-post)
-                ;; Empty board
-                empty-board?
-                (empty-board)
-                ;; All Posts
-                (and (or is-all-posts
-                         is-must-see)
-                     ;; Commenting out grid view switcher for now
-                     ; (= @board-switch :stream)
-                     )
-                (rum/with-key (all-posts)
-                 (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-                ;; Layout boards activities
+                ;; Commenting out grid view switcher for now
+                ;; Entries grid view
+                ; (= @board-switch :grid)
+                ; (entries-layout)
+                ;; Entries stream view
                 :else
-                (cond
-                  ;; Commenting out grid view switcher for now
-                  ;; Entries grid view
-                  ; (= @board-switch :grid)
-                  ; (entries-layout)
-                  ;; Entries stream view
-                  :else
-                  (section-stream)))])]]))
+                (section-stream)))]]]))

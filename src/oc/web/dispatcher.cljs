@@ -148,7 +148,6 @@
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
-   :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
@@ -283,7 +282,6 @@
    :navbar-data         [[:base :org-data :board-data :current-user-data]
                           (fn [base org-data board-data current-user-data]
                             (let [navbar-data (select-keys base [:show-login-overlay
-                                                                 :mobile-navigation-sidebar
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
                                                                  :panel-stack
@@ -357,7 +355,6 @@
                                :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
-                               :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)

@@ -96,7 +96,6 @@
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
-                mobile-navigation-sidebar
                 activity-share-container
                 show-cmail
                 showing-mobile-user-notifications
@@ -171,7 +170,6 @@
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))]
-    ;; Show loading if
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -250,11 +248,7 @@
           ;; Mobile notifications
           (and is-mobile?
                showing-mobile-user-notifications)
-          (user-notifications)
-          ;; Show mobile navigation
-          (and is-mobile?
-               mobile-navigation-sidebar)
-          (navigation-sidebar))
+          (user-notifications))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -287,7 +281,6 @@
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
-                              (not mobile-navigation-sidebar)
                               (not open-panel)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))

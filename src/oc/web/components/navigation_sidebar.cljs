@@ -57,7 +57,6 @@
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :editable-boards)
-                                (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :hide-left-navbar)
                                 ;; Locals
@@ -93,7 +92,6 @@
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
         current-user-data (drv/react s :current-user-data)
-        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
@@ -117,22 +115,9 @@
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :hide-left-navbar (drv/react s :hide-left-navbar)})
+      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})
        :style {:overflow (when (= (:step qsg-data) :add-section-1)
                            "visible")}}
-      [:div.mobile-header-container
-        [:button.mlb-reset.mobile-header-close
-          {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
-        (orgs-dropdown)
-        [:button.btn-reset.mobile-menu.group
-          {:on-click #(do
-                       (when is-mobile?
-                         (nav-actions/show-org-settings nil)
-                         (nav-actions/show-user-settings nil))
-                       (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                       (nav-actions/menu-toggle))}
-          (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts

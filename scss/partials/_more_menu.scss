@@ -6,10 +6,6 @@ div.more-menu {
   opacity: 1;
   position: relative;
 
-  @include mobile() {
-    width: 30px;
-  }
-
   div.activity-move {
     position: absolute;
     bottom: 32px;

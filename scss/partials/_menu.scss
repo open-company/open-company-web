@@ -12,6 +12,12 @@ div.menu {
   background-color: $carrot_modal_bg;
   z-index: #{$navbar_zindex + 156};
 
+  @include mobile() {
+    position: absolute;
+    padding: 0;
+    background-color: $grey_num_2;
+  }
+
   &.dropdown-menu {
     letter-spacing: 0em;
   }
@@ -20,6 +26,15 @@ div.menu {
     position: absolute;
     right: 336px;
     top: 12px;
+  }
+
+  &.expanded-user-menu {
+    div.menu-container {
+      @include mobile() {
+        display: block;
+        opacity: 1;
+      }
+    }
   }
 
   div.menu-container {
@@ -35,25 +50,21 @@ div.menu {
     overflow-y: scroll;
 
     @include mobile() {
-      position: absolute;
-      top: 0px;
-      left: 0px;
+      position: relative;
+      top: unset;
+      left: unset;
+      right: unset;
       width: 100%;
       height: 100vh;
       border: none;
       box-shadow: none;
       transition: 230ms;
       display: block;
-      text-align: right;
+      text-align: left;
       background-color: white;
       display: none;
       opacity: 0;
       padding: 0 16px;
-
-      &.expanded-user-menu {
-        display: block;
-        opacity: 1;
-      }
     }
 
     div.menu-header {
@@ -64,19 +75,30 @@ div.menu {
       padding: 12px 16px 12px 24px;
       margin-bottom: 24px;
 
+      @include mobile() {
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        border-bottom: 1px solid $ultra_light_grey;
+      }
+
       button.mobile-close-bt {
         display: none;
 
         @include mobile() {
           display: block;
+          position: absolute;
+          left: 16px;
+          top: 13px;
           width: 24px;
           height: 24px;
-          background-image: cdnUrl("/img/ML/mobile_back_arrow.svg");
-          background-size: 16px 12px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+          background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          margin: 2px 16px 0 -5px;
-          float: left;
         }
       }
 
@@ -96,6 +118,10 @@ div.menu {
         color: $deep_navy;
         line-height: 32px;
         float: left;
+
+        @include mobile() {
+          margin-left: 8px;
+        }
       }
     }
 
@@ -105,7 +131,7 @@ div.menu {
       margin: 16px 0;
 
       @include mobile() {
-        display: none;
+        margin: 24px 0;
       }
     }
 
@@ -143,19 +169,6 @@ div.menu {
       position: relative;
       @include OC_Body_Book();
       font-size: 14px;
-
-      &:after {
-        @include mobile() {
-          content: "";
-          display: block;
-          position: absolute;
-          bottom: 0;
-          left: 30px;
-          width: calc(100% - 16px);
-          height: 1px;
-          background-color: $ultra_light_grey;
-        }
-      }
 
       &.whats-new {
         #HW_badge_cont {

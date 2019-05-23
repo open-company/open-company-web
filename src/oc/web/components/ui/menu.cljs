@@ -109,14 +109,16 @@
         {:ref :menu-container}
         [:div.menu-header.group
           [:button.mlb-reset.mobile-close-bt
-            {:on-click #(do
-                         (menu-close s)
-                         (nav-actions/mobile-nav-sidebar))}]
+            {:on-click #(menu-close s)}]
+          (when is-mobile?
+            (user-avatar-image current-user-data))
           [:div.user-name
             {:class utils/hide-class}
             (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
-          (user-avatar-image current-user-data)]
-        (when (jwt/jwt)
+          (when-not is-mobile?
+            (user-avatar-image current-user-data))]
+        (when (and (jwt/jwt)
+                   (not is-mobile?))
           [:a.qsg-profile-photo-2
             {:href "#"
              :on-click (partial user-profile-click s)}
@@ -124,14 +126,17 @@
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.personal-profile
               "My profile"]])
-        (when (jwt/jwt)
+        (when (and (jwt/jwt)
+                   (not is-mobile?))
           [:a
             {:href "#"
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
-        [:div.oc-menu-separator]
-        (when show-reminders?
+        (when-not is-mobile?
+          [:div.oc-menu-separator])
+        (when (and show-reminders?
+                   (not is-mobile?))
           [:a.qsg-create-reminder-2
             {:href "#"
              :on-click #(reminders-click s % qsg-data)}
@@ -139,8 +144,9 @@
               (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        (when (or (= user-role :admin)
-                  show-invite-people?)
+        (when (and (not is-mobile?)
+                   (or (= user-role :admin)
+                       show-invite-people?))
           [:div.oc-menu-separator])
         (when (and (not is-mobile?)
                    (= user-role :admin)
@@ -182,7 +188,8 @@
         ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
         ;     [:div.oc-menu-item
         ;       "Billing"]])
-        [:div.oc-menu-separator]
+        (when-not is-mobile?
+          [:div.oc-menu-separator])
         [:a.whats-new-link
           (if is-mobile?
             {:href "https://whats-new.carrot.io/"

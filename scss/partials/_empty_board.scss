@@ -73,6 +73,10 @@ div.empty-board {
       font-size: 14px;
       border-radius: 6px;
       margin: 21px auto 0;
+
+      @include mobile() {
+        display: none;
+      }
     }
   }
 }

@@ -151,8 +151,7 @@
                                 (activity-actions/send-item-read (:uuid activity-data) true))}
                   "Mark as read"]))])
         (when (and external-share
-                   share-link
-                   (not is-mobile?))
+                   share-link)
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"

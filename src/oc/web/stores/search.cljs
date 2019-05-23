@@ -67,4 +67,4 @@
 
 (defmethod dispatcher/action :search-focus
   [db [_]]
-  (dissoc db :mobile-navigation-sidebar))
+  db)

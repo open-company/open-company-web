@@ -69,6 +69,7 @@ div.org-dashboard {
 
     @include mobile(){
       padding-top: #{$mobile_navbar_height}px;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
     }
 
     div.org-dashboard-container {
@@ -148,6 +149,6 @@ div.org-dashboard div.org-dashboard-inner {
   }
   @include mobile(){
     background-color: $grey_num_2;
-    min-height: calc(100vh - #{$navbar_height}px);
+    min-height: calc(100vh - #{$mobile_navbar_height}px);
   }
 }
