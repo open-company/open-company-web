@@ -193,14 +193,19 @@ div.stream-comments {
 
       div.stream-comment-right {
         margin-left: 40px;
+        @include preload_image(cdnUrl("/img/ML/comment_react_emoji.svg"));
       }
 
       div.stream-comment-header {
         height: 16px;
 
+        @include preload_image(cdnUrl("/img/ML/comment_edit_pen.svg"));
+
         div.stream-comment-author-right  {
           float: left;
           max-width: 80%;
+
+          @include preload_image(cdnUrl("/img/ML/comment_delete_can.svg"));
 
           div.stream-comment-author-name {
             @include OC_Body_Bold();
@@ -208,6 +213,7 @@ div.stream-comments {
             color: $deep_navy;
             line-height: 15px;
             float: left;
+            @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
           }
 
           div.stream-comment-author-timestamp {
