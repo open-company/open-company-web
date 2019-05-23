@@ -17,6 +17,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -182,7 +183,11 @@
                     [:button.mlb-reset.share-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
-                       :on-click #(copy-comment-url (:url comment-data))
+                       :on-click #(do
+                                    (copy-comment-url (:url comment-data))
+                                    (notification-actions/show-notification {:title "Share link copied to clipboard"
+                                                                             :dismiss true
+                                                                             :id :comment-url-copied}))
                        :title "Share"}])
                   [:button.mlb-reset.react-bt
                     {:data-toggle "tooltip"
