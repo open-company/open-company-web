@@ -202,7 +202,7 @@
                     [:button.mlb-reset.send-reminder-bt
                       {:on-click (fn [_]
                                    (let [wrt-share {:note "When you have a moment, please check out this post."
-                                                    :subject (str "Just a reminder: " (:headline activity-data))
+                                                    :subject (str "You may have missed: " (:headline activity-data))
                                                     :user-id (:user-id u)}]
                                      (swap! (::sending-notice s) assoc (:user-id u) :loading)
                                      ;; Show the share popup
