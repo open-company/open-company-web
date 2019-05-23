@@ -36,6 +36,7 @@
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
+    [binaryage/oops "0.7.0"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
 
     ;; CLJSJS packages http://cljsjs.github.io/
     ;; Update together with resources/public/lib/jwt_decode/
@@ -50,9 +51,10 @@
     [cljsjs/filestack "0.9.9-0"] ; Filestack image manipulatino and storing https://github.com/filestack/filestack-js
     [cljsjs/emoji-mart "2.2.1-0"] ; EmojiMart picker for native emoji picking https://github.com/missive/emoji-mart
     [cljsjs/localforage "1.5.3-0"] ; Offline storage, improved. Wraps IndexedDB, WebSQL, or localStorage using a simple but powerful API. https://github.com/localForage/localForage
+    [cljsjs/react-giphy-selector "0.0.2-0"] ;; A very customizable react search component for picking the perfect giphy. https://github.com/tshaddix/react-giphy-selector
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.5" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
+    [open-company/lib "0.17.8" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
