@@ -133,6 +133,13 @@ div.expanded-post {
     div.is-comments {
       margin-right: 16px;
       float: left;
+
+      div.is-comments-authors.show-border {
+        div.is-comments-author {
+          background-color: $oc_gray_8;
+          border: 2px solid $oc_gray_8;
+        }
+      }
     }
 
     div.reactions {
@@ -165,38 +172,16 @@ div.expanded-post {
   div.expanded-post-comments {
     padding-bottom: 0;
     margin-top: 24px;
-    padding-top: 24px;
+    padding-top: 16px;
     border-top: 1px solid $ultra_light_grey;
 
     div.stream-comments {
-      width: 100%;
-    }
-  }
-
-  div.expanded-post-fixed-add-comment {
-    position: fixed;
-    bottom: 0;
-    left: #{$left_navigation_sidebar_width}px;
-    width: calc(100vw - #{$left_navigation_sidebar_width}px);
-    background-color: white;
-    min-height: 71px;
-    border-top: 1px solid $ultra_light_grey;
-
-    @include mobile() {
-      position: relative;
-      left: unset;
-      width: 100%;
-      border-top: none;
+      width: calc(100% + 32px);
+      margin-left: -16px;
     }
 
-    div.expanded-post-fixed-add-comment-inner {
-      width: 640px;
-      margin: 24px auto;
-
-      @include mobile() {
-        width: 100%;
-        margin: 0;
-      }
+    div.add-comment-box-container {
+      margin-top: 8px;
     }
   }
 }

@@ -19,33 +19,11 @@ div.add-comment-box-container {
       box-shadow: none;
     }
 
-    // &.show-buttons {
-
-    //   div.add-comment-internal {
-    //     min-height: unset;
-    //     border: 1px solid $light_ui_grey;
-    //     padding: 9px 16px 32px 16px;
-
-    //     div.add-comment {
-    //       min-height: 29px;
-
-    //       @include tablet() {
-    //         height: auto;
-    //         width: auto;
-    //       }
-    //     }
-
-    //     div.emoji-picker {
-    //       display: block;
-    //     }
-    //   }
-    // }
-
     @include user-profile(24);
 
     div.user-avatar-img-container {
       position: absolute;
-      bottom: 0;
+      top: 8px;
       left: 0;
     }
 
@@ -61,25 +39,29 @@ div.add-comment-box-container {
 
       div.add-comment {
         resize: none;
-        border: none;
         outline: none;
         @include OC_Body_Book();
         color: $deep_navy;
         font-size: 16px;
         cursor: text;
-        line-height: 27px;
-        min-height: initial;
+        line-height: 20px;
         white-space: pre-wrap;
         word-wrap: break-word;
-        padding: 0;
+        padding: 9px 14px;
         margin: 0px;
         height: auto;
-        min-height: 27px;
+        min-height: 38px;
+        background-color: white;
+        border-radius: 4px;
+        border: 1px solid $mid_light_grey;
+        background-color: white;
+        outline: none;
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
         &.medium-editor-placeholder:after {
           @include OC_Body_Book();
           font-size: 16px;
-          color: rgba($ui_grey, 0.5);
+          color: rgba($deep_navy, 0.5);
         }
 
         @include tablet() {
@@ -122,7 +104,7 @@ div.add-comment-box-container {
 
     button.send-btn {
       position: absolute;
-      bottom: 0;
+      bottom: 8px;
       right: 0;
       width: 50px;
       height: 24px;

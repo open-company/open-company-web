@@ -23,7 +23,6 @@
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.post-modal :refer (post-modal)]
             [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.shared-misc :refer (video-lightbox)]
