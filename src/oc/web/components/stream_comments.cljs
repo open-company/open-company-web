@@ -139,10 +139,12 @@
                                      (reset! (::initial-comment-scroll s) true)
                                      (utils/after 2000 (fn []
                                       (reset! (::highlight-comment-url s) true)
-                                      (utils/scroll-to-element (rum/ref-node s (str "stream-comment-" (router/current-comment-id))))
-                                      (utils/after 5000(fn []
-                                       (timbre/info "comment-scroll        reset highlight")
-                                       (reset! (::highlight-comment-url s) false))))))))
+                                      (let [el (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
+                                        (timbre/info "comment-scroll      scrolling to" el "->" (.-scrollTop el))
+                                        (utils/scroll-to-element el)
+                                        (utils/after 5000(fn []
+                                         (timbre/info "comment-scroll        reset highlight")
+                                         (reset! (::highlight-comment-url s) false)))))))))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments
