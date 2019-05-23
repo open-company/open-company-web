@@ -1,6 +1,10 @@
 div.org-dashboard {
   background-color: $oc_gray_8;
 
+  @include mobile() {
+    background-color: $grey_num_2;
+  }
+
   div.login-required {
     min-height: calc(100vh - #{$footer_small_height}px - 44px);
   }
@@ -64,7 +68,6 @@ div.org-dashboard {
     min-height: calc(100vh - #{$footer_height}px);
 
     @include mobile(){
-      background-color: white;
       padding-top: #{$mobile_navbar_height}px;
     }
 
@@ -78,7 +81,7 @@ div.org-dashboard {
       @include mobile() {
         margin: 0px;
         min-width: initial;
-        background-color: white;
+        background-color: $grey_num_2;
       }
 
       div.empty-dashboard {
@@ -103,7 +106,7 @@ div.org-dashboard {
 
 html {
   @include mobile(){
-    background-color: $ultra_light_grey;
+    background-color: $grey_num_2;
   }
 }
 
@@ -125,12 +128,8 @@ body {
       min-height: 100vh;
 
       @include mobile(){
-        background-color: $ultra_light_grey;
+        background-color: $grey_num_2;
       }
-    }
-
-    @include mobile(){
-      background-color: $ultra_light_grey;
     }
   }
 }
@@ -148,7 +147,7 @@ div.org-dashboard div.org-dashboard-inner {
     padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
   }
   @include mobile(){
-    background-color: white;
+    background-color: $grey_num_2;
     min-height: calc(100vh - #{$navbar_height}px);
   }
 }
