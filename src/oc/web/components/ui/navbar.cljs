@@ -58,7 +58,14 @@
          user-role (user-store/user-role org-data current-user-data)
          can-compose? (or (= user-role :admin)
                           (= user-role :author))
-        qsg-data (drv/react s :qsg)]
+        qsg-data (drv/react s :qsg)
+        section-name (cond
+                      (= (router/current-board-slug) "all-posts")
+                      "All Posts"
+                      (= (router/current-board-slug) "must-see")
+                      "Must See"
+                      :else
+                      (:name board-data))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -75,99 +82,72 @@
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
-            (let [board-icon (cond
-                              (and (= (:access board-data) "private")
-                                   (not= (:slug board-data) utils/default-drafts-board-slug))
-                              [:span.private-icon]
-                              (= (:access board-data) "public")
-                              [:span.public-icon]
-                              (= (router/current-board-slug) "must-see")
-                              [:span.must-see-icon])]
-              [:button.mlb-reset.navigation-sidebar-ham-bt
-                {:class (utils/class-set {:active mobile-ap-active?})
-                 :on-click #(if is-mobile?
-                              (nav-actions/mobile-nav-sidebar)
-                              (dis/dispatch! [:update [:hide-left-navbar] not]))}
-                board-icon
-                [:span.board-name
-                  {:class (when board-icon "has-icon")}
-                  (cond
-                    (= (router/current-board-slug) "all-posts")
-                    "All Posts"
-                    (= (router/current-board-slug) "must-see")
-                    "Must See"
-                    :else
-                    (:name board-data))]])
-           (when-not is-mobile?
-             (orgs-dropdown))]
-          (when-not is-mobile?
+            (when-not is-mobile?
+              (let [board-icon (cond
+                                (and (= (:access board-data) "private")
+                                     (not= (:slug board-data) utils/default-drafts-board-slug))
+                                [:span.private-icon]
+                                (= (:access board-data) "public")
+                                [:span.public-icon]
+                                (= (router/current-board-slug) "must-see")
+                                [:span.must-see-icon])]
+                [:button.mlb-reset.navigation-sidebar-ham-bt
+                  {:class (utils/class-set {:active mobile-ap-active?})
+                   :on-click #(dis/dispatch! [:update [:hide-left-navbar] not])}
+                  board-icon
+                  [:span.board-name
+                    {:class (when board-icon "has-icon")}
+                    section-name]]))
+           (orgs-dropdown)]
+          (if is-mobile?
+            [:div.navbar-center
+              [:button.mlb-reset.mobile-board-button
+                {:on-click #(nav-actions/mobile-nav-sidebar)}
+                section-name]]
             [:div.navbar-center
               {:class (when search-active "search-active")}
               (search-box)])
           [:div.navbar-right
-            (if is-mobile?
-              [:div.mobile-right-nav
-                [:button.mlb-reset.search-bt
-                  {:on-click #(do
-                                (menu/menu-close)
-                                (search-actions/active)
-                                (user-actions/hide-mobile-user-notifications)
-                                (utils/after 500 search-actions/focus))
-                   :class (when search-active "active")}]
-                (when (jwt/user-is-part-of-the-team (:team-id org-data))
-                  [:button.mlb-reset.mobile-notification-bell
-                    {:class (utils/class-set {:active mobile-user-notifications})
-                     :on-click #(do
-                                  (search-actions/inactive)
-                                  (menu/menu-close)
-                                  (when (or org-settings
-                                          user-settings)
-                                    (nav-actions/show-user-settings nil)
-                                    (nav-actions/show-org-settings nil))
-                                  (user-actions/show-mobile-user-notifications))}])
-                (when can-compose?
-                  [:button.mlb-reset.mobile-compose-bt
-                    {:on-click #(ui-compose)}])]
-              (if (jwt/jwt)
-                [:div.group
-                  (user-notifications)
-                  [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1.qsg-invite-team-1.qsg-create-reminder-1
-                    (when (or (= (:step qsg-data) :profile-photo-1)
-                              (= (:step qsg-data) :company-logo-1)
-                              (= (:step qsg-data) :invite-team-1)
-                              (= (:step qsg-data) :create-reminder-1))
-                      (qsg-breadcrumb qsg-data))
-                    [:div.user-menu-button
-                      {:ref "user-menu"
-                       :class (when show-whats-new-green-dot "green-dot")}
-                      (user-avatar
-                       {:click-cb #(do
-                                     (when (= (:step qsg-data) :profile-photo-1)
-                                       (qsg-actions/next-profile-photo-trail))
-                                     (when (= (:step qsg-data) :invite-team-1)
-                                        (qsg-actions/next-invite-team-trail))
-                                     (when (= (:step qsg-data) :company-logo-1)
-                                       (qsg-actions/next-company-logo-trail))
-                                     (when (= (:step qsg-data) :create-reminder-1)
-                                       (qsg-actions/next-create-reminder-trail))
-                                     (nav-actions/menu-toggle)
-                                     ;; Dismiss the QSG tooltip is it's open
-                                     (when (:show-qsg-tooltip? qsg-data)
-                                       (qsg-actions/dismiss-qsg-tooltip)))})
-                      (when (:show-qsg-tooltip? qsg-data)
-                        [:div.qsg-tooltip-container.group
-                          [:div.qsg-tooltip-top-arrow]
-                          [:button.mlb-reset.qsg-tooltip-dismiss
-                            {:on-click #(qsg-actions/dismiss-qsg-tooltip)}]
-                          [:div.qsg-tooltips
-                            [:div.qsg-tooltip-title
-                              (str
-                               "Quickstart guide"
-                               (when (> (:overall-progress qsg-data) 95)
-                                 " complete!"))]
-                            [:div.qsg-tooltip
-                              "You can find the quickstart guide here anytime."]
-                            [:button.mlb-reset.qsg-tooltip-bt
-                              {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
-                              "OK, got it"]]])]]]
-                (login-button)))]]]]))
+            (if (jwt/jwt)
+              [:div.group
+                (user-notifications)
+                [:div.user-menu.qsg-profile-photo-1.qsg-company-logo-1.qsg-invite-team-1.qsg-create-reminder-1
+                  (when (or (= (:step qsg-data) :profile-photo-1)
+                            (= (:step qsg-data) :company-logo-1)
+                            (= (:step qsg-data) :invite-team-1)
+                            (= (:step qsg-data) :create-reminder-1))
+                    (qsg-breadcrumb qsg-data))
+                  [:div.user-menu-button
+                    {:ref "user-menu"
+                     :class (when show-whats-new-green-dot "green-dot")}
+                    (user-avatar
+                     {:click-cb #(do
+                                   (when (= (:step qsg-data) :profile-photo-1)
+                                     (qsg-actions/next-profile-photo-trail))
+                                   (when (= (:step qsg-data) :invite-team-1)
+                                      (qsg-actions/next-invite-team-trail))
+                                   (when (= (:step qsg-data) :company-logo-1)
+                                     (qsg-actions/next-company-logo-trail))
+                                   (when (= (:step qsg-data) :create-reminder-1)
+                                     (qsg-actions/next-create-reminder-trail))
+                                   (nav-actions/menu-toggle)
+                                   ;; Dismiss the QSG tooltip is it's open
+                                   (when (:show-qsg-tooltip? qsg-data)
+                                     (qsg-actions/dismiss-qsg-tooltip)))})
+                    (when (:show-qsg-tooltip? qsg-data)
+                      [:div.qsg-tooltip-container.group
+                        [:div.qsg-tooltip-top-arrow]
+                        [:button.mlb-reset.qsg-tooltip-dismiss
+                          {:on-click #(qsg-actions/dismiss-qsg-tooltip)}]
+                        [:div.qsg-tooltips
+                          [:div.qsg-tooltip-title
+                            (str
+                             "Quickstart guide"
+                             (when (> (:overall-progress qsg-data) 95)
+                               " complete!"))]
+                          [:div.qsg-tooltip
+                            "You can find the quickstart guide here anytime."]
+                          [:button.mlb-reset.qsg-tooltip-bt
+                            {:on-click #(qsg-actions/dismiss-qsg-tooltip)}
+                            "OK, got it"]]])]]]
+              (login-button))]]]]))

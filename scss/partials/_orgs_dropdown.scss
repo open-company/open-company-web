@@ -2,6 +2,10 @@ div.orgs-dropdown {
   height: 32px;
   position: relative;
 
+  @include mobile() {
+    height: 40px;
+  }
+
   button.orgs-dropdown-btn {
     border: none;
     outline: none;

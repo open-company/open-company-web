@@ -33,6 +33,11 @@ div.dashboard-layout {
 
     @include mobile(){
       padding: 0px;
+      transition: none;
+      margin-left: 0;
+      width: 100%;
+      max-width: initial;
+      min-width: initial;
     }
 
     div.board-container {
@@ -44,7 +49,8 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: $ultra_light_grey;
+        background-color: white;
+        padding: 0;
       }
 
       @include mobile() {

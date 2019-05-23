@@ -3,7 +3,7 @@ nav.oc-navbar {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #FBFAF9;
+  background-color: $grey_num_2;
   transition: height 230ms;
   border-bottom: 1px solid $ultra_light_grey;
 
@@ -22,10 +22,11 @@ nav.oc-navbar {
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
-    height: #{$navbar_height}px;
+    height: #{$mobile_navbar_height}px;
     padding-bottom: 1px;
     border-bottom: none;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid $grey_num_3;
+    background-color: $grey_num_2;
 
     &.show-login-overlay {
       height: 100vh !important;
@@ -52,11 +53,16 @@ nav.oc-navbar {
 
     @include mobile() {
       width: 100vw;
-      padding: 12px 16px;
+      padding: 16px;
+      height: #{$mobile_navbar_height}px;
     }
 
     div.oc-navbar-header-container{
       height: 32px;
+
+      @include mobile(){
+        height: 40px;
+      }
 
       div.navbar-center {
         text-align: center;
@@ -70,20 +76,40 @@ nav.oc-navbar {
         font-size: 26px;
         transition: margin-left 320ms ease-in, width 320ms ease-in;
 
+        @include mobile() {
+          position: absolute;
+          top: 16px;
+          left: 72px;
+          width: calc(100vw - 64px - 80px);
+          height: 40px;
+          margin: 0;
+        }
+
         &.search-active {
           width: 430px;
           margin-left: -215px;
         }
 
-        @include mobile() {
-          width: 80px;
-          height: 32px;
-          margin-left: -40px;
-          transition: margin-left 0ms ease-in, width 0ms ease-in;
+        button.mobile-board-button {
+          display: none;
 
-          &.search-active {
-            width: 80px;
-            margin-left: -40px;
+          @include mobile() {
+            display: block;
+            width: calc(100vw - 64px - 80px);
+            margin: 0;
+            height: 40px;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
+            border: none;
+            padding: 10px 14px;
+            @include OC_Body_Book();
+            font-size: 16px;
+            color: $deep_navy;
+            text-align: left;
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            background-size: 8px 10px;
+            background-position: top 15px right 8px;
+            background-repeat: no-repeat;
           }
         }
 
@@ -98,11 +124,16 @@ nav.oc-navbar {
         height: 32px;
 
         @include mobile() {
-          width: 40%;
+          height: 40px;
         }
 
         div.orgs-dropdown {
           float: left;
+
+          @include mobile(){
+            height: 40px;
+            @include org-avatar(40);            
+          }
         }
 
         button.navigation-sidebar-ham-bt {
@@ -214,9 +245,21 @@ nav.oc-navbar {
         float: right;
         margin-right: 0px;
 
+        @include mobile() {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 40px;
+          height: 40px;
+        }
+
         div.user-notifications {
           float: left;
           margin-right: 8px;
+
+          @include mobile() {
+            display: none;
+          }
         }
 
         div.user-menu {
@@ -225,8 +268,10 @@ nav.oc-navbar {
           float: right;
           position: relative;
 
-          @inlcude mobile() {
+          @include mobile() {
             float: unset;
+            width: 40px;
+            height: 40px;
           }
 
           div.qsg-tooltip-container {
@@ -312,77 +357,7 @@ nav.oc-navbar {
               position: absolute;
               top: 0;
               right: 0;
-              border: 2px solid #FBFAF9;
-            }
-          }
-        }
-
-        div.mobile-right-nav {
-          display: none;
-        }
-
-        @include mobile() {
-          div.mobile-right-nav {
-            display: block;
-            float: right;
-            height: 32px;
-
-            button:not(:last-child) {
-              margin: 0 16px 0 0;
-            }
-
-            button:last-child {
-              margin: 0;
-            }
-
-            button.search-bt {
-              width: 24px;
-              height: 24px;
-              background-image: cdnUrl("/img/ML/spyglass.svg");
-              background-size: 18px 18px;
-              background-repeat: no-repeat;
-              background-position: 0px center;
-              padding: 0;
-              margin-top: 4px;
-              display: block;
-              float: left;
-
-              @include preload_image(cdnUlr("/img/ML/spyglass_active.svg"));
-
-              &.active {
-                background-image: cdnUrl("/img/ML/spyglass_active.svg");
-              }
-            }
-
-            button.mobile-notification-bell {
-              width: 32px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/notification_bell.svg");
-              background-size: 32px 32px;
-              background-position: 0 center;
-              background-repeat: no-repeat;
-              padding: 0;
-              // margin-top: 4px;
-              display: block;
-              float: left;
-
-              // @include preload_image(cdnUlr("/img/ML/notification_bell_active.svg"));
-
-              // &.active {
-              //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");
-              // }
-            }
-
-            button.mobile-compose-bt {
-              width: 32px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_plus_button.svg");
-              background-size: 32px 32px;
-              background-position: 0 center;
-              background-repeat: no-repeat;
-              padding: 0;
-              display: block;
-              float: left;
+              border: 2px solid $grey_num_2;
             }
           }
         }

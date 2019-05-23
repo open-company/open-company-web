@@ -71,7 +71,8 @@
         edit-link (utils/link-for (:links activity-data) "partial-update")
         share-link (utils/link-for (:links activity-data) "share")
         mark-unread-link (utils/link-for (:links activity-data) "mark-unread")
-        editable-boards (drv/react s :editable-boards)]
+        editable-boards (drv/react s :editable-boards)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     (when (or edit-link
               share-link
               delete-link)
@@ -86,7 +87,7 @@
              :ref "more-menu-bt"
              :on-click #(show-hide-menu s will-open will-close)
              :class (when @(::showing-menu s) "active")
-             :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+             :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
@@ -99,7 +100,8 @@
           @(::showing-menu s)
           [:ul.more-menu-list
             {:class (when mark-unread-link "has-read-unread")}
-            (when edit-link
+            (when (and edit-link
+                       (not is-mobile?))
               [:li.edit
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
@@ -107,7 +109,8 @@
                                 (will-close))
                               (activity-actions/activity-edit activity-data))}
                 "Edit"])
-            (when delete-link
+            (when (and delete-link
+                       (not is-mobile?))
               [:li.delete
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
@@ -115,7 +118,8 @@
                                 (will-close))
                               (delete-clicked % activity-data))}
                 "Delete"])
-            (when edit-link
+            (when (and edit-link
+                       (not is-mobile?))
               [:li.move
                {:on-click #(do
                              (reset! (::showing-menu s) false)
@@ -148,7 +152,7 @@
                   "Mark as read"]))])
         (when (and external-share
                    share-link
-                   (not (responsive/is-tablet-or-mobile?)))
+                   (not is-mobile?))
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"

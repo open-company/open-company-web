@@ -50,11 +50,13 @@ div.stream-item {
   @include mobile() {
     width: 100%;
     margin: 0;
-    border: none;
     border-radius: 0;
+    border-top: none;
+    border-bottom: 1px solid $grey_num_3;
+    background-color: $grey_num_2;
 
     div.stream-item-inner {
-      padding: 16px;
+      padding: 24px 16px;
     }
   }
 
@@ -67,6 +69,10 @@ div.stream-item {
 
     div.stream-item-inner {
       border-left: 4px solid white;
+
+      @include mobile() {
+        border-left: 2px solid white;
+      }
     }
 
     @include big_web(){
@@ -84,6 +90,10 @@ div.stream-item {
 
       div.stream-item-inner {
         border-left: 4px solid $sea_blue;
+
+        @include mobile() {
+          border-left: 2px solid $sea_blue;
+        }
       }
 
       @include big_web(){
@@ -193,6 +203,10 @@ div.stream-item {
 
   div.must-see-tag {
     display: none;
+
+    @include mobile() {
+      margin-top: 8px;
+    }
   }
 
   & > div.new-tag, & > div.must-see-tag {
@@ -646,7 +660,7 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: auto;
+          display: none;
         }
       }
     }

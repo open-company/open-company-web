@@ -41,7 +41,7 @@
     font-size: 12px;
     line-height: 16px;
     text-align: center;
-    color: #FBFAF9;
+    color: $grey_num_2;
     width: 16px;
     height: 16px;
     display: inline-block;
@@ -109,7 +109,7 @@
 }
 
 @mixin item-selected() {
-  background-color: #FBFAF9;
+  background-color: $grey_num_2;
 
   @include mobile() {
     background-color: transparent;
@@ -150,7 +150,7 @@
 }
 
 @mixin item-hover(){
-  background-color: #FBFAF9;
+  background-color: $grey_num_2;
 
   @include mobile() {
     background-color: transparent;
@@ -583,6 +583,10 @@ div.left-navigation-sidebar {
 
       @include big_web() {
         opacity: 0.9;
+      }
+
+      @include mobile() {
+        display: none;
       }
 
       span.compose-green-icon {

@@ -3,7 +3,7 @@ div.secure-activity-container {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: #fbfaf9;
+  background-color: $grey_num_2;
   min-height: 100vh;
 
   @include tablet() {
