@@ -47,6 +47,10 @@ div.wrt-popup-container {
   opacity: 1;
   cursor: auto;
 
+  @include mobile() {
+    position: absolute;
+  }
+
   button.modal-close-bt {
     position: absolute;
     right: 336px;
@@ -64,6 +68,13 @@ div.wrt-popup-container {
     transition: right 180ms ease-in;
     overflow-x: hidden;
     overflow-y: scroll;
+
+    @include mobile() {
+      position: relative;
+      top: unset;
+      right: unset;
+      width: 100%;
+    }
 
     div.wrt-popup-header {
       width: calc(100% + 48px);
