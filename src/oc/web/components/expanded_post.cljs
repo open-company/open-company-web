@@ -122,7 +122,7 @@
           [:div.back-to-board-inner
             back-to-label]]
         (more-menu activity-data dom-element-id
-         {:external-share (not is-mobile?)
+         {:external-share true
           :tooltip-position "bottom"
           :show-unread true})]
       (when has-video

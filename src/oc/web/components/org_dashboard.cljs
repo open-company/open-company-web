@@ -181,6 +181,7 @@
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
                                   :activity-removed show-activity-removed
+                                  :expanded-activity (router/current-activity-id)
                                   :showing-qsg (:visible qsg-data)
                                   :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)
                                   :show-menu (= open-panel :menu)})}

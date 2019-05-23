@@ -39,17 +39,6 @@ div.more-menu {
     &:hover, &:active, &:focus {
       opacity: 1;
     }
-
-    @include mobile() {
-      background-image: cdnUrl("/img/ML/more_menu_icon.svg");
-      background-size: 32px 32px;
-      background-position: center;
-      padding: 0;
-
-      &:hover, &:active, &:focus {
-        background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
-      }
-    }
   }
 
   button.more-menu-share-bt {
@@ -70,17 +59,6 @@ div.more-menu {
 
     &:hover, &:active, &:focus {
       opacity: 1;
-    }
-
-    @include mobile() {
-      background-image: cdnUrl("/img/ML/share_menu_icon.svg");
-      background-size: 32px 32px;
-      background-position: center;
-      padding: 0;
-
-      &:hover, &:active, &:focus {
-        background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");
-      }      
     }
   }
 

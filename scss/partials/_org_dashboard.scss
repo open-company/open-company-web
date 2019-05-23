@@ -19,6 +19,15 @@ div.org-dashboard {
     }
   }
 
+  &.expanded-activity div.page {
+    @include mobile() {
+      padding-top: 0;
+      nav.oc-navbar {
+        display: none;
+      }
+    }
+  }
+
   &.showing-qsg {
     overflow: hidden;
     height: 100%;

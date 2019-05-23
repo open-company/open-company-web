@@ -2,6 +2,11 @@ div.expanded-post {
   width: 640px;
   margin: 0 auto;
 
+  @include mobile() {
+    width: 100%;
+    padding: 16px;
+  }
+
   div.activity-share-container {
     div.activity-share-modal-container {
       top: -21px;
@@ -66,12 +71,20 @@ div.expanded-post {
   div.expanded-post-headline {
     @include activity-title(36px, 47px);
     margin-top: 16px;
+
+    @include mobile() {
+      @include activity-title(22px, 28px);
+    }
   }
 
   div.expanded-post-author {
     @include user-profile(24);
     margin-top: 16px;
     height: 24px;
+
+    @include mobile() {
+      margin-top: 8px;
+    }
 
     div.user-avatar-img-container {
       float: left;
@@ -94,12 +107,15 @@ div.expanded-post {
     line-height: 24px;
     white-space: pre-wrap;
     word-break: break-word;
+
+    @include mobile() {
+      margin: 16px 0;
+    }
   }
 
   div.expanded-post-body {
     @include activity-body(18, 24, 24, $deep_navy);
     margin-top: 16px;
-
 
     .interactable-image {
       cursor: zoom-in;
@@ -166,9 +182,21 @@ div.expanded-post {
     min-height: 71px;
     border-top: 1px solid $ultra_light_grey;
 
+    @include mobile() {
+      position: relative;
+      left: unset;
+      width: 100%;
+      border-top: none;
+    }
+
     div.expanded-post-fixed-add-comment-inner {
       width: 640px;
       margin: 24px auto;
+
+      @include mobile() {
+        width: 100%;
+        margin: 0;
+      }
     }
   }
 }
