@@ -10,10 +10,11 @@ div.stream-comments {
 
     div.stream-comment {
       position: relative;
-      transition: background-color 280ms ease-in;
+      background-color: #FFF7DD;
 
-      &.highlighted {
-        background-color: #FFF7DD;
+      &.not-highlighted {
+        background-color: transparent;
+        transition: background-color 5s ease-in;
       }
 
       div.stream-comment-inner {

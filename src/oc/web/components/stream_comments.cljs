@@ -132,12 +132,13 @@
                                  (when (and comments-data
                                             (router/current-comment-id)
                                             (not @(::initial-comment-scroll s)))
-                                   (when-let [comment-node (rum/ref-node s (str "stream-comment-" (router/current-comment-id)))]
+                                   (when-let [comment-node (rum/ref-node s
+                                                            (str "stream-comment-" (router/current-comment-id)))]
                                      (reset! (::initial-comment-scroll s) true)
                                      (utils/after 5000 (fn []
                                       (reset! (::highlight-comment-url s) true)
-                                      (.scrollIntoView (rum/ref-node s (str "stream-comment-" (router/current-comment-id))))
-                                      (utils/after 5000(fn []
+                                      (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"})
+                                      (utils/after 1000(fn []
                                        (reset! (::highlight-comment-url s) false))))))))
                                s)}
   [s activity-data comments-data collapse-comments]
@@ -157,8 +158,8 @@
              :ref (str "stream-comment-" (:uuid comment-data))
              :class (utils/class-set {:editing is-editing?
                                       :showing-picker showing-picker?
-                                      :highlighted (and @(::highlight-comment-url s)
-                                                        (= (:uuid comment-data) (router/current-comment-id)))})}
+                                      :not-highlighted (or (not @(::highlight-comment-url s))
+                                                           (not= (:uuid comment-data) (router/current-comment-id)))})}
             [:div.stream-comment-inner
               (when-not is-editing?
                 [:div.stream-comment-floating-buttons
@@ -187,7 +188,8 @@
                                     (copy-comment-url (:url comment-data))
                                     (notification-actions/show-notification {:title "Share link copied to clipboard"
                                                                              :dismiss true
-                                                                             :id :comment-url-copied}))
+                                                                             :id (keyword (str "comment-url-copied-"
+                                                                              (:uuid comment-data)))}))
                        :title "Share"}])
                   [:button.mlb-reset.react-bt
                     {:data-toggle "tooltip"
@@ -198,7 +200,8 @@
                     (react-utils/build (.-Picker js/EmojiMart)
                      {:native true
                       :onClick (fn [emoji event]
-                                 (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                 (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native")
+                                        (:reactions comment-data))
                                    (comment-actions/react-from-picker activity-data comment-data
                                     (gobj/get emoji "native")))
                                  (reset! (::show-picker s) nil))}))])
@@ -220,7 +223,8 @@
                      :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
                                   (when (> (.-length $body) 0)
                                     (.restore (.data $body "dotdotdot"))
-                                    (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
+                                    (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s)
+                                     (:uuid comment-data)))))))
                      :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                               :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
                                               utils/hide-class true})}]]
