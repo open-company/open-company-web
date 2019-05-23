@@ -494,8 +494,9 @@
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
 (defn activity-share [activity-data share-data & [share-cb]]
-  (let [share-link (utils/link-for (:links activity-data) "share")]
-    (api/share-entry share-link share-data (or share-cb activity-share-cb))
+  (let [share-link (utils/link-for (:links activity-data) "share")
+        callback (if (fn? share-cb) share-cb activity-share-cb)]
+    (api/share-entry share-link share-data callback)
     (dis/dispatch! [:activity-share share-data])))
 
 (defn entry-revert [revision-id entry-editing]
@@ -663,7 +664,7 @@
       (dis/dispatch! [:activities-count (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
-      (dis/dispatch! [:activity-reads (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
+      (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
 
 ;; AP Seen
 
