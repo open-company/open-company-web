@@ -113,12 +113,40 @@ div.wrt-popup-container {
       background-color: $grey_num_2;
       padding: 12px 16px;
 
+      @include mobile() {
+        position: relative;
+        border-bottom: 1px solid $ultra_light_grey;
+      }
+
       div.wrt-popup-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
         color: $deep_navy;
         line-height: 32px;
         float: left;
+
+        @include mobile() {
+          text-align: center;
+          float: unset;
+        }
+      }
+
+      button.mobile-close-bt {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          position: absolute;
+          left: 16px;
+          top: 16px;
+          width: 24px;
+          height: 24px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+        } 
       }
     }
 
@@ -330,6 +358,10 @@ div.wrt-popup-container {
             padding: 0;
             margin-top: -14px;
             display: none;
+
+            @include mobile() {
+              display: block;
+            }
           }
         }
       }
