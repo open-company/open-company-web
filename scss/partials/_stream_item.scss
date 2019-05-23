@@ -72,7 +72,6 @@ div.stream-item {
         div.stream-item-inner{
           border-left: 4px solid white;
         }
-
         div.stream-item-body-ext {
           div.stream-item-footer {
             div.stream-item-comments-summary {
@@ -82,6 +81,21 @@ div.stream-item {
                     background-color: white;
                     border: 2px solid white;
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      div.stream-item-body-ext {
+        div.stream-item-footer {
+          div.stream-item-comments-summary {
+            div.is-comments {
+              div.is-comments-authors.show-border {
+                div.is-comments-author {
+                  background-color: white;
+                  border: 2px solid white;
                 }
               }
             }
@@ -434,8 +448,8 @@ div.stream-item {
         div.is-comments {
           div.is-comments-authors.show-border {
             div.is-comments-author {
-              background-color: $ultra_light_grey;
-              border: 2px solid $ultra_light_grey;
+              background-color: $oc_gray_8;
+              border: 2px solid $oc_gray_8;
             }
           }
         }
