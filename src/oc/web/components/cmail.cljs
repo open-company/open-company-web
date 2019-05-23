@@ -324,20 +324,6 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn edit-tooltip [s]
-  [:div.edit-tooltip-container.group
-    [:button.mlb-reset.edit-tooltip-dismiss
-      {:on-click #(nux-actions/dismiss-edit-tooltip)}]
-    [:div.edit-tooltips
-      [:div.edit-tooltip-title
-        "Great impact with rich content!"]
-      [:div.edit-tooltip
-        "Add images, attachments, or embed video to create context rich communication for you and your team."]
-      [:button.mlb-reset.got-it-bt
-        {:on-click #(nux-actions/dismiss-edit-tooltip)}
-        "OK, got it"]
-      [:div.edit-tooltip-letter]]])
-
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
@@ -591,10 +577,6 @@
               "POST")]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
-          (when (and (or is-mobile?
-                         is-fullscreen?)
-                     show-edit-tooltip)
-            (edit-tooltip s))
           [:div.cmail-content
             ;; Video elements
             ; FIXME: disable video on mobile for now
@@ -659,6 +641,18 @@
                                (when (= (.-key e) "Enter")
                                  (utils/event-stop e)
                                  (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
+            (when show-edit-tooltip
+              [:div.edit-tooltip-outer-container
+                [:div.edit-tooltip-container.group
+                  [:div.edit-tooltip-title
+                    "Post summaries"]
+                  [:div.edit-tooltip
+                    (str "Write a quick summary to help your team "
+                     "understand why this post matters. Summaries"
+                     "appear in the stream view.")]
+                  [:button.mlb-reset.edit-tooltip-bt
+                    {:on-click #(nux-actions/dismiss-edit-tooltip)}
+                    "OK, got it"]]])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :initial-body @(::initial-body s)
@@ -709,8 +703,4 @@
                   (:auto-saving cmail-data))
             [:div.saving-saved "Saving..."]
             (when (false? (:auto-saving cmail-data))
-              [:div.saving-saved "Saved"])))]
-     (when (and (not is-mobile?)
-                     show-edit-tooltip
-                     (not is-fullscreen?))
-            (edit-tooltip s))]]))
+              [:div.saving-saved "Saved"])))]]]))
