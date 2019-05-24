@@ -84,17 +84,8 @@
               [:div.user-notification.group
                 {:class (utils/class-set {:unread (:unread n)})
                  :on-click (fn [e]
-                             (cond
-                               (and reminder?
-                                    (= notification-type "reminder-alert"))
-                               (ui-compose @(drv/get-ref s :show-add-post-tooltip))
-                               (and reminder?
-                                    (= notification-type "reminder-notification"))
-                               (nav-actions/show-reminders)
-                               (and entry-uuid
-                                    board-slug
-                                    (not (utils/event-inside? e (rum/ref-node s :read-bt))))
-                               (router/nav! (oc-urls/entry board-slug entry-uuid)))
+                             (when (fn? (:click n))
+                               ((:click n)))
                              (user-actions/hide-mobile-user-notifications))
                  :key children-key}
                 (user-avatar-image (:author n))
