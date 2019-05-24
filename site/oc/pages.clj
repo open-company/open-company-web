@@ -48,17 +48,17 @@
 (defn circular-font-folder [font-file]
   (str (when (env :oc-web-cdn-url)
         (env :oc-web-cdn-url))
-    "/CircularWebFont" font-file))
+   font-file))
 
 (defn circular-book-font []
   [:link {:rel "stylesheet"
           :type "text/css"
-          :href (circular-font-folder "/LLCircular-BookWeb/css/stylesheet.css")}])
+          :href (circular-font-folder "/CircularWebFont/LLCircular-BookWeb/css/stylesheet.css")}])
 
 (defn circular-bold-font []
   [:link {:rel "stylesheet"
           :type "text/css"
-          :href (circular-font-folder "/LLCircular-BoldWeb/css/stylesheet.css")}])
+          :href (circular-font-folder "/CircularWebFont/LLCircular-BoldWeb/css/stylesheet.css")}])
 
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
