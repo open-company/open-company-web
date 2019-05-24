@@ -134,11 +134,8 @@
                   (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (when-not is-mobile?
-                (comments-summary activity-data true))
-              (reactions activity-data)
-              (when is-mobile?
-                (comments-summary activity-data true))]
+              (comments-summary activity-data true)
+              (reactions activity-data)]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])

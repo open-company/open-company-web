@@ -232,23 +232,17 @@ div.secure-activity-container {
         height: 26px;
         margin-top: 16px;
 
-        @include tablet() {
-          height: 68px;
-        }
-
         div.is-comments {
           margin-right: 16px;
 
           @include tablet() {
-            margin-right: 0;
-            margin-top: 16px;
-            float: unset;
+            margin-right: 16px;
           }
         }
 
-        @include tablet() {
-          div.reactions {
-            float: unset;
+        div.reactions {
+          @include tablet() {
+            float: left;
           }
         }
       }
@@ -280,6 +274,12 @@ div.secure-activity-container {
               border-radius: 4px;
               border: 1px solid $mid_light_grey;
               padding: 6px 14px;
+
+              @include tablet() {
+                border: none;
+                padding: 0;
+                border-radius: 0;
+              }
             }
           }
 
