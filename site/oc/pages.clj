@@ -3,6 +3,9 @@
             [oc.privacy :as privacy]
             [environ.core :refer (env)]))
 
+(defn cdn [img-src]
+  (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
+
 (def bootstrap-css
   ;; Bootstrap CSS //getbootstrap.com/
   [:link
@@ -42,6 +45,12 @@
   ;; Google fonts Muli
   [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif:700" :rel "stylesheet"}])
 
+(def circular-book-font
+  [:link {:rel "stylesheet" :type "text/css" :href (cdn "/css/LLCircular-BookWeb/css/stylesheet.css")}])
+
+(def circular-bold-font
+  [:link {:rel "stylesheet" :type "text/css" :href (cdn "/css/LLCircular-BoldWeb/css/stylesheet.css")}])
+
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
                               (str "'" (env :ga-version) "'")
@@ -53,9 +62,6 @@
 
 (defn fullstory-init []
   [:script (str "init_fullstory();")])
-
-(defn cdn [img-src]
-  (str (when (env :oc-web-cdn-url) (str (env :oc-web-cdn-url) "/" (env :oc-deploy-key))) img-src))
 
 (defn terms [options]
   (terms/terms options))
@@ -1162,6 +1168,10 @@
              :href "//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"}]
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
+          ;; Lineto font
+          circular-book-font
+          circular-bold-font
+          ;; Google fonts
           google-fonts
           ;;  Medium Editor css
           [:link {:type "text/css" :rel "stylesheet" :href "/css/medium-editor/medium-editor.css"}]
@@ -1252,6 +1262,9 @@
              :name "viewport"}]
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
+          ;; Lineto font
+          circular-book-font
+          circular-bold-font
           ;; Google fonts
           google-fonts
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]

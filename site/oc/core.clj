@@ -18,6 +18,8 @@
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     [:title "Carrot | Leadership communication for fast-growing and remote teams."]
+    pages/circular-book-font
+    pages/circular-bold-font
     pages/google-fonts
     pages/bootstrap-css
     ;; Local css

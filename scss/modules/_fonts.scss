@@ -25,7 +25,7 @@
 }
 
 .OC-Body-Book {
-  font-family: "Circular Book", Muli, Arial, sans-serif;
+  font-family: "LL Circular Book Web", Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -34,34 +34,16 @@
 }
 
 .OC-Body-Book-Oblique {
-  font-family: "Circular Book Oblique", Muli, Arial, sans-serif;
+  font-family: "LL Circular Book Web", Muli, Arial, sans-serif;
   font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-.OC-Body-Medium-Oblique {
-  font-family: "Circular Medium Oblique", Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-.OC-Body-Medium {
-  font-family: "Circular Medium", Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
+  font-style: italic;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;;
 }
 
 .OC-Body-Bold {
-  font-family: "Circular Bold", Muli, Arial, sans-serif;
+  font-family: "LL Circular Bold Web", Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -70,27 +52,9 @@
 }
 
 .OC-Body-Bold-Oblique {
-  font-family: "Circular Bold Oblique", Muli, Arial, sans-serif;
+  font-family: "LL Circular Bold Web", Muli, Arial, sans-serif;
   font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-.OC-Body-Black {
-  font-family: "Circular Black", Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-.OC-Body-Black-Oblique {
-  font-family: "Circular Black Oblique", Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
+  font-style: italic;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;;
@@ -113,28 +77,12 @@
   @include OCBodyFont(Circular-BookItalic, 300);
 }
 
-@mixin OC_Body_Medium(){
-  @include OCBodyFont(Circular-Medium);
-}
-
-@mixin OC_Body_Medium_Italic(){
-  @include OCBodyFont(Circular-MediumItalic);
-}
-
 @mixin OC_Body_Bold(){
   @include OCBodyFont(Circular-Bold, bold);
 }
 
 @mixin OC_Body_Bold_Italic(){
   @include OCBodyFont(Circular-BoldItalic, bold);
-}
-
-@mixin OC_Body_Black(){
-  @include OCBodyFont(Circular-Black, 900);
-}
-
-@mixin OC_Body_Black_Italic(){
-  @include OCBodyFont(Circular-BlackItalic, 900);
 }
 
 @mixin OC_Title($weight: 700){
