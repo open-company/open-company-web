@@ -92,7 +92,7 @@ div.add-comment-box-container {
         }
 
         @include tablet() {
-          width: 100%;
+          width: calc(100% - 48px);
           resize: vertical;
           padding-right: 0px;
         }
