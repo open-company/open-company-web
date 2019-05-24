@@ -113,7 +113,8 @@
                                     (reset! (::last-focused-state s) is-self-focused?)
                                     (when is-self-focused?
                                       (scroll-to-bottom s))))
-                               (js/emojiAutocomplete)
+                               (try (js/emojiAutocomplete)
+                                (catch :default e false))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments
@@ -122,7 +123,8 @@
       [:div.stream-comments-list
         (for [idx (range (count comments-data))
               :let [comment-data (nth comments-data idx)
-                    is-editing? (= @(::editing? s) (:uuid comment-data))
+                    is-editing? (and (seq @(::editing? s))
+                                     (= @(::editing? s) (:uuid comment-data)))
                     can-show-edit-bt? (and (:can-edit comment-data)
                                                (not (:is-emoji comment-data)))
                     can-show-delete-bt? (:can-delete comment-data)
