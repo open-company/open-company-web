@@ -90,7 +90,9 @@
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
                 {:on-click #(router/redirect! oc-urls/home)}
-                "learn more about Carrot"]
+                (str "learn more"
+                 (when-not is-mobile?
+                   " about Carrot"))]
               [:span.or " or "]
               [:button.mlb-reset.login-bt
                 {:on-click #(user-actions/show-login :login-with-email)}
