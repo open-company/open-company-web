@@ -65,8 +65,9 @@ div.activity-share-modal-container {
         height: 56px;
         box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
         padding: 16px 16px 16px 46px;
-        text-align: left;
+        text-align: center;
         line-height: 24px;
+        font-size: 16px;
       }
 
       button.mobile-modal-close-bt {
@@ -278,7 +279,7 @@ div.activity-share-modal-container {
       margin-top: 8px;
 
       @include mobile() {
-        padding: 0px 24px;
+        padding: 24px;
         min-height: calc(100vh - 56px);
       }
 
