@@ -12,7 +12,6 @@ div.medium-editor-media-picker button.media {
   background-position: 50%;
   background-size: 14px;
   background-repeat: no-repeat;
-  border-radius: 22px;
   padding: 0;
   float: left;
   opacity: 1;
@@ -87,7 +86,7 @@ div.medium-editor-media-picker div.media-picker-container button.media-entry:hov
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-photo {
-  background-image: url("/img/ML/media_photo.png");
+  background-image: url("/img/ML/media_photo.svg");
   background-size: 16px 14px;
 }
 
@@ -95,8 +94,17 @@ div.medium-editor-media-picker div.media-picker-container.expanded button.media-
   opacity: 1;
 }
 
+div.medium-editor-media-picker div.media-picker-container button.media-gif {
+  background-image: url("/img/ML/media_gif.svg");
+  background-size: 24px 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-gif:hover {
+  opacity: 1;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media-video {
-  background-image: url("/img/ML/media_video.png");
+  background-image: url("/img/ML/media_video.svg");
   background-size: 18px 12px;
 }
 

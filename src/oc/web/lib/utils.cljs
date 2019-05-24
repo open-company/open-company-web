@@ -636,7 +636,7 @@
 
 (def default-headline "Untitled post")
 
-(def default-abstract "Post preview: summarize why this post matters…")
+(def default-abstract "Quick summary: why this post matters...")
 
 (def max-abstract-length 280)
 
