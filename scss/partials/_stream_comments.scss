@@ -14,7 +14,7 @@ div.stream-comments {
 
       @include big_web() {
         &:hover {
-          background-color: rgba($ultra_light_grey, 0.3);
+          background-color: #F5F5F5;
 
           div.stream-comment-floating-buttons {
             display: block;
