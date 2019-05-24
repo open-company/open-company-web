@@ -802,7 +802,6 @@
                         (au/has-text? activity-data))]
     (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
                                                   :video-id nil
-                                                  :video-transcript nil
                                                   :video-processed false
                                                   :video-error false
                                                   :has-changes has-changes})])))
