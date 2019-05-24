@@ -1,5 +1,8 @@
 (ns oc.web.utils.user
   (:require [oc.web.lib.jwt :as jwt]
+            [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.utils.activity :as activity-utils]))
 
 (def user-avatar-filestack-config
@@ -58,20 +61,32 @@
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
         is-interaction (seq (:interaction-id notification))
         created-at (:notify-at notification)
-        title (notification-title notification)]
+        title (notification-title notification)
+        reminder-data (:reminder notification)
+        reminder? (:reminder? notification)
+        entry-uuid (:entry-id notification)]
     (when (seq title)
-      {:uuid (:entry-id notification)
+      {:uuid entry-uuid
        :board-slug (:slug board-data)
        :interaction-id (:interaction-id notification)
        :is-interaction is-interaction
        :unread unread
        :mention? (:mention? notification)
-       :reminder? (:reminder? notification)
-       :reminder (:reminder notification)
+       :reminder? reminder?
+       :reminder reminder-data
        :created-at (:notify-at notification)
        :body (notification-content notification)
        :title title
-       :author (:author notification)})))
+       :author (:author notification)
+       :click (fn []
+               (if reminder?
+                 (if (and reminder-data
+                          (= (:notification-type reminder-data) "reminder-notification"))
+                   (oc.web.actions.nav-sidebar/show-reminders)
+                   (ui-compose))
+                 (when (and (:slug board-data)
+                            entry-uuid)
+                   (router/nav! (oc-urls/entry (:slug board-data) entry-uuid)))))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))
@@ -92,6 +107,3 @@
   (let [slack-orgs-with-bot (map :slack-org-id bots-data)
         slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
     (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
-
-(defn is-org-creator? [org-data]
-  (= (:user-id (:author org-data)) (jwt/user-id)))
