@@ -3,6 +3,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.utils.ui :refer (ui-compose)]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.utils.activity :as activity-utils]))
 
 (def user-avatar-filestack-config
@@ -80,10 +81,11 @@
        :title title
        :author (:author notification)
        :click (if reminder?
-                (if (and reminder-data
-                         (= (:notification-type reminder-data) "reminder-notification"))
-                  #(oc.web.actions.nav-sidebar/show-reminders)
-                  #(ui-compose))
+                (when-not (responsive/is-mobile-size?)
+                  (if (and reminder-data
+                           (= (:notification-type reminder-data) "reminder-notification"))
+                    #(oc.web.actions.nav-sidebar/show-reminders)
+                    #(ui-compose)))
                 (when (and (:slug board-data)
                            entry-uuid)
                   (if interaction-uuid
