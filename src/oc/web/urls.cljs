@@ -159,9 +159,9 @@
 
 (defn comment-url
   "Comment url"
-  ([comment-uuid] (comment (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
-  ([entry-uuid comment-uuid] (comment (router/current-org-slug) (router/current-board-slug) entry-uuid comment-uuid))
-  ([board-slug entry-uuid comment-uuid] (comment (router/current-org-slug) board-slug entry-uuid comment-uuid))
+  ([comment-uuid] (comment-url (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([entry-uuid comment-uuid] (comment-url (router/current-org-slug) (router/current-board-slug) entry-uuid comment-uuid))
+  ([board-slug entry-uuid comment-uuid] (comment-url (router/current-org-slug) board-slug entry-uuid comment-uuid))
   ([org-slug board-slug entry-uuid comment-uuid] (str (entry org-slug board-slug entry-uuid) "/comment/" comment-uuid)))
 
 ;; Secure activities
