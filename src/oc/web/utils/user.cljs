@@ -78,15 +78,14 @@
        :body (notification-content notification)
        :title title
        :author (:author notification)
-       :click (fn []
-               (if reminder?
-                 (if (and reminder-data
-                          (= (:notification-type reminder-data) "reminder-notification"))
-                   (oc.web.actions.nav-sidebar/show-reminders)
-                   (ui-compose))
-                 (when (and (:slug board-data)
-                            entry-uuid)
-                   (router/nav! (oc-urls/entry (:slug board-data) entry-uuid)))))})))
+       :click (if reminder?
+                (if (and reminder-data
+                         (= (:notification-type reminder-data) "reminder-notification"))
+                  #(oc.web.actions.nav-sidebar/show-reminders)
+                  #(ui-compose))
+                (when (and (:slug board-data)
+                           entry-uuid)
+                  #(router/nav! (oc-urls/entry (:slug board-data) entry-uuid))))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))
