@@ -45,11 +45,20 @@
   ;; Google fonts Muli
   [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif:700" :rel "stylesheet"}])
 
-(def circular-book-font
-  [:link {:rel "stylesheet" :type "text/css" :href (cdn "/css/LLCircular-BookWeb/css/stylesheet.css")}])
+(defn circular-font-folder [font-file]
+  (str (when (env :oc-web-cdn-url)
+        (env :oc-web-cdn-url))
+    "/CircularWebFont/css" font-file))
 
-(def circular-bold-font
-  [:link {:rel "stylesheet" :type "text/css" :href (cdn "/css/LLCircular-BoldWeb/css/stylesheet.css")}])
+(defn circular-book-font []
+  [:link {:rel "stylesheet"
+          :type "text/css"
+          :href (circular-font-folder "/LLCircular-BookWeb/css/stylesheet.css")}])
+
+(defn circular-bold-font []
+  [:link {:rel "stylesheet"
+          :type "text/css"
+          :href (circular-font-folder "/css/LLCircular-BoldWeb/css/stylesheet.css")}])
 
 (defn google-analytics-init []
   [:script (let [ga-version (if (env :ga-version)
@@ -1169,8 +1178,8 @@
           ;; Emoji One Autocomplete CSS
           [:link {:type "text/css" :rel "stylesheet" :href "/css/emojione/autocomplete.css"}]
           ;; Lineto font
-          circular-book-font
-          circular-bold-font
+          (circular-book-font)
+          (circular-bold-font)
           ;; Google fonts
           google-fonts
           ;;  Medium Editor css
@@ -1263,8 +1272,8 @@
           [:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
           [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
           ;; Lineto font
-          circular-book-font
-          circular-bold-font
+          (circular-book-font)
+          (circular-bold-font)
           ;; Google fonts
           google-fonts
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
