@@ -2,6 +2,25 @@ div.stream-comments {
   height: 100%;
   position: relative;
 
+  &.editing {
+    div.stream-comments-list {
+      div.streacm-comment {
+        @include big_web(){
+          &:hover {
+            background-color: transparent;
+            div.stream-comment-floating-buttons {
+              display: none;
+            }
+
+            div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
   div.stream-comments-empty {
     display: none;
   }
@@ -58,6 +77,7 @@ div.stream-comments {
             outline: none;
             padding: 4px;
             box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            padding: 8px 16px;
 
             &:focus, &:active {
               outline: none;
