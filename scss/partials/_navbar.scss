@@ -213,7 +213,28 @@ nav.oc-navbar {
 
           @include mobile(){
             height: 40px;
-            @include org-avatar(40);            
+            @include org-avatar(40);
+
+            button.orgs-dropdown-btn {
+              div.org-avatar div.org-avatar-container span.org-name {
+                display: none;
+              }
+            }
+
+            div.orgs-dropdown-container {
+              ul.orgs-dropdown-menu {
+                li div.org-avatar {
+                  @include org-avatar(24);
+
+                  div.org-avatar-container.no-avatar {
+                    span.org-name {
+                      display: block !important;
+                      max-width: 88px;
+                    }
+                  }
+                }
+              }
+            }
           }
         }
 
