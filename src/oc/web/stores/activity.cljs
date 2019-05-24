@@ -304,7 +304,7 @@
   (let [activity-data   (dispatcher/activity-data org-slug item-id db)
         board-data      (dispatcher/board-data db org-slug (:board-slug activity-data))
         fixed-read-data (vec (map #(assoc % :seen true) read-data))
-        team-users      (filterv #(= (:status %) "active") (:users team-roster))
+        team-users      (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
         seen-ids        (set (map :user-id read-data))
         private-access? (= (:access board-data) "private")
         filtered-users  (if private-access?
