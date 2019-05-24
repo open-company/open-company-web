@@ -192,6 +192,7 @@ div.dashboard-layout {
         padding: 0px 0px 8px;
         position: relative;
         height: 40px;
+        border-bottom: 1px solid $ultra_light_grey;
 
         @include mobile() {
           display: none;

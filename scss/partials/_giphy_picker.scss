@@ -1,0 +1,61 @@
+div.giphy-picker {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  border: 1px solid $ultra_light_grey;
+  padding: 16px 8px;
+  background-color: white;
+
+  div.giphy-picker-container {
+
+    .giphy-picker-form {
+
+      input.giphy-picker-form-input {
+        border-radius: 4px;
+        background-color: $ultra_light_grey;
+        outline: none;
+        border: none;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        margin-right: 16px;
+        height: 32px;
+        padding: 7px 8px;
+      }
+
+      button.giphy-picker-form-submit {
+        border-radius: 6px;
+        @include OC_Body_Bold();
+        font-size: 12px;
+        line-height: 24px;
+        height: 32px;
+        text-align: center;
+        background-color: $carrot_green;
+        color: white;
+        padding: 0 8px;
+      }
+    }
+
+    div.giphy-picker-results-container {
+      margin-top: 16px;
+
+      .giphy-picker-results-item {
+        margin-top: 8px;
+      }
+    }
+
+    div.giphy-picker-suggestions {
+      .giphy-picker-suggestions-suggestion {
+
+      }
+    }
+
+    .giphy-picker-loader {
+      @include OC_Body_Book();
+      font-size: 12px;
+      color: $deep_navy;
+    }
+  }
+}

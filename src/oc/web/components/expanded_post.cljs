@@ -176,9 +176,6 @@
                   "OK, got it"]])
             (wrt-count activity-data reads-data)])]
       [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data)]
-      [:div.expanded-post-fixed-add-comment
-        {:ref :expanded-post-fixed-add-comment}
-        [:div.expanded-post-fixed-add-comment-inner
-          (rum/with-key (add-comment activity-data (utils/debounced-fn #(save-fixed-comment-height! s) 300))
-           (str "expanded-post-fixed-add-comment-" (:uuid activity-data)))]]]))
+        (stream-comments activity-data comments-data)
+        (when (:can-comment activity-data)
+          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))

@@ -24,8 +24,7 @@
   ([comment-map :guard map?]
     (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
           delete-comment-link (utils/link-for (:links comment-map) "delete")
-          reaction-data (first (:reactions comment-map))
-          can-react? (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"])]
+          can-react? (utils/link-for (:links comment-map) "react"  "POST")]
       (-> comment-map
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
@@ -156,7 +155,7 @@
   [db [_ comments-key interaction-data]]
   (let [item-uuid (:uuid (:interaction interaction-data))
         comments-data (get-in db comments-key)
-        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+        new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :ws-interaction/comment-add

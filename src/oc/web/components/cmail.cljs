@@ -186,12 +186,7 @@
 
 (defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
-    (dis/dispatch! [:input [:cmail-data :body] (utils/clean-body-html (.-innerHTML body-el))]))
-  (when ls/oc-enable-transcriptions
-    (let [editing-data @(drv/get-ref s :cmail-data)]
-      (when (:fixed-video-id editing-data)
-        (when-let [transcription-el (rum/ref-node s "transcript-edit")]
-          (dis/dispatch! [:update [:cmail-data] #(merge % {:video-transcript (.-value transcription-el)})]))))))
+    (dis/dispatch! [:input [:cmail-data :body] (utils/clean-body-html (.-innerHTML body-el))])))
 
 (defn- fix-headline [cmail-data]
   (utils/trim (:headline cmail-data)))
@@ -376,16 +371,9 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
-                    (when ls/oc-enable-transcriptions
-                      (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
                     (utils/after 500
                      #(when-let [body-el (body-element)]
                         (utils/to-end-of-content-editable body-el)))
-                    s)
-                   :did-remount (fn [_ s]
-                    (when ls/oc-enable-transcriptions
-                      (ui-utils/resize-textarea (rum/ref-node s "transcript-edit")))
-
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -662,16 +650,8 @@
                                :start-video-recording-cb #(video-record-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["photo" "video"]
+                               :media-config ["gif" "photo" "video"]
                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
-            (when (and ls/oc-enable-transcriptions
-                       (:fixed-video-id cmail-data)
-                       (:video-processed cmail-data))
-              [:div.cmail-data-transcript
-                [:textarea.video-transcript
-                  {:ref "transcript-edit"
-                   :on-input #(ui-utils/resize-textarea (.-target %))
-                   :default-value (:video-transcript cmail-data)}]])
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]

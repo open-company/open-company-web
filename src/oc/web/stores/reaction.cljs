@@ -130,25 +130,27 @@
           reaction (:reaction reaction-data)
           comment-data (nth (:data data) (:index data))
           reactions-data (:reactions comment-data)
-          reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
-          old-reaction-data (nth reactions-data reaction-idx)
-          reaction-data-with-count (assoc reaction-data :count (:count interaction-data))
+          reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))]
+      (let [
           is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
-          with-reacted (if is-current-user
-                         ;; If the reaction is from the current user we need to
-                         ;; update the reacted, the links are the one coming with
-                         ;; the WS message
-                         (assoc reaction-data-with-count :reacted add-event?)
-                         ;; If it's a reaction from another user we need to
-                         ;; survive the reacted and the links from the reactions
-                         ;; we already have
-                         (merge reaction-data-with-count {:reacted (:reacted old-reaction-data)
-                                                          :links (:links old-reaction-data)}))
-          with-links (assoc with-reacted :links old-reaction-data)
-          new-reactions-data (assoc reactions-data reaction-idx with-reacted)
+          old-reaction-data (if reaction-idx
+                              (nth reactions-data reaction-idx)
+                              ;; In case we don't have an old reaction
+                              ;; grab the links from the WS message and set reacted
+                              ;; true only if the reaction is coming from the current user
+                              ;; and is an add interaction
+                              {:reacted (when is-current-user
+                                          add-event?)
+                               :links (:links reaction-data)})
+          with-reacted (merge reaction-data {:count (:count interaction-data)
+                                             :reacted (:reacted old-reaction-data)
+                                             :links (:links old-reaction-data)})
+          new-reactions-data (if reaction-idx
+                               (assoc reactions-data reaction-idx with-reacted)
+                               (conj (or reactions-data []) with-reacted))
           new-comment-data (assoc comment-data :reactions new-reactions-data)
           new-comments-data (assoc (:data data) (:index data) new-comment-data)]
-      new-comments-data)))
+      new-comments-data))))
 
 (defn- update-comment-reaction
   [db interaction-data add-event?]
