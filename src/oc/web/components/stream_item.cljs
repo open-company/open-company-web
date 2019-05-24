@@ -189,14 +189,7 @@
                    :ref :abstract
                    :dangerouslySetInnerHTML {:__html (if has-abstract
                                                        (:abstract activity-data)
-                                                       (:body activity-data))}}])]
-            (when (and ls/oc-enable-transcriptions
-                       (:video-transcript activity-data))
-              [:div.stream-item-transcript
-                [:div.stream-item-transcript-header
-                  "This transcript was automatically generated and may not be accurate"]
-                [:div.stream-item-transcript-content
-                  (:video-transcript activity-data)]])]
+                                                       (:body activity-data))}}])]]
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit
