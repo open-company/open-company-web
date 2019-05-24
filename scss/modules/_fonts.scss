@@ -15,6 +15,9 @@
 950 Black
 */
 
+$circular_book: "LL Circular Book Web";
+$circular_bold: "LL Circular Book Web";
+
 .OC-Title {
   font-family: "PT Serif", serif !important;
   font-weight: 700;
@@ -25,7 +28,7 @@
 }
 
 .OC-Body-Book {
-  font-family: "LL Circular Book Web", Muli, Arial, sans-serif;
+  font-family: $circular_book, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -34,7 +37,7 @@
 }
 
 .OC-Body-Book-Oblique {
-  font-family: "LL Circular Book Web", Muli, Arial, sans-serif;
+  font-family: $circular_book, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: italic;
   -webkit-font-smoothing: antialiased;
@@ -43,7 +46,7 @@
 }
 
 .OC-Body-Bold {
-  font-family: "LL Circular Bold Web", Muli, Arial, sans-serif;
+  font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -52,7 +55,7 @@
 }
 
 .OC-Body-Bold-Oblique {
-  font-family: "LL Circular Bold Web", Muli, Arial, sans-serif;
+  font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: italic;
   -webkit-font-smoothing: antialiased;
@@ -60,29 +63,29 @@
   text-rendering: optimizeLegibility;;
 }
 
-@mixin OCBodyFont($font_variant, $font_weight: normal){
+@mixin OCBodyFont($font_variant, $font_weight: normal, $font_style: normal){
   font-family: #{$font_variant}, Muli, Arial, sans-serif;
   font-weight: $font_weight;
-  font-style: normal;
+  font-style: $font_style;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;;
 }
 
 @mixin OC_Body_Book() {
-  @include OCBodyFont(Circular-Book, 300);
+  @include OCBodyFont($circular_book, 300);
 }
 
 @mixin OC_Body_Book_Italic() {
-  @include OCBodyFont(Circular-BookItalic, 300);
+  @include OCBodyFont($circular_book, 300, italic);
 }
 
 @mixin OC_Body_Bold(){
-  @include OCBodyFont(Circular-Bold, bold);
+  @include OCBodyFont($circular_bold, bold);
 }
 
 @mixin OC_Body_Bold_Italic(){
-  @include OCBodyFont(Circular-BoldItalic, bold);
+  @include OCBodyFont($circular_bold, bold, italic);
 }
 
 @mixin OC_Title($weight: 700){
