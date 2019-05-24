@@ -254,7 +254,7 @@ $h2_top_margin: 24;
     display: none !important;
   }
 
-  &.medium-editor-placeholder:after {
+  &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     @include OC_Body_Book();
     font-size: #{$font-size}px;
     line-height: #{$separator}px;

@@ -767,8 +767,9 @@ div.cmail-outer {
             margin: 22px 0px;
           }
 
-          &.medium-editor-placeholder:after {
+          &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
             color: $light_ui_grey !important;
+            font-style: normal;
           }
 
           &:after {

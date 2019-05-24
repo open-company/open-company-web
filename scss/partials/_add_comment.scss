@@ -53,10 +53,11 @@ div.add-comment-box-container {
         outline: none;
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
-        &.medium-editor-placeholder:after {
+        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
           @include OC_Body_Book();
           font-size: 16px;
           color: rgba($deep_navy, 0.5);
+          font-style: normal;
         }
 
         @include tablet() {
