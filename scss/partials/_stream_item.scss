@@ -105,7 +105,8 @@ div.stream-item {
     }
 
     &.must-see-item {
-      margin-top: 2px;
+      z-index: 1;
+      position: relative;
 
       div.stream-item-inner {
         border-left: 4px solid $sea_blue;
@@ -113,6 +114,7 @@ div.stream-item {
 
       @include big_web(){
         &:hover {
+          z-index: 2;
           box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
 
           div.stream-item-inner {
