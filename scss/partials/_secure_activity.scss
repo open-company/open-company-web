@@ -6,10 +6,6 @@ div.secure-activity-container {
   background-color: $grey_num_2;
   min-height: 100vh;
 
-  @include tablet() {
-    background-color: white;
-  }
-
   div.activity-header {
     height: 56px;
     position: fixed;
@@ -23,6 +19,8 @@ div.secure-activity-container {
 
     @include tablet() {
       position: absolute;
+      height: 72px;
+      padding: 16px;
     }
 
     div.org-avatar {
@@ -32,6 +30,7 @@ div.secure-activity-container {
       @include tablet(){
         float: unset;
         margin: 0 auto;
+        @include org-avatar(40);
       }
 
       div.org-avatar-container{
@@ -48,6 +47,10 @@ div.secure-activity-container {
       top: 12px;
       right: 24px;
 
+      @include tablet() {
+        top: 20px;
+      }
+
       button.login-as-bt {
         float: right;
         @include OC_Body_Book();
@@ -55,6 +58,10 @@ div.secure-activity-container {
         color: $carrot_green;
         @include user-profile(32);
         padding: 0;
+
+        @include tablet() {
+          @include user-profile(40);
+        }
 
         span.login-as {
           margin-top: 4px;
@@ -89,10 +96,6 @@ div.secure-activity-container {
         @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_green;
-
-        @include tablet() {
-          display: none;
-        }
       }
 
       button.learn-more-bt {
@@ -104,10 +107,6 @@ div.secure-activity-container {
         color: $carrot_green;
         padding: 0;
         margin: 0;
-
-        @include tablet() {
-          display: none;
-        }
       }
     }
   }
@@ -119,12 +118,16 @@ div.secure-activity-container {
     @include tablet() {
       width: 100%;
       margin: 57px auto 0;
-      padding: 24px 0;
+      padding: 24px 16px;
     }
 
     div.activity-content {
       position: relative;
       min-height: calc(100vh - 201px);
+
+      @include tablet() {
+        min-height: calc(100vh - 210px);
+      }
 
       div.ziggeo-player {
         margin-top: 16px;
