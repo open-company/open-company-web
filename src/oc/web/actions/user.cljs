@@ -469,7 +469,12 @@
          {:title (:title fixed-notification)
           :mention true
           :dismiss true
-          :click #(router/nav! (oc-urls/entry (:board-slug fixed-notification) (:uuid fixed-notification)))
+          :click (fn []
+                   (if (:reminder? fixed-notification)
+                     (oc.web.actions.nav-sidebar/show-reminders)
+                     (when (and (:board-slug fixed-notification)
+                                (:uuid fixed-notification))
+                      (router/nav! (oc-urls/entry (:board-slug fixed-notification) (:uuid fixed-notification))))))
           :mention-author (:author fixed-notification)
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
