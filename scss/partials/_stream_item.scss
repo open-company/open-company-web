@@ -60,6 +60,8 @@ div.stream-item {
 
   &.unread-item {
     background-color: white;
+    z-index: 1;
+    position: relative;
 
     div.stream-item-inner {
       border-left: 4px solid white;
@@ -71,6 +73,8 @@ div.stream-item {
 
         div.stream-item-inner{
           border-left: 4px solid white;
+          z-index: 2;
+          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         }
         div.stream-item-body-ext {
           div.stream-item-footer {
@@ -105,18 +109,12 @@ div.stream-item {
     }
 
     &.must-see-item {
-      z-index: 1;
-      position: relative;
-
       div.stream-item-inner {
         border-left: 4px solid $sea_blue;
       }
 
       @include big_web(){
         &:hover {
-          z-index: 2;
-          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-
           div.stream-item-inner {
             border-left: 4px solid $sea_blue;
           }
