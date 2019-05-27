@@ -84,7 +84,7 @@
           [:div.team-management-body-title
             (str (count all-users) " member" (when (> (count all-users) 1) "s"))]
           [:div.team-management-search-users
-            [:input.org-settings-team-search-field
+            [:input.org-settings-team-search-field.oc-input
               {:value @(::query s)
                :placeholder "Search by name..."
                :on-change #(reset! (::query s) (.. % -target -value))}]]

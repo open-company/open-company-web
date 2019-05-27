@@ -510,10 +510,10 @@
                 [:div.mobile-saving-saved "Saved"])))
           [:div.cmail-header-board-must-see-container.group
             {:class (when (:must-see cmail-data) "must-see-on")}
-            [:div.board-name
+            [:div.board-name.oc-input
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-               :class (when show-sections-picker "open")}
+               :class (when show-sections-picker "active")}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker

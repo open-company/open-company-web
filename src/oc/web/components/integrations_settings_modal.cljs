@@ -89,7 +89,7 @@
                     (comment ;; TODO: commented this out, we need to add this feature
                       [:div.self-join
                         "Slack members can self-join this as: "
-                        [:select.self-join-select
+                        [:select.self-join-select.oc-input
                           [:option
                             "Admin"]
                           [:option

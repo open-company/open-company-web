@@ -38,9 +38,10 @@
       [:div.move-post-inner
         [:div.move-post-title
           "Move"]
-        [:div.select-new-board
+        [:div.select-new-board.oc-input
           {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
-           :class (when (nil? @(::selected-board s)) "placeholder")}
+           :class (utils/class-set {:placeholder (nil? @(::selected-board s))
+                                    :active @(::show-boards-list s)})}
           (or (:name @(::selected-board s)) "Select a new board...")]
         (when @(::show-boards-list s)
           [:div.boards-list

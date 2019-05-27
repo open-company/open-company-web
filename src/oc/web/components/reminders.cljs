@@ -106,7 +106,7 @@
           [:div.half-row-right
             [:div.edit-reminder-label
               "To update the team about"]
-            [:input.edit-reminder-field
+            [:input.edit-reminder-field.oc-input
               {:value (:headline reminder-data)
                :ref :reminder-title
                :type "text"

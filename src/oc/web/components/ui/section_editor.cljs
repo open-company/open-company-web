@@ -241,8 +241,8 @@
                        (:section-error section-editing)))])
           [:div.section-editor-add-label
             "Section security"]
-          [:div.section-editor-add-access
-            {:class (when @(::show-access-list s) "expanded")
+          [:div.section-editor-add-access.oc-input
+            {:class (when @(::show-access-list s) "active")
              :on-click #(do
                           (utils/event-stop %)
                           (reset! (::show-access-list s) (not @(::show-access-list s))))}
@@ -325,7 +325,7 @@
               (when can-change
                 [:div.section-editor-private-users-search
                   {:ref "private-users-search"}
-                  [:input
+                  [:input.oc-input
                     {:class utils/hide-class
                      :value @query
                      :type "text"
