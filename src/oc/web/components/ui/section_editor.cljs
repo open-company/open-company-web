@@ -490,9 +490,8 @@
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
                                                       {:title "Section deleted"
-                                                       :primary-bt-title "OK"
-                                                       :primary-bt-dismiss true
-                                                       :expire 10
+                                                       :dismiss true
+                                                       :expire 3
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
                                                    (nav-actions/hide-section-editor))})))
