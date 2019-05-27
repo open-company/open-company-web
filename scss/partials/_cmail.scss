@@ -288,6 +288,7 @@ div.cmail-outer {
 
             @media screen and (min-height: 556px) {
               max-height: initial;
+              min-height: calc(100vh - 362px);
             }
           }
         }
