@@ -124,14 +124,6 @@
               [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :class utils/hide-class}])
-            (when (and ls/oc-enable-transcriptions
-                       (:video-transcript activity-data)
-                       (:video-processed activity-data))
-              [:div.activity-video-transcript
-                [:div.activity-video-transcript-header
-                  "This transcript was automatically generated and may not be accurate"]
-                [:div.activity-video-transcript-content
-                  (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
               (comments-summary activity-data true)

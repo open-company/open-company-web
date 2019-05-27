@@ -202,32 +202,6 @@ div.secure-activity-container {
         }
       }
 
-      div.activity-video-transcript {
-        max-height: 330px;
-        margin-top: 16px;
-        width: 100%;
-        background-color: rgba($ultra_light_grey, 0.2);
-        border-top: 1px solid $ultra_light_grey;
-        padding: 24px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-
-        div.activity-video-transcript-header {
-          @include OC_Body_Book();
-          font-size: 12px;
-          color: $light_ui_grey;
-        }
-
-        div.activity-video-transcript-content {
-          margin-top: 24px;
-          @include OC_Body_Book();
-          font-size: 16px;
-          color: $deep_navy;
-        }
-      }
-
       div.activity-content-footer {
         height: 26px;
         margin-top: 16px;
