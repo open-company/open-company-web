@@ -66,7 +66,8 @@
                (not (utils/event-inside? e (rum/ref-node s :on-dd-node)))
                (not (utils/event-inside? e (rum/ref-node s :on-bt))))
       (reset! (::frequency-dropdown s) false)
-      (reset! (::on-dropdown s) false))))
+      (reset! (::on-dropdown s) false)
+      (reset! (::assignee-dropdown s) false))))
   [s]
   (let [reminder-data (drv/react s :reminder-edit)
         reminders-roster (drv/react s :reminders-roster)
