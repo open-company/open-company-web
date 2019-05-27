@@ -73,7 +73,7 @@
         share-link (utils/link-for (:links entity-data) "share")
         mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
         editable-boards (drv/react s :editable-boards)
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     (js/console.log "DBG more-menu entity-data" (:links entity-data) "edit-link" edit-link "delete-link" delete-link)
     (when (or edit-link
               share-link

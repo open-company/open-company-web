@@ -133,7 +133,7 @@
              :class (utils/class-set {:editing is-editing?
                                       :showing-picker showing-picker?})}
             (when-not is-editing?
-              (if (responsive/is-mobile-size?)
+              (if (responsive/is-tablet-or-mobile?)
                 [:div.stream-comment-mobile-menu
                   (more-menu comment-data nil {:external-share false
                                                :entity-type "comment"
