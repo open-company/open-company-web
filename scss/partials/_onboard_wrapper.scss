@@ -370,6 +370,13 @@ div.onboard-lander {
       color: $deep_navy;
       line-height: 18px;
       position: relative;
+      opacity: 1;
+
+      @include big_web() {
+        &:hover {
+          opacity: 0.9;
+        }
+      }
 
       div.slack-icon {
         position: absolute;
