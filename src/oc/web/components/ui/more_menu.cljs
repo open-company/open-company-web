@@ -65,14 +65,16 @@
                        {:did-mount (fn [s]
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                          s)}
-  [s activity-data share-container-id
-   {:keys [will-open will-close external-share tooltip-position show-unread]}]
-  (let [delete-link (utils/link-for (:links activity-data) "delete")
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")
-        mark-unread-link (utils/link-for (:links activity-data) "mark-unread")
+  [s entity-data share-container-id
+   {:keys [will-open will-close external-share tooltip-position show-unread
+           show-edit? show-delete? edit-cb delete-cb show-move?]}]
+  (let [delete-link (utils/link-for (:links entity-data) "delete")
+        edit-link (utils/link-for (:links entity-data) "partial-update")
+        share-link (utils/link-for (:links entity-data) "share")
+        mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
         editable-boards (drv/react s :editable-boards)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-mobile-size?)]
+    (js/console.log "DBG more-menu entity-data" (:links entity-data) "edit-link" edit-link "delete-link" delete-link)
     (when (or edit-link
               share-link
               delete-link)
@@ -95,31 +97,35 @@
         (cond
           @(::move-activity s)
           (activity-move {:boards-list (vals editable-boards)
-                          :activity-data activity-data
+                          :activity-data entity-data
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
             {:class (when mark-unread-link "has-read-unread")}
             (when (and edit-link
-                       (not is-mobile?))
+                       show-edit?)
               [:li.edit
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/activity-edit activity-data))}
+                              (if (fn? edit-cb)
+                                (edit-cb entity-data)
+                                (activity-actions/activity-edit entity-data)))}
                 "Edit"])
             (when (and delete-link
-                       (not is-mobile?))
+                       show-delete?)
               [:li.delete
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (delete-clicked % activity-data))}
+                              (if (fn? delete-cb)
+                                (delete-cb entity-data)
+                                (delete-clicked % entity-data)))}
                 "Delete"])
             (when (and edit-link
-                       (not is-mobile?))
+                       show-move?)
               [:li.move
                {:on-click #(do
                              (reset! (::showing-menu s) false)
@@ -132,7 +138,7 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/activity-share-show activity-data share-container-id))}
+                              (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
             (when mark-unread-link
               (if show-unread
@@ -141,14 +147,14 @@
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/mark-unread activity-data))}
+                                (activity-actions/mark-unread entity-data))}
                   "Mark unread"]
                 [:li.read
                   {:on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/send-item-read (:uuid activity-data) true))}
+                                (activity-actions/send-item-read (:uuid entity-data) true))}
                   "Mark as read"]))])
         (when (and external-share
                    share-link)
@@ -159,7 +165,7 @@
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))
-                          (activity-actions/activity-share-show activity-data share-container-id))
+                          (activity-actions/activity-share-show entity-data share-container-id))
              :data-toggle "tooltip"
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"

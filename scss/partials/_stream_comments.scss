@@ -26,6 +26,28 @@ div.stream-comments {
         }
       }
 
+      div.stream-comment-mobile-menu {
+        display: none;
+
+        @include mobile() {
+          display: block;
+
+          div.more-menu {
+            button.more-menu-bt {
+              background-position: 0px left 4px top;
+              margin-top: -4px;
+            }
+
+            ul.more-menu-list {
+              width: 78px;
+              top: 20px;
+              right: 13px;
+              left: unset;
+            }
+          }
+        }
+      }
+
       &.showing-picker {
         div.stream-comment-floating-buttons {
           background-color: rgba($ultra_light_grey, 0.3);
@@ -280,11 +302,19 @@ div.stream-comments {
       div.stream-comment-footer {
         height: 24px;
         margin-top: 2px;
+
+        @include mobile() {
+          margin-top: 8px;
+        }
       }
 
       div.save-cancel-edit-buttons {
         float: right;
         padding-top: 16px;
+
+        @include mobile() {
+          padding-top: 0;
+        }
 
         button {
           float: right;

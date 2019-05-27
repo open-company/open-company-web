@@ -149,6 +149,9 @@
           (when is-published?
             (more-menu activity-data dom-element-id
              {:external-share (not is-mobile?)
+              :show-edit? (not is-mobile?)
+              :show-delete? (not is-mobile?)
+              :show-move? (not is-mobile?)
               :show-unread (not (:unread activity-data))}))]
         [:div.must-see-tag.mobile-only "Must see"]
         [:div.new-tag.mobile-only "NEW"]

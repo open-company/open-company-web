@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
@@ -15,6 +16,7 @@
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -131,40 +133,49 @@
              :class (utils/class-set {:editing is-editing?
                                       :showing-picker showing-picker?})}
             (when-not is-editing?
-              [:div.stream-comment-floating-buttons
-                {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                          :can-delete can-show-delete-bt?})}
-                (when can-show-edit-bt?
-                  [:button.mlb-reset.edit-bt
+              (if (responsive/is-mobile-size?)
+                [:div.stream-comment-mobile-menu
+                  (more-menu comment-data nil {:external-share false
+                                               :entity-type "comment"
+                                               :show-edit? true
+                                               :edit-cb (partial start-editing s)
+                                               :show-delete? true
+                                               :delete-cb (partial delete-clicked s activity-data)
+                                               :show-unread false})]
+                [:div.stream-comment-floating-buttons
+                  {:class (utils/class-set {:can-edit can-show-edit-bt?
+                                            :can-delete can-show-delete-bt?})}
+                  (when can-show-edit-bt?
+                    [:button.mlb-reset.edit-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :title "Edit"
+                       :on-click (fn [_]
+                                  (start-editing s comment-data))}])
+                  (when can-show-delete-bt?
+                    [:button.mlb-reset.delete-bt
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :title "Delete"
+                       :on-click (fn [_]
+                                  (delete-clicked s activity-data comment-data))}])
+                  ; [:button.mlb-reset.share-bt
+                  ;   {:data-toggle "tooltip"
+                  ;    :data-placement "top"
+                  ;    :title "Share"}]
+                  [:button.mlb-reset.react-bt
                     {:data-toggle "tooltip"
                      :data-placement "top"
-                     :title "Edit"
-                     :on-click (fn [_]
-                                (start-editing s comment-data))}])
-                (when can-show-delete-bt?
-                  [:button.mlb-reset.delete-bt
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :title "Delete"
-                     :on-click (fn [_]
-                                (delete-clicked s activity-data comment-data))}])
-                ; [:button.mlb-reset.share-bt
-                ;   {:data-toggle "tooltip"
-                ;    :data-placement "top"
-                ;    :title "Share"}]
-                [:button.mlb-reset.react-bt
-                  {:data-toggle "tooltip"
-                   :data-placement "top"
-                   :title "Add reaction"
-                   :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                (when showing-picker?
-                  (react-utils/build (.-Picker js/EmojiMart)
-                   {:native true
-                    :onClick (fn [emoji event]
-                               (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-                                 (comment-actions/react-from-picker activity-data comment-data
-                                  (gobj/get emoji "native")))
-                               (reset! (::show-picker s) nil))}))])
+                     :title "Add reaction"
+                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
+                  (when showing-picker?
+                    (react-utils/build (.-Picker js/EmojiMart)
+                     {:native true
+                      :onClick (fn [emoji event]
+                                 (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                   (comment-actions/react-from-picker activity-data comment-data
+                                    (gobj/get emoji "native")))
+                                 (reset! (::show-picker s) nil))}))]))
             [:div.stream-comment-author-avatar
               (user-avatar-image (:author comment-data))]
 
