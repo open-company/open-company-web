@@ -18,6 +18,7 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -422,11 +423,7 @@
                                 (real-close)
                                 (utils/after
                                  180
-                                 #(let [org-slug (router/current-org-slug)
-                                        board-slug (:board-slug cmail-data)
-                                        post-url (oc-urls/entry org-slug board-slug (:uuid cmail-data))]
-                                    ;; Redirect to AP if coming from it or if the post is not published
-                                    (router/nav! post-url))))
+                                 #(routing-actions/open-post-modal cmail-data)))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
