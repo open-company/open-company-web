@@ -150,7 +150,7 @@
         {:ref "post-body"
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
-      [:div.expanded-post-footer
+      [:div.expanded-post-footer.group
         (comments-summary activity-data true)
         (reactions activity-data)
         (when user-is-part-of-the-team
