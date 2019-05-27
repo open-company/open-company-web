@@ -113,6 +113,10 @@
                                (drv/drv :current-user-data)
                                ;; Mixins
                                first-render-mixin
+                               {:did-mount (fn [s]
+                                (when-let [video-field (rum/ref-node s "video-input")]
+                                  (.focus video-field))
+                                s)}
   [s {:keys [dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
         valid-url (valid-video-url? @(::video-url s))]
