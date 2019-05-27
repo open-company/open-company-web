@@ -234,7 +234,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body($font-size: 16, $separator: $bottom_margin, $h2_margin: $h2_top_margin, $color: $deep_navy){
+@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: $deep_navy){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -256,16 +256,16 @@ $h2_top_margin: 24;
 
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     @include OC_Body_Book();
-    font-size: #{$font-size}px;
-    line-height: #{$separator}px;
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
     color: $grey_num_1;
     opacity: 1;
     font-style: none !important;
   }
 
   @include OC_Body_Book();
-  font-size: #{$font-size}px;
-  line-height: #{$separator}px;
+  font-size: #{$font_size}px;
+  line-height: #{$line_height}px;
   color: $color;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -279,13 +279,13 @@ $h2_top_margin: 24;
   }
 
   & > *:not(:last-child) {
-    margin: #{$separator}px 0px;
+    margin: #{$line_height}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
   & > *:last-child:not(:first-child) {
-    margin: #{$separator}px 0px 0px;
+    margin: #{$line_height}px 0px 0px;
     padding-bottom: 0px;
   }
 
@@ -311,7 +311,7 @@ $h2_top_margin: 24;
   }
 
   & > *:not(:first-child) {
-    margin-top: #{$separator}px;
+    margin-top: #{$line_height}px;
   }
 
   h2 + p {
@@ -319,9 +319,9 @@ $h2_top_margin: 24;
   }
 
   h2 {
-    @include OC_Title();
-    font-size: #{$font-size + 2}px;
-    line-height: #{$separator}px;
+    @include OC_Body_Bold();
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
   }
@@ -336,7 +336,7 @@ $h2_top_margin: 24;
   }
 
   .emojione {
-    @include emoji-size($font-size - 2);
+    @include emoji-size($font_size - 2);
   }
 
   hr.media-divider-line {

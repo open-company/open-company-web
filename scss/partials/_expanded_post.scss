@@ -97,7 +97,7 @@ div.expanded-post {
   }
 
   div.expanded-post-body {
-    @include activity-body(18, 24, 24, $deep_navy);
+    @include activity-body(18, 24, $deep_navy);
     margin-top: 16px;
 
 
