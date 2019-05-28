@@ -75,29 +75,6 @@
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
-            (let [board-icon (cond
-                              (and (= (:access board-data) "private")
-                                   (not= (:slug board-data) utils/default-drafts-board-slug))
-                              [:span.private-icon]
-                              (= (:access board-data) "public")
-                              [:span.public-icon]
-                              (= (router/current-board-slug) "must-see")
-                              [:span.must-see-icon])]
-              [:button.mlb-reset.navigation-sidebar-ham-bt
-                {:class (utils/class-set {:active mobile-ap-active?})
-                 :on-click #(if is-mobile?
-                              (nav-actions/mobile-nav-sidebar)
-                              (dis/dispatch! [:update [:hide-left-navbar] not]))}
-                board-icon
-                [:span.board-name
-                  {:class (when board-icon "has-icon")}
-                  (cond
-                    (= (router/current-board-slug) "all-posts")
-                    "All Posts"
-                    (= (router/current-board-slug) "must-see")
-                    "Must See"
-                    :else
-                    (:name board-data))]])
            (when-not is-mobile?
              (orgs-dropdown))]
           (when-not is-mobile?
