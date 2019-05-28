@@ -117,11 +117,7 @@
                                first-render-mixin
                                {:will-mount (fn [s]
                                  (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
-                                   ; (set! (.. picker-el -style -display) "block")
-                                   (js/console.log "DBG el" picker-el "offsetTop" (.-offsetTop picker-el))
-                                   (reset! (::offset-top s) (.-offsetTop picker-el))
-                                   ; (set! (.. picker-el -style -display) "none")
-                                   )
+                                   (reset! (::offset-top s) (.-offsetTop picker-el)))
                                 s)}
   [s {:keys [dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
