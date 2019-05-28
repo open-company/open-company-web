@@ -636,7 +636,7 @@
                     "Post summaries"]
                   [:div.edit-tooltip
                     (str "Write a quick summary to help your team "
-                     "understand why this post matters. Summaries"
+                     "understand why this post matters. Summaries "
                      "appear in the stream view.")]
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
