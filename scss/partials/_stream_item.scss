@@ -67,6 +67,10 @@ div.stream-item {
       border-left: 4px solid white;
     }
 
+    &.showing-share {
+      z-index: 3;
+    }
+
     @include big_web(){
       &:hover {
         background-color: white;

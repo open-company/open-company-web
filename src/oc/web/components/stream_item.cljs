@@ -57,6 +57,7 @@
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
                          (drv/drv :show-post-added-tooltip)
+                         (drv/drv :activity-share-container)
                          ;; Locals
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
@@ -110,7 +111,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
-                                :expandable is-published?})
+                                :expandable is-published?
+                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
                    (when-not is-mobile?
