@@ -17,7 +17,7 @@
 
 (defn open-post-modal [activity-data]
   (let [org (router/current-org-slug)
-        board (:board-slug activity-data)
+        board (router/current-board-slug)
         activity (:uuid activity-data)
         post-url (oc-urls/entry (:board-slug activity-data) activity)
         query-params (router/query-params)
