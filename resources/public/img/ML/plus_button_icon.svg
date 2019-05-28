@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+    <title>Group 3</title>
     <desc>Created with Sketch.</desc>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="4d2ac49f-d9e1-4767-84a8-4574f3464dfc" transform="translate(-188.000000, -184.000000)" fill="#C2C3C6">
-            <g id="Side-nav-labels">
-                <g id="Group-10">
-                    <g id="Group-6" transform="translate(0.000000, 183.000000)">
-                        <g id="Group-3" transform="translate(16.000000, 0.000000)">
-                            <path d="M174,1 L182,1 C183.104569,1 184,1.8954305 184,3 L184,11 C184,12.1045695 183.104569,13 182,13 L174,13 C172.895431,13 172,12.1045695 172,11 L172,3 C172,1.8954305 172.895431,1 174,1 Z M177.4,6.4 L175.597239,6.4 C175.269464,6.4 175,6.66862915 175,7 C175,7.33368111 175.267393,7.6 175.597239,7.6 L177.4,7.6 L177.4,9.40276146 C177.4,9.73053629 177.668629,10 178,10 C178.333681,10 178.6,9.7326072 178.6,9.40276146 L178.6,7.6 L180.402761,7.6 C180.730536,7.6 181,7.33137085 181,7 C181,6.66631889 180.732607,6.4 180.402761,6.4 L178.6,6.4 L178.6,4.59723854 C178.6,4.26946371 178.331371,4 178,4 C177.666319,4 177.4,4.2673928 177.4,4.59723854 L177.4,6.4 Z" id="Combined-Shape"></path>
+    <g id="Styles-&amp;-states" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Nav-tweaks" transform="translate(-184.000000, -175.000000)" fill="#242D42">
+            <g id="Group-7" transform="translate(0.000000, 56.000000)">
+                <g id="Group-6">
+                    <g id="Group-5" transform="translate(0.000000, 110.000000)">
+                        <g id="Group-3" transform="translate(184.000000, 9.000000)">
+                            <g id="Group-4">
+                                <rect id="Rectangle-13-Copy" opacity="0.100000001" x="0" y="0" width="16" height="16" rx="4"></rect>
+                                <path d="M7.4,7.4 L7.4,4.59723854 C7.4,4.2673928 7.66631889,4 8,4 C8.33137085,4 8.6,4.26946371 8.6,4.59723854 L8.6,7.4 L11.4027615,7.4 C11.7326072,7.4 12,7.66631889 12,8 C12,8.33137085 11.7305363,8.6 11.4027615,8.6 L8.6,8.6 L8.6,11.4027615 C8.6,11.7326072 8.33368111,12 8,12 C7.66862915,12 7.4,11.7305363 7.4,11.4027615 L7.4,8.6 L4.59723854,8.6 C4.2673928,8.6 4,8.33368111 4,8 C4,7.66862915 4.26946371,7.4 4.59723854,7.4 L7.4,7.4 Z" id="Combined-Shape"></path>
+                            </g>
                         </g>
                     </g>
                 </g>
