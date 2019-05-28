@@ -130,7 +130,7 @@ div.press-kit-wrap {
 
               a {
                 display: block;
-                @include OC_Body_Black();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 text-decoration: uppercase;
                 letter-spacing: 0.5;
@@ -240,7 +240,7 @@ div.press-kit-wrap {
             a.media-res-content-video-download {
               text-align: center;
               margin: 32px auto 40px;
-              @include OC_Body_Black();
+              @include OC_Body_Bold();
               font-size: 14px;
               text-transform: uppercase;
               letter-spacing: 0.5;
@@ -290,7 +290,7 @@ div.press-kit-wrap {
                   a {
                     color: #32C97B;
                     text-align: left;
-                    @include OC_Body_Black();
+                    @include OC_Body_Bold();
                     font-size: 14px;
                     text-transform: uppercase;
                   }

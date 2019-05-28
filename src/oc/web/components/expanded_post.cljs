@@ -95,7 +95,7 @@
         is-all-posts? (= (router/current-board-slug) "all-posts")
         back-to-label (str "Back to "
                            (if is-all-posts?
-                             "All Posts"
+                             "All posts"
                              (:board-name activity-data)))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))

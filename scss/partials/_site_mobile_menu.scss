@@ -65,7 +65,7 @@ div.site-mobile-menu {
     button.login-btn {
       background-color: white;
       border-radius: 8px;
-      @include OC_Body_Black();
+      @include OC_Body_Bold();
       font-size: 16px;
       color: $carrot_orange;
       background-color: $coral;

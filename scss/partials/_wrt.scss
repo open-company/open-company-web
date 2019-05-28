@@ -178,7 +178,7 @@ div.wrt-popup-container {
           }
 
           .wrt-chart-text {
-            @include OC_Body_Medium();
+            @include OC_Body_Bold();
             font-size: 24px;
             fill: $deep_navy;
             -moz-transform: translateY(8px);
