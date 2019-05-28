@@ -186,3 +186,5 @@ var OCWebSetupMarketingSiteJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
+// Integrations panel
+var OCWebStaticOpenIntegrationsPanel = function() {};

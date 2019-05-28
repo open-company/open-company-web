@@ -169,7 +169,6 @@
                         {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
-                         :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                          :title (str (:name board-data) " settings")
                          :on-click #(nav-actions/show-section-editor)}]])]
                 ; (when-not is-mobile?
@@ -190,35 +189,7 @@
                 ;            :on-click #(reset! board-sort :own)}
                 ;           "Recently posted"]]]))
                 ])
-            (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-                  non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
-                                         "decisions to keep you and your team pulling in the same direction.")
-                  is-second-user (= add-post-tooltip :is-second-user)]
-              (when (and (not is-drafts-board)
-                         (not current-activity-id)
-                         add-post-tooltip)
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-                  [:div.add-post-tooltips
-                    {:class (when is-second-user "second-user")}
-                    [:div.add-post-tooltip-box-mobile]
-                    [:div.add-post-tooltip-title
-                      (str "Welcome to Carrot, " (:first-name current-user-data) "!")]
-                      [:div.add-post-tooltip
-                        (if is-admin-or-author
-                          (if is-second-user
-                            non-admin-tooltip
-                            "Create a test post now to see how it works. You can delete it anytime.")
-                          non-admin-tooltip)
-                        (when (and is-admin-or-author
-                                   (not is-second-user))
-                          [:button.mlb-reset.add-post-bt
-                            {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-                            [:span.add-post-bt-pen]
-                            "Create your first post"])]
-                    [:div.add-post-tooltip-box
-                      {:class (when is-second-user "second-user")}]]]))
+            
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards

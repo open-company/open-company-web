@@ -303,7 +303,7 @@ div.section-editor-container {
         border-radius: 4px;
         border: 1px solid rgba($carrot_light_gray_1, .5);
         position: absolute;
-        width: 100%;
+        width: 272px;
         background-color: white;
         z-index: 1001;
 
@@ -334,6 +334,7 @@ div.section-editor-container {
         float: left;
 
         &.private-access:before {
+          background-size: 10px 12px;
           background-image: cdnUrl("/img/ML/section_access_private.svg");
         }
 

@@ -175,7 +175,7 @@ div.secure-activity-container {
         outline: none;
         margin: 16px 0 0;
         cursor: text;
-        @include activity-body(18, 24, 24, $deep_navy); 
+        @include activity-body(18, 24, $deep_navy);
         color: $deep_navy;
         @include OC_Body_Book();
         font-size: 18px;
@@ -193,7 +193,7 @@ div.secure-activity-container {
           display: none;
         }
 
-        &.medium-editor-placeholder:after {
+        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
           color: $deep_navy !important;
         }
 
