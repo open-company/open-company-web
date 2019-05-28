@@ -541,7 +541,8 @@
                  :title "Must See"}
                 [:span.must-see-toggle-circle]]]
             (when (:must-see cmail-data)
-              [:div.must-see-tag])]
+              [:div.must-see-tag
+                {:class (when-not is-fullscreen? "white-bg")}])]
           (when is-fullscreen?
             [:div.cmail-header-right-buttons
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
