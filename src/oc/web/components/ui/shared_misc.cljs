@@ -178,7 +178,7 @@
             [:div.testimonial-quote
               (str
                "“Carrot is a perfect "
-               "compliment for Slack. We "
+               "complement for Slack. We "
                "use it for longer-form "
                "weekly updates no one "
                "should miss.”")]

@@ -7,10 +7,6 @@ nav.oc-navbar {
   transition: height 230ms;
   border-bottom: 1px solid $ultra_light_grey;
 
-  &.showing-qsg {
-    width: calc(100% - #{$qsg_width});
-  }
-
   &.showing-orgs-dropdown {
     overflow: visible;
   }
@@ -105,90 +101,6 @@ nav.oc-navbar {
           float: left;
         }
 
-        button.navigation-sidebar-ham-bt {
-          position: relative;
-          padding: 0 0 0 24px;
-          display: block;
-          height: 32px;
-          opacity: 1;
-          float: left;
-
-          &:after {
-            content: "";
-            width: 14px;
-            height: 10px;
-            background-image: cdnUrl("/img/ML/navbar_ham.svg");
-            background-repeat: no-repeat;
-            background-size: 14px 10px;
-            background-position: center;
-            position: absolute;
-            left: 0;
-            top: 10px;
-          }
-
-          span.board-name, span.private-icon, span.public-icon, span.must-see-icon {
-            display: none;
-          }
-
-          @include mobile() {
-            float: unset;
-            width: 60vw;
-
-            span.private-icon {
-              margin-right: 6px;
-              width: 10px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_private_board.svg");
-              background-repeat: no-repeat;
-              background-size: 10px 13px;
-              background-position: center 8px;
-              display: block;
-              float: left;
-            }
-
-            span.public-icon {
-              margin-right: 6px;
-              width: 12px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_public_board.svg");
-              background-repeat: no-repeat;
-              background-size: 12px 12px;
-              background-position: center;
-              display: block;
-              float: left;
-            }
-
-            span.must-see-icon {
-              margin-right: 6px;
-              width: 12px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_must_see.svg");
-              background-repeat: no-repeat;
-              background-size: 12px 16px;
-              background-position: center;
-              display: block;
-              float: left;
-            }
-
-            span.board-name {
-              @include OC_Body_Bold();
-              font-size: 16px;
-              color: $deep_navy;
-              height: 32px;
-              line-height: 32px;
-              display: block;
-              float: left;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-width: calc(60vw - 35px);
-
-              &.has-icon {
-                max-width: calc(60vw - 53px);
-              }
-            }
-          }
-        }
-
         button.search-bt {
           width: 24px;
           height: 24px;
@@ -227,78 +139,6 @@ nav.oc-navbar {
 
           @inlcude mobile() {
             float: unset;
-          }
-
-          div.qsg-tooltip-container {
-            border: 1px solid rgba($carrot_gold, 0.5);
-            background-color: #FDF6E4;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-            width: 300px;
-            border-radius: 6px;
-            padding: 24px 20px;
-            margin: 12px 0 0;
-            position: absolute;
-            right: -16px;
-            top: 28px;
-            text-align: center;
-            z-index: 5;
-
-            div.qsg-tooltip-top-arrow {
-              position: absolute;
-              top: -6px;
-              width: 10px;
-              height: 6px;
-              right: 14px;
-              background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
-              background-position: center;
-              background-size: 10px 6px;
-              background-repeat: no-repeat;
-            }
-
-            button.qsg-tooltip-dismiss {
-              position: absolute;
-              top: 0;
-              right: 0;
-              width: 32px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
-              background-size: 8px 8px;
-              background-position: center;
-              background-repeat: no-repeat;
-            }
-
-            div.qsg-tooltips {
-
-              div.qsg-tooltip-title {
-                @include OC_Title();
-                font-size: 18px;
-                color: $deep_navy;
-                line-height: 20px;
-              }
-
-              div.qsg-tooltip {
-                @include OC_Body_Book();
-                font-size: 16px;
-                color: $deep_navy;
-                line-height: 18px;
-                margin: 4px auto 0;
-                text-align: center;
-                max-width: 92%;
-              }
-
-              button.qsg-tooltip-bt {
-                width: auto;
-                margin-top: 16px;
-                height: 32px;
-                width: 96px;
-                background-color: transparent;
-                border-radius: 6px;
-                color: white;
-                background-color: $carrot_green;
-                @include OC_Body_Bold();
-                font-size: 16px;
-              }
-            }
           }
 
           div.user-menu-button.green-dot {

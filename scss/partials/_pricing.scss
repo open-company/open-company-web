@@ -411,7 +411,7 @@ div.pricing-wrap {
           a.chat-with-us {
             float: left;
             color: $carrot_green;
-            @include OC_Body_Black();
+            @include OC_Body_Bold();
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.5;

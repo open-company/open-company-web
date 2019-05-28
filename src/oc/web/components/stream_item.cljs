@@ -56,7 +56,6 @@
                          ;; Derivatives
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
-                         (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
@@ -146,13 +145,13 @@
                  (:name publisher)
                  " in "
                  (:board-name activity-data))]
-              [:div.must-see-tag.big-web-tablet-only "Must see"]]]
+              [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
             (more-menu activity-data dom-element-id
              {:external-share (not is-mobile?)
               :show-unread (not (:unread activity-data))}))]
-        [:div.must-see-tag.mobile-only "Must see"]
+        [:div.must-see-tag.mobile-only]
         [:div.new-tag.mobile-only "NEW"]
         [:div.stream-item-body-ext.group
           [:div.thumbnail-container.group
@@ -210,21 +209,7 @@
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    (wrt-count activity-data read-data)
-                    (when (and (not is-mobile?)
-                               (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
-                      [:div.post-added-tooltip-container.group
-                        [:div.post-added-tooltip-top-arrow]
-                        [:button.mlb-reset.post-added-tooltip-dismiss
-                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                        [:div.post-added-tooltips
-                          [:div.post-added-tooltip
-                            (if (org-utils/is-org-creator? org-data)
-                              "After you invite your team, you'll know who saw this post."
-                              "Here's where you'll know who saw this post.")]
-                          [:button.mlb-reset.post-added-bt
-                            {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                            "OK, got it"]]])])
+                    (wrt-count activity-data read-data)])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}

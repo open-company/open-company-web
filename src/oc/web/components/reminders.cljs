@@ -272,7 +272,6 @@
                        (drv/drv :show-reminders)
                        (drv/drv :reminders-data)
                        (drv/drv :reminder-edit)
-                       (drv/drv :qsg)
                        {:did-mount (fn [s]
                          (reminder-actions/load-reminders-roster)
                          (reminder-actions/load-reminders)
@@ -285,10 +284,8 @@
         reminders-data (drv/react s :reminders-data)
         reminder-edit-data (drv/react s :reminder-edit)
         can-add-reminder? (utils/link-for (:links reminders-data) "create")
-        is-mobile? (responsive/is-tablet-or-mobile?)
-        qsg-data (drv/react s :qsg)]
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.reminders-container.fullscreen-page
-      {:class (when (:visible qsg-data) "showing-qsg")}
       [:div.reminders-inner
         {:class (utils/class-set {:no-bottom-padding (= reminder-tab :reminders)
                                   :loading (not reminders-data)})}
