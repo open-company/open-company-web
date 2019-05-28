@@ -398,6 +398,11 @@ div.stream-item {
           line-height: 24px;
         }
 
+        b, strong, &.editing b, &.editing strong {
+          @include OC_Body_Book();
+          font-weight: normal;
+        }
+
         .carrot-no-preview {
           display: none;
         }
