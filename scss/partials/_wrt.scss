@@ -79,6 +79,7 @@ div.wrt-popup-container {
 
   @include mobile() {
     position: absolute;
+    padding: 0;
   }
 
   button.modal-close-bt {

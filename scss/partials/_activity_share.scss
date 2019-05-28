@@ -28,6 +28,7 @@ div.activity-share-modal-container {
     border: none;
     box-shadow: none;
     padding: 0px;
+    border-bottom: 1px solid $ultra_light_grey;
   }
 
   &.will-appear {
@@ -66,7 +67,6 @@ div.activity-share-modal-container {
         padding: 16px 0;
         text-align: center;
         line-height: 24px;
-        @include OC_Body_Bold();
       }
 
       button.mobile-modal-close-bt {
@@ -278,7 +278,7 @@ div.activity-share-modal-container {
       margin-top: 8px;
 
       @include mobile() {
-        padding: 0px 24px;
+        padding: 24px;
         min-height: calc(100vh - 56px);
       }
 

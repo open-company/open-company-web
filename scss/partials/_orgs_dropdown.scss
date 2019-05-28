@@ -18,6 +18,10 @@ div.orgs-dropdown {
 
     div.org-avatar {
       height: 32px;
+
+      @include mobile() {
+        height: 40px;
+      }
     }
 
     &.dropdown-toggle {
@@ -105,6 +109,10 @@ div.orgs-dropdown {
           height: 24px;
           overflow: hidden;
           @include org-avatar(24);
+
+          @include mobile() {
+            @include org-avatar(24);
+          }
 
           div.org-avatar-container {
             width: 120px;

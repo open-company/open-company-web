@@ -320,20 +320,20 @@
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
-   :wrt-read-data         [[:panel-stack]
-                            (fn [panel-stack]
+   :wrt-read-data         [[:base :panel-stack]
+                            (fn [base panel-stack]
                               (when (and panel-stack
                                          (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                 (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
-                                  (activity-read-data wrt-uuid))))]
-   :wrt-activity-data     [[:panel-stack]
-                            (fn [panel-stack]
+                                  (activity-read-data wrt-uuid base))))]
+   :wrt-activity-data     [[:base :panel-stack]
+                            (fn [base panel-stack]
                               (when (and panel-stack
                                          (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                 (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
-                                  (activity-data-get wrt-uuid))))]
+                                  (activity-data-get wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data
                             :ap-initial-at :show-sections-picker :entry-editing
                             :jwt :wrt-show]
