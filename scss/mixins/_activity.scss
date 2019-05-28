@@ -40,66 +40,24 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin new-tag() {
-  div.new-tag {
-    @include OC_Body_Black();
-    color: #F8A936;
-    font-size: 11px;
-    line-height: 17px;
-    padding: 2px 0px 0px 18px;
-    border-radius: 4px;
-    height: 18px;
-    width: 50px;
-    background-color: #FFEFD8;
-    text-transform: uppercase;
-    text-align: left;
-    position: relative;
-    vertical-align: top;
-
-    &:before {
-      content: "";
-      width: 8px;
-      height: 10px;
-      background-image: cdnUrl("/img/ML/new_badge_bell.svg");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 8px 10px;
-      position: absolute;
-      top: 4px;
-      left: 6px;
-    }
-  }
-}
-
 @mixin must-see-tag() {
   div.must-see-tag {
-    @include OC_Body_Bold();
-    color: $sea_blue;
-    font-size: 11px;
-    line-height: 14px;
-    padding: 2px 4px 2px 14px;
-    border-radius: 4px;
+    background-image: cdnUrl("/img/ML/must_see_tag.svg");
+    background-size: 74px 18px;
+    background-position: center;
+    background-repeat: no-repeat;
     height: 18px;
+<<<<<<< HEAD
     width: 80px;
     background-color: rgba($sea_blue,.2);
     text-transform: uppercase;
     text-align: center;
+=======
+    width: 74px;
+>>>>>>> carrot-2
     margin-right: 8px;
     position: relative;
     vertical-align: top;
-
-    &:before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 10px 10px;
-      position: absolute;
-      top: 4px;
-      left: 4px;
-    }
   }
 }
 
@@ -163,7 +121,7 @@ $h2_top_margin: 24;
     display: inline-block;
     height: 26px;
     border-radius: 100px;
-    @include OC_Body_Black();
+    @include OC_Body_Bold();
     font-size: 12px;
     color: $carrot_light_gray_3;
     background-color: $carrot_light_gray_7;
