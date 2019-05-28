@@ -169,10 +169,13 @@
         disallow-public-board? (and (:content-visibility org-data)
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
+      {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
+                    (on-change nil nil nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(on-change nil nil nav-actions/close-all-panels)}]
       [:div.section-editor.group
-        {:on-click (fn [e]
+        {:ref :section-editor
+         :on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
                        (reset! (::show-access-list s) false))
                      (when-not (utils/event-inside? e (rum/ref-node s "private-users-search"))
