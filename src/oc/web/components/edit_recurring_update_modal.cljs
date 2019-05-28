@@ -117,7 +117,7 @@
                               (swap! (::assignee-dropdown s) not)
                               (reset! (::frequency-dropdown s) false)
                               (reset! (::on-dropdown s) false))
-                 :class (when-not (:assignee reminder-data) "placeholder")}
+                 :class (when (empty? (:assignee reminder-data)) "placeholder")}
                 (if (:assignee reminder-data)
                   (str (utils/name-or-email (:assignee reminder-data)) (when self-assignee? " (you)"))
                   "Pick a user")]
