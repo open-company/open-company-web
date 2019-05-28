@@ -146,6 +146,7 @@ div.notifications {
 
       &.no-description {
         @include OC_Body_Book();
+        line-height: 22px;
       }
 
       @include mobile() {

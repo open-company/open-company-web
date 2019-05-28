@@ -471,6 +471,7 @@
           :resultColumns 1
           :preloadTrending true
           :containerClassName "giphy-picker-container"
+          :queryFormAutoFocus true
           :queryFormClassName "giphy-picker-form"
           :queryFormInputClassName "giphy-picker-form-input"
           :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"

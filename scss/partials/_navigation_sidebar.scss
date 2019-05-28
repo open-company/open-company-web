@@ -269,9 +269,13 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-content {
     width: #{$left_navigation_sidebar_width}px;
-    height: calc(100% - 72px);
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+
+    &.can-compose {
+      height: calc(100% - 72px);
+    }
 
     @include mobile() {
       position: relative;

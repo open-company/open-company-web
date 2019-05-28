@@ -43,6 +43,8 @@
   &:-moz-placeholder           {@content}
   &::-moz-placeholder          {@content}
   &:-ms-input-placeholder      {@content}
+  &:placeholder                {@content}
+  &::placeholder               {@content}
 }
 
 @mixin pillbox(){

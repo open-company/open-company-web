@@ -282,10 +282,11 @@ div.cmail-outer {
 
           div.rich-body-editor {
             min-height: calc(100vh - 342px);
-            @include activity-body(18, 26, 26, $deep_navy);
+            @include activity-body(18, 26, $deep_navy);
 
             @media screen and (min-height: 556px) {
               max-height: initial;
+              min-height: calc(100vh - 362px);
             }
           }
         }
@@ -631,7 +632,6 @@ div.cmail-outer {
         outline: none;
         cursor: text;
         @include activity-headline();
-        @include OC_Body_Bold();
         font-size: 22px;
         color: $deep_navy;
         white-space: pre-wrap;
@@ -775,11 +775,11 @@ div.cmail-outer {
           margin: 8px 0px 0px;
           cursor: text;
           color: $deep_navy;
-          @include OC_Body_Bold();
+          @include OC_Body_Book();
           height: auto;
 
           @include big_web() {
-            @include activity-body(18, 26, 26, $deep_navy);
+            @include activity-body(18, 26, $deep_navy);
             font-size: 18px;
             line-height: 26px;
           }
@@ -791,7 +791,7 @@ div.cmail-outer {
           @include tablet() {
             min-height: 20vh;
             max-height: initial;
-            @include activity-body(18, 24, 24, $deep_navy);
+            @include activity-body(18, 24, $deep_navy);
             font-size: 18px;
             line-height: 24px;
             overflow-y: auto;
@@ -806,8 +806,9 @@ div.cmail-outer {
             margin: 22px 0px;
           }
 
-          &.medium-editor-placeholder:after {
+          &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
             color: $light_ui_grey !important;
+            font-style: normal;
           }
 
           &:after {
