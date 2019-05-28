@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :refer (first-render-mixin)]))
@@ -109,15 +110,34 @@
                                (rum/local false ::dismiss)
                                (rum/local "" ::video-url)
                                (rum/local false ::video-url-focused)
+                               (rum/local 0 ::offset-top)
                                ;; Derivatives
                                (drv/drv :current-user-data)
                                ;; Mixins
                                first-render-mixin
+                               {:will-mount (fn [s]
+                                 (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
+                                   ; (set! (.. picker-el -style -display) "block")
+                                   (js/console.log "DBG el" picker-el "offsetTop" (.-offsetTop picker-el))
+                                   (reset! (::offset-top s) (.-offsetTop picker-el))
+                                   ; (set! (.. picker-el -style -display) "none")
+                                   )
+                                s)}
   [s {:keys [dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
-        valid-url (valid-video-url? @(::video-url s))]
+        valid-url (valid-video-url? @(::video-url s))
+        scrolling-element (sel1 [:div.cmail-content-outer])
+        win-height (or (.-clientHeight (.-documentElement js/document))
+                       (.-innerHeight js/window))
+        scroll-top (.-scrollTop scrolling-element)
+        top-position (max 0 @(::offset-top s))
+        relative-position (+ top-position 286 (* scroll-top -1) 153)
+        adjusted-position (if (> relative-position win-height) ;; 286 is the top offset of the body
+                            (max 0 (- top-position (- relative-position win-height) 16))
+                            top-position)]
     [:div.media-video-modal-container
-      {:class (when @(::video-url-focused s) "video-url-focused")}
+      {:class (when @(::video-url-focused s) "video-url-focused")
+       :style {:top (str adjusted-position "px")}}
       [:div.media-video-modal-title
         "Embed video"]
       [:input.media-video-modal-input

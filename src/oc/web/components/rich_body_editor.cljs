@@ -3,12 +3,12 @@
             [oops.core :refer [oget oget+]]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.mention :as mention-utils]
@@ -18,6 +18,7 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
+            [oc.web.components.ui.gif-picker-wrapper :refer (gif-picker-wrapper)]
             [cljsjs.medium-editor]
             [cljsjs.react-giphy-selector]
             [goog.dom :as gdom]
@@ -463,23 +464,7 @@
                                           (media-video-add s @(::media-picker-ext s) nil)
                                           (reset! (::showing-media-video-modal s) false))})])
     (when @(::showing-gif-selector s)
-      [:div.giphy-picker
-        {:ref :giphy-picker}
-        (react-utils/build (.-Selector js/ReactGiphySelector)
-         {:apiKey ls/giphy-api-key
-          :queryInputPlaceholder "Search for GIF"
-          :resultColumns 1
-          :preloadTrending true
-          :containerClassName "giphy-picker-container"
-          :queryFormClassName "giphy-picker-form"
-          :queryFormInputClassName "giphy-picker-form-input"
-          :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
-          :queryFormSubmitContent "Seach"
-          :searchResultsClassName "giphy-picker-results-container"
-          :searchResultClassName "giphy-picker-results-item"
-          :suggestionsClassName "giphy-picker-suggestions"
-          :suggestionClassName "giphy-picker-suggestions-suggestion"
-          :loaderClassName "giphy-picker-loader"
-          :onGifSelected (fn [gif-obj]
-                          (reset! (::showing-gif-selector s) false)
-                          (media-gif-add s @(::media-picker-ext s) gif-obj))})])])
+      (gif-picker-wrapper
+       (fn [gif-obj]
+         (reset! (::showing-gif-selector s) false)
+         (media-gif-add s @(::media-picker-ext s) gif-obj))))])
