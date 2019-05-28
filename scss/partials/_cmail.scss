@@ -732,7 +732,7 @@ div.cmail-outer {
           margin: 8px 0px 0px;
           cursor: text;
           color: $deep_navy;
-          @include OC_Body_Bold();
+          @include OC_Body_Book();
           height: auto;
 
           @include big_web() {
