@@ -150,3 +150,10 @@
 
 (defn hide-wrt []
   (pop-panel))
+
+;; Integrations
+
+(defn open-integrations-panel []
+  (show-org-settings :integrations))
+
+(set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)

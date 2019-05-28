@@ -81,11 +81,11 @@ $circular_bold: "LL Circular Bold Web";
 }
 
 @mixin OC_Body_Bold(){
-  @include OCBodyFont($circular_bold, bold);
+  @include OCBodyFont($circular_bold, normal);
 }
 
 @mixin OC_Body_Bold_Italic(){
-  @include OCBodyFont($circular_bold, bold, italic);
+  @include OCBodyFont($circular_bold, normal, italic);
 }
 
 @mixin OC_Title($weight: 700){

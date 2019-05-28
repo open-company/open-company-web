@@ -118,6 +118,10 @@
                                {:will-mount (fn [s]
                                  (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
                                    (reset! (::offset-top s) (.-offsetTop picker-el)))
+                                 s)
+                                :did-mount (fn [s]
+                                 (when-let [video-field (rum/ref-node s "video-input")]
+                                  (.focus video-field))
                                 s)}
   [s {:keys [dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
@@ -142,6 +146,10 @@
            :ref "video-input"
            :on-change #(reset! (::video-url s) (.. % -target -value))
            :on-focus #(reset! (::video-url-focused s) true)
+           :on-key-press (fn [e]
+                           (when (and valid-url
+                                      (= (.-key e) "Enter"))
+                             (video-add-click s)))
            :on-blur #(when (clojure.string/blank? @(::video-url s))
                        (reset! (::video-url-focused s) false))
            :placeholder "Paste the video link…"}]

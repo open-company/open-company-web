@@ -174,7 +174,6 @@
                           {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                            :data-placement "top"
                            :data-container "body"
-                           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                            :title (str (:name board-data) " settings")
                            :on-click #(nav-actions/show-section-editor)}]])]
                   ; (when-not is-mobile?

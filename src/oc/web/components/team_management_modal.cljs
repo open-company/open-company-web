@@ -65,7 +65,13 @@
         filtered-users (if (seq @(::query s))
                          (filter #(user-match @(::query s) %) all-users)
                          all-users)
-        sorted-users (reverse (sort-by utils/name-or-email filtered-users))
+        splitted-users (group-by #(= (:user-id %) (:user-id cur-user-data)) filtered-users)
+        self-user (-> splitted-users (get true) first)
+        other-users (get splitted-users false)
+        other-sorted-users (reverse (sort-by utils/name-or-email other-users))
+        sorted-users (if self-user
+                       (concat [self-user] other-sorted-users)
+                       other-sorted-users)
         team-roster (:team-roster invite-users-data)]
     [:div.team-management-modal
       [:button.mlb-reset.modal-close-bt

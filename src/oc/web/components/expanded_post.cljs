@@ -145,12 +145,14 @@
                           :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
         (:headline activity-data)]
-      [:div.expanded-post-author
+      [:div.expanded-post-author.group
         (user-avatar-image publisher)
         [:div.expanded-post-author-inner
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
-               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
+          (when (:must-see activity-data)
+            [:div.must-see-tag])]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract
           (:abstract activity-data)])
