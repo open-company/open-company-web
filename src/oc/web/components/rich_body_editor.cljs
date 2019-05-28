@@ -18,7 +18,7 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
-            [oc.web.components.ui.gif-picker-wrapper :refer (gif-picker-wrapper)]
+            [oc.web.components.ui.gif-picker :refer (gif-picker)]
             [cljsjs.medium-editor]
             [cljsjs.react-giphy-selector]
             [goog.dom :as gdom]
@@ -464,7 +464,7 @@
                                           (media-video-add s @(::media-picker-ext s) nil)
                                           (reset! (::showing-media-video-modal s) false))})])
     (when @(::showing-gif-selector s)
-      (gif-picker-wrapper
+      (gif-picker
        (fn [gif-obj]
          (reset! (::showing-gif-selector s) false)
          (media-gif-add s @(::media-picker-ext s) gif-obj))))])

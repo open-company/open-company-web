@@ -1,15 +1,15 @@
-(ns oc.web.components.ui.gif-picker-wrapper
+(ns oc.web.components.ui.gif-picker
   (:require [rum.core :as rum]
             [dommy.core :refer-macros (sel1)]
             [oc.web.local-settings :as ls]
             [oc.web.lib.react-utils :as react-utils]))
 
-(rum/defcs gif-picker-wrapper < (rum/local 0 ::offset-top)
-                                {:will-mount (fn [s]
+(rum/defcs gif-picker < (rum/local 0 ::offset-top)
+                        {:will-mount (fn [s]
 
-                                  (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
-                                    (reset! (::offset-top s) (.-offsetTop picker-el)))
-                                 s)}
+                          (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
+                            (reset! (::offset-top s) (.-offsetTop picker-el)))
+                         s)}
   [s pick-emoji-cb]
   (let [scrolling-element (sel1 [:div.cmail-content-outer])
         win-height (or (.-clientHeight (.-documentElement js/document))
