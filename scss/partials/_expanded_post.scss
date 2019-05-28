@@ -71,7 +71,7 @@ div.expanded-post {
   div.expanded-post-author {
     @include user-profile(24);
     margin-top: 16px;
-    height: 24px;
+    min-height: 24px;
 
     div.user-avatar-img-container {
       float: left;
@@ -90,6 +90,12 @@ div.expanded-post {
         display: inline-block;
         margin-left: 8px;
         margin-top: 2px;
+
+        @include mobile() {
+          display: block;
+          margin-left: 0;
+          margin-top: 8px;
+        }
       }
     }
   }

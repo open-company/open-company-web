@@ -137,7 +137,7 @@
                           :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
         (:headline activity-data)]
-      [:div.expanded-post-author
+      [:div.expanded-post-author.group
         (user-avatar-image publisher)
         [:div.expanded-post-author-inner
           (str (:name publisher) " in "
