@@ -200,7 +200,7 @@
         [:a
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
-            "Chat with us"]]
+            "Get support"]]
         [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out
