@@ -43,14 +43,20 @@ $h2_top_margin: 24;
 @mixin must-see-tag() {
   div.must-see-tag {
     background-image: cdnUrl("/img/ML/must_see_tag.svg");
-    background-size: 74px 18px;
+    background-size: 66px 14px;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: rgba($sea_blue, 0.2);
     height: 18px;
     width: 74px;
     margin-right: 8px;
     position: relative;
     vertical-align: top;
+    border-radius: 4px;
+
+    &.white-bg {
+      background-color: white;
+    }
   }
 }
 
