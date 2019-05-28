@@ -144,13 +144,13 @@
                  (:name publisher)
                  " in "
                  (:board-name activity-data))]
-              [:div.must-see-tag.big-web-tablet-only "Must see"]]]
+              [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
             (more-menu activity-data dom-element-id
              {:external-share (not is-mobile?)
               :show-unread (not (:unread activity-data))}))]
-        [:div.must-see-tag.mobile-only "Must see"]
+        [:div.must-see-tag.mobile-only]
         [:div.new-tag.mobile-only "NEW"]
         [:div.stream-item-body-ext.group
           [:div.thumbnail-container.group

@@ -125,10 +125,6 @@ div.cmail-outer {
             }
           }
 
-          div.must-see-tag {
-            background-color: rgba($sea_blue,.2);
-          }
-
           div.must-see-toggle-container {
             &.on {
               div.must-see-toggle {
@@ -360,7 +356,7 @@ div.cmail-outer {
         position: relative;
 
         &.must-see-on {
-          width: 300px;
+          width: 304px;
         }
 
         div.board-name {
@@ -467,7 +463,6 @@ div.cmail-outer {
         div.must-see-tag {
           float: left;
           margin: 7px 0 0 16px;
-          background-color: white;
         }
       }
 
