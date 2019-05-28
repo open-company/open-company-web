@@ -158,7 +158,7 @@
         [:input.search
           {:class (when-not @(::search-clicked? s) "inactive")
            :ref "search-input"
-           :placeholder "Search posts…"
+           :placeholder "Search"
            :on-blur #(do
                        (when (responsive/is-mobile-size?)
                          (set! (.-placehoder (.-target %)) ""))

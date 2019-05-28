@@ -66,7 +66,8 @@
                (not (utils/event-inside? e (rum/ref-node s :on-dd-node)))
                (not (utils/event-inside? e (rum/ref-node s :on-bt))))
       (reset! (::frequency-dropdown s) false)
-      (reset! (::on-dropdown s) false))))
+      (reset! (::on-dropdown s) false)
+      (reset! (::assignee-dropdown s) false))))
   [s]
   (let [reminder-data (drv/react s :reminder-edit)
         reminders-roster (drv/react s :reminders-roster)
@@ -116,7 +117,7 @@
                               (swap! (::assignee-dropdown s) not)
                               (reset! (::frequency-dropdown s) false)
                               (reset! (::on-dropdown s) false))
-                 :class (when-not (:assignee reminder-data) "placeholder")}
+                 :class (when (empty? (:assignee reminder-data)) "placeholder")}
                 (if (:assignee reminder-data)
                   (str (utils/name-or-email (:assignee reminder-data)) (when self-assignee? " (you)"))
                   "Pick a user")]

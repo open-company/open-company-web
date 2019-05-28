@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.routing :as routing-actions]
@@ -68,6 +69,7 @@
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
+  (drv/drv :show-post-added-tooltip)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -82,6 +84,9 @@
     s)
    :did-remount (fn [_ s]
     (load-comments s)
+    s)
+   :will-unmount (fn [s]
+    (nux-actions/dismiss-post-added-tooltip)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -109,7 +114,10 @@
                         :height (utils/calc-video-height 638)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
         activities-read (drv/react s :activities-read)
-        reads-data (get activities-read (:uuid activity-data))]
+        reads-data (get activities-read (:uuid activity-data))
+        post-add-tooltip (drv/react s :show-post-added-tooltip)
+        should-show-post-added-tooltip? (and post-add-tooltip
+                                             (= post-add-tooltip (router/current-activity-id)))]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
@@ -137,12 +145,14 @@
                           :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
         (:headline activity-data)]
-      [:div.expanded-post-author
+      [:div.expanded-post-author.group
         (user-avatar-image publisher)
         [:div.expanded-post-author-inner
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
-               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
+          (when (:must-see activity-data)
+            [:div.must-see-tag])]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract
           (:abstract activity-data)])
@@ -154,7 +164,19 @@
         (comments-summary activity-data true)
         (reactions activity-data)
         (when user-is-part-of-the-team
-          (wrt-count activity-data reads-data))]
+          [:div.expanded-post-wrt-container
+            (when should-show-post-added-tooltip?
+              [:div.post-added-tooltip-container
+                {:ref :post-added-tooltip}
+                [:div.post-added-tooltip-title
+                  "Post analytics"]
+                [:div.post-added-tooltip
+                  (str "Invite your team to Carrot so you can know who read your "
+                   "post and when. Click here to access your post analytics anytime.")]
+                [:button.mlb-reset.post-added-tooltip-bt
+                  {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                  "OK, got it"]])
+            (wrt-count activity-data reads-data)])]
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data)
         (when (:can-comment activity-data)

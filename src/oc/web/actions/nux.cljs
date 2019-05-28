@@ -5,7 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.utils.user :as user-utils]
+            [oc.web.utils.org :as org-utils]
             [oc.web.lib.json :refer (json->cljs cljs->json)]))
 
 (defn get-nux-cookie
@@ -61,7 +61,7 @@
   []
   (when-let* [nv (get-nux-cookie)
               org-data (dis/org-data)]
-    (let [is-org-creator (user-utils/is-org-creator? org-data)
+    (let [is-org-creator (org-utils/is-org-creator? org-data)
           team-data (dis/team-data)
           can-edit? (utils/is-admin-or-author? org-data)
           is-admin? (jwt/is-admin? (:team-id org-data))
