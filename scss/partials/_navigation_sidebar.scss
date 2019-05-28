@@ -41,11 +41,11 @@
     font-size: 12px;
     line-height: 16px;
     text-align: center;
-    color: #FBFAF9;
+    color: $light_navy;
     width: 16px;
     height: 16px;
     display: inline-block;
-    background-color: #C2C3C6;
+    background-color: rgba($light_navy, 0.1);
     border-radius: 4px;
     margin-top: 4px;
     margin-right: 16px;
@@ -389,42 +389,21 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
-    height: 20px;
-
-    @include mobile() {
-      border-top: 1px solid $ultra_light_grey;
-      height: 32px;
-    }
+    margin-top: 8px;
 
     .left-navigation-sidebar-top-title {
-      padding: 0px 0px 0px 16px;
+      padding: 8px 16px;
       margin: 0;
-      height: 15px;
-      margin-bottom: 8px;
-      margin-top: 16px;
+      height: 34px;
       width: 100%;
-
-      @include mobile() {
-        background-color: $ultra_light_grey;
-        height: 32px;
-        width: 100%;
-        padding: 8px 48px 6px;
-        margin-bottom: 0px;
-      }
 
       span {
         @include OC_Body_Book();
-        font-size: 12px;
-        line-height: 15px;
-        height: 15px;
-        color: #90939E;
+        font-size: 14px;
+        line-height: 18px;
+        color: rgba($deep_navy, 0.5);
         float: left;
         cursor: default;
-
-        @include mobile() {
-          display: block;
-          line-height: 15px;
-        }
       }
 
       div.boards-icon {
@@ -442,8 +421,7 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-top: -2px;
-      margin-right: 11px;
+      margin-right: -2px;
       float: right;
       padding: 0;
       cursor: pointer;
@@ -451,7 +429,7 @@ div.left-navigation-sidebar {
       background-image: cdnUrl("/img/ML/plus_button_icon.svg");
       background-repeat: no-repeat;
       background-position: center;
-      background-size: 12px 12px;
+      background-size: 16px 16px;
       @include OC_Body_Bold();
 
       &.qsg-add-section-1 {
@@ -468,7 +446,7 @@ div.left-navigation-sidebar {
 
     a.left-navigation-sidebar-item {
       display: block;
-      cursor: default;
+      cursor: pointer;
       padding-left: 16px;
       margin: 0;
       text-decoration: none;

@@ -145,13 +145,13 @@
                  (:name publisher)
                  " in "
                  (:board-name activity-data))]
-              [:div.must-see-tag.big-web-tablet-only "Must see"]]]
+              [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
             (more-menu activity-data dom-element-id
              {:external-share (not is-mobile?)
               :show-unread (not (:unread activity-data))}))]
-        [:div.must-see-tag.mobile-only "Must see"]
+        [:div.must-see-tag.mobile-only]
         [:div.new-tag.mobile-only "NEW"]
         [:div.stream-item-body-ext.group
           [:div.thumbnail-container.group
@@ -189,14 +189,7 @@
                    :ref :abstract
                    :dangerouslySetInnerHTML {:__html (if has-abstract
                                                        (:abstract activity-data)
-                                                       (:body activity-data))}}])]
-            (when (and ls/oc-enable-transcriptions
-                       (:video-transcript activity-data))
-              [:div.stream-item-transcript
-                [:div.stream-item-transcript-header
-                  "This transcript was automatically generated and may not be accurate"]
-                [:div.stream-item-transcript-content
-                  (:video-transcript activity-data)]])]
+                                                       (:body activity-data))}}])]]
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit

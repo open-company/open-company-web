@@ -352,7 +352,7 @@ div.about-wrap {
                 margin-top: 16px;
                 color: $carrot_green;
                 text-transform: uppercase;
-                @include OC_Body_Black();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 letter-spacing: 0.5;
               }
@@ -362,7 +362,7 @@ div.about-wrap {
                 margin-right: 16px;
                 color: rgba($deep_navy, 0.5);
                 text-transform: uppercase;
-                @include OC_Body_Black();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 letter-spacing: 0.5; 
               }

@@ -129,10 +129,6 @@ div.cmail-outer {
             }
           }
 
-          div.must-see-tag {
-            background-color: rgba($sea_blue,.2);
-          }
-
           div.must-see-toggle-container {
             &.on {
               div.must-see-toggle {
@@ -358,7 +354,7 @@ div.cmail-outer {
         position: relative;
 
         &.must-see-on {
-          width: 300px;
+          width: 304px;
         }
 
         div.board-name {
@@ -465,7 +461,6 @@ div.cmail-outer {
         div.must-see-tag {
           float: left;
           margin: 7px 0 0 16px;
-          background-color: white;
         }
       }
 
@@ -774,26 +769,6 @@ div.cmail-outer {
           &:after {
             margin: 0;
           }
-        }
-      }
-
-      div.cmail-data-transcript {
-        max-height: 330px;
-        margin-top: 16px;
-        width: 100%;
-        background-color: rgba($ultra_light_grey, 0.2);
-        border-top: 1px solid $ultra_light_grey;
-        padding: 24px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-
-        textarea.video-transcript {
-          width: 100%;
-          background-color: transparent;
-          border: none;
-          outline: none;
         }
       }
 
