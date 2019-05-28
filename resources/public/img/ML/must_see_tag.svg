@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="74px" height="18px" viewBox="0 0 74 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Must-see-tag</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Post-stream" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="FoC:-activity-notifier" transform="translate(-573.000000, -164.000000)" fill="#6187F8">
+            <g id="Must-see-tag" transform="translate(573.000000, 164.000000)">
+                <g>
+                    <rect id="Rectangle-3" opacity="0.200000003" x="0" y="0" width="74" height="18" rx="4"></rect>
+                    <text id="MUST-SEE" font-family="Circular-Bold, Circular" font-size="11" font-weight="bold">
+                        <tspan x="16" y="13">MUST SEE</tspan>
+                    </text>
+                    <path d="M9.44306329,7.77807069 L11.4784539,7.77807069 C12.009532,7.77807069 12.1602586,8.10906344 11.8132464,8.5195697 L7.4972686,13.6252574 C6.97793764,14.2396123 6.55693671,14.0829054 6.55693671,13.2702025 L6.55693671,10.2219293 L4.52154611,10.2219293 C3.99046802,10.2219293 3.83974142,9.89093656 4.18675361,9.4804303 L8.5027314,4.37474256 C9.02206236,3.76038774 9.44306329,3.91709464 9.44306329,4.72979746 L9.44306329,7.77807069 Z" id="Combined-Shape" fill-rule="nonzero"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
