@@ -127,7 +127,7 @@
                             {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                             [:span.add-post-bt-pen]
                             "New post"])
-                      [:div.add-post-tooltip-box
+                      [:div.add-post-tooltip-box.big-web-only
                         {:class (when is-second-user "second-user")}]]]))
               (when-not current-activity-id
                 ;; Board name row: board name, settings button and say something button

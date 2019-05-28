@@ -147,6 +147,10 @@ div.dashboard-layout {
             align-items: center;
             padding: 0 46px;
 
+            @include mobile() {
+              display: none;
+            }
+
             span.add-post-bt-pen {
               width: 14px;
               height: 14px;
