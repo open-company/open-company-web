@@ -96,23 +96,7 @@
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
-            (when-not is-mobile?
-              (let [board-icon (cond
-                                (and (= (:access board-data) "private")
-                                     (not= (:slug board-data) utils/default-drafts-board-slug))
-                                [:span.private-icon]
-                                (= (:access board-data) "public")
-                                [:span.public-icon]
-                                (= (router/current-board-slug) "must-see")
-                                [:span.must-see-icon])]
-                [:button.mlb-reset.navigation-sidebar-ham-bt
-                  {:class (utils/class-set {:active mobile-ap-active?})
-                   :on-click #(dis/dispatch! [:update [:hide-left-navbar] not])}
-                  board-icon
-                  [:span.board-name
-                    {:class (when board-icon "has-icon")}
-                    section-name]]))
-           (orgs-dropdown)]
+            (orgs-dropdown)]
           (if is-mobile?
             [:div.navbar-center
               [:button.mlb-reset.mobile-board-button
