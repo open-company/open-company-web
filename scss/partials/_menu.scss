@@ -153,10 +153,6 @@ div.menu {
       }
     }
 
-    a.qsg-profile-photo-2, a.qsg-company-logo-2, a.qsg-invite-team-2, a.qsg-create-reminder-2 {
-      position: relative;
-    }
-
     @include mobile() {
       // Remove the last bottom line on mobile
       & > *:last-child div.oc-menu-item:after{

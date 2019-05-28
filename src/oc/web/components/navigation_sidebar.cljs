@@ -13,8 +13,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -51,7 +50,6 @@
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
-                                (drv/drv :qsg)
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
@@ -110,14 +108,10 @@
                             (not @(::footer-height s))
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        qsg-data (drv/react s :qsg)
-        showing-qsg (:visible qsg-data)
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})
-       :style {:overflow (when (= (:step qsg-data) :add-section-1)
-                           "visible")}}
+      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"}
         ;; All posts
@@ -154,16 +148,13 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:span "Sections"]
               (when create-link
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.qsg-add-section-1
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
-                   :class (when (= (:step qsg-data) :add-section-1) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                  (when (= (:step qsg-data) :add-section-1)
-                    (qsg-breadcrumb qsg-data))])]])
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards

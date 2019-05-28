@@ -32,18 +32,6 @@ div.org-dashboard {
     }
   }
 
-  &.showing-qsg {
-    overflow: hidden;
-    height: 100%;
-
-    div.page {
-      width: calc(100% - #{$qsg_width});
-      overflow-x: hidden;
-      overflow-y: auto;
-      max-height: 100vh;
-    }
-  }
-
   div.menu {
     display: none;
   }
@@ -51,12 +39,6 @@ div.org-dashboard {
   &.show-menu {
     div.menu {
       display: block;
-    }
-  }
-
-  &.showing-digest-sample, &.showing-qsg.showing-digest-sample {
-    div.page {
-      overflow: hidden;
     }
   }
 

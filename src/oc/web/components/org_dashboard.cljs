@@ -12,7 +12,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
-            [oc.web.components.qsg :refer (qsg)]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -29,7 +28,6 @@
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
-            [oc.web.components.qsg-digest-sample :refer (qsg-digest-sample)]
             [oc.web.components.ui.activity-removed :refer (activity-removed)]
             [oc.web.components.user-profile-modal :refer (user-profile-modal)]
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
@@ -74,7 +72,6 @@
                            (drv/drv :org-dashboard-data)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
-                           (drv/drv :qsg)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
@@ -160,7 +157,6 @@
                         (not show-activity-removed)
                         loading?)
         is-showing-mobile-search (and is-mobile? search-active?)
-        qsg-data (drv/react s :qsg)
         open-panel (last panel-stack)
         show-section-editor (= open-panel :section-edit)
         show-section-add (= open-panel :section-add)
@@ -179,8 +175,6 @@
                                   :activity-not-found show-activity-not-found
                                   :activity-removed show-activity-removed
                                   :expanded-activity (router/current-activity-id)
-                                  :showing-qsg (:visible qsg-data)
-                                  :showing-digest-sample (:qsg-show-sample-digest-view qsg-data)
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
@@ -284,10 +278,4 @@
                               (not open-panel)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
-                 (dashboard-layout))]]
-            (when (:qsg-show-sample-digest-view qsg-data)
-              (qsg-digest-sample))])
-        (when (:visible qsg-data)
-          [:div.qsg-main-container
-            (qsg)
-            (video-lightbox)])])))
+                 (dashboard-layout))]]])])))

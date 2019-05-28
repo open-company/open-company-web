@@ -13,11 +13,9 @@
             [oc.web.stores.user :as user-store]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.whats-new :as whats-new]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn menu-close [& [s]]
@@ -30,27 +28,22 @@
 
 (defn user-profile-click [s e]
   (.preventDefault e)
-  (qsg-actions/next-profile-photo-trail)
   (nav-actions/show-user-settings :profile))
 
 (defn notifications-settings-click [s e]
   (.preventDefault e)
   (nav-actions/show-user-settings :notifications))
 
-(defn team-settings-click [s e qsg-data]
+(defn team-settings-click [s e]
   (.preventDefault e)
-  (when (= (:step qsg-data) :company-logo-2)
-    (qsg-actions/next-company-logo-trail))
   (nav-actions/show-org-settings :org))
 
 (defn manage-team-click [s e]
   (.preventDefault e)
   (nav-actions/show-org-settings :team))
 
-(defn invite-team-click [s e  qsg-data]
+(defn invite-team-click [s e]
   (.preventDefault e)
-  (when (= (:step qsg-data) :invite-team-2)
-    (qsg-actions/finish-invite-team-trail))
   (nav-actions/show-org-settings :invite))
 
 (defn integrations-click [s e]
@@ -62,25 +55,17 @@
   (.preventDefault e)
   (user-actions/show-login :login-with-slack))
 
-(defn show-qsg-click [s e]
-  (menu-close s)
-  (.preventDefault e)
-  (qsg-actions/show-qsg-view))
-
 (defn whats-new-click [s e]
   (.preventDefault e)
   (whats-new/show))
 
-(defn reminders-click [s e qsg-data]
+(defn reminders-click [s e]
   (.preventDefault e)
-  (when (= (:step qsg-data) :create-reminder-2)
-    (qsg-actions/finish-create-reminder-trail))
   (nav-actions/show-reminders))
 
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
-                  (drv/drv :qsg)
   {:did-mount (fn [s]
    (whats-new/check-whats-new-badge)
    s)
@@ -92,7 +77,6 @@
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
-        qsg-data (drv/react s :qsg)
         show-reminders? (utils/link-for (:links org-data) "reminders")
         expanded-user-menu (= (last panel-stack) :menu)
         org-slug (router/current-org-slug)
@@ -119,11 +103,9 @@
             (user-avatar-image current-user-data))]
         (when (and (jwt/jwt)
                    (not is-mobile?))
-          [:a.qsg-profile-photo-2
+          [:a
             {:href "#"
              :on-click (partial user-profile-click s)}
-            (when (= (:step qsg-data) :profile-photo-2)
-              (qsg-breadcrumb qsg-data))
             [:div.oc-menu-item.personal-profile
               "My profile"]])
         (when (and (jwt/jwt)
@@ -137,11 +119,9 @@
           [:div.oc-menu-separator])
         (when (and show-reminders?
                    (not is-mobile?))
-          [:a.qsg-create-reminder-2
+          [:a
             {:href "#"
-             :on-click #(reminders-click s % qsg-data)}
-            (when (= (:step qsg-data) :create-reminder-2)
-              (qsg-breadcrumb qsg-data))
+             :on-click #(reminders-click s %)}
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
         (when (and (not is-mobile?)
@@ -151,20 +131,16 @@
         (when (and (not is-mobile?)
                    (= user-role :admin)
                    org-slug)
-          [:a.qsg-company-logo-2
+          [:a
             {:href "#"
-             :on-click #(team-settings-click s % qsg-data)}
-            (when (= (:step qsg-data) :company-logo-2)
-              (qsg-breadcrumb qsg-data))
+             :on-click #(team-settings-click s %)}
             [:div.oc-menu-item.digest-settings
               "Admin settings"]])
         (when (and (not is-mobile?)
                    show-invite-people?)
-          [:a.qsg-invite-team-2
+          [:a
             {:href "#"
-             :on-click #(invite-team-click s %  qsg-data)}
-            (when (= (:step qsg-data) :invite-team-2)
-              (qsg-breadcrumb qsg-data))
+             :on-click #(invite-team-click s %)}
             [:div.oc-menu-item.invite-team
               "Invite people"]])
         (when (and (not is-mobile?)
@@ -197,13 +173,6 @@
             {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
-        (when (and (not is-mobile?)
-                   (jwt/jwt)
-                   (= user-role :admin))
-          [:a
-            {:on-click (partial show-qsg-click s)}
-            [:div.oc-menu-item.show-qsg
-              "Quickstart guide"]])
         [:a
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support

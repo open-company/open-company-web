@@ -119,7 +119,6 @@
             "Continue with Google"]]
         ;; Or with email
         [:div.or-with-email
-          [:div.or-with-email-line]
           [:div.or-with-email-copy
             "Or, sign in with email"]]
         ;; Email fields
@@ -169,7 +168,7 @@
                  :type "password"
                  :tabIndex 2
                  :name "pswd"}]
-              [:div.left.forgot-password
+              [:div.forgot-password
                 [:a {:on-click #(user-actions/show-login :password-reset)} "Forgot Password?"]]]
             ;; Login button
             [:button.mlb-reset.mlb-default.continue
@@ -185,7 +184,7 @@
              :on-click (fn [e]
                          (utils/event-stop e)
                          (router/nav! oc-urls/sign-up))}
-            "Signup here"]]]]))
+            "Sign up here"]]]]))
 
 (rum/defcs password-reset < rum/reactive
                             dont-scroll
