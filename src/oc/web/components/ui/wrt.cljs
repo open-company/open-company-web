@@ -185,4 +185,4 @@
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " viewer" (when (not= read-count 1) "s"))
-          "0 Viewers")]]))
+          "0 viewers")]]))
