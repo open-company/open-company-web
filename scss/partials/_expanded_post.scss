@@ -83,6 +83,14 @@ div.expanded-post {
       font-size: 12px;
       color: rgba($deep_navy, 0.5);
       line-height: 24px;
+
+      @include must-see-tag();
+
+      div.must-see-tag {
+        display: inline-block;
+        margin-left: 8px;
+        margin-top: 2px;
+      }
     }
   }
 
