@@ -9,7 +9,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.responsive :as responsive]
@@ -17,7 +16,6 @@
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 (defn close-clicked [s dismiss-action]
@@ -88,7 +86,6 @@
 (defn logo-on-click [org-avatar-editing]
   (iu/upload! org-utils/org-avatar-filestack-config
     (fn [res]
-      (qsg-actions/finish-company-logo-trail)
       (let [url (gobj/get res "url")
             img (gdom/createDom "img")]
         (set! (.-onerror img) #(logo-add-error img))
@@ -98,7 +95,6 @@
         (set! (.-src img) url)))
     nil
     (fn [err]
-      (qsg-actions/finish-company-logo-trail)
       (logo-add-error nil))))
 
 (defn email-domain-removed [success?]
@@ -112,7 +108,6 @@
 (rum/defcs org-settings-modal <
   ;; Mixins
   rum/reactive
-  (drv/drv :qsg)
   (drv/drv :org-data)
   (drv/drv :team-data)
   (drv/drv :org-editing)
@@ -147,7 +142,6 @@
   [s]
   (let [org-data (drv/react s :org-data)
         org-avatar-editing (drv/react s :org-avatar-editing)
-        qsg-data (drv/react s :qsg)
         org-data-for-avatar (merge org-data org-avatar-editing)
         org-editing (drv/react s :org-editing)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -178,13 +172,11 @@
             {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
             "Back"]]
         [:div.org-settings-body
-          [:div.org-settings-header-avatar.qsg-company-logo-3.group
+          [:div.org-settings-header-avatar.group
             {:ref "org-settings-header-logo"
              :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
                                       utils/hide-class true})
              :on-click logo-on-click}
-            (when (= (:step qsg-data) :company-logo-3)
-              (qsg-breadcrumb qsg-data))
             (org-avatar org-data-for-avatar false :never)
             [:span.edit-company-logo
               "Edit company logo"]]

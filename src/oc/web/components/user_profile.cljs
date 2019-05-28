@@ -8,14 +8,12 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-stores]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.carrot-close-bt :refer (carrot-close-bt)]
             [oc.web.components.user-profile-personal-tab :refer (user-profile-personal-tab)]
             [oc.web.components.user-profile-notifications-tab :refer (user-profile-notifications-tab)]))
@@ -77,7 +75,6 @@
 (defn success-cb
   [res]
   (let [url (googobj/get res "url")]
-    (qsg-actions/finish-profile-photo-trail)
     (if-not url
       (error-cb nil nil)
       (do
@@ -96,7 +93,6 @@
                           (drv/drv :edit-user-profile)
                           (drv/drv :current-panel)
                           (drv/drv :edit-user-profile-avatar)
-                          (drv/drv :qsg)
                           ;; Locals
                           (rum/local nil ::temp-user-avatar)
                           ;; Mixins
@@ -123,8 +119,7 @@
         edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         temp-user-avatar @(::temp-user-avatar s)
-        is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")
-        qsg-data (drv/react s :qsg)]
+        is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")]
     [:div.user-profile
       [:div.user-profile-mobile-header
         [:button.mlb-reset.user-profile-mobile-close
@@ -135,12 +130,10 @@
         [:button.mlb-reset.settings-modal-close
           {:on-click #(close-cb current-user-data)}]
         [:div.user-profile-header.group
-          [:div.user-profile-header-avatar.qsg-profile-photo-3
+          [:div.user-profile-header-avatar
             {:ref "user-profile-header-avatar"
              :class (utils/class-set {:profile-tab (= tab :profile)})
              :on-click #(upload-user-profile-pictuer-clicked)}
-            (when (= (:step qsg-data) :profile-photo-3)
-              (qsg-breadcrumb qsg-data))
             (if is-jelly-head-avatar
               [:div.empty-user-avatar-placeholder]
               (user-avatar-image user-for-avatar))]

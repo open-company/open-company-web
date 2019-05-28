@@ -34,34 +34,30 @@ div.add-comment-box-container {
       width: calc(100% - 24px - 16px - 50px);
       position: relative;
       max-height: 200px;
+      border-radius: 4px;
+      border: 1px solid $mid_light_grey;
       overflow-x: hidden;
       overflow-y: auto;
 
       div.add-comment {
         resize: none;
         outline: none;
-        @include OC_Body_Book();
-        color: $deep_navy;
-        font-size: 16px;
-        cursor: text;
-        line-height: 20px;
+        cursor: auto;
         white-space: pre-wrap;
         word-wrap: break-word;
+        margin: 0;
         padding: 9px 14px;
-        margin: 0px;
+        background-color: white;
         height: auto;
         min-height: 38px;
-        background-color: white;
-        border-radius: 4px;
-        border: 1px solid $mid_light_grey;
-        background-color: white;
         outline: none;
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
-        &.medium-editor-placeholder:after {
+        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
           @include OC_Body_Book();
           font-size: 16px;
           color: rgba($deep_navy, 0.5);
+          font-style: normal;
         }
 
         @include tablet() {
@@ -70,17 +66,11 @@ div.add-comment-box-container {
           padding-right: 0px;
         }
 
-        p {
-          margin-bottom: 0px;
-        }
-
         .emojione {
           @include emoji-size(13);
         }
 
-        a {
-          color: $carrot_green;
-        }
+        @include activity-comment();
       }
 
       // div.emoji-picker {

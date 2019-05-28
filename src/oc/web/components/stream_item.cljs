@@ -10,7 +10,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.user :as user-utils]
+            [oc.web.utils.org :as org-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
@@ -56,7 +56,7 @@
                          ;; Derivatives
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
-                         (drv/drv :show-post-added-tooltip)
+                         (drv/drv :activity-share-container)
                          ;; Locals
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
@@ -110,7 +110,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
-                                :expandable is-published?})
+                                :expandable is-published?
+                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
                    (when-not is-mobile?
@@ -209,21 +210,7 @@
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    (wrt-count activity-data read-data)
-                    (when (and (not is-mobile?)
-                               (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
-                      [:div.post-added-tooltip-container.group
-                        [:div.post-added-tooltip-top-arrow]
-                        [:button.mlb-reset.post-added-tooltip-dismiss
-                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                        [:div.post-added-tooltips
-                          [:div.post-added-tooltip
-                            (if (user-utils/is-org-creator? org-data)
-                              "After you invite your team, you'll know who saw this post."
-                              "Here's where you'll know who saw this post.")]
-                          [:button.mlb-reset.post-added-bt
-                            {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                            "OK, got it"]]])])
+                    (wrt-count activity-data read-data)])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}

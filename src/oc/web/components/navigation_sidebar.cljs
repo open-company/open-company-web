@@ -13,8 +13,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -51,7 +50,6 @@
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
-                                (drv/drv :qsg)
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
@@ -112,15 +110,11 @@
                             (not @(::footer-height s))
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        qsg-data (drv/react s :qsg)
-        showing-qsg (:visible qsg-data)
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :hide-left-navbar (drv/react s :hide-left-navbar)})
-       :style {:overflow (when (= (:step qsg-data) :add-section-1)
-                           "visible")}}
+                                :hide-left-navbar (drv/react s :hide-left-navbar)})}
       [:div.mobile-header-container
         [:button.mlb-reset.mobile-header-close
           {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
@@ -134,7 +128,8 @@
                        (nav-actions/menu-toggle))}
           (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
-        {:ref "left-navigation-sidebar-content"}
+        {:ref "left-navigation-sidebar-content"
+         :class (when can-compose "can-compose")}
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -143,7 +138,7 @@
              :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
@@ -169,16 +164,12 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:span "Sections"]
               (when create-link
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.qsg-add-section-1
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
-                   :class (when (= (:step qsg-data) :add-section-1) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                  (when (= (:step qsg-data) :add-section-1)
-                    (qsg-breadcrumb qsg-data))])]])
+                   :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
@@ -198,7 +189,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
+                    {:class (utils/class-set {:new (seq (:unread board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]

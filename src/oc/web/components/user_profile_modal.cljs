@@ -8,14 +8,12 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-stores]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn real-close-cb [editing-user-data dismiss-action mobile-back-bt]
   (when (:has-changes editing-user-data)
@@ -68,7 +66,6 @@
 (defn success-cb
   [res]
   (let [url (googobj/get res "url")]
-    (qsg-actions/finish-profile-photo-trail)
     (if-not url
       (error-cb nil nil)
       (do
@@ -118,7 +115,6 @@
 
 (rum/defcs user-profile-modal <
   rum/reactive
-  (drv/drv :qsg)
   (drv/drv :edit-user-profile)
   (drv/drv :current-user-data)
   (drv/drv :edit-user-profile-avatar)
@@ -146,7 +142,6 @@
   [s]
   (let [edit-user-profile-avatar (drv/react s :edit-user-profile-avatar)
         is-jelly-head-avatar (s/includes? edit-user-profile-avatar "/img/ML/happy_face_")
-        qsg-data (drv/react s :qsg)
         user-profile-data (drv/react s :edit-user-profile)
         current-user-data (:user-data user-profile-data)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
@@ -172,11 +167,9 @@
             {:on-click (fn [_] (close-cb current-user-data #(nav-actions/show-user-settings nil)))}
             "Back"]]
         [:div.user-profile-body
-          [:div.user-profile-avatar.qsg-profile-photo-3
+          [:div.user-profile-avatar
             {:ref "user-profile-avatar"
              :on-click #(upload-user-profile-pictuer-clicked)}
-            (when (= (:step qsg-data) :profile-photo-3)
-              (qsg-breadcrumb qsg-data))
             (if is-jelly-head-avatar
               [:div.empty-user-avatar-placeholder]
               (user-avatar-image user-for-avatar))

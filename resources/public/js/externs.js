@@ -98,7 +98,6 @@ var OCWebPrintJWTContents = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintPanelStack = function(){};
 var OCWebPrintPostsData = function(){};
-var OCWebPrintQSGData = function(){};
 var OCWebPrintReactionsData = function(){};
 var OCWebPrintRemindersData = function(){};
 var OCWebPrintReminderEditData = function(){};
@@ -187,3 +186,5 @@ var OCWebSetupMarketingSiteJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
+// Integrations panel
+var OCWebStaticOpenIntegrationsPanel = function() {};

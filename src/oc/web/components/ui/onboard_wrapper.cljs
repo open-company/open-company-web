@@ -60,7 +60,7 @@
              :aria-label "Back"}]
           [:div.mobile-logo]]
         [:div.title.main-lander
-          "Welcome to Carrot"]]
+          "Create an account"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -69,10 +69,9 @@
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
                          (user-actions/login-with-slack auth-link)))}
-          [:div.signup-with-slack-content
-            [:div.slack-icon
-              {:aria-label "slack"}]
-            "Continue with Slack"]]
+          "Continue with Slack"
+          [:div.slack-icon
+            {:aria-label "slack"}]]
        [:button.mlb-reset.signup-with-google
          {:on-touch-start identity
           :on-click #(do
@@ -80,10 +79,9 @@
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                             {:auth-source "google"})]
                          (user-actions/login-with-google auth-link)))}
-          [:div.signup-with-google-content
-            [:div.google-icon
-              {:aria-label "google"}]
-            "Continue with Google "]]
+          "Continue with Google"
+          [:div.google-icon
+            {:aria-label "google"}]]
         [:div.or-with-email
           [:div.or-with-email-copy
             "Or, sign up with email"]]
@@ -147,7 +145,7 @@
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href oc-urls/login} "Login here"]]]]))
+          [:a {:href oc-urls/login} "Sign in"]]]]))
 
 (defn- profile-setup-team-data
   ""
@@ -296,8 +294,7 @@
           "Tell us about you"]
         (when-not has-org?
           [:div.steps
-            "Step 1 of 2"])
-        [:div.steps-separator]]
+            "Step 1 of 2"])]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -315,19 +312,19 @@
               {:class utils/hide-class
                :type "text"
                :ref "first-name"
-               :placeholder "First name"
+               :placeholder "First name..."
                :max-length user-utils/user-name-max-lenth
                :value (or (:first-name user-data) "")
                :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
             [:input.field.right-half-field.oc-input
               {:class utils/hide-class
                :type "text"
-               :placeholder "Last name"
+               :placeholder "Last name..."
                :value (or (:last-name user-data) "")
                :max-length user-utils/user-name-max-lenth
                :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]]
           (when-not has-org?
-            [:div.field-label
+            [:div.field-label.company-name
               "Company name"
               (when (:error org-editing)
                 [:span.error "Must be at least 3 characters"])])
@@ -335,7 +332,7 @@
             [:input.field.oc-input
               {:type "text"
                :ref "org-name"
-               :placeholder "e.g., Acme, or Acme Design"
+               :placeholder "Enter a team name..."
                :class (utils/class-set {:error (:error org-editing)
                                         utils/hide-class true})
                :max-length org-utils/org-name-max-length
@@ -378,9 +375,9 @@
                                 (when (and (seq cleaned-email-domain)
                                            valid-email-domain?)
                                   (check-email-domain cleaned-email-domain s))))
-                 :placeholder "Email domain, e.g. acme.com"}]
+                 :placeholder "@domain.com"}]
             [:div.field-label.info
-              "Anyone with email addresses at these domain can automatically join your workspace."]])
+              "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."]])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -576,8 +573,7 @@
         [:div.title
           "Pick a few topics to start"]
         [:div.steps
-          "Step 2 of 2"]
-        [:div.steps-separator]]
+          "Step 2 of 2"]]
       [:div.onboard-form
         [:div.sections-list
           (if (seq sections-list)
@@ -595,7 +591,7 @@
           {:on-touch-start identity
            :on-click continue-fn
            :disabled disabled}
-          "✨ Start using Carrot ✨"]]]))
+          "Start using Carrot"]]]))
 
 (def default-invite-row
   {:user ""
@@ -673,8 +669,7 @@
         [:div.subtitle
           "Invite some colleagues to explore Carrot with you."]
         [:div.steps
-          "Step 3 of 3"]
-        [:div.steps-separator]]
+          "Step 3 of 3"]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -778,8 +773,7 @@
           "Joining as: "
           [:span.email-address
             {:class utils/hide-class}
-            (:email jwt)]]
-        [:div.steps-separator]]
+            (:email jwt)]]]
       [:div.onboard-form
         [:form
           {:on-submit (fn [e]
@@ -847,7 +841,6 @@
           [:div.mobile-logo]]
         [:div.title.about-yourself
           "Tell us a bit about you"]
-        [:div.steps-separator]
         (when (:error edit-user-profile)
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]
@@ -861,6 +854,7 @@
             {:class utils/hide-class
              :type "text"
              :ref "first-name"
+             :placeholder "First name..."
              :value (:first-name user-data)
              :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
@@ -869,6 +863,7 @@
           [:input.field.oc-input
             {:class utils/hide-class
              :type "text"
+             :placeholder "Last name..."
              :value (:last-name user-data)
              :max-length user-utils/user-name-max-lenth
              :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]
@@ -879,7 +874,7 @@
              :on-click #(do
                           (reset! (::saving s) true)
                           (user-actions/user-profile-save current-user-data edit-user-profile))}
-            "✨ Start using Carrot ✨"]]]]))
+            "Start using Carrot"]]]]))
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]

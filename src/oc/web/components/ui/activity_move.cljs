@@ -42,7 +42,7 @@
           {:on-click #(do (utils/event-stop %) (reset! (::show-boards-list s) (not @(::show-boards-list s))))
            :class (utils/class-set {:placeholder (nil? @(::selected-board s))
                                     :active @(::show-boards-list s)})}
-          (or (:name @(::selected-board s)) "Select a new board...")]
+          (or (:name @(::selected-board s)) "Move to...")]
         (when @(::show-boards-list s)
           [:div.boards-list
             (for [board sorted-boards-list]

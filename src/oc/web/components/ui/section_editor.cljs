@@ -8,7 +8,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
@@ -108,7 +107,6 @@
    (when-not (utils/event-inside? e (rum/dom-node s))
      (nav-actions/hide-section-editor))))
   ;; Derivatives
-  (drv/drv :qsg)
   (drv/drv :org-data)
   (drv/drv :board-data)
   (drv/drv :section-editing)
@@ -165,14 +163,16 @@
                        (some #{current-user-id} (:authors section-editing))
                        (jwt/is-admin? (:team-id org-data)))
         last-section-standing (= (count no-drafts-boards) 1)
-        qsg-data (drv/react s :qsg)
         disallow-public-board? (and (:content-visibility org-data)
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
+      {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
+                    (on-change nil nil nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(on-change nil nil nav-actions/close-all-panels)}]
       [:div.section-editor.group
-        {:on-click (fn [e]
+        {:ref :section-editor
+         :on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
                        (reset! (::show-access-list s) false))
                      (when-not (utils/event-inside? e (rum/ref-node s "private-users-search"))
@@ -201,8 +201,6 @@
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
                                                 (on-change % personal-note nav-actions/hide-section-editor))]
-                              (when (not @(::editing-existing-section s))
-                                (qsg-actions/finish-add-section-trail))
                               (section-actions/section-save-create section-editing section-name success-cb))))
                :class (when disable-bt "disabled")}
               "Save"])
@@ -490,9 +488,8 @@
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
                                                       {:title "Section deleted"
-                                                       :primary-bt-title "OK"
-                                                       :primary-bt-dismiss true
-                                                       :expire 10
+                                                       :dismiss true
+                                                       :expire 3
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
                                                    (nav-actions/hide-section-editor))})))
