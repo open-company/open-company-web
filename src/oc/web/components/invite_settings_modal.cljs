@@ -6,7 +6,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -159,7 +158,6 @@
             "Invite people"]
           [:button.mlb-reset.save-bt
             {:on-click #(let [valid-count (count (filterv valid-user? invite-users))]
-                          (qsg-actions/finish-invite-team-trail)
                           (reset! (::sending s) valid-count)
                           (reset! (::initial-sending s) valid-count)
                           (reset! (::send-bt-cta s) "Sending")

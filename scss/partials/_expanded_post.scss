@@ -113,6 +113,7 @@ div.expanded-post {
   div.expanded-post-footer {
     margin-top: 24px;
     height: 26px;
+    position: relative;
 
     div.is-comments {
       margin-right: 16px;
@@ -146,10 +147,53 @@ div.expanded-post {
       }
     }
 
-    div.wrt-count-container {
+    div.expanded-post-wrt-container {
       float: left;
       position: relative;
       margin-top: 4px;
+
+      div.post-added-tooltip-container {
+        position: absolute;
+        bottom: 40px;
+        left: 0;
+        width: 320px;
+        padding: 16px;
+        border-radius: 4px;
+        background-color: $deep_navy;
+
+        &:after {
+          content: " ";
+          position: absolute;
+          left: 24px;
+          bottom: -3px;
+          width: 6px;
+          height: 6px;
+          transform: rotate(-45deg);
+          background-color: $deep_navy;
+        }
+
+        div.post-added-tooltip-title {
+          color: white;
+          @include OC_Body_Bold();
+          font-size: 16px;
+        }
+
+        div.post-added-tooltip {
+          margin-top: 8px;
+          color: white;
+          @include OC_Body_Book();
+          font-size: 14px;
+        }
+
+        button.post-added-tooltip-bt {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $carrot_green;
+          margin-top: 8px;
+          padding: 0;
+          display: block;
+        }
+      }
     }
   }
 
