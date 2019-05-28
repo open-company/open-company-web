@@ -434,7 +434,7 @@ div.stream-item {
     }
 
     div.stream-item-footer {
-      height: 26px;
+      min-height: 26px;
       margin-top: 16px;
 
       div.stream-body-draft-edit {
@@ -594,6 +594,10 @@ div.stream-item {
         position: relative;
         margin-top: 4px;
         margin-right: 16px;
+
+        @include mobile() {
+          margin-left: 2px;
+        }
       }
 
       div.time-since {
