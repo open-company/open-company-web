@@ -67,16 +67,18 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
   {:did-mount (fn [s]
-   (whats-new/check-whats-new-badge)
+   (when (responsive/is-mobile-size?)
+     (whats-new/check-whats-new-badge))
    s)
    :did-remount (fn [_ s]
-   (whats-new/check-whats-new-badge)
+   (when (responsive/is-mobile-size?)
+     (whats-new/check-whats-new-badge))
     s)}
   [s]
   (let [{:keys [panel-stack org-data board-data]} (drv/react s :navbar-data)
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)
+        is-mobile? (responsive/is-mobile-size?)
         show-reminders? (utils/link-for (:links org-data) "reminders")
         expanded-user-menu (= (last panel-stack) :menu)
         org-slug (router/current-org-slug)
