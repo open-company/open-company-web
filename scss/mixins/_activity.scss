@@ -254,7 +254,7 @@ $h2_top_margin: 24;
     @include OC_Body_Bold();
     color: $color;
     letter-spacing: normal !important;
-    font-weight: 400;
+    font-weight: normal;
   }
 
   &.editing {
@@ -278,9 +278,9 @@ $h2_top_margin: 24;
 
   h2 {
     @include OC_Body_Bold();
-    font-size: #{$font_size}px;
+    font-size: #{$font_size + 2}px;
     line-height: #{$line_height}px;
-    font-weight: bold;
+    font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
   }
