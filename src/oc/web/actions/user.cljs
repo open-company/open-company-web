@@ -466,7 +466,7 @@
          {:title (:title fixed-notification)
           :mention true
           :dismiss true
-          :click #(router/nav! (oc-urls/entry (:board-slug fixed-notification) (:uuid fixed-notification)))
+          :click (:click fixed-notification)
           :mention-author (:author fixed-notification)
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
