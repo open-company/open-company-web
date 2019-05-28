@@ -201,6 +201,7 @@
                         "Unopened"))]
                   ;; Send reminder button
                   (when (and (not (:seen u))
+                             (not is-self-user?)
                              (not user-sending-notice))
                     [:button.mlb-reset.send-reminder-bt
                       {:on-click (fn [_]
@@ -235,9 +236,7 @@
                                                              (str "Sent via Slack")))]
                                           (swap! (::sending-notice s) assoc (:user-id u) user-label)
                                           (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u))))))))}
-                      (if is-self-user?
-                        "Remind me"
-                        "Notify")])])]])]]))
+                      "Send"])])]])]]))
 
 (defn- under-middle-screen? [el]
   (let [el-offset-top (aget (.offset (js/$ el)) "top")
