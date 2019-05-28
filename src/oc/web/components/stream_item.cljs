@@ -56,7 +56,6 @@
                          ;; Derivatives
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
-                         (drv/drv :show-post-added-tooltip)
                          (drv/drv :activity-share-container)
                          ;; Locals
                          (rum/local false ::truncated)
@@ -211,21 +210,7 @@
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    (wrt-count activity-data read-data)
-                    (when (and (not is-mobile?)
-                               (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
-                      [:div.post-added-tooltip-container.group
-                        [:div.post-added-tooltip-top-arrow]
-                        [:button.mlb-reset.post-added-tooltip-dismiss
-                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                        [:div.post-added-tooltips
-                          [:div.post-added-tooltip
-                            (if (org-utils/is-org-creator? org-data)
-                              "After you invite your team, you'll know who saw this post."
-                              "Here's where you'll know who saw this post.")]
-                          [:button.mlb-reset.post-added-bt
-                            {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                            "OK, got it"]]])])
+                    (wrt-count activity-data read-data)])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}

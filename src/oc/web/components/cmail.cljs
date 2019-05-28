@@ -16,7 +16,6 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -247,8 +246,6 @@
         (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline :abstract fixed-abstract})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
-          (qsg-actions/finish-create-post-trail)
-          (qsg-actions/turn-on-show-guide)
           (remove-autosave s)
           (if published?
             (do
@@ -323,20 +320,8 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn edit-tooltip [s]
-  [:div.edit-tooltip-container.group
-    [:button.mlb-reset.edit-tooltip-dismiss
-      {:on-click #(nux-actions/dismiss-edit-tooltip)}]
-    [:div.edit-tooltips
-      [:div.edit-tooltip
-        (str
-         "Share something with your team, like an announcement, update, or decision. "
-         (when-not (responsive/is-tablet-or-mobile?)
-           "Use the buttons below to add images, video, or attachments."))]]])
-
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
-                   (drv/drv :qsg)
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
                    (drv/drv :show-sections-picker)
@@ -452,7 +437,6 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        qsg-data (drv/react s :qsg)
         disabled? (disable-post-bt? s)
         working? (or (and published?
                           @(::saving s))
@@ -460,8 +444,7 @@
                           @(::publishing s)))
         is-fullscreen? (:fullscreen cmail-state)]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen is-fullscreen?
-                                :showing-qsg (:visible qsg-data)})}
+      {:class (utils/class-set {:fullscreen is-fullscreen?})}
       [:div.cmail-container
         [:div.cmail-header
           (let [long-tooltip (not= (:status cmail-data) "published")]
@@ -479,9 +462,7 @@
                               (if (and (= (:status cmail-data) "published")
                                        (:has-changes cmail-data))
                                 (cancel-clicked s)
-                                (do
-                                  (qsg-actions/turn-on-show-guide)
-                                  (activity-actions/cmail-hide))))
+                                (activity-actions/cmail-hide)))
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -580,11 +561,8 @@
               "SAVE"
               "POST")]]
         [:div.cmail-content-outer
+          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
-            {:class (when show-edit-tooltip "showing-edit-tooltip")}
-            (when (and is-mobile?
-                       show-edit-tooltip)
-              (edit-tooltip s))
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -648,6 +626,18 @@
                                (when (= (.-key e) "Enter")
                                  (utils/event-stop e)
                                  (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
+            (when show-edit-tooltip
+              [:div.edit-tooltip-outer-container
+                [:div.edit-tooltip-container.group
+                  [:div.edit-tooltip-title
+                    "Post summaries"]
+                  [:div.edit-tooltip
+                    (str "Write a quick summary to help your team "
+                     "understand why this post matters. Summaries "
+                     "appear in the stream view.")]
+                  [:button.mlb-reset.edit-tooltip-bt
+                    {:on-click #(nux-actions/dismiss-edit-tooltip)}
+                    "OK, got it"]]])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :initial-body @(::initial-body s)
@@ -661,10 +651,7 @@
                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))
-            (when (and (not is-mobile?)
-                       show-edit-tooltip)
-              (edit-tooltip s))]]
+             #(activity-actions/remove-attachment :cmail-data %))]]
       [:div.cmail-footer
         (when-not is-fullscreen?
           [:div.cmail-footer-right

@@ -136,7 +136,6 @@
 (defn drv-spec [db route-db]
   {:base                [[] db]
    :route               [[] route-db]
-   :qsg                 [[:base] (fn [base] (:qsg base))]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
@@ -741,9 +740,6 @@
 (defn print-reminder-edit-data []
   (reminder-edit-data (router/current-org-slug) @app-state))
 
-(defn print-qsg-data []
-  (:qsg @app-state))
-
 (defn print-panel-stack []
   (:panel-stack @app-state))
 
@@ -766,7 +762,6 @@
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
-(set! (.-OCWebPrintQSGData js/window) print-qsg-data)
 (set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:app_state app-state

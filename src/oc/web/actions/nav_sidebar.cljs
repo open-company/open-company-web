@@ -4,7 +4,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]))
@@ -38,7 +37,6 @@
         (routing-actions/routing @router/path)
         (user-actions/initial-loading true))
       (router/nav! url)))
-  (qsg-actions/turn-on-show-guide)
   (close-navigation-sidebar))
 
 (defn mobile-nav-sidebar []

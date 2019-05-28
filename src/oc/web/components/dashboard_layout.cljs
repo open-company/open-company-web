@@ -1,4 +1,4 @@
-(ns oc.web.components.dashboard-layout
+ (ns oc.web.components.dashboard-layout
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
@@ -11,7 +11,6 @@
             [oc.web.utils.activity :as au]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -24,14 +23,12 @@
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
 (rum/defcs dashboard-layout < rum/reactive
                               ;; Derivative
-                              (drv/drv :qsg)
                               (drv/drv :route)
                               (drv/drv :org-data)
                               (drv/drv :team-data)
@@ -91,8 +88,7 @@
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))
-        qsg-data (drv/react s :qsg)]
+                                     (not (:read-only board-data)))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -104,11 +100,40 @@
           (when (or (not is-tablet-or-mobile?)
                     (not mobile-navigation-sidebar))
             [:div.board-container.group
+              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
+                    non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+                                           "decisions to keep you and your team pulling in the same direction.")
+                    is-second-user (= add-post-tooltip :is-second-user)]
+                (when (and (not is-drafts-board)
+                           (not current-activity-id)
+                           add-post-tooltip)
+                  [:div.add-post-tooltip-container.group
+                    [:button.mlb-reset.add-post-tooltip-dismiss
+                      {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+                    [:div.add-post-tooltips
+                      {:class (when is-second-user "second-user")}
+                      [:div.add-post-tooltip-box-mobile]
+                      [:div.add-post-tooltip-title
+                        "Welcome to Carrot!"]
+                        [:div.add-post-tooltip
+                          (if is-admin-or-author
+                            (if is-second-user
+                              non-admin-tooltip
+                              "Create your first post now to see how Carrot works. Don't worry, you can delete it anytime.")
+                            non-admin-tooltip)]
+                        (when (and is-admin-or-author
+                                   (not is-second-user))
+                          [:button.mlb-reset.add-post-bt
+                            {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+                            [:span.add-post-bt-pen]
+                            "New post"])
+                      [:div.add-post-tooltip-box.big-web-only
+                        {:class (when is-second-user "second-user")}]]]))
               (when-not current-activity-id
                 ;; Board name row: board name, settings button and say something button
                 [:div.board-name-container.group
+
                   ;; Board name and settings button
-                  
                   [:div.board-name
                     (when (router/current-board-slug)
                       [:div.board-name-with-icon
@@ -150,21 +175,7 @@
                            :data-placement "top"
                            :data-container "body"
                            :title (str (:name board-data) " settings")
-                           :on-click #(do
-                                        (when (:show-section-settings-tooltip qsg-data)
-                                          (qsg-actions/dismiss-section-settings-tooltip))
-                                        (nav-actions/show-section-editor))}]
-                      (when (:show-section-settings-tooltip qsg-data)
-                        [:div.section-settings-tooltip-container.group
-                          [:div.section-settings-tooltip-top-arrow]
-                          [:button.mlb-reset.section-settings-tooltip-dismiss
-                            {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}]
-                          [:div.section-settings-tooltips
-                            [:div.section-settings-tooltip
-                              "You can make changes to a section at any time."]
-                            [:button.mlb-reset.section-settings-bt
-                              {:on-click #(qsg-actions/dismiss-section-settings-tooltip)}
-                              "OK, got it"]]])])]
+                           :on-click #(nav-actions/show-section-editor)}]])]
                   ; (when-not is-mobile?
                   ;   (let [default-sort (= @board-sort :default)]
                   ;     [:div.board-sort.group
@@ -183,37 +194,6 @@
                   ;            :on-click #(reset! board-sort :own)}
                   ;           "Recently posted"]]]))
                   ])
-              (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-                    non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
-                                           "decisions to keep you and your team pulling in the same direction.")
-                    is-second-user (= add-post-tooltip :is-second-user)]
-                (when (and (not is-drafts-board)
-                           (not current-activity-id)
-                           add-post-tooltip)
-                  [:div.add-post-tooltip-container.group
-                    [:button.mlb-reset.add-post-tooltip-dismiss
-                      {:on-click #(do
-                                    (nux-actions/dismiss-add-post-tooltip)
-                                    (qsg-actions/turn-on-show-guide))}]
-                    [:div.add-post-tooltips
-                      {:class (when is-second-user "second-user")}
-                      [:div.add-post-tooltip-box-mobile]
-                      [:div.add-post-tooltip-title
-                        (str "Welcome to Carrot, " (:first-name current-user-data) "!")]
-                        [:div.add-post-tooltip
-                          (if is-admin-or-author
-                            (if is-second-user
-                              non-admin-tooltip
-                              "Create a test post now to see how it works. You can delete it anytime.")
-                            non-admin-tooltip)
-                          (when (and is-admin-or-author
-                                     (not is-second-user))
-                            [:button.mlb-reset.add-post-bt
-                              {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-                              [:span.add-post-bt-pen]
-                              "Create your first post"])]
-                      [:div.add-post-tooltip-box
-                        {:class (when is-second-user "second-user")}]]]))
               ;; Board content: empty org, all posts, empty board, drafts view, entries view
               (cond
                 ;; No boards

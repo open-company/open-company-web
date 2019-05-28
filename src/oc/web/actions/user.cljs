@@ -15,7 +15,6 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
@@ -373,9 +372,7 @@
               (fn []
                 (jwt-actions/jwt-refresh
                  #(if org-editing
-                    (do
-                      (org-actions/create-or-update-org org-editing)
-                      (qsg-actions/first-user-qsg))
+                    (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
                       (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
