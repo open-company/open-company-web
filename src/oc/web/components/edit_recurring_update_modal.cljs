@@ -116,7 +116,7 @@
                               (swap! (::assignee-dropdown s) not)
                               (reset! (::frequency-dropdown s) false)
                               (reset! (::on-dropdown s) false))
-                 :class (utils/class-set {:placeholder (:assignee reminder-data)
+                 :class (utils/class-set {:placeholder (empty? (:assignee reminder-data))
                                           :active @(::assignee-dropdown s)})}
                 (if (:assignee reminder-data)
                   (str (utils/name-or-email (:assignee reminder-data)) (when self-assignee? " (you)"))
@@ -149,7 +149,7 @@
                               (reset! (::assignee-dropdown s) false)
                               (swap! (::frequency-dropdown s) not)
                               (reset! (::on-dropdown s) false))
-                 :class (utils/class-set {:placeholder frequency-value
+                 :class (utils/class-set {:placeholder (empty? frequency-value)
                                           :active @(::frequency-dropdown s)})}
                 (or frequency-value "Pick a frequency")]
               (when @(::frequency-dropdown s)
