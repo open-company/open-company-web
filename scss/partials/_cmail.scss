@@ -632,7 +632,6 @@ div.cmail-outer {
         outline: none;
         cursor: text;
         @include activity-headline();
-        @include OC_Body_Bold();
         font-size: 22px;
         color: $deep_navy;
         white-space: pre-wrap;
