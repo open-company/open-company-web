@@ -212,7 +212,7 @@
         [:div.section-editor-add
           [:div.section-editor-add-label
             [:span.section-name "Section name"]]
-          [:div.section-editor-add-name
+          [:div.section-editor-add-name.oc-input
             {:content-editable true
              :placeholder "Section name"
              :ref "section-name"
@@ -454,7 +454,7 @@
             [:div.section-editor-add-label
               "Personal note"])
           (when (= (:access section-editing) "private")
-            [:div.section-editor-add-personal-note
+            [:div.section-editor-add-personal-note.oc-input
               {:class utils/hide-class
                :content-editable true
                :placeholder "Add a personal note to your invitation..."
