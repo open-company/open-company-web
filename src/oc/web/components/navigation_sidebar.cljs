@@ -134,7 +134,8 @@
                        (nav-actions/menu-toggle))}
           (user-avatar-image current-user-data)]]
       [:div.left-navigation-sidebar-content
-        {:ref "left-navigation-sidebar-content"}
+        {:ref "left-navigation-sidebar-content"
+         :class (when can-compose "can-compose")}
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -175,8 +176,7 @@
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                   :data-container "body"}
                   (when (= (:step qsg-data) :add-section-1)
                     (qsg-breadcrumb qsg-data))])]])
         (when show-boards
