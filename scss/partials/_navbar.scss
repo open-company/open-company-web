@@ -200,10 +200,6 @@ nav.oc-navbar {
         float: left;
         height: 32px;
 
-        @include mobile() {
-          height: 40px;
-        }
-
         div.orgs-dropdown {
           float: left;
 
@@ -221,16 +217,16 @@ nav.oc-navbar {
               span.org-name {
                 display: none;
               }
+            }
 
-              ul.orgs-dropdown-menu {
-                li div.org-avatar {
-                  @include org-avatar(24);
+            ul.orgs-dropdown-menu {
+              li div.org-avatar {
+                @include org-avatar(24);
 
-                  div.org-avatar-container.no-avatar {
-                    span.org-name {
-                      display: block !important;
-                      max-width: 88px;
-                    }
+                div.org-avatar-container, div.org-avatar-container.no-avatar {
+                  span.org-name {
+                    display: block !important;
+                    max-width: 88px;
                   }
                 }
               }
