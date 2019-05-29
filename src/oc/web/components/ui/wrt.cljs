@@ -220,25 +220,22 @@
                                          wrt-share (merge user-payload
                                                     {:note "When you have a moment, please check out this post."
                                                      :subject (str "You may have missed: " (:headline activity-data))})]
+                                     ()
                                      (swap! (::sending-notice s) assoc (:user-id u) :loading)
                                      ;; Show the share popup
                                      (activity-actions/activity-share activity-data [wrt-share]
-                                      (fn [{:keys [body]}]
-                                        (let [resp (first body)
-                                              medium (:medium resp)
-                                              slack-org (when (= medium "slack")
-                                                          (:slack-org-id (:channel resp)))
-                                              slack-user (when slack-org
-                                                           (get (:slack-users u) (keyword slack-org)))
-                                              user-label (if (= medium "email")
-                                                           (str "Sent to: " (first (:to resp)))
-                                                           (if (and slack-user
-                                                                    (seq (:display-name slack-user))
-                                                                    (not= (:display-name slack-user) "-"))
-                                                             (str "Sent to: @" (:display-name slack-user) " (Slack)")
-                                                             (str "Sent via Slack")))]
-                                          (swap! (::sending-notice s) assoc (:user-id u) user-label)
-                                          (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u))))))))}
+                                      (fn [{:keys [success body]}]
+                                        (when success
+                                          (let [resp (first body)
+                                                user-label (if (= (:medium wrt-share) "email")
+                                                             (str "Sent to: " (:email wrt-share))
+                                                             (if (and slack-user
+                                                                      (seq (:display-name slack-user))
+                                                                      (not= (:display-name slack-user) "-"))
+                                                               (str "Sent to: @" (:display-name slack-user) " (Slack)")
+                                                               (str "Sent via Slack")))]
+                                            (swap! (::sending-notice s) assoc (:user-id u) user-label)
+                                            (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u)))))))))}
                       "Send"])])]])]]))
 
 (defn- under-middle-screen? [el]
