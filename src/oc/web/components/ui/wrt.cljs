@@ -220,7 +220,6 @@
                                          wrt-share (merge user-payload
                                                     {:note "When you have a moment, please check out this post."
                                                      :subject (str "You may have missed: " (:headline activity-data))})]
-                                     ()
                                      (swap! (::sending-notice s) assoc (:user-id u) :loading)
                                      ;; Show the share popup
                                      (activity-actions/activity-share activity-data [wrt-share]
