@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.media-video-modal
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
+            [oops.core :refer (oget+)]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.dispatcher :as dis]

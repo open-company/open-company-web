@@ -1,6 +1,6 @@
-(ns oc.web.components.ui.gif-picker
+(ns oc.web.components.ui.giphy-picker
   (:require [rum.core :as rum]
-            [oops.core :refer [oget+]]
+            [oops.core :refer (oget+)]
             [dommy.core :refer-macros (sel1)]
             [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
@@ -9,7 +9,7 @@
 (def fullscreen-giphy-picker-max-height 408)
 (def default-giphy-picker-max-height 320)
 
-(rum/defcs gif-picker < (rum/local 0 ::offset-top)
+(rum/defcs giphy-picker < (rum/local 0 ::offset-top)
                         {:will-mount (fn [s]
 
                           (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]

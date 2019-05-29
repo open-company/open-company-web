@@ -1,6 +1,6 @@
 (ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
-            [oops.core :refer [oget oget+]]
+            [oops.core :refer (oget oget+)]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
@@ -18,7 +18,7 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
-            [oc.web.components.ui.gif-picker :refer (gif-picker)]
+            [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [cljsjs.medium-editor]
             [cljsjs.react-giphy-selector]
             [goog.dom :as gdom]
@@ -466,7 +466,7 @@
                                           (media-video-add s @(::media-picker-ext s) nil)
                                           (reset! (::showing-media-video-modal s) false))})])
     (when @(::showing-gif-selector s)
-      (gif-picker {:fullscreen fullscreen
-                   :pick-emoji-cb (fn [gif-obj]
-                    (reset! (::showing-gif-selector s) false)
-                    (media-gif-add s @(::media-picker-ext s) gif-obj))}))])
+      (giphy-picker {:fullscreen fullscreen
+                     :pick-emoji-cb (fn [gif-obj]
+                                     (reset! (::showing-gif-selector s) false)
+                                     (media-gif-add s @(::media-picker-ext s) gif-obj))}))])
