@@ -26,9 +26,6 @@
                                 (on-window-click-mixin (fn [s e]
                                  (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
                                    (close-tray s))))
-                                {:will-mount (fn [s]
-                                  (user-actions/get-user nil)
-                                  s)}
   [s]
   (let [user-notifications-data (drv/react s :user-notifications)
         has-new-content (has-new-content? user-notifications-data)
