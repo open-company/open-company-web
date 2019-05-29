@@ -29,6 +29,7 @@
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
+                    (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::show-sections-list)
                     (ui-mixins/on-window-click-mixin (fn [s e]
@@ -105,6 +106,10 @@
                 section-name]
               (when @(::show-sections-list s)
                 [:div.mobile-sections-list
+                  (when can-compose?
+                    [:button.mlb-reset.mobile-section-item.compose
+                      {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+                      "Create post"])
                   (when show-all-posts
                     [:button.mlb-reset.mobile-section-item.all-posts
                       {:class (when (= (router/current-board-slug) "all-posts") "active")
