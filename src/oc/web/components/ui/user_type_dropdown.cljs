@@ -8,7 +8,7 @@
   [{:keys [user-id user-type on-change hide-admin on-remove disabled?]}]
   (let [user-dropdown-id (str "dropdown-" user-id)]
     [:div.dropdown
-      [:button.btn-reset.user-type-btn.dropdown-toggle
+      [:button.btn-reset.user-type-btn.dropdown-toggle.oc-input
         {:id user-dropdown-id
          :data-toggle "dropdown"
          :aria-haspopup true

@@ -178,7 +178,7 @@
           [:div.invite-via
             [:div.invite-via-label
               "Invite via"]
-            [:select.invite-via-select
+            [:select.invite-via-select.oc-input
               {:disabled (not (:can-slack-invite team-data))
                :value @(::inviting-from s)
                :on-change #(user-type-did-change s invite-users (.. % -target -value))}
@@ -218,7 +218,7 @@
                     [:div.org-settings-field-container.group
                       {:class (utils/class-set {:focus (= @(::email-focused s) key-string)
                                                 :has-value (seq (:user user-data))})}
-                      [:input.org-settings-field.email-field
+                      [:input.org-settings-field.email-field.oc-input
                         {:type "text"
                          :class (when (:error user-data) "error")
                          :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"

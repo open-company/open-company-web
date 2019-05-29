@@ -92,8 +92,9 @@
           (small-loading)
           [:div.wrt-popup-inner
             [:div.wrt-popup-tabs
-              [:div.wrt-popup-tabs-select
-                {:on-click #(swap! (::list-view-dropdown-open s) not)}
+              [:div.wrt-popup-tabs-select.oc-input
+                {:on-click #(swap! (::list-view-dropdown-open s) not)
+                 :class (when @(::list-view-dropdown-open s) "active")}
                 (dropdown-label @list-view (count all-users))]
               (when @(::list-view-dropdown-open s)
                 (dropdown-list {:items [{:value :all
@@ -109,7 +110,7 @@
                                               (reset! query ""))}))]
             (when (= @list-view :all)
               [:div.wrt-popup-search-container.group
-                [:input.wrt-popup-query
+                [:input.wrt-popup-query.oc-input
                   {:value @query
                    :type "text"
                    :placeholder "Search by name..."

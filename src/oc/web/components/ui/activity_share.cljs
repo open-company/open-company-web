@@ -152,7 +152,7 @@
                                     post-url
                                     secure-url))]
                   [:div.shared-url-container.group
-                    [:input
+                    [:input.oc-input
                       {:value share-url
                        :key share-url
                        :read-only true
