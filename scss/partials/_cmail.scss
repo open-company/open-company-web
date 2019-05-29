@@ -460,8 +460,10 @@ div.cmail-outer {
           background-color: rgba(white, 0.2);
           border-radius: 4px;
 
-          &:hover, &.open {
-            background-color: black;
+          @include big_web() {
+            &:hover, &.open {
+              background-color: black;
+            }
           }
 
           div.board-name-inner {
