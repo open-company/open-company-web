@@ -644,6 +644,7 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
+                               :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :start-video-recording-cb #(video-record-clicked s)
                                :upload-progress-cb (fn [is-uploading?]

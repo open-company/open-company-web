@@ -231,7 +231,7 @@ div.cmail-outer {
 
       div.cmail-content-outer {
         padding-top: 56px;
-        padding-bottom: 52px;
+        padding-bottom: 0;
         overflow-x: hidden;
         overflow-y: auto;
         height: 100%;
@@ -244,8 +244,8 @@ div.cmail-outer {
       div.cmail-content {
         width: 640px;
         margin: 0 auto;
-        padding: 66px 0 24px;
-        min-height: 240px;
+        padding: 66px 0 0;
+        min-height: 100%;
         max-height: unset;
         overflow-x: auto;
         overflow-y: auto;
@@ -274,11 +274,8 @@ div.cmail-outer {
         }
 
         div.rich-body-editor-container {
-          position: realative;
-        }
-
-        div.rich-body-editor-container {
           margin-top: 32px;
+          padding-bottom: 32px;
 
           div.rich-body-editor {
             min-height: calc(100vh - 342px);
@@ -755,6 +752,10 @@ div.cmail-outer {
             display: block;
           }
         }
+      }
+
+      div.rich-body-editor-outer-container {
+        position: relative;
       }
 
       div.rich-body-editor-container {
