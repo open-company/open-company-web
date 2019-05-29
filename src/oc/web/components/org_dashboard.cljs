@@ -64,6 +64,10 @@
                     board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (section-actions/section-get board-link))))))))
 
+(defn- init-whats-new []
+  (when-not (responsive/is-tablet-or-mobile?)
+    (whats-new/init)))
+
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
                            rum/reactive
@@ -76,10 +80,10 @@
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
-                             (whats-new/init)
+                             (init-whats-new)
                              s)
                             :did-remount (fn [s]
-                             (whats-new/init)
+                             (init-whats-new)
                              s)}
   [s]
   (let [{:keys [orgs
