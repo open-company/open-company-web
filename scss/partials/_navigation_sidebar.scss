@@ -523,7 +523,9 @@ div.left-navigation-sidebar {
       opacity: 1;
 
       @include big_web() {
-        opacity: 0.9;
+        &:hover {
+          opacity: 0.9;
+        }
       }
 
       @include mobile() {
