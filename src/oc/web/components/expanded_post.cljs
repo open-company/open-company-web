@@ -64,6 +64,7 @@
 
 (rum/defcs expanded-post <
   rum/reactive
+  (drv/drv :route)
   (drv/drv :activity-data)
   (drv/drv :comments-data)
   (drv/drv :hide-left-navbar)
@@ -97,11 +98,13 @@
         dom-node-class (str "expanded-post-" (:uuid activity-data))
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
-        is-all-posts? (= (router/current-board-slug) "all-posts")
+        route (drv/react s :route)
+        back-to-slug (or (:back-to route) (:board route))
+        is-all-posts? (= back-to-slug "all-posts")
         back-to-label (str "Back to "
                            (if is-all-posts?
                              "All posts"
-                             (:board-name activity-data)))
+                             (:name (dis/board-data back-to-slug))))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
         is-publisher? (= (:user-id publisher) (jwt/user-id))
