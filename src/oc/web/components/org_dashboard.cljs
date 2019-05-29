@@ -65,7 +65,7 @@
           (section-actions/section-get board-link))))))))
 
 (defn- init-whats-new []
-  (when (responsive/is-tablet-or-mobile?)
+  (when-not (responsive/is-tablet-or-mobile?)
     (whats-new/init)))
 
 (rum/defcs org-dashboard < ;; Mixins
