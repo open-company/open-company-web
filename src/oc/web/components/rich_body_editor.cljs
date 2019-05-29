@@ -347,7 +347,7 @@
                                                    "details" "summary" "nav" "abbr"
                                                    "table" "thead" "tbody" "tr" "th" "td"]))}
                  :placeholder #js {:text placeholder
-                                   :hideOnClick true}
+                                   :hideOnClick false}
                  :keyboardCommands #js {:commands #js [
                                     #js {
                                       :command "bold"
