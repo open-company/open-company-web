@@ -185,6 +185,16 @@
        (when success
         (dis/dispatch! [:user-data (json->cljs body)]))))))
 
+;; Get user
+
+(defn get-user [user-link]
+  (let [fixed-user-link (or user-link (utils/link-for (:links (dis/auth-settings)) "user" "GET"))]
+    (api/get-user user-link (fn [data]
+     (let [user-map (json->cljs data)]
+       (dis/dispatch! [:user-data user-map])
+       (utils/after 100 nux-actions/check-nux)
+       (patch-timezone-if-needed user-map))))))
+
 ;; Auth
 
 (defn auth-settings-get
@@ -194,11 +204,7 @@
     (when body
       ;; auth settings loaded
       (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-        (api/get-user user-link (fn [data]
-          (let [user-map (json->cljs data)]
-            (dis/dispatch! [:user-data user-map])
-            (utils/after 100 nux-actions/check-nux)
-            (patch-timezone-if-needed user-map)))))
+        (get-user user-link))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link

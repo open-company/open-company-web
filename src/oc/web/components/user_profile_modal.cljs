@@ -125,7 +125,10 @@
   (rum/local false ::email-error)
   (rum/local false ::password-error)
   (rum/local false ::current-password-error)
-  {:after-render (fn [s]
+  {:will-mount (fn [s]
+    (user-actions/get-user nil)
+    s)
+   :after-render (fn [s]
     (when-not (utils/is-test-env?)
       (doto (js/$ "[data-toggle=\"tooltip\"]")
         (.tooltip "fixTitle")
