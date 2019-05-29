@@ -130,7 +130,10 @@
           [:div.back-to-board-inner
             back-to-label]]
         (more-menu activity-data dom-element-id
-         {:external-share (not is-mobile?)
+         {:external-share true
+          :show-edit? (not is-mobile?)
+          :show-delete? (not is-mobile?)
+          :show-move? (not is-mobile?)
           :tooltip-position "bottom"
           :show-unread true})]
       (when has-video
@@ -160,7 +163,7 @@
         {:ref "post-body"
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
-      [:div.expanded-post-footer
+      [:div.expanded-post-footer.group
         (comments-summary activity-data true)
         (reactions activity-data)
         (when user-is-part-of-the-team

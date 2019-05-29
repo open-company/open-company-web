@@ -64,6 +64,10 @@
                     board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (section-actions/section-get board-link))))))))
 
+(defn- init-whats-new []
+  (when-not (responsive/is-tablet-or-mobile?)
+    (whats-new/init)))
+
 (rum/defcs org-dashboard < ;; Mixins
                            rum/static
                            rum/reactive
@@ -76,10 +80,10 @@
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
                              (refresh-board-data s)
-                             (whats-new/init)
+                             (init-whats-new)
                              s)
                             :did-remount (fn [s]
-                             (whats-new/init)
+                             (init-whats-new)
                              s)}
   [s]
   (let [{:keys [orgs
@@ -93,7 +97,6 @@
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
-                mobile-navigation-sidebar
                 activity-share-container
                 show-cmail
                 showing-mobile-user-notifications
@@ -167,7 +170,6 @@
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))]
-    ;; Show loading if
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -176,6 +178,7 @@
                                   :mobile-or-tablet is-mobile?
                                   :activity-not-found show-activity-not-found
                                   :activity-removed show-activity-removed
+                                  :expanded-activity (router/current-activity-id)
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
@@ -243,11 +246,7 @@
           ;; Mobile notifications
           (and is-mobile?
                showing-mobile-user-notifications)
-          (user-notifications)
-          ;; Show mobile navigation
-          (and is-mobile?
-               mobile-navigation-sidebar)
-          (navigation-sidebar))
+          (user-notifications))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -280,7 +279,6 @@
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
-                              (not mobile-navigation-sidebar)
                               (not open-panel)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
