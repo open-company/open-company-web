@@ -118,8 +118,7 @@
   (rum/local false ::show-advanced-settings)
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
-      (org-actions/get-org org-data)
-      (team-actions/force-team-refresh (:team-id org-data)))
+      (org-actions/get-org org-data))
     (reset-form s)
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))

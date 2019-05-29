@@ -574,7 +574,7 @@
     (auth-http (method-for-link user-link) (relative-href user-link)
       {:headers (headers-for-link user-link)}
       (fn [{:keys [status body success]}]
-        (callback body)))
+        (callback success body)))
     (handle-missing-link "get-user" user-link callback)))
 
 (defn patch-user [patch-user-link new-user-data callback]
