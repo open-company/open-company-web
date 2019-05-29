@@ -869,7 +869,8 @@
                     (dis/board-data (router/current-org-slug) board-slug)
                     (dis/board-data))]
     (if (or (not board-data)
-            (= (:slug board-data) utils/default-drafts-board-slug))
+            (= (:slug board-data) utils/default-drafts-board-slug)
+            (not (utils/link-for (:links board-data) "create")))
       (get-default-section)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
