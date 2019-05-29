@@ -36,7 +36,7 @@ div.integrations-settings-modal {
       width: calc(100% + 48px);
       height: 56px;
       margin-left: -24px;
-      background-color: #FBFAF9;
+      background-color: $grey_num_2;
       padding: 12px 16px;
 
       div.integrations-settings-header-title {
@@ -128,7 +128,7 @@ div.integrations-settings-modal {
               float: left;
               width: 32px;
               height: 32px;
-              border: 1px solid #EEEAE9;
+              border: 1px solid $grey_num_3;
               background-color: white;
               border-radius: 4px;
 

@@ -109,7 +109,7 @@
 }
 
 @mixin item-selected() {
-  background-color: #FBFAF9;
+  background-color: $grey_num_2;
 
   @include mobile() {
     background-color: transparent;
@@ -150,7 +150,7 @@
 }
 
 @mixin item-hover(){
-  background-color: #FBFAF9;
+  background-color: $grey_num_2;
 
   @include mobile() {
     background-color: transparent;
@@ -227,43 +227,6 @@ div.left-navigation-sidebar {
 
     &.show-mobile-boards-menu {
       display: block;
-    }
-  }
-
-  div.mobile-header-container {
-    display: none;
-
-    @include mobile() {
-      width: 100%;
-      height: 56px;
-      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-      background-color: white;
-      display: block;
-      padding: 12px 16px;
-
-      button.mobile-header-close {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 14px 14px;
-        margin: 4px 16px 0 -5px;
-        float: left;
-      }
-
-      div.orgs-dropdown {
-        float: left;
-        margin-top: -1px;
-      }
-
-      button.mobile-menu {
-        padding: 0;
-        position: relative;
-        float: right;
-
-        @include user-profile(32);
-      }
     }
   }
 
@@ -561,6 +524,10 @@ div.left-navigation-sidebar {
 
       @include big_web() {
         opacity: 0.9;
+      }
+
+      @include mobile() {
+        display: none;
       }
 
       span.compose-green-icon {

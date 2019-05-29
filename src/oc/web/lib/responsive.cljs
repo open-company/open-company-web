@@ -33,7 +33,7 @@
  "Check if it's mobile based only on screen size"
  ;; fake the browser type for the moment
  (when (neg? @_mobile)
- (set-browser-type!))
+   (set-browser-type!))
  @_mobile)
 
 (def left-navigation-sidebar-minimum-right-margin 16)

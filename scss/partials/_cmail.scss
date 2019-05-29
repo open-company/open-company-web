@@ -51,7 +51,7 @@ div.cmail-outer {
       height: 100vh;
       top: 0;
       left: 0;
-      background-color: #FBFAF9;
+      background-color: $grey_num_2;
       position: absolute;
 
       @include tablet() {
@@ -64,7 +64,7 @@ div.cmail-outer {
       }
 
       div.cmail-header {
-        background-color: #FBFAF9;
+        background-color: $grey_num_2;
         border-bottom: 1px solid $ultra_light_grey;
         position: absolute;
         top: 0;
@@ -261,7 +261,7 @@ div.cmail-outer {
           padding-bottom: 32px;
 
           textarea.cmail-content-abstract {
-            background-color: #FBFAF9;
+            background-color: $grey_num_2;
             @include activity-abstract(18px, 26px);
           }
         }
