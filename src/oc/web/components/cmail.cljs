@@ -442,27 +442,50 @@
                           @(::saving s))
                      (and (not published?)
                           @(::publishing s)))
-        is-fullscreen? (:fullscreen cmail-state)]
+        is-fullscreen? (and (not is-mobile?)
+                            (:fullscreen cmail-state))
+        close-cb (fn [_]
+                  (if (au/has-content? (assoc cmail-data
+                                         :body
+                                         (cleaned-body)))
+                    (autosave s)
+                    (do
+                      (reset! (::deleting s) true)
+                      (activity-actions/activity-delete cmail-data)))
+                  (if (and (= (:status cmail-data) "published")
+                           (:has-changes cmail-data))
+                    (cancel-clicked s)
+                    (activity-actions/cmail-hide)))]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?})}
       [:div.cmail-container
-        [:div.cmail-header
+        [:div.cmail-mobile-header
+          [:button.mlb-reset.mobile-close-bt
+            {:on-click close-cb}]
+          [:div.cmail-mobile-header-title
+            (if (= (:status cmail-data) "published")
+              "New post"
+              "Edit post")
+            (when (not= (:status cmail-data) "published")
+              (if (or (:has-changes cmail-data)
+                      (:auto-saving cmail-data))
+                [:span.saving-saved " (saving)"]
+                (when (false? (:auto-saving cmail-data))
+                  [:span.saving-saved " (saved)"])))]
+          [:button.mlb-reset.mobile-post-button
+            {:ref "mobile-post-btn"
+             :on-click #(post-clicked s)
+             :class (utils/class-set {:disabled disabled?
+                                      :loading working?})}
+            (if (= (:status cmail-data) "published")
+              "Save"
+              "Post")]]
+        [:div.cmail-header.group
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
               {:class (when long-tooltip "long-tooltip")}
               [:button.mlb-reset.close-bt
-                {:on-click #(do
-                              (if (au/has-content? (assoc cmail-data
-                                                     :body
-                                                     (cleaned-body)))
-                                (autosave s)
-                                (do
-                                  (reset! (::deleting s) true)
-                                  (activity-actions/activity-delete cmail-data)))
-                              (if (and (= (:status cmail-data) "published")
-                                       (:has-changes cmail-data))
-                                (cancel-clicked s)
-                                (activity-actions/cmail-hide)))
+                {:on-click close-cb
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -479,13 +502,6 @@
                         "Shrink"
                         "Expand")}]]
           [:div.cmail-header-vertical-separator]
-          (when (and (not= (:status cmail-data) "published")
-                     is-mobile?)
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.mobile-saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.mobile-saving-saved "Saved"])))
           [:div.cmail-header-board-must-see-container.group
             {:class (when (:must-see cmail-data) "must-see-on")}
             [:div.board-name.oc-input
@@ -551,15 +567,7 @@
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
               "Save"
-              "Post")]
-          [:button.mlb-reset.mobile-post-button
-            {:ref "mobile-post-btn"
-             :on-click #(post-clicked s)
-             :class (utils/class-set {:disabled disabled?
-                                      :loading working?})}
-            (if (= (:status cmail-data) "published")
-              "SAVE"
-              "POST")]]
+              "Post")]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content

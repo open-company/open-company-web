@@ -134,8 +134,8 @@
             back-to-label]]
         (more-menu activity-data dom-element-id
          {:external-share true
-          :show-edit? (not is-mobile?)
-          :show-delete? (not is-mobile?)
+          :show-edit? true
+          :show-delete? true
           :show-move? (not is-mobile?)
           :tooltip-position "bottom"
           :show-unread true})]
