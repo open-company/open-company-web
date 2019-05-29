@@ -227,7 +227,7 @@
                                         (when success
                                           (let [resp (first body)
                                                 user-label (if (= (:medium wrt-share) "email")
-                                                             (str "Sent to: " (:email wrt-share))
+                                                             (str "Sent to: " (:email u))
                                                              (if (and slack-user
                                                                       (seq (:display-name slack-user))
                                                                       (not= (:display-name slack-user) "-"))
