@@ -140,7 +140,7 @@
        :style {:top (str adjusted-position "px")}}
       [:div.media-video-modal-title
         "Embed video"]
-      [:input.media-video-modal-input
+      [:input.media-video-modal-input.oc-input
           {:type "text"
            :value @(::video-url s)
            :ref "video-input"

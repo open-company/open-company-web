@@ -49,7 +49,7 @@
                     (reset! (::typing s) false)
                     (reset! (::show-channels-dropdown s) (not @(::show-channels-dropdown s)))
                     (utils/event-stop %))}
-      [:input.board-edit-slack-channel
+      [:input.board-edit-slack-channel.oc-input
         {:value (or @(::slack-channel s) "")
          :placeholder (if disabled "Not connected" "Select a channel...")
          :on-focus (fn []
