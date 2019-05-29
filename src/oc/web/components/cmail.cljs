@@ -630,11 +630,12 @@
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
-                    "Post summaries"]
+                    "Key points"]
                   [:div.edit-tooltip
-                    (str "Write a quick summary to help your team "
-                     "understand why this post matters. Summaries "
-                     "appear in the stream view.")]
+                    (str
+                     "Add a quick summary to let everyone "
+                     "know why this post matters. This "
+                     "is what your team sees first.")]
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
                     "OK, got it"]]])
