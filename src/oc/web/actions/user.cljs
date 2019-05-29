@@ -188,7 +188,7 @@
 ;; Get user
 
 (defn get-user [user-link]
-  (let [fixed-user-link (or user-link (utils/link-for (:links (dis/auth-settings)) "user" "GET"))]
+  (when-let [fixed-user-link (or user-link (utils/link-for (:links (dis/auth-settings)) "user" "GET"))]
     (api/get-user user-link (fn [data]
      (let [user-map (json->cljs data)]
        (dis/dispatch! [:user-data user-map])
