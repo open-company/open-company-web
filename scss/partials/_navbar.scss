@@ -88,7 +88,7 @@ nav.oc-navbar {
           @include mobile() {
             display: block;
             width: calc(100vw - 64px - 80px);
-            max-height: calc(100vh - 100px);
+            max-height: 60vh;
             position: absolute;
             top: 48px;
             left: 0;
