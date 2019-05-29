@@ -78,10 +78,8 @@
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
              (org-actions/get-org org-data)
-             (let [ap-initial-at (:ap-initial-at @dis/app-state)
-                   currently-logged-in (jwt/jwt)]
-               (when-not (or (router/current-activity-id)
-                             ap-initial-at)
+             (let [currently-logged-in (jwt/jwt)]
+               (when-not (router/current-activity-id)
                  ;; 404 only if the user is not looking at a secure post page
                  ;; if so the entry point response can not include the specified org
                  (when-not (router/current-secure-activity-id)

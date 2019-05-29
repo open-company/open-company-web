@@ -74,8 +74,7 @@
         sorted-items (sorted-posts @(drv/get-ref s :filtered-posts))
         direction (:direction container-data)
         next-link (utils/link-for (:links container-data) "next")
-        prev-link (utils/link-for (:links container-data) "previous")
-        ap-initial-at @(drv/get-ref s :ap-initial-at)]
+        prev-link (utils/link-for (:links container-data) "previous")]
     ;; First load or subsequent load more with
     ;; different set of items
     (if (= direction :up)
@@ -85,11 +84,7 @@
             last-new-entry-idx (dec (- (count sorted-items) saved-items))
             scroll-to-entry (get sorted-items last-new-entry-idx)]
         (reset! (::last-direction s) :up)
-        (reset! (::scroll-to-entry s) scroll-to-entry))
-      (when ap-initial-at
-        (reset!
-         (::scroll-to-entry s)
-         (first (filter #(= (:published-at %) ap-initial-at) sorted-items)))))
+        (reset! (::scroll-to-entry s) scroll-to-entry)))
     (reset! (::has-prev s) prev-link)
     (reset! (::has-next s) next-link)
     (if next-link
@@ -98,7 +93,6 @@
 
 (rum/defcs all-posts  < rum/reactive
                         ;; Derivatives
-                        (drv/drv :ap-initial-at)
                         (drv/drv :filtered-posts)
                         (drv/drv :container-data)
                         (drv/drv :activities-read)

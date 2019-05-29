@@ -51,30 +51,24 @@
       (api/request-reads-count cleaned-ids))))
 
 ;; All Posts
-(defn all-posts-get-finish [from {:keys [body success]}]
+(defn all-posts-get-finish [{:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))
-          should-404? (and from
-                           (router/current-activity-id)
-                           (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
-      (when should-404?
-        (routing-actions/maybe-404))
-      (when (and (not should-404?)
-                 (= (router/current-board-slug) "all-posts"))
+          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))]
+      (when (= (router/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
-(defn all-posts-get [org-data ap-initial-at & [finish-cb]]
+(defn all-posts-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (api/get-all-posts activity-link ap-initial-at
+    (api/get-all-posts activity-link
      (fn [resp]
-       (all-posts-get-finish ap-initial-at resp)
+       (all-posts-get-finish resp)
        (when (fn? finish-cb)
         (finish-cb resp))))))
 
@@ -105,7 +99,7 @@
     (let [activity-href (:href activity-link)
           must-see-filter (str activity-href "?must-see=true")
           must-see-link (assoc activity-link :href must-see-filter)]
-      (api/get-all-posts must-see-link nil (partial must-see-get-finish)))))
+      (api/get-all-posts must-see-link (partial must-see-get-finish)))))
 
 (defn must-see-more-finish [direction {:keys [success body]}]
   (when success
@@ -128,7 +122,7 @@
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-all-posts
-      (all-posts-get org-data (:ap-initial-at @dis/app-state))
+      (all-posts-get org-data)
       is-must-see
       (must-see-get org-data)
       :else
@@ -632,7 +626,7 @@
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
         (when (= (router/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data) (dis/ap-initial-at))))))
+          (all-posts-get (dis/org-data))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
@@ -653,7 +647,7 @@
         (when (or (= change-type :add)
                   (= change-type :delete))
           (if (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread))
+            (all-posts-get (dis/org-data) dispatch-unread))
             (sa/section-change section-uuid dispatch-unread))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)

@@ -33,7 +33,6 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
-                              (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
@@ -212,7 +211,7 @@
                      ; (= @board-switch :stream)
                      )
                 (rum/with-key (all-posts)
-                 (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
+                 (str "all-posts-component-" (if is-all-posts "AP" "MS")))
                 ;; Layout boards activities
                 :else
                 (cond

@@ -397,17 +397,12 @@
 
 ;; All Posts
 
-(defn get-all-posts [activity-link from callback]
+(defn get-all-posts [activity-link callback]
   (if activity-link
-    (let [href (relative-href activity-link)
-          final-href (if from
-                       (str href "?start=" from "&direction=around")
-                       href)]
-      (storage-http (method-for-link activity-link) final-href
-        {:headers (headers-for-link activity-link)}
-        callback))
-    (handle-missing-link "get-all-posts" activity-link callback
-     {:from from})))
+    (storage-http (method-for-link activity-link) (relative-href activity-link)
+      {:headers (headers-for-link activity-link)}
+      callback)
+    (handle-missing-link "get-all-posts" activity-link callback)))
 
 (defn load-more-all-posts [more-link direction callback]
   (if (and more-link direction)
