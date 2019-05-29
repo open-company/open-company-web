@@ -123,7 +123,7 @@ div.cmail-outer {
             background-color: $ultra_light_grey;
             color: $deep_navy;
 
-            &:hover, &.open {
+            &:hover, &.active {
               background-color: $more_ultra_light_grey;
             }
           }
@@ -461,7 +461,7 @@ div.cmail-outer {
           border-radius: 4px;
 
           @include big_web() {
-            &:hover, &.open {
+            &:hover, &.active {
               background-color: black;
             }
           }

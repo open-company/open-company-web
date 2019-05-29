@@ -435,5 +435,5 @@
         next-activity-data (assoc (get-in db activity-key) :unread false)
         temp-val (get-in db section-change-key)]
     (-> db
-      (update-in section-change-key (fn [unreads] (vec (filter #(not= % activity-uuid) (or unreads [])))))
+      (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
       (assoc-in activity-key next-activity-data))))

@@ -95,7 +95,7 @@
               [:span.error "Email already exists"]
               @(::email-error s)
               [:span.error "Email is not valid"])]
-          [:input.field
+          [:input.field.oc-input
             {:type "email"
              :class (utils/class-set {:error (= (:error signup-with-email) 409)
                                       utils/hide-class true})
@@ -110,7 +110,7 @@
             (when @(::password-error s)
               [:span.error
                 "Minimum 8 characters"])]
-          [:input.field
+          [:input.field.oc-input
             {:type "password"
              :pattern ".{8,}"
              :value @(::pswd s)
@@ -308,7 +308,7 @@
             [:div.field-label.right-half-field-label.name-fields
               "Last name"]]
           [:div.group
-            [:input.field.left-half-field
+            [:input.field.left-half-field.oc-input
               {:class utils/hide-class
                :type "text"
                :ref "first-name"
@@ -316,7 +316,7 @@
                :max-length user-utils/user-name-max-lenth
                :value (or (:first-name user-data) "")
                :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
-            [:input.field.right-half-field
+            [:input.field.right-half-field.oc-input
               {:class utils/hide-class
                :type "text"
                :placeholder "Last name..."
@@ -329,7 +329,7 @@
               (when (:error org-editing)
                 [:span.error "Must be at least 3 characters"])])
           (when-not has-org?
-            [:input.field
+            [:input.field.oc-input
               {:type "text"
                :ref "org-name"
                :placeholder "Enter a team name..."
@@ -350,7 +350,7 @@
                   (:domain-error org-editing)])])
           (when-not has-org?
             [:div.org-email-domain-field
-              [:input.field.email
+              [:input.field.email.oc-input
                 {:name "um-domain-invite"
                  :ref "um-domain-invite"
                  :class (utils/class-set {:error (and (seq (:email-domain org-editing))
@@ -511,7 +511,7 @@
             "Company name"
             (when (:error org-editing)
               [:span.error "Must be at least 3 characters"])]
-          [:input.field
+          [:input.field.oc-input
             {:type "text"
              :ref "org-name"
              :class (utils/class-set {:error (:error org-editing)
@@ -528,7 +528,7 @@
                    "Only company email domains are allowed."])]
             [:div.org-email-domain-field
               {:class (when (:domain-error org-editing) "error")}
-              [:input.um-invite-field.email
+              [:input.um-invite-field.email.oc-input
                 {:name "um-domain-invite"
                  :ref "um-domain-invite"
                  :type "text"
@@ -688,7 +688,7 @@
               [:div.invite-row
                 {:class (when (:error invite) "error")
                  :key (str "invite-row-" @(::invite-rand s) "-" idx)}
-                [:input
+                [:input.oc-input
                   {:type "text"
                    :placeholder "name@example.com"
                    :on-change (fn [e]
@@ -784,7 +784,7 @@
               [:span.error "An error occurred, please try again."])
             (when @(::password-error s)
               [:span.error "Minimum 8 characters"])]
-          [:input.field
+          [:input.field.oc-input
             {:type "password"
              :class (when collect-pswd-error "error")
              :value (or (:pswd collect-pswd) "")
@@ -850,7 +850,7 @@
                         (.preventDefault e))}
           [:div.field-label
             "First name"]
-          [:input.field
+          [:input.field.oc-input
             {:class utils/hide-class
              :type "text"
              :ref "first-name"
@@ -860,7 +860,7 @@
              :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
           [:div.field-label
             "Last name"]
-          [:input.field
+          [:input.field.oc-input
             {:class utils/hide-class
              :type "text"
              :placeholder "Last name..."

@@ -183,7 +183,7 @@
           [:div.org-settings-fields
             [:div.org-settings-label
               "Company name"]
-            [:input.org-settings-field
+            [:input.org-settings-field.oc-input
               {:type "text"
               :value (or (:name org-editing) "")
               :on-change #(dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. % -target -value)
@@ -198,7 +198,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-            [:input.org-settings-field
+            [:input.org-settings-field.oc-input
               {:type "text"
                :placeholder "@domain.com"
                :auto-capitalize "none"
