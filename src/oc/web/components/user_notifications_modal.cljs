@@ -98,7 +98,7 @@
         [:div.user-notifications-body
           [:div.user-profile-modal-fields
             [:div.field-label "Daily digest"]
-            [:select.field-value
+            [:select.field-value.oc-input
               {:value (:digest-medium current-user-data)
                :disabled (not slack-enabled?)
                :on-change #(change! s :digest-medium (.. % -target -value))}
@@ -113,7 +113,7 @@
               "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
             [:div.field-label "Comments and mentions"]
-            [:select.field-value
+            [:select.field-value.oc-input
               {:value (:notification-medium current-user-data)
                :on-change #(change! s :notification-medium (.. % -target -value))}
               [:option
@@ -128,7 +128,7 @@
                 "In-app only"]]]
           [:div.user-profile-modal-fields
             [:div.field-label "Reminders"]
-            [:select.field-value
+            [:select.field-value.oc-input
               {:value (:reminder-medium current-user-data)
                :on-change #(change! s :reminder-medium (.. % -target -value))}
               [:option

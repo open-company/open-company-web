@@ -102,7 +102,7 @@
                       (router/current-org-slug)
                       activity-uuid)
         patch-comment-link (utils/link-for (:links comment-data) "partial-update")]
-    (api/patch-comment patch-comment-link new-body nil)
+    (api/patch-comment patch-comment-link new-body #())
     (dis/dispatch! [:comment-save
                     comments-key
                     activity-uuid

@@ -151,7 +151,7 @@
               [:label.sign-in-label "Enter Email"]]
             ;; Email field
             [:div.sign-in-field-container
-              [:input.sign-in-field.email
+              [:input.sign-in-field.email.oc-input
                 {:value (:email (:login-with-email (rum/react dis/app-state)))
                  :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
                  :type "email"
@@ -162,7 +162,7 @@
             [:div.sign-in-label-container
               [:label.sign-in-label "Password"]]
             [:div.sign-in-field-container
-              [:input.sign-in-field.pswd
+              [:input.sign-in-field.pswd.oc-input
                 {:value (:pswd (:login-with-email (rum/react dis/app-state)))
                  :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
                  :type "password"
@@ -219,7 +219,7 @@
             [:div.sign-in-label-container
               [:label.sign-in-label "Please enter your email address"]]
             [:div.sign-in-field-container.email
-              [:input.sign-in-field
+              [:input.sign-in-field.oc-input
                 {:class utils/hide-class
                  :value (:email (:password-reset (rum/react dis/app-state)))
                  :tabIndex 1
@@ -284,7 +284,7 @@
             [:div.sign-in-label-container
               [:label.sign-in-label {:for "signup-pswd"} "Password"]]
             [:div.sign-in-field-container
-              [:input.sign-in-field.pswd
+              [:input.sign-in-field.pswd.oc-input
                 {:value (:pswd (:collect-pswd (rum/react dis/app-state)))
                  :id "collect-pswd-pswd"
                  :on-change #(dis/dispatch! [:input [:collect-pswd :pswd] (.. % -target -value)])

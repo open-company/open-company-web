@@ -178,14 +178,14 @@
             [:div.field-label "First name"
               (when @(::name-error s)
                 [:span.error "Please provide your name."])]
-            [:input.field-value
+            [:input.field-value.oc-input
               {:value (:first-name current-user-data)
                :type "text"
                :tab-index 1
                :max-length user-utils/user-name-max-lenth
                :on-change #(change! s :first-name (.. % -target -value))}]
             [:div.field-label "Last name"]
-            [:input.field-value
+            [:input.field-value.oc-input
               {:value (:last-name current-user-data)
                :type "text"
                :tab-index 2
@@ -194,7 +194,7 @@
             [:div.field-label "Email"
               (when @(::email-error s)
                 [:span.error "This email isn't valid."])]
-            [:input.field-value.not-allowed
+            [:input.field-value.not-allowed.oc-input
               {:value (:email current-user-data)
                :placeholder "Your email address"
                :read-only true
@@ -205,7 +205,7 @@
                 (when @(::current-password-error s)
                     [:span.error "Current password required"])])
             (when (= (:auth-source current-user-data) "email")
-              [:input.field-value
+              [:input.field-value.oc-input
                 {:type "password"
                  :tab-index 3
                  :on-change #(change! s :current-password (.. % -target -value))
@@ -215,13 +215,13 @@
                 (when @(::password-error s)
                   [:span.error "Minimum 8 characters"])])
             (when (= (:auth-source current-user-data) "email")
-              [:input.field-value
+              [:input.field-value.oc-input
                 {:type "password"
                    :tab-index 4
                    :on-change #(change! s :password (.. % -target -value))
                    :value (:password current-user-data)}])
             [:div.field-label "Timezone"]
-            [:select.field-value
+            [:select.field-value.oc-input
               {:value (:timezone current-user-data)
                :on-change #(change! s :timezone (.. % -target -value))}
               ;; Promoted timezones

@@ -27,7 +27,7 @@
       (events/unlistenByKey @(::esc-key-listener s))
       (reset! (::esc-key-listener s) nil))
     (reset! (::medium-editor s) nil)
-    (reset! (::editing? s) false)))
+    (reset! (::editing? s) nil)))
 
 (defn cancel-edit
   [e s c]
@@ -94,7 +94,7 @@
                              (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local false ::showing-menu)
-                             (rum/local false ::editing?)
+                             (rum/local nil ::editing?)
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
@@ -115,14 +115,18 @@
                                     (reset! (::last-focused-state s) is-self-focused?)
                                     (when is-self-focused?
                                       (scroll-to-bottom s))))
+                               (try (js/emojiAutocomplete)
+                                (catch :default e false))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments
+    {:class (when (seq @(::editing? s)) "editing")}
     (if (pos? (count comments-data))
       [:div.stream-comments-list
         (for [idx (range (count comments-data))
               :let [comment-data (nth comments-data idx)
-                    is-editing? (= @(::editing? s) (:uuid comment-data))
+                    is-editing? (and (seq @(::editing? s))
+                                     (= @(::editing? s) (:uuid comment-data)))
                     can-show-edit-bt? (and (:can-edit comment-data)
                                                (not (:is-emoji comment-data)))
                     can-show-delete-bt? (:can-delete comment-data)
@@ -131,6 +135,7 @@
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))
              :class (utils/class-set {:editing is-editing?
+                                      :editing-other-comment (not (nil? @(::editing? s)))
                                       :showing-picker showing-picker?})}
             (when-not is-editing?
               (if (responsive/is-tablet-or-mobile?)
@@ -191,13 +196,13 @@
                 [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                   {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                    :ref (str "comment-body-" (:uuid comment-data))
-                   :content-editable is-editing?
                    :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
                                 (when (> (.-length $body) 0)
                                   (.restore (.data $body "dotdotdot"))
                                   (reset! (::expanded-comments s) (vec (set (conj @(::expanded-comments s) (:uuid comment-data)))))))
                    :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                             :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
+                                            :emoji-autocomplete is-editing?
                                             utils/hide-class true})}]]
               (if is-editing?
                 [:div.stream-comment-footer.group
