@@ -20,6 +20,9 @@ div.cmail-outer {
     background-color: white;
     width: 100%;
     box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: $grey_num_2;
   }
 
   &.fullscreen {

@@ -442,7 +442,8 @@
                           @(::saving s))
                      (and (not published?)
                           @(::publishing s)))
-        is-fullscreen? (:fullscreen cmail-state)
+        is-fullscreen? (and (not is-mobile?)
+                            (:fullscreen cmail-state))
         close-cb (fn [_]
                   (if (au/has-content? (assoc cmail-data
                                          :body
