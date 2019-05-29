@@ -409,7 +409,7 @@
                                   (reset! (::showing-media-video-modal s) false))
                                 (when (and @(::showing-gif-selector s)
                                            (not (utils/event-inside? e (sel1 [:button.media.media-gif])))
-                                           (not (utils/event-inside? e (rum/ref-node s :giphy-picker))))
+                                           (not (utils/event-inside? e (sel1 [:div.giphy-picker]))))
                                   (media-gif-add s @(::media-picker-ext s) nil)
                                   (reset! (::showing-gif-selector s) false))))
                                {:did-mount (fn [s]
@@ -447,7 +447,8 @@
              upload-progress-cb
              dispatch-input-key
              attachment-dom-selector
-             start-video-recording-cb]}]
+             start-video-recording-cb
+             fullscreen]}]
   [:div.rich-body-editor-outer-container
     [:div.rich-body-editor-container
       [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
@@ -460,11 +461,12 @@
     (when @(::showing-media-video-modal s)
       [:div.video-container
         {:ref :video-container}
-        (media-video-modal {:dismiss-cb #(do
+        (media-video-modal {:fullscreen fullscreen
+                            :dismiss-cb #(do
                                           (media-video-add s @(::media-picker-ext s) nil)
                                           (reset! (::showing-media-video-modal s) false))})])
     (when @(::showing-gif-selector s)
-      (gif-picker
-       (fn [gif-obj]
-         (reset! (::showing-gif-selector s) false)
-         (media-gif-add s @(::media-picker-ext s) gif-obj))))])
+      (gif-picker {:fullscreen fullscreen
+                   :pick-emoji-cb (fn [gif-obj]
+                    (reset! (::showing-gif-selector s) false)
+                    (media-gif-add s @(::media-picker-ext s) gif-obj))}))])
