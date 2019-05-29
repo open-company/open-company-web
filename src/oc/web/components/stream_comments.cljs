@@ -133,6 +133,7 @@
           [:div.stream-comment
             {:key (str "stream-comment-" (:created-at comment-data))
              :class (utils/class-set {:editing is-editing?
+                                      :editing-other-comment (not (nil? @(::editing? s)))
                                       :showing-picker showing-picker?})}
             (when-not is-editing?
               [:div.stream-comment-floating-buttons

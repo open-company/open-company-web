@@ -32,7 +32,7 @@ div.stream-comments {
       position: relative;
 
       @include big_web() {
-        &:hover {
+        &:not(.editing-other-comment):hover {
           background-color: #F5F5F5;
 
           div.stream-comment-floating-buttons {
