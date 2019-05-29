@@ -271,3 +271,9 @@ div.not-found, div.server-error{
   top: 0px;
   overflow: scroll;
 }
+
+.oc-input {
+  &.active, &:active, &:focus {
+    opacity: 0.9;
+  }
+}
