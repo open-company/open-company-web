@@ -114,26 +114,25 @@
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
-                   (when-not is-mobile?
-                     (if is-drafts-board
-                       (activity-actions/activity-edit activity-data)
-                       (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
-                             stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
-                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
-                             attachments-el (rum/ref-node s :stream-item-attachments)]
-                         (when (and ;; More menu wasn't clicked
-                                    (not (utils/event-inside? e more-menu-el))
-                                    ;; WRT wasn't clicked 
-                                    (not (utils/event-inside? e stream-item-wrt-el))
-                                    ;; Attachments wasn't clicked
-                                    (not (utils/event-inside? e attachments-el))
-                                    ;; Emoji picker wasn't clicked
-                                    (not (utils/event-inside? e emoji-picker))
-                                    ;; a button wasn't clicked
-                                    (not (utils/button-clicked? e))
-                                    ;; No input field clicked
-                                    (not (utils/input-clicked? e)))
-                           (routing-actions/open-post-modal activity-data))))))
+                   (if is-drafts-board
+                     (activity-actions/activity-edit activity-data)
+                     (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                           stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
+                           emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
+                           attachments-el (rum/ref-node s :stream-item-attachments)]
+                       (when (and ;; More menu wasn't clicked
+                                  (not (utils/event-inside? e more-menu-el))
+                                  ;; WRT wasn't clicked 
+                                  (not (utils/event-inside? e stream-item-wrt-el))
+                                  ;; Attachments wasn't clicked
+                                  (not (utils/event-inside? e attachments-el))
+                                  ;; Emoji picker wasn't clicked
+                                  (not (utils/event-inside? e emoji-picker))
+                                  ;; a button wasn't clicked
+                                  (not (utils/button-clicked? e))
+                                  ;; No input field clicked
+                                  (not (utils/input-clicked? e)))
+                         (routing-actions/open-post-modal activity-data)))))
        :id dom-element-id}
       [:div.stream-item-inner
         [:div.stream-item-header.group
@@ -151,6 +150,9 @@
           (when is-published?
             (more-menu activity-data dom-element-id
              {:external-share (not is-mobile?)
+              :show-edit? (not is-mobile?)
+              :show-delete? (not is-mobile?)
+              :show-move? (not is-mobile?)
               :show-unread (not (:unread activity-data))}))]
         [:div.must-see-tag.mobile-only]
         [:div.new-tag.mobile-only "NEW"]
