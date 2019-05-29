@@ -320,6 +320,7 @@ div.cmail-outer {
       width: 100vw;
       height: 100vh;
       background-color: $grey_num_2;
+      padding-top: 50px;
     }
 
     div.cmail-mobile-header {
@@ -327,11 +328,15 @@ div.cmail-outer {
 
       @include tablet() {
         display: block;
-        width: 100%;
+        width: 100vw;
         height: 50px;
         padding: 16px;
-        position: relative;
+        position: fixed;
+        top: 0;
+        left: 0;
         border-bottom: 1px solid $ultra_light_grey;
+        background-color: $grey_num_2;
+        z-index: 2;
 
         button.mobile-close-bt {
           background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
@@ -401,15 +406,11 @@ div.cmail-outer {
       @include no-user-select();
 
       @include tablet() {
-        // position: relative;
-        // top: 50px;
-        // left: 0;
         width: 100%;
         height: 56px;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         padding: 12px 14px;
-        z-index: #{$navbar_zindex + 126};
         background-color: $grey_num_2;
       }
 
