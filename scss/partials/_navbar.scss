@@ -88,13 +88,13 @@ nav.oc-navbar {
           @include mobile() {
             display: block;
             width: calc(100vw - 64px - 80px);
-            max-height: calc(100vh - 100px);
+            max-height: 60vh;
             position: absolute;
             top: 48px;
             left: 0;
             border-radius: 4px;
             background-color: white;
-            padding: 8px 0;
+            padding: 8px 0 0;
             overflow-x: hidden;
             overflow-y: auto;
             border: 1px solid $mid_light_grey;
@@ -115,6 +115,23 @@ nav.oc-navbar {
               text-overflow: ellipsis;
               white-space: nowrap;
               position: relative;
+
+              &.compose {
+                padding-left: 39px;
+                &:before {
+                  content: " ";
+                  width: 12px;
+                  height: 12px;
+                  position: absolute;
+                  top: 11px;
+                  left: 18px;
+                  background-image: cdnUrl("/img/ML/compose_icon_grey.svg");
+                  background-size: 12px 12px;
+                  background-repeat: no-repeat;
+                  background-position: center;
+                  opacity: 0.5;
+                }
+              }
 
               &.all-posts {
                 padding-left: 39px;
@@ -157,6 +174,37 @@ nav.oc-navbar {
                 &.all-posts:before, &.drafts:before {
                   opacity: 1;
                 }
+              }
+            }
+
+            button.mobile-section-item-compose {
+              border-radius: 6px;
+              background-color: $carrot_green;
+              margin: 8px;
+              text-align: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 40px;
+              width: calc(100% - 16px);
+              opacity: 1;
+
+              span.compose-green-icon {
+                width: 12px;
+                height: 22px;
+                background-image: cdnUrl("/img/ML/white_pen.svg");
+                background-size: 12px 12px;
+                background-position: center;
+                background-repeat: no-repeat;
+              }
+
+              span.compose-green-label {
+                @include OC_Body_Bold();
+                font-size: 16px;
+                line-height: 22px;
+                color: white;
+                margin-left: 8px;
+                margin-top: 1px;
               }
             }
           }

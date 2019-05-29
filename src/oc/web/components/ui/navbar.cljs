@@ -29,6 +29,7 @@
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
+                    (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::show-sections-list)
                     (ui-mixins/on-window-click-mixin (fn [s e]
@@ -120,7 +121,12 @@
                       {:key (str "mobile-section-" (:slug board))
                        :class (when (= (router/current-board-slug) (:slug board)) "active")
                        :on-click #(mobile-nav! % (:slug board))}
-                      (:name board)])])]
+                      (:name board)])
+                  (when can-compose?
+                    [:button.mlb-reset.mobile-section-item-compose
+                      {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+                      [:span.compose-green-icon]
+                      [:span.compose-green-label "New post"]])])]
             [:div.navbar-center
               {:class (when search-active "search-active")}
               (search-box)])
