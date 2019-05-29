@@ -480,7 +480,7 @@
             (if (= (:status cmail-data) "published")
               "SAVE"
               "POST")]]
-        [:div.cmail-header
+        [:div.cmail-header.group
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
               {:class (when long-tooltip "long-tooltip")}
