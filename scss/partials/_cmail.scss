@@ -20,6 +20,9 @@ div.cmail-outer {
     background-color: white;
     width: 100%;
     box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: $grey_num_2;
   }
 
   &.fullscreen {
@@ -250,6 +253,11 @@ div.cmail-outer {
         overflow-x: auto;
         overflow-y: auto;
 
+        @include tablet() {
+          padding: 16px 16px 24px;
+          width: 100%;
+        }
+
         div.cmail-content-headline {
           font-size: 32px;
           line-height: 40px;
@@ -261,7 +269,7 @@ div.cmail-outer {
           padding-bottom: 32px;
 
           textarea.cmail-content-abstract {
-            background-color: $grey_num_2;
+            background-color: transparent;
             @include activity-abstract(18px, 26px);
           }
         }
@@ -308,6 +316,81 @@ div.cmail-outer {
     @include tablet() {
       width: 100vw;
       height: 100vh;
+      background-color: $grey_num_2;
+      padding-top: 50px;
+    }
+
+    div.cmail-mobile-header {
+      display: none;
+
+      @include tablet() {
+        display: block;
+        width: 100vw;
+        height: 50px;
+        padding: 16px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        border-bottom: 1px solid $ultra_light_grey;
+        background-color: $grey_num_2;
+        z-index: 2;
+
+        button.mobile-close-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 24px;
+          height: 24px;
+          margin-top: -3px;
+          margin-left: -6px;
+          padding: 0;
+        }
+
+        div.cmail-mobile-header-title {
+          margin: 0 auto;
+          width: 150px;
+          line-height: 18px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $deep_navy;
+          position: absolute;
+          top: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+          text-align: center;
+
+          span.saving-saved {
+            @include OC_Body_Book();
+          }
+        }
+
+        button.mobile-post-button {
+          display: none;
+
+          @include tablet() {
+            display: block;
+            float: right;
+            color: $carrot_green;
+            width: 40px;
+            height: 24px;
+            text-align: right;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 24px;
+            float: right;
+            madgin: 0;
+            padding: 0;
+            position: relative;
+            margin-top: -3px;
+
+            &.disabled {
+              opacity: 0.4;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
     }
 
     div.cmail-header {
@@ -320,31 +403,13 @@ div.cmail-outer {
       @include no-user-select();
 
       @include tablet() {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 56px;
+        width: 100%;
+        min-height: 56px;
+        height: auto;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         padding: 12px 14px;
-        z-index: #{$navbar_zindex + 126};
-      }
-
-      div.mobile-saving-saved {
-        position: absolute;
-        top: 18px;
-        left: 50%;
-        margin-left: -20px;
-        display: inline-block;
-        width: 40px;
-        height: 20px;
-        @include OC_Body_Book();
-        color: white;
-        font-size: 12px;
-        line-height: 20px;
-        text-align: center;
-        opacity: 0.5;
+        background-color: $grey_num_2;
       }
 
       div.cmail-header-board-must-see-container {
@@ -353,8 +418,25 @@ div.cmail-outer {
         width: 208px;
         position: relative;
 
+        @include tablet() {
+          width: 100%;
+          min-height: 32px;
+          height: auto;
+          float: unset;
+        }
+
         &.must-see-on {
           width: 304px;
+
+          @include tablet() {
+            width: 100%;
+
+            div.must-see-tag {
+              margin-left: 0;
+              margin-top: 16px;
+              background-color: rgba($sea_blue, 0.2) !important;
+            }
+          }
         }
 
         div.board-name {
@@ -375,8 +457,10 @@ div.cmail-outer {
           background-color: rgba(white, 0.2);
           border-radius: 4px;
 
-          &:hover, &.active {
-            background-color: black;
+          @include big_web() {
+            &:hover, &.active {
+              background-color: black;
+            }
           }
 
           div.board-name-inner {
@@ -387,10 +471,14 @@ div.cmail-outer {
           }
 
           @include tablet() {
-            margin-left: 0;
-            margin-top: 0;
-            @include OC_Body_Bold();
-            font-size: 14px;
+            width: calc(100% - 16px - 32px);
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            background-color: $ultra_light_grey;
+            color: $deep_navy;
+
+            &:hover, &.open {
+              background-color: $more_ultra_light_grey;
+            }
           }
         }
 
@@ -401,6 +489,10 @@ div.cmail-outer {
           z-index: #{$navbar_zindex + 156};
           max-height: 370px;
           overflow: auto;
+
+          @include tablet() {
+            width: calc(100% - 16px - 32px);
+          }
         }
 
         div.must-see-toggle-container {
@@ -454,6 +546,23 @@ div.cmail-outer {
               box-shadow: 0 2px 2px 0 rgba(0,0,0,0.12);
             }
           }
+
+          @include tablet() {
+            &.on {
+              div.must-see-toggle {
+                background-color: rgba($sea_blue, 0.2);
+              }
+            }
+
+            div.must-see-toggle {
+              background-color: $ultra_light_grey;
+
+              span.must-see-toggle-circle {
+                background-color: $deep_navy;
+                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
+              }
+            }
+          }
         }
 
         @include must-see-tag();
@@ -481,6 +590,10 @@ div.cmail-outer {
           &:hover {
             opacity: 1;
           }
+        }
+
+        @include tablet() {
+          display: none;
         }
       }
 
@@ -516,6 +629,10 @@ div.cmail-outer {
 
       div.close-bt-container {
         float: left;
+        
+        @include tablet() {
+          display: none;
+        }
 
         button.close-bt {
           width: 32px;
@@ -544,28 +661,6 @@ div.cmail-outer {
 
         .tooltip {
           margin-top: -16px;
-        }
-      }
-
-      button.mobile-post-button {
-        display: none;
-
-        @include tablet() {
-          display: block;
-          color: white;
-          width: 40px;
-          height: 24px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          float: right;
-          margin: 0 2px 0 0 ;
-          padding: 0;
-          position: relative;
-
-          &.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-          }
         }
       }
 
@@ -689,11 +784,13 @@ div.cmail-outer {
           @include activity-abstract(18px, 26px);
           height: 26px;
           width: 100%;
-          
+          background-color: transparent;
           border: none;
           resize: none;
           outline: none;
           overflow: hidden;
+          padding: 0;
+          margin: 0;
 
           @include placeholder(){
             color: $grey_num_1;
