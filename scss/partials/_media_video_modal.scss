@@ -1,7 +1,7 @@
 div.media-video-modal-container {
   position: absolute;
-  bottom: 48px;
-  left: 50%;
+  top: 0;
+  right: 0;
   margin-left: -275px;
   z-index: #{$navbar_zindex + 126};
   width: 272px;
