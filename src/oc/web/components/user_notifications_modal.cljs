@@ -51,7 +51,10 @@
   ;; Locals
   (rum/local false ::loading)
   (rum/local false ::show-success)
-  {:after-render (fn [s]
+  {:will-mount (fn [s]
+   (user-actions/get-user nil)
+   s)
+   :after-render (fn [s]
    (when-not (utils/is-test-env?)
      (doto (js/$ "[data-toggle=\"tooltip\"]")
        (.tooltip "fixTitle")

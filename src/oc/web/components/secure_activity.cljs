@@ -90,7 +90,9 @@
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
                 {:on-click #(router/redirect! oc-urls/home)}
-                "learn more about Carrot"]
+                (str "learn more"
+                 (when-not is-mobile?
+                   " about Carrot"))]
               [:span.or " or "]
               [:button.mlb-reset.login-bt
                 {:on-click #(user-actions/show-login :login-with-email)}
@@ -124,11 +126,8 @@
                  :class utils/hide-class}])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (when-not is-mobile?
-                (comments-summary activity-data true))
-              (reactions activity-data)
-              (when is-mobile?
-                (comments-summary activity-data true))]
+              (comments-summary activity-data true)
+              (reactions activity-data)]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])

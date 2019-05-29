@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -45,7 +46,12 @@
   (rum/local false ::resending-invite)
   (rum/local "" ::query)
   (rum/local #{} ::removing)
-  {:after-render (fn [s]
+  {:will-mount (fn [s]
+    (let [org-data @(drv/get-ref s :org-data)]
+        (org-actions/get-org org-data)
+        (team-actions/force-team-refresh (:team-id org-data)))
+    s)
+   :after-render (fn [s]
     (doto (js/$ "[data-toggle=\"tooltip\"]")
      (.tooltip "fixTitle")
      (.tooltip "hide"))

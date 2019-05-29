@@ -20,6 +20,11 @@
   (drv/drv :current-user-data)
   ;; Locals
   (rum/local false ::saving)
+  {:will-mount (fn [s]
+    (let [org-data @(drv/get-ref s :org-data)]
+        (org-actions/get-org org-data)
+        (team-actions/force-team-refresh (:team-id org-data)))
+    s)}
   [s]
   (let [org-data (drv/react s :org-data)
         team-data (drv/react s :team-data)
