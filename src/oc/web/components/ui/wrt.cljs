@@ -132,14 +132,14 @@
                       {:x "50%" :y "50%"}
                       (str seen-percent "%")]]]]
               [:div.wrt-chart-label
-                (case (count seen-users)
-                  (count all-users)
+                (cond 
+                  (= (count all-users) (count seen-users))
                   "👏 Everyone has seen this post!"
-                  1
+                  (= 1 (count seen-users))
                   "1 person has viewed this post."
-                  0
+                  (zero? (count seen-users))
                   "No one has viewed this post."
-                  ; else
+                  :else
                   (str (count seen-users)
                    " of "
                    (count all-users)
