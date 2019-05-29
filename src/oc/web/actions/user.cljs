@@ -189,8 +189,8 @@
 
 (defn get-user [user-link]
   (when-let [fixed-user-link (or user-link (utils/link-for (:links (dis/auth-settings)) "user" "GET"))]
-    (api/get-user fixed-user-link (fn [data]
-     (let [user-map (json->cljs data)]
+    (api/get-user fixed-user-link (fn [success data]
+     (let [user-map (when success (json->cljs data))]
        (dis/dispatch! [:user-data user-map])
        (utils/after 100 nux-actions/check-nux)
        (patch-timezone-if-needed user-map))))))
