@@ -95,6 +95,8 @@
          :ref :wrt-popup
          :on-click #(.stopPropagation %)}
         [:div.wrt-popup-header
+          [:button.mlb-reset.mobile-close-bt
+            {:on-click nav-actions/hide-wrt}]
           [:div.wrt-popup-header-title
             "Who viewed this post"]]
         ;; Show a spinner on mobile if no data is loaded yet

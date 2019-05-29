@@ -593,8 +593,8 @@
     (api/get-auth-settings (fn [body]
       (when body
         (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-          (api/get-user user-link (fn [data]
-            (dis/dispatch! [:user-data (json->cljs data)]))))
+          (api/get-user user-link (fn [success data]
+            (dis/dispatch! [:user-data (when success (json->cljs data))]))))
         (dis/dispatch! [:auth-settings body])
         (api/get-entry-point org-slug
           (fn [success body]

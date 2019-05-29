@@ -1,4 +1,5 @@
 $avatar_size: 32;
+$mobile_avatar_size: 40;
 
 button.user-avatar-button{
   margin: 0;
@@ -6,7 +7,7 @@ button.user-avatar-button{
   background-color: transparent;
   width: #{$avatar_size}px;
   height: #{$avatar_size}px;
-  border-radius: #{$avatar-size / 2}px;
+  border-radius: 50%;
   padding: 0;
   position: relative;
 
@@ -20,4 +21,10 @@ button.user-avatar-button{
   }
 
   @include user-profile($avatar_size);
+
+  @include mobile() {
+    width: #{$mobile_avatar_size}px;
+    height: #{$mobile_avatar_size}px;
+    @include user-profile($mobile_avatar_size);
+  }
 }

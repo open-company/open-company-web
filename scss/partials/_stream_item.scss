@@ -46,11 +46,13 @@ div.stream-item {
   @include mobile() {
     width: 100%;
     margin: 0;
-    border: none;
     border-radius: 0;
+    border-top: none;
+    border-bottom: 1px solid $grey_num_3;
+    background-color: $grey_num_2;
 
     div.stream-item-inner {
-      padding: 16px;
+      padding: 24px 16px;
     }
   }
 
@@ -65,6 +67,10 @@ div.stream-item {
 
     div.stream-item-inner {
       border-left: 4px solid white;
+
+      @include mobile() {
+        border-left: 2px solid white;
+      }
     }
 
     &.showing-share {
@@ -115,6 +121,10 @@ div.stream-item {
     &.must-see-item {
       div.stream-item-inner {
         border-left: 4px solid $sea_blue;
+
+        @include mobile() {
+          border-left: 2px solid $sea_blue;
+        }
       }
 
       @include big_web(){
@@ -220,6 +230,10 @@ div.stream-item {
 
   div.must-see-tag {
     display: none;
+
+    @include mobile() {
+      margin-top: 8px;
+    }
   }
 
   & > div.new-tag, & > div.must-see-tag {
@@ -397,11 +411,20 @@ div.stream-item {
         white-space: pre-wrap;
         word-break: break-word;
 
+        @include mobile() {
+          margin-top: 4px;
+        }
+
         h2 {
           color: $deep_navy;
           @include OC_Body_Book();
           font-size: 18px;
           line-height: 24px;
+        }
+
+        b, strong, &.editing b, &.editing strong {
+          @include OC_Body_Book();
+          font-weight: normal;
         }
 
         .carrot-no-preview {
@@ -411,7 +434,7 @@ div.stream-item {
     }
 
     div.stream-item-footer {
-      height: 26px;
+      min-height: 26px;
       margin-top: 16px;
 
       div.stream-body-draft-edit {
@@ -571,6 +594,10 @@ div.stream-item {
         position: relative;
         margin-top: 4px;
         margin-right: 16px;
+
+        @include mobile() {
+          margin-left: 2px;
+        }
       }
 
       div.time-since {
@@ -584,7 +611,7 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: auto;
+          display: none;
         }
       }
     }

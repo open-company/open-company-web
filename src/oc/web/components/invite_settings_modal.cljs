@@ -106,6 +106,9 @@
   {:will-mount (fn [s]
                  (setup-initial-rows s)
                  (nux-actions/dismiss-post-added-tooltip)
+                 (let [org-data @(drv/get-ref s :org-data)]
+                   (org-actions/get-org org-data)
+                   (team-actions/force-team-refresh (:team-id org-data)))
                 s)
    :after-render (fn [s]
                    (doto (js/$ "[data-toggle=\"tooltip\"]")
