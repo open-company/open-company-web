@@ -102,32 +102,47 @@
   [past-date & [flags]]
   (let [past-js-date (js-date past-date)
         past (.getTime past-js-date)
-        now (.getTime (js-date))
+        now-date (js-date)
+        now (.getTime now-date)
         seconds (.floor js/Math (/ (- now past) 1000))
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
         hours-interval (.floor js/Math (/ seconds 3600))
-        minutes-interval (.floor js/Math (/ seconds 60))]
+        minutes-interval (.floor js/Math (/ seconds 60))
+        short? (in? flags :short)]
     (cond
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
 
-      (or (pos? months-interval)
-          (> days-interval 7))
+      (pos? months-interval)
       (date-string past-js-date flags)
 
       (pos? days-interval)
-      (str days-interval " " (pluralize "day" days-interval) " ago")
+      (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
 
       (pos? hours-interval)
-      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+      (str hours-interval (if short? "h" (str " " (pluralize "hour" hours-interval) " ago")))
 
       (pos? minutes-interval)
-      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+      (str minutes-interval (if short? "m" (str " " (pluralize "minute" minutes-interval) " ago")))
 
       :else
-      "Just now")))
+      (if short? "now" "Just now"))))
+
+(defn foc-date-time [past-date & [flags]]
+  (let [past-js-date (js-date past-date)
+        past (.getTime past-js-date)
+        now-date (js-date)
+        now (.getTime now-date)]
+    (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
+             (= (.getMonth past-js-date) (.getMonth now-date))
+             (= (.getDate past-js-date) (.getDate now-date)))
+      (s/lower
+       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
+                                                                                  :minute "2-digit"
+                                                                                  :format "hour:minute"}))
+      (time-since past-date (concat flags [:short])))))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -334,9 +349,9 @@
     (= :admin user-type)))
 
 (defn is-admin-or-author?
-  [org-data]
+  [org-data & [board-data]]
   (let [user-data (jwt/get-contents)
-        user-type (get-user-type user-data org-data)]
+        user-type (get-user-type user-data org-data board-data)]
     (or (= :admin user-type)
         (= :author user-type))))
 
@@ -453,6 +468,14 @@
      (when-not hide-time
       (str " at " time-string)))))
 
+(defn tooltip-date [past-date]
+  (let [past-js-date (js-date past-date)
+        now-date (js-date)
+        hide-time (or (not= (.getFullYear past-js-date) (.getFullYear now-date))
+                      (not= (.getMonth past-js-date) (.getMonth now-date))
+                      (not= (.getDate past-js-date) (.getDate now-date)))]
+    (activity-date-string past-js-date hide-time false)))
+
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"
   [past-js-date & [hide-time]]
@@ -485,21 +508,20 @@
         :else
         "Just now"))))
 
-(defn entry-date-tooltip [entry-data]
+(defn activity-date-tooltip [entry-data]
   (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
         updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
         created-str (activity-date created-at)
         updated-str (activity-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
                        "Posted "
-                       "Created ")]
-    (if (or (= (:created-at entry-data) (:updated-at entry-data))
-            (not (:updated-at entry-data)))
+                       "Created ")
+        last-edit (last (:author entry-data))]
+    (if (= (:created-at entry-data) (:updated-at last-edit))
       (str label-prefix created-str)
-      (str label-prefix created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
-
-(defn activity-date-tooltip [activity-data]
-  (entry-date-tooltip activity-data))
+      (if (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+        (str label-prefix created-str "\nEdited " updated-str)
+        (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 
 (defn ios-copy-to-clipboard [el]
   (let [old-ce (.-contentEditable el)
@@ -614,6 +636,10 @@
 
 (def default-headline "Untitled post")
 
+(def default-abstract "Quick summary: why this post matters...")
+
+(def max-abstract-length 280)
+
 (def default-drafts-board-name "Drafts")
 
 (def default-drafts-board-slug "drafts")
@@ -655,6 +681,21 @@
 
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
 
+(defn element-clicked? [e element-name]
+  (loop [el (.-target e)]
+    (if (or (not el) (= (.-tagName el) element-name))
+      el
+      (recur (.-parentElement el)))))
+
+(defn button-clicked? [e]
+  (element-clicked? e "BUTTON"))
+
+(defn input-clicked? [e]
+  (element-clicked? e "INPUT"))
+
+(defn anchor-clicked? [e]
+  (element-clicked? e "A"))
+
 (defn debounced-fn
   "Debounce function: give a function and a wait time call it immediately
   and avoid calling it again for the wait time.
@@ -690,3 +731,8 @@
             (reset! timeout nil)
             (reset! last-call now)
             (apply f args)))))))
+
+(defn observe []
+  (if (.-attachEvent js/window)
+    (fn [el e handler] (.attachEvent el (str "on" e) handler))
+    (fn [el e handler] (.addEventListener el e handler))))

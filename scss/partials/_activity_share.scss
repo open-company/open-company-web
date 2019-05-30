@@ -9,13 +9,13 @@ div.activity-share-modal-container {
   background-color: $carrot_modal_bg;
   z-index: 110;
   transition: opacity 180ms ease-in;
-  width: 360px;
+  width: 250px;
   background-color: white;
   border-radius: 8px;
-  padding: 32px 24px;
+  padding: 16px;
   margin-top: 55px;
-  border: 1px solid $deep_tan;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid $mid_light_grey;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
   text-align: left;
 
   @include mobile() {
@@ -28,6 +28,7 @@ div.activity-share-modal-container {
     border: none;
     box-shadow: none;
     padding: 0px;
+    border-bottom: 1px solid $ultra_light_grey;
   }
 
   &.will-appear {
@@ -48,10 +49,9 @@ div.activity-share-modal-container {
     }
 
     div.activity-share-main-cta {
-      @include avenir_H();
-      font-size: 16px;
-      color: $deep_navy;
-      line-height: 22px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $light_navy;
       position: relative;
       max-width: 100%;
       overflow: hidden;
@@ -64,8 +64,8 @@ div.activity-share-modal-container {
         width: 100%;
         height: 56px;
         box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        padding: 16px 16px 16px 46px;
-        text-align: left;
+        padding: 16px 0;
+        text-align: center;
         line-height: 24px;
       }
 
@@ -100,22 +100,6 @@ div.activity-share-modal-container {
       }
     }
 
-    div.activity-share-subheadline {
-      @include avenir_M();
-      font-size: 14px;
-      color: $oc_gray_3;
-      line-height: 20px;
-      text-align: center;
-      position: relative;
-      padding-bottom: 24px;
-      margin-top: 20px;
-
-      @include mobile() {
-        padding-bottom: 16px;
-        margin-top: 8px;
-      }
-    }
-
     div.activity-share-medium-selector-container {
       width: 100%;
       height: 32px;
@@ -127,7 +111,7 @@ div.activity-share-modal-container {
 
       div.activity-share-medium-selector {
         height: 33px;
-        @include avenir_B();
+        @include OC_Body_Bold();
         font-size: 13px;
         line-height: 24px;
         text-align: left;
@@ -166,7 +150,7 @@ div.activity-share-modal-container {
       div.mediums-box {
         
         div.medium {
-          @include avenir_M();
+          @include OC_Body_Bold();
           color: $carrot_dark_gray;
           font-size: 16px;
 
@@ -212,7 +196,7 @@ div.activity-share-modal-container {
               }
 
               div.labels {
-                @include avenir_M();
+                @include OC_Body_Bold();
                 font-size: 15px;
                 color: $deep_navy;
                 padding-top: 8px;
@@ -227,7 +211,7 @@ div.activity-share-modal-container {
                   min-height: 77px;
                   border-radius: 4px;
                   background-color: white;
-                  @include avenir_M();
+                  @include OC_Body_Bold();
                   font-size: 14px;
                   color: $oc_gray_7;
                   padding: 0.4rem 0.8rem;
@@ -240,7 +224,7 @@ div.activity-share-modal-container {
                   height: 40px;
                   border-radius: 4px;
                   background-color: white;
-                  @include avenir_M();
+                  @include OC_Body_Bold();
                   font-size: 14px;
                   color: $oc_gray_7;
                   padding: 0.4rem 0.8rem;
@@ -271,7 +255,7 @@ div.activity-share-modal-container {
           button {
             margin: 0;
             padding: 0;
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 14px;
             margin-left: 16px;
 
@@ -291,76 +275,48 @@ div.activity-share-modal-container {
     }
 
     div.activity-share-modal-shared {
-      margin-top: 24px;
+      margin-top: 8px;
 
       @include mobile() {
-        padding: 0px 24px;
+        padding: 24px;
         min-height: calc(100vh - 56px);
       }
 
-      div.url-audience-description {
-        @include avenir_M();
-        font-size: 12px;
-        line-height: 18px;
-        color: $ui_grey;
-        margin-top: 24px;
-      }
-
-      div.medium-row.url-field-row {
-        margin-top: 24px;
-      }
-
-      div.checkbox-row {
+      button.checkbox-row {
         height: 18px;
-        margin-top: 9px;
         cursor: pointer;
+        padding: 0;
+        width: 100%;
 
-        div.checkbox {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          border: 1px solid $carrot_light_gray;
+        div.carrot-option-button {
           float: left;
-          margin: 0;
-          padding: 0;
-          position: relative;
-
-          &.selected:after {
-            content: "";
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            top: 4px;
-            left: 4px;
-            background-color: $sea_blue;
-            border-radius: 50%;
-          }
+          margin-top: 2px;
         }
 
         div.checkbox-label {
           display: block;
           float: left;
           line-height: 18px;
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 12px;
           color: $deep_navy;
           margin-left: 8px;
 
           span.bold {
-            @include avenir_H();
+            @include OC_Body_Bold();
           }
         }
       }
 
       div.share-headline {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 12px;
         color: $carrot_dark_gray;
         margin-bottom: 8px;
       }
 
       div.shared-subheadline {
-        @include avenir_BOOK();
+        @include OC_Body_Book();
         font-size: 12px;
         color: $carrot_dark_gray_1;
         margin-top: 8px;
@@ -369,29 +325,25 @@ div.activity-share-modal-container {
       }
 
       div.shared-url-container {
-        border-top: 1px solid rgba($carrot_light_gray_1, 0.5);
-        border-left: 1px solid rgba($carrot_light_gray_1, 0.5);
-        border-bottom: 1px solid rgba($carrot_light_gray_1, 0.5);
-        padding: 7px 4px 7px 8px;
-        width: calc(100% - 96px);
-        height: 40px;
-        float: left;
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-        margin-top: 8px;
+        width: 100%;
+        height: 32px;
+        margin-top: 16px;
 
         input {
           border: none;
           outline: none;
-          padding: 0;
+          padding: 7px 8px;
+          height: 32px;
+          border-radius: 4px;
           margin: 0;
           width: 100%;
-          @include avenir_M();
+          @include OC_Body_Book();
           color: $deep_navy;
           font-size: 14px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          background-color: $ultra_light_grey;
         }
 
         div.tooltip {
@@ -400,19 +352,16 @@ div.activity-share-modal-container {
       }
 
       button.copy-btn {
-        width: 96px;
-        height: 40px;
+        width: 100%;
+        margin-top: 8px;
+        height: 32px;
         text-align: center;
-        padding: 4px 0px;
-        margin: 0;
-        @include avenir_H();
-        font-size: 12px;
-        float: left;
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        border-radius: 4px;
         background-color: $carrot_green;
         color: white;
-        margin-top: 8px;
+        padding: 0;
       }
 
       button.done-btn {

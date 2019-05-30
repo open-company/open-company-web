@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="12px" height="15px" viewBox="0 0 12 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 49 (51002) - http://www.bohemiancoding.com/sketch -->
-    <title>Group 2</title>
+<svg width="10px" height="12px" viewBox="0 0 10 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <defs>
-        <rect id="path-1" x="0" y="4.8" width="11.2" height="9.6" rx="1.5"></rect>
-    </defs>
-    <g id="👋-Onboarding" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Topic-Creation-Alts" transform="translate(-502.000000, -281.000000)">
-            <g id="Group-2" transform="translate(502.000000, 281.000000)">
-                <g id="Group-6" transform="translate(1.200000, 0.000000)" stroke="#34414F" stroke-width="1.5">
-                    <rect id="Rectangle-18" x="1.15" y="0.75" width="6.5" height="8.356" rx="2"></rect>
-                </g>
-                <g id="Rectangle-19">
-                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
-                    <rect stroke="#34414F" stroke-width="1.5" x="0.75" y="5.55" width="9.7" height="8.1" rx="1.5"></rect>
+    <g id="Section-management" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Section-manage-details" transform="translate(-992.000000, -116.000000)" fill="#34414F">
+            <g id="Group-7" transform="translate(984.000000, 80.000000)">
+                <g id="Group-6">
+                    <g id="Group-5" transform="translate(0.000000, 26.000000)">
+                        <path d="M9.25,13.6000949 C9.25,11.611707 10.9286676,10 13,10 C15.0706855,10 16.75,11.6126661 16.75,13.6001538 L16.75,15.1000006 C17.4404792,15.1006877 18,15.6361175 18,16.3018883 L18,20.7981117 C18,21.4618963 17.4409289,22 16.7486695,22 L9.25133053,22 C8.56023976,22 8,21.4643101 8,20.7981117 L8,16.3018883 C8,15.638529 8.55835488,15.1006896 9.25,15.1000007 L9.25,13.6000949 Z M10.5,15.1 L15.5,15.1 L15.5,13.6001538 C15.5,12.2753205 14.3802386,11.2 13,11.2 C11.6190559,11.2 10.5,12.2744177 10.5,13.6000949 L10.5,15.1 Z" id="Combined-Shape"></path>
+                    </g>
                 </g>
             </g>
         </g>

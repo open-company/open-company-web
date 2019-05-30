@@ -42,19 +42,19 @@ div.org-settings div.org-settings-inner {
         float: left;
         margin-left: 16px;
         margin-top: 8px;
+      }
 
-        div.cta {
-          @include avenir_H();
-          font-size: 16px;
-          color: $carrot_text_blue;
-        }
+      div.cta {
+        @include OC_Body_Bold();
+        font-size: 16px;
+        color: $carrot_text_blue;
+      }
 
-        div.description {
-          @include avenir_BOOK();
-          font-size: 14px;
-          color: $carrot_light_gray;
-          margin-top: 12px;
-        }
+      div.description {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_light_gray;
+        margin-top: 12px;
       }
     }
 
@@ -82,15 +82,11 @@ div.org-settings div.org-settings-inner {
         }
       }
 
-      div.org-settings-list {
-        margin-bottom: 16px;
-
-        div.org-settings-list-item {
-          div.org-settings-list-item-name {
-            @include avenir_R();
-            font-size: 16px;
-            color: $carrot_dark_gray;
-          }
+      div.org-settings-list-item {
+        div.org-settings-list-item-name {
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: $carrot_dark_gray;
         }
       }
 
@@ -106,13 +102,15 @@ div.org-settings div.org-settings-inner {
           border-radius: 6px;
           margin-right: 8px;
           color: $carrot_green;
+          @include OC_Body_Bold();
+          font-size: 14px;
           border: none;
           outline: none;
           box-shadow: none;
 
           span.org-settings-list-item-name {
             color: $carrot_green;
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 14px;
           }
 
@@ -145,22 +143,22 @@ div.org-settings div.org-settings-inner {
           width: 390px;
 
           @include placeholder(){
-            @include avenir_R();
+            @include OC_Body_Book();
             color: $ui_grey;
             font-size: 16px;
           }
         }
+      }
 
-        button.add-email-domain-bt {
-          height: 20px;
-          padding: 0px 8px;
-          color: $carrot_green;
-          @include avenir_H();
-          font-size: 14px;
-          border-top-right-radius: 6px;
-          border-bottom-right-radius: 6px;
-          float: right;
-        }
+      button.add-email-domain-bt {
+        height: 20px;
+        padding: 0px 8px;
+        color: $carrot_green;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+        float: right;
       }
     }
 
@@ -237,85 +235,81 @@ div.org-settings div.org-settings-inner {
                 }
               }
             }
+          }
 
-            div.org-settings-list-item-name {
-              @include avenir_H();
-              font-size: 14px;
-              color: $deep_navy;
-              float: none !important;
-              width: 100%;
-              line-height: 20px;
+          div.org-settings-list-item-name {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            color: $deep_navy;
+            float: none !important;
+            width: 100%;
+            line-height: 20px;
 
-              div.integrations-more-menu {
-                float: right;
-                width: auto;
-                transform: opacity 180ms ease-in;
-                opacity: 1;
-                position: relative;
+            div.integrations-more-menu {
+              float: right;
+              width: auto;
+              transform: opacity 180ms ease-in;
+              opacity: 1;
+              position: relative;
 
-                button.integrations-more-menu-bt {
-                  width: 24px;
-                  height: 24px;
-                  display: none;
-                  background-image: cdnUrl("/img/ML/more_menu_icon.svg");
-                  background-size: 32px 32px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                  opacity: 0.8;
+              button.integrations-more-menu-bt {
+                width: 24px;
+                height: 24px;
+                display: none;
+                background-image: cdnUrl("/img/ML/more_menu_icon.svg");
+                background-size: 32px 32px;
+                background-position: center;
+                background-repeat: no-repeat;
+                opacity: 0.8;
 
-                  &:hover, &:active, &:focus, &.active {
-                    opacity: 1;
-                    display: inline;
-                  }
+                &:hover, &:active, &:focus, &.active {
+                  opacity: 1;
+                  display: inline;
                 }
+              }
 
-                ul.integrations-more-menu-list {
-                  position: absolute;
-                  top: 24px;
-                  left: calc(100% - 152px);
-                  width: 160px;
-                  outline: none;
-                  z-index: 110;
-                  background-color: $deep_navy;
-                  box-shadow: none;
-                  border-radius: 4px;
-                  margin: 0;
-                  padding: 0px 16px;
-                  list-style-type: none;
+              ul.integrations-more-menu-list {
+                position: absolute;
+                top: 24px;
+                left: calc(100% - 152px);
+                width: 160px;
+                outline: none;
+                z-index: 110;
+                background-color: $deep_navy;
+                box-shadow: none;
+                border-radius: 4px;
+                margin: 0;
+                padding: 0px 16px;
+                list-style-type: none;
 
-                  li {
-                    height: 48px;
-                    @include avenir_H();
-                    font-size: 14px;
-                    color: white;
-                    cursor: pointer;
-                    padding: 16px 0px 16px 0px;
-                    position: relative;
-                    border-bottom: 1px solid rgba(white, 0.1);
+                li {
+                  height: 48px;
+                  @include OC_Body_Bold();
+                  font-size: 14px;
+                  color: white;
+                  cursor: pointer;
+                  padding: 16px 0px 16px 0px;
+                  position: relative;
+                  border-bottom: 1px solid rgba(white, 0.1);
 
-                    &:first-child {
-                      margin-top: 0px;
-                    }
-
-                    &:last-child {
-                      border-bottom: 0px;
-                    }
+                  &:first-child {
+                    margin-top: 0px;
                   }
                 }
               }
             }
+          }
 
-            div.org-settings-list-item-desc {
-              @include avenir_R();
-              font-size: 14px;
-              color: $deep_navy;
-              line-height: 20px;
-              height: 20px;
-              float: none;
-            }
+          div.org-settings-list-item-desc {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $deep_navy;
+            line-height: 20px;
+            height: 20px;
+            float: none;
 
             div.slack-org-self-join {
-              @include avenir_R();
+              @include OC_Body_Book();
               font-size: 12px;
               color: $deep_navy;
               opacity: 0.5;
@@ -324,7 +318,7 @@ div.org-settings div.org-settings-inner {
             }
 
             div.slack-org-bot-switch {
-              @include avenir_R();
+              @include OC_Body_Book();
               font-size: 13px;
               color: $deep_navy;
               margin-top: 16px;
@@ -338,7 +332,7 @@ div.org-settings div.org-settings-inner {
                 float: right;
                 width: 140px;
                 height: 32px;
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 13px;
                 color: $carrot_green;
                 background-color: $feint_emerald;
@@ -369,7 +363,7 @@ div.org-settings div.org-settings-inner {
           }
 
           div.checkbox-label {
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 14px;
             color: $deep_navy;
             float: left;
@@ -394,6 +388,18 @@ div.org-settings div.org-settings-inner {
               width: #{$settings_content_width - 48}px;
               margin-left: -142px;
             }
+
+            button.enable-carrot-bot-bt {
+              float: right;
+              width: 140px;
+              height: 32px;
+              @include OC_Body_Bold();
+              font-size: 13px;
+              color: $carrot_green;
+              background-color: $feint_emerald;
+              border-radius: 6px;
+              margin-top: -5px;
+            }
           }
         }
       }
@@ -407,7 +413,7 @@ div.org-settings div.org-settings-inner {
       margin-left: 0px;
       height: 32px;
       background-color: transparent;
-      @include avenir_M();
+      @include OC_Body_Book();
       font-size: 16px;
       color: $grey_num_1;
       padding: 0;

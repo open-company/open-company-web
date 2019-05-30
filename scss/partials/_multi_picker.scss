@@ -5,11 +5,10 @@ div.multi-picker-container {
   height: 20px;
     
   button.multi-picker-choice {
-    @include avenir_M();
+    @include OC_Body_Book();
     font-size: 14px;
     color: $deep_navy;
     position: relative;
-    margin-left: 12px;
     float: left;
     width: 22px;
     height: 21px;

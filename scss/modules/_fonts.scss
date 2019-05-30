@@ -15,7 +15,10 @@
 950 Black
 */
 
-.PTSerif {
+$circular_book: "LL Circular Book Web";
+$circular_bold: "LL Circular Bold Web";
+
+.OC-Title {
   font-family: "PT Serif", serif !important;
   font-weight: 700;
   font-style: normal;
@@ -24,8 +27,8 @@
   text-rendering: optimizeLegibility;;
 }
 
-.AvenirLTStd-Book {
-  font-family: AvenirLTStd-Book, Muli, Arial, sans-serif;
+.OC-Body-Book {
+  font-family: $circular_book, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -33,8 +36,17 @@
   text-rendering: optimizeLegibility;;
 }
 
-.AvenirLTStd-BookOblique {
-  font-family: AvenirLTStd-BookOblique, Muli, Arial, sans-serif;
+.OC-Body-Book-Oblique {
+  font-family: $circular_book, Muli, Arial, sans-serif;
+  font-weight: normal;
+  font-style: italic;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;;
+}
+
+.OC-Body-Bold {
+  font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -42,128 +54,41 @@
   text-rendering: optimizeLegibility;;
 }
 
-.AvenirLTStd-Roman {
-  font-family: AvenirLTStd-Roman, Muli, Arial, sans-serif;
+.OC-Body-Bold-Oblique {
+  font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: normal;
-  font-style: normal;
+  font-style: italic;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;;
 }
 
-.AvenirLTStd-MediumOblique {
-  font-family: AvenirLTStd-MediumOblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
+@mixin OCBodyFont($font_variant, $font_weight: normal, $font_style: normal){
+  font-family: #{$font_variant}, Muli, Arial, sans-serif;
+  font-weight: $font_weight;
+  font-style: $font_style;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;;
 }
 
-.AvenirLTStd-Medium {
-  font-family: AvenirLTStd-Medium, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
+@mixin OC_Body_Book() {
+  @include OCBodyFont($circular_book, 300);
 }
 
-.AvenirLTStd-Oblique {
-  font-family: AvenirLTStd-Oblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
+@mixin OC_Body_Book_Italic() {
+  @include OCBodyFont($circular_book, 300, italic);
 }
 
-.AvenirLTStd-Heavy {
-  font-family: AvenirLTStd-Heavy, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
+@mixin OC_Body_Bold(){
+  @include OCBodyFont($circular_bold, normal);
 }
 
-.AvenirLTStd-HeavyOblique {
-  font-family: AvenirLTStd-HeavyOblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
+@mixin OC_Body_Bold_Italic(){
+  @include OCBodyFont($circular_bold, normal, italic);
 }
 
-.AvenirLTStd-Black {
-  font-family: AvenirLTStd-Black, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-.AvenirLTStd-BlackOblique {
-  font-family: AvenirLTStd-BlackOblique, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-@mixin avenir($avenir_variant){
-  font-family: #{$avenir_variant}, Muli, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;;
-}
-
-@mixin avenir_BOOK() {
-  @include avenir(AvenirLTStd-Book);
-}
-
-@mixin avenir_BOOKO() {
-  @include avenir(AvenirLTStd-BookOblique);
-}
-
-@mixin avenir_R(){
-  @include avenir(AvenirLTStd-Roman);
-}
-
-@mixin avenir_O(){
-  @include avenir(AvenirLTStd-Oblique);
-}
-
-@mixin avenir_M(){
-  @include avenir(AvenirLTStd-Medium);
-}
-
-@mixin avenir_MO(){
-  @include avenir(AvenirLTStd-MediumOblique);
-}
-
-@mixin avenir_H(){
-  @include avenir(AvenirLTStd-Heavy);
-}
-
-@mixin avenir_HO(){
-  @include avenir(AvenirLTStd-HeavyOblique);
-}
-
-@mixin avenir_B(){
-  @include avenir(AvenirLTStd-Black);
-}
-
-@mixin avenir_BO(){
-  @include avenir(AvenirLTStd-BlackOblique);
-}
-
-@mixin PTSerif($weight: 700){
+@mixin OC_Title($weight: 700){
   font-family: "PT Serif", serif !important;
   font-weight: $weight;
   font-style: normal;

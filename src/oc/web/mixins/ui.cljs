@@ -34,6 +34,9 @@
       state)})
 
 (def first-render-mixin
+  "This mixin will add a :first-render-done atom to your component state. It will
+   be false when the component is not mounted, and true when it is. Very useful for
+   appear or disappear animations or to track down the component state."
   {:init (fn [state]
            (assoc state :first-render-done (atom false)))
    :after-render
@@ -183,12 +186,8 @@
          mounted-kw :wrt-mixin-is-mounted
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
-                         (when       ;; element is the initially visible body
-                                (and (.contains (.-classList el) "to-truncate")
-                                     ;; but item is not truncated
-                                     (not (.contains (.-classList el) "ddd-truncated"))
-                                     ;; and the element is visible in the viewport
-                                     (au/is-element-visible? el))
+                         ;; when the element is visible in the viewport
+                         (when (au/is-element-visible? el)
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s & [_]]
                          (when @(get s mounted-kw)
@@ -233,3 +232,39 @@
       (events/unlistenByKey (:on-click-out-listener s))
       (dissoc s :on-click-out-listener))
     s))})
+
+(defn on-window-resize-mixin [callback]
+  {:did-mount (fn [s]
+   (let [on-resize-listener (events/listen (.getElementById js/document "app") EventType/RESIZE
+                             (fn [e]
+                              (callback s e)))]
+    (assoc s :on-resize-listener on-resize-listener)))
+   :will-unmount (fn [s]
+   (if (:on-resize-listener s)
+    (do
+      (events/unlistenByKey (:on-resize-listener s))
+      (dissoc s :on-resize-listener))
+    s))})
+
+(defn autoresize-textarea
+  "Given a React reference to a component node, listens on all the events on that textarea element
+   and resize its frame to make sure it doesn't scroll and the no extra blank space."
+  [ref & [initially-focused]]
+  (letfn [(init-textarea [el]
+            (let [observe (utils/observe)
+                  resize-fn (fn []
+                              (set! (.-height (.-style el)) "auto")
+                              (set! (.-height (.-style el)) (str (.-scrollHeight el) "px")))
+                  delayed-resize-fn (fn [] (utils/after 0 resize-fn))]
+            (observe el "change" resize-fn)
+            (observe el "cut" delayed-resize-fn)
+            (observe el "paste" delayed-resize-fn)
+            (observe el "drop" delayed-resize-fn)
+            (observe el "keydown" delayed-resize-fn)
+            (when initially-focused
+              (.focus el))
+            (resize-fn)))]
+    {:did-mount (fn [s]
+      (when-let [el (rum/ref-node s ref)]
+        (init-textarea el))
+      s)}))

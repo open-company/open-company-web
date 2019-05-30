@@ -62,12 +62,14 @@
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss app-update slack-bot mention mention-author
-             click] :as notification-data}]
+             click] :as notification-data}
+      light-theme]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
                               :app-update app-update
                               :slack-bot slack-bot
                               :opac opac
+                              :light-theme light-theme
                               :mention-notification (and mention mention-author)
                               :inline-bt (or primary-bt-inline
                                              (and id
@@ -93,8 +95,10 @@
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
                         (dismiss %)))
-         :ref :dismiss-bt}])
+         :ref :dismiss-bt}
+        "OK"])
     [:div.notification-title.group
+      {:class (when-not (seq description) "no-description")}
       (when slack-icon
         [:span.slack-icon])
       title]
@@ -110,9 +114,12 @@
 (rum/defcs notifications < rum/static
                            rum/reactive
                            (drv/drv :notifications-data)
+                           (drv/drv :panel-stack)
   [s]
-  (let [notifications-data (drv/react s :notifications-data)]
+  (let [notifications-data (drv/react s :notifications-data)
+        panel-stack (drv/react s :panel-stack)
+        has-open-panel? (pos? (count panel-stack))]
     [:div.notifications
       (for [idx (range (count notifications-data))
             :let [n (nth notifications-data idx)]]
-        (rum/with-key (notification n) (str "notif-" (:id n))))]))
+        (rum/with-key (notification n has-open-panel?) (str "notif-" (:id n))))]))

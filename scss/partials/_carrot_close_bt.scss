@@ -48,3 +48,12 @@ button.settings-modal-close {
     opacity: 1;
   }
 }
+
+button.modal-close-bt {
+  width: 32px;
+  height: 32px;
+  background-image: cdnUrl("/img/ML/carrot_2_modal_close.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 32px 32px;
+}

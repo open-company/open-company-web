@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="12px" viewBox="0 0 10 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Styles-&amp;-states" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Section-settings" transform="translate(-415.000000, -293.000000)" fill="#242D42">
+            <g id="Group" transform="translate(280.000000, 175.000000)">
+                <g id="Group-8" transform="translate(0.000000, 112.000000)">
+                    <path d="M136.25,9.60009485 C136.25,7.61170705 137.928668,6 140,6 C142.070686,6 143.75,7.61266612 143.75,9.60015382 L143.75,11.1000006 C144.440479,11.1006877 145,11.6361175 145,12.3018883 L145,16.7981117 C145,17.4618963 144.440929,18 143.748669,18 L136.251331,18 C135.56024,18 135,17.4643101 135,16.7981117 L135,12.3018883 C135,11.638529 135.558355,11.1006896 136.25,11.1000007 L136.25,9.60009485 Z M137.5,11.1 L142.5,11.1 L142.5,9.60015382 C142.5,8.2753205 141.380239,7.2 140,7.2 C138.619056,7.2 137.5,8.27441772 137.5,9.60009485 L137.5,11.1 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

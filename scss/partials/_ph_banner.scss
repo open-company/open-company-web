@@ -52,14 +52,14 @@ div.ph-banner {
     }
 
     div.ph-banner-copy {
-      @include avenir_R();
+      @include OC_Body_Bold();
       color: white;
       font-size: 16px;
       text-align: left;
       display: block;
 
       span.heavy {
-        @include avenir_H();
+        @include OC_Body_Bold();
 
         @media screen and (max-width: 420px) {
           display: none;

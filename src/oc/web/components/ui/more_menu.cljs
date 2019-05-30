@@ -65,12 +65,15 @@
                        {:did-mount (fn [s]
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                          s)}
-  [s activity-data share-container-id
-   {:keys [will-open will-close external-share tooltip-position]}]
-  (let [delete-link (utils/link-for (:links activity-data) "delete")
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")
-        editable-boards (drv/react s :editable-boards)]
+  [s entity-data share-container-id
+   {:keys [will-open will-close external-share tooltip-position show-unread
+           show-edit? show-delete? edit-cb delete-cb show-move?]}]
+  (let [delete-link (utils/link-for (:links entity-data) "delete")
+        edit-link (utils/link-for (:links entity-data) "partial-update")
+        share-link (utils/link-for (:links entity-data) "share")
+        mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
+        editable-boards (drv/react s :editable-boards)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     (when (or edit-link
               share-link
               delete-link)
@@ -85,40 +88,45 @@
              :ref "more-menu-bt"
              :on-click #(show-hide-menu s will-open will-close)
              :class (when @(::showing-menu s) "active")
-             :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+             :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "More"}])
         (cond
           @(::move-activity s)
           (activity-move {:boards-list (vals editable-boards)
-                          :activity-data activity-data
+                          :activity-data entity-data
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
-            (when edit-link
+            {:class (when mark-unread-link "has-read-unread")}
+            (when (and edit-link
+                       show-edit?)
               [:li.edit
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/activity-edit activity-data))}
+                              (if (fn? edit-cb)
+                                (edit-cb entity-data)
+                                (activity-actions/activity-edit entity-data)))}
                 "Edit"])
-            (when delete-link
+            (when (and delete-link
+                       show-delete?)
               [:li.delete
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (delete-clicked % activity-data))}
+                              (if (fn? delete-cb)
+                                (delete-cb entity-data)
+                                (delete-clicked % entity-data)))}
                 "Delete"])
-            (when edit-link
+            (when (and edit-link
+                       show-move?)
               [:li.move
                {:on-click #(do
-                             (utils/event-stop %)
                              (reset! (::showing-menu s) false)
                              (reset! (::move-activity s) true))}
                "Move"])
@@ -126,15 +134,29 @@
                        share-link)
               [:li.share
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/activity-share-show activity-data share-container-id))}
-                "Share"])])
+                              (activity-actions/activity-share-show entity-data share-container-id))}
+                "Share"])
+            (when mark-unread-link
+              (if show-unread
+                [:li.unread
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/mark-unread entity-data))}
+                  "Mark unread"]
+                [:li.read
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/send-item-read (:uuid entity-data) true))}
+                  "Mark as read"]))])
         (when (and external-share
-                   share-link
-                   (not (responsive/is-tablet-or-mobile?)))
+                   share-link)
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
@@ -142,8 +164,8 @@
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))
-                          (activity-actions/activity-share-show activity-data share-container-id))
+                          (activity-actions/activity-share-show entity-data share-container-id))
              :data-toggle "tooltip"
              :data-placement (or tooltip-position "top")
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])])))

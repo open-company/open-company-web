@@ -2,6 +2,25 @@ div.stream-comments {
   height: 100%;
   position: relative;
 
+  &.editing {
+    div.stream-comments-list {
+      div.streacm-comment {
+        @include big_web(){
+          &:hover {
+            background-color: transparent;
+            div.stream-comment-floating-buttons {
+              display: none;
+            }
+
+            div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
   div.stream-comments-empty {
     display: none;
   }
@@ -9,142 +28,226 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment {
-      padding: 0px 0px 16px;
+      padding: 8px 16px;
+      position: relative;
 
-      &:last-child {
-        padding: 0;
+      @include big_web() {
+        &:not(.editing-other-comment):hover {
+          background-color: #F5F5F5;
+
+          div.stream-comment-floating-buttons {
+            display: block;
+          }
+
+          div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
+            display: block;
+          }
+        }
       }
 
-      &:hover, &.showing-more-menu {
-        div.stream-comment-header {
-          div.stream-comment-more-menu-container {
-            button.comment-more-menu {
-              display: block;
+      div.stream-comment-mobile-menu {
+        display: none;
+
+        @include mobile() {
+          display: block;
+
+          div.more-menu {
+            button.more-menu-bt {
+              background-position: 0px left 4px top;
+              margin-top: -4px;
             }
+
+            ul.more-menu-list {
+              width: 78px;
+              top: 20px;
+              right: 13px;
+              left: unset;
+            }
+          }
+        }
+      }
+
+      &.showing-picker {
+        div.stream-comment-floating-buttons {
+          background-color: rgba($ultra_light_grey, 0.3);
+          display: block;
+        }
+      }
+
+      &.editing {
+        @include big_web() {
+          &:hover {
+            background-color: initial;
+          }
+        }
+        div.stream-comment-floating-buttons div.stream-comment-floating-buttons-inner:hover {
+          display: none;
+        }
+
+        div.stream-comment-header {
+          display: none;
+        }
+
+        div.stream-comment-content {
+          div.stream-comment-body, div.stream-comment-body.medium-editor-element {
+            // editing comment
+            display: block;
+            margin-top: 0;
+            border-radius: 4px;
+            border: 1px solid $mid_light_grey;
+            background-color: white;
+            outline: none;
+            padding: 4px;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            padding: 8px 16px;
+
+            &:focus, &:active {
+              outline: none;
+            }
+          }
+        }
+      }
+
+      div.stream-comment-floating-buttons {
+        position: absolute;
+        right: 16px;
+        top: -13px;
+        height: 26px;
+        width: 34px; // FIXME With share change to 69px;
+        display: none;
+
+        &.can-edit, &.can-delete {
+          width: 69px; // FIXME With share change to 104px;
+        }
+
+        &.can-edit.can-delete {
+          width: 104px; // FIXME With share change to 139px;
+        }
+
+        div.emoji-mart {
+          right: 0;
+          left: unset;
+          position: absolute;
+          top: 34px;
+        }
+
+        .tooltip {
+          z-index: 1500;
+
+          &:last-child {
+            width: 86px;
+          }
+
+          &.in {
+            opacity: 1;
+          }
+
+          // Change Bootstrap tooltip style
+          .tooltip-arrow {
+            display: block;
+          }
+
+          .tooltip-inner {
+            background-color: $deep_navy;
+            white-space:pre-wrap;
+            max-width: none;
+            text-align: left;
+            opacity: 1;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: white;
+            line-height: 18px;
+            padding: 5px 8px;
+            border-radius: 4px;
+            box-shadow: none;
+            border: none;
+          }
+        }
+        & > button {
+          background-color: #3FBD7C;
+          width: 35px;
+          height: 26px;
+          background-position: center;
+          background-repeat: no-repeat;
+          border-right: 1px solid #61C98F;
+          margin: 0;
+          padding: 0;
+
+          &:last-of-type {
+            width: 34px;
+            border-right: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+          }
+
+          &:first-of-type {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+          }
+
+          @include big_web() {
+            &:hover {
+              background-color: #3CA473;
+            }
+          }
+
+          &.edit-bt {
+            background-image: cdnUrl("/img/ML/comment_edit_pen.svg");
+            background-size: 12px 12px;
+          }
+
+          &.delete-bt {
+            background-image: cdnUrl("/img/ML/comment_delete_can.svg");
+            background-size: 12px 14px;
+          }
+
+          &.share-bt {
+            background-image: cdnUrl("/img/ML/comment_share.svg");
+            background-size: 14px 12px;
+          }
+
+          &.react-bt {
+            background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
+            background-size: 14px 14px;
           }
         }
       }
 
       div.stream-comment-author-avatar {
         float: left;
-        width: 32px;
-        height: 32px;
+        width: 24px;
+        height: 24px;
 
-        @include user-profile(32);
+        @include user-profile(24);
       }
 
       div.stream-comment-right {
-        margin-left: 48px;
+        margin-left: 40px;
       }
 
       div.stream-comment-header {
-        height: 24px;
+        height: 16px;
 
-        div.stream-comment-author-right {
+        div.stream-comment-author-right  {
           float: left;
           max-width: 80%;
-          // height: 24px;
 
           div.stream-comment-author-name {
-            @include avenir_H();
-            font-size: 14px;
+            @include OC_Body_Bold();
+            font-size: 12px;
             color: $deep_navy;
             line-height: 15px;
             float: left;
           }
 
           div.stream-comment-author-timestamp {
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 12px;
-            color: $ui_grey;
-            opacity: 0.5;
+            color: rgba($deep_navy, 0.5);
             float: left;
             margin-left: 8px;
             line-height: 14px;
-          }
-        }
-
-        div.stream-comment-more-menu-container {
-          position: relative;
-          float: right;
-          margin-left: 8px;
-
-          button.comment-more-menu {
-            width: 24px;
-            height: 24px;
-            padding: 2px 2px 16px 2px;
-            display: block;
-            background-image: cdnUrl("/img/ML/horizontal_ellipsis.svg");
-            background-position: 50% 3px;
-            background-size: 20px 4px;
-            background-repeat: no-repeat;
-            opacity: 0.4;
             display: none;
-
-            &:hover, &:hover, &.active {
-              opacity: 1;
-            }
-
-            @include tablet() {
-              display: block;
-            }
-          }
-
-          div.stream-comment-more-menu {
-            position: absolute;
-            top: -8px;
-            right: 100%;
-            background-color: white;
-            width: 136px;
-            border: 1px solid $deep_tan;
-            box-shadow: 0 2px 4px 1px rgba(0,0,0,0.10);
-            outline: none;
-            z-index: 110;
-            border-radius: 5px;
-            margin: 0;
-            padding: 24px;
-
-            @include preload_image(cdnUrl("/img/ML/more_menu_edit_black.svg"));
-            @include preload_image(cdnUrl("/img/ML/more_menu_delete_black.svg"), "before");
-
-            div.stream-comment-more-menu-item {
-              height: 18px;
-              @include avenir_H();
-              font-size: 14px;
-              color: $deep_navy;
-              cursor: pointer;
-              padding-left: 32px;
-              position: relative;
-              margin-top: 16px;
-
-              &:before {
-                content: "";
-                position: absolute;
-                top: 0px;
-                left: 0px;
-                width: 18px;
-                height: 18px;
-                background-repeat: no-repeat;
-                background-size: 18px 18px;
-                background-position: center;
-              }
-
-              &:first-child {
-                margin-top: 0px;
-              }
-
-              &.edit {
-                &:before {
-                  background-image: cdnUrl("/img/ML/more_menu_edit_black.svg");
-                }
-              }
-
-              &.delete {
-                &:before {
-                  background-image: cdnUrl("/img/ML/more_menu_delete_black.svg");
-                }
-              }
-            }
           }
         }
       }
@@ -152,168 +255,52 @@ div.stream-comments {
       div.stream-comment-content {
         text-align: left;
         position: relative;
+        margin-top: 2px;
 
         div.stream-comment-body {
-          @include avenir_R();
-          font-size: 16px;
-          color: $deep_navy;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-          line-height: 20px;
           display: inline;
-
-          & > *:last-child {
-            display: inline;
-          }
-
-          & > *:not(:last-child) {
-            display: block;
-          }
-
-          &.editing {
-            display: block;
-            margin-top: 6px;
-          }
-
-          &:hover {
-            a.read-more {
-              color: $carrot_green;
-            }
-          }
-
-          a.read-more {
-            @include avenir_H();
-            font-size: 12px;
-            color: $deep_navy;
-          }
-
-          &.medium-editor-element {
-            // editing comment
-            border-radius: 4px;
-            border: 1px solid $ui_grey;
-            box-shadow: 0px 2px 6px 0px rgba(0,0,0, 0.1);
-            border: 2px solid $light_ui_grey;
-            background-color: white;
-            outline: none;
-            padding: 4px;
-          }
-
-          * {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-          }
-
-          margin-bottom: 0px;
-
-          &>*:last-child {
-            margin-bottom: 0px;
-          }
-
-          &.emoji-comment {
-            font-size: 50px;
-            height: 50px;
-            line-height: 50px;
-
-            // & > * {
-            //   line-height: 20px;
-            //   margin-top: 20px;
-            // }
-          }
-
-          a {
-            color: $carrot_green;
-          }
+          @include activity-comment();
         }
+      }
 
-        button.stream-comment-reaction {
-          height: 16px;
-          @include avenir_M();
-          font-size: 12px;
-          color: $ui_grey;
-          padding: 0;
-          margin-left: 6px;
-          margin-top: 0;
-          padding: 0 6px;
-          display: inline;
-
-          div.stream-comment-reaction-icon {
-            float: left;
-            width: 14px;
-            height: 16px;
-            background-repeat: no-repeat;
-            background-image: cdnUrl("/img/ML/comment_agree_off.svg");
-            opacity: 0.5;
-            background-size: 14px 14px;
-            background-position: center 2px;
-
-            @include preload_image(cdnUrl("/img/ML/comment_agree_on.svg"));
-          }
-
-          div.stream-comment-reaction-count {
-            height: 16px;
-            float: left;
-            margin-left: 6px;
-            color: $ui_grey;
-            @include avenir_M();
-            font-size: 12px;
-            line-height: 22px;
-          }
-
-          &.reacted {
-            color: $carrot_green;
-
-            &.can-react:hover {
-              color: $deep_navy;
-              div.stream-comment-reaction-icon {
-                background-image: cdnUrl("/img/ML/comment_agree_off.svg");
-                opacity: 0.7;
-              }
-
-              div.stream-comment-reaction-count {
-                color: $deep_navy;
-              }
-            }
-
-            div.stream-comment-reaction-icon {
-              background-image: cdnUrl("/img/ML/comment_agree_on.svg");
-              opacity: 1;
-            }
-
-            div.stream-comment-reaction-count {
-              color: $carrot_green;
-            }
-          }
-
-          &.can-react {
-            cursor: pointer;
-
-            &:hover {
-              color: $deep_navy;
-
-              div.stream-comment-reaction-icon {
-                background-image: cdnUrl("/img/ML/comment_agree_on.svg");
-                opacity: 1;
-              }
-
-              div.stream-comment-reaction-count {
-                color: $deep_navy;
-              }
-            }
-          }
-        }
+      div.stream-comment-reactions-footer {
+        height: 24px;
+        margin-top: 8px;
       }
 
       div.stream-comment-footer {
         height: 24px;
         margin-top: 2px;
+
+        @include mobile() {
+          margin-top: 8px;
+        }
       }
 
       div.save-cancel-edit-buttons {
         float: right;
-        padding-top: 8px;
+        padding-top: 16px;
+
+        @include mobile() {
+          padding-top: 0;
+        }
 
         button {
           float: right;
+          @include OC_Body_Book();
+          font-size: 14px;
+          padding: 0;
+          height: 18px;
+          line-height: 18px;
+
+          &.cancel-bt {
+            color: rgba($deep_navy, 0.5);
+            margin-right: 16px;
+          }
+
+          &.save-bt {
+            color: $carrot_green;
+          }
         }
       }
     }
@@ -324,7 +311,7 @@ div.stream-comments {
       margin: 14px 0 8px;
 
       span.collapse-expand-list {
-        @include avenir_H();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $ui_grey;
         padding-left: 22px;

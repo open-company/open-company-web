@@ -7,12 +7,11 @@ div.medium-editor-media-picker {
 }
 
 div.medium-editor-media-picker button.media {
-  width: 44px;
-  height: 44px;
+  width: 24px;
+  height: 24px;
   background-position: 50%;
   background-size: 14px;
   background-repeat: no-repeat;
-  border-radius: 22px;
   padding: 0;
   float: left;
   opacity: 1;
@@ -21,6 +20,7 @@ div.medium-editor-media-picker button.media {
   border: none;
   background-color: transparent;
   overflow: visible;
+  margin-top: 0;
 }
 
 div.medium-editor-media-picker button.media.add-media-bt {
@@ -32,8 +32,8 @@ div.medium-editor-media-picker button.media.add-media-bt {
   float: left;
   margin-right: 0px;
   border-radius: 22px;
-  width: 44px;
-  height: 44px;
+  width: 24px;
+  height: 24px;
   opacity: 1;
 }
 
@@ -54,7 +54,7 @@ div.medium-editor-media-picker button.media.add-media-bt.expanded {
 
 div.medium-editor-media-picker div.media-picker-container {
     width: 0px;
-    height: 44px;
+    height: 24px;
     transition: width 0ms;
     float: left;
     position: relative;
@@ -62,24 +62,18 @@ div.medium-editor-media-picker div.media-picker-container {
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media {
-  background-color: #D8D8D8;
-  margin-left: 0px;
+  margin-left: 0;
   transform: rotate(0deg);
   transition: transform 0ms, margin-left 0ms, opacity 0ms;
   float: left;
-  top: 0px;
-  left: 0px;
-  position: absolute;
+  margin-right: 16px;
   opacity: 0;
+  width: 24px;
+  height: 24px;
 }
 
-div.medium-editor-media-picker div.media-picker-container button.media:hover,
-div.medium-editor-media-picker div.media-picker-container button.media.active {
-  background-color: #3FBD7C;
-}
-
-div.medium-editor-media-picker div.media-picker-container button.media:not(.media-0) {
-  top: -15px;
+div.medium-editor-media-picker div.media-picker-container button.media:last-child {
+  margin-right: 0;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-entry {
@@ -92,21 +86,30 @@ div.medium-editor-media-picker div.media-picker-container button.media-entry:hov
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-photo {
-  background-image: url("/img/ML/media_photo.png");
-  background-size: 14px;
+  background-image: url("/img/ML/media_photo.svg");
+  background-size: 16px 14px;
 }
 
-div.medium-editor-media-picker div.media-picker-container button.media-photo:hover {
-  background-image: url("/img/ML/media_photo_white.png");
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-photo:hover {
+  opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-gif {
+  background-image: url("/img/ML/media_gif.svg");
+  background-size: 24px 14px;
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-gif:hover {
+  opacity: 1;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-video {
-  background-image: url("/img/ML/media_video.png");
-  background-size: 14px;
+  background-image: url("/img/ML/media_video.svg");
+  background-size: 18px 12px;
 }
 
-div.medium-editor-media-picker div.media-picker-container button.media-video:hover {
-  background-image: url("/img/ML/media_video_white.png");
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-video:hover {
+  opacity: 1;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-chart {
@@ -137,53 +140,29 @@ div.medium-editor-media-picker div.media-picker-container button.media-divider:h
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-1 {
-  width: 52px;
+  width: 24px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-2 {
-  width: 104px;
+  width: 64px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-3 {
-  width: 156px;
+  width: 104px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-4 {
-  width: 208px;
+  width: 144px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-5 {
-  width: 260px;
+  width: 184px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-6 {
-  width: 312px;
+  width: 224px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded button.media {
-  opacity: 1;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-0 {
-  margin-left: 0px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-1 {
-  margin-left: 52px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-2 {
-  margin-left: 104px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-3 {
-  margin-left: 156px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-4 {
-  margin-left: 208px;
-}
-
-div.medium-editor-media-picker div.media-picker-container.expanded button.media.media-5 {
-  margin-left: 260px;
+  opacity: 0.5;
 }

@@ -98,7 +98,7 @@ div.reminders-container {
 
       div.reminders-header-title {
         margin-bottom: 16px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 22px;
         color: $deep_navy;
         line-height: 30px;
@@ -128,7 +128,7 @@ div.reminders-container {
 
         div.reminders-header-tab {
           position: relative;
-          @include avenir_B();
+          @include OC_Body_Bold();
           font-size: 13px;
           color: $ui_grey;
           text-transform: uppercase;
@@ -204,14 +204,14 @@ div.reminders-container {
           }
 
           div.empty-reminders-title {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 16px;
             color: $deep_navy;
             margin-top: 16px;
           }
 
           div.empty-reminders-description {
-            @include avenir_M();
+            @include OC_Body_Book();
             font-size: 14px;
             color: $ui_grey;
             margin-top: 4px;
@@ -224,7 +224,7 @@ div.reminders-container {
             border-radius: 6px;
             background-color: $carrot_green;
             color: white;
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 14px;
           }
         }
@@ -278,7 +278,7 @@ div.reminders-container {
               }
 
               div.reminder-title {
-                @include avenir_R();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $deep_navy;
                 line-height: 32px;
@@ -297,7 +297,7 @@ div.reminders-container {
                 span.dot {
                   color: $light_ui_grey;
                   font-size: 16px;
-                  @include avenir_M();
+                  @include OC_Body_Bold();
                 }
               }
 
@@ -308,7 +308,7 @@ div.reminders-container {
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 margin-left: 16px;
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 32px;
                 color: $grey_num_1;
@@ -363,7 +363,7 @@ div.reminders-container {
           }
 
           div.edit-reminder-label {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 12px;
             line-height: 16px;
             margin-top: 16px;
@@ -381,7 +381,7 @@ div.reminders-container {
 
             @include placeholder(){
               color: rgba($deep_navy, 0.5);
-              @include avenir_R();
+              @include OC_Body_Book();
               font-size: 14px;
               line-height: 22px;
             }
@@ -464,7 +464,7 @@ div.reminders-container {
             margin-top: 8px;
             outline: none;
             position: relative;
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 14px;
             line-height: 22px;
             cursor: pointer;
@@ -523,7 +523,7 @@ div.reminders-container {
               height: 32px;
               padding: 0;
               color: $carrot_orange_2;
-              @include avenir_R();
+              @include OC_Body_Bold();
               font-size: 14px;
 
               @include mobile() {
@@ -532,7 +532,7 @@ div.reminders-container {
             }
 
             &.cancel-bt {
-              @include avenir_R();
+              @include OC_Body_Bold();
               font-size: 14px;
               color: $ui_grey;
               padding: 0;
@@ -544,7 +544,7 @@ div.reminders-container {
               background-color: $carrot_green;
               border-radius: 6px;
               color: white;
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 14px;
 
               &.disabled {

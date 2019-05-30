@@ -7,7 +7,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.comment :as comment-utils]))
 
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
@@ -104,7 +105,7 @@
         delete (utils/link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defn post-new?
+(defn post-unseen?
   "An entry is new if its uuid is contained in container's unseen."
   [entry changes]
   (let [board-uuid (:board-uuid entry)
@@ -113,6 +114,14 @@
         user-id (jwt/user-id)]
     (and (utils/in? board-unseen (:uuid entry))
          (not= (:user-id (:publisher entry)) user-id))))
+
+(defn post-unread?
+  "An entry is new if its uuid is contained in container's unread."
+  [entry changes]
+  (let [board-uuid (:board-uuid entry)
+        board-change-data (get changes board-uuid {})
+        board-unread (:unread board-change-data)]
+    (utils/in? board-unread (:uuid entry))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
@@ -145,7 +154,8 @@
         body-thumbnail (html/first-body-thumbnail (:body entry-data))]
     (-> entry-data
       (assoc :content-type "entry")
-      (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+      (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+      (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
       (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
@@ -156,7 +166,8 @@
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
       (assoc :has-thumbnail body-thumbnail)
-      (assoc :body-thumbnail body-thumbnail))))
+      (assoc :body-thumbnail body-thumbnail)
+      (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
 (defn fix-board
   "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."

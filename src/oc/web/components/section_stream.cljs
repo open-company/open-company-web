@@ -20,9 +20,6 @@
             [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
 
-(defn- wrt-stream-item-mixin-cb [_ item-uuid]
-  (activity-actions/wrt-events-gate item-uuid))
-
 (rum/defcs section-stream < rum/static
                             rum/reactive
                             ;; Derivatives
@@ -32,8 +29,6 @@
                             (drv/drv :org-data)
                             ;; Mixins
                             mixins/first-render-mixin
-                            (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner.to-truncate"
-                             wrt-stream-item-mixin-cb)
                             section-mixins/container-nav-in
 
   [s]

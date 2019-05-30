@@ -19,6 +19,9 @@
 ;; Interaction location
 (def interaction-server-domain "http://localhost:3002")
 
+;; Change location
+(def change-server-domain "http://localhost:3006")
+
 ;; Search location
 (def search-server-domain "http://localhost:3007")
 (def search-enabled? true)
@@ -68,3 +71,6 @@
 
 ;; WS monitor
 (def ws-monitor-interval 30)
+
+;; Giphy
+(def giphy-api-key "M2FfNXledXWbpa7FZkg2vvUD8kHMTQVF")

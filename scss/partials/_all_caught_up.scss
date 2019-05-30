@@ -12,13 +12,13 @@ div.all-caught-up {
     background-size: 26px 33px;
     background-position: 52px 0px;
     background-repeat: no-repeat;
-    width: 130px;
+    width: 150px;
     height: 33px;
     margin: 0 auto;
     text-align: center;
 
     div.message {
-      @include avenir_R();
+      @include OC_Body_Bold();
       font-size: 14px;
       color: $carrot_light_gray_4;
       padding-top: 33px;

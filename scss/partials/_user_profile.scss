@@ -53,7 +53,7 @@ div.user-profile {
       }
 
       div.user-profile-mobile-header-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         color: $deep_navy;
         line-height: 20px;
@@ -113,14 +113,14 @@ div.user-profile {
       }
 
       div.user-profile-header-name {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 22px;
         color: $deep_navy;
         margin-left: 64px;
       }
 
       div.user-profile-header-role {
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 18px;
         color: $light_ui_grey;
         margin-left: 64px;
@@ -156,7 +156,7 @@ div.user-profile {
           margin: 0;
           padding: 0;
           cursor: pointer;
-          @include avenir_B();
+          @include OC_Body_Bold();
           font-size: 13px;
           color: $ui_grey;
           text-decoration: none;
@@ -195,7 +195,7 @@ div.user-profile {
       button {
         float: right;
         margin-left: 24px;
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 14px;
       }
 
@@ -204,7 +204,7 @@ div.user-profile {
         background-color: $carrot_green;
         border-radius: 6px;
         color: white;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
         height: 40px;
 
@@ -293,7 +293,7 @@ div.user-profile {
 
             span.user-avatar-upload-description {
               color: #a3a6ab;
-              @include avenir_BOOK();
+              @include OC_Body_Book();
               font-size: 14px;
               float: left;
               width: 100%;
@@ -318,7 +318,7 @@ div.user-profile {
           }
 
           div.user-profile-field-label {
-            @include avenir_H();
+            @include OC_Body_Bold();
             font-size: 12px;
             color: $deep_navy;
             margin-top: 32px;
@@ -360,7 +360,7 @@ div.user-profile {
 
               div.enable-slack {
                 display: block;
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 13px;
                 color: $deep_navy;
                 margin-top: 8px;
@@ -389,7 +389,7 @@ div.user-profile {
               button.user-type-btn {
                 width: 100%;
                 text-align: left;
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 18px;
                 color: $deep_navy;
@@ -407,7 +407,7 @@ div.user-profile {
 
               li {
                 width: 100%;
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 14px;
                 line-height: 20px;
                 color: $deep_navy;
@@ -423,7 +423,7 @@ div.user-profile {
               outline: none;
               padding: 10px 16px;
               position: relative;
-              @include avenir_M();
+              @include OC_Body_Book();
               font-size: 15px;
               color: $deep_navy;
 
@@ -432,7 +432,7 @@ div.user-profile {
               }
 
               @include placeholder() {
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 16px;
                 color: $carrot_light_gray;
               }

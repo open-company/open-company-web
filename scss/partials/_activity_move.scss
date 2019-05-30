@@ -1,72 +1,72 @@
 div.activity-move {
-  width: 310px;
-  height: 166px;
+  width: 192px;
+  height: 130px;
   z-index: 110;
 
   div.move-post-inner {
     background-color: white;
-    border: 1px solid rgba(177,184,192,0.50);
-    box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
-    border-radius: 5px;
-    padding: 10px 13px 6px 8px;
-    width: 310px;
-    height: 166px;
-    padding: 16px 28px;
+    border: 1px solid $mid_light_grey;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+    border-radius: 4px;
+    padding: 16px;
+    width: 100%;
+    height: 130px;
     position: relative;
 
     div.move-post-title {
-      @include avenir_H();
-      font-size: 12px;
-      color: $oc_gray_7;
-
-      i.mdi:before {
-        opacity: 0.7;
-        font-size: 14px;
-        margin-left: 8px;
-      }
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $light_navy;
+      line-height: 18px;
     }
 
     div.select-new-board {
-      margin-top: 16px;
-      width: 250px;
-      height: 40px;
-      border: 1px solid $carrot_light_gray_1;
+      margin-top: 8px;
+      width: 100%;
+      height: 32px;
       border-radius: 4px;
-      @include avenir_R();
+      background-color: $ultra_light_grey;
+      @include OC_Body_Book();
       font-size: 14px;
-      color: $carrot_dark_gray;
-      padding: 8px 12px;
+      color: $deep_navy;
+      padding: 7px 8px;
+      background-image: cdnUrl("/img/ML/select_arrows.svg");
+      background-size: 8px 10px;
+      background-position: top 11px right 8px;
+      background-repeat: no-repeat;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &.placeholder{
-        color: rgba($carrot_dark_gray, 0.5);
-      }
-
-      &:after {
-        font-family: "Material Design Icons";
-        content: "\f140";
-        float: right;
-        font-size: 16px;
+        color: rgba($deep_navy, 0.4);
       }
     }
 
     div.boards-list {
       position: absolute;
-      left: 28px;
-      top: 89px;
-      width: 250px;
-      border: 1px solid $carrot_light_gray_1;
+      left: 16px;
+      top: 80px;
+      width: 160px;
+      border: 1px solid $ultra_light_grey;
       border-radius: 4px;
       background-color: white;
+      padding: 8px 0;
       z-index: 112;
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 300px;
 
       div.board-item {
-        height: 40px;
-        @include avenir_R();
+        height: 32px;
+        @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_dark_gray;
+        color: $deep_navy;
         cursor: pointer;
-        padding: 8px;
+        padding: 7px 8px;
         background-color: white;
+        overflow: hidden;
+        max-width: 100%;
+        text-overflow: ellipsis;
 
         &.disabled {
           opacity: 0.4;
@@ -79,10 +79,14 @@ div.activity-move {
     }
 
     button {
-      margin-top: 16px;
-      float: right;
-      margin-left: 16px;
-      height: 40px;
+      margin-top: 8px;
+      border-radius: 4px;
+      height: 32px;
+      background-color: $carrot_green;
+      color: white;
+      @include OC_Body_Bold;
+      font-size: 14px;
+      width: 100%;
     }
   }
 }

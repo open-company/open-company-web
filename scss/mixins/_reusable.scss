@@ -43,6 +43,8 @@
   &:-moz-placeholder           {@content}
   &::-moz-placeholder          {@content}
   &:-ms-input-placeholder      {@content}
+  &:placeholder                {@content}
+  &::placeholder               {@content}
 }
 
 @mixin pillbox(){
@@ -57,7 +59,7 @@
     color: rgba(78, 90, 107, 0.5);
     cursor: pointer;
     text-transform: uppercase;
-    @include avenir_M();
+    @include OC_Body_Bold();
 
     &.active {
       background-color: #ffffff;
@@ -109,7 +111,7 @@
     font-size: $font_size;
     line-height: 1.8;
     color: $text_color;
-    @include avenir_M();
+    @include OC_Body_Bold();
 
     a {
       cursor: pointer;
@@ -124,7 +126,7 @@
 
   h1, h2, h3, h4, h5 {
     text-size: 19px;
-    @include avenir_M();
+    @include OC_Body_Bold();
   }
 
   ul {
@@ -191,7 +193,7 @@
       width: #{$size}px;
       height: #{$size}px;
       border-radius: 50%;
-      vertical-align: middle;
+      vertical-align: top;
       object-fit: cover;
     }
 

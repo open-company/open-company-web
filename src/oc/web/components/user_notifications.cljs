@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.ui :refer (ui-compose)]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
@@ -27,7 +28,8 @@
                                    (close-tray s))))
   [s]
   (let [user-notifications-data (drv/react s :user-notifications)
-        has-new-content (has-new-content? user-notifications-data)]
+        has-new-content (has-new-content? user-notifications-data)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.user-notifications
       [:button.mlb-reset.notification-bell-bt
         {:class (utils/class-set {:new has-new-content
@@ -38,13 +40,25 @@
       [:div.user-notifications-tray
         {:class (utils/class-set {:hidden-tray (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group
-          [:button.mlb-reset.user-notifications-tray-mobile-close
-            {:on-click #(user-actions/hide-mobile-user-notifications)}]
-          [:div.title "Notifications"]
-          (when has-new-content
+          (when-not has-new-content
             [:button.mlb-reset.all-read-bt
-              {:on-click #(user-actions/read-notifications)}
-              "Mark all as read"])]
+              {:on-click #(user-actions/read-notifications)
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title "Mark all as read"}])
+          [:div.title "Notifications"]
+          (if is-mobile?
+            [:button.mlb-reset.user-notifications-tray-mobile-close
+              {:on-click #(user-actions/hide-mobile-user-notifications)}]
+            [:button.mlb-reset.notification-settings-bt
+              {:on-click #(do
+                            (close-tray s)
+                            (nav-actions/show-user-settings :notifications))
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title "Notification settings"}])]
         [:div.user-notifications-tray-list
           (if (empty? user-notifications-data)
             [:div.user-notifications-tray-empty
@@ -70,38 +84,21 @@
               [:div.user-notification.group
                 {:class (utils/class-set {:unread (:unread n)})
                  :on-click (fn [e]
-                             (cond
-                               (and reminder?
-                                    (= notification-type "reminder-alert"))
-                               (ui-compose @(drv/get-ref s :show-add-post-tooltip))
-                               (and reminder?
-                                    (= notification-type "reminder-notification"))
-                               (nav-actions/show-reminders)
-                               (and entry-uuid
-                                    board-slug
-                                    (not (utils/event-inside? e (rum/ref-node s :read-bt))))
-                               (router/nav! (oc-urls/entry board-slug entry-uuid)))
+                             (when (fn? (:click n))
+                               ((:click n)))
                              (user-actions/hide-mobile-user-notifications))
                  :key children-key}
                 (user-avatar-image (:author n))
                 [:div.user-notification-title
                   (:title n)]
-                [:div.user-notification-body.oc-mentions.oc-mentions-hover
-                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]
                 [:div.user-notification-time-since
                   [:time
                     {:date-time (:created-at n)
                      :data-toggle "tooltip"
                      :data-placement "top"
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-string (utils/js-date (:created-at n)))}
-                    (utils/time-since (:created-at n))]]
-                (when (:unread n)
-                  [:button.mlb-reset.read-bt
-                    {:title "Mark as read"
-                     :ref :read-bt
-                     :data-toggle "tooltip"
-                     :data-placement "top"
                      :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :on-click #(user-actions/read-notification n)}])]))]]]))
+                     :data-title (utils/tooltip-date (:created-at n))}
+                    (utils/time-since (:created-at n) [:short])]]
+                [:div.user-notification-body.oc-mentions.oc-mentions-hover
+                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))]]]))

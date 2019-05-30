@@ -19,7 +19,7 @@
                                     "hello@carrot.io"]
                                   "."]
                         :solid-button-style :red
-                        :solid-button-title "Ok, got it!"
+                        :solid-button-title "OK, got it!"
                         :solid-button-cb #(alert-modal/hide-alert)}]
         (alert-modal/show-alert alert-data)))))
 

@@ -1,0 +1,251 @@
+div.edit-recurring-update-modal-container {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.edit-recurring-update-modal {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    div.edit-recurring-update-modal-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      div.edit-recurring-update-modal-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.save-bt {
+        height: 32px;
+        padding: 7px 14px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: white;
+        line-height: 18px;
+        float: right;
+        border-radius: 6px;
+
+        &.disabled {
+          cursor: not-allowed;
+          opacity: 0.5;
+        }
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+        margin-right: 8px;
+      }
+    }
+
+    div.edit-recurring-update-body {
+      margin: 24px auto 0;
+      @include OC_Body_Book();
+      font-size: 14px;
+
+      div.field-label {
+        margin-top: 16px;
+        color: $light_navy;
+      }
+
+      div.dropdown-container {
+        position: relative;
+
+        &.users-list {
+          top: 40px;
+
+          &.loading-users {
+            &:after {
+              display: none;
+            }
+          }
+
+          div.small-loading {
+            position: absolute;
+            right: 16px;
+            top: 10px;
+            margin: 0;
+          }
+        }
+      }
+
+      div.loading-users {
+        height: 32px;
+      }
+
+      input.field-value, div.field-value {
+        width: 100%;
+        height: 32px;
+        background: $ultra_light_grey;
+        border-radius: 4px;
+        padding: 7px 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        margin-top: 8px;
+        border: none;
+        outline: none;
+
+        @include placeholder(){
+          color: rgba($deep_navy, 0.4);
+        }
+
+        &:focus, &:active {
+          border: none;
+          outline: none;
+        }
+
+        &.not-allowed {
+          cursor: not-allowed;
+        }
+      }
+
+      div.dropdown-field-value {
+        background-image: cdnUrl("/img/ML/select_arrows.svg");
+        background-size: 8px 10px;
+        background-position: top 11px right 8px;
+        background-repeat: no-repeat;
+        cursor: pointer;
+
+        &.placeholder {
+          color: rgba($deep_navy, 0.4);
+        }
+      }
+
+      select.field-value {
+        width: 100%;
+        height: 32px;
+        border-radius: 4px;
+        padding: 7px 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        margin-top: 8px;
+        display: block;
+        border: none;
+        outline: none;
+        display: block;
+        appearance: none;
+        -webkit-appearance: none;
+        background-color: $ultra_light_grey;
+        position: relative;
+        background-image: cdnUrl("/img/ML/select_arrows.svg");
+        background-size: 8px 10px;
+        background-position: top 11px right 8px;
+        background-repeat: no-repeat;
+      
+        &::-ms-expand {
+          display: none;
+        }
+
+        &:hover {
+          border-color: #888;
+        }
+
+        &:focus {
+          border-color: none;
+          box-shadow: none;
+          outline: none;
+        }
+
+        option {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+        }
+      }
+
+      div.dropdown-list-container {
+        width: 100%;
+        left: 0;
+        top: 8px;
+        border-radius: 4px;
+        margin-top: 0;
+
+        div.dropdown-list-content {
+          margin-top: 0;
+          max-height: 190px;
+          overflow-y: auto;
+
+          ul.dropdown-list {
+            li.dropdown-list-item {
+              color: $deep_navy;
+              opacity: 0.8;
+              padding: 5px 4px 3px;
+
+              &.selected, &:hover {
+                color: $deep_navy;
+                opacity: 1;
+              }
+
+              &.disabled {
+                color:$deep_navy;
+                opacity: 0.4;
+              }
+            }
+          }
+        }
+
+        div.triangle {
+          display: none;
+        }
+      }
+
+      div.edit-recurring-update-footer {
+        margin-top: 16px;
+        height: 24px;
+        border-top: 1px solid rgba($deep_tan, 0.3);
+        padding-top: 16px;
+
+        button.delete-bt {
+          height: 18px;
+          float: left;
+          width: 160px;
+          color: $carrot_orange_2;
+          @include OC_Body_Book();
+          font-size: 14px;
+          text-align: left;
+          margin: 0;
+          padding: 0;
+        }
+      }
+    }
+  }
+}

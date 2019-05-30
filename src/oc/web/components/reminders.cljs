@@ -106,7 +106,7 @@
           [:div.half-row-right
             [:div.edit-reminder-label
               "To update the team about"]
-            [:input.edit-reminder-field
+            [:input.edit-reminder-field.oc-input
               {:value (:headline reminder-data)
                :ref :reminder-title
                :type "text"
@@ -272,7 +272,6 @@
                        (drv/drv :show-reminders)
                        (drv/drv :reminders-data)
                        (drv/drv :reminder-edit)
-                       (drv/drv :qsg)
                        {:did-mount (fn [s]
                          (reminder-actions/load-reminders-roster)
                          (reminder-actions/load-reminders)
@@ -285,10 +284,8 @@
         reminders-data (drv/react s :reminders-data)
         reminder-edit-data (drv/react s :reminder-edit)
         can-add-reminder? (utils/link-for (:links reminders-data) "create")
-        is-mobile? (responsive/is-tablet-or-mobile?)
-        qsg-data (drv/react s :qsg)]
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.reminders-container.fullscreen-page
-      {:class (when (:visible qsg-data) "showing-qsg")}
       [:div.reminders-inner
         {:class (utils/class-set {:no-bottom-padding (= reminder-tab :reminders)
                                   :loading (not reminders-data)})}
@@ -299,7 +296,7 @@
                       "back-arrow")
              :on-click (fn [_]
                         (let [mobile-back-action #(when is-mobile?
-                                                    (nav-actions/mobile-menu-toggle))]
+                                                    (nav-actions/menu-toggle))]
                           (cancel-clicked reminder-edit-data
                            ;; On mobile the X goes back to the list of reminders
                            ;; on desktop it always dismiss the reminders modal

@@ -21,7 +21,6 @@
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
-            [oc.web.stores.qsg]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
@@ -162,18 +161,21 @@
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:main :team :invite} (keyword (:org-settings query-params))))
+                              (#{:org :team :invite :integrations} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and (not org-settings)
                              (contains? query-params :reminders))
                     :reminders)
+        panel-stack (cond
+                      org-settings [org-settings]
+                      user-settings [user-settings]
+                      reminders [reminders]
+                      :else [])
         bot-access (when (contains? query-params :access)
                       (:access query-params))
         next-app-state {:loading loading
                         :ap-initial-at (when has-at-param (:at query-params))
-                        :org-settings org-settings
-                        :user-settings user-settings
-                        :show-reminders reminders
+                        :panel-stack panel-stack
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
 

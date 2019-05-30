@@ -1,9 +1,7 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :refer-macros (sel1)]
-            [goog.events :as events]
-            [goog.events.EventType :as EventType]
+            [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -12,42 +10,31 @@
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.user :as user-utils]
+            [oc.web.utils.org :as org-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.more-menu :refer (more-menu)]
-            [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.stream-comments :refer (stream-comments)]
+            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]
-            [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
-            [oc.web.components.ui.ziggeo :refer (ziggeo-player)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
-(defn expand [s expand? & [scroll-to-comments?]]
-  (reset! (::expanded s) expand?)
-  (when (and expand?
-             scroll-to-comments?)
-    (reset! (::should-scroll-to-comments s) true))
-  (when expand?
-    ;; When expanding a post send the WRT read
-    (activity-actions/send-item-read (:uuid (first (:rum/args s)))))
-  (when-not expand?
-    (reset! (::should-scroll-to-card s) true)))
-
-(defn should-show-continue-reading? [s]
+(defn- check-item-ready
+  "After component is mounted/re-mounted "
+  [s]
   (let [activity-data (first (:rum/args s))
         $item-body (js/$ (rum/ref-node s "activity-body"))
         comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
     (when (or (.hasClass $item-body "ddd-truncated")
-              (> (count (:attachments activity-data)) 3)
+              (pos? (count (:attachments activity-data)))
               (pos? (count comments-data))
-              (:body-has-images activity-data)
+              (:body-thumbnail activity-data)
               (:fixed-video-id activity-data))
       (reset! (::truncated s) true))
     (reset! (::item-ready s) true)))
@@ -60,76 +47,44 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- item-mounted [s]
+  (let [activity-data (first (:rum/args s))
+        comments-data @(drv/get-ref s :comments-data)]
+    (comment-actions/get-comments-if-needed activity-data comments-data)))
+
 (rum/defcs stream-item < rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
-                         (drv/drv :add-comment-focus)
                          (drv/drv :comments-data)
-                         (drv/drv :show-post-added-tooltip)
+                         (drv/drv :activity-share-container)
                          ;; Locals
-                         (rum/local false ::expanded)
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
-                         (rum/local false ::should-scroll-to-comments)
-                         (rum/local false ::should-scroll-to-card)
-                         (rum/local false ::more-menu-open)
-                         (rum/local false ::hovering-tile)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin "activity-body" (* 30 3))
-                         am/truncate-comments-mixin
+                         (am/truncate-element-mixin :abstract (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
-                           (let [single-post-view (boolean (seq (router/current-activity-id)))]
-                             (reset! (::expanded s) single-post-view))
                            s)
                           :did-mount (fn [s]
-                           (should-show-continue-reading? s)
-                           (let [activity-uuid (:uuid (first (:rum/args s)))]
-                             (when (= (router/current-activity-id) activity-uuid)
-                               (activity-actions/send-item-read activity-uuid)))
+                           (item-mounted s)
+                           (check-item-ready s)
                            s)
                           :did-remount (fn [_ s]
-                           (should-show-continue-reading? s)
-                           s)
-                          :after-render (fn [s]
-                           (let [activity-data (first (:rum/args s))
-                                 comments-data @(drv/get-ref s :comments-data)]
-                             (comment-actions/get-comments-if-needed activity-data comments-data)
-                             (when @(::should-scroll-to-comments s)
-                               (let [actual-comments-count (count (au/get-comments activity-data comments-data))
-                                     dom-node (rum/dom-node s)]
-                                ;; Commet out the scroll to comments for the moment
-                                (utils/scroll-to-y
-                                 (- (.-top (.offset (js/$ (rum/ref-node s "stream-item-reactions"))))
-                                  206) 180)
-                                (when (zero? actual-comments-count)
-                                  (.focus (.find (js/$ dom-node) "div.add-comment"))))
-                               (reset! (::should-scroll-to-comments s) false)))
-                           (when @(::should-scroll-to-card s)
-                             (utils/after 180
-                              #(let [dom-node (rum/dom-node s)]
-                                 (when-not (au/is-element-top-in-viewport? dom-node 32)
-                                   (utils/scroll-to-y
-                                    (- (.-top (.offset (js/$ dom-node))) responsive/navbar-height 16) 80))))
-                             (reset! (::should-scroll-to-card s) false))
+                           (item-mounted s)
+                           (check-item-ready s)
                            s)}
   [s activity-data read-data]
-  (let [single-post-view (boolean (seq (router/current-activity-id)))
-        org-data (drv/react s :org-data)
+  (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         truncated? @(::truncated s)
-        expanded? @(::expanded s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
-        comments-drv (drv/react s :comments-data)
-        comments-data (au/get-comments activity-data comments-drv)
+        _ (drv/react s :comments-data)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
-        is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
@@ -144,174 +99,142 @@
                      (if is-mobile?
                        {:width (win-width)
                         :height @(::mobile-video-height s)}
-                       {:width (if expanded? 638 136)
-                        :height (if expanded? (utils/calc-video-height 638) (utils/calc-video-height 136))}))
+                       {:width 136
+                        :height (utils/calc-video-height 136)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
                              is-published?)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
-                                :show-continue-reading truncated?
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :new-item (:new activity-data)
-                                :single-post-view single-post-view})
+                                :unseen-item (:unseen activity-data)
+                                :unread-item (:unread activity-data)
+                                :expandable is-published?
+                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        ;; click on the whole tile only for draft editing
-       :on-click #(when (and is-drafts-board
-                             (not is-mobile?))
-                   (activity-actions/activity-edit activity-data))
+       :on-click (fn [e]
+                   (if is-drafts-board
+                     (activity-actions/activity-edit activity-data)
+                     (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                           stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
+                           emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
+                           attachments-el (rum/ref-node s :stream-item-attachments)]
+                       (when (and ;; More menu wasn't clicked
+                                  (not (utils/event-inside? e more-menu-el))
+                                  ;; WRT wasn't clicked 
+                                  (not (utils/event-inside? e stream-item-wrt-el))
+                                  ;; Attachments wasn't clicked
+                                  (not (utils/event-inside? e attachments-el))
+                                  ;; Emoji picker wasn't clicked
+                                  (not (utils/event-inside? e emoji-picker))
+                                  ;; a button wasn't clicked
+                                  (not (utils/button-clicked? e))
+                                  ;; No input field clicked
+                                  (not (utils/input-clicked? e)))
+                         (routing-actions/open-post-modal activity-data)))))
        :id dom-element-id}
-      [:div.stream-item-header.group
-        [:div.stream-header-head-author
-          (user-avatar-image publisher)
-          [:div.name
-            [:div.name-inner
-              {:class utils/hide-class}
-              (str
-               (:name publisher)
-               " in "
-               (:board-name activity-data))]
-            [:div.must-see-tag.big-web-tablet-only "Must see"]
-            [:div.new-tag.big-web-tablet-only "NEW"]]
-          [:div.time-since
-            (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/time-since t)])]
-          (when should-show-wrt
-            [:div.separator])
-          (when should-show-wrt
-            [:div.stream-item-wrt
-              (wrt-count activity-data read-data)
-              (when (and (not is-mobile?)
-                         (= (drv/react s :show-post-added-tooltip) (:uuid activity-data)))
-                [:div.post-added-tooltip-container.group
-                  [:div.post-added-tooltip-top-arrow]
-                  [:button.mlb-reset.post-added-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-post-added-tooltip)}]
-                  [:div.post-added-tooltips
-                    [:div.post-added-tooltip
-                      (if (user-utils/is-org-creator? org-data)
-                        "After you invite your team, you'll know who saw this post."
-                        "Here's where you'll know who saw this post.")]
-                    [:button.mlb-reset.post-added-bt
-                      {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                      "OK, got it"]]])])]
-        (when (and is-published?
-                   is-mobile?)
-          (more-menu activity-data dom-element-id
-           {:external-share (not is-mobile?)}))]
-      [:div.must-see-tag.mobile-only "Must see"]
-      [:div.new-tag.mobile-only "NEW"]
-      [:div.stream-item-body-ext.group
-        {:class (when expanded? "expanded")}
-        [:div.thumbnail-container.group
-          {:on-click #(when (and ;; it's not a draft
-                                 (not is-drafts-board)
-                                 ;; it's truncated
-                                 truncated?
-                                 ;; it's not already expanded
-                                 (not expanded?)
-                                 ;; click is not on a Ziggeo video to play it inline
-                                 (not (utils/event-inside? % (rum/ref-node s :ziggeo-player))))
-                          (expand s true))}
-          (if has-video
-            [:div.group
-             {:key (str "ziggeo-player-" (:fixed-video-id activity-data) "-" (if expanded? "exp" ""))
-              :ref :ziggeo-player}
-             (ziggeo-player {:video-id (:fixed-video-id activity-data)
-                             :width (:width video-size)
-                             :height (:height video-size)
-                             :lazy (not video-player-show)
-                             :video-image (:video-image activity-data)
-                             :video-processed (:video-processed activity-data)
-                             :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})]
-            (when (:body-thumbnail activity-data)
-              [:div.body-thumbnail
-                {:class (:type (:body-thumbnail activity-data))
-                 :data-image (:thumbnail (:body-thumbnail activity-data))
-                 :style {:background-image (str "url(\"" (:thumbnail (:body-thumbnail activity-data)) "\")")}}]))
-          [:div.stream-body-left.group
-            {:class (utils/class-set {:has-thumbnail (and (:has-thumbnail activity-data) (not expanded?))
-                                      :has-video (:fixed-video-id activity-data)
-                                      utils/hide-class true})}
-            [:div.stream-item-headline.ap-seen-item-headline
-              {:ref "activity-headline"
-               :data-itemuuid (:uuid activity-data)
-               :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-            [:div.stream-item-body-container
-              [:div.stream-item-body
-                {:class (utils/class-set {:expanded expanded?
-                                          :wrt-item-ready @(::item-ready s)})}
-                [:div.stream-item-body-inner.to-truncate.oc-mentions.oc-mentions-hover
-                  {:ref "activity-body"
+      [:div.stream-item-inner
+        [:div.stream-item-header.group
+          [:div.stream-header-head-author
+            (user-avatar-image publisher)
+            [:div.name
+              [:div.name-inner
+                {:class utils/hide-class}
+                (str
+                 (:name publisher)
+                 " in "
+                 (:board-name activity-data))]
+              [:div.must-see-tag.big-web-tablet-only]]]
+          [:div.activity-share-container]
+          (when is-published?
+            (more-menu activity-data dom-element-id
+             {:external-share (not is-mobile?)
+              :show-edit? true
+              :show-delete? true
+              :show-move? (not is-mobile?)
+              :show-unread (not (:unread activity-data))}))]
+        [:div.must-see-tag.mobile-only]
+        [:div.new-tag.mobile-only "NEW"]
+        [:div.stream-item-body-ext.group
+          [:div.thumbnail-container.group
+            (if has-video
+              [:div.group
+               {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
+                :ref :ziggeo-player}
+               (ziggeo-player {:video-id (:fixed-video-id activity-data)
+                               :width (:width video-size)
+                               :height (:height video-size)
+                               :lazy (not video-player-show)
+                               :video-image (:video-image activity-data)
+                               :video-processed (:video-processed activity-data)
+                               :playing-cb #(activity-actions/send-item-read (:uuid activity-data))})]
+              (when (:body-thumbnail activity-data)
+                [:div.body-thumbnail-wrapper
+                  {:class (:type (:body-thumbnail activity-data))}
+                  [:img.body-thumbnail
+                    {:data-image (:thumbnail (:body-thumbnail activity-data))
+                     :src (:thumbnail (:body-thumbnail activity-data))}]]))
+            [:div.stream-body-left.group
+              {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
+                                        :has-video (:fixed-video-id activity-data)
+                                        utils/hide-class true})}
+              [:div.stream-item-headline.ap-seen-item-headline
+                {:ref "activity-headline"
+                 :data-itemuuid (:uuid activity-data)
+                 :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+              (let [has-abstract (seq (:abstract activity-data))]
+                [:div.stream-item-body
+                  {:class (utils/class-set {:no-abstract (not has-abstract)
+                                            :item-ready @(::item-ready s)
+                                            :truncated truncated?})
                    :data-itemuuid (:uuid activity-data)
-                   :class (utils/class-set {:hide-images (and truncated? (not expanded?))
-                                            :wrt-truncated truncated?
-                                            :wrt-expanded expanded?})
-                   :dangerouslySetInnerHTML (utils/emojify (:stream-view-body activity-data))}]
-                [:div.stream-item-body-inner.no-truncate.oc-mentions.oc-mentions-hover
-                  {:ref "full-activity-body"
-                   :data-itemuuid (:uuid activity-data)
-                   :class (utils/class-set {:wrt-truncated truncated?
-                                            :wrt-expanded expanded?})
-                   :dangerouslySetInnerHTML (utils/emojify (:body activity-data))}]]]]
-          (when (and ls/oc-enable-transcriptions
-                     expanded?
-                     (:video-transcript activity-data))
-            [:div.stream-item-transcript
-              [:div.stream-item-transcript-header
-                "This transcript was automatically generated and may not be accurate"]
-              [:div.stream-item-transcript-content
-                (:video-transcript activity-data)]])]
-          (stream-attachments activity-attachments
-           (when (and truncated? (not expanded?))
-             #(expand s true)))
-          (if is-drafts-board
-            [:div.stream-item-footer.group
-              [:div.stream-body-draft-edit
-                [:button.mlb-reset.edit-draft-bt
-                  {:on-click #(activity-actions/activity-edit activity-data)}
-                  "Continue editing"]]
-              [:div.stream-body-draft-delete
-                [:button.mlb-reset.delete-draft-bt
-                  {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
-                  "Delete draft"]]]
-            [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"}
-              [:div.stream-item-comments-summary
-                {:on-click #(expand s true true)}
-                (comments-summary activity-data true)]
-              (reactions activity-data)])]
-        (when (and expanded?
-                   (:has-comments activity-data))
-          [:div.stream-body-right
-            [:div.stream-body-comments
-              {:class (when (drv/react s :add-comment-focus) "add-comment-expanded")}
-              (stream-comments activity-data comments-data true)
-              (when (:can-comment activity-data)
-                (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])
-        (when-not is-drafts-board
-          [:div.stream-item-bottom-footer.group
-            {:class (when expanded? "expanded")}
-            [:button.mlb-reset.expand-button
-              {:class (when expanded? "expanded")
-               :ref :expand-button
-               :on-click #(when-not expanded?
-                            (expand s true))
-               :on-mouse-down #(when expanded?
-                                (expand s false))}
-              [:span.expand-icon]
-              [:span.expand-label
-                (if expanded?
-                  "Show less"
-                  "Show more")]]
-            [:div.activity-share-container]
-            (when (and is-published?
-                       (not is-mobile?))
-              (more-menu activity-data dom-element-id
-               {:external-share (not is-mobile?)}))])]))
+                   :ref :abstract
+                   :dangerouslySetInnerHTML {:__html (if has-abstract
+                                                       (:abstract activity-data)
+                                                       (:body activity-data))}}])]]
+            (if is-drafts-board
+              [:div.stream-item-footer.group
+                [:div.stream-body-draft-edit
+                  [:button.mlb-reset.edit-draft-bt
+                    {:on-click #(activity-actions/activity-edit activity-data)}
+                    "Continue editing"]]
+                [:div.stream-body-draft-delete
+                  [:button.mlb-reset.delete-draft-bt
+                    {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
+                    "Delete draft"]]]
+              [:div.stream-item-footer.group
+                {:ref "stream-item-reactions"}
+                [:div.stream-item-comments-summary
+                  ; {:on-click #(expand s true true)}
+                  (comments-summary activity-data true)]
+                (reactions activity-data)
+                (when should-show-wrt
+                  [:div.stream-item-wrt
+                    {:ref :stream-item-wrt}
+                    (wrt-count activity-data read-data)])
+                (when (seq activity-attachments)
+                  [:div.stream-item-attachments
+                    {:ref :stream-item-attachments}
+                    [:div.stream-item-attachments-count
+                      (count activity-attachments) " Attachment" (when (> (count activity-attachments) 1) "s")]
+                    [:div.stream-item-attachments-list
+                      (for [atc activity-attachments]
+                        [:a.stream-item-attachments-item
+                          {:href (:file-url atc)
+                           :target "_blank"}
+                          [:div.stream-item-attachments-item-desc
+                            [:span.file-name
+                              (:file-name atc)]
+                            [:span.file-size
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])
+                [:div.time-since
+                  (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                    [:time
+                      {:date-time t
+                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                       :data-title (str "Posted on " (utils/tooltip-date (:published-at activity-data)))}
+                      (utils/foc-date-time t)])]])]]]))

@@ -18,6 +18,8 @@
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     [:title "Carrot | Leadership communication for fast-growing and remote teams."]
+    (pages/circular-book-font)
+    (pages/circular-bold-font)
     pages/google-fonts
     pages/bootstrap-css
     ;; Local css
@@ -30,8 +32,6 @@
       <script src=\"//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js\"></script>
       <script src=\"//oss.maxcdn.com/respond/1.4.2/respond.min.js\"></script>
     <![endif]-->"
-    ;; CarrotKit Font
-    [:link {:type "text/css" :rel "stylesheet" :href (pages/cdn "/css/fonts/CarrotKit.css")}]
     pages/font-awesome
     ;; Favicon
     [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]

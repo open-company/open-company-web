@@ -1,15 +1,16 @@
 div.carrot-checkbox {
   display: block-inline;
   border-radius: 2px;
-  border: 1.5px solid $carrot_light_gray;
+  border: 1.5px solid #848D95;
   width: 16px;
   height: 16px;
+  cursor: pointer;
 
   &.selected {
-    border: 1.5px solid $carrot_text_blue;
-    background-color: $carrot_text_blue;
+    border: 1.5px solid $carrot_green;
+    background-color: $carrot_green;
     background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
-    background-size: 14px 11px;
+    background-size: 10px 8px;
     background-repeat: no-repeat;
     background-position: center;
   }

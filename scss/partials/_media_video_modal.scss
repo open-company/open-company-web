@@ -1,114 +1,64 @@
 div.media-video-modal-container {
   position: absolute;
-  top: -98px;
-  left: -129px;
+  top: 0;
+  right: 0;
+  margin-left: -275px;
   z-index: #{$navbar_zindex + 126};
-  width: 550px;
-  height: 72px;
+  width: 272px;
+  height: 153px;
   background-color: white;
-  border: 1px solid $deep_tan;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.10);
+  border: 1px solid $mid_light_grey;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
   padding: 16px;
 
-  &.video-url-focused {
-    input {
-      width: 396px;
-      border-top: 1px solid rgba(177,184,192,0.50);
-      border-left: 1px solid rgba(177,184,192,0.50);
-      border-bottom: 1px solid rgba(177,184,192,0.50);
-      border-right: none;
-      border-top-left-radius: 4px;
-      border-bottom-left-radius: 4px;
-      border-top-right-radius: 0px;
-      border-bottom-right-radius: 0px;
-    }
-
-    span.middle-or {
-      opacity: 0;
-    }
-
-    button.embed-video-bt {
-      display: block;
-    }
-
-    button.record-video-bt {
-      display: none;
-    }
+  div.media-video-modal-title {
+    @include OC_Body_Book();
+    font-size: 14px;
+    color: $light_navy;
   }
 
   input {
-    width: 307px;
-    height: 40px;
-    border-radius: 4px;
-    background-color: white;
-    border: 1px solid rgba(177,184,192,0.50);
-    padding: 10px 17px;
-    @include avenir_R();
+    width: 100%;
+    height: 32px;
+    margin-top: 8px;
+    background-color: $ultra_light_grey;;
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 24px;
     color: $deep_navy;
-    outline: none;
-    padding: 9px 12px;
+    border-radius: 4px;
+    padding: 7px 8px;
     float: left;
+    outline: none;
+    border: none;
 
     @include placeholder(){
-      color: $carrot_light_gray;
+      color: rgba($deep_navy, 0.5);
     }
-  }
-
-  span.middle-or {
-    @include avenir_R();
-    font-size: 14px;
-    color: $deep_navy;
-    margin-left: 16px;
-    margin-right: 16px;
-    line-height: 40px;
-    opacity: 0.5;
-    vertical-align: middle;
-    float: left;
   }
 
   button.embed-video-bt {
-    display: none;
-
-    width: 120px;
-    height: 40px;
-    background-color: $carrot_green;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    color: white;
-    @include avenir_H();
-    font-size: 14px;
-    float: left;
-
-    &.disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-  }
-
-  button.record-video-bt {
-    width: 160px;
-    height: 40px;
+    width: 100%;
+    height: 32px;
     background-color: $carrot_green;
     border-radius: 4px;
     color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 14px;
-    float: left;
+    margin-top: 8px;
 
-    span.white-video-icon {
-      width: 18px;
-      height: 12px;
-      background-image: cdnUrl("/img/ML/white_video_icon.svg");
-      background-position: center;
-      background-size: 18px 12px;
-      background-repeat: no-repeat;
-      margin-right: 6px;
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 1;
     }
+  }
+
+  div.media-video-description {
+    margin-top: 8px;
+    text-align: center;
+    @include OC_Body_Book();
+    font-size: 12px;
+    color: rgba($light_navy, 0.5);
+    line-height: 15px;
   }
 }

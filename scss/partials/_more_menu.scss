@@ -1,18 +1,14 @@
 div.more-menu {
   float: right;
   width: auto;
-  height: 32px;
+  height: 26px;
   transform: opacity 180ms ease-in;
   opacity: 1;
   position: relative;
 
-  @include mobile() {
-    width: 30px;
-  }
-
   div.activity-move {
     position: absolute;
-    bottom: 32px;
+    top: 24px;
     left: unset;
     right: -9px;
 
@@ -23,37 +19,26 @@ div.more-menu {
   }
 
   button.more-menu-bt {
-    height: 32px;
+    height: 26px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
     background-size: 18px 4px;
     background-position: left center;
     padding: 0 0 0 24px;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.5;
 
     @include mobile() {
       width: 32px;
     }
 
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_active.svg");
-    }
-
-    @include mobile() {
-      background-image: cdnUrl("/img/ML/more_menu_icon.svg");
-      background-size: 32px 32px;
-      background-position: center;
-      padding: 0;
-
-      &:hover, &:active, &:focus {
-        background-image: cdnUrl("/img/ML/more_menu_icon_active.svg");
-      }      
+      opacity: 1;
     }
   }
 
   button.more-menu-share-bt {
-    height: 32px;
+    height: 24px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_share_arrow.svg");
     background-size: 16px 14px;
@@ -62,41 +47,36 @@ div.more-menu {
     background-repeat: no-repeat;
     margin-left: 16px;
     display: inline-block;
-    opacity: 1;
+    opacity: 0.5;
 
     @include mobile() {
       width: 32px;
     }
 
     &:hover, &:active, &:focus {
-      background-image: cdnUrl("/img/ML/more_menu_share_arrow_active.svg");
-    }
-
-    @include mobile() {
-      background-image: cdnUrl("/img/ML/share_menu_icon.svg");
-      background-size: 32px 32px;
-      background-position: center;
-      padding: 0;
-
-      &:hover, &:active, &:focus {
-        background-image: cdnUrl("/img/ML/share_menu_icon_active.svg");
-      }      
+      opacity: 1;
     }
   }
 
   ul.more-menu-list {
     position: absolute;
-    bottom: 32px;
-    left: calc(100% - 120px);
-    width: 128px;
+    top: 24px;
+    left: calc(100% - 108px);
+    width: 74px;
     outline: none;
     z-index: 110;
-    background-color: $deep_navy;
+    background-color: white;
+    border: 1px solid $mid_light_grey;
     box-shadow: none;
     border-radius: 4px;
     margin: 0;
-    padding: 0px 16px;
+    padding: 8px 0;
     list-style-type: none;
+
+    &.has-read-unread {
+      left: calc(100% - 166px);
+      width: 120px;
+    }
 
     @include mobile() {
       top: 40px;
@@ -104,14 +84,14 @@ div.more-menu {
     }
 
     li {
-      height: 48px;
-      @include avenir_H();
+      @include OC_Body_Book();
       font-size: 14px;
-      color: white;
+      color: $deep_navy;
+      line-height: 18px;
       cursor: pointer;
-      padding: 16px 0px 16px 32px;
+      padding: 8px 16px;
+      background-color: white;
       position: relative;
-      border-bottom: 1px solid rgba(white, 0.1);
 
       &:first-child {
         margin-top: 0px;
@@ -121,56 +101,11 @@ div.more-menu {
         border-bottom: 0px;
       }
 
-      &.edit {
-        &:before {
-          background-image: cdnUrl("/img/ML/more_menu_edit.svg");
+      @include big_web() {
+        &:hover {
+          background-color: $feint_emerald;
+          color: $carrot_green;
         }
-      }
-
-      &.delete {
-        &:before {
-          background-image: cdnUrl("/img/ML/more_menu_delete.svg");
-        }
-      }
-
-      &.share {
-        &:before {
-          background-image: cdnUrl("/img/ML/more_menu_share.svg");
-        }
-      }
-
-      &.must-see {
-        &:before {
-          background-image: cdnUrl("/img/ML/more_menu_mustsee.svg");
-          background-position: 3px 0px;
-        }
-      }
-
-      &.must-see-on {
-        &:before {
-          background-image: cdnUrl("/img/ML/must_see_bolt_blue.svg");
-          background-position: 3px 0px;
-        }
-      }
-
-      &.move {
-        &:before {
-          background-image: cdnUrl("/img/ML/move_activity.svg");
-          background-size: 14px 14px;
-        }
-      }
-
-      &:before {
-        content: "";
-        position: absolute;
-        top: 16px;
-        left: 0px;
-        width: 16px;
-        height: 16px;
-        background-repeat: no-repeat;
-        background-size: 16px 16px;
-        background-position: center;
-        background-color: transpant;
       }
 
       &.disabled {

@@ -1,7 +1,5 @@
 (ns oc.web.lib.fullstory
-  (:require [oc.web.lib.jwt :as jwt]
-            [oc.web.dispatcher :as dis]
-            [oc.web.stores.user :as user-store]))
+  (:require [oc.web.lib.jwt :as jwt]))
 
 (defn identify []
   (when (and (exists? js/FS)
@@ -22,7 +20,10 @@
     (.setUserVars js/FS
      (clj->js {:org (:name org-data)
                :org_slug (:slug org-data)
-               :role (user-store/user-role org-data (dis/current-user-data))}))))
+               ;; FIXME: add back user role here if we start using FS seriously
+               ;; removed for circular dependency problem
+               ;; (user-store/user-role org-data (dis/current-user-data))
+               :role "-"}))))
 
 (defn session-url []
   (when (and (exists? js/FS)

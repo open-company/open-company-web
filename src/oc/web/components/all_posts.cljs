@@ -66,9 +66,6 @@
 (defn- ap-seen-mixin-cb [_ item-uuid]
   (activity-actions/ap-seen-events-gate item-uuid))
 
-(defn- wrt-stream-item-mixin-cb [_ item-uuid]
-  (activity-actions/wrt-events-gate item-uuid))
-
 (defn- sorted-posts [posts]
   (activity-utils/get-sorted-activities posts))
 
@@ -118,14 +115,12 @@
                         ;; Mixins
                         mixins/first-render-mixin
                         (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
-                        (mixins/wrt-stream-item-mixin "div.wrt-item-ready > div.stream-item-body-inner.to-truncate"
-                         wrt-stream-item-mixin-cb)
                         section-mixins/container-nav-in
 
                         {:will-mount (fn [s]
                           (check-pagination s)
                           s)
-                         :did-remount (fn [s]
+                         :did-remount (fn [_ s]
                           (when (or (= (router/current-board-slug) "all-posts")
                                     (= (router/current-board-slug) "must-see"))
                             (check-pagination s))
@@ -168,7 +163,7 @@
       [:div.all-posts-cards
         (when @(::top-loading s)
           [:div.loading-updates.top-loading
-            "Retrieving activity..."])
+            "Loading more posts..."])
         [:div.all-posts-cards-inner.group
           (when (or @(::top-loading s)
                     (and (:loading-more container-data)
@@ -187,7 +182,7 @@
              (str "all-posts-entry-" (:uuid e) "-" (:updated-at e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
-            "Retrieving activity..."])
+            "Loading more posts..."])
         (when (and @(::show-all-caught-up-message s)
                    (responsive/is-mobile-size?))
           (all-caught-up))]]))

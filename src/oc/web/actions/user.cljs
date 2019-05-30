@@ -15,7 +15,6 @@
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
             [oc.web.ws.notify-client :as ws-nc]
@@ -186,6 +185,16 @@
        (when success
         (dis/dispatch! [:user-data (json->cljs body)]))))))
 
+;; Get user
+
+(defn get-user [user-link]
+  (when-let [fixed-user-link (or user-link (utils/link-for (:links (dis/auth-settings)) "user" "GET"))]
+    (api/get-user fixed-user-link (fn [success data]
+     (let [user-map (when success (json->cljs data))]
+       (dis/dispatch! [:user-data user-map])
+       (utils/after 100 nux-actions/check-nux)
+       (patch-timezone-if-needed user-map))))))
+
 ;; Auth
 
 (defn auth-settings-get
@@ -195,11 +204,7 @@
     (when body
       ;; auth settings loaded
       (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-        (api/get-user user-link (fn [data]
-          (let [user-map (json->cljs data)]
-            (dis/dispatch! [:user-data user-map])
-            (utils/after 100 nux-actions/check-nux)
-            (patch-timezone-if-needed user-map)))))
+        (get-user user-link))
       (dis/dispatch! [:auth-settings body])
       (check-user-walls)
       ;; Start teams retrieve if we have a link
@@ -373,9 +378,7 @@
               (fn []
                 (jwt-actions/jwt-refresh
                  #(if org-editing
-                    (do
-                      (org-actions/create-or-update-org org-editing)
-                      (qsg-actions/first-user-qsg))
+                    (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
                       (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
@@ -392,7 +395,7 @@
            (notification-actions/show-notification
             {:title "Image upload error"
              :description "An error occurred while processing your image. Please retry."
-             :expire 5
+             :expire 3
              :id :user-avatar-upload-failed
              :dismiss true}))
          (do
@@ -401,7 +404,7 @@
            (notification-actions/show-notification
             {:title "Image update succeeded"
              :description "Your image was succesfully updated."
-             :expire 5
+             :expire 3
              :dismiss true})))))))
 
 (defn user-profile-reset []
@@ -416,7 +419,7 @@
          (notification-actions/show-notification
           {:title (if success "Verification email re-sent!" "An error occurred")
            :description (when-not success "Please try again.")
-           :expire 5
+           :expire 3
            :primary-bt-title "OK"
            :primary-bt-dismiss true
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
@@ -444,11 +447,6 @@
     (when (> (- now latest-auth-settings) reload-time)
       (auth-settings-get))))
 
-;; User profile tab
-
-(defn change-user-profile-panel [panel]
-  (dis/dispatch! [:input [:user-settings] panel]))
-
 ;; User notifications
 
 (defn read-notifications []
@@ -474,11 +472,11 @@
          {:title (:title fixed-notification)
           :mention true
           :dismiss true
-          :click #(router/nav! (oc-urls/entry (:board-slug fixed-notification) (:uuid fixed-notification)))
+          :click (:click fixed-notification)
           :mention-author (:author fixed-notification)
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
-          :expire 5})))))
+          :expire 3})))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))

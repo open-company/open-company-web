@@ -26,7 +26,7 @@ html {
 }
 
 html, body {
-  @include avenir_M();
+  @include OC_Body_Bold();
   font-size: 16px;
   width: 100%;
   color: $oc_gray_5;
@@ -48,17 +48,19 @@ html, body {
   }
 
   .tooltip-inner {
-    background-color: $deep_navy;
+    background-color: white;
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
     opacity: 1;
-    @include avenir_H();
+    @include OC_Body_Book();
     font-size: 14px;
-    color: white;
+    color: $light_navy;
     line-height: 18px;
-    padding: 14px 18px;
-    corner-radius: 6px;
+    padding: 11px 16px;
+    border-radius: 4px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+    border: 1px solid $mid_light_grey;
   }
 }
 
@@ -80,7 +82,7 @@ div.fullscreen-page {
 }
 
 h1, h2, h3, h4, h5, h6, .oc-header {
-  @include avenir_M();
+  @include OC_Body_Bold();
 }
 
 a {
@@ -142,10 +144,6 @@ span.num.red {
   background: rgba(250,100,82, 0.5);
 }
 
-.navbar-offset {
-  padding-top: #{$navbar_height}px;
-}
-
 div#wrap {
   min-height: 100vh;
   background-color: $ultra_light_gold;
@@ -154,14 +152,14 @@ div#wrap {
 button.slack-button {
   height: 40px;
   font-size: 15px;
-  @include avenir_M();
+  @include OC_Body_Bold();
   padding: 8px 5px 5px 5px;
   border-radius: 5px;
   border: 1px solid rgba(78,90,107,0.4);
-  opacity: 0.8;
+  opacity: 1;
 
   &:hover {
-    opacity: 1;
+    opacity: 0.9;
   }
 
   &:before {
@@ -228,7 +226,7 @@ div.not-found, div.server-error{
     h1 {
       color: $oc_gray_6;
       font-size: 150px;
-      @include avenir_B();
+      @include OC_Body_Bold();
     }
 
     a.login {
@@ -257,7 +255,7 @@ div.not-found, div.server-error{
       margin: 50px auto;
       color: $carrot_orange;
       text-align: center;
-      @include avenir_H();
+      @include OC_Body_Bold();
     }
   }
 }
@@ -268,4 +266,10 @@ div.not-found, div.server-error{
   max-height: 300px;
   top: 0px;
   overflow: scroll;
+}
+
+.oc-input {
+  &.active, &:active, &:focus {
+    opacity: 0.9;
+  }
 }

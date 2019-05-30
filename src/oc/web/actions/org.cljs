@@ -10,7 +10,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
-            [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.lib.json :refer (json->cljs)]
@@ -270,7 +269,7 @@
       (notification-actions/show-notification
         {:title "Image update succeeded"
          :description "Your image was succesfully updated."
-         :expire 5
+         :expire 3
          :dismiss true})
       (org-loaded (json->cljs body) false))
     (do
@@ -278,7 +277,7 @@
       (notification-actions/show-notification
        {:title "Image upload error"
         :description "An error occurred while processing your company avatar. Please retry."
-        :expire 5
+        :expire 3
         :id :org-avatar-upload-failed
         :dismiss true}))))
 

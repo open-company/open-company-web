@@ -3,17 +3,8 @@
             [defun.core :refer (defun-)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.dispatcher :as dispatcher]))
-
-
-(defun- sort-comments
-  ([comments :guard nil?]
-   [])
-  ([comments :guard map?]
-   (sort-comments (vals comments)))
-  ([comments :guard sequential?]
-   (vec (sort-by :created-at comments))))
-
+            [oc.web.dispatcher :as dispatcher]
+            [oc.web.utils.comment :as comment-utils]))
 
 (defn- is-emoji
   [body]
@@ -33,8 +24,7 @@
   ([comment-map :guard map?]
     (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
           delete-comment-link (utils/link-for (:links comment-map) "delete")
-          reaction-data (first (:reactions comment-map))
-          can-react? (utils/link-for (:links reaction-data) "react"  ["PUT" "DELETE"])]
+          can-react? (utils/link-for (:links comment-map) "react"  "POST")]
       (-> comment-map
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
@@ -66,7 +56,7 @@
                                          :author {:name (:name user-data)
                                                   :avatar-url (:avatar-url user-data)
                                                   :user-id (:user-id user-data)}})
-        new-comments-data (sort-comments (conj comments-data new-comment-data))]
+        new-comments-data (comment-utils/sort-comments (conj comments-data new-comment-data))]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
@@ -81,7 +71,7 @@
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error comments-key body activity-uuid]}]]
   (let [cleaned-comments (map parse-comment (:items (:collection body)))
-        sorted-comments (sort-comments cleaned-comments)
+        sorted-comments (comment-utils/sort-comments cleaned-comments)
         pre-comments-key (vec (butlast comments-key))]
     (-> db
       (assoc-in comments-key sorted-comments)
@@ -165,7 +155,7 @@
   [db [_ comments-key interaction-data]]
   (let [item-uuid (:uuid (:interaction interaction-data))
         comments-data (get-in db comments-key)
-        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+        new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
@@ -180,7 +170,7 @@
           old-comments-data (filterv :links all-old-comments-data)
           ;; Add the new comment to the comments list, make sure it's not present already
           new-comments-data (vec (conj (filter #(not= (:created-at %) created-at) old-comments-data) comment-data))
-          sorted-comments-data (sort-comments new-comments-data)
+          sorted-comments-data (comment-utils/sort-comments new-comments-data)
           ;; update the comments link of the entry
           comments-link-idx (utils/index-of
                              (:links entry-data)

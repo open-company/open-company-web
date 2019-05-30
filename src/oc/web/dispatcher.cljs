@@ -1,6 +1,8 @@
 (ns oc.web.dispatcher
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
+            [clojure.string :as s]
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
@@ -108,20 +110,15 @@
 (defn change-data-key [org-slug]
   (vec (conj (org-key org-slug) :change-data)))
 
-(defn change-cache-data-key [org-slug]
-  (vec (conj (org-key org-slug) :change-cache-data)))
-
 (def activities-read-key
   [:activities-read])
 
-(defn get-posts-for-board [activity-id posts-data board-slug]
+(defn get-posts-for-board [posts-data board-slug]
   (let [posts-list (vals posts-data)
-        filter-fn (if (seq activity-id)
-                    #(= (:uuid %) activity-id)
-                    (if (= board-slug utils/default-drafts-board-slug)
-                      #(not= (:status %) "published")
-                      #(and (= (:board-slug %) board-slug)
-                            (= (:status %) "published"))))]
+        filter-fn (if (= board-slug utils/default-drafts-board-slug)
+                    #(not= (:status %) "published")
+                    #(and (= (:board-slug %) board-slug)
+                          (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
 ;; Functions needed by derivatives
@@ -139,7 +136,6 @@
 (defn drv-spec [db route-db]
   {:base                [[] db]
    :route               [[] route-db]
-   :qsg                 [[:base] (fn [base] (:qsg base))]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
@@ -150,16 +146,16 @@
    :query-params        [[:route] (fn [route] (:query-params route))]
    :teams-data          [[:base] (fn [base] (get-in base teams-data-key))]
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
-   :org-settings        [[:base] (fn [base] (:org-settings base))]
-   :user-settings       [[:base] (fn [base] (:user-settings base))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
-   :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
    :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
+   :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
+   :panel-stack         [[:base] (fn [base] (:panel-stack base))]
+   :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -169,15 +165,19 @@
                              :success (:email-verification-success base)})]
    :jwt                 [[:base] (fn [base] (:jwt base))]
    :id-token            [[:base] (fn [base] (:id-token base))]
-   :current-user-data   [[:base] (fn [base] (:current-user-data base))]
+   :current-user-data   [[:base]
+                          (fn [base]
+                            (if (and (not (:jwt base))
+                                     (:id-token base)
+                                     (router/current-secure-activity-id))
+                              (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
+                              (:current-user-data base)))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :mobile-menu-open    [[:base] (fn [base] (:mobile-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
-   :show-reminders      [[:base] (fn [base] (:show-reminders base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
@@ -221,10 +221,9 @@
                              (let [org-slug (:slug org-data)
                                    all-boards-slug (map :slug (:boards org-data))
                                    container-slug (:board route)
-                                   activity-id (:activity route)
                                    is-board? ((set all-boards-slug) container-slug)]
                               (if is-board?
-                                (get-posts-for-board activity-id posts-data container-slug)
+                                (get-posts-for-board posts-data container-slug)
                                 (let [container-key (container-key org-slug container-slug)
                                       items-list (:posts-list (get-in base container-key))]
                                   (zipmap items-list (map #(get posts-data %) items-list)))))))]
@@ -236,10 +235,6 @@
                           (fn [base org-slug]
                             (when (and base org-slug)
                               (get-in base (change-data-key org-slug))))]
-   :change-cache-data   [[:base :org-slug]
-                          (fn [base org-slug]
-                            (when (and base org-slug)
-                              (get-in base (change-cache-data-key org-slug))))]
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
@@ -267,12 +262,6 @@
    :section-editing     [[:base]
                           (fn [base]
                             (:section-editing base))]
-   :show-section-editor [[:base]
-                          (fn [base]
-                            (:show-section-editor base))]
-   :show-section-add    [[:base]
-                          (fn [base]
-                            (:show-section-add base))]
    :show-sections-picker [[:base]
                           (fn [base]
                             (:show-sections-picker base))]
@@ -291,15 +280,13 @@
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
    :navbar-data         [[:base :org-data :board-data :current-user-data]
                           (fn [base org-data board-data current-user-data]
-                            (let [navbar-data (select-keys base [:mobile-menu-open
-                                                                 :show-login-overlay
-                                                                 :mobile-navigation-sidebar
+                            (let [navbar-data (select-keys base [:show-login-overlay
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
-                                                                 :user-settings
-                                                                 :org-settings
+                                                                 :panel-stack
                                                                  :search-active
-                                                                 :mobile-user-notifications])]
+                                                                 :mobile-user-notifications
+                                                                 :show-whats-new-green-dot])]
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
@@ -332,41 +319,45 @@
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data :ap-initial-at
-                            :show-section-editor :show-section-add :show-sections-picker :entry-editing
-                            :mobile-menu-open :jwt :wrt-show :show-reminders]
+   :wrt-read-data         [[:base :panel-stack]
+                            (fn [base panel-stack]
+                              (when (and panel-stack
+                                         (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                            wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
+                                  (activity-read-data wrt-uuid base))))]
+   :wrt-activity-data     [[:base :org-slug :panel-stack]
+                            (fn [base org-slug panel-stack]
+                              (when (and panel-stack
+                                         (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
+                                            wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
+
+                                  (activity-data-get org-slug wrt-uuid base))))]
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data
+                            :ap-initial-at :show-sections-picker :entry-editing
+                            :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data filtered-posts activity-data
-                                 ap-initial-at show-section-editor show-section-add show-sections-picker
-                                 entry-editing mobile-menu-open jwt wrt-show show-reminders]
+                                 ap-initial-at show-sections-picker entry-editing jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :container-data container-data
                                :board-data board-data
                                :posts-data filtered-posts
-                               :org-settings-data (:org-settings base)
-                               :show-reminders show-reminders
-                               :user-settings (:user-settings base)
+                               :panel-stack (:panel-stack base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
                                :ap-initial-at ap-initial-at
-                               :show-section-editor show-section-editor
-                               :show-section-add show-section-add
                                :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
-                               :mobile-navigation-sidebar (:mobile-navigation-sidebar base)
                                :activity-share-container (:activity-share-container base)
-                               :mobile-menu-open mobile-menu-open
                                :show-cmail (boolean (:cmail-state base))
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
-                               :wrt-activity-data (when wrt-show
-                                                   (activity-data-get wrt-show))
-                               :wrt-read-data (when wrt-show
-                                                (activity-read-data wrt-show))
                                :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
@@ -519,20 +510,21 @@
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
      (if is-board?
-       (get-posts-for-board nil posts-data posts-filter)
+       (get-posts-for-board posts-data posts-filter)
        (let [container-key (container-key org-slug posts-filter)
              items-list (:posts-list (get-in data container-key))]
         (zipmap items-list (map #(get posts-data %) items-list))))))
-  ([data org-slug posts-filter activity-id]
-    (let [org-data (org-data data org-slug)
-          all-boards-slug (map :slug (:boards org-data))
-          is-board? ((set all-boards-slug) posts-filter)
-          posts-data (get-in data (posts-data-key org-slug))]
-     (if is-board?
-       (get-posts-for-board activity-id posts-data posts-filter)
-       (let [container-key (container-key org-slug posts-filter)
-             items-list (:posts-list (get-in data container-key))]
-        (zipmap items-list (map #(get posts-data %) items-list)))))))
+  ; ([data org-slug posts-filter activity-id]
+  ;   (let [org-data (org-data data org-slug)
+  ;         all-boards-slug (map :slug (:boards org-data))
+  ;         is-board? ((set all-boards-slug) posts-filter)
+  ;         posts-data (get-in data (posts-data-key org-slug))]
+  ;    (if is-board?
+  ;      (get-posts-for-board activity-id posts-data posts-filter)
+  ;      (let [container-key (container-key org-slug posts-filter)
+  ;            items-list (:posts-list (get-in data container-key))]
+  ;       (zipmap items-list (map #(get posts-data %) items-list))))))
+  )
 
 (defn draft-posts-data
   ([]
@@ -638,15 +630,6 @@
   ([data org-slug]
     (get-in data (change-data-key org-slug))))
 
-(defn change-cache-data
-  "Get change data."
-  ([]
-    (change-cache-data @app-state))
-  ([data]
-    (change-cache-data data (router/current-org-slug)))
-  ([data org-slug]
-    (get-in data (change-cache-data-key org-slug))))
-
 (defun activity-read-data
   "Get the read counts of all the items."
   ([]
@@ -704,9 +687,6 @@
 (defn print-activity-read-data []
   (get-in @app-state activities-read-key))
 
-(defn print-change-cache-data []
-  (get-in @app-state (change-cache-data-key (router/current-org-slug))))
-
 (defn print-board-data []
   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug))))
 
@@ -758,16 +738,15 @@
 (defn print-reminder-edit-data []
   (reminder-edit-data (router/current-org-slug) @app-state))
 
-(defn print-qsg-data []
-  (:qsg @app-state))
+(defn print-panel-stack []
+  (:panel-stack @app-state))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
 (set! (.-OCWebPrintTeamRoster js/window) print-team-roster)
 (set! (.-OCWebPrintChangeData js/window) print-change-data)
-(set! (.-OCWebPrintActivitiesReadData js/window) print-activity-read-data)
-(set! (.-OCWebPrintChangeCacheData js/window) print-change-cache-data)
+(set! (.-OCWebPrintActivityReadData js/window) print-activity-read-data)
 (set! (.-OCWebPrintBoardData js/window) print-board-data)
 (set! (.-OCWebPrintContainerData js/window) print-container-data)
 (set! (.-OCWebPrintActivityData js/window) print-activity-data)
@@ -781,7 +760,7 @@
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
-(set! (.-OCWebPrintQSGData js/window) print-qsg-data)
+(set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:app_state app-state
                                     :deref cljs.core.deref

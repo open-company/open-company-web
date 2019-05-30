@@ -3,7 +3,7 @@ div.login-button{
 
   a.signup-signin {
     color: $ui_grey;
-    @include avenir_R();
+    @include OC_Body_Bold();
     font-size: 12px;
     float: left;
   }

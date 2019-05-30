@@ -1,6 +1,7 @@
 (ns oc.web.actions.activity
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [taoensso.timbre :as timbre]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -12,6 +13,7 @@
             [oc.web.lib.user-cache :as uc]
             [oc.web.local-settings :as ls]
             [oc.web.actions.section :as sa]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
@@ -68,9 +70,13 @@
       (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
-(defn all-posts-get [org-data ap-initial-at]
+(defn all-posts-get [org-data ap-initial-at & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (api/get-all-posts activity-link ap-initial-at (partial all-posts-get-finish ap-initial-at))))
+    (api/get-all-posts activity-link ap-initial-at
+     (fn [resp]
+       (all-posts-get-finish ap-initial-at resp)
+       (when (fn? finish-cb)
+        (finish-cb resp))))))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
@@ -488,8 +494,9 @@
   (dis/dispatch! [:activity-share/finish success (when success (json->cljs body))]))
 
 (defn activity-share [activity-data share-data & [share-cb]]
-  (let [share-link (utils/link-for (:links activity-data) "share")]
-    (api/share-entry share-link share-data (or share-cb activity-share-cb))
+  (let [share-link (utils/link-for (:links activity-data) "share")
+        callback (if (fn? share-cb) share-cb activity-share-cb)]
+    (api/share-entry share-link share-data callback)
     (dis/dispatch! [:activity-share share-data])))
 
 (defn entry-revert [revision-id entry-editing]
@@ -586,8 +593,8 @@
     (api/get-auth-settings (fn [body]
       (when body
         (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-          (api/get-user user-link (fn [data]
-            (dis/dispatch! [:user-data (json->cljs data)]))))
+          (api/get-user user-link (fn [success data]
+            (dis/dispatch! [:user-data (when success (json->cljs data))]))))
         (dis/dispatch! [:auth-settings body])
         (api/get-entry-point org-slug
           (fn [success body]
@@ -632,16 +639,23 @@
       (let [change-data (:data data)
             activity-uuid (:item-id change-data)
             section-uuid (:container-id change-data)
-            change-type (:change-type change-data)]
+            change-type (:change-type change-data)
+            ;; In case another user is adding a new post mark it as unread
+            ;; directly to avoid delays in the newly added post propagation
+            dispatch-unread (when (and (= change-type :add)
+                                       (not= (:user-id change-data) (jwt/user-id)))
+                              (fn [{:keys [success]}]
+                                (when success
+                                  (dis/dispatch! [:mark-unread (router/current-org-slug) {:uuid activity-uuid
+                                                                                          :board-uuid section-uuid}]))))]
         (when (= change-type :delete)
           (dis/dispatch! [:activity-delete (router/current-org-slug) {:uuid activity-uuid}]))
         ;; Refresh the AP in case of items added or removed
         (when (or (= change-type :add)
                   (= change-type :delete))
-          (when (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at)))
-          (when (= (router/current-board-slug) "must-see")
-            (must-see-get (dis/org-data))))
+          (if (= (router/current-board-slug) "all-posts")
+            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread))
+            (sa/section-change section-uuid dispatch-unread))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid)))))
@@ -650,7 +664,7 @@
       (dis/dispatch! [:activities-count (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
-      (dis/dispatch! [:activity-reads (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
+      (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
 
 ;; AP Seen
 
@@ -708,17 +722,23 @@
     (ws-cc/item-seen publisher-id container-id activity-id)
     (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
 
-(defn- send-item-read
+(defn send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
-  [activity-id]
+  [activity-id & [show-notification]]
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               org-id (:uuid (dis/org-data))
               container-id (:board-uuid activity-data)
               user-name (jwt/get-key :name)
               avatar-url (jwt/get-key :avatar-url)]
-    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)
+    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
+    (when show-notification
+      (notification-actions/show-notification {:title "Post marked as read"
+                                               :dismiss true
+                                               :expire 3
+                                               :id :mark-read-success}))))
 
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
@@ -783,7 +803,6 @@
                         (au/has-text? activity-data))]
     (dis/dispatch! [:update [edit-key] #(merge % {:fixed-video-id nil
                                                   :video-id nil
-                                                  :video-transcript nil
                                                   :video-processed false
                                                   :video-error false
                                                   :has-changes has-changes})])))
@@ -850,7 +869,8 @@
                     (dis/board-data (router/current-org-slug) board-slug)
                     (dis/board-data))]
     (if (or (not board-data)
-            (= (:slug board-data) utils/default-drafts-board-slug))
+            (= (:slug board-data) utils/default-drafts-board-slug)
+            (not (utils/link-for (:links board-data) "create")))
       (get-default-section)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
@@ -864,10 +884,11 @@
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
 (defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:collapse false
-                             :fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
+  (let [cmail-default-state {:fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (when (:fullscreen cmail-default-state)
+      (dom-utils/lock-page-scroll))
     (when-not (:auto cmail-state)
       (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
@@ -876,16 +897,16 @@
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
   (dis/dispatch! [:input [:cmail-data] nil])
-  (dis/dispatch! [:input [:cmail-state] nil]))
+  (dis/dispatch! [:input [:cmail-state] nil])
+  (dom-utils/unlock-page-scroll))
 
 (defn cmail-toggle-fullscreen []
-  (cmail-fullscreen-save (not (:fullscreen (:cmail-state @dis/app-state))))
-  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse false
-                                                    :fullscreen (not (:fullscreen %))})]))
-
-(defn cmail-toggle-collapse []
-  (dis/dispatch! [:update [:cmail-state] #(merge % {:collapse (not (:collapse %))
-                                                    :fullscreen (:fullscreen %)})]))
+  (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
+    (cmail-fullscreen-save next-fullscreen-value)
+    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])
+    (if next-fullscreen-value
+      (dom-utils/lock-page-scroll)
+      (dom-utils/unlock-page-scroll))))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
@@ -923,3 +944,14 @@
                                 {:fullscreen true :auto true}
                                 {})]
       (cmail-show fixed-activity-data initial-cmail-state))))
+
+(defn mark-unread [activity-data]
+  (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
+    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
+    (api/mark-unread mark-unread-link (:board-uuid activity-data)
+     (fn [{:keys [error success]}]
+      (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
+                                               :description (when error "Please try again")
+                                               :dismiss true
+                                               :expire 3
+                                               :id (if success :mark-unread-success :mark-unread-error)})))))

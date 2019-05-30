@@ -1,0 +1,298 @@
+div.invite-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.invite-settings {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 56px 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    div.invite-settings-header {
+      width: 320px;
+      height: 56px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+
+      div.invite-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+        margin-right: 8px;
+      }
+
+      button.save-bt {
+        height: 32px;
+        padding: 7px 14px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: white;
+        line-height: 18px;
+        float: right;
+        border-radius: 6px;
+      }
+    }
+
+    div.invite-settings-body {
+      width: 272px;
+      margin: 24px auto 0;
+
+      div.invite-via {
+
+        div.invite-via-label {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $light_navy;
+        }
+
+        select.invite-via-select {
+          width: 100%;
+          height: 32px;
+          border-radius: 4px;
+          padding: 7px 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          margin-top: 8px;
+          display: block;
+          border: none;
+          outline: none;
+          display: block;
+          appearance: none;
+          -webkit-appearance: none;
+          background-color: $ultra_light_grey;
+          position: relative;
+          background-image: cdnUrl("/img/ML/select_arrows.svg");
+          background-size: 8px 10px;
+          background-position: top 11px right 8px;
+          background-repeat: no-repeat;
+        
+          &::-ms-expand {
+            display: none;
+          }
+
+          &:hover {
+            border-color: #888;
+          }
+
+          &:focus {
+            border-color: none;
+            box-shadow: none;
+            outline: none;
+          }
+
+          option {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $deep_navy;
+          }
+        }
+      }
+
+      div.invites-list {
+        margin-top: 16px;
+        border-top: 1px solid $ultra_light_grey;
+        padding-top: 16px;
+
+        div.invites-list-title {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $light_navy;
+        }
+
+        div.invites-list-item {
+          margin-top: 8px;
+          position: relative;
+
+          &:not(:first-child) {
+            margin-top: 16px;
+          }
+
+          div.org-settings-field-container {
+            width: calc(100% - 24px);
+            border-radius: 4px;
+            background-color: $ultra_light_grey;
+            border: none;
+            outline: none;
+
+            &.has-value {
+              button.clear-user {
+                display: block;
+              }
+            }
+
+            &.focus {
+              background-color: $mid_light_grey;
+
+              input.org-settings-field {
+                background-color: $mid_light_grey;
+              }
+            }
+
+            input.org-settings-field {
+              width: calc(100% - 24px);
+              border-radius: 4px;
+              background-color: $ultra_light_grey;
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: $deep_navy;
+              border: none;
+              outline: none;
+              padding: 7px 8px;
+
+              &:focus, &:active {
+                border: none;
+                outline: none;
+              }
+            }
+
+            button.clear-user {
+              float: right;
+              width: 24px;
+              height: 24px;
+              margin-top: 4px;
+              padding: 0;
+              background-image: cdnUrl("/img/ML/clear_user.svg");
+              background-size: 10px 10px;
+              background-position: center;
+              background-repeat: no-repeat;
+              display: none;
+            }
+          }
+
+          div.user-name-dropdown {
+            width: calc(100% - 24px);
+
+            div.slack-users-dropdown-list {
+              top: 40px;
+            }
+          }
+
+          button.remove-user {
+            position: absolute;
+            top: 16px;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            margin-top: 4px;
+            padding: 0;
+            background-image: cdnUrl("/img/ML/remove_user.svg");
+            background-size: 12px 14px;
+            background-position: top 5px right 0px;
+            background-repeat: no-repeat;
+            display: block;
+          }
+
+          div.user-type-dropdown {
+            width: calc(100% - 24px);
+
+            div.dropdown {
+              margin-top: 8px;
+              height: 32px;
+              text-align: left;
+              border-radius: 4px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: $deep_navy;
+              background-color: $ultra_light_grey;
+
+              button.user-type-btn {
+                width: 100%;
+                text-align: left;
+                height: 32px;
+                padding: 7px 8px;
+              }
+
+              ul.user-type-dropdown-menu {
+                left: 0px;
+                top: 40px;
+                width: 100%;
+
+                li {
+                  color: $deep_navy;
+                  text-align: left;
+                  padding: 7px 12px;
+                }
+              }
+            }
+          }
+
+          button.remove-user {
+            margin-top: 8px;
+            margin-left: 0;
+            padding: 0;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: #C1C6CA;
+
+            i.mdi.mdi-delete:before {
+              font-size: 14px;
+              color: #C1C6CA;
+            }
+          }
+        }
+      }
+
+      button.add-button {
+        padding: 0 0 0 20px;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: #C1C6CA;
+        margin-top: 16px;
+        position: relative;
+
+        div.add-button-plus {
+          width: 12px;
+          height: 12px;
+          background-image: cdnUrl("/img/ML/invite_add_another_plus.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+          position: absolute;
+          left: 0;
+          top: 2px;
+        }
+      }
+    }
+  }
+}

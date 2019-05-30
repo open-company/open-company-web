@@ -9,6 +9,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.utils.comment :as comment-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
@@ -39,6 +40,9 @@
                              (mention-mixins/oc-mentions-hover)
                              {:did-mount (fn [s]
                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                               (let [activity-data @(drv/get-ref s :secure-activity-data)
+                                     comments-data @(drv/get-ref s :comments-data)]
+                                (comment-utils/get-comments-if-needed activity-data comments-data))
                                s)
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
@@ -70,7 +74,7 @@
       (login-overlays-handler)
       (when activity-data
         [:div.activity-header.group
-          (org-avatar org-data activity-link (if is-mobile? :never :always) (not is-mobile?))
+          (org-avatar org-data activity-link (if is-mobile? :never :always))
           (if id-token
             [:div.activity-header-right
               [:button.mlb-reset.login-as-bt
@@ -81,78 +85,64 @@
                  :title "Log in to view all posts"}
                 [:span
                   [:span.login-as
-                    "Login as " (:first-name id-token)]
+                    "Log in as " (:first-name id-token)]
                   (user-avatar-image id-token)]]]
             [:div.activity-header-right
               [:button.mlb-reset.learn-more-bt
-                {:on-click #(router/nav! oc-urls/home)}
-                "Learn more"]
+                {:on-click #(router/redirect! oc-urls/home)}
+                (str "learn more"
+                 (when-not is-mobile?
+                   " about Carrot"))]
+              [:span.or " or "]
               [:button.mlb-reset.login-bt
                 {:on-click #(user-actions/show-login :login-with-email)}
                 "Login"]])])
       (when activity-data
         [:div.activity-content-outer
-          [:div.activity-content-header
-            [:div.activity-content-header-author
-              (user-avatar-image (:publisher activity-data))
-              [:div.name
-                {:class utils/hide-class}
-                (:name (:publisher activity-data))]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/time-since t)])]]]
           [:div.activity-content
             (when (:headline activity-data)
               [:div.activity-title
                 {:dangerouslySetInnerHTML (utils/emojify (:headline activity-data))
                  :class utils/hide-class}])
+            [:div.activity-content-author
+              (user-avatar-image (:publisher activity-data))
+              [:div.name
+                {:class utils/hide-class}
+                (str (:name (:publisher activity-data)) " in "
+                 (:board-name activity-data) " on "
+                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
             (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
                               :height (:height video-size)
                               :video-processed (:video-processed activity-data)}))
+            (when (:abstract activity-data)
+              [:div.activity-abstract
+                {:class utils/hide-class}
+                (:abstract activity-data)])
             (when (:body activity-data)
               [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :class utils/hide-class}])
-            (when (and ls/oc-enable-transcriptions
-                       (:video-transcript activity-data)
-                       (:video-processed activity-data))
-              [:div.activity-video-transcript
-                [:div.activity-video-transcript-header
-                  "This transcript was automatically generated and may not be accurate"]
-                [:div.activity-video-transcript-content
-                  (:video-transcript activity-data)]])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (when-not is-mobile?
-                (comments-summary activity-data true))
-              (reactions activity-data)
-              (when is-mobile?
-                (comments-summary activity-data true))]
+              (comments-summary activity-data true)
+              (reactions activity-data)]
+            (when (or (pos? (count comments-data))
+                      (:can-comment activity-data))
+              [:div.comments-separator])
             (when comments-data
               (stream-comments activity-data comments-data true))
             (when (:can-comment activity-data)
-              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]])
+              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
+            [:div.secure-activity-footer
+              (if id-token
+                [:button.mlb-reset.secure-activity-footer-bt
+                  {:on-click #(user-actions/show-login :login-with-email)}
+                  "Log in required to access all posts"]
+                [:a.sent-via-carrot
+                  {:href oc-urls/home}
+                  "Learn more about Carrot"])]])
       (when-not activity-data
         [:div.secure-activity-container
-          (loading {:loading true})])
-      [:div.secure-activity-footer
-        (if id-token
-          [:button.mlb-reset.secure-activity-footer-bt.with-id-token
-            {:on-click #(user-actions/show-login :login-with-email)}
-            [:span.pre-login-span "Log in to view all posts."]
-            [:span.green-user-button.group
-              (user-avatar-image id-token)
-              [:span.inner "Log in as " (:first-name id-token)]]]
-          [:button.mlb-reset.secure-activity-footer-bt
-            {:on-click #(router/nav! oc-urls/home)}
-            [:span
-              "Learn more about Carrot"
-              [:div.right-arrow]]])]]))
+          (loading {:loading true})])]))

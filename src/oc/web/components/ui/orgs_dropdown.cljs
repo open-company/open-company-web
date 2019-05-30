@@ -17,7 +17,7 @@
                  (utils/event-stop %)
                  (dis/dispatch! [:input [:orgs-dropdown-visible] false])
                  (router/nav! (oc-urls/org (:slug org))))}
-    (org-avatar org false :always true)])
+    (org-avatar org false :always)])
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive
@@ -43,10 +43,9 @@
                                   :show-dropdown-caret orgs-dropdown-visible})
          :on-click (fn [e]
                      (utils/event-stop e)
-                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                      (when should-show-dropdown?
                        (dis/dispatch! [:input [:orgs-dropdown-visible] (not orgs-dropdown-visible)])))}
-        (org-avatar org-data (not should-show-dropdown?) :always true)]
+        (org-avatar org-data (not should-show-dropdown?) :always)]
       (when orgs-dropdown-visible
         [:div.orgs-dropdown-container
           [:div.triangle]

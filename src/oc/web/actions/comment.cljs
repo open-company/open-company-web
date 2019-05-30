@@ -89,6 +89,12 @@
       (fn [{:keys [status success body]}]
         (get-comments activity-data)))))
 
+(defn react-from-picker [activity-data comment-data emoji]
+  (let [react-link (utils/link-for (:links comment-data) "react" "POST")]
+    (api/react-from-picker react-link emoji
+      (fn [{:keys [status succes body]}]
+        (get-comments activity-data)))))
+
 (defn save-comment [activity-uuid comment-data new-body]
   ;; Send WRT on comment update
   (activity-actions/send-item-read activity-uuid)
@@ -96,7 +102,7 @@
                       (router/current-org-slug)
                       activity-uuid)
         patch-comment-link (utils/link-for (:links comment-data) "partial-update")]
-    (api/patch-comment patch-comment-link new-body nil)
+    (api/patch-comment patch-comment-link new-body #())
     (dis/dispatch! [:comment-save
                     comments-key
                     activity-uuid

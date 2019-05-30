@@ -1,7 +1,9 @@
 (ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
+            [oops.core :refer (oget oget+)]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
@@ -10,15 +12,41 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.mention :as mention-utils]
+            [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
-            [oc.web.components.ui.multi-picker :refer (multi-picker)]
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
+            [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [cljsjs.medium-editor]
+            [cljsjs.react-giphy-selector]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
-            [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]))
+
+;; Gif handling
+
+(defn add-gif [s editable]
+  (reset! (::showing-gif-selector s) true))
+
+(defn media-gif-add [s editable gif-data]
+  (if (nil? gif-data)
+    (.addGIF editable nil nil nil nil)
+    (let [original (oget+ gif-data ["images" "original"])
+          original-url (or (oget+ original "?url")
+                           (oget+ original "?gif_url"))
+          fixed-width-still (oget+ gif-data ["images" "fixed_width_still"])
+          fixed-width-still-url (or (oget+ fixed-width-still "?url")
+                                    (oget+ fixed-width-still "?gif_url"))
+          original-width (oget+ original "width")
+          original-height (oget+ original "height")]
+      (.addGIF
+       editable
+       original-url
+       fixed-width-still-url
+       original-width
+       original-height))))
 
 ;; Attachment
 
@@ -42,12 +70,12 @@
 
 (defn attachment-upload-success-cb [state editable res]
   (reset! (::media-attachment-did-success state) true)
-  (let [url (gobj/get res "url")]
+  (let [url (oget res :url)]
     (if-not url
       (attachment-upload-failed-cb state editable)
-      (let [size (gobj/get res "size")
-            mimetype (gobj/get res "mimetype")
-            filename (gobj/get res "filename")
+      (let [size (oget res :size)
+            mimetype (oget res :mimetype)
+            filename (oget res :filename)
             createdat (utils/js-date)
             prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
             subtitle (str prefix (filesize size :binary false :format "%.2f" ))
@@ -85,10 +113,14 @@
 ;; Video
 
 (defn add-video [s editable]
-  (let [editable (or editable (get-media-picker-extension s))]
-    (.saveSelection editable))
-  (dis/dispatch! [:input [:media-input :media-video] true])
-  (reset! (::media-video s) true))
+  (let [options (first (:rum/args s))]
+    (when-not (:use-inline-media-picker options)
+      (let [editable (or editable (get-media-picker-extension s))]
+        (.saveSelection editable)))
+    (dis/dispatch! [:input [:media-input :media-video] true])
+    (reset! (::media-video s) true)
+    (when (:use-inline-media-picker options)
+      (reset! (::showing-media-video-modal s) true))))
 
 (defn get-video-thumbnail [video]
   (cond
@@ -172,7 +204,7 @@
        ;; success-cb
        (fn [res]
          (reset! (::media-photo-did-success s) true)
-         (let [url (gobj/get res "url")
+         (let [url (oget res :url)
                img   (gdom/createDom "img")]
            (set! (.-onload img) #(img-on-load s editable url img))
            (set! (.-onerror img) #(img-on-load s editable nil nil))
@@ -181,8 +213,8 @@
            (set! (.-src img) url)
            (reset! (::media-photo s) {:res res :url url})
            ;; if the image is a vector image
-           (if (or (= (string/lower (gobj/get res "mimetype")) "image/svg+xml")
-                   (string/ends-with? (string/lower (gobj/get res "filename")) ".svg"))
+           (if (or (= (string/lower (oget res :mimetype)) "image/svg+xml")
+                   (string/ends-with? (string/lower (oget res :filename)) ".svg"))
              ;l use the same url for the thumbnail since the size doesn't matter
              (do
                (reset! (::media-photo s) (assoc @(::media-photo s) :thumbnail url))
@@ -219,6 +251,8 @@
 
 (defn on-picker-click [s editable type]
   (cond
+    (= type "gif")
+    (add-gif s editable)
     (= type "photo")
     (add-photo s editable)
     (= type "video")
@@ -233,10 +267,8 @@
         on-change (:on-change options)]
     (on-change)))
 
-(def default-mutli-picker-button-id "entry-edit-multi-picker-bt")
-
 (defn- file-dnd-handler [s editor-ext file]
-  (if (< (gobj/get file "size") (* 5 1000 1000))
+  (if (< (oget file :size) (* 5 1000 1000))
     (if (.match (.-type file) "image")
       (iu/upload-file! file
         (fn [url]
@@ -244,9 +276,9 @@
           (utils/after 500 #(utils/to-end-of-content-editable (rum/ref-node s "body")))))
       (iu/upload-file! file
         (fn [url]
-          (let [size (gobj/get file "size")
-                mimetype (gobj/get file "type")
-                filename (gobj/get file "name")
+          (let [size (oget file :size)
+                mimetype (oget file :type)
+                filename (oget file :name)
                 createdat (utils/js-date)
                 prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
                 subtitle (str prefix (filesize size :binary false :format "%.2f" ))
@@ -273,8 +305,9 @@
         placeholder (or (:placeholder options) "What would you like to share?")
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
-                           :useInlinePlusButton (:use-inline-media-picker options)
-                           :saveSelectionClickElementId default-mutli-picker-button-id
+                           :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
+                                                         :alwaysExpanded (:use-inline-media-picker options)}
+                           ; :saveSelectionClickElementId default-mutli-picker-button-id
                            :delegateMethods #js {:onPickerClick (partial on-picker-click s)
                                                  :willExpand #(reset! (::did-change s) true)}}
         media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
@@ -315,7 +348,7 @@
                                                    "details" "summary" "nav" "abbr"
                                                    "table" "thead" "tbody" "tr" "th" "td"]))}
                  :placeholder #js {:text placeholder
-                                   :hideOnClick true}
+                                   :hideOnClick false}
                  :keyboardCommands #js {:commands #js [
                                     #js {
                                       :command "bold"
@@ -361,11 +394,24 @@
                                (rum/local false ::media-attachment)
                                (rum/local false ::media-photo-did-success)
                                (rum/local false ::media-attachment-did-success)
+                               (rum/local false ::showing-media-video-modal)
+                               (rum/local false ::showing-gif-selector)
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
                                (drv/drv :team-roster)
                                (mention-mixins/oc-mentions-hover)
+                               (on-window-click-mixin (fn [s e]
+                                (when (and @(::showing-media-video-modal s)
+                                           (not (utils/event-inside? e (sel1 [:button.media.media-video])))
+                                           (not (utils/event-inside? e (rum/ref-node s :video-container))))
+                                  (media-video-add s @(::media-picker-ext s) nil)
+                                  (reset! (::showing-media-video-modal s) false))
+                                (when (and @(::showing-gif-selector s)
+                                           (not (utils/event-inside? e (sel1 [:button.media.media-gif])))
+                                           (not (utils/event-inside? e (sel1 [:div.giphy-picker]))))
+                                  (media-gif-add s @(::media-picker-ext s) nil)
+                                  (reset! (::showing-gif-selector s) false))))
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
@@ -399,26 +445,28 @@
              classes
              show-placeholder
              upload-progress-cb
-             multi-picker-container-selector
              dispatch-input-key
-             start-video-recording-cb]}]
-  [:div.rich-body-editor-container
-    (when multi-picker-container-selector
-      (when-let [multi-picker-container (.querySelector js/document multi-picker-container-selector)]
-        (rum/portal
-         (multi-picker
-          {:toggle-button-id default-mutli-picker-button-id
-           :add-photo-cb #(add-photo s nil)
-           :add-video-cb #(add-video s nil)
-           :add-attachment-cb #(add-attachment s nil)
-           :start-video-recording-cb #(do
-                                        (.removeSelection (get-media-picker-extension s))
-                                        (start-video-recording-cb %))})
-         multi-picker-container)))
-    [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
-      {:ref "body"
-       :content-editable (not nux)
-       :class (str classes
-               (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
-                                 :uploading @(::upload-lock s)}))
-       :dangerouslySetInnerHTML (utils/emojify initial-body)}]])
+             attachment-dom-selector
+             start-video-recording-cb
+             fullscreen]}]
+  [:div.rich-body-editor-outer-container
+    [:div.rich-body-editor-container
+      [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
+        {:ref "body"
+         :content-editable (not nux)
+         :class (str classes
+                 (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                                   :uploading @(::upload-lock s)}))
+         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
+    (when @(::showing-media-video-modal s)
+      [:div.video-container
+        {:ref :video-container}
+        (media-video-modal {:fullscreen fullscreen
+                            :dismiss-cb #(do
+                                          (media-video-add s @(::media-picker-ext s) nil)
+                                          (reset! (::showing-media-video-modal s) false))})])
+    (when @(::showing-gif-selector s)
+      (giphy-picker {:fullscreen fullscreen
+                     :pick-emoji-cb (fn [gif-obj]
+                                     (reset! (::showing-gif-selector s) false)
+                                     (media-gif-add s @(::media-picker-ext s) gif-obj))}))])

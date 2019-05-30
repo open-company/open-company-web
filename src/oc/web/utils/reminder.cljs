@@ -112,12 +112,15 @@
                                        :tooltip tooltip}))
                       (:items roster-data))
         users-list (vec (map #(-> %
-                                (assoc :name (utils/name-or-email %))
+                                (assoc :name (str (utils/name-or-email %) (when (= (:user-id %) (jwt/user-id)) " (you)")))
                                 (select-keys [:name :user-id :disabled :tooltip])
                                 (rename-keys {:name :label :user-id :value})
                                 (assoc :user-map %))
-                     fixed-roster))]
-    (sort-by :label users-list)))
+                     fixed-roster))
+        splitted (group-by #(= (:value %) (jwt/user-id)) users-list)
+        self-user (-> splitted (get true) first)
+        without-user (get splitted false)]
+    (concat [self-user] (sort-by :label without-user))))
 
 (defn sort-fn [reminder-a reminder-b]
   (let [assignee-compare (compare (:name (:assignee reminder-a)) (:name (:assignee reminder-b)))]

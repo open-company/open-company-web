@@ -1,5 +1,6 @@
 (ns oc.web.utils.comment
   (:require [cljsjs.medium-editor]
+            [defun.core :refer (defun-)]
             [goog.object :as gobj]
             [cuerdas.core :as string]
             [oc.web.api :as api]
@@ -26,7 +27,7 @@
                             :unwrapTags #js ["div" "label" "font" "h1" "h2" "h3" "h4" "h5" "div" "p" "ul" "ol" "li"
                                              "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                              "details" "summary" "nav" "abbr" "a"]}
-                :placeholder #js {:text "Add a comment..."
+                :placeholder #js {:text "Leave a new comment…"
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
                                   #js {
@@ -86,7 +87,9 @@
   (let [comments-link (utils/link-for (:links activity-data) "comments")
         activity-uuid (:uuid activity-data)
         comments-data (get all-comments-data activity-uuid)
-        should-load-comments? (and ;; there are comments to load,
+        should-load-comments? (and ;; there is a comments link
+                                   (map? comments-link)
+                                   ;; there are comments to load,
                                    (pos? (:count comments-link))
                                    ;; they are not already loading,
                                    (not (:loading comments-data))
@@ -95,3 +98,11 @@
     ;; Load the whole list of comments if..
     (when should-load-comments?
       (get-comments activity-data))))
+
+(defun- sort-comments
+  ([comments :guard nil?]
+   [])
+  ([comments :guard map?]
+   (sort-comments (vals comments)))
+  ([comments :guard sequential?]
+   (vec (sort-by :created-at comments))))

@@ -3,13 +3,9 @@ nav.oc-navbar {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: white;
+  background-color: $grey_num_2;
   transition: height 230ms;
   border-bottom: 1px solid $ultra_light_grey;
-
-  &.showing-qsg {
-    width: calc(100% - #{$qsg_width});
-  }
 
   &.showing-orgs-dropdown {
     overflow: visible;
@@ -22,10 +18,12 @@ nav.oc-navbar {
   @include mobile(){
     transition: 230ms;
     overflow: hidden;
-    height: #{$navbar_height}px;
+    height: #{$mobile_navbar_height}px;
     padding-bottom: 1px;
     border-bottom: none;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid $grey_num_3;
+    background-color: $grey_num_2;
+    overflow: visible;
 
     &.show-login-overlay {
       height: 100vh !important;
@@ -35,33 +33,33 @@ nav.oc-navbar {
       overflow: visible;
     }
 
-    &.mobile-menu-open {
+    &.expanded-user-menu {
       height: 100vh;
     }
   }
 
   z-index: $navbar_zindex;
-  background-color: white;
   margin: 0px;
-
-  div.oc-navbar-header {
-    padding-top: 10px;
-  }
 
   div.oc-navbar-header {
     position: relative;
     margin: 0 auto;
-    padding: 12px 24px;
+    padding: 12px 16px;
     height: #{$navbar_height}px;
     width: 100%;
 
     @include mobile() {
       width: 100vw;
-      padding: 12px 16px;
+      padding: 16px;
+      height: #{$mobile_navbar_height}px;
     }
 
     div.oc-navbar-header-container{
       height: 32px;
+
+      @include mobile(){
+        height: 40px;
+      }
 
       div.navbar-center {
         text-align: center;
@@ -71,24 +69,172 @@ nav.oc-navbar {
         left: 50%;
         top: 12px;
         margin-left: -160px;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 26px;
         transition: margin-left 320ms ease-in, width 320ms ease-in;
+
+        @include mobile() {
+          position: absolute;
+          top: 16px;
+          left: 72px;
+          width: calc(100vw - 64px - 80px);
+          height: 40px;
+          margin: 0;
+        }
+
+        div.mobile-sections-list {
+          display: none;
+
+          @include mobile() {
+            display: block;
+            width: calc(100vw - 64px - 80px);
+            max-height: 60vh;
+            position: absolute;
+            top: 48px;
+            left: 0;
+            border-radius: 4px;
+            background-color: white;
+            padding: 8px 0 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            border: 1px solid $mid_light_grey;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+
+            button.mobile-section-item {
+              display: block;
+              width: 100%;
+              height: 34px;
+              padding: 8px 16px;
+              @include OC_Body_Book();
+              color: rgba($light_navy, 0.5);
+              font-size: 14px;
+              line-height: 18px;
+              text-align: left;
+              max-width: 100%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              position: relative;
+
+              &.compose {
+                padding-left: 39px;
+                &:before {
+                  content: " ";
+                  width: 12px;
+                  height: 12px;
+                  position: absolute;
+                  top: 11px;
+                  left: 18px;
+                  background-image: cdnUrl("/img/ML/compose_icon_grey.svg");
+                  background-size: 12px 12px;
+                  background-repeat: no-repeat;
+                  background-position: center;
+                  opacity: 0.5;
+                }
+              }
+
+              &.all-posts {
+                padding-left: 39px;
+                &:before {
+                  content: " ";
+                  width: 16px;
+                  height: 16px;
+                  position: absolute;
+                  top: 9px;
+                  left: 16px;
+                  background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
+                  background-size: 16px 16px;
+                  background-repeat: no-repeat;
+                  background-position: center;
+                  opacity: 0.5;
+                }
+              }
+
+              &.drafts {
+                padding-left: 39px;
+                &:before {
+                  content: " ";
+                  width: 12px;
+                  height: 16px;
+                  position: absolute;
+                  top: 9px;
+                  left: 18px;
+                  background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
+                  background-size: 12px 16px;
+                  background-repeat: no-repeat;
+                  background-position: center;
+                  opacity: 0.5;
+                }
+              }
+
+              &.active {
+                background-color: $ultra_light_grey;
+                color: $light_navy;
+
+                &.all-posts:before, &.drafts:before {
+                  opacity: 1;
+                }
+              }
+            }
+
+            button.mobile-section-item-compose {
+              border-radius: 6px;
+              background-color: $carrot_green;
+              margin: 8px;
+              text-align: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 40px;
+              width: calc(100% - 16px);
+              opacity: 1;
+
+              span.compose-green-icon {
+                width: 12px;
+                height: 22px;
+                background-image: cdnUrl("/img/ML/white_pen.svg");
+                background-size: 12px 12px;
+                background-position: center;
+                background-repeat: no-repeat;
+              }
+
+              span.compose-green-label {
+                @include OC_Body_Bold();
+                font-size: 16px;
+                line-height: 22px;
+                color: white;
+                margin-left: 8px;
+                margin-top: 1px;
+              }
+            }
+          }
+        }
 
         &.search-active {
           width: 430px;
           margin-left: -215px;
         }
 
-        @include mobile() {
-          width: 80px;
-          height: 32px;
-          margin-left: -40px;
-          transition: margin-left 0ms ease-in, width 0ms ease-in;
+        button.mobile-board-button {
+          display: none;
 
-          &.search-active {
-            width: 80px;
-            margin-left: -40px;
+          @include mobile() {
+            display: block;
+            width: calc(100vw - 64px - 80px);
+            margin: 0;
+            height: 40px;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
+            border: none;
+            padding: 10px 14px;
+            @include OC_Body_Book();
+            font-size: 16px;
+            color: $deep_navy;
+            text-align: left;
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            background-size: 8px 10px;
+            background-position: top 15px right 8px;
+            background-repeat: no-repeat;
           }
         }
 
@@ -102,85 +248,35 @@ nav.oc-navbar {
         float: left;
         height: 32px;
 
-        @include mobile() {
-          width: 40%;
-        }
+        div.orgs-dropdown {
+          float: left;
 
-        button.mobile-navigation-sidebar-ham-bt {
-          display: none;
+          @include mobile(){
+            height: 40px;
+            @include org-avatar(40);
 
-          @include mobile() {
-            position: relative;
-            padding: 0 0 0 35px;
-            display: block;
-            height: 32px;
-            opacity: 1;
-            width: 60vw;
-
-            &:after {
-              content: "";
-              width: 19px;
-              height: 12px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
-              background-repeat: no-repeat;
-              background-size: 19px 12px;
-              background-position: center;
-              position: absolute;
-              opacity: 0.5;
-              left: 0;
-              top: 9px;
+            button.orgs-dropdown-btn {
+              div.org-avatar div.org-avatar-container span.org-name {
+                display: none;
+              }
             }
 
-            span.private-icon {
-              margin-right: 6px;
-              width: 10px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_private_board.svg");
-              background-repeat: no-repeat;
-              background-size: 10px 13px;
-              background-position: center 8px;
-              display: block;
-              float: left;
+            div.org-avatar-container {
+              span.org-name {
+                display: none;
+              }
             }
 
-            span.public-icon {
-              margin-right: 6px;
-              width: 12px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_public_board.svg");
-              background-repeat: no-repeat;
-              background-size: 12px 12px;
-              background-position: center;
-              display: block;
-              float: left;
-            }
+            ul.orgs-dropdown-menu {
+              li div.org-avatar {
+                @include org-avatar(24);
 
-            span.must-see-icon {
-              margin-right: 6px;
-              width: 12px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_navbar_must_see.svg");
-              background-repeat: no-repeat;
-              background-size: 12px 16px;
-              background-position: center;
-              display: block;
-              float: left;
-            }
-
-            span.board-name {
-              @include avenir_H();
-              font-size: 16px;
-              color: $deep_navy;
-              height: 32px;
-              line-height: 32px;
-              display: block;
-              float: left;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-width: calc(60vw - 35px);
-
-              &.has-icon {
-                max-width: calc(60vw - 53px);
+                div.org-avatar-container, div.org-avatar-container.no-avatar {
+                  span.org-name {
+                    display: block !important;
+                    max-width: 88px;
+                  }
+                }
               }
             }
           }
@@ -211,162 +307,47 @@ nav.oc-navbar {
         float: right;
         margin-right: 0px;
 
+        @include mobile() {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 40px;
+          height: 40px;
+        }
+
         div.user-notifications {
           float: left;
-          margin-right: 16px;
-          margin-top: 4px;
+          margin-right: 8px;
+
+          @include mobile() {
+            display: none;
+          }
         }
 
         div.user-menu {
-          width: 48px;
+          width: 32px;
           height: 32px;
           float: right;
           position: relative;
 
-          @inlcude mobile() {
+          @include mobile() {
             float: unset;
+            width: 40px;
+            height: 40px;
           }
 
-
-          div.qsg-tooltip-container {
-            border: 1px solid rgba($carrot_gold, 0.5);
-            background-color: #FDF6E4;
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-            width: 300px;
-            border-radius: 6px;
-            padding: 24px 20px;
-            margin: 12px 0 0;
-            position: absolute;
-            right: -16px;
-            top: 28px;
-            text-align: center;
-            z-index: 5;
-
-            div.qsg-tooltip-top-arrow {
-              position: absolute;
-              top: -6px;
-              width: 10px;
-              height: 6px;
-              right: 14px;
-              background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
-              background-position: center;
-              background-size: 10px 6px;
-              background-repeat: no-repeat;
-            }
-
-            button.qsg-tooltip-dismiss {
+          div.user-menu-button.green-dot {
+            position: relative;
+            &:after {
+              content: "";
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              background-color: $carrot_green;
               position: absolute;
               top: 0;
               right: 0;
-              width: 32px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
-              background-size: 8px 8px;
-              background-position: center;
-              background-repeat: no-repeat;
-            }
-
-            div.qsg-tooltips {
-
-              div.qsg-tooltip-title {
-                @include PTSerif();
-                font-size: 18px;
-                color: $deep_navy;
-                line-height: 20px;
-              }
-
-              div.qsg-tooltip {
-                @include avenir_R();
-                font-size: 16px;
-                color: $deep_navy;
-                line-height: 18px;
-                margin: 4px auto 0;
-                text-align: center;
-                max-width: 92%;
-              }
-
-              button.qsg-tooltip-bt {
-                width: auto;
-                margin-top: 16px;
-                height: 32px;
-                width: 96px;
-                background-color: transparent;
-                border-radius: 6px;
-                color: white;
-                background-color: $carrot_green;
-                @include avenir_H();
-                font-size: 16px;
-              }
-            }
-          }
-        }
-
-        div.mobile-right-nav {
-          display: none;
-        }
-
-        @include mobile() {
-          div.mobile-right-nav {
-            display: block;
-            float: right;
-            height: 32px;
-
-            button:not(:last-child) {
-              margin: 0 16px 0 0;
-            }
-
-            button:last-child {
-              margin: 0;
-            }
-
-            button.search-bt {
-              width: 24px;
-              height: 24px;
-              background-image: cdnUrl("/img/ML/spyglass.svg");
-              background-size: 18px 18px;
-              background-repeat: no-repeat;
-              background-position: 0px center;
-              padding: 0;
-              margin-top: 4px;
-              display: block;
-              float: left;
-
-              @include preload_image(cdnUlr("/img/ML/spyglass_active.svg"));
-
-              &.active {
-                background-image: cdnUrl("/img/ML/spyglass_active.svg");
-              }
-            }
-
-            button.mobile-notification-bell {
-              width: 24px;
-              height: 24px;
-              background-image: cdnUrl("/img/ML/notification_bell.svg");
-              background-size: 16px 20px;
-              background-position: 0 center;
-              background-repeat: no-repeat;
-              padding: 0;
-              margin-top: 4px;
-              display: block;
-              float: left;
-
-              @include preload_image(cdnUlr("/img/ML/notification_bell_active.svg"));
-
-              &.active {
-                background-image: cdnUrl("/img/ML/notification_bell_active.svg");
-              }
-            }
-
-            button.mobile-compose-bt {
-              width: 32px;
-              height: 32px;
-              background-image: cdnUrl("/img/ML/mobile_plus_button.svg");
-              background-size: 32px 32px;
-              background-position: 0 center;
-              background-repeat: no-repeat;
-              padding: 0;
-              display: block;
-              float: left;
+              border: 2px solid $grey_num_2;
             }
           }
         }

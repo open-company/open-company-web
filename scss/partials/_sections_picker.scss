@@ -1,135 +1,53 @@
 div.sections-picker {
   background-color: white;
-  border-radius: 6px;
-  border: 1px solid $deep_tan;
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-  padding: 16px 0 4px;
-  width: 200px;
+  border-radius: 4px;
+  border: 1px solid $mid_light_grey;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+  width: 160px;
   max-height: 100vh;
   cursor: default;
 
-  div.sections-picker-header {
-    height: 33px;
-    border-bottom: 1px solid $ultra_light_grey;
-    padding: 0 16px 9px;
-
-    div.sections-picker-header-left {
-      float: left;
-      @include avenir_B();
-      font-size: 13px;
-      color: $ui_grey;
-      text-transform: uppercase;
-      white-space: nowrap;
-      max-width: 80%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    div.sections-picker-header-right {
-      float: right;
-      width: 20%;
-
-      button.add-new-section-bt {
-        height: 24px;
-        width: 24px;
-        background-image: cdnUrl("/img/ML/sections_picker_add_section.svg");
-        background-size: 16px 16px;
-        background-position: 8px center;
-        background-repeat: no-repeat;
-        padding: 0;
-        float: right;
-      }
-    }
-  }
-
   div.sections-picker-content {
-    padding: 0 16px;
+    padding: 8px 0;
     overflow-y: auto;
 
-    div.sections-picker-group {
+    div.sections-picker-section {
+      padding: 8px 16px;
+      cursor: pointer;
 
-      div.sections-picker-section {
-        border-bottom: 1px solid $ultra_light_grey;
-        padding: 16px 0px;
-        cursor: pointer;
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        @include big_web() {
-          &.active, &:hover {
-            div.sections-picker-circle {
-              border: 1px solid $carrot_orange_2;
-              position: relative;
-
-              &:after {
-                content: "";
-                background-color: $carrot_orange_2;
-                border-radius: 50%;
-                width: 8px;
-                height: 8px;
-                position: absolute;
-                left: 3px;
-                top: 3px;
-              }
-            }
+      @include big_web() {
+        &.active, &:hover {
+          div.sections-picker-section-name {
+            opacity: 1;
           }
         }
+      }
 
-        @include mobile() {
-          &.active {
-            div.sections-picker-circle {
-              border: 1px solid $carrot_orange_2;
-              position: relative;
-
-              &:after {
-                content: "";
-                background-color: $carrot_orange_2;
-                border-radius: 50%;
-                width: 8px;
-                height: 8px;
-                position: absolute;
-                left: 3px;
-                top: 3px;
-              }
-            }
-          }
-        }
-
+      @include mobile() {
         &.active {
           div.sections-picker-section-name {
-            @include avenir_H();
-            color: $deep_navy;
+            opacity: 1;
           }
         }
+      }
 
-        div.sections-picker-circle {
-          float: right;
-          width: 16px;
-          height: 16px;
-          border: 1px solid $light_ui_grey;
-          border-radius: 50%;
-        }
-
+      &.active {
         div.sections-picker-section-name {
-          @include avenir_R();
-          font-size: 14px;
-          color: $ui_grey;
-          float: left;
-          width: 150px;
-
-          span.name {
-            max-width: 126px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          @include mobile() {
-            width: 80%;
-          }
+          opacity: 1;
         }
+      }
+
+      div.sections-picker-section-name {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        opacity: 0.5;
+        height: 18px;
+        line-height: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
       }
     }
   }

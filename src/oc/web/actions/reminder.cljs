@@ -45,13 +45,15 @@
   "Move a reminder in the edit location of the app-state and open the edit component."
   [reminder-uuid]
   (dis/dispatch! [:edit-reminder (router/current-org-slug) reminder-uuid])
-  (dis/dispatch! [:input [:show-reminders] reminder-uuid]))
+  ; (dis/dispatch! [:input [:show-reminders] reminder-uuid])
+  (nav-actions/edit-reminder reminder-uuid))
 
 (defn new-reminder
   "Move an empty reminder in the edit location of the app-state and open the edit component."
   []
   (dis/dispatch! [:edit-reminder (router/current-org-slug)])
-  (dis/dispatch! [:input [:show-reminders] :new]))
+  ; (dis/dispatch! [:input [:show-reminders] :new])
+  (nav-actions/show-new-reminder))
 
 (defn update-reminder
   "Update a reminder map."
@@ -90,7 +92,7 @@
                                                                 "Reminder created and teammate notified")
                                                         :primary-bt-title "OK"
                                                         :primary-bt-dismiss true
-                                                        :expire 10
+                                                        :expire 3
                                                         :id :reminder-created})))
            (refresh-reminders)))))))
 
@@ -98,7 +100,7 @@
   "Exit edit losing changes."
   []
   (dis/dispatch! [:cancel-edit-reminder (router/current-org-slug)])
-  (nav-actions/show-reminders))
+  (nav-actions/close-reminders))
 
 (defn delete-reminder
   "Delete a reminder."

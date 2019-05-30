@@ -10,26 +10,22 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
-            [oc.web.actions.qsg :as qsg-actions]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.mixins.ui :refer (no-scroll-mixin)]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]))
 
 ;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
-(defn show-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] (or panel :main)]))
-
 (defn dismiss-modal [& [panel]]
-  (dis/dispatch! [:input [:org-settings] nil]))
+  (nav-actions/show-org-settings nil))
 
 (rum/defc org-settings-tabs
   [org-data active-tab]
@@ -40,14 +36,14 @@
         {:class (when (= :main active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :main))}
+           :on-click #(do (utils/event-stop %) (nav-actions/show-org-settings :org))}
           "SETTINGS"]])
     (when (utils/is-admin? org-data)
       [:div.org-settings-tab
         {:class (when (= :team active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
-           :on-click #(do (utils/event-stop %) (show-modal :team))}
+           :on-click #(do (utils/event-stop %) (nav-actions/show-org-settings :team))}
           "MANAGE TEAM"]])
     (when (utils/is-admin-or-author? org-data)
       [:div.org-settings-tab
@@ -56,7 +52,7 @@
           {:href "#"
            :on-click (fn [e]
                        (utils/event-stop e)
-                       (show-modal :invite))}
+                       (nav-actions/show-org-settings :invite))}
           "INVITE PEOPLE"]])])
 
 (defn close-clicked [s]
@@ -95,7 +91,7 @@
   (notification-actions/show-notification
    {:title "Image upload error"
     :description "An error occurred while processing your company avatar. Please retry."
-    :expire 5
+    :expire 3
     :id :org-avatar-upload-failed
     :dismiss true})
   (when img
@@ -117,7 +113,6 @@
 (defn logo-on-click [org-avatar-editing]
   (iu/upload! org-utils/org-avatar-filestack-config
     (fn [res]
-      (qsg-actions/finish-company-logo-trail)
       (let [url (gobj/get res "url")
             img (gdom/createDom "img")]
         (set! (.-onerror img) #(logo-add-error img))
@@ -127,7 +122,6 @@
         (set! (.-src img) url)))
     nil
     (fn [err]
-      (qsg-actions/finish-company-logo-trail)
       (logo-add-error nil))))
 
 (rum/defcs org-settings
@@ -137,12 +131,11 @@
     ;; Derivatives
     (drv/drv :org-data)
     (drv/drv :org-editing)
-    (drv/drv :org-settings)
     (drv/drv :alert-modal)
     (drv/drv :org-editing)
+    (drv/drv :current-panel)
     (drv/drv :invite-data)
     (drv/drv :org-avatar-editing)
-    (drv/drv :qsg)
     ;; Mixins
     no-scroll-mixin
 
@@ -159,31 +152,27 @@
       s)}
   [s]
   (let [org-editing (drv/react s :org-editing)
-        settings-tab (drv/react s :org-settings)
+        settings-tab (drv/react s :current-panel)
         org-data (drv/react s :org-data)
         alert-modal-data (drv/react s :alert-modal)
         main-tab? (= settings-tab :main)
         org-avatar-editing (drv/react s :org-avatar-editing)
-        org-data-for-avatar (merge org-data org-avatar-editing)
-        qsg-data (drv/react s :qsg)]
+        org-data-for-avatar (merge org-data org-avatar-editing)]
     (when (:read-only org-data)
       (utils/after 100 dismiss-modal))
     (if org-data
       [:div.org-settings.fullscreen-page
-        {:class (when (:visible qsg-data) "showing-qsg")}
         [:div.org-settings-inner
           (when-not alert-modal-data
             [:button.settings-modal-close.mlb-reset
               {:on-click #(close-clicked s)}])
           [:div.org-settings-header
-            [:div.org-settings-header-avatar.qsg-company-logo-3
+            [:div.org-settings-header-avatar
               {:ref "org-settings-header-logo"
                :class (utils/class-set {:missing-logo (empty? (:logo-url org-avatar-editing))
                                         :main-panel main-tab?
                                         utils/hide-class true})
                :on-click logo-on-click}
-              (when (= (:step qsg-data) :company-logo-3)
-                (qsg-breadcrumb qsg-data))
               (org-avatar org-data-for-avatar false :never)]
             [:div.org-name (:name org-data)]
             [:div.org-url (str ls/web-server "/" (:slug org-data))]]

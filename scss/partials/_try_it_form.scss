@@ -11,7 +11,7 @@ div.try-it-combo-field {
       border-bottom-left-radius: 100px;
       width: 322px;
       height: 48px;
-      @include avenir_M();
+      @include OC_Body_Book();
       font-size: 16px;
       color: $carrot_dark_brown;
       padding: 11px 20px 10px;
@@ -41,7 +41,7 @@ div.try-it-combo-field {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     color: white;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 16px;
     padding: 10px 18px;
 
@@ -58,7 +58,7 @@ div.get-started-button {
     height: 32px;
     border-radius: 6px;
     background-color: $carrot_text_blue;
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 13px;
     color: white;
     padding: 8px 20px;
@@ -89,7 +89,7 @@ div.get-started-button {
       background-color: $carrot_text_blue;
       color: white;
       font-size: 16px;
-      @include avenir_H();
+      @include OC_Body_Bold();
       padding: 13px 80px;
       width: auto;
       height: auto;
@@ -103,12 +103,12 @@ div.get-started-button {
     margin-top: 20px;
 
     a {
-      @include avenir_BOOK();
+      @include OC_Body_Book();
       font-size: 14px;
       color: white;
 
       span.login {
-        @include avenir_M();
+        @include OC_Body_Book();
         text-decoration: underline;
       }
     }

@@ -1,7 +1,6 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
-  margin-top: 16px;
 
   @include tablet() {
     padding: 0;
@@ -20,98 +19,137 @@ div.add-comment-box-container {
       box-shadow: none;
     }
 
-    &.show-buttons {
+    @include user-profile(24);
 
-      div.add-comment-internal {
-        min-height: unset;
-        border: 1px solid $light_ui_grey;
-        padding: 9px 16px 32px 16px;
+    div.user-avatar-img-container {
+      position: absolute;
+      top: 8px;
+      left: 0;
 
-        div.add-comment {
-          min-height: 29px;
-
-          @include tablet() {
-            height: auto;
-            width: auto;
-          }
-        }
-
-        div.emoji-picker {
-          display: block;
-        }
+      @include mobile() {
+        display: none;
       }
     }
 
-    div.add-comment-internal{
-      min-height: 49px;
-      width: 100%;
+    @include mobile() {
       background-color: white;
+      border: 1px solid $mid_light_grey;
       border-radius: 4px;
-      border: 1px solid $medium_light_grey;
-      padding: 9px 16px;
-      position: relative;
+      padding: 9px 14px;
+    }
 
-      &:hover {
-        border: 1px solid $light_ui_grey;
+    div.add-comment-internal{
+      position: absolute;
+      bottom: 0;
+      left: 40px;
+      width: calc(100% - 24px - 16px - 50px);
+      position: relative;
+      max-height: 200px;
+      border-radius: 4px;
+      border: 1px solid $mid_light_grey;
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      @include mobile() {
+        width: 100%;
+        left: unset;
+        position: relative;
+        bottom: unset;
+        max-height: unset;
+        border: none;
       }
 
       div.add-comment {
         resize: none;
-        border: none;
         outline: none;
-        @include avenir_R();
-        color: $deep_navy;
-        font-size: 16px;
-        cursor: text;
-        height: 27px;
-        min-height: initial;
+        cursor: auto;
         white-space: pre-wrap;
         word-wrap: break-word;
-        padding: 4px 0px 0px 0px;
-        margin: 0px;
+        margin: 0;
+        padding: 9px 14px;
+        background-color: white;
         height: auto;
-        min-height: 27px;
+        min-height: 38px;
+        outline: none;
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
-        &.medium-editor-placeholder:after {
-          @include avenir_R();
-          color: rgba($ui_grey, 0.5);
-          margin-left: 0px;
+        @include mobile() {
+          padding: 0;
+          border: none;
+          border-radius: 0;
+          box-shadow: none;
+          min-height: unset;
+        }
+
+        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: rgba($deep_navy, 0.5);
+          font-style: normal;
         }
 
         @include tablet() {
-          width: 100%;
+          width: calc(100% - 48px);
           resize: vertical;
           padding-right: 0px;
-        }
-
-        p {
-          margin-bottom: 0px;
         }
 
         .emojione {
           @include emoji-size(13);
         }
 
-        a {
-          color: $carrot_green;
-        }
+        @include activity-comment();
       }
 
-      div.emoji-picker {
-        position: absolute;
-        top: unset;
-        bottom: 0px;
-        right: 0px;
-        display: none;
+      // div.emoji-picker {
+      //   position: absolute;
+      //   top: unset;
+      //   bottom: 0px;
+      //   right: 0px;
+      //   display: none;
 
-        div.picker-container {
-          left: unset;
-          right: -5px;
-          top: 24px;
+      //   div.picker-container {
+      //     left: unset;
+      //     right: -5px;
+      //     top: 24px;
+      //   }
+
+      //   @include tablet() {
+      //     display: none;
+      //   }
+      // }
+    }
+
+    button.send-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 0;
+      width: 50px;
+      height: 24px;
+      padding: 0;
+      margin: 0;
+      text-align: right;
+      color: $carrot_green;
+      @include OC_Body_Bold();
+      font-size: 16px;
+
+      @include mobile() {
+        right: 10px;
+        width: 40px;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 1 !important;
+
+        @include mobile() {
+          color: rgba($light_navy, 0.5);
         }
 
-        @include tablet() {
-          display: none;
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
         }
       }
     }
@@ -128,7 +166,7 @@ div.add-comment-box-container {
         padding: 10px 24px;
         text-align: center;
         color: $ui_grey;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
 
         &:disabled {
@@ -144,9 +182,9 @@ div.add-comment-box-container {
         background-color: $carrot_green;
         text-align: center;
         color: white;
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 14px;
-        border-radius: 100px;
+        border-radius: 6px;
 
         &:disabled {
           background-color: $light_ui_grey;
