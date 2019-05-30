@@ -144,10 +144,6 @@ span.num.red {
   background: rgba(250,100,82, 0.5);
 }
 
-.navbar-offset {
-  padding-top: #{$navbar_height}px;
-}
-
 div#wrap {
   min-height: 100vh;
   background-color: $ultra_light_gold;
@@ -270,4 +266,10 @@ div.not-found, div.server-error{
   max-height: 300px;
   top: 0px;
   overflow: scroll;
+}
+
+.oc-input {
+  &.active, &:active, &:focus {
+    opacity: 0.9;
+  }
 }

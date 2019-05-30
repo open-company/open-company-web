@@ -1,8 +1,7 @@
 div.giphy-picker {
   position: absolute;
-  bottom: 48px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  right: 0;
   border-radius: 4px;
   border: 1px solid $ultra_light_grey;
   padding: 16px 8px;
@@ -38,8 +37,13 @@ div.giphy-picker {
       }
     }
 
-    div.giphy-picker-results-container {
+    .giphy-picker-results-container {
       margin-top: 16px;
+      max-height: 212px !important;
+
+      &.fullscreen {
+        max-height: 300px !important;
+      }
 
       .giphy-picker-results-item {
         margin-top: 8px;

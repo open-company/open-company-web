@@ -166,10 +166,13 @@
         disallow-public-board? (and (:content-visibility org-data)
                                     (:disallow-public-board (:content-visibility org-data)))]
     [:div.section-editor-container
+      {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :section-editor))
+                    (on-change nil nil nav-actions/close-all-panels))}
       [:button.mlb-reset.modal-close-bt
         {:on-click #(on-change nil nil nav-actions/close-all-panels)}]
       [:div.section-editor.group
-        {:on-click (fn [e]
+        {:ref :section-editor
+         :on-click (fn [e]
                      (when-not (utils/event-inside? e (rum/ref-node s "section-editor-add-access-list"))
                        (reset! (::show-access-list s) false))
                      (when-not (utils/event-inside? e (rum/ref-node s "private-users-search"))
@@ -207,7 +210,7 @@
         [:div.section-editor-add
           [:div.section-editor-add-label
             [:span.section-name "Section name"]]
-          [:div.section-editor-add-name
+          [:div.section-editor-add-name.oc-input
             {:content-editable true
              :placeholder "Section name"
              :ref "section-name"
@@ -236,8 +239,8 @@
                        (:section-error section-editing)))])
           [:div.section-editor-add-label
             "Section security"]
-          [:div.section-editor-add-access
-            {:class (when @(::show-access-list s) "expanded")
+          [:div.section-editor-add-access.oc-input
+            {:class (when @(::show-access-list s) "active")
              :on-click #(do
                           (utils/event-stop %)
                           (reset! (::show-access-list s) (not @(::show-access-list s))))}
@@ -320,7 +323,7 @@
               (when can-change
                 [:div.section-editor-private-users-search
                   {:ref "private-users-search"}
-                  [:input
+                  [:input.oc-input
                     {:class utils/hide-class
                      :value @query
                      :type "text"
@@ -449,7 +452,7 @@
             [:div.section-editor-add-label
               "Personal note"])
           (when (= (:access section-editing) "private")
-            [:div.section-editor-add-personal-note
+            [:div.section-editor-add-personal-note.oc-input
               {:class utils/hide-class
                :content-editable true
                :placeholder "Add a personal note to your invitation..."
@@ -485,9 +488,8 @@
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
                                                       {:title "Section deleted"
-                                                       :primary-bt-title "OK"
-                                                       :primary-bt-dismiss true
-                                                       :expire 10
+                                                       :dismiss true
+                                                       :expire 3
                                                        :id :section-deleted}))
                                                    (alert-modal/hide-alert)
                                                    (nav-actions/hide-section-editor))})))

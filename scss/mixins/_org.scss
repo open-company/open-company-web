@@ -18,6 +18,7 @@
 
       border: 1px solid $ultra_light_grey;
       background-size: #{$logo_width}px #{$logo_height}px;
+      border-radius: 4px;
     } @else {
       $logo_width: $max_logo_height * (66 / 119);
 

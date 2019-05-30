@@ -2,6 +2,25 @@ div.stream-comments {
   height: 100%;
   position: relative;
 
+  &.editing {
+    div.stream-comments-list {
+      div.streacm-comment {
+        @include big_web(){
+          &:hover {
+            background-color: transparent;
+            div.stream-comment-floating-buttons {
+              display: none;
+            }
+
+            div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
   div.stream-comments-empty {
     display: none;
   }
@@ -22,8 +41,8 @@ div.stream-comments {
       }
 
       @include big_web() {
-        &:not(.highlighted):hover div.stream-comment-inner {
-          background-color: rgba($ultra_light_grey, 0.3);
+        &:not(.editing-other-comment):not(.highlighted):hover div.stream-comment-inner {
+          background-color: #F5F5F5;
 
           div.stream-comment-floating-buttons {
             display: block;
@@ -31,6 +50,28 @@ div.stream-comments {
 
           div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
             display: block;
+          }
+        }
+      }
+
+      div.stream-comment-mobile-menu {
+        display: none;
+
+        @include mobile() {
+          display: block;
+
+          div.more-menu {
+            button.more-menu-bt {
+              background-position: 0px left 4px top;
+              margin-top: -4px;
+            }
+
+            ul.more-menu-list {
+              width: 78px;
+              top: 20px;
+              right: 13px;
+              left: unset;
+            }
           }
         }
       }
@@ -67,6 +108,7 @@ div.stream-comments {
             outline: none;
             padding: 4px;
             box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            padding: 8px 16px;
 
             &:focus, &:active {
               outline: none;
@@ -236,59 +278,8 @@ div.stream-comments {
         margin-top: 2px;
 
         div.stream-comment-body {
-          @include OC_Body_Book();
-          font-size: 16px;
-          color: $deep_navy;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-          line-height: 20px;
           display: inline;
-
-          & > *:last-child {
-            display: inline;
-          }
-
-          & > *:not(:last-child) {
-            display: block;
-          }
-
-          &.editing {
-            display: block;
-            margin-top: 6px;
-          }
-
-          &:hover {
-            a.read-more {
-              color: $carrot_green;
-            }
-          }
-
-          a.read-more {
-            @include OC_Body_Book();
-            font-size: 12px;
-            color: $deep_navy;
-          }
-
-          * {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-          }
-
-          margin-bottom: 0px;
-
-          &>*:last-child {
-            margin-bottom: 0px;
-          }
-
-          &.emoji-comment {
-            font-size: 40px;
-            height: 50px;
-            line-height: 50px;
-          }
-
-          a {
-            color: $carrot_green;
-          }
+          @include activity-comment();
         }
       }
 
@@ -300,11 +291,19 @@ div.stream-comments {
       div.stream-comment-footer {
         height: 24px;
         margin-top: 2px;
+
+        @include mobile() {
+          margin-top: 8px;
+        }
       }
 
       div.save-cancel-edit-buttons {
         float: right;
         padding-top: 16px;
+
+        @include mobile() {
+          padding-top: 0;
+        }
 
         button {
           float: right;

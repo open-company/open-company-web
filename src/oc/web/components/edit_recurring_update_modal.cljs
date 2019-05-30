@@ -66,7 +66,8 @@
                (not (utils/event-inside? e (rum/ref-node s :on-dd-node)))
                (not (utils/event-inside? e (rum/ref-node s :on-bt))))
       (reset! (::frequency-dropdown s) false)
-      (reset! (::on-dropdown s) false))))
+      (reset! (::on-dropdown s) false)
+      (reset! (::assignee-dropdown s) false))))
   [s]
   (let [reminder-data (drv/react s :reminder-edit)
         reminders-roster (drv/react s :reminders-roster)
@@ -110,13 +111,14 @@
             [:div.loading-users (small-loading)]
             [:div
               {:class (when (empty? users-list) "loading-users")}
-              [:div.field-value.dropdown-field-value
+              [:div.field-value.dropdown-field-value.oc-input
                 {:ref :assignee-bt
                  :on-click #(when-not (empty? users-list)
                               (swap! (::assignee-dropdown s) not)
                               (reset! (::frequency-dropdown s) false)
                               (reset! (::on-dropdown s) false))
-                 :class (when-not (:assignee reminder-data) "placeholder")}
+                 :class (utils/class-set {:placeholder (empty? (:assignee reminder-data))
+                                          :active @(::assignee-dropdown s)})}
                 (if (:assignee reminder-data)
                   (str (utils/name-or-email (:assignee reminder-data)) (when self-assignee? " (you)"))
                   "Pick a user")]
@@ -132,7 +134,7 @@
                                                  (update-reminder s {:assignee selected-user}))
                                                (reset! (::assignee-dropdown s) false))})])])
           [:div.field-label "To update the team about"]
-          [:input.field-value
+          [:input.field-value.oc-input
             {:value (or (:headline reminder-data) "")
              :ref :reminder-title
              :type "text"
@@ -142,13 +144,14 @@
           [:div.field-label "Every"]
           (let [frequency-value (get reminder-utils/frequency-values (:frequency reminder-data))]
             [:div
-              [:div.field-value.dropdown-field-value
+              [:div.field-value.dropdown-field-value.oc-input
                 {:ref :frequency-bt
                  :on-click #(do
                               (reset! (::assignee-dropdown s) false)
                               (swap! (::frequency-dropdown s) not)
                               (reset! (::on-dropdown s) false))
-                 :class (when-not frequency-value "placeholder")}
+                 :class (utils/class-set {:placeholder (empty? frequency-value)
+                                          :active @(::frequency-dropdown s)})}
                 (or frequency-value "Pick a frequency")]
               (when @(::frequency-dropdown s)
                 [:div.dropdown-container
@@ -178,12 +181,13 @@
                                                  (update-reminder s with-occurrence-value))
                                                (reset! (::frequency-dropdown s) false))})])])
           [:div.field-label on-label]
-          [:div.field-value.dropdown-field-value
+          [:div.field-value.dropdown-field-value.oc-input
             {:ref :on-bt
              :on-click #(do
                           (reset! (::assignee-dropdown s) false)
                           (reset! (::frequency-dropdown s) false)
-                          (swap! (::on-dropdown s) not))}
+                          (swap! (::on-dropdown s) not))
+             :class (when @(::on-dropdown s) "active")}
             occurrence-label-value]
           (when @(::on-dropdown s)
             [:div.dropdown-container

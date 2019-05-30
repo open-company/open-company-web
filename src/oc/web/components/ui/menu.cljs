@@ -67,10 +67,12 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
   {:did-mount (fn [s]
-   (whats-new/check-whats-new-badge)
+   (when (responsive/is-mobile-size?)
+     (whats-new/check-whats-new-badge))
    s)
    :did-remount (fn [_ s]
-   (whats-new/check-whats-new-badge)
+   (when (responsive/is-mobile-size?)
+     (whats-new/check-whats-new-badge))
     s)}
   [s]
   (let [{:keys [panel-stack org-data board-data]} (drv/react s :navbar-data)
@@ -93,34 +95,40 @@
         {:ref :menu-container}
         [:div.menu-header.group
           [:button.mlb-reset.mobile-close-bt
-            {:on-click #(do
-                         (menu-close s)
-                         (nav-actions/mobile-nav-sidebar))}]
+            {:on-click #(menu-close s)}]
+          (when is-mobile?
+            (user-avatar-image current-user-data))
           [:div.user-name
             {:class utils/hide-class}
             (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
-          (user-avatar-image current-user-data)]
-        (when (jwt/jwt)
+          (when-not is-mobile?
+            (user-avatar-image current-user-data))]
+        (when (and (jwt/jwt)
+                   (not is-mobile?))
           [:a
             {:href "#"
              :on-click (partial user-profile-click s)}
             [:div.oc-menu-item.personal-profile
               "My profile"]])
-        (when (jwt/jwt)
+        (when (and (jwt/jwt)
+                   (not is-mobile?))
           [:a
             {:href "#"
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
-        [:div.oc-menu-separator]
-        (when show-reminders?
+        (when-not is-mobile?
+          [:div.oc-menu-separator])
+        (when (and show-reminders?
+                   (not is-mobile?))
           [:a
             {:href "#"
              :on-click #(reminders-click s %)}
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        (when (or (= user-role :admin)
-                  show-invite-people?)
+        (when (and (not is-mobile?)
+                   (or (= user-role :admin)
+                       show-invite-people?))
           [:div.oc-menu-separator])
         (when (and (not is-mobile?)
                    (= user-role :admin)
@@ -158,7 +166,8 @@
         ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
         ;     [:div.oc-menu-item
         ;       "Billing"]])
-        [:div.oc-menu-separator]
+        (when-not is-mobile?
+          [:div.oc-menu-separator])
         [:a.whats-new-link
           (if is-mobile?
             {:href "https://whats-new.carrot.io/"
@@ -169,7 +178,7 @@
         [:a
           {:on-click #(chat/chat-click 42861)}
           [:div.oc-menu-item.support
-            "Chat with us"]]
+            "Get support"]]
         [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out

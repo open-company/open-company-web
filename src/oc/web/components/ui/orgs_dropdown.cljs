@@ -43,7 +43,6 @@
                                   :show-dropdown-caret orgs-dropdown-visible})
          :on-click (fn [e]
                      (utils/event-stop e)
-                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                      (when should-show-dropdown?
                        (dis/dispatch! [:input [:orgs-dropdown-visible] (not orgs-dropdown-visible)])))}
         (org-avatar org-data (not should-show-dropdown?) :always)]

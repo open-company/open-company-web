@@ -79,7 +79,7 @@
     [:div.slack-users-dropdown
       {:class (if disabled "disabled" "")
        :key (str "slack-users-dropdown-" (count all-sorted-users))}
-      [:input.slack-users-dropdown
+      [:input.slack-users-dropdown.oc-input
         {:value @(::slack-user s)
          :on-focus (fn []
                       (when (fn? on-focus) (on-focus))

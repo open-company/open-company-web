@@ -118,8 +118,7 @@
   (rum/local false ::show-advanced-settings)
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
-      (org-actions/get-org org-data)
-      (team-actions/force-team-refresh (:team-id org-data)))
+      (org-actions/get-org org-data))
     (reset-form s)
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
@@ -183,7 +182,7 @@
           [:div.org-settings-fields
             [:div.org-settings-label
               "Company name"]
-            [:input.org-settings-field
+            [:input.org-settings-field.oc-input
               {:type "text"
               :value (or (:name org-editing) "")
               :on-change #(dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. % -target -value)
@@ -198,7 +197,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-            [:input.org-settings-field
+            [:input.org-settings-field.oc-input
               {:type "text"
                :placeholder "@domain.com"
                :auto-capitalize "none"

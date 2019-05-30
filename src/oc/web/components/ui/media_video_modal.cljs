@@ -1,10 +1,14 @@
 (ns oc.web.components.ui.media-video-modal
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
+            [oops.core :refer (oget+)]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :refer (first-render-mixin)]))
+
+(def media-video-modal-height 153)
 
 (def youtube-regexp
  "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?(?:(?:time_continue|t)=\\d+s?&)?v=([a-zA-Z0-9_-]{11}).*")
@@ -109,23 +113,68 @@
                                (rum/local false ::dismiss)
                                (rum/local "" ::video-url)
                                (rum/local false ::video-url-focused)
+                               (rum/local 0 ::offset-top)
                                ;; Derivatives
                                (drv/drv :current-user-data)
                                ;; Mixins
                                first-render-mixin
-  [s {:keys [dismiss-cb]}]
+                               {:will-mount (fn [s]
+                                 (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
+                                   (reset! (::offset-top s) (.-offsetTop picker-el)))
+                                 s)
+                                :did-mount (fn [s]
+                                 (when-let [video-field (rum/ref-node s "video-input")]
+                                  (.focus video-field))
+                                s)}
+  [s {:keys [fullscreen dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
-        valid-url (valid-video-url? @(::video-url s))]
+        valid-url (valid-video-url? @(::video-url s))
+        scrolling-element-selector (if fullscreen :div.cmail-content-outer :div.cmail-content)
+        scrolling-element (sel1 [scrolling-element-selector])
+        win-height (or (.-clientHeight (.-documentElement js/document))
+                       (.-innerHeight js/window))
+        fixed-win-height (if fullscreen win-height (- win-height 52)) ;; Remove bottom padding of Cmail view
+        top-offset-limit (.-offsetTop (sel1 [:div.rich-body-editor-outer-container]))
+        top-limit (if fullscreen
+                    0
+                    ;; On Cmail the top limit is not 0 but it's the dark bar, so let's
+                    ;; calculate the distance btw the rich body editor and the top of the bar
+                    ;; and remove the bar height
+                    (+ (* -1 top-offset-limit)
+                       56))
+        offset-top (if fullscreen
+                    ;; On Bmail the offset is directly the top offset of the body container
+                    top-offset-limit
+                    ;; On cmail let's get the distance of Cmail from the top of the page
+                    ;; and add the distance between the rich-body-editor container
+                    ;; and the first fixed element (that is the limit to calculate the absolute offset)
+                    (+ (oget+ (.offset (js/$ (sel1 [:div.cmail-outer]))) :top)
+                       top-offset-limit))
+        ; offset-height (.-scrollHeight scrolling-element)
+        scroll-top (.-scrollTop scrolling-element)
+        top-position (max 0 @(::offset-top s))
+        relative-position (+ top-position
+                             offset-top
+                             (* scroll-top -1)
+                             media-video-modal-height)
+        adjusted-position (if (> relative-position fixed-win-height) ;; 286 is the top offset of the body
+                            (max top-limit (- top-position (- relative-position fixed-win-height) 16))
+                            top-position)]
     [:div.media-video-modal-container
-      {:class (when @(::video-url-focused s) "video-url-focused")}
+      {:class (when @(::video-url-focused s) "video-url-focused")
+       :style {:top (str adjusted-position "px")}}
       [:div.media-video-modal-title
         "Embed video"]
-      [:input.media-video-modal-input
+      [:input.media-video-modal-input.oc-input
           {:type "text"
            :value @(::video-url s)
            :ref "video-input"
            :on-change #(reset! (::video-url s) (.. % -target -value))
            :on-focus #(reset! (::video-url-focused s) true)
+           :on-key-press (fn [e]
+                           (when (and valid-url
+                                      (= (.-key e) "Enter"))
+                             (video-add-click s)))
            :on-blur #(when (clojure.string/blank? @(::video-url s))
                        (reset! (::video-url-focused s) false))
            :placeholder "Paste the video link…"}]

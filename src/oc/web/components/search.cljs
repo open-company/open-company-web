@@ -155,10 +155,10 @@
            :on-click #(search-reset s)}]
         [:div.spyglass-icon
           {:on-click #(reset! (::search-clicked? s) true)}]
-        [:input.search
+        [:input.search.oc-input
           {:class (when-not @(::search-clicked? s) "inactive")
            :ref "search-input"
-           :placeholder "Search posts…"
+           :placeholder "Search"
            :on-blur #(do
                        (when (responsive/is-mobile-size?)
                          (set! (.-placehoder (.-target %)) ""))

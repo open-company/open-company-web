@@ -23,9 +23,6 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 
-(defn close-navigation-sidebar []
-  (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
-
 (defn nav-to-url! [e url]
   (when (and e
              (.-preventDefault e))
@@ -36,11 +33,8 @@
       (do
         (routing-actions/routing @router/path)
         (user-actions/initial-loading true))
-      (router/nav! url)))
-  (close-navigation-sidebar))
+      (router/nav! url))))
 
-(defn mobile-nav-sidebar []
-  (dis/dispatch! [:update [:mobile-navigation-sidebar] not]))
 
 ;; Push panel
 
@@ -86,8 +80,7 @@
        (section-actions/section-save sec-data note dismiss-action)
        (when (fn? dismiss-action)
         (dismiss-action))))])
-  (push-panel :section-add)
-  (close-navigation-sidebar))
+  (push-panel :section-add))
 
 (defn show-section-add-with-callback [callback]
   (dis/dispatch! [:input [:show-section-add-cb]
@@ -103,16 +96,13 @@
 ;; Reminders
 
 (defn show-reminders []
-  (push-panel :reminders)
-  (close-navigation-sidebar))
+  (push-panel :reminders))
 
 (defn show-new-reminder []
-  (push-panel :reminder-new)
-  (close-navigation-sidebar))
+  (push-panel :reminder-new))
 
 (defn edit-reminder [reminder-uuid]
-  (push-panel (keyword (str "reminder-" reminder-uuid)))
-  (close-navigation-sidebar))
+  (push-panel (keyword (str "reminder-" reminder-uuid))))
 
 (defn close-reminders []
   (pop-panel))
@@ -133,20 +123,24 @@
 (defn show-org-settings [panel]
   (if panel
     (push-panel panel)
-    (pop-panel))
-  (close-navigation-sidebar))
+    (pop-panel)))
 
 (defn show-user-settings [panel]
   (if panel
     (push-panel panel)
-    (pop-panel))
-  (close-navigation-sidebar))
+    (pop-panel)))
 
 ;; WRT
 
 (defn show-wrt [activity-uuid]
-  (push-panel (keyword (str "wrt-" activity-uuid)))
-  (close-navigation-sidebar))
+  (push-panel (keyword (str "wrt-" activity-uuid))))
 
 (defn hide-wrt []
   (pop-panel))
+
+;; Integrations
+
+(defn open-integrations-panel []
+  (show-org-settings :integrations))
+
+(set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)

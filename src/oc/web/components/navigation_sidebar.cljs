@@ -55,7 +55,6 @@
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :editable-boards)
-                                (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :hide-left-navbar)
                                 ;; Locals
@@ -91,7 +90,6 @@
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
         current-user-data (drv/react s :current-user-data)
-        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
@@ -113,22 +111,10 @@
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :hide-left-navbar (drv/react s :hide-left-navbar)})}
-      [:div.mobile-header-container
-        [:button.mlb-reset.mobile-header-close
-          {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
-        (orgs-dropdown)
-        [:button.btn-reset.mobile-menu.group
-          {:on-click #(do
-                       (when is-mobile?
-                         (nav-actions/show-org-settings nil)
-                         (nav-actions/show-user-settings nil))
-                       (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                       (nav-actions/menu-toggle))}
-          (user-avatar-image current-user-data)]]
+      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})}
       [:div.left-navigation-sidebar-content
-        {:ref "left-navigation-sidebar-content"}
+        {:ref "left-navigation-sidebar-content"
+         :class (when can-compose "can-compose")}
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -137,7 +123,7 @@
              :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
@@ -168,8 +154,7 @@
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}])]])
+                   :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
@@ -189,7 +174,7 @@
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
+                    {:class (utils/class-set {:new (seq (:unread board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
                      :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]

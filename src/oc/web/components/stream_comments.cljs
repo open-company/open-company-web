@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
@@ -18,6 +19,7 @@
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
+            [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -28,7 +30,7 @@
       (events/unlistenByKey @(::esc-key-listener s))
       (reset! (::esc-key-listener s) nil))
     (reset! (::medium-editor s) nil)
-    (reset! (::editing? s) false)))
+    (reset! (::editing? s) nil)))
 
 (defn cancel-edit
   [e s c]
@@ -104,7 +106,7 @@
                              (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local false ::showing-menu)
-                             (rum/local false ::editing?)
+                             (rum/local nil ::editing?)
                              (rum/local false ::medium-editor)
                              (rum/local nil ::esc-key-listener)
                              (rum/local [] ::expanded-comments)
@@ -140,14 +142,18 @@
                                       (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"})
                                       (utils/after 1000(fn []
                                        (reset! (::highlight-comment-url s) false))))))))
+                               (try (js/emojiAutocomplete)
+                                (catch :default e false))
                                s)}
   [s activity-data comments-data collapse-comments]
   [:div.stream-comments
+    {:class (when (seq @(::editing? s)) "editing")}
     (if (pos? (count comments-data))
       [:div.stream-comments-list
         (for [idx (range (count comments-data))
               :let [comment-data (nth comments-data idx)
-                    is-editing? (= @(::editing? s) (:uuid comment-data))
+                    is-editing? (and (seq @(::editing? s))
+                                     (= @(::editing? s) (:uuid comment-data)))
                     can-show-edit-bt? (and (:can-edit comment-data)
                                                (not (:is-emoji comment-data)))
                     can-show-delete-bt? (:can-delete comment-data)
@@ -157,54 +163,63 @@
             {:key (str "stream-comment-" (:created-at comment-data))
              :ref (str "stream-comment-" (:uuid comment-data))
              :class (utils/class-set {:editing is-editing?
+                                      :editing-other-comment (not (nil? @(::editing? s)))
                                       :showing-picker showing-picker?
                                       :not-highlighted (or (not @(::highlight-comment-url s))
                                                            (not= (:uuid comment-data) (router/current-comment-id)))})}
             [:div.stream-comment-inner
               (when-not is-editing?
-                [:div.stream-comment-floating-buttons
-                  {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                            :can-delete can-show-delete-bt?
-                                            :can-share (seq (:url comment-data))})}
-                  (when can-show-edit-bt?
-                    [:button.mlb-reset.edit-bt
+                (if (responsive/is-tablet-or-mobile?)
+                  [:div.stream-comment-mobile-menu
+                    (more-menu comment-data nil {:external-share false
+                                                 :entity-type "comment"
+                                                 :show-edit? true
+                                                 :edit-cb (partial start-editing s)
+                                                 :show-delete? true
+                                                 :delete-cb (partial delete-clicked s activity-data)
+                                                 :show-unread false})]
+                  [:div.stream-comment-floating-buttons
+                    {:class (utils/class-set {:can-edit can-show-edit-bt?
+                                              :can-delete can-show-delete-bt?
+                                              :can-share (seq (:url comment-data))})}
+                    (when can-show-edit-bt?
+                      [:button.mlb-reset.edit-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :title "Edit"
+                         :on-click (fn [_]
+                                    (start-editing s comment-data))}])
+                    (when can-show-delete-bt?
+                      [:button.mlb-reset.delete-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :title "Delete"
+                         :on-click (fn [_]
+                                    (delete-clicked s activity-data comment-data))}])
+                    (when (:url comment-data)
+                      [:button.mlb-reset.share-bt
+                        {:data-toggle "tooltip"
+                         :data-placement "top"
+                         :on-click #(do
+                                      (copy-comment-url (:url comment-data))
+                                      (notification-actions/show-notification {:title "Share link copied to clipboard"
+                                                                               :dismiss true
+                                                                               :id (keyword (str "comment-url-copied-"
+                                                                                (:uuid comment-data)))}))
+                         :title "Share"}])
+                    [:button.mlb-reset.react-bt
                       {:data-toggle "tooltip"
                        :data-placement "top"
-                       :title "Edit"
-                       :on-click (fn [_]
-                                  (start-editing s comment-data))}])
-                  (when can-show-delete-bt?
-                    [:button.mlb-reset.delete-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :title "Delete"
-                       :on-click (fn [_]
-                                  (delete-clicked s activity-data comment-data))}])
-                  (when (:url comment-data)
-                    [:button.mlb-reset.share-bt
-                      {:data-toggle "tooltip"
-                       :data-placement "top"
-                       :on-click #(do
-                                    (copy-comment-url (:url comment-data))
-                                    (notification-actions/show-notification {:title "Share link copied to clipboard"
-                                                                             :dismiss true
-                                                                             :id (keyword (str "comment-url-copied-"
-                                                                              (:uuid comment-data)))}))
-                       :title "Share"}])
-                  [:button.mlb-reset.react-bt
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :title "Add reaction"
-                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                  (when showing-picker?
-                    (react-utils/build (.-Picker js/EmojiMart)
-                     {:native true
-                      :onClick (fn [emoji event]
-                                 (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native")
-                                        (:reactions comment-data))
-                                   (comment-actions/react-from-picker activity-data comment-data
-                                    (gobj/get emoji "native")))
-                                 (reset! (::show-picker s) nil))}))])
+                       :title "Add reaction"
+                       :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
+                    (when showing-picker?
+                      (react-utils/build (.-Picker js/EmojiMart)
+                       {:native true
+                        :onClick (fn [emoji event]
+                                   (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                     (comment-actions/react-from-picker activity-data comment-data
+                                      (gobj/get emoji "native")))
+                                   (reset! (::show-picker s) nil))}))]))
               [:div.stream-comment-author-avatar
                 (user-avatar-image (:author comment-data))]
               [:div.stream-comment-right
@@ -219,7 +234,6 @@
                   [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                     {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
                      :ref (str "comment-body-" (:uuid comment-data))
-                     :content-editable is-editing?
                      :on-click #(when-let [$body (.closest (js/$ (.-target %)) ".stream-comment-body.ddd-truncated")]
                                   (when (> (.-length $body) 0)
                                     (.restore (.data $body "dotdotdot"))
@@ -227,6 +241,7 @@
                                      (:uuid comment-data)))))))
                      :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                               :expanded (utils/in? @(::expanded-comments s) (:uuid comment-data))
+                                              :emoji-autocomplete is-editing?
                                               utils/hide-class true})}]]
                 (if is-editing?
                   [:div.stream-comment-footer.group

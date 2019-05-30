@@ -33,6 +33,11 @@ div.dashboard-layout {
 
     @include mobile(){
       padding: 0px;
+      transition: none;
+      margin-left: 0;
+      width: 100%;
+      max-width: initial;
+      min-width: initial;
     }
 
     div.board-container {
@@ -44,7 +49,8 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: $ultra_light_grey;
+        background-color: $grey_num_2;
+        padding: 0;
       }
 
       @include mobile() {
@@ -356,7 +362,7 @@ div.dashboard-layout {
             background-image: cdnUrl("/img/ML/board_private_dark.svg");
             background-size: 10px 12px;
             background-repeat: no-repeat;
-            background-position: center;
+            background-position: left 0 bottom 1px;
             float: left;
             margin-left: 6px;
 
@@ -375,7 +381,7 @@ div.dashboard-layout {
             background-image: cdnUrl("/img/ML/board_public_dark.svg");
             background-size: 12px 12px;
             background-repeat: no-repeat;
-            background-position: center;
+            background-position: left 0 bottom 1px;
             float: left;
             margin-left: 6px;
 

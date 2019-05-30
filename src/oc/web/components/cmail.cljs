@@ -17,6 +17,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -407,11 +408,7 @@
                                 (real-close)
                                 (utils/after
                                  180
-                                 #(let [org-slug (router/current-org-slug)
-                                        board-slug (:board-slug cmail-data)
-                                        post-url (oc-urls/entry org-slug board-slug (:uuid cmail-data))]
-                                    ;; Redirect to AP if coming from it or if the post is not published
-                                    (router/nav! post-url))))
+                                 #(routing-actions/open-post-modal cmail-data)))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
@@ -445,27 +442,50 @@
                           @(::saving s))
                      (and (not published?)
                           @(::publishing s)))
-        is-fullscreen? (:fullscreen cmail-state)]
+        is-fullscreen? (and (not is-mobile?)
+                            (:fullscreen cmail-state))
+        close-cb (fn [_]
+                  (if (au/has-content? (assoc cmail-data
+                                         :body
+                                         (cleaned-body)))
+                    (autosave s)
+                    (do
+                      (reset! (::deleting s) true)
+                      (activity-actions/activity-delete cmail-data)))
+                  (if (and (= (:status cmail-data) "published")
+                           (:has-changes cmail-data))
+                    (cancel-clicked s)
+                    (activity-actions/cmail-hide)))]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?})}
       [:div.cmail-container
-        [:div.cmail-header
+        [:div.cmail-mobile-header
+          [:button.mlb-reset.mobile-close-bt
+            {:on-click close-cb}]
+          [:div.cmail-mobile-header-title
+            (if (= (:status cmail-data) "published")
+              "New post"
+              "Edit post")
+            (when (not= (:status cmail-data) "published")
+              (if (or (:has-changes cmail-data)
+                      (:auto-saving cmail-data))
+                [:span.saving-saved " (saving)"]
+                (when (false? (:auto-saving cmail-data))
+                  [:span.saving-saved " (saved)"])))]
+          [:button.mlb-reset.mobile-post-button
+            {:ref "mobile-post-btn"
+             :on-click #(post-clicked s)
+             :class (utils/class-set {:disabled disabled?
+                                      :loading working?})}
+            (if (= (:status cmail-data) "published")
+              "Save"
+              "Post")]]
+        [:div.cmail-header.group
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
               {:class (when long-tooltip "long-tooltip")}
               [:button.mlb-reset.close-bt
-                {:on-click #(do
-                              (if (au/has-content? (assoc cmail-data
-                                                     :body
-                                                     (cleaned-body)))
-                                (autosave s)
-                                (do
-                                  (reset! (::deleting s) true)
-                                  (activity-actions/activity-delete cmail-data)))
-                              (if (and (= (:status cmail-data) "published")
-                                       (:has-changes cmail-data))
-                                (cancel-clicked s)
-                                (activity-actions/cmail-hide)))
+                {:on-click close-cb
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -482,19 +502,12 @@
                         "Shrink"
                         "Expand")}]]
           [:div.cmail-header-vertical-separator]
-          (when (and (not= (:status cmail-data) "published")
-                     is-mobile?)
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.mobile-saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.mobile-saving-saved "Saved"])))
           [:div.cmail-header-board-must-see-container.group
             {:class (when (:must-see cmail-data) "must-see-on")}
-            [:div.board-name
+            [:div.board-name.oc-input
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-               :class (when show-sections-picker "open")}
+               :class (when show-sections-picker "active")}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
@@ -554,15 +567,7 @@
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
               "Save"
-              "Post")]
-          [:button.mlb-reset.mobile-post-button
-            {:ref "mobile-post-btn"
-             :on-click #(post-clicked s)
-             :class (utils/class-set {:disabled disabled?
-                                      :loading working?})}
-            (if (= (:status cmail-data) "published")
-              "SAVE"
-              "POST")]]
+              "Post")]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
@@ -633,11 +638,12 @@
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
-                    "Post summaries"]
+                    "Key points"]
                   [:div.edit-tooltip
-                    (str "Write a quick summary to help your team "
-                     "understand why this post matters. Summaries "
-                     "appear in the stream view.")]
+                    (str
+                     "Add a quick summary to let everyone "
+                     "know why this post matters. This "
+                     "is what your team sees first.")]
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
                     "OK, got it"]]])
@@ -646,6 +652,7 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
+                               :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :start-video-recording-cb #(video-record-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
