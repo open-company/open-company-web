@@ -239,7 +239,7 @@
           (activity-share)
           ;; WRT
           show-wrt-view?
-          (wrt)
+          (wrt org-data)
           ;; Search results
           is-showing-mobile-search
           (search-box)

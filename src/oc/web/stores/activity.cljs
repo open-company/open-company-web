@@ -304,11 +304,13 @@
   (let [activity-data   (dispatcher/activity-data org-slug item-id db)
         board-data      (dispatcher/board-data db org-slug (:board-slug activity-data))
         fixed-read-data (vec (map #(assoc % :seen true) read-data))
-        team-users      (filterv #(= (:status %) "active") (:users team-roster))
+        team-users      (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
         seen-ids        (set (map :user-id read-data))
         private-access? (= (:access board-data) "private")
+        all-private-users (when private-access?
+                            (set (concat (map :user-id (:authors board-data)) (map :user-id (:viewers board-data)))))
         filtered-users  (if private-access?
-                          (filterv #((set (map :user-id (:authors board-data))) (:user-id %)) team-users)
+                          (filterv #(all-private-users (:user-id %)) team-users)
                           team-users)
         all-ids         (set (map :user-id filtered-users))
         unseen-ids      (clojure.set/difference all-ids seen-ids)

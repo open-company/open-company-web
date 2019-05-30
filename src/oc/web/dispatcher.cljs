@@ -326,13 +326,14 @@
                                 (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
                                   (activity-read-data wrt-uuid base))))]
-   :wrt-activity-data     [[:base :panel-stack]
-                            (fn [base panel-stack]
+   :wrt-activity-data     [[:base :org-slug :panel-stack]
+                            (fn [base org-slug panel-stack]
                               (when (and panel-stack
                                          (seq (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                 (when-let* [wrt-panel (name (first (filter #(s/starts-with? (name %) "wrt-") panel-stack)))
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
-                                  (activity-data-get wrt-uuid base))))]
+
+                                  (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data
                             :ap-initial-at :show-sections-picker :entry-editing
                             :jwt :wrt-show]
