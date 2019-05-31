@@ -167,7 +167,7 @@ nav.oc-navbar {
                 }
               }
 
-              &.active {
+              &.active, &:focus, &:active {
                 background-color: $ultra_light_grey;
                 color: $light_navy;
 
