@@ -195,8 +195,7 @@
                 {:title "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."
                  :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                  :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+                 :data-container "body"}]]
             [:input.org-settings-field.oc-input
               {:type "text"
                :placeholder "@domain.com"
@@ -221,7 +220,9 @@
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
               [:button.mlb-reset.advanced-settings-bt
-                {:on-click #(reset! (::show-advanced-settings s) true)}
+                {:on-click (fn [_]
+                              (reset! (::show-advanced-settings s) true)
+                              (utils/after 1000 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))}
                 "Show advanced settings"]]
             [:div.org-settings-advanced
               [:div.org-settings-advanced-title
@@ -242,8 +243,7 @@
                              "be logged in to view posts.")
                      :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                      :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+                     :data-container "body"}]]]
               [:div.org-settings-advanced-row.public-sections.group
                 (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                   :disabled false
