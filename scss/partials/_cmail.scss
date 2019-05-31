@@ -685,6 +685,7 @@ div.cmail-outer {
       height: auto;
 
       @include tablet() {
+        padding: 4px 16px 24px;
         min-height: calc(100vh - 112px);
         max-height: initial;
         overflow-x: visible;
