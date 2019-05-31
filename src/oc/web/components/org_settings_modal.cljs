@@ -6,7 +6,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
@@ -187,8 +186,6 @@
               :value (or (:name org-editing) "")
               :on-change #(dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. % -target -value)
                                                                                     :has-changes true})])}]
-            [:div.org-settings-desc
-              (str ls/web-server-domain "/" (:slug org-data))]
             [:div.org-settings-label
               "Allowed email domains"
               [:i.mdi.mdi-information-outline
