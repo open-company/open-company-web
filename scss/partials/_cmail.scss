@@ -247,7 +247,7 @@ div.cmail-outer {
       div.cmail-content {
         width: 640px;
         margin: 0 auto;
-        padding: 66px 0 0;
+        padding: 66px 0 18px;
         min-height: 100%;
         max-height: unset;
         overflow-x: auto;
@@ -283,15 +283,14 @@ div.cmail-outer {
 
         div.rich-body-editor-container {
           margin-top: 32px;
-          padding-bottom: 32px;
 
           div.rich-body-editor {
-            min-height: calc(100vh - 342px);
+            min-height: calc(100vh - 334px);
             @include activity-body(18, 26, $deep_navy);
 
             @media screen and (min-height: 556px) {
               max-height: initial;
-              min-height: calc(100vh - 362px);
+              min-height: calc(100vh - 354px);
             }
           }
         }
