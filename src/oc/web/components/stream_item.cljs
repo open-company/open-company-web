@@ -144,7 +144,11 @@
                 (str
                  (:name publisher)
                  " in "
-                 (:board-name activity-data))]
+                 (:board-name activity-data)
+                 (when (= (:board-access activity-data) "private")
+                   " (private)")
+                 (when (= (:board-access activity-data) "public")
+                   " (public)"))]
               [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?

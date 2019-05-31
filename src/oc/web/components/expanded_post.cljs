@@ -155,7 +155,12 @@
         (user-avatar-image publisher)
         [:div.expanded-post-author-inner
           (str (:name publisher) " in "
-               (:board-name activity-data) " on "
+               (:board-name activity-data)
+               (when (= (:board-access activity-data) "private")
+                 " (private)")
+               (when (= (:board-access activity-data) "public")
+                 " (public)")
+               " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
           (when (:must-see activity-data)
             [:div.must-see-tag])]]
