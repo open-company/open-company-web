@@ -733,8 +733,7 @@ div.cmail-outer {
         &:empty:before {
           content: attr(placeholder);
           display: inline-block;
-          color: $grey_num_1 !important;
-          opacity: 1;
+          color: rgba($deep_navy, 0.5) !important;
           font-style: none;
           height: 28px;
         }
@@ -792,8 +791,7 @@ div.cmail-outer {
           margin: 0;
 
           @include placeholder(){
-            color: $grey_num_1;
-            opacity: 1;
+            color: rgba($deep_navy, 0.5) !important;
             text-decoration: none;
             text-transform: none;
           }
@@ -904,7 +902,7 @@ div.cmail-outer {
           }
 
           &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-            color: $light_ui_grey !important;
+            color: rgba($deep_navy, 0.5) !important;
             font-style: normal;
           }
 
