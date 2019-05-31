@@ -251,6 +251,14 @@ nav.oc-navbar {
         div.orgs-dropdown {
           float: left;
 
+          button.orgs-dropdown-btn {
+            div.org-avatar-container {
+              span.org-name {
+                font-size: 18px;
+              }
+            }
+          }
+
           @include mobile(){
             height: 40px;
             @include org-avatar(40);
