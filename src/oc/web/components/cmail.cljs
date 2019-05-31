@@ -638,12 +638,11 @@
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
-                    "Key points"]
+                    "Quick summary"]
                   [:div.edit-tooltip
                     (str
-                     "Add a quick summary to let everyone "
-                     "know why this post matters. This "
-                     "is what your team sees first.")]
+                     "Help everyone know what your post is about. "
+                     "This is what your team sees first.")]
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
                     "OK, got it"]]])
