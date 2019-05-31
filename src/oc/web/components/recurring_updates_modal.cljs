@@ -65,6 +65,8 @@
                      " (" (name (:frequency reminder)) ")")]]])]
             [:div.recurring-updates-empty-list
               [:div.recurring-updates-empty-list-title
-                "Setup recurring updates"]
+                "Set up recurring updates"]
               [:div.recurring-updates-empty-list-desc
-                "Create a new reminder for you, or someone on your team to get started."]])]]))
+                (str
+                 "Carrot reminds you when it's time to update your team. "
+                 "You can create reminders for yourself and others.")]])]]))
