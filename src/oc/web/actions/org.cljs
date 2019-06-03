@@ -67,7 +67,7 @@
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
-(defn org-loaded [org-data saved? & [email-domain]]
+(defn org-loaded [org-data saved? & [email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
@@ -76,12 +76,13 @@
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "activity")]
-    (sa/load-other-sections (:boards org-data))
-    (when activity-link
-      ;; Preload all posts data
-      (aa/all-posts-get org-data ap-initial-at)
-      ;; Preload must see data
-      (aa/must-see-get org-data))
+    (when complete-refresh?
+      (sa/load-other-sections (:boards org-data))
+      (when activity-link
+        ;; Preload all posts data
+        (aa/all-posts-get org-data ap-initial-at)
+        ;; Preload must see data
+        (aa/must-see-get org-data)))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
@@ -136,14 +137,14 @@
   (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data))
 
-(defn get-org-cb [{:keys [status body success]}]
+(defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data false)))
+    (org-loaded org-data false nil (not prevent-complete-refresh?))))
 
-(defn get-org [& [org-data]]
+(defn get-org [& [org-data prevent-complete-refresh?]]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link get-org-cb)))
+    (api/get-org org-link (partial get-org-cb prevent-complete-refresh?))))
 
 ;; Org redirect
 
