@@ -35,7 +35,8 @@
                     (ui-mixins/on-window-click-mixin (fn [s e]
                       (when (and @(::show-sections-list s)
                                  (not (utils/event-inside? e (rum/ref-node s :mobile-board-button))))
-                        (reset! (::show-sections-list s) false))))
+                        (reset! (::show-sections-list s) false)
+                        (utils/event-stop e))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
