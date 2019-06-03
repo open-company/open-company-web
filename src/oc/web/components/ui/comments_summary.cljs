@@ -59,9 +59,9 @@
                (or show-zero-comments?
                    (not (zero? comments-count))))
       [:div.is-comments
-        {:on-click #(do
+        {:on-click (fn [e]
                      (routing-actions/open-post-modal entry-data true)
-                     (utils/after 180 #(comment-actions/add-comment-focus (:uuid entry-data))))}
+                     (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
         [:div.is-comments-authors.group
           {:style {:width (str (if (pos? face-pile-count) (+ 10 (* 18 face-pile-count)) 0) "px")}
