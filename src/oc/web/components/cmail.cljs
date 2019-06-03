@@ -408,7 +408,7 @@
                                 (real-close)
                                 (utils/after
                                  180
-                                 #(routing-actions/open-post-modal cmail-data)))
+                                 #(routing-actions/open-post-modal cmail-data false)))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]

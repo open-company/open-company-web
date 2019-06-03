@@ -117,11 +117,14 @@
                    (if is-drafts-board
                      (activity-actions/activity-edit activity-data)
                      (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                           comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)
                            stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
                            emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
                            attachments-el (rum/ref-node s :stream-item-attachments)]
                        (when (and ;; More menu wasn't clicked
                                   (not (utils/event-inside? e more-menu-el))
+                                  ;; Comments summary wasn't clicked
+                                  (not (utils/event-inside? e comments-summary-el))
                                   ;; WRT wasn't clicked 
                                   (not (utils/event-inside? e stream-item-wrt-el))
                                   ;; Attachments wasn't clicked
@@ -132,7 +135,7 @@
                                   (not (utils/button-clicked? e))
                                   ;; No input field clicked
                                   (not (utils/input-clicked? e)))
-                         (routing-actions/open-post-modal activity-data)))))
+                         (routing-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-item-inner
         [:div.stream-item-header.group
