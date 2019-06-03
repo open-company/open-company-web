@@ -41,7 +41,7 @@
          (empty? (:domain um-domain-invite)))))
 
 (defn reset-form [s]
-  (let [org-data (first (:rum/args s))
+  (let [org-data @(drv/get-ref s :org-data)
         um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
     (org-actions/org-edit-setup org-data)
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
@@ -184,9 +184,13 @@
               "Company name"]
             [:input.org-settings-field.oc-input
               {:type "text"
-              :value (or (:name org-editing) "")
-              :on-change #(dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. % -target -value)
-                                                                                    :has-changes true})])}]
+               :value (or (:name org-editing) "")
+               :max-length org-utils/org-name-max-length
+               :on-change #(let [org-name (.. % -target -value)
+                                 clean-org-name (subs org-name 0 (min (count org-name) org-utils/org-name-max-length))]
+                            (dis/dispatch! [:input [:org-editing] (merge org-editing {:name clean-org-name
+                                                                                      :has-changes true
+                                                                                      :rand (rand 1000)})]))}]
             [:div.org-settings-desc
               (str ls/web-server-domain "/" (:slug org-data))]
             [:div.org-settings-label
