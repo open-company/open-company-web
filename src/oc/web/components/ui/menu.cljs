@@ -126,9 +126,7 @@
              :on-click #(reminders-click s %)}
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        (when (and (not is-mobile?)
-                   (or (= user-role :admin)
-                       show-invite-people?))
+        (when (not is-mobile?)
           [:div.oc-menu-separator])
         (when (and (not is-mobile?)
                    (= user-role :admin)
@@ -146,13 +144,14 @@
             [:div.oc-menu-item.invite-team
               "Invite people"]])
         (when (and (not is-mobile?)
-                   org-slug
-                   (= user-role :admin))
+                   org-slug)
           [:a
             {:href "#"
              :on-click #(manage-team-click s %)}
             [:div.oc-menu-item.manage-team
-              "Manage team"]])
+              (if (= user-role :admin)
+                "Manage team"
+                "View team")]])
         (when (and (not is-mobile?)
                    org-slug
                    (= user-role :admin))
