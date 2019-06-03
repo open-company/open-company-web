@@ -605,12 +605,18 @@
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
-               :on-key-down #(headline-on-change s)
                :on-click    #(headline-on-change s)
-               :on-key-press (fn [e]
-                             (when (= (.-key e) "Enter")
-                               (utils/event-stop e)
-                               (utils/to-end-of-content-editable (body-element))))
+               :on-key-down (fn [e]
+                              (headline-on-change s)
+                              (cond
+                                (and (.-metaKey e)
+                                     (= "Enter" (.-key e)))
+                                (post-clicked s)
+                                (and (= (.-key e) "Enter")
+                                     (not (.-metaKey e)))
+                                (do
+                                  (utils/event-stop e)
+                                  (utils/to-end-of-content-editable (body-element)))))
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             ;; Abstract
             [:div.cmail-content-abstract-container
@@ -630,10 +636,16 @@
                  :on-focus #(reset! (::abstract-focused s) true)
                  :on-blur #(reset! (::abstract-focused s) false)
                  ; :on-click    #(abstract-on-change s)
-                 :on-key-press (fn [e]
-                               (when (= (.-key e) "Enter")
-                                 (utils/event-stop e)
-                                 (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
+                 :on-key-down (fn [e]
+                                (cond
+                                  (and (= (.-key e) "Enter")
+                                       (not (.-metaKey e)))
+                                  (do
+                                    (utils/event-stop e)
+                                    (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor])))
+                                  (and (.-metaKey e)
+                                       (= "Enter" (.-key e)))
+                                  (post-clicked s)))}]]
             (when show-edit-tooltip
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
@@ -654,6 +666,7 @@
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :start-video-recording-cb #(video-record-clicked s)
+                               :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
