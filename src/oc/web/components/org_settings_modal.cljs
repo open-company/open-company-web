@@ -184,6 +184,7 @@
               "Company name"]
             [:input.org-settings-field.oc-input
               {:type "text"
+               :class (when (:error org-editing) "error")
                :value (or (:name org-editing) "")
                :max-length org-utils/org-name-max-length
                :on-change #(let [org-name (.. % -target -value)
@@ -191,6 +192,8 @@
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name clean-org-name
                                                                                       :has-changes true
                                                                                       :rand (rand 1000)})]))}]
+            (when (:error org-editing)
+              [:div.error "Must be between 3 and 50 characters"])
             [:div.org-settings-desc
               (str ls/web-server-domain "/" (:slug org-data))]
             [:div.org-settings-label
