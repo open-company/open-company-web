@@ -135,7 +135,9 @@
                                   ;; a button wasn't clicked
                                   (not (utils/button-clicked? e))
                                   ;; No input field clicked
-                                  (not (utils/input-clicked? e)))
+                                  (not (utils/input-clicked? e))
+                                  ;; No body link was clicked
+                                  (not (utils/anchor-clicked? e)))
                          (routing-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-item-inner
