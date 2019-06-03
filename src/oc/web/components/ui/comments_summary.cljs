@@ -30,9 +30,9 @@
 
 (def max-face-pile 3)
 
-(rum/defcs comments-summary < rum/static
-                              rum/reactive
+(rum/defcs comments-summary < rum/reactive
                               (drv/drv :comments-data)
+                              (drv/drv :mobile-sections-list-open)
   [s entry-data show-zero-comments?]
   (let [all-comments-data (drv/react s :comments-data)
         _comments-data (get all-comments-data (:uuid entry-data))
@@ -52,7 +52,8 @@
         face-pile-count (min max-face-pile (count comments-authors))
         short-label? (and (responsive/is-mobile-size?)
                           (> (count (:reactions entry-data)) 1))
-        faces-to-render (take max-face-pile comments-authors)]
+        faces-to-render (take max-face-pile comments-authors)
+        mobile-sections-list-open (drv/react s :mobile-sections-list-open)]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))

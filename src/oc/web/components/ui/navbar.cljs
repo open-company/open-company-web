@@ -27,15 +27,21 @@
   (utils/event-stop e)
   (router/nav! (oc-urls/board board-slug)))
 
+(defn- close-mobile-sections-list []
+  (dis/dispatch! [:input [:mobile-sections-list-open] false]))
+
+(defn- toggle-mobile-sections-list []
+  (dis/dispatch! [:update [:mobile-sections-list-open] not]))
+
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
                     (drv/drv :show-add-post-tooltip)
+                    (drv/drv :mobile-sections-list-open)
                     (ui-mixins/render-on-resize nil)
-                    (rum/local false ::show-sections-list)
                     (ui-mixins/on-window-click-mixin (fn [s e]
-                      (when (and @(::show-sections-list s)
+                      (when (and @(drv/get-ref s :mobile-sections-list-open)
                                  (not (utils/event-inside? e (rum/ref-node s :mobile-board-button))))
-                        (reset! (::show-sections-list s) false))))
+                        (utils/after 10 close-mobile-sections-list))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
@@ -81,7 +87,8 @@
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-boards (or create-link (pos? (count boards)))
-        sorted-boards (navigation-sidebar/sort-boards boards)]
+        sorted-boards (navigation-sidebar/sort-boards boards)
+        mobile-sections-list-open (drv/react s :mobile-sections-list-open)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -101,10 +108,10 @@
           (if is-mobile?
             [:div.navbar-center
               [:button.mlb-reset.mobile-board-button
-                {:on-click #(swap! (::show-sections-list s) not)
+                {:on-click #(toggle-mobile-sections-list)
                  :ref :mobile-board-button}
                 section-name]
-              (when @(::show-sections-list s)
+              (when mobile-sections-list-open
                 [:div.mobile-sections-list
                   (when show-all-posts
                     [:button.mlb-reset.mobile-section-item.all-posts

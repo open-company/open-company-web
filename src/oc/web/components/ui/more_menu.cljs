@@ -51,6 +51,8 @@
     (alert-modal/show-alert alert-data)))
 
 (rum/defcs more-menu < rum/reactive
+                       (drv/drv :editable-boards)
+                       (drv/drv :mobile-sections-list-open)
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (on-window-click-mixin (fn [s e]
@@ -61,7 +63,6 @@
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))
-                       (drv/drv :editable-boards)
                        {:did-mount (fn [s]
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                          s)}
@@ -73,7 +74,8 @@
         share-link (utils/link-for (:links entity-data) "share")
         mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
         editable-boards (drv/react s :editable-boards)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        mobile-sections-list-open (drv/react s :mobile-sections-list-open)]
     (when (or edit-link
               share-link
               delete-link)
@@ -86,7 +88,8 @@
           [:button.mlb-reset.more-menu-bt
             {:type "button"
              :ref "more-menu-bt"
-             :on-click #(show-hide-menu s will-open will-close)
+             :on-click #(when-not @(drv/get-ref s :mobile-sections-list-open)
+                          (show-hide-menu s will-open will-close))
              :class (when @(::showing-menu s) "active")
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
@@ -160,7 +163,7 @@
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
-             :on-click #(do
+             :on-click #(when-not @(drv/get-ref s :mobile-sections-list-open)
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))

@@ -156,6 +156,7 @@
    :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
+   :mobile-sections-list-open [[:base] (fn [base] (:mobile-sections-list-open base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]

@@ -57,6 +57,7 @@
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
+                         (drv/drv :mobile-sections-list-open)
                          ;; Locals
                          (rum/local false ::truncated)
                          (rum/local false ::item-ready)
@@ -103,7 +104,8 @@
                         :height (utils/calc-video-height 136)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
-                             is-published?)]
+                             is-published?)
+        mobile-sections-list-open (drv/react s :mobile-sections-list-open)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -112,28 +114,29 @@
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
-       ;; click on the whole tile only for draft editing
        :on-click (fn [e]
-                   (if is-drafts-board
-                     (activity-actions/activity-edit activity-data)
-                     (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
-                           stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
-                           emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
-                           attachments-el (rum/ref-node s :stream-item-attachments)]
-                       (when (and ;; More menu wasn't clicked
-                                  (not (utils/event-inside? e more-menu-el))
-                                  ;; WRT wasn't clicked 
-                                  (not (utils/event-inside? e stream-item-wrt-el))
-                                  ;; Attachments wasn't clicked
-                                  (not (utils/event-inside? e attachments-el))
-                                  ;; Emoji picker wasn't clicked
-                                  (not (utils/event-inside? e emoji-picker))
-                                  ;; a button wasn't clicked
-                                  (not (utils/button-clicked? e))
-                                  ;; No input field clicked
-                                  (not (utils/input-clicked? e)))
-                         (routing-actions/open-post-modal activity-data)
-                         (utils/scroll-to-y 0)))))
+                   (if @(drv/get-ref s :mobile-sections-list-open)
+                     (utils/event-stop e)
+                     (if is-drafts-board
+                       (activity-actions/activity-edit activity-data)
+                       (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                             stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
+                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
+                             attachments-el (rum/ref-node s :stream-item-attachments)]
+                         (when (and ;; More menu wasn't clicked
+                                    (not (utils/event-inside? e more-menu-el))
+                                    ;; WRT wasn't clicked
+                                    (not (utils/event-inside? e stream-item-wrt-el))
+                                    ;; Attachments wasn't clicked
+                                    (not (utils/event-inside? e attachments-el))
+                                    ;; Emoji picker wasn't clicked
+                                    (not (utils/event-inside? e emoji-picker))
+                                    ;; a button wasn't clicked
+                                    (not (utils/button-clicked? e))
+                                    ;; No input field clicked
+                                    (not (utils/input-clicked? e)))
+                           (routing-actions/open-post-modal activity-data)
+                           (utils/scroll-to-y 0))))))
        :id dom-element-id}
       [:div.stream-item-inner
         [:div.stream-item-header.group
