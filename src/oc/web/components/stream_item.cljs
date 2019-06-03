@@ -132,8 +132,7 @@
                                   (not (utils/button-clicked? e))
                                   ;; No input field clicked
                                   (not (utils/input-clicked? e)))
-                         (routing-actions/open-post-modal activity-data)
-                         (utils/scroll-to-y 0)))))
+                         (routing-actions/open-post-modal activity-data)))))
        :id dom-element-id}
       [:div.stream-item-inner
         [:div.stream-item-header.group
