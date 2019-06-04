@@ -237,5 +237,5 @@
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                       :data-title (str "Posted on " (utils/tooltip-date (:published-at activity-data)))}
+                       :data-title (utils/activity-date-tooltip activity-data)}
                       (utils/foc-date-time t)])]])]]]))
