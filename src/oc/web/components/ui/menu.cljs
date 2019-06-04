@@ -126,7 +126,7 @@
              :on-click #(reminders-click s %)}
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        (when (not is-mobile?)
+        (when-not is-mobile?
           [:div.oc-menu-separator])
         (when (and (not is-mobile?)
                    (= user-role :admin)
