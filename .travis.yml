@@ -1,5 +1,4 @@
 language: clojure
-dist: precise
 jdk:
   - openjdk8
 sudo: true
