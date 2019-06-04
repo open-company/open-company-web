@@ -1,6 +1,6 @@
 (ns oc.web.utils.comment
   (:require [cljsjs.medium-editor]
-            [defun.core :refer (defun-)]
+            [defun.core :refer (defun)]
             [goog.object :as gobj]
             [cuerdas.core :as string]
             [oc.web.api :as api]
@@ -99,7 +99,7 @@
     (when should-load-comments?
       (get-comments activity-data))))
 
-(defun- sort-comments
+(defun sort-comments
   ([comments :guard nil?]
    [])
   ([comments :guard map?]
