@@ -5,7 +5,6 @@
 (rum/defcs lazy-stream < rum/static
                          (rum/local false ::mounted)
                          {:did-mount (fn [s]
-                           (js/console.log "DBG lazy-stream/did-mount")
                            (utils/after 180 #(reset! (::mounted s) true))
                            s)}
   [s stream-comp]
