@@ -23,7 +23,7 @@
 
     ;; ClojureScript libraries
     [cljs-http "0.1.44"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
+    [clj-commons/secretary "1.2.5-SNAPSHOT"] ; Client-side router https://github.com/clj-commons/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [com.cognitect/transit-cljs "0.8.248"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
     [funcool/cuerdas "2.0.5"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
