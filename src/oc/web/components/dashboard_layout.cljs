@@ -198,7 +198,7 @@
               (empty-org)
               ;; Expanded post
               current-activity-id
-              (expanded-post)
+              (lazy-stream expanded-post)
               ;; Empty board
               empty-board?
               (empty-board)
