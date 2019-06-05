@@ -1,5 +1,6 @@
 div.section-stream {
   width: #{$board_container_width}px;
+  padding-bottom: 24px;
 
   @include mobile() {
     width: 100%;
