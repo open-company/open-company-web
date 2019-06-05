@@ -45,7 +45,7 @@ div.dashboard-layout {
       background-color: $oc_gray_8;
       position: relative;
       margin: 0 auto;
-      padding: 24px 0 24px;
+      padding: 24px 0 0;
 
       @include mobile() {
         width: 100%;
