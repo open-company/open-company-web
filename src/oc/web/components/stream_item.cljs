@@ -141,7 +141,12 @@
             (user-avatar-image publisher)
             [:div.name
               [:div.name-inner
-                {:class utils/hide-class}
+                {:class utils/hide-class
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
                 (str
                  (:name publisher)
                  " in "
