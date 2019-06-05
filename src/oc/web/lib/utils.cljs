@@ -519,8 +519,8 @@
         created-str (tooltip-date created-at)
         updated-str (tooltip-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
-                       "Posted "
-                       "Created ")]
+                       "Posted on "
+                       "Created on ")]
     (if-not should-show-updated-at?
       (str label-prefix created-str)
       (if (= (:user-id last-edit) (:user-id (:publisher entry-data)))
