@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="375px" height="202px" viewBox="0 0 375 202" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 2</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Styles-&amp;-states" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Section-loading-state-(mobile)" transform="translate(0.000000, -173.000000)">
+            <g id="Group-2" transform="translate(0.000000, 173.000000)">
+                <polygon id="Background" fill="#EEEAE9" opacity="0.01" points="0 0 375 0 375 1 0 1"></polygon>
+                <g id="Group" transform="translate(0.000000, 25.000000)">
+                    <g id="Group-9" transform="translate(16.000000, 0.000000)" fill="#ECECEC">
+                        <rect id="Rectangle-13-Copy-4" x="0" y="0" width="219" height="16" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-5" x="0" y="40" width="279" height="24" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-6" x="0" y="72" width="325" height="16" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-6" x="0" y="96" width="180" height="16" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-7" x="0" y="136" width="240" height="16" rx="4"></rect>
+                    </g>
+                    <polygon id="Background" fill="#EEEAE9" points="0 176 375 176 375 177 0 177"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
