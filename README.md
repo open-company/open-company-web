@@ -53,7 +53,9 @@ If you do not have Java 8+ [download it](http://www.oracle.com/technetwork/java/
 An option we recommend is [OpenJDK](https://openjdk.java.net/). There are [instructions for Linux](https://openjdk.java.net/install/index.html) and [Homebrew](https://brew.sh/) can be used to install OpenJDK on a Mac with:
 
 ```
-brew update && brew cask install adoptopenjdk8
+brew tap AdoptOpenJDK/openjdk
+brew update
+brew cask install adoptopenjdk8
 ```
 
 #### Boot
