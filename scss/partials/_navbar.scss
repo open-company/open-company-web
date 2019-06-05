@@ -295,7 +295,7 @@ nav.oc-navbar {
           left: calc(30vw - 12px);
           top: 16px;
 
-          @include preload_image(cdnUlr("/img/ML/spyglass_active.svg"));
+          @include preload_image(cdnUrl("/img/ML/spyglass_active.svg"));
 
           &.active {
             background-image: cdnUrl("/img/ML/spyglass_active.svg");

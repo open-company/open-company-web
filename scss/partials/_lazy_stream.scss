@@ -26,8 +26,15 @@ div.lazy-stream {
 }
 
 div.preload-interstitial {
-  @include preload_image(cdnUlr("/img/ML/interstitial.svg"));
+  // width: 1px;
+  // height: 1px;
+  // background-color: transparent;
+  // position: absolute;
+  // top: -99999px;
+  // left: -99999px;
+  // content: "";
+  @include preload_image(cdnUrl("/img/ML/interstitial.svg"));
   @include mobile() {
-    @include preload_image(cdnUlr("/img/ML/interstitial_mobile.svg"));
+    @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
   }
 }
