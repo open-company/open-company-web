@@ -127,7 +127,7 @@ div.org-dashboard div.org-dashboard-inner {
 
   @include big_web(){
     min-height: 100vh;
-    padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
+    padding-top: #{$navbar_height}px;
   }
   @include mobile(){
     background-color: $grey_num_2;
