@@ -277,17 +277,6 @@
     (secure-activity-handler secure-activity "secure-activity" target params)
     (board-handler "activity" target org-dashboard params)))
 
-;; Component specific to a team settings
-(defn team-handler [route target component params]
-  (let [org (:org params)
-        query-params (:query-params params)]
-    (pre-routing query-params true)
-    ;; save the route
-    (router/set-route! [org route] {:org org :query-params query-params})
-    (post-routing)
-    ;; render component
-    (drv-root component target)))
-
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
   (let [new-user (= (:new (:query-params params)) "true")]
@@ -552,36 +541,6 @@
     (defroute drafts-slash-route (str (urls/drafts ":org") "/") {:as params}
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
-
-    (defroute must-see-route (urls/must-see ":org") {:as params}
-      (timbre/info "Routing must-see-route" (urls/must-see ":org"))
-      (org-handler "must-see" target org-dashboard (assoc params :board "must-see")))
-
-    (defroute must-see-slash-route (str (urls/must-see ":org") "/") {:as params}
-      (timbre/info "Routing must-see-slash-route" (str (urls/must-see ":org") "/"))
-      (org-handler "must-see" target org-dashboard (assoc params :board "must-see")))
-
-    (defroute user-notifications-route urls/user-notifications {:as params}
-      (timbre/info "Routing user-notifications-route" urls/user-notifications)
-      (pre-routing (:query-params params))
-      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
-      (post-routing)
-      (if (jwt/jwt)
-        (router/redirect! (str (utils/your-digest-url) "?user-settings=notifications"))
-        (do
-          (user-actions/save-login-redirect)
-          (router/redirect! urls/login))))
-
-    (defroute user-profile-route urls/user-profile {:as params}
-      (timbre/info "Routing user-profile-route" urls/user-profile)
-      (pre-routing (:query-params params))
-      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
-      (post-routing)
-      (if (jwt/jwt)
-        (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
-        (do
-          (user-actions/save-login-redirect)
-          (router/redirect! urls/login))))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
