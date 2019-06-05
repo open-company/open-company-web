@@ -19,6 +19,7 @@
             [oc.web.components.all-posts :refer (all-posts)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
+            [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.section-stream :refer (section-stream)]
@@ -207,7 +208,7 @@
                    ;; Commenting out grid view switcher for now
                    ; (= @board-switch :stream)
                    )
-              (rum/with-key (all-posts)
+              (rum/with-key (lazy-stream all-posts)
                (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
               ;; Layout boards activities
               :else
@@ -218,4 +219,4 @@
                 ; (entries-layout)
                 ;; Entries stream view
                 :else
-                (section-stream)))]]]))
+                (lazy-stream section-stream)))]]]))
