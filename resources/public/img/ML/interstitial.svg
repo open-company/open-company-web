@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="720px" height="218px" viewBox="0 0 720 218" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Mask Copy 8</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Styles-&amp;-states" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Section-loading-state" transform="translate(-388.000000, -135.000000)">
+            <g id="Mask-Copy-8" transform="translate(388.000000, 135.000000)">
+                <polygon fill="#EEEAE9" opacity="0.01" points="0 0 720 0 720 1 0 1"></polygon>
+                <g id="Group-10" stroke-width="1" transform="translate(0.000000, 33.000000)">
+                    <polygon id="Mask-Copy-9" fill="#EEEAE9" points="0 184 720 184 720 185 0 185"></polygon>
+                    <g id="Group-9" transform="translate(40.000000, 0.000000)" fill="#ECECEC">
+                        <rect id="Rectangle-13-Copy-4" x="0" y="0" width="219" height="16" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-5" x="0" y="40" width="558" height="24" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-6" x="0" y="72" width="618" height="16" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-6" x="0" y="96" width="418" height="16" rx="4"></rect>
+                        <rect id="Rectangle-13-Copy-7" x="0" y="136" width="480" height="16" rx="4"></rect>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
