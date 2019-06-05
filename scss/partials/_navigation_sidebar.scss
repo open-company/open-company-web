@@ -151,6 +151,7 @@
 
 @mixin item-hover(){
   background-color: $grey_num_2;
+  -webkit-tap-highlight-color: $grey_num_2;
 
   @include mobile() {
     background-color: transparent;
