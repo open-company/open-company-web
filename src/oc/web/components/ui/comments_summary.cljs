@@ -50,8 +50,7 @@
                          (count comments-data)
                          (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))
-        short-label? (and (responsive/is-mobile-size?)
-                          (> (count (:reactions entry-data)) 1))
+        short-label? (responsive/is-mobile-size?)
         faces-to-render (take max-face-pile comments-authors)]
     (when (and comments-count
                (or show-zero-comments?
