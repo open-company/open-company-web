@@ -18,6 +18,7 @@ div.lazy-stream {
     background-position: 0 0;
 
     @include mobile() {
+      background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
       min-height: casl(100vh - #{$mobile_navbar_height}px - 8px);
       background-size: 100% auto;
     }
