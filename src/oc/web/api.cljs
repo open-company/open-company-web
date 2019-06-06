@@ -409,12 +409,12 @@
     (handle-missing-link "get-all-posts" activity-link callback
      {:from from})))
 
-(defn load-more-all-posts [more-link direction callback]
+(defn load-more-items [more-link direction callback]
   (if (and more-link direction)
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
       callback)
-    (handle-missing-link "load-more-all-posts" more-link callback {:direction direction})))
+    (handle-missing-link "load-more-items" more-link callback {:direction direction})))
 
 ;; Auth
 

@@ -84,7 +84,7 @@
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
-  (api/load-more-all-posts more-link direction (partial all-posts-more-finish direction))
+  (api/load-more-items more-link direction (partial all-posts-more-finish direction))
   (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
 
 ;; Must see
@@ -116,7 +116,7 @@
   (let [more-href (:href more-link)
         more-must-see-filter (str more-href "&must-see=true")
         more-must-see-link (assoc more-link :href more-must-see-filter)]
-    (api/load-more-all-posts more-must-see-link direction (partial must-see-more-finish direction))
+    (api/load-more-items more-must-see-link direction (partial must-see-more-finish direction))
     (dis/dispatch! [:must-see-more (router/current-org-slug)])))
 
 ;; Referesh org when needed
