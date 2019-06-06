@@ -257,3 +257,20 @@
        (when-not success
          (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
+
+(defn request-reads-count
+  "Request the reads count data only for the items we don't have already."
+  [item-ids]
+  (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
+    (when (seq cleaned-ids)
+      (api/request-reads-count cleaned-ids))))
+
+(defn section-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
+  (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) (router/current-board-slug)
+   direction (when success (json->cljs body))]))
+
+(defn section-more [more-link direction]
+  (api/load-more-items more-link direction (partial section-more-finish direction))
+  (dispatcher/dispatch! [:section-more (router/current-org-slug) (router/current-board-slug)]))

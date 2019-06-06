@@ -211,3 +211,29 @@
 (defmethod reducer :org-loaded
   [db [_ org-data saved?]]
   (fix-org-section-data db org-data (dispatcher/change-data db)))
+
+(defmethod dispatcher/action :section-more
+  [db [_ org-slug board-slug]]
+  (let [container-key (dispatcher/board-data-key org-slug board-slug)
+        container-data (get-in db container-key)
+        next-container-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-container-data)))
+
+(defmethod dispatcher/action :section-more/finish
+  [db [_ org board direction next-board-data]]
+  (if next-board-data
+    (let [container-key (dispatcher/board-data-key org board)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-board-data (merge next-board-data {:posts-list (:posts-list container-data)
+                                                     :old-links (:links container-data)})
+          fixed-posts-data (au/fix-board prepare-board-data (dispatcher/change-data db) direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (-> db
+        (assoc-in container-key new-container-data)
+        (assoc-in posts-data-key new-items-map)))
+    db))
