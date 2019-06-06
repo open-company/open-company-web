@@ -16,13 +16,12 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.components.all-posts :refer (all-posts)]
+            [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.expanded-post :refer (expanded-post)]
-            [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
@@ -145,7 +144,7 @@
                                                    "Must see"
 
                                                    :default
-                                                   (:name board-data)))}]])
+                                                   (str (:name board-data) " " (count posts-data))))}]])
                   (when (and (= (:access board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
@@ -202,21 +201,8 @@
               ;; Empty board
               empty-board?
               (empty-board)
-              ;; All Posts
-              (and (or is-all-posts
-                       is-must-see)
-                   ;; Commenting out grid view switcher for now
-                   ; (= @board-switch :stream)
-                   )
-              (rum/with-key (lazy-stream all-posts)
-               (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-              ;; Layout boards activities
+              ;; Paginated board/container
               :else
-              (cond
-                ;; Commenting out grid view switcher for now
-                ;; Entries grid view
-                ; (= @board-switch :grid)
-                ; (entries-layout)
-                ;; Entries stream view
-                :else
-                (lazy-stream section-stream)))]]]))
+              (rum/with-key (lazy-stream paginated-stream)
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data))))
+              )]]]))

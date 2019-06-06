@@ -1,4 +1,4 @@
-div.all-posts {
+div.paginated-stream {
   width: #{$board_container_width}px;
   padding-bottom: 24px;
 
@@ -8,7 +8,7 @@ div.all-posts {
     margin-top: 0px;
   }
 
-  div.all-posts-cards {
+  div.paginated-stream-cards {
     float: left;
 
     @include mobile() {
@@ -26,7 +26,7 @@ div.all-posts {
       @include OC_Body_Book_Italic();
     }
 
-    div.all-posts-cards-inner {
+    div.paginated-stream-cards-inner {
       position: relative;
 
       div.activities-overlay {

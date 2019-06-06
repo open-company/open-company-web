@@ -10,6 +10,7 @@
             [oc.web.utils.activity :as activity-utils]
             [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
@@ -46,7 +47,9 @@
         (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-more @(::has-prev s) :up)
         (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-more @(::has-prev s) :up)))
+        (activity-actions/must-see-more @(::has-prev s) :up)
+        :else
+        (section-actions/section-more @(::has-prev s) :up)))
     ;; scrolling down
     (when (and (not @(::bottom-loading s))
                @(::has-next s)
@@ -59,19 +62,18 @@
         (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-more @(::has-next s) :down)))
+        (activity-actions/must-see-more @(::has-next s) :down)
+        :else
+        (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
     (reset! (::last-scroll s) scroll-top)))
 
 (defn- ap-seen-mixin-cb [_ item-uuid]
   (activity-actions/ap-seen-events-gate item-uuid))
 
-(defn- sorted-posts [posts]
-  (activity-utils/get-sorted-activities posts))
-
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
-        sorted-items (sorted-posts @(drv/get-ref s :filtered-posts))
+        sorted-items @(drv/get-ref s :filtered-posts)
         direction (:direction container-data)
         next-link (utils/link-for (:links container-data) "next")
         prev-link (utils/link-for (:links container-data) "previous")
@@ -121,17 +123,13 @@
                           (check-pagination s)
                           s)
                          :did-remount (fn [_ s]
-                          (when (or (= (router/current-board-slug) "all-posts")
-                                    (= (router/current-board-slug) "must-see"))
-                            (check-pagination s))
+                          (check-pagination s)
                          s)
                          :did-mount (fn [s]
-                          (when (or (= (router/current-board-slug) "all-posts")
-                                    (= (router/current-board-slug) "must-see"))
-                            (reset! (::last-scroll s) (.-scrollTop (.-body js/document)))
-                            (reset! (::scroll-listener s)
-                             (events/listen js/window EventType/SCROLL #(did-scroll s %)))
-                            (check-pagination s))
+                          (reset! (::last-scroll s) (.-scrollTop (.-body js/document)))
+                          (reset! (::scroll-listener s)
+                           (events/listen js/window EventType/SCROLL #(did-scroll s %)))
+                          (check-pagination s)
 
                           s)
                          :after-render (fn [s]
@@ -146,10 +144,12 @@
                           (let [container-data @(drv/get-ref s :container-data)]
                             (when-not (:loading-more container-data)
                               (when @(::top-loading s)
-                                (reset! (::top-loading s) false))
+                                (reset! (::top-loading s) false)
+                                (check-pagination s))
                               (when @(::bottom-loading s)
                                 (reset! (::bottom-loading s) false)
-                                (reset! (::show-all-caught-up-message s) true))))
+                                (reset! (::show-all-caught-up-message s) true)
+                                (check-pagination s))))
                           s)
                          :will-unmount (fn [s]
                           (when @(::scroll-listener s)
@@ -157,14 +157,14 @@
                           s)}
   [s]
   (let [container-data (drv/react s :container-data)
-        items (sorted-posts (drv/react s :filtered-posts))
+        items (drv/react s :filtered-posts)
         activities-read (drv/react s :activities-read)]
-    [:div.all-posts.group
-      [:div.all-posts-cards
+    [:div.paginated-stream.group
+      [:div.paginated-stream-cards
         (when @(::top-loading s)
           [:div.loading-updates.top-loading
             "Loading more posts..."])
-        [:div.all-posts-cards-inner.group
+        [:div.paginated-stream-cards-inner.group
           (when (or @(::top-loading s)
                     (and (:loading-more container-data)
                          (not @(:first-render-done s)))
