@@ -207,9 +207,13 @@
                              :query-params query-params})]
    :container-data      [[:base :org-slug :board-slug]
                          (fn [base org-slug board-slug]
-                           (timbre/debug (container-key org-slug board-slug))
                            (when (and org-slug board-slug)
-                             (get-in base (container-key org-slug board-slug))))]
+                             (let [is-container? (or (= board-slug "all-posts")
+                                                     (= board-slug "must-see"))
+                                   container-key (if is-container?
+                                                   (container-key org-slug board-slug)
+                                                   (board-data-key org-slug board-slug))]
+                               (get-in base container-key))))]
    :posts-data          [[:base :org-slug]
                          (fn [base org-slug]
                            (when (and base org-slug)
@@ -222,11 +226,12 @@
                                    all-boards-slug (map :slug (:boards org-data))
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
-                              (if is-board?
-                                (get-posts-for-board posts-data container-slug)
-                                (let [container-key (container-key org-slug container-slug)
-                                      items-list (:posts-list (get-in base container-key))]
-                                  (zipmap items-list (map #(get posts-data %) items-list)))))))]
+                              (let [container-key (if is-board?
+                                                    (board-data-key org-slug container-slug)
+                                                    (container-key org-slug container-slug))
+                                    container-data (get-in base container-key)
+                                    items-list (:posts-list container-data)]
+                                (map #(when (contains? posts-data %) (get posts-data %)) items-list)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -509,11 +514,11 @@
           all-boards-slug (map :slug (:boards org-data))
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
-     (if is-board?
-       (get-posts-for-board posts-data posts-filter)
-       (let [container-key (container-key org-slug posts-filter)
-             items-list (:posts-list (get-in data container-key))]
-        (zipmap items-list (map #(get posts-data %) items-list))))))
+     (let [container-key (if is-board?
+                           (board-data-key org-slug posts-filter)
+                           (container-key org-slug posts-filter))
+           items-list (:posts-list (get-in data container-key))]
+      (zipmap items-list (map #(get posts-data %) items-list)))))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -691,7 +696,10 @@
   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug))))
 
 (defn print-container-data []
-  (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug))))
+  (if (or (= (router/current-board-slug) "all-posts")
+          (= (router/current-board-slug) "must-see"))
+    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))
+    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-data []
   (get-in
