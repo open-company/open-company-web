@@ -144,7 +144,7 @@
                                                    "Must see"
 
                                                    :default
-                                                   (str (:name board-data) " " (count posts-data))))}]])
+                                                   (:name board-data)))}]])
                   (when (and (= (:access board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
