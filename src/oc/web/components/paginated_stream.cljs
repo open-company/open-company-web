@@ -1,4 +1,4 @@
-(ns oc.web.components.all-posts
+(ns oc.web.components.paginated-stream
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
@@ -98,7 +98,7 @@
       (reset! (::show-all-caught-up-message s) false)
       (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))))
 
-(rum/defcs all-posts  < rum/reactive
+(rum/defcs paginated-stream  < rum/reactive
                         ;; Derivatives
                         (drv/drv :ap-initial-at)
                         (drv/drv :filtered-posts)
@@ -179,7 +179,7 @@
                 :let [reads-data (get activities-read (:uuid e))]]
             (rum/with-key
              (stream-item e reads-data)
-             (str "all-posts-entry-" (:uuid e) "-" (:updated-at e))))]
+             (str "paginated-stream-entry-" (:uuid e) "-" (:updated-at e))))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Loading more posts..."])
