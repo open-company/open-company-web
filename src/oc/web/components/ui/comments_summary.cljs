@@ -77,7 +77,8 @@
               (when-not short-label?
                 (str " comment" (when (not= comments-count 1) "s")))
               (when should-show-new-tag?
-                [:div.new-comments-tag])]
+                [:div.new-comments-tag
+                  "(NEW)"])]
             [:span.add-a-comment
               (if short-label?
                 "Comment"
