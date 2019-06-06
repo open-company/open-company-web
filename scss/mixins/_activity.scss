@@ -40,6 +40,19 @@ $h2_top_margin: 24;
   }
 }
 
+@mixin new-comments-tag(){
+  div.new-comments-tag {
+    @include image-2x("/img/ML/comments_summary_new_tag");
+    background-size: 38px 15px;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 38px;
+    height: 15px;
+    position: relative;
+    vertical-align: bottom;
+  }
+}
+
 @mixin must-see-tag() {
   div.must-see-tag {
     @include image-2x("/img/ML/must_see_tag");
@@ -59,7 +72,6 @@ $h2_top_margin: 24;
     }
   }
 }
-
 
 @mixin must-see(){
   div.must-see {

@@ -52,7 +52,8 @@
         face-pile-count (min max-face-pile (count comments-authors))
         short-label? (and (responsive/is-mobile-size?)
                           (> (count (:reactions entry-data)) 1))
-        faces-to-render (take max-face-pile comments-authors)]
+        faces-to-render (take max-face-pile comments-authors)
+        should-show-new-tag? (:new-comments? entry-data)]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
@@ -71,9 +72,12 @@
                                     :add-a-comment (not (pos? comments-count))
                                     utils/hide-class true})}
           (if (pos? comments-count)
-            (str comments-count
+            [:div.group
+              comments-count
               (when-not short-label?
-                (str " comment" (when (not= comments-count 1) "s"))))
+                (str " comment" (when (not= comments-count 1) "s")))
+              (when should-show-new-tag?
+                [:div.new-comments-tag])]
             [:span.add-a-comment
               (if short-label?
                 "Comment"
