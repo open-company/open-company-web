@@ -779,6 +779,18 @@
        {:org-slug org-slug
         :secure-activity-id secure-activity-id}))))
 
+(defn get-current-entry [org-slug board-slug activity-uuid callback]
+  (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
+                         :method "GET"
+                         :rel ""
+                         :accept "application/vnd.open-company.entry.v1+json"}]
+    (if (and org-slug board-slug activity-uuid)
+      (storage-http (method-for-link activity-link) (relative-href activity-link)
+       {:headers (headers-for-link activity-link)}
+       callback)
+      (handle-missing-link "get-current-entry" activity-link callback
+       {:org-slug org-slug :board-slug board-slug :activity-uuid activity-uuid}))))
+
 ;; Search
 
 (defn query
