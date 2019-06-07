@@ -342,10 +342,12 @@
           (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
            nil]))))))
 
-(defn get-current-entry []
-  (api/get-current-entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)
+(defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
+  (api/get-current-entry (router/current-org-slug) board-slug activity-uuid
    (fn [{:keys [status success body]}]
-    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
+    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])
+    (when (fn? loaded-cb)
+      (utils/after 100 #(loaded-cb success))))))
 
 (declare entry-revert)
 

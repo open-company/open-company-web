@@ -77,7 +77,7 @@
         boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "activity")]
     (when (router/current-activity-id)
-      (aa/get-current-entry))
+      (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
     (sa/load-other-sections (:boards org-data))
     (when activity-link
       ;; Preload all posts data
