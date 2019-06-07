@@ -339,17 +339,16 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :filtered-posts :activity-data
-                            :ap-initial-at :show-sections-picker :entry-editing
-                            :jwt :wrt-show]
-                            (fn [base orgs org-data board-data container-data filtered-posts activity-data
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
+                            :ap-initial-at :show-sections-picker :entry-editing :jwt :wrt-show]
+                            (fn [base orgs org-data board-data container-data posts-data activity-data
                                  ap-initial-at show-sections-picker entry-editing jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :container-data container-data
                                :board-data board-data
-                               :posts-data filtered-posts
+                               :posts-data posts-data
                                :panel-stack (:panel-stack base)
                                :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
