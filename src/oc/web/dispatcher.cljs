@@ -518,7 +518,7 @@
                            (board-data-key org-slug posts-filter)
                            (container-key org-slug posts-filter))
            items-list (:posts-list (get-in data container-key))]
-      (zipmap items-list (map #(get posts-data %) items-list)))))
+      (map #(when (contains? posts-data %) (get posts-data %)) items-list))))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
