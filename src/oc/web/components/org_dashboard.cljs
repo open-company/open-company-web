@@ -142,7 +142,8 @@
                                       container-data))
                              (not (nil? posts-data))
                              (or (and (router/current-activity-id)
-                                      (not (seq (filter #(= (:uuid %) (router/current-activity-id)) posts-data))))
+                                      (not ((set (keys posts-data)) (router/current-activity-id)))
+                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))
                                  (and ap-initial-at
                                       (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
