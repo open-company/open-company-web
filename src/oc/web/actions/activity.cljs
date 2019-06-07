@@ -342,6 +342,11 @@
           (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
            nil]))))))
 
+(defn get-current-entry []
+  (api/get-current-entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)
+   (fn [{:keys [status success body]}]
+    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))
+
 (declare entry-revert)
 
 (defn entry-clear-local-cache [item-uuid edit-key item]
