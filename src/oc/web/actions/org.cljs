@@ -76,6 +76,8 @@
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "activity")]
+    (when (router/current-activity-id)
+      (aa/get-current-entry))
     (sa/load-other-sections (:boards org-data))
     (when activity-link
       ;; Preload all posts data
