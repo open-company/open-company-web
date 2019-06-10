@@ -67,6 +67,23 @@
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
+(def default-board "all-posts")
+
+(defn get-default-board [org-data]
+  (let [last-board-slug default-board]
+    ; Replace default-board with the following to go back to the last visited board
+    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
+    (if (and (= last-board-slug "all-posts")
+             (utils/link-for (:links org-data) "activity"))
+      {:slug "all-posts"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (or
+          ; Get the last accessed board from the saved cookie
+          board
+          (let [sorted-boards (vec (sort-by :name boards))]
+            (first sorted-boards)))))))
+
 (defn org-loaded [org-data saved? & [email-domain]]
   ;; Save the last visited org
   (when (and org-data
@@ -115,7 +132,7 @@
            (not (utils/in? (:route @router/path) "confirm-invitation"))
            (not (utils/in? (:route @router/path) "secure-activity")))
       ;; Redirect to the first board if at least one is present
-      (let [board-to (utils/get-default-board org-data)]
+      (let [board-to (get-default-board org-data)]
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
