@@ -107,6 +107,9 @@
 (defn current-posts-filter []
   (:board @path))
 
+(defn current-sort-type []
+  (or (:sort-type @path) :recent-activity))
+
 (defn current-activity-id []
   (:activity @path))
 

@@ -183,6 +183,7 @@
 (defn org-handler [route target component params]
   (let [org (:org (:params params))
         board (:board (:params params))
+        sort-type dis/default-sort-type
         query-params (:query-params params)
         ;; First ever landing cookie name
         first-ever-cookie-name (when (= route "all-posts")
@@ -200,7 +201,7 @@
       (do
         (pre-routing query-params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
