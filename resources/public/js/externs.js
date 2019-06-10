@@ -175,6 +175,8 @@ ZiggeoApi.V2.Player.get = function(){};
 var Headway = function(){};
 Headway.init = function(){};
 Headway.show = function(){};
+// Intercom (Chat support)
+var Intercom = function(){};
 // Homepage animation
 var OCWebSetupMarketingSiteJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
