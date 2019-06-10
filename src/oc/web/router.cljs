@@ -142,6 +142,11 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
+(defn last-activity-sort-cookie
+  "Cookie to save the last sort selected for AP or MS"
+  [org-slug]
+  (str "last-activity-sort-" (jwt/user-id) "-" (name org-slug)))
+
 (defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
