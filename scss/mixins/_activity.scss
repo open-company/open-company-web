@@ -43,12 +43,12 @@ $h2_top_margin: 24;
 @mixin new-comments-tag(){
   div.new-comments-tag {
     width: auto;
-    height: 15px;
+    height: 17px;
     position: relative;
-    vertical-align: top;
+    vertical-align: inherit;
     @include OC_Body_Bold();
-    line-height: 15px;
-    font-size: 15px;
+    line-height: 17px;
+    font-size: 12px;
     color: $carrot_green;
   }
 }
