@@ -176,7 +176,7 @@
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a
-          {:on-click #(chat/chat-click 42861)}
+          {:on-click #(chat/chat-click)}
           [:div.oc-menu-item.support
             "Get support"]]
         [:div.oc-menu-separator]

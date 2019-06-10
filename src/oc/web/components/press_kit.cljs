@@ -65,7 +65,7 @@
                   "We’re always happy to talk about Carrot."
                   [:a
                     {:href "#"
-                     :on-click #(chat/chat-click 43229)}
+                     :on-click #(chat/chat-click)}
                     "SAY HELLO"]]]]]
 
           [:div.core-ft
@@ -189,7 +189,7 @@
                   [:li "Email: "
                        [:a {:href oc-urls/contact-mail-to} oc-urls/contact-email]]
                   [:li "Chat: "
-                     [:a {:on-click #(chat/chat-click 43229)
+                     [:a {:on-click #(chat/chat-click)
                           :href "#"}
                       "Say hello"]]
                   [:li "Social: "

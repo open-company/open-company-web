@@ -35,7 +35,7 @@
           [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]
           [:div.column-item [:a {:href oc-urls/press-kit} "Press Kit"]]
           [:div.column-item [:a {:href "#"
-                                 :on-click #(chat/chat-click 43229)}
+                                 :on-click #(chat/chat-click)}
                               "Contact"]]]
 
         [:div.column.column-support

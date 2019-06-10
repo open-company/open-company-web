@@ -98,8 +98,8 @@
               [:div.tear-subtitle
                 "A team of more than 250? Let's create a custom plan."]
               [:a.tear-start-bt
-                {:href "#"
-                 :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
+                {:class "intercom-chat-link"
+                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                 "Contact Us"]
               [:div.tear-feature-separator]
               [:div.tear-feature
@@ -175,7 +175,7 @@
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
               {:href "#"
-               :on-click #(chat/chat-click 43239)}
+               :on-click #(chat/chat-click)}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -193,7 +193,7 @@
           [:div.faq-row-answer
             [:a.chat-with-us
               {:href "#"
-               :on-click #(chat/chat-click 43234)}
+               :on-click #(chat/chat-click)}
               "Get in touch with us"]]]]
 
         shared-misc/testimonials-section

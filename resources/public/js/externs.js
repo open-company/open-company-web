@@ -175,12 +175,6 @@ ZiggeoApi.V2.Player.get = function(){};
 var Headway = function(){};
 Headway.init = function(){};
 Headway.show = function(){};
-// Drift
-var drift = function(){};
-drift.api = {};
-drift.api.startInteraction = function(){};
-drift.identify = function(){};
-drift.track = function(){};
 // Homepage animation
 var OCWebSetupMarketingSiteJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};

@@ -173,7 +173,7 @@
                      "call home.")]
                   [:a
                     {:href "#"
-                     :on-click #(chat/chat-click 43229)}
+                     :on-click #(chat/chat-click)}
                     "Say hello"]]]
               [:div.about-bottom-copy-row.group
                 [:div.about-bottom-copy-left
