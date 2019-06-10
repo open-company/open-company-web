@@ -39,16 +39,14 @@
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
+                              (drv/drv :sort-type)
                               ;; Locals
-                              ;; Commenting out board sorting for now
-                              ; (rum/local :default ::board-sort)
-                              ; (rum/local false ::sorting-menu-expanded)
+                              (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              ;; Commenting out board sorting for now
-                              ; (on-window-click-mixin (fn [s e]
-                              ;  (when (and @(::sorting-menu-expanded s)
-                              ;             (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
-                              ;   (reset! (::sorting-menu-expanded s) false))))
+                              (on-window-click-mixin (fn [s e]
+                               (when (and @(::sorting-menu-expanded s)
+                                          (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
+                                (reset! (::sorting-menu-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -79,7 +77,7 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        ; board-sort (::board-sort s)
+        board-sort (drv/react s :sort-type)
         show-drafts (pos? (:count drafts-link))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
@@ -138,13 +136,13 @@
                                                   :public (= (:access board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
-                                                   "All posts"
+                                                   (str "All posts " (count posts-data))
 
                                                    is-must-see
                                                    "Must see"
 
                                                    :default
-                                                   (:name board-data)))}]])
+                                                   (str (:name board-data) " " (count posts-data))))}]])
                   (when (and (= (:access board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
@@ -171,25 +169,27 @@
                          :data-container "body"
                          :title (str (:name board-data) " settings")
                          :on-click #(nav-actions/show-section-editor)}]])]
-                ; (when-not is-mobile?
-                ;   (let [default-sort (= @board-sort :default)]
-                ;     [:div.board-sort.group
-                ;       {:ref :board-sort-menu}
-                ;       [:button.mlb-reset.board-sort-bt
-                ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                ;         (if default-sort "Recent activity" "Recently posted")]
-                ;       [:div.board-sort-menu
-                ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when default-sort "active")
-                ;            :on-click #(reset! board-sort :defautl)}
-                ;           "Recent activity"]
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when-not default-sort "active")
-                ;            :on-click #(reset! board-sort :own)}
-                ;           "Recently posted"]]]))
-                ])
-            
+                (when-not is-mobile?
+                  (let [default-sort (= board-sort dis/default-sort-type)]
+                    [:div.board-sort.group
+                      {:ref :board-sort-menu}
+                      [:button.mlb-reset.board-sort-bt
+                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                        (if default-sort "Recent activity" "Recently posted")]
+                      [:div.board-sort-menu
+                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                        [:div.board-sort-menu-item
+                          {:class (when default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recent-activity))}
+                          "Recent activity"]
+                        [:div.board-sort-menu-item
+                          {:class (when-not default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recently-posted))}
+                          "Recently posted"]]]))])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -204,5 +204,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data))))
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
               )]]]))
