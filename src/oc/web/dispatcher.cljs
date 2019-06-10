@@ -11,6 +11,8 @@
 (defonce app-state (atom {:loading false
                           :show-login-overlay false}))
 
+(def default-sort-type :recent-activity)
+
 ;; Data key paths
 
 (def api-entry-point-key [:api-entry-point])
@@ -43,8 +45,12 @@
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
 
-(defn container-key [org-slug posts-filter]
-  (vec (conj (containers-key org-slug) (keyword posts-filter))))
+(defn container-key 
+  ([org-slug posts-filter-with-sort]
+  (vec (conj (containers-key org-slug) (keyword posts-filter-with-sort))))
+  ([org-slug posts-filter sort-type]
+  (vec (conj (containers-key org-slug)
+   (keyword (str (name posts-filter) "-" (name (or sort-type default-sort-type))))))))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -139,6 +145,7 @@
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
+   :sort-type           [[:route] (fn [route] (:sort-type route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
    :loading             [[:base] (fn [base] (:loading base))]
@@ -205,13 +212,13 @@
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
                              :query-params query-params})]
-   :container-data      [[:base :org-slug :board-slug]
-                         (fn [base org-slug board-slug]
+   :container-data      [[:base :org-slug :board-slug :sort-type]
+                         (fn [base org-slug board-slug sort-type]
                            (when (and org-slug board-slug)
                              (let [is-container? (or (= board-slug "all-posts")
                                                      (= board-slug "must-see"))
                                    container-key (if is-container?
-                                                   (container-key org-slug board-slug)
+                                                   (container-key org-slug board-slug sort-type)
                                                    (board-data-key org-slug board-slug))]
                                (get-in base container-key))))]
    :posts-data          [[:base :org-slug]
@@ -221,14 +228,15 @@
 
    :filtered-posts      [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
-                           (when (and base org-data posts-data route)
+                           (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
                                    all-boards-slug (map :slug (:boards org-data))
+                                   sort-type (:sort-type route)
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
                               (let [container-key (if is-board?
                                                     (board-data-key org-slug container-slug)
-                                                    (container-key org-slug container-slug))
+                                                    (container-key org-slug container-slug sort-type))
                                     container-data (get-in base container-key)
                                     items-list (:posts-list container-data)]
                                 (map #(when (contains? posts-data %) (get posts-data %)) items-list)))))]
@@ -499,7 +507,9 @@
   ([data org-slug]
     (container-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
-    (get-in data (container-key org-slug posts-filter))))
+    (container-data data org-slug posts-filter (router/current-sort-type)))
+  ([data org-slug posts-filter sort-type]
+    (get-in data (container-key org-slug posts-filter sort-type))))
 
 (defn filtered-posts-data
   ([]
@@ -509,13 +519,15 @@
   ([data org-slug]
     (filtered-posts-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
+    (filtered-posts-data data org-slug posts-filter (router/current-sort-type)))
+  ([data org-slug posts-filter sort-type]
     (let [org-data (org-data data org-slug)
           all-boards-slug (map :slug (:boards org-data))
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
      (let [container-key (if is-board?
                            (board-data-key org-slug posts-filter)
-                           (container-key org-slug posts-filter))
+                           (container-key org-slug posts-filter sort-type))
            items-list (:posts-list (get-in data container-key))]
       (map #(when (contains? posts-data %) (get posts-data %)) items-list))))
   ; ([data org-slug posts-filter activity-id]
@@ -697,7 +709,7 @@
 (defn print-container-data []
   (if (or (= (router/current-board-slug) "all-posts")
           (= (router/current-board-slug) "must-see"))
-    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))
+    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
     (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-data []

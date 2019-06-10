@@ -51,15 +51,14 @@
       (api/request-reads-count cleaned-ids))))
 
 ;; All Posts
-(defn all-posts-get-finish [from {:keys [body success]}]
+(defn all-posts-get-finish [sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
           fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))
-          should-404? (and from
-                           (router/current-activity-id)
+          should-404? (and (router/current-activity-id)
                            (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
       (when should-404?
         (routing-actions/maybe-404))
@@ -68,28 +67,42 @@
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards (:fixed-items fixed-all-posts))
-      (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
+      (dis/dispatch! [:all-posts-get/finish org sort-type fixed-all-posts]))))
+
+(defn- activity-real-get [activity-link ap-initial-at sort-type org-slug finish-cb]
+  (api/get-all-posts activity-link ap-initial-at
+   (fn [resp]
+     (all-posts-get-finish sort-type resp)
+     (when (fn? finish-cb)
+       (finish-cb resp)))))
+
+(defn activity-get [org-data ap-initial-at & [finish-cb]]
+  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+    (activity-real-get activity-link ap-initial-at :recently-posted (:slug org-data) finish-cb)))
+
+(defn recent-activity-get [org-data ap-initial-at & [finish-cb]]
+  (when-let [recent-activity-link (utils/link-for (:links org-data) "recent-activity")]
+    (activity-real-get recent-activity-link ap-initial-at :recent-activity (:slug org-data) finish-cb)))
 
 (defn all-posts-get [org-data ap-initial-at & [finish-cb]]
-  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (api/get-all-posts activity-link ap-initial-at
-     (fn [resp]
-       (all-posts-get-finish ap-initial-at resp)
-       (when (fn? finish-cb)
-        (finish-cb resp))))))
+  (let [sort-type (router/current-sort-type)
+        activity-link-rel (if (= sort-type dis/default-sort-type) "recent-activity" "activity")
+        activity-link (utils/link-for (:links org-data) activity-link-rel)]
+    (when activity-link
+      (activity-real-get activity-link ap-initial-at sort-type (:slug org-data) finish-cb))))
 
-(defn all-posts-more-finish [direction {:keys [success body]}]
+(defn all-posts-more-finish [direction sort-type {:keys [success body]}]
   (when success
     (request-reads-count (map :uuid (:items (json->cljs body)))))
-  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
-  (api/load-more-items more-link direction (partial all-posts-more-finish direction))
-  (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
+  (api/load-more-items more-link direction (partial all-posts-more-finish direction (router/current-sort-type)))
+  (dis/dispatch! [:all-posts-more (router/current-org-slug) (router/current-sort-type)]))
 
 ;; Must see
 (defn must-see-get-finish
-  [{:keys [success body]}]
+  [sort-type {:keys [success body]}]
     (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
@@ -98,26 +111,29 @@
       (when (= (router/current-board-slug) "must-see")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (watch-boards (:fixed-items must-see-posts))
-      (dis/dispatch! [:must-see-get/finish org must-see-posts]))))
+      (dis/dispatch! [:must-see-get/finish org sort-type must-see-posts]))))
 
 (defn must-see-get [org-data]
-  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (let [activity-href (:href activity-link)
-          must-see-filter (str activity-href "?must-see=true")
-          must-see-link (assoc activity-link :href must-see-filter)]
-      (api/get-all-posts must-see-link nil (partial must-see-get-finish)))))
+  (let [current-sort-type (router/current-sort-type)
+        link-rel (if (= current-sort-type dis/default-sort-type) "recent-activity" "activity")]
+    (when-let [activity-link (utils/link-for (:links org-data) link-rel)]
+      (let [activity-href (:href activity-link)
+            must-see-filter (str activity-href "?must-see=true")
+            must-see-link (assoc activity-link :href must-see-filter)]
+        (api/get-all-posts must-see-link nil (partial must-see-get-finish current-sort-type))))))
 
-(defn must-see-more-finish [direction {:keys [success body]}]
+(defn must-see-more-finish [direction sort-type {:keys [success body]}]
   (when success
     (request-reads-count (map :uuid (:items (json->cljs body)))))
-  (dis/dispatch! [:must-see-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+  (dis/dispatch! [:must-see-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
 
 (defn must-see-more [more-link direction]
   (let [more-href (:href more-link)
         more-must-see-filter (str more-href "&must-see=true")
-        more-must-see-link (assoc more-link :href more-must-see-filter)]
-    (api/load-more-items more-must-see-link direction (partial must-see-more-finish direction))
-    (dis/dispatch! [:must-see-more (router/current-org-slug)])))
+        more-must-see-link (assoc more-link :href more-must-see-filter)
+        current-sort-type (router/current-sort-type)]
+    (api/load-more-items more-must-see-link direction (partial must-see-more-finish direction current-sort-type))
+    (dis/dispatch! [:must-see-more (router/current-org-slug) current-sort-type])))
 
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
@@ -128,7 +144,7 @@
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-all-posts
-      (all-posts-get org-data (:ap-initial-at @dis/app-state))
+      (activity-get org-data (:ap-initial-at @dis/app-state))
       is-must-see
       (must-see-get org-data)
       :else
@@ -962,3 +978,6 @@
                                                :dismiss true
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
+
+(defn change-sort-type [type]
+  (swap! router/path merge {:sort-type type}))
