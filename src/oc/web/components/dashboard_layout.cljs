@@ -136,13 +136,13 @@
                                                   :public (= (:access board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
-                                                   (str "All posts " (count posts-data))
+                                                   "All posts"
 
                                                    is-must-see
                                                    "Must see"
 
                                                    :default
-                                                   (str (:name board-data) " " (count posts-data))))}]])
+                                                   (:name board-data)))}]])
                   (when (and (= (:access board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
