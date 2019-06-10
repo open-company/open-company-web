@@ -50,6 +50,14 @@ div.is-comments {
 
       &:hover {
         color: $deep_navy;
+
+        span.add-a-comment {
+          color: $deep_navy;
+
+          &:before {
+            opacity: 1;
+          }
+        }
       }
     }
 
@@ -66,7 +74,7 @@ div.is-comments {
 
     span.add-a-comment {
       padding-left: 6px;
-      color: $deep_navy;
+      color: rgba($deep_navy, 0.5);
 
       &:before {
         content: "";
@@ -78,7 +86,7 @@ div.is-comments {
         height: 15px;
         float: left;
         display: block;
-
+        opacity: 0.5;
       }
     }
   }
