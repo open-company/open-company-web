@@ -114,11 +114,14 @@
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
-        (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-          (sa/section-get board-link))
+        (do
+          (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+            (sa/section-get :recently-posted board-link))
+          (when-let [recent-board-link (utils/link-for (:links board-data) "recent-activity" "GET")]
+            (sa/section-get :recent-activity recent-board-link)))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-          (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
+          (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
           (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
                      (not ap-initial-at)) ;; neither for a briefing link
             (routing-actions/maybe-404))))

@@ -59,10 +59,12 @@
         (activity-actions/must-see-get org-data)
 
         :default
-        (when-let* [fixed-board-data (or board-data
-                     (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
-                    board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
-          (section-actions/section-get board-link))))))))
+        (let [sort-type (router/current-sort-type)
+              board-rel (if (= sort-type :recent-activity) "recent-activity" ["item" "self"])]
+          (when-let* [fixed-board-data (or board-data
+                       (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
+                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+            (section-actions/section-get sort-type board-link)))))))))
 
 (defn- init-whats-new []
   (when-not (responsive/is-tablet-or-mobile?)

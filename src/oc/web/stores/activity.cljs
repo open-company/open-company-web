@@ -123,11 +123,11 @@
     (update-in [:section-editing] dissoc :loading)))
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
-  [db [_ new-board-data edit-key]]
+  [db [_ sort-type new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
-        board-key (dispatcher/board-data-key org-slug board-slug)
+        board-key (dispatcher/board-data-key org-slug board-slug sort-type)
         fixed-board-data (au/fix-board new-board-data (dispatcher/change-data db))
         merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-board-data))]
@@ -252,8 +252,8 @@
       (add-remove-item-from-must-see org-slug :recently-posted activity-data))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
-  [db [_ org-slug fixed-board-data]]
-  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data))
+  [db [_ org-slug sort-type fixed-board-data]]
+  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data) sort-type)
         posts-key (dispatcher/posts-data-key org-slug)]
   (-> db
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))

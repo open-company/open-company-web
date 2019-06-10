@@ -57,13 +57,8 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))
-          should-404? (and (router/current-activity-id)
-                           (not (get (:fixed-items fixed-all-posts) (router/current-activity-id))))]
-      (when should-404?
-        (routing-actions/maybe-404))
-      (when (and (not should-404?)
-                 (= (router/current-board-slug) "all-posts"))
+          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))]
+      (when (= (router/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards (:fixed-items fixed-all-posts))
@@ -140,15 +135,19 @@
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-must-see (= (router/current-board-slug) "must-see")
-        board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))]
+        board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
+        sort-type (router/current-sort-type)
+        board-rel (if (= sort-type :recent-activity) "recent-activity" "self")]
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-all-posts
-      (activity-get org-data (:ap-initial-at @dis/app-state))
+      (if (= sort-type :recent-activity)
+        (recent-activity-get org-data (:ap-initial-at @dis/app-state))
+        (activity-get org-data (:ap-initial-at @dis/app-state)))
       is-must-see
       (must-see-get org-data)
       :else
-      (sa/section-get (utils/link-for (:links board-data) "self" "GET")))))
+      (sa/section-get sort-type (utils/link-for (:links board-data) board-rel "GET")))))
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
@@ -263,7 +262,8 @@
                      (swap! initial-revision assoc (:uuid entry-saved)
                             (or (:revision-id entry-map) -1)))
                    (when board-data
-                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
+                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug)
+                      (router/current-sort-type) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
                    (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
@@ -310,7 +310,7 @@
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid fixed-board-data)))
-    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
+    (dis/dispatch! [:entry-save-with-board/finish org-slug (router/current-sort-type) fixed-board-data])
     (when (= (:status saved-activity-data) "published")
       (send-item-read (:uuid saved-activity-data)))))
 
@@ -355,13 +355,19 @@
     (let [entry-link (utils/link-for (:links entry-data) "self")]
       (api/get-entry entry-link
         (fn [{:keys [status success body]}]
-          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-           nil]))))))
+          (if (and (= status 404)
+                   (= (:uuid entry-data) (router/current-activity-id)))
+            (routing-actions/maybe-404)
+            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+             nil])))))))
 
 (defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
   (api/get-current-entry (router/current-org-slug) board-slug activity-uuid
    (fn [{:keys [status success body]}]
-    (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])
+    (if (and (= status 404)
+             (= activity-uuid (router/current-activity-id)))
+      (routing-actions/maybe-404)
+      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
     (when (fn? loaded-cb)
       (utils/after 100 #(loaded-cb success))))))
 
@@ -451,7 +457,7 @@
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
-    (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
+    (dis/dispatch! [:entry-publish-with-board/finish (router/current-sort-type) new-board-data edit-key])
     ;; Send item read
     (send-item-read (:uuid saved-activity-data))
     (nux-actions/show-post-added-tooltip (:uuid saved-activity-data))))
@@ -980,6 +986,7 @@
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
 
 (defn change-sort-type [type]
-  (when (= (router/current-board-slug) "all-posts")
-    (cook/set-cookie! (router/last-activity-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6)))
+  (if (= (router/current-board-slug) "all-posts")
+    (cook/set-cookie! (router/last-activity-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6))
+    (cook/set-cookie! (router/last-section-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6)))
   (swap! router/path merge {:sort-type type}))

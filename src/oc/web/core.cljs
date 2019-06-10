@@ -228,6 +228,8 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         entry (:entry (:params params))
+        last-sort-cookie (cook/get-cookie (router/last-section-sort-cookie org))
+        sort-type (if (= last-sort-cookie "recent-activity") "recent-activity" dis/default-sort-type)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
@@ -240,6 +242,7 @@
      {:org org
       :board board
       :activity entry
+      :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
     (post-routing)

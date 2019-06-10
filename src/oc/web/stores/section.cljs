@@ -20,14 +20,14 @@
      (swap! dispatcher/app-state reducer payload))))
 
 (defmethod dispatcher/action :section
-  [db [_ section-data]]
+  [db [_ sort-type section-data]]
   (let [db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
         with-entries (:entries section-data)
         org-slug (utils/section-org-slug section-data)
         fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
-        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
+        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data) sort-type))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
                             old-section-data
@@ -39,9 +39,7 @@
                             (assoc-in db-loading posts-key merged-items)
                             db-loading)]
     (assoc-in with-merged-items
-              (dispatcher/board-data-key
-               org-slug
-               (:slug section-data))
+              (dispatcher/board-data-key org-slug (:slug section-data) sort-type)
               (dissoc with-current-edit :fixed-items))))
 
 (defn new?
@@ -81,10 +79,10 @@
   db)
 
 (defmethod dispatcher/action :section-edit-save/finish
-  [db [_ section-data]]
+  [db [_ sort-type section-data]]
   (let [org-slug (utils/section-org-slug section-data)
         section-slug (:slug section-data)
-        board-key (dispatcher/board-data-key org-slug section-slug)
+        board-key (dispatcher/board-data-key org-slug section-slug sort-type)
         fixed-section-data (au/fix-board section-data (dispatcher/change-data db))]
     (-> db
         (assoc-in board-key fixed-section-data)
@@ -213,16 +211,16 @@
   (fix-org-section-data db org-data (dispatcher/change-data db)))
 
 (defmethod dispatcher/action :section-more
-  [db [_ org-slug board-slug]]
-  (let [container-key (dispatcher/board-data-key org-slug board-slug)
+  [db [_ org-slug board-slug sort-type]]
+  (let [container-key (dispatcher/board-data-key org-slug board-slug sort-type)
         container-data (get-in db container-key)
         next-container-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-container-data)))
 
 (defmethod dispatcher/action :section-more/finish
-  [db [_ org board direction next-board-data]]
+  [db [_ org board direction sort-type next-board-data]]
   (if next-board-data
-    (let [container-key (dispatcher/board-data-key org board)
+    (let [container-key (dispatcher/board-data-key org board sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
