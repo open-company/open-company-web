@@ -152,14 +152,19 @@
       db)))
 
 (defmethod dispatcher/action :ws-interaction/comment-delete
-  [db [_ comments-key interaction-data]]
-  (let [item-uuid (:uuid (:interaction interaction-data))
+  [db [_ org-slug interaction-data]]
+  (let [activity-uuid (:resource-uuid comment-data)
+        item-uuid (:uuid (:interaction interaction-data))
         comments-data (get-in db comments-key)
-        new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))]
-    (assoc-in db comments-key new-comments-data)))
+        new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
+        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) (jwt/user-id)) new-comments-data)))
+        comments-key (dispatcher/activity-comments-key org-slug activity-uuid)]
+    (-> db
+      (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-at (:created-at last-not-own-comment)})
+      (assoc-in comments-key new-comments-data))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
-  [db [_ board-key entry-data interaction-data comments-key]]
+  [db [_ org-slug entry-data interaction-data]]
   (if entry-data
     ;; If the entry is present in the local state
     (let [; get the comment data from the ws message
@@ -181,8 +186,12 @@
           new-authors (if (and old-authors (first (filter #(= (:user-id %) (:user-id new-author)) old-authors)))
                         old-authors
                         (concat [new-author] old-authors))
-          with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)]
+          with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)
+          comment-from-current-user? (= (:user-id comment-data) (jwt/user-id))
+          with-new-at (if comment-from-current-user?
+                        with-authors
+                        (assoc with-authors :new-at created-at))]
       (-> db
-        (assoc-in comments-key sorted-comments-data)
-        (assoc-in (dispatcher/activity-key (second board-key) activity-uuid) with-authors)))
+        (assoc-in (dispatcher/activity-comments-key org-slug activity-uuid) sorted-comments-data)
+        (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)))
     db))
