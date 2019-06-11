@@ -304,7 +304,11 @@
   [db [_ items-count]]
   (let [old-reads-data (get-in db dispatcher/activities-read-key)
         ks (vec (map :item-id items-count))
-        vs (map #(zipmap [:count :reads :item-id] [(:count %) (get-in old-reads-data [(:item-id %) :reads]) (:item-id %)]) items-count)
+        vs (map #(zipmap [:count :reads :item-id :last-read-at]
+                         [(:count %)
+                          (get-in old-reads-data [(:item-id %) :reads])
+                          (:item-id %)
+                          (:last-read-at %)]) items-count)
         new-items-count (zipmap ks vs)]
     (update-in db dispatcher/activities-read-key merge new-items-count)))
 
