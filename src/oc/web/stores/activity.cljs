@@ -329,6 +329,7 @@
                                                                 :reads fixed-read-data
                                                                 :item-id item-id
                                                                 :unreads unseen-users
+                                                                :last-read-at (:read-at (last (sort-by :read-at read-data)))
                                                                 :private-access? private-access?})))
 
 (defmethod dispatcher/action :must-see-get/finish
