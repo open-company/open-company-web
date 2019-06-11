@@ -103,7 +103,9 @@
                         :height (utils/calc-video-height 136)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
-                             is-published?)]
+                             is-published?)
+        has-new-comments? (< (.getTime (utils/js-date (:last-read-at read-data)))
+                             (.getTime (utils/js-date (:new-at activity-data))))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -208,7 +210,7 @@
                 {:ref "stream-item-reactions"}
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
-                  (comments-summary activity-data true)]
+                  (comments-summary activity-data true has-new-comments?)]
                 (reactions activity-data)
                 (when should-show-wrt
                   [:div.stream-item-wrt
