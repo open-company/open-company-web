@@ -477,12 +477,13 @@ div.dashboard-layout {
               height: 34px;
               @include OC_Body_Book();
               font-size: 14px;
-              opacity: 0.5;
               padding: 8px 16px;
               cursor: pointer;
 
-              &.active, &:hover {
-                opacity: 1;
+              &.active, &:hover, &:active, &:focus {
+                background-color: $feint_emerald;
+                color: $carrot_green;
+                -webkit-tap-highlight-color: $feint_emerald;
               }
             }
           }
