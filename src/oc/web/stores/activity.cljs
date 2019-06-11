@@ -438,7 +438,7 @@
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread true)
         temp-val (get-in db section-change-key)
-        activity-read-key (conj activities-read-key activity-uuid)]
+        activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
       (update-in activity-read-key merge {:last-read-at nil})
@@ -452,7 +452,7 @@
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread false)
         temp-val (get-in db section-change-key)
-        activity-read-key (conj activities-read-key activity-uuid)]
+        activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
       (update-in activity-read-key merge {:last-read-at (utils/as-of-now)})
