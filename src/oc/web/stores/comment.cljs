@@ -153,12 +153,12 @@
 
 (defmethod dispatcher/action :ws-interaction/comment-delete
   [db [_ org-slug interaction-data]]
-  (let [activity-uuid (:resource-uuid comment-data)
+  (let [activity-uuid (:resource-uuid interaction-data)
         item-uuid (:uuid (:interaction interaction-data))
+        comments-key (dispatcher/activity-comments-key org-slug activity-uuid)
         comments-data (get-in db comments-key)
         new-comments-data (vec (remove #(= item-uuid (:uuid %)) comments-data))
-        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) (jwt/user-id)) new-comments-data)))
-        comments-key (dispatcher/activity-comments-key org-slug activity-uuid)]
+        last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) (jwt/user-id)) new-comments-data)))]
     (-> db
       (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-at (:created-at last-not-own-comment)})
       (assoc-in comments-key new-comments-data))))
