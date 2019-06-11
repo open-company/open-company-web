@@ -104,9 +104,14 @@
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
                              is-published?)
-        has-new-comments? (and (:new-at activity-data)
-                               (< (.getTime (utils/js-date (:last-read-at read-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))]
+        ;; Add NEW tag besides comment summary
+        has-new-comments? (or ;; if the post is unread or
+                              (:unread activity-data)
+                              ;; if the post has a last comment timestamp (a comment not from current user)
+                              (and (:new-at activity-data)
+                                   ;; and that's after the user last read
+                                   (< (.getTime (utils/js-date (:last-read-at read-data)))
+                                      (.getTime (utils/js-date (:new-at activity-data))))))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
