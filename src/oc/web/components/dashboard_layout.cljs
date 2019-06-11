@@ -169,27 +169,26 @@
                          :data-container "body"
                          :title (str (:name board-data) " settings")
                          :on-click #(nav-actions/show-section-editor)}]])]
-                (when-not is-mobile?
-                  (let [default-sort (= board-sort dis/default-sort-type)]
-                    [:div.board-sort.group
-                      {:ref :board-sort-menu}
-                      [:button.mlb-reset.board-sort-bt
-                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                        (if default-sort "Recent activity" "Recently posted")]
-                      [:div.board-sort-menu
-                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                        [:div.board-sort-menu-item
-                          {:class (when default-sort "active")
-                           :on-click #(do
-                                        (reset! (::sorting-menu-expanded s) false)
-                                        (activity-actions/change-sort-type :recent-activity))}
-                          "Recent activity"]
-                        [:div.board-sort-menu-item
-                          {:class (when-not default-sort "active")
-                           :on-click #(do
-                                        (reset! (::sorting-menu-expanded s) false)
-                                        (activity-actions/change-sort-type :recently-posted))}
-                          "Recently posted"]]]))])
+                (let [default-sort (= board-sort dis/default-sort-type)]
+                  [:div.board-sort.group
+                    {:ref :board-sort-menu}
+                    [:button.mlb-reset.board-sort-bt
+                      {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                      (if default-sort "Recent activity" "Recently posted")]
+                    [:div.board-sort-menu
+                      {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                      [:div.board-sort-menu-item
+                        {:class (when default-sort "active")
+                         :on-click #(do
+                                      (reset! (::sorting-menu-expanded s) false)
+                                      (activity-actions/change-sort-type :recent-activity))}
+                        "Recent activity"]
+                      [:div.board-sort-menu-item
+                        {:class (when-not default-sort "active")
+                         :on-click #(do
+                                      (reset! (::sorting-menu-expanded s) false)
+                                      (activity-actions/change-sort-type :recently-posted))}
+                        "Recently posted"]]])])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
