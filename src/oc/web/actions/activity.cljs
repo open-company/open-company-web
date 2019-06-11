@@ -986,7 +986,5 @@
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
 
 (defn change-sort-type [type]
-  (if (= (router/current-board-slug) "all-posts")
-    (cook/set-cookie! (router/last-activity-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6))
-    (cook/set-cookie! (router/last-section-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6)))
+  (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6))
   (swap! router/path merge {:sort-type type}))

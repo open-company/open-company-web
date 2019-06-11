@@ -183,7 +183,7 @@
 (defn org-handler [route target component params]
   (let [org (:org (:params params))
         board (:board (:params params))
-        last-sort-cookie (cook/get-cookie (router/last-activity-sort-cookie org))
+        last-sort-cookie (cook/get-cookie (router/last-sort-cookie org))
         sort-type (if (= last-sort-cookie "recently-posted") :recently-posted dis/default-sort-type)
         query-params (:query-params params)
         ;; First ever landing cookie name
@@ -228,7 +228,7 @@
   (let [org (:org (:params params))
         board (:board (:params params))
         entry (:entry (:params params))
-        last-sort-cookie (cook/get-cookie (router/last-section-sort-cookie org))
+        last-sort-cookie (cook/get-cookie (router/last-sort-cookie org))
         sort-type (if (= last-sort-cookie "recently-posted") :recently-posted dis/default-sort-type)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
