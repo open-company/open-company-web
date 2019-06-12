@@ -162,6 +162,7 @@ div.org-settings-modal {
         width: 100%;
         border: none;
         outline: none;
+        border: 1px solid $ultra_light_grey;
 
         @include placeholder(){
           opacity: 0.6;
@@ -171,6 +172,18 @@ div.org-settings-modal {
           border: none;
           outline: none;
         }
+
+        &.error {
+          border: 1px solid $carrot_orange;
+        }
+      }
+
+      div.error {
+        margin-top: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_orange;
+        line-height: 18px;
       }
 
       div.org-settings-desc {

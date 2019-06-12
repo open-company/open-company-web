@@ -1,5 +1,6 @@
 div.all-posts {
   width: #{$board_container_width}px;
+  padding-bottom: 24px;
 
   @include mobile() {
     width: 100%;

@@ -52,7 +52,6 @@
     (.setUseFragment false)))
 
 (def history (atom nil))
-(def route-dispatcher (atom nil))
 
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
@@ -88,8 +87,7 @@
   (timbre/info "history-back!")
   (.go (.-history js/window) -1))
 
-(defn setup-navigation! [cb-fn sec-route-dispatcher]
-  (reset! route-dispatcher sec-route-dispatcher)
+(defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
             (events/listen HistoryEventType/NAVIGATE
               ;; wrap in a fn to allow live reloading

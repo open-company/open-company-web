@@ -125,7 +125,7 @@
                              attachments-el (rum/ref-node s :stream-item-attachments)]
                          (when (and ;; More menu wasn't clicked
                                     (not (utils/event-inside? e more-menu-el))
-                                    ;; WRT wasn't clicked
+                                    ;; WRT wasn't clicked 
                                     (not (utils/event-inside? e stream-item-wrt-el))
                                     ;; Attachments wasn't clicked
                                     (not (utils/event-inside? e attachments-el))
@@ -134,7 +134,9 @@
                                     ;; a button wasn't clicked
                                     (not (utils/button-clicked? e))
                                     ;; No input field clicked
-                                    (not (utils/input-clicked? e)))
+                                    (not (utils/input-clicked? e))
+                                    ;; No anchor clicked
+                                    (not (utils/anchor-clicked? e)))
                            (routing-actions/open-post-modal activity-data)
                            (utils/scroll-to-y 0))))))
        :id dom-element-id}
