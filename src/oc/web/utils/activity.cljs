@@ -257,7 +257,7 @@
           :sorted-comments)
       (:comments activity-data)))
 
-(defn- is-element-visible?
+(defn is-element-visible?
    "Given a DOM element return true if it's actually visible in the viewport."
   [el]
   (let [rect (.getBoundingClientRect el)
