@@ -140,7 +140,10 @@
 
 ;; Integrations
 
-(defn open-integrations-panel []
+(defn open-integrations-panel [e]
+  (when e
+    (.preventDefault e)
+    (.stopPropagation e))
   (show-org-settings :integrations))
 
 (set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)

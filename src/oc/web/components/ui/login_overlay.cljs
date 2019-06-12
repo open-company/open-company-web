@@ -51,6 +51,7 @@
                               dont-scroll
                               no-scroll-mixin
                               (drv/drv :auth-settings)
+                              (drv/drv :login-with-email)
                               {:will-mount (fn [s]
                                 (dis/dispatch! [:input [:login-with-email] {:email "" :pswd ""}])
                                 s)
@@ -72,7 +73,8 @@
                               pswd (:pswd login-with-email)]
                           (.preventDefault %)
                           (user-actions/maybe-save-login-redirect)
-                          (user-actions/login-with-email email pswd)))]
+                          (user-actions/login-with-email email pswd)))
+        login-with-email (drv/react state :login-with-email)]
     [:div.login-overlay-container.group
       {:on-click (partial close-overlay)}
       ;; Close X button
@@ -152,7 +154,7 @@
             ;; Email field
             [:div.sign-in-field-container
               [:input.sign-in-field.email.oc-input
-                {:value (:email (:login-with-email (rum/react dis/app-state)))
+                {:value (:email login-with-email)
                  :on-change #(dis/dispatch! [:input [:login-with-email :email] (.. % -target -value)])
                  :type "email"
                  :auto-focus true
@@ -163,7 +165,7 @@
               [:label.sign-in-label "Password"]]
             [:div.sign-in-field-container
               [:input.sign-in-field.pswd.oc-input
-                {:value (:pswd (:login-with-email (rum/react dis/app-state)))
+                {:value (:pswd login-with-email)
                  :on-change #(dis/dispatch! [:input [:login-with-email :pswd] (.. % -target -value)])
                  :type "password"
                  :tabIndex 2
@@ -174,7 +176,9 @@
             [:button.mlb-reset.mlb-default.continue
               {:class (when-not login-enabled "disabled")
                :on-touch-start identity
-               :on-click login-action}
+               :on-click login-action
+               :disabled (or (not (seq (:email login-with-email)))
+                             (not (seq (:pswd login-with-email))))}
               "Sign In"]]]
         ;; Link to signup
         [:div.footer-link

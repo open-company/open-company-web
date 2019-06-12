@@ -152,6 +152,7 @@
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
+   :login-with-email    [[:base] (fn [base] (:login-with-email base))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
    :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]

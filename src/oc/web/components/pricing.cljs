@@ -99,7 +99,7 @@
                 "A team of more than 250? Let's create a custom plan."]
               [:a.tear-start-bt
                 {:href "#"
-                 :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
+                 :onClick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
                 "Contact Us"]
               [:div.tear-feature-separator]
               [:div.tear-feature
