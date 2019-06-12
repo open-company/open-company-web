@@ -427,6 +427,14 @@ div.dashboard-layout {
               color: $ui_grey;
             }
 
+            @include big_web() {
+              opacity: 0.5;
+
+              &:hover, &:active, &:focus, &.active {
+                opacity: 1;
+              }
+            }
+
             &:after {
               content: "";
               width: 8px;
