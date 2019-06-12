@@ -169,20 +169,26 @@
         containers-key (dispatcher/containers-key org-slug)
         with-fixed-containers (reduce
                                (fn [ndb ckey]
-                                 (let [container-posts-key (conj (dispatcher/container-key org-slug ckey :recent-activity) :posts-list)
-                                       recently-container-posts-key (conj (dispatcher/container-key org-slug ckey :recently-posted) :posts-list)]
-                                  (-> ndb
-                                   (update-in container-posts-key (fn [posts-list]
-                                    (filter #(not= % (:uuid activity-data)) posts-list)))
-                                   (update-in recently-container-posts-key (fn [posts-list]
-                                     (filter #(not= % (:uuid activity-data)) posts-list))))))
+                                 (update-in ndb (conj (dispatcher/container-key org-slug ckey) :posts-list)
+                                  (fn [posts-list]
+                                    (filter #(not= % (:uuid activity-data)) posts-list))))
                                db
-                               (keys (get-in db containers-key)))]
+                               (keys (get-in db containers-key)))
+        ;; Remove the post from all the boards posts list too
+        boards-key (dispatcher/boards-key org-slug)
+        with-fixed-boards (reduce
+                           (fn [ndb ckey]
+                             (update-in ndb (conj (dispatcher/board-data-key org-slug ckey) :posts-list)
+                              (fn [posts-list]
+                                (filter #(not= % (:uuid activity-data)) posts-list))))
+                           with-fixed-containers
+                           (keys (get-in db boards-key)))]
+    ;; Now if the post is the one being edited in cmail let's remove it from there too
     (if (= (:uuid (get-in db [:cmail-data])) (:uuid activity-data))
-      (-> with-fixed-containers
+      (-> with-fixed-boards
           (assoc-in [:cmail-data] {:delete true})
           (assoc-in posts-key next-posts))
-      (assoc-in with-fixed-containers posts-key next-posts))))
+      with-fixed-boards)))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
