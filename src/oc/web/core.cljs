@@ -46,7 +46,6 @@
             [oc.web.lib.raven :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.lib.prevent-route-dispatch :refer (prevent-route-dispatch)]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
             [oc.web.components.user-profile :refer (user-profile)]
@@ -78,7 +77,6 @@
 (defonce raven (sentry/raven-setup))
 
 ;; Avoid warnings
-(declare route-dispatch!)
 
 (defn check-get-params [query-params]
   (when (contains? query-params :browser-type)
@@ -181,8 +179,8 @@
 
 ;; Company list
 (defn org-handler [route target component params]
-  (let [org (:org (:params params))
-        board (:board (:params params))
+  (let [org (:org params)
+        board (:board params)
         query-params (:query-params params)
         ;; First ever landing cookie name
         first-ever-cookie-name (when (= route "all-posts")
@@ -212,7 +210,7 @@
 (defn simple-handler [component route-name target params & [rewrite-url]]
   (pre-routing (:query-params params) rewrite-url)
   ;; save route
-  (let [org (:org (:params params))]
+  (let [org (:org params)]
     (router/set-route! (vec (remove nil? [route-name org])) {:org org :query-params (:query-params params)}))
   (post-routing)
   (when-not (contains? (:query-params params) :jwt)
@@ -223,9 +221,9 @@
 
 ;; Component specific to a board
 (defn board-handler [route target component params]
-  (let [org (:org (:params params))
-        board (:board (:params params))
-        entry (:entry (:params params))
+  (let [org (:org params)
+        board (:board params)
+        entry (:entry params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
@@ -246,8 +244,8 @@
 
 ;; Component specific to a secure activity
 (defn secure-activity-handler [component route target params]
-  (let [org (:org (:params params))
-        secure-id (:secure-id (:params params))
+  (let [org (:org params)
+        secure-id (:secure-id params)
         query-params (:query-params params)]
     (pre-routing query-params true)
     ;; save the route
@@ -257,7 +255,7 @@
        nil?
        [org route secure-id]))
      {:org org
-      :activity (:entry (:params params))
+      :activity (:entry params)
       :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
       :query-params query-params})
      ;; do we have the company data already?
@@ -278,17 +276,6 @@
                           (:id (:query-params params)))))
     (secure-activity-handler secure-activity "secure-activity" target params)
     (board-handler "activity" target org-dashboard params)))
-
-;; Component specific to a team settings
-(defn team-handler [route target component params]
-  (let [org (:org (:params params))
-        query-params (:query-params params)]
-    (pre-routing query-params true)
-    ;; save the route
-    (router/set-route! [org route] {:org org :query-params query-params})
-    (post-routing)
-    ;; render component
-    (drv-root component target)))
 
 (defn slack-lander-check [params]
   (pre-routing (:query-params params) true)
@@ -533,57 +520,27 @@
 
     (defroute all-posts-route (urls/all-posts ":org") {:as params}
       (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))
-      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
+      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
     (defroute all-posts-slash-route (str (urls/all-posts ":org") "/") {:as params}
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
-      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
+      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
     (defroute first-ever-all-posts-route (urls/first-ever-all-posts ":org") {:as params}
       (timbre/info "Routing first-ever-all-posts-route" (urls/first-ever-all-posts ":org"))
-      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
+      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
     (defroute first-ever-all-posts-slash-route (str (urls/first-ever-all-posts ":org") "/") {:as params}
       (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
-      (org-handler "all-posts" target org-dashboard (assoc-in params [:params :board] "all-posts")))
+      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))
-      (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
+      (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
 
     (defroute drafts-slash-route (str (urls/drafts ":org") "/") {:as params}
       (timbre/info "Routing board-slash-route" (str (urls/drafts ":org") "/"))
-      (board-handler "dashboard" target org-dashboard (assoc-in params [:params :board] "drafts")))
-
-    (defroute must-see-route (urls/must-see ":org") {:as params}
-      (timbre/info "Routing must-see-route" (urls/must-see ":org"))
-      (org-handler "must-see" target org-dashboard (assoc-in params [:params :board] "must-see")))
-
-    (defroute must-see-slash-route (str (urls/must-see ":org") "/") {:as params}
-      (timbre/info "Routing must-see-slash-route" (str (urls/must-see ":org") "/"))
-      (org-handler "must-see" target org-dashboard (assoc-in params [:params :board] "must-see")))
-
-    (defroute user-notifications-route urls/user-notifications {:as params}
-      (timbre/info "Routing user-notifications-route" urls/user-notifications)
-      (pre-routing (:query-params params))
-      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
-      (post-routing)
-      (if (jwt/jwt)
-        (router/redirect! (str (utils/your-digest-url) "?user-settings=notifications"))
-        (do
-          (user-actions/save-login-redirect)
-          (router/redirect! urls/login))))
-
-    (defroute user-profile-route urls/user-profile {:as params}
-      (timbre/info "Routing user-profile-route" urls/user-profile)
-      (pre-routing (:query-params params))
-      (router/set-route! ["user-profile"] {:query-params (:query-params params)})
-      (post-routing)
-      (if (jwt/jwt)
-        (router/redirect! (str (utils/your-digest-url) "?user-settings=profile"))
-        (do
-          (user-actions/save-login-redirect)
-          (router/redirect! urls/login))))
+      (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
@@ -616,87 +573,18 @@
         (router/redirect-404!)
         (router/redirect! (str urls/login-wall "?login-redirect=" (js/encodeURIComponent (router/get-token))))))
 
-    (def route-dispatch!
-      (secretary/uri-dispatcher [_loading_route
-                                 login-route
-                                 ;; Signup email
-                                 sign-up-slack-route
-                                 sign-up-slack-slash-route
-                                 signup-profile-route
-                                 signup-profile-slash-route
-                                 signup-team-route
-                                 signup-team-slash-route
-                                 signup-update-team-route
-                                 signup-update-team-slash-route
-                                 signup-setup-sections-route
-                                 signup-setup-sections-slash-route
-                                 signup-invite-route
-                                 signup-invite-slash-route
-                                 signup-route
-                                 signup-slash-route
-                                 ;; Signup slack
-                                 slack-lander-check-route
-                                 slack-lander-check-slash-route
-                                 ;; Signup google
-                                 google-lander-check-route
-                                 google-lander-check-slash-route
-                                 ;; Email wall
-                                 email-wall-route
-                                 email-wall-slash-route
-                                 ;; Login wall
-                                 login-wall-route
-                                 login-wall-slash-route
-                                 ;; Marketing site components
-                                 about-route
-                                 slack-route
-                                 pricing-route
-                                 press-kit-route
-                                 logout-route
-                                 email-confirmation-route
-                                 confirm-invitation-route
-                                 confirm-invitation-password-route
-                                 confirm-invitation-profile-route
-                                 password-reset-route
-                                 ;  ; subscription-callback-route
-                                 ;; Home page
-                                 home-page-route
-                                 user-profile-route
-                                 user-notifications-route
-                                 ;; Org routes
-                                 org-route
-                                 org-slash-route
-                                 first-ever-all-posts-route
-                                 first-ever-all-posts-slash-route
-                                 all-posts-route
-                                 all-posts-slash-route
-                                 ; Drafts board
-                                 drafts-route
-                                 drafts-slash-route
-                                 ; Secure activity route
-                                 secure-activity-route
-                                 secure-activity-slash-route
-                                 ;; Boards
-                                 board-route
-                                 board-slash-route
-                                 ; Entry route
-                                 entry-route
-                                 entry-slash-route
-                                 ;; Not found
-                                 not-found-route]))
-
     (defn handle-url-change [e]
-      (when-not @prevent-route-dispatch
-        ;; we are checking if this event is due to user action,
-        ;; such as click a link, a back button, etc.
-        ;; as opposed to programmatically setting the URL with the API
-        (when-not (.-isNavigation e)
-          ;; in this case, we're setting it so
-          ;; let's scroll to the top to simulate a navigation
-          (js/window.scrollTo 0 0))
-        ;; dispatch on the token
-        (route-dispatch! (router/get-token))
-        ; remove all the tooltips
-        (utils/after 100 #(utils/remove-tooltips)))))
+      ;; we are checking if this event is due to user action,
+      ;; such as click a link, a back button, etc.
+      ;; as opposed to programmatically setting the URL with the API
+      (when-not (.-isNavigation e)
+        ;; in this case, we're setting it so
+        ;; let's scroll to the top to simulate a navigation
+        (js/window.scrollTo 0 0))
+      ;; dispatch on the token
+      (secretary/dispatch! (router/get-token))
+      ; remove all the tooltips
+      (utils/after 100 #(utils/remove-tooltips))))
   (do
     (timbre/error "Error: div#app is not defined!")
     (sentry/capture-message "Error: div#app is not defined!")))
@@ -728,10 +616,10 @@
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
-  (when (and handle-url-change route-dispatch!)
-    (router/setup-navigation! handle-url-change route-dispatch!))
+  (when handle-url-change
+    (router/setup-navigation! handle-url-change))
   (ziggeo/init-ziggeo true))
 
 (defn on-js-reload []
   (.clear js/console)
-  (route-dispatch! (router/get-token)))
+  (secretary/dispatch! (router/get-token)))
