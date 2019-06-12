@@ -131,7 +131,9 @@
                                   ;; a button wasn't clicked
                                   (not (utils/button-clicked? e))
                                   ;; No input field clicked
-                                  (not (utils/input-clicked? e)))
+                                  (not (utils/input-clicked? e))
+                                  ;; No anchor clicked
+                                  (not (utils/anchor-clicked? e)))
                          (routing-actions/open-post-modal activity-data)
                          (utils/scroll-to-y 0)))))
        :id dom-element-id}
