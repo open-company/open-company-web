@@ -110,5 +110,7 @@
                 [:button.mlb-reset.continue-btn
                   {:aria-label "Login"
                    :class (when-not login-enabled "disabled")
-                   :on-click login-action}
+                   :on-click login-action
+                   :disabled (or (not (seq @(::email s)))
+                                 (not (seq @(::pswd s))))}
                   "Continue"]]]]]]]))
