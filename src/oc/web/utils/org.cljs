@@ -5,7 +5,7 @@
   {:accept "image/*"
    :fromSources ["local_file_system"]})
 
-(def org-name-max-length 64)
+(def org-name-max-length 60)
 
 (defn clean-email-domain [email-domain]
   (when email-domain

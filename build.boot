@@ -2,21 +2,15 @@
 (def cljs-deps
   '[
     ;; Boot tasks
-    [adzerk/boot-cljs "2.1.4" :scope "test"]
-    [adzerk/boot-reload "0.5.2" :scope "test"]
-    ;; NB: Do not upgrade boot-cljs-test to 0.3.1 since it breaks travis CI.
-    ;; More info https://travis-ci.org/open-company/open-company-web/builds/239524353
-    [crisptrutski/boot-cljs-test "0.3.4" :scope "test"]
-    [tolitius/boot-check "0.1.12" :scope "test"]
+    [adzerk/boot-cljs "2.1.5" :scope "test"] ; Boot task for compiling Cljs apps https://github.com/boot-clj/boot-cljs
+    [adzerk/boot-reload "0.6.0" :scope "test"] ; Boot task providing live-reload of browser css, images https://github.com/adzerk-oss/boot-reload
+    [crisptrutski/boot-cljs-test "0.3.4" :scope "test"] ; Boot task to run ClojureScript tests https://github.com/crisptrutski/boot-cljs-test
+    [tolitius/boot-check "0.1.12" :scope "test"] ; Check, analyze and inspect Clojure/Script code https://github.com/tolitius/boot-check
 
     ;; Clojure/ClojureScript
     ;; NB: Need to change Clojure version in boot.properties in sync with this
-    ;; NB: Can't go past Clojure Alpha 19 to Alpha 20 due to ##NaN issues w/ doo library
-    ;;     discussed here: https://groups.google.com/forum/#!msg/clojure/IB2CaORBMnM/NjN24lQLDQAJ
-    ;;     These are apparently fixed with ClojureScript 1.9.946+
-    [org.clojure/clojure "1.10.0-alpha7"] ; Lisp on the JVM http://clojure.org/documentation
-    ;; NB: Can't go past ClojureScript 1.9.908 right now due to issues w/ React
-    [org.clojure/clojurescript "1.10.238"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/clojure "1.10.1-RC1"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.10.520"] ; ClojureScript compiler https://github.com/clojure/clojurescript
 
     ;; Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes access
@@ -29,10 +23,10 @@
 
     ;; ClojureScript libraries
     [cljs-http "0.1.44"] ; HTTP for cljs https://github.com/r0man/cljs-http
-    [secretary "2.0.0.1-260a59"] ; Client-side router https://github.com/gf3/secretary
+    [clj-commons/secretary "1.2.5-SNAPSHOT"] ; Client-side router https://github.com/clj-commons/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
     [com.cognitect/transit-cljs "0.8.248"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
-    [funcool/cuerdas "2.0.5"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [funcool/cuerdas "2.2.0"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
     [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
