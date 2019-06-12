@@ -19,7 +19,10 @@
   ;; We need to remove the boards that are no longer in the org
   (let [boards-key (dispatcher/boards-key (:slug org-data))
         old-boards (get-in db boards-key)
-        board-slugs (set (map (comp keyword :slug) (:boards org-data)))
+        board-slugs (set (apply concat
+                     (map #(vec [(keyword (str (:slug %) "-recent-activity"))
+                                 (keyword (str (:slug %) "-recently-posted"))])
+                      (:boards org-data))))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))
