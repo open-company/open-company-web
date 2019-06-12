@@ -170,7 +170,7 @@
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
 (defn fix-board
-  "Fix container data coming from the API."
+  "Parse board data coming from the API."
   ([container-data]
    (fix-board container-data {}))
   ([container-data change-data & [direction]]
@@ -211,7 +211,7 @@
       with-saved-items)))
 
 (defn fix-container
-  "Fix container data coming from the API."
+  "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
    (fix-container container-data {}))
   ([container-data change-data & [direction]]
