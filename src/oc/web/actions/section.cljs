@@ -62,10 +62,11 @@
       (fn [{:keys [status body success]}]
         (when success
           (section-get-finish :recently-posted (json->cljs body)))))
-    (api/get-board recent-board-link
-      (fn [{:keys [status body success]}]
-        (when success
-          (section-get-finish :recent-activity (json->cljs body)))))))
+    (when recent-board-link
+      (api/get-board recent-board-link
+        (fn [{:keys [status body success]}]
+          (when success
+            (section-get-finish :recent-activity (json->cljs body))))))))
 
 (declare refresh-org-data)
 
