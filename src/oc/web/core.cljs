@@ -235,7 +235,6 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
-        last-sort-cookie (cook/get-cookie (router/last-sort-cookie org))
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
