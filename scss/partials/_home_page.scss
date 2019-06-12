@@ -84,7 +84,7 @@ div.home-wrap {
         color: $deep_navy;
         font-size: 26px;
         line-height: 36px;
-        @include OC_Body_Bold();
+        @include OC_Body_Book();
         margin: 0 auto;
         z-index: 2;
         position: relative;

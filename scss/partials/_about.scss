@@ -245,7 +245,7 @@ div.about-wrap {
           }
 
           p {
-            @include OC_Body_Bold();
+            @include OC_Body_Book();
             font-size: 30px;
             color: $deep_navy;
             text-align: left;
