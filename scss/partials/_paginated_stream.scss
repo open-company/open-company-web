@@ -19,11 +19,11 @@ div.paginated-stream {
     div.loading-updates {
       width: 100%;
       text-align: center;
-      color: $oc_gray_7;
       margin-bottom: 16px;
       font-size: 14px;
       margin-top: 24px;
-      @include OC_Body_Book_Italic();
+      @include OC_Body_Book();
+      color: rgba($deep_navy, 0.5);
     }
 
     div.paginated-stream-cards-inner {
