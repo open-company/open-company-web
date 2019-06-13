@@ -20,6 +20,9 @@
   (let [org (router/current-org-slug)
         old-board (router/current-board-slug)
         board (:board-slug activity-data)
+        back-to (if (= old-board utils/default-drafts-board-slug)
+                  board
+                  old-board)
         activity (:uuid activity-data)
         post-url (oc-urls/entry board activity)
         query-params (router/query-params)
@@ -31,7 +34,7 @@
                               :board board
                               :activity activity
                               :query-params query-params
-                              :back-to old-board
+                              :back-to back-to
                               :back-y scroll-y-position})
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
