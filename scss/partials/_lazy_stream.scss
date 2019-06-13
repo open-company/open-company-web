@@ -1,33 +1,122 @@
 div.lazy-stream {
   width: #{$board_container_width}px;
   height: 100%;
+  max-height: calc(100vh - 140px);
+  overflow: hidden;
 
   @include mobile() {
     width: 100%;
     margin-left: 0px;
     margin-top: 0px;
+    min-height: casl(100vh - #{$mobile_navbar_height}px - 8px);
   }
 
   div.lazy-stream-interstitial {
-    width: 100%;
-    height: 100%;
-    min-height: calc(100vh - 140px);
-    background-image: cdnUrl("/img/ML/interstitial.svg");
-    background-size: #{$board_container_width}px 218px;
-    background-repeat: repeat-y;
-    background-position: 0 0;
+    // min-height: calc(100vh - 140px);
+    // background-image: cdnUrl("/img/ML/interstitial.svg");
+    // background-size: #{$board_container_width}px 218px;
+    // background-repeat: repeat-y;
+    // background-position: 0 0;
+    border-bottom: 1px solid $grey_num_3;
+    padding: 32px 0 24px;
+    width: 0px;
+    animation: fullView 0.5s forwards linear;
 
     @include mobile() {
-      background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
-      min-height: casl(100vh - #{$mobile_navbar_height}px - 8px);
-      background-size: 100% auto;
+      // background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
+      // min-height: casl(100vh - #{$mobile_navbar_height}px - 8px);
+      // background-size: 100% auto;
+      padding: 24px 16px
+    }
+
+    div.lazy-stream-header, div.lazy-stream-headline, div.lazy-stream-body, div.lazy-stream-body-2,
+    div.lazy-stream-footer {
+      &.animate {
+        animation : shimmer 2s infinite;
+        background: linear-gradient(to right, #eff1f3 4%, #e2e2e2 25%, #eff1f3 36%);
+        background-size: 1000px 100%;
+      }
+    }
+
+    div.lazy-stream-header {
+      border-radius: 4px;
+      background-color: $ultra_light_grey;
+      height: 16px;
+      width: 219px;
+
+      @include mobile() {
+        width: 65%;
+      }
+    }
+
+    div.lazy-stream-headline {
+      margin-top: 24px;
+      border-radius: 4px;
+      background-color: $ultra_light_grey;
+      height: 24px;
+      width: 558px;
+
+      @include mobile() {
+        width: 85%;
+      }
+    }
+
+    div.lazy-stream-body {
+      margin-top: 8px;
+      border-radius: 4px;
+      background-color: $ultra_light_grey;
+      height: 16px;
+      width: 618px;
+
+      @include mobile() {
+        width: 100%;
+      }
+    }
+
+    div.lazy-stream-body-2 {
+      margin-top: 8px;
+      border-radius: 4px;
+      background-color: $ultra_light_grey;
+      height: 16px;
+      width: 419px;
+
+      @include mobile() {
+        width: 55%;
+      }
+    }
+
+    div.lazy-stream-footer {
+      margin-top: 24px;
+      border-radius: 4px;
+      background-color: $ultra_light_grey;
+      height: 16px;
+      width: 480px;
+
+      @include mobile() {
+        width: 75%;
+      }
     }
   }
 }
 
-div.preload-interstitial {
-  @include preload_image(cdnUrl("/img/ML/interstitial.svg"));
-  @include mobile() {
-    @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
+@keyframes fullView {
+  100% {
+    width: 100%;
   }
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+// div.preload-interstitial {
+//   @include preload_image(cdnUrl("/img/ML/interstitial.svg"));
+//   @include mobile() {
+//     @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
+//   }
+// }
