@@ -114,7 +114,8 @@
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :unseen-item (:unseen activity-data)
+                                :unseen-item (or has-new-comments?
+                                                 (:unseen activity-data))
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
