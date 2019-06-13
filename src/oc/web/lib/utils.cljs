@@ -513,9 +513,11 @@
         last-edit (last (:author entry-data))
         updated-at (when (:updated-at last-edit)
                      (:updated-at last-edit))
+        same-author? (= (:user-id last-edit) (:user-id (:publisher entry-data)))
         ;; Show edit only if happened at least 24 hours after publish
-        should-show-updated-at? (> (- (.getTime (js-date updated-at)) (.getTime (js-date created-at)))
-                                 (* 1000 60 60 24))
+        should-show-updated-at? (or (not same-author?)
+                                    (> (- (.getTime (js-date updated-at)) (.getTime (js-date created-at)))
+                                     (* 1000 60 60 24)))
         created-str (tooltip-date created-at)
         updated-str (tooltip-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
@@ -523,7 +525,7 @@
                        "Created on ")]
     (if-not should-show-updated-at?
       (str label-prefix created-str)
-      (if (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+      (if same-author?
         (str label-prefix created-str "\nEdited " updated-str)
         (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 
