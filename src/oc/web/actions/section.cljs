@@ -253,8 +253,7 @@
 (defn section-save-create [section-editing section-name success-cb]
   (if (< (count section-name) min-section-name-length)
     (dispatcher/dispatch! [:section-edit/error (str "Name must be at least " min-section-name-length " characters.")])
-    (let [next-section-editing (merge section-editing {:slug utils/default-section-slug
-                                                       :loading true
+    (let [next-section-editing (merge section-editing {:loading true
                                                        :name section-name})]
       (dispatcher/dispatch! [:input [:section-editing] next-section-editing])
       (success-cb next-section-editing))))
