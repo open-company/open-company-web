@@ -184,15 +184,13 @@
                                         utils/hide-class true})}
               [:div.stream-item-headline.ap-seen-item-headline
                 {:ref "activity-headline"
-                 :class utils/hide-class
                  :data-itemuuid (:uuid activity-data)
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
               (let [has-abstract (seq (:abstract activity-data))]
                 [:div.stream-item-body
                   {:class (utils/class-set {:no-abstract (not has-abstract)
                                             :item-ready @(::item-ready s)
-                                            :truncated truncated?
-                                            utils/hide-class true})
+                                            :truncated truncated?})
                    :data-itemuuid (:uuid activity-data)
                    :ref :abstract
                    :dangerouslySetInnerHTML {:__html (if has-abstract
