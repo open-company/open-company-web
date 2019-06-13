@@ -20,8 +20,8 @@ div.stream-item {
         }
 
         div.stream-item-header {
-          div.more-menu {
-            display: block;
+          div.more-menu button {
+            display: initial;
           }
         }
 
@@ -210,7 +210,9 @@ div.stream-item {
       height: 24px;
 
       @include big_web() {
-        display: none;
+        &:not(.menu-expanded) button {
+          display: none;
+        }
       }
 
       @include mobile() {

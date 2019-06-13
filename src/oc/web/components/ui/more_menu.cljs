@@ -78,7 +78,10 @@
               share-link
               delete-link)
       [:div.more-menu
-        {:ref "more-menu"}
+        {:ref "more-menu"
+         :class (when (or @(::move-activity s)
+                          @(::showing-menu s))
+                  "menu-expanded")}
         (when (or edit-link
                   delete-link
                   (and (not external-share)
