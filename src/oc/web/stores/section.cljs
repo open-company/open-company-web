@@ -82,10 +82,22 @@
   [db [_ sort-type section-data]]
   (let [org-slug (utils/section-org-slug section-data)
         section-slug (:slug section-data)
-        board-key (dispatcher/board-data-key org-slug section-slug sort-type)
-        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))]
+        board-key (dispatcher/board-data-key org-slug section-slug :recently-posted)
+        recent-board-key (dispatcher/board-data-key org-slug section-slug :recent-activity)
+        ;; Parse the new section data
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
+        old-board-data (get-in db board-key)
+        ;; Replace the old section data for :recently-posted sort
+        ;; w/o overriding the posts and links to avoid breaking pagination
+        next-board-data (merge fixed-section-data
+                         (select-keys old-board-data [:posts-list :fixed-items :links]))
+        old-recent-board-data (get-in db recent-board-key)
+        ;; Same for the :recent-activity sort
+        next-recent-board-data (merge fixed-section-data
+                                (select-keys old-recent-board-data [:posts-list :fixed-items :links]))]
     (-> db
-        (assoc-in board-key fixed-section-data)
+        (assoc-in board-key next-board-data)
+        (assoc-in recent-board-key next-recent-board-data)
         (dissoc :section-editing))))
 
 (defmethod dispatcher/action :section-edit/dismiss
