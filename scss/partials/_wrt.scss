@@ -296,13 +296,13 @@ div.wrt-popup-container {
             }
           }
 
-          &.seen {
+          &.seen, &.sent {
             div.wrt-popup-list-row-name, div.wrt-popup-list-row-seen {
               width: calc(100% - 24px - 8px);
             }
           }
 
-          &:not(.seen) {
+          &:not(.seen), &:not(.sent) {
             @include big_web() {
               &:hover {
                 button.send-reminder-bt {
