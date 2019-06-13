@@ -288,6 +288,7 @@ $h2_top_margin: 24;
   a, span[data-auto-link] {
     text-decoration: none;
     color: $carrot_green;
+    background-color: transparent;
   }
 
   a:hover {
@@ -508,7 +509,13 @@ $h2_top_margin: 24;
     line-height: 50px;
   }
 
-  a {
+  a, span[data-auto-link] {
+    text-decoration: none;
     color: $carrot_green;
+    background-color: transparent;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 }
