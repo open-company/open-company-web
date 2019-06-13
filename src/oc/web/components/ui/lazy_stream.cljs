@@ -18,7 +18,6 @@
                            s)}
   [s stream-comp]
   [:div.lazy-stream
-    ; (if @(::mounted s)
-    ;   (stream-comp)
-    ;   [:div.lazy-stream-interstitial])
-    (assoc (get-interstitials) 0 :div.lazy-stream-inner)])
+    (if @(::mounted s)
+      (stream-comp)
+      (assoc (get-interstitials) 0 :div.lazy-stream-inner))])
