@@ -142,12 +142,15 @@
           [:div.stream-header-head-author
             (user-avatar-image publisher)
             [:div.name
-              [:div.name-inner
-                {:class utils/hide-class}
-                (str
-                 (:name publisher)
-                 " in "
-                 (:board-name activity-data))]
+              [:div.mobile-name
+                [:div.name-inner
+                  {:class utils/hide-class}
+                  (str
+                   (:name publisher)
+                   " in "
+                   (:board-name activity-data))]
+                [:div.mobile-time-since
+                  (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
               [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?

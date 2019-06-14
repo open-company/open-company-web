@@ -189,15 +189,38 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: auto;
+          width: calc(100% - 88px);
         }
 
-        div.name-inner {
-          display: inline-block;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          line-height: 24px;
-          margin-right: 8px;
+        div.mobile-name {
+
+          @include mobile() {
+            display: flex;
+            align-items: center;
+          }
+
+          div.name-inner {
+            display: inline-block;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 24px;
+            margin-right: 8px;
+
+            @include mobile() {
+              flex: 1;
+              min-width: 0;
+              display: block;
+            }
+          }
+
+          div.mobile-time-since {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              white-space: nowrap;
+            }
+          }
         }
       }
 
