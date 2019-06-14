@@ -155,7 +155,12 @@
       [:div.expanded-post-author.group
         (user-avatar-image publisher)
         [:div.expanded-post-author-inner
-          {:class utils/hide-class}
+          {:data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+           :data-title (utils/activity-date-tooltip activity-data)
+           :class utils/hide-class}
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
