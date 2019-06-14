@@ -177,9 +177,10 @@ nav.oc-navbar {
                   }
                 }
 
-                &.active {
+                &.active, &:focus, &:active {
                   background-color: $ultra_light_grey;
                   color: $light_navy;
+                  -webkit-tap-highlight-color: $ultra_light_grey;
 
                   &.all-posts:before, &.drafts:before {
                     opacity: 1;
@@ -265,6 +266,14 @@ nav.oc-navbar {
 
         div.orgs-dropdown {
           float: left;
+
+          button.orgs-dropdown-btn {
+            div.org-avatar-container {
+              span.org-name {
+                font-size: 18px;
+              }
+            }
+          }
 
           @include mobile(){
             height: 40px;
