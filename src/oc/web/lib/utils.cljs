@@ -511,17 +511,23 @@
         "Just now"))))
 
 (defn activity-date-tooltip [entry-data]
-  (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
-        updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
-        created-str (activity-date created-at)
-        updated-str (activity-date updated-at)
+  (let [created-at (or (:published-at entry-data) (:created-at entry-data))
+        last-edit (last (:author entry-data))
+        updated-at (when (:updated-at last-edit)
+                     (:updated-at last-edit))
+        same-author? (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+        ;; Show edit only if happened at least 24 hours after publish
+        should-show-updated-at? (or (not same-author?)
+                                    (> (- (.getTime (js-date updated-at)) (.getTime (js-date created-at)))
+                                     (* 1000 60 60 24)))
+        created-str (tooltip-date created-at)
+        updated-str (tooltip-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
-                       "Posted "
-                       "Created ")
-        last-edit (last (:author entry-data))]
-    (if (= (:created-at entry-data) (:updated-at last-edit))
+                       "Posted on "
+                       "Created on ")]
+    (if-not should-show-updated-at?
       (str label-prefix created-str)
-      (if (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+      (if same-author?
         (str label-prefix created-str "\nEdited " updated-str)
         (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 

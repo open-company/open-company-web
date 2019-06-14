@@ -618,7 +618,7 @@ div.cmail-outer {
           border-radius: 4px;
           margin-left: 8px;
 
-          @include preload_image(cdnUlr("/img/ML/cmail_fullscreen_collapse.svg"));
+          @include preload_image(cdnUrl("/img/ML/cmail_fullscreen_collapse.svg"));
         }
 
         .tooltip {
@@ -643,7 +643,7 @@ div.cmail-outer {
           background-color: rgba(white, 0.2);
           border-radius: 4px;
 
-          @include preload_image(cdnUlr("/img/ML/cmail_fullscreen_close.svg"));
+          @include preload_image(cdnUrl("/img/ML/cmail_fullscreen_close.svg"));
 
           @include tablet() {
             margin-left: 0;
