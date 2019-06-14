@@ -16,7 +16,7 @@
 
 ;; Post modal
 
-(defn open-post-modal [activity-data scroll-to-bottom]
+(defn open-post-modal [activity-data scroll-to-top]
   (let [org (router/current-org-slug)
         old-board (router/current-board-slug)
         board (:board-slug activity-data)
@@ -28,14 +28,14 @@
         query-params (router/query-params)
         route [org board activity "activity"]
         scroll-y-position (.. js/document -scrollingElement -scrollTop)]
-    (when-not scroll-to-bottom
-      (utils/scroll-to-y 0 0))
     (router/set-route! route {:org org
                               :board board
                               :activity activity
                               :query-params query-params
                               :back-to back-to
                               :back-y scroll-y-position})
+    (when-not scroll-to-top
+      (utils/scroll-to-y 0 0))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 (defn dismiss-post-modal []
@@ -45,8 +45,8 @@
         query-params (router/query-params)
         route [org board "dashboard"]
         back-y (or (:back-y @router/path) 0)]
-    (utils/after 0 #(utils/scroll-to-y back-y 0))
     (router/set-route! route {:org org
                               :board board
+                              :scroll-y back-y
                               :query-params query-params})
     (.pushState (.-history js/window) #js {} (.-title js/document) to-url)))
