@@ -141,6 +141,18 @@ div.expanded-post {
     }
   }
 
+  div.expanded-post-mobile-reactions {
+    display: none;
+
+    @include mobile() {
+      display: block;
+      height: 48px;
+      margin: 16px 0 0;
+      padding-bottom: 16px;
+      border-bottom: 1px solid $ultra_light_grey;
+    }
+  }
+
   div.expanded-post-footer {
     margin-top: 24px;
     min-height: 26px;

@@ -47,6 +47,12 @@ div.stream-attachments {
           background-repeat: no-repeat;
           background-position: center;
           float: left;
+
+          @include mobile() {
+            background-image: cdnUrl("/img/ML/mobile_attachment_icon.svg");
+            background-size: 16px 18px;
+            width: 16px;
+          }
         }
 
         span.attachment-name {
@@ -58,17 +64,31 @@ div.stream-attachments {
           display: block;
           float: left;
           margin-left: 6px;
+
+          @include mobile() {
+            color: $carrot_green;
+            margin-left: 8px;
+            font-size: 16px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: calc(100% - 120px);
+          }
         }
 
         span.attachment-description {
           @include OC_Body_Book();
           font-size: 12px;
-          color: $light_ui_grey;
+          color: rgba($deep_navy, 0.5);
           white-space: nowrap;
           line-height: 20px;
           display: block;
           float: left;
           margin-left: 6px;
+
+          @include mobile() {
+            margin-left: 8px;
+            font-size: 16px;
+          }
         }
 
         button.remove-attachment-bt {

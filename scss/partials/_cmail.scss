@@ -723,13 +723,11 @@ div.cmail-outer {
         border: none;
         outline: none;
         cursor: text;
-        @include activity-headline();
-        font-size: 22px;
+        @include activity-title();
         color: $deep_navy;
         white-space: pre-wrap;
         word-wrap: break-word;
         min-height: 28px;
-        line-height: 28px;
 
         &:empty:before {
           content: attr(placeholder);

@@ -419,6 +419,7 @@ div.stream-item {
         @include activity-title();
         color: $deep_navy;
         display: inline;
+
         @include mobile() {
           margin-top: 16px;
         }
@@ -457,9 +458,27 @@ div.stream-item {
       }
     }
 
+    div.stream-item-mobile-reactions {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        height: 48px;
+        margin: 16px 0 0;
+        padding-bottom: 16px;
+        border-bottom: 1px solid $ultra_light_grey;
+      }
+    }
+
     div.stream-item-footer {
       min-height: 26px;
       margin-top: 16px;
+
+      @include mobile() {
+        height: 16px;
+        overflow: hidden;
+        margin-top: 12px;
+      }
 
       div.stream-body-draft-edit {
         float: left;

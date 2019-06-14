@@ -199,6 +199,10 @@
                    :dangerouslySetInnerHTML {:__html (if has-abstract
                                                        (:abstract activity-data)
                                                        (:body activity-data))}}])]]
+            (when (and (not is-drafts-board)
+                       is-mobile?)
+                [:div.stream-item-mobile-reactions
+                  (reactions activity-data)])
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit
@@ -214,7 +218,8 @@
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
                   (comments-summary activity-data true)]
-                (reactions activity-data)
+                (when-not is-mobile?
+                  (reactions activity-data))
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
@@ -223,7 +228,7 @@
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
                     [:div.stream-item-attachments-count
-                      (count activity-attachments) " Attachment" (when (> (count activity-attachments) 1) "s")]
+                      (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
                     [:div.stream-item-attachments-list
                       (for [atc activity-attachments]
                         [:a.stream-item-attachments-item
