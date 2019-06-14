@@ -425,6 +425,7 @@ div.dashboard-layout {
               justify-content: center;
               align-items: center;
               color: $ui_grey;
+              opacity: 1;
             }
 
             @include big_web() {
