@@ -94,6 +94,7 @@ nav.oc-navbar {
             left: 0;
             background-color: transparent;
             display: block;
+            z-index: #{$navbar_zindex + 10};
 
             div.mobile-sections-list-inner {
               display: block;
