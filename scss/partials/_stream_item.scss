@@ -189,7 +189,8 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: calc(100% - 88px);
+          width: calc(100% - 40px);
+          max-width: unset;
         }
 
         div.mobile-name {
