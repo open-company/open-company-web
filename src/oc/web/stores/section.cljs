@@ -109,7 +109,8 @@
                        current-viewers)
         next-notifications (vec (conj current-notifications user))]
     (assoc db :section-editing
-           (merge section-data {:authors next-authors
+           (merge section-data {:has-changes true
+                                :authors next-authors
                                 :viewers next-viewers
                                 :private-notifications next-notifications}))))
 
@@ -121,7 +122,8 @@
         next-authors (filterv #(not= % (:user-id user)) (:authors section-data))
         next-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))]
     (assoc db :section-editing
-           (merge section-data {:authors next-authors
+           (merge section-data {:has-changes true
+                                :authors next-authors
                                 :viewers next-viewers
                                 :private-notifications private-notifications}))))
 

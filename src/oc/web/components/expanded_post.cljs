@@ -150,6 +150,7 @@
                           :video-image (:video-image activity-data)
                           :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
+        {:class utils/hide-class}
         (:headline activity-data)]
       [:div.expanded-post-author.group
         (user-avatar-image publisher)
@@ -158,7 +159,8 @@
            :data-placement "top"
            :data-container "body"
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-           :data-title (utils/activity-date-tooltip activity-data)}
+           :data-title (utils/activity-date-tooltip activity-data)
+           :class utils/hide-class}
           (str (:name publisher) " in "
                (:board-name activity-data) " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
@@ -166,9 +168,11 @@
             [:div.must-see-tag])]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract
+          {:class utils/hide-class}
           (:abstract activity-data)])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
+         :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
       [:div.expanded-post-footer.group

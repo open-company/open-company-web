@@ -405,10 +405,11 @@
                             ;; Redirect to the publishing board if the slug is available
                             (if redirect?
                               (do
-                                (real-close)
-                                (utils/after
-                                 180
-                                 #(routing-actions/open-post-modal cmail-data)))
+                                (router/nav!
+                                 (if (= (router/current-board-slug) "all-posts")
+                                   (oc-urls/all-posts)
+                                   (oc-urls/board (:board-slug cmail-data))))
+                                (real-close))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
