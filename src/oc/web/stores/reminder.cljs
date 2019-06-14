@@ -9,7 +9,7 @@
         reminder-edit-key (dispatcher/reminder-edit-key org-slug)
         old-edit-reminder-data (get-in db reminder-edit-key)
         new-reminder-data (reminder-utils/parse-reminder (reminder-utils/new-reminder-data))
-        reminder-data (if old-edit-reminder-data
+        reminder-data (or
                         ;; If the edit reminder is already populated it means a post/patch
                         ;; request failed, this avoid losing the edited data
                         old-edit-reminder-data
