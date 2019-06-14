@@ -74,8 +74,7 @@
         ; Comments count
         [:div.is-comments-summary
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))
-                                    utils/hide-class true})}
+                                    :add-a-comment (not (pos? comments-count))})}
           (if (pos? comments-count)
             (str comments-count
               (when-not short-label?
