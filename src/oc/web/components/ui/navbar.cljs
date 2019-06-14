@@ -24,7 +24,6 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar)]))
 
 (defn- mobile-nav! [e board-slug]
-  (utils/event-stop e)
   (router/nav! (oc-urls/board board-slug)))
 
 (rum/defcs navbar < rum/reactive
@@ -122,9 +121,7 @@
                         (:name board)])
                     (when can-compose?
                       [:button.mlb-reset.mobile-section-item-compose
-                        {:on-click (fn [e]
-                                      (utils/event-stop e)
-                                      (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+                        {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
                         [:span.compose-green-icon]
                         [:span.compose-green-label "New post"]])]])]
             [:div.navbar-center
