@@ -103,8 +103,7 @@
                         :height (utils/calc-video-height 136)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
-                             is-published?
-                             (not is-mobile?))]
+                             is-published?)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
