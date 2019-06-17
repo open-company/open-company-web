@@ -128,10 +128,10 @@
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
       (when (and @(::saving s)
-                 (:saved org-editing))
+                 (contains? org-editing :saved))
         (reset! (::saving s) false)
-        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
-        (notification-actions/show-notification {:title "Settings saved"
+        (utils/after 2500 (fn [_] (dis/dispatch! [:update [:org-editing] #(dissoc % :saved)])))
+        (notification-actions/show-notification {:title (if (:saved org-editing) "Settings saved" "Error saving, please retry")
                                                  :primary-bt-title "OK"
                                                  :primary-bt-dismiss true
                                                  :expire 10
@@ -162,8 +162,8 @@
                          (org-actions/org-edit-save org-editing))
              :disabled (or @(::saving s)
                            (:saved org-editing)
-                           (and (seq (:name org-editing))
-                                (< (count (str/trim (:name org-editing))) 3)))
+                           (not (seq (:name org-editing)))
+                           (< (count (str/trim (:name org-editing))) 3))
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
@@ -190,6 +190,7 @@
                                  clean-org-name (subs org-name 0 (min (count org-name) org-utils/org-name-max-length))]
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name clean-org-name
                                                                                       :has-changes true
+                                                                                      :error false
                                                                                       :rand (rand 1000)})]))}]
             (when (:error org-editing)
               [:div.error "Must be between 3 and 50 characters"])
