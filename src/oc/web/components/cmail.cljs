@@ -408,7 +408,9 @@
                                 (real-close)
                                 (utils/after
                                  180
-                                 #(routing-actions/open-post-modal cmail-data false)))
+                                 #(router/nav! (if (= (router/current-board-slug) "all-posts")
+                                                 (oc-urls/all-posts)
+                                                 (oc-urls/board (:board-slug cmail-data))))))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
