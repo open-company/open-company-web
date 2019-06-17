@@ -24,7 +24,6 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar)]))
 
 (defn- mobile-nav! [e board-slug]
-  (utils/event-stop e)
   (router/nav! (oc-urls/board board-slug)))
 
 (rum/defcs navbar < rum/reactive
@@ -32,11 +31,6 @@
                     (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::show-sections-list)
-                    (ui-mixins/on-window-click-mixin (fn [s e]
-                      (when (and @(::show-sections-list s)
-                                 (not (utils/event-inside? e (rum/ref-node s :mobile-board-button))))
-                        (reset! (::show-sections-list s) false)
-                        (utils/event-stop e))))
                     {:did-mount (fn [s]
                      (when-not (utils/is-test-env?)
                        (when-not (responsive/is-tablet-or-mobile?)
@@ -107,27 +101,29 @@
                 section-name]
               (when @(::show-sections-list s)
                 [:div.mobile-sections-list
-                  (when show-all-posts
-                    [:button.mlb-reset.mobile-section-item.all-posts
-                      {:class (when (= (router/current-board-slug) "all-posts") "active")
-                       :on-click #(mobile-nav! % "all-posts")}
-                      "All Posts"])
-                  (when drafts-link
-                    [:button.mlb-reset.mobile-section-item.drafts
-                      {:class (when (= (router/current-board-slug) utils/default-drafts-board-slug) "active")
-                       :on-click #(mobile-nav! % utils/default-drafts-board-slug)}
-                      "Drafts"])
-                  (for [board sorted-boards]
-                    [:button.mlb-reset.mobile-section-item
-                      {:key (str "mobile-section-" (:slug board))
-                       :class (when (= (router/current-board-slug) (:slug board)) "active")
-                       :on-click #(mobile-nav! % (:slug board))}
-                      (:name board)])
-                  (when can-compose?
-                    [:button.mlb-reset.mobile-section-item-compose
-                      {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
-                      [:span.compose-green-icon]
-                      [:span.compose-green-label "New post"]])])]
+                  {:on-click #(reset! (::show-sections-list s) false)}
+                  [:div.mobile-sections-list-inner
+                    (when show-all-posts
+                      [:button.mlb-reset.mobile-section-item.all-posts
+                        {:class (when (= (router/current-board-slug) "all-posts") "active")
+                         :on-click #(mobile-nav! % "all-posts")}
+                        "All Posts"])
+                    (when drafts-link
+                      [:button.mlb-reset.mobile-section-item.drafts
+                        {:class (when (= (router/current-board-slug) utils/default-drafts-board-slug) "active")
+                         :on-click #(mobile-nav! % utils/default-drafts-board-slug)}
+                        "Drafts"])
+                    (for [board sorted-boards]
+                      [:button.mlb-reset.mobile-section-item
+                        {:key (str "mobile-section-" (:slug board))
+                         :class (when (= (router/current-board-slug) (:slug board)) "active")
+                         :on-click #(mobile-nav! % (:slug board))}
+                        (:name board)])
+                    (when can-compose?
+                      [:button.mlb-reset.mobile-section-item-compose
+                        {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+                        [:span.compose-green-icon]
+                        [:span.compose-green-label "New post"]])]])]
             [:div.navbar-center
               {:class (when search-active "search-active")}
               (search-box)])
