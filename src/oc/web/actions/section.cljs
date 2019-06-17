@@ -249,7 +249,8 @@
       (success-cb next-section-editing))))
 
 (defn pre-flight-check [section-slug section-name]
-  (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] true])
+  (dispatcher/dispatch! [:update [:section-editing] #(merge % {:has-changes true
+                                                               :pre-flight-loading true})])
   (let [org-data (dispatcher/org-data)
         pre-flight-link (utils/link-for (:links org-data) "pre-flight-create")]
     (api/pre-flight-section-check pre-flight-link section-slug section-name

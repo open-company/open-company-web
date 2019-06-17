@@ -1,5 +1,5 @@
 div.org-dashboard {
-  background-color: $oc_gray_8;
+  background-color: $grey_num_2;
 
   @include mobile() {
     background-color: $grey_num_2;
@@ -55,7 +55,7 @@ div.org-dashboard {
     }
 
     div.org-dashboard-container {
-      background-color: $oc_gray_8;
+      background-color: $grey_num_2;
 
       @include big_web() {
         min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
