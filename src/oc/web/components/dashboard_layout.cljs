@@ -91,6 +91,7 @@
       ;; Entries list
       [:div.dashboard-layout.group
         (when (and is-mobile?
+                   (not current-activity-id)
                    can-compose)
           [:button.mlb-reset.mobile-floating-compose-bt
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
