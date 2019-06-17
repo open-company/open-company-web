@@ -46,6 +46,15 @@ div.wrt-count-container {
     position: relative;
     opacity: 0.5;
 
+    @include mobile() {
+      padding-left: 0;
+      line-height: 20px;
+
+      &:before {
+        display: none;
+      }
+    }
+
     &:before {
       content: "";
       width: 10px;

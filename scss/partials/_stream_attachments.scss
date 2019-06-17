@@ -3,6 +3,7 @@ div.stream-attachments {
 
   @include mobile() {
     width: 100%;
+    margin-top: 16px;
   }
 
   div.stream-attachments-content {
@@ -49,9 +50,10 @@ div.stream-attachments {
           float: left;
 
           @include mobile() {
-            background-image: cdnUrl("/img/ML/mobile_attachment_icon.svg");
-            background-size: 16px 18px;
-            width: 16px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            width: 14px;
+            opacity: 0.7;
           }
         }
 

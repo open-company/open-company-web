@@ -3,6 +3,10 @@ div.is-comments {
   text-align: right;
   height: 26px;
 
+  @include mobile() {
+    height: 20px;
+  }
+
   div.is-comments-authors {
     float: left;
 
@@ -37,7 +41,7 @@ div.is-comments {
         height: 20px;
         border: 1px solid transparent;
         margin-left: -8px;
-        margin-top: 4px;
+        margin-top: 0;
 
         @include user-profile(16);
       }
@@ -70,6 +74,8 @@ div.is-comments {
 
     @include mobile() {
       max-width: 68vw;
+      margin-top: 0;
+      line-height: 20px;
     }
 
     span.add-a-comment {
