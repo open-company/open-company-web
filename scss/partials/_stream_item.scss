@@ -394,11 +394,13 @@ div.stream-item {
       }
 
       div.stream-item-headline {
-        @include activity-title();
+        @include activity-title(24px, 28px);
         color: $deep_navy;
         display: inline;
+
         @include mobile() {
           margin-top: 16px;
+          @include activity-title();
         }
       }
 
