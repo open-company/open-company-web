@@ -28,11 +28,11 @@
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
     [:div.stream-item-body
-      {:data-itemuuid (:uuid activity-data)
-       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
-    [:div.stream-item-body.no-abstract
       {:data-itemuuid (:uuid activity-data)}
-      (:abstract activity-data)]))
+      (:abstract activity-data)]
+    [:div.stream-item-body.no-abstract
+      {:data-itemuuid (:uuid activity-data)
+       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
