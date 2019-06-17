@@ -256,8 +256,7 @@
                            (editable-boards-data base org-slug))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
-                            (when (and org-slug board-slug)
-                              (board-data base org-slug board-slug)))]
+                            (board-data base org-slug board-slug))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
@@ -486,7 +485,8 @@
   ([data org-slug board-slug]
     (board-data data org-slug board-slug (router/current-sort-type)))
   ([data org-slug board-slug sort-type]
-    (get-in data (board-data-key org-slug board-slug sort-type))))
+    (when (and org-slug board-slug sort-type)
+      (get-in data (board-data-key org-slug board-slug sort-type)))))
 
 (defn editable-boards-data
   ([] (editable-boards-data @app-state (router/current-org-slug)))
