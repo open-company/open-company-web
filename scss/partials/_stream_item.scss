@@ -427,6 +427,7 @@ div.stream-item {
 
         @include mobile() {
           margin-top: 16px;
+          @include activity-title(24px, 28px);
         }
       }
 
