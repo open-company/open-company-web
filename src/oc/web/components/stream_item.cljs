@@ -25,19 +25,14 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
-(defn- check-item-ready
-  "After component is mounted/re-mounted "
-  [s]
-  (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s "activity-body"))
-        comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
-    (when (or (.hasClass $item-body "ddd-truncated")
-              (pos? (count (:attachments activity-data)))
-              (pos? (count comments-data))
-              (:body-thumbnail activity-data)
-              (:fixed-video-id activity-data))
-      (reset! (::truncated s) true))
-    (reset! (::item-ready s) true)))
+(defn- stream-item-summary [activity-data]
+  (if (seq (:abstract activity-data))
+    [:div.stream-item-body
+      {:data-itemuuid (:uuid activity-data)
+       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+    [:div.stream-item-body.no-abstract
+      {:data-itemuuid (:uuid activity-data)}
+      (:abstract activity-data)]))
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
@@ -58,28 +53,23 @@
                          (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
                          ;; Locals
-                         (rum/local false ::truncated)
-                         (rum/local false ::item-ready)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin :abstract (* 24 3))
+                         (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
                            (item-mounted s)
-                           (check-item-ready s)
                            s)
                           :did-remount (fn [_ s]
                            (item-mounted s)
-                           (check-item-ready s)
                            s)}
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
         _ (drv/react s :comments-data)
@@ -191,16 +181,7 @@
                 {:ref "activity-headline"
                  :data-itemuuid (:uuid activity-data)
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-              (let [has-abstract (seq (:abstract activity-data))]
-                [:div.stream-item-body
-                  {:class (utils/class-set {:no-abstract (not has-abstract)
-                                            :item-ready @(::item-ready s)
-                                            :truncated truncated?})
-                   :data-itemuuid (:uuid activity-data)
-                   :ref :abstract
-                   :dangerouslySetInnerHTML {:__html (if has-abstract
-                                                       (:abstract activity-data)
-                                                       (:body activity-data))}}])]]
+              (stream-item-summary activity-data)]]
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit
