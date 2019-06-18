@@ -869,6 +869,10 @@ div.cmail-outer {
 
       div.rich-body-editor-outer-container {
         position: relative;
+
+        @include tablet() {
+          min-height: calc(100vh - 334px);
+        }
       }
 
       div.rich-body-editor-container {

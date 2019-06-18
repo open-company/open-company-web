@@ -28,7 +28,6 @@ div.stream-attachments {
 
     div.stream-attachments-item {
       height: 28px;
-      // float: left;
       max-width: 100%;
 
       div.attachment-info {
@@ -48,7 +47,7 @@ div.stream-attachments {
         div.attachment-labels {
           display: flex;
           align-items: center;
-          max-width: 100%;
+          max-width: calc(100% - 18px);
           float: left;
 
           &.edit {
