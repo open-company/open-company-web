@@ -405,11 +405,12 @@
                             ;; Redirect to the publishing board if the slug is available
                             (if redirect?
                               (do
-                                (router/nav!
-                                 (if (= (router/current-board-slug) "all-posts")
-                                   (oc-urls/all-posts)
-                                   (oc-urls/board (:board-slug cmail-data))))
-                                (real-close))
+                                (real-close)
+                                (utils/after
+                                 180
+                                 #(router/nav! (if (= (router/current-board-slug) "all-posts")
+                                                 (oc-urls/all-posts)
+                                                 (oc-urls/board (:board-slug cmail-data))))))
                               (reset! (::disable-post s) false))))))
                     s)
                    :after-render (fn [s]
@@ -606,12 +607,18 @@
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
-               :on-key-down #(headline-on-change s)
                :on-click    #(headline-on-change s)
-               :on-key-press (fn [e]
-                             (when (= (.-key e) "Enter")
-                               (utils/event-stop e)
-                               (utils/to-end-of-content-editable (body-element))))
+               :on-key-down (fn [e]
+                              (headline-on-change s)
+                              (cond
+                                (and (.-metaKey e)
+                                     (= "Enter" (.-key e)))
+                                (post-clicked s)
+                                (and (= (.-key e) "Enter")
+                                     (not (.-metaKey e)))
+                                (do
+                                  (utils/event-stop e)
+                                  (utils/to-end-of-content-editable (body-element)))))
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             ;; Abstract
             [:div.cmail-content-abstract-container
@@ -631,20 +638,25 @@
                  :on-focus #(reset! (::abstract-focused s) true)
                  :on-blur #(reset! (::abstract-focused s) false)
                  ; :on-click    #(abstract-on-change s)
-                 :on-key-press (fn [e]
-                               (when (= (.-key e) "Enter")
-                                 (utils/event-stop e)
-                                 (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor]))))}]]
+                 :on-key-down (fn [e]
+                                (cond
+                                  (and (= (.-key e) "Enter")
+                                       (not (.-metaKey e)))
+                                  (do
+                                    (utils/event-stop e)
+                                    (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor])))
+                                  (and (.-metaKey e)
+                                       (= "Enter" (.-key e)))
+                                  (post-clicked s)))}]]
             (when show-edit-tooltip
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
-                    "Key points"]
+                    "Quick summary"]
                   [:div.edit-tooltip
                     (str
-                     "Add a quick summary to let everyone "
-                     "know why this post matters. This "
-                     "is what your team sees first.")]
+                     "Help everyone know what your post is about. "
+                     "This is what your team sees first.")]
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
                     "OK, got it"]]])
@@ -656,6 +668,7 @@
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :start-video-recording-cb #(video-record-clicked s)
+                               :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]

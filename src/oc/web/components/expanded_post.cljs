@@ -162,7 +162,12 @@
            :data-title (utils/activity-date-tooltip activity-data)
            :class utils/hide-class}
           (str (:name publisher) " in "
-               (:board-name activity-data) " on "
+               (:board-name activity-data)
+               (when (= (:board-access activity-data) "private")
+                 " (private)")
+               (when (= (:board-access activity-data) "public")
+                 " (public)")
+               " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
           (when (:must-see activity-data)
             [:div.must-see-tag])]]
