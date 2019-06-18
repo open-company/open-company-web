@@ -291,7 +291,7 @@
   [db [_ org direction sort-type posts-data]]
   (if posts-data
     (let [org-data (dispatcher/org-data db org)
-          container-key (dispatcher/container-key org :all-posts)
+          container-key (dispatcher/container-key org :all-posts sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
