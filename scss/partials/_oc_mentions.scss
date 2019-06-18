@@ -84,6 +84,7 @@ div.oc-mention-panel {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+        max-width: 100%;
 
         &.slack-icon {
           &:before {
