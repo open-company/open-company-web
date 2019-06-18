@@ -62,10 +62,11 @@
         entry-data (dis/activity-data org-slug activity-uuid)
         reaction-data (:interaction interaction-data)
         is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))]
-    (if (and entry-data (seq (:reactions entry-data)))
-      (when is-current-user
-        (activity-actions/get-entry entry-data))
-      (router/nav! (oc-urls/board (router/current-org-slug) board-slug)))))
+    ;; Refresh entry if necessary
+    (when (and entry-data
+             (seq (:reactions entry-data))
+             is-current-user)
+      (activity-actions/get-entry entry-data))))
 
 (defn ws-interaction-reaction-add [interaction-data]
   (let [org-slug (router/current-org-slug)
