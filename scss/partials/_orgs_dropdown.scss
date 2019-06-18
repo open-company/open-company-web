@@ -31,10 +31,10 @@ div.orgs-dropdown {
 
         &:after {
           content: "";
-          background-image: cdnUrl("/img/ML/board_settings.svg");
-          background-size: 8px 8px;
+          background-image: cdnUrl("/img/ML/select_arrows.svg");
+          background-size: 8px 12px;
+          background-position: top 11px right 0;
           background-repeat: no-repeat;
-          background-position: right 0 top 14px;
           width: 8px;
           height: 32px;
           opacity: 1;

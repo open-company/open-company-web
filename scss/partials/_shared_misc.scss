@@ -1062,7 +1062,7 @@ section.home-keep-aligned {
                 background-position: center;
                 background-repeat: no-repeat;
 
-                @include preload_image(cdnUlr("/img/ML/slack_email_switch_slack_logo_active.svg"));
+                @include preload_image(cdnUrl("/img/ML/slack_email_switch_slack_logo_active.svg"));
               }
 
               div.email-logo {
@@ -1073,7 +1073,7 @@ section.home-keep-aligned {
                 background-position: center;
                 background-repeat: no-repeat;
 
-                @include preload_image(cdnUlr("/img/ML/slack_email_switch_email_logo_active.svg"));
+                @include preload_image(cdnUrl("/img/ML/slack_email_switch_email_logo_active.svg"));
               }
             }
 

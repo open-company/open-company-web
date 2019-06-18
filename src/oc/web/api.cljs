@@ -156,8 +156,11 @@
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status response)
-        ; when a request get a 401 logout the user (presumably using an old token, or attempting anonymous access)
-        (when (= status 401)
+        ; when a request gets a 401, redirect the user to logout
+        ; (presumably they are using an old token, or attempting anonymous access),
+        ; but only if they are already logged in
+        (when (and jwt
+                   (= status 401))
           (router/redirect! oc-urls/logout))
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)

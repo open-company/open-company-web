@@ -57,7 +57,7 @@
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
           all-posts-data (when success (json->cljs body))
-          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data))]
+          fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "all-posts")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
@@ -102,7 +102,7 @@
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           must-see-data (when success (json->cljs body))
-          must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data))]
+          must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "must-see")
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
       (watch-boards (:fixed-items must-see-posts))
