@@ -1,5 +1,7 @@
 (ns oc.web.components.rich-body-editor
   (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [oops.core :refer (oget oget+)]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
@@ -377,6 +379,15 @@
                 "editableInput"
                 (fn [event editable]
                   (body-on-change s)))
+    (.subscribe body-editor
+                "editableKeydown"
+                (fn [e editable]
+                  (let [opts (first (:rum/args s))
+                        cmd-enter-cb (:cmd-enter-cb opts)]
+                    (when (and (fn? cmd-enter-cb)
+                               (.-metaKey e)
+                               (= "Enter" (.-key e)))
+                      (cmd-enter-cb e)))))
     (reset! (::editor s) body-editor)))
 
 (defn toggle-menu-cb [s show?]

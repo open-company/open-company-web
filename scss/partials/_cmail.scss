@@ -247,7 +247,7 @@ div.cmail-outer {
       div.cmail-content {
         width: 640px;
         margin: 0 auto;
-        padding: 66px 0 0;
+        padding: 66px 0 18px;
         min-height: 100%;
         max-height: unset;
         overflow-x: auto;
@@ -286,15 +286,14 @@ div.cmail-outer {
 
         div.rich-body-editor-container {
           margin-top: 32px;
-          padding-bottom: 32px;
 
           div.rich-body-editor {
-            min-height: calc(100vh - 342px);
+            min-height: calc(100vh - 334px);
             @include activity-body(18, 26, $deep_navy);
 
             @media screen and (min-height: 556px) {
               max-height: initial;
-              min-height: calc(100vh - 362px);
+              min-height: calc(100vh - 354px);
             }
           }
         }
@@ -689,7 +688,7 @@ div.cmail-outer {
       height: auto;
 
       @include tablet() {
-        padding: 24px;
+        padding: 4px 16px 24px;
         min-height: calc(100vh - 112px);
         max-height: initial;
         overflow-x: visible;
@@ -737,8 +736,7 @@ div.cmail-outer {
         &:empty:before {
           content: attr(placeholder);
           display: inline-block;
-          color: $grey_num_1 !important;
-          opacity: 1;
+          color: rgba($deep_navy, 0.5) !important;
           font-style: none;
           height: 28px;
         }
@@ -796,8 +794,7 @@ div.cmail-outer {
           margin: 0;
 
           @include placeholder(){
-            color: $grey_num_1;
-            opacity: 1;
+            color: rgba($deep_navy, 0.5) !important;
             text-decoration: none;
             text-transform: none;
           }
@@ -908,7 +905,7 @@ div.cmail-outer {
           }
 
           &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-            color: $light_ui_grey !important;
+            color: rgba($deep_navy, 0.5) !important;
             font-style: normal;
           }
 
