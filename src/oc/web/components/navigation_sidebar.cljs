@@ -11,9 +11,7 @@
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))

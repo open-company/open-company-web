@@ -130,7 +130,7 @@
                 {:value "in-app"}
                 "In-app only"]]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Reminders"]
+            [:div.field-label "Recurring update reminders"]
             [:select.field-value.oc-input
               {:value (:reminder-medium current-user-data)
                :on-change #(change! s :reminder-medium (.. % -target -value))}

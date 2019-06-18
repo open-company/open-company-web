@@ -132,29 +132,21 @@ div.section-editor-container {
         @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
-        padding: 7px 8px;
+        padding: 5px 8px;
         position: relative;
         cursor: text;
         outline: none;
         margin-top: 8px;
         overflow-y: auto;
         overflow-x: hidden;
+        border: 1px solid $ultra_light_grey;
 
         &.preflight-error {
-          background-color: rgba($carrot_orange_2, 0.4);
+          border: 1px solid $carrot_orange;
         }
 
-        &.preflight-ok:after {
-          content: "";
-          width: 13px;
-          height: 10px;
-          position: absolute;
-          bottom: 14px;
-          right: 16px;
-          background-image: cdnUrl("/img/ML/section_preflight_checkmark.svg");
-          background-position: center;
-          background-size: 13px 10px;
-          background-repeat: no-repeat;
+        &.preflight-ok {
+          border: 1px solid $carrot_green;
         }
 
         &:empty:before {
