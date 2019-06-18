@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.lib.ziggeo :as ziggeo]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.comment :as comment-utils]))
 
@@ -152,6 +153,8 @@
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
         fixed-video-id (:video-id entry-data)
         body-thumbnail (html/first-body-thumbnail (:body entry-data))]
+    (when (seq fixed-video-id)
+      (ziggeo/init-ziggeo true))
     (-> entry-data
       (assoc :content-type "entry")
       (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
