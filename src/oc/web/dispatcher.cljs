@@ -175,7 +175,6 @@
                               (:current-user-data base)))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
-   :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
@@ -347,7 +346,6 @@
                                :board-data board-data
                                :posts-data filtered-posts
                                :panel-stack (:panel-stack base)
-                               :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
