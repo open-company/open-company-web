@@ -189,12 +189,14 @@
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
 (defn scroll-to-y [scroll-y & [duration]]
-  (.play
-    (new Scroll
-         (.-scrollingElement js/document)
-         #js [0 (.-scrollY js/window)]
-         #js [0 scroll-y]
-         (if (integer? duration) duration oc-animation-duration))))
+  (if (and duration (zero? duration))
+    (.scrollTo (.-scrollingElement js/document) 0 scroll-y)
+    (.play
+      (new Scroll
+           (.-scrollingElement js/document)
+           #js [0 (.-scrollY js/window)]
+           #js [0 scroll-y]
+           (if (integer? duration) duration oc-animation-duration)))))
 
 (defn scroll-to-bottom [elem & [animated]]
   (let [elem-scroll-top (.-scrollHeight elem)]
@@ -642,7 +644,7 @@
 
 (def default-headline "Untitled post")
 
-(def default-abstract "Quick summary: why this post matters...")
+(def default-abstract "Quick summary: let everyone know what your post is about...")
 
 (def max-abstract-length 280)
 

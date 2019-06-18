@@ -70,8 +70,25 @@ div.recurring-updates-modal-container {
       }
     }
 
-    div.recurring-updates-list {
+    div.recurring-updates-empty-list {
       margin: 24px auto 0;
+
+      div.recurring-updates-empty-list-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $light_navy;
+      }
+
+      div.recurring-updates-empty-list-desc {
+        margin-top: 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+      }
+    }
+
+    div.recurring-updates-list {
+      margin: 8px auto 0;
 
       div.recurring-updates-list-item {
         padding: 16px 0;
