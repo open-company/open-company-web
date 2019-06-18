@@ -465,8 +465,8 @@
             {:on-click close-cb}]
           [:div.cmail-mobile-header-title
             (if (= (:status cmail-data) "published")
-              "New"
-              "Edit")
+              "Edit"
+              "New")
             (when (not= (:status cmail-data) "published")
               (if (or (:has-changes cmail-data)
                       (:auto-saving cmail-data))
