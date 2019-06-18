@@ -463,6 +463,8 @@
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
+          [:button.mlb-reset.mobile-attachment-button
+            {:on-click #(add-attachment s)}]
           [:div.cmail-mobile-header-title
             (if (= (:status cmail-data) "published")
               "New post"

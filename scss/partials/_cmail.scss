@@ -347,6 +347,18 @@ div.cmail-outer {
           padding: 0;
         }
 
+        button.mobile-attachment-button {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 14px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 24px;
+          height: 24px;
+          margin-top: -3px;
+          margin-left: 8px;
+          padding: 0;
+        }
+
         div.cmail-mobile-header-title {
           margin: 0 auto;
           width: 150px;
