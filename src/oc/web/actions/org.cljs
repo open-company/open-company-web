@@ -34,10 +34,10 @@
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link)
-                                                    {:user-id (:user-id user-data)
-                                                     :team-id (:team-id team-data)
-                                                     :redirect redirect})]
+        fixed-auth-url (utils/auth-link-with-state (:href auth-link)
+                                                   {:user-id (:user-id user-data)
+                                                    :team-id (:team-id team-data)
+                                                    :redirect redirect})]
     (router/redirect! fixed-auth-url)))
 
 (defn maybe-show-integration-added-notification? []

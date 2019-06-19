@@ -339,7 +339,7 @@
                         (if (> (.indexOf redirect "?") -1)
                           (str redirect "&add=team")
                           (str redirect "?add=team")))
-        fixed-add-slack-team-link (utils/slack-link-with-state
+        fixed-add-slack-team-link (utils/auth-link-with-state
                                    (:href add-slack-team-link)
                                    {:user-id (:user-id current-user-data)
                                     :team-id team-id

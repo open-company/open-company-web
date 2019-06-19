@@ -397,7 +397,7 @@
       edn/read-string))
 
 
-(defn slack-link-with-state [original-url {:keys [user-id team-id redirect redirect-origin] :as state}]
+(defn auth-link-with-state [original-url {:keys [user-id team-id redirect redirect-origin] :as state}]
   (let [parsed-url       (js/URL. original-url)
         old-state-string (.. parsed-url -searchParams (get "state"))
         decoded-state    (decode-state-string old-state-string)
