@@ -59,7 +59,7 @@
           all-posts-data (when success (json->cljs body))
           fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "all-posts")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365)))
       (request-reads-count (keys (:fixed-items fixed-all-posts)))
       (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org sort-type fixed-all-posts]))))
@@ -104,7 +104,7 @@
           must-see-data (when success (json->cljs body))
           must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "must-see")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 6)))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" cook/default-cookie-expire))
       (watch-boards (:fixed-items must-see-posts))
       (dis/dispatch! [:must-see-get/finish org sort-type must-see-posts]))))
 
@@ -986,5 +986,5 @@
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
 
 (defn change-sort-type [type]
-  (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) (* 60 60 24 6))
+  (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))

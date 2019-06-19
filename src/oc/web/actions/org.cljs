@@ -63,7 +63,7 @@
     ;; avoid infinite loop of the Go to digest button
     ;; by changing the value of the last visited slug
     (if (pos? (count orgs))
-      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) cook/default-cookie-expire)
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
@@ -88,7 +88,7 @@
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
-    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
+    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
