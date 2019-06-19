@@ -4,7 +4,8 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.user :as user-utils]))
+            [oc.web.utils.user :as user-utils]
+            [cljsjs.moment-timezone]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images

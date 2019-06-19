@@ -1,5 +1,6 @@
 (ns oc.web.lib.utils
   (:require [clojure.string]
+            [clojure.edn :as edn]
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
@@ -383,14 +384,31 @@
       :else
       (:email user))))
 
+(defn- encode-state-string
+  [data]
+  (-> data
+      pr-str
+      js/btoa))
+
+(defn- decode-state-string
+  [s]
+  (-> s
+      js/atob
+      edn/read-string))
+
+
 (defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace
-   original-url
-   team-id
-   (str
-    (when (seq team-id) (str team-id ":"))
-    (when (seq user-id) (str user-id ":"))
-    redirect)))
+  (let [parsed-url       (js/URL. original-url)
+        old-state-string (.. parsed-url -searchParams (get "state"))
+        decoded-state    (decode-state-string old-state-string)
+        updated-state    (cond-> {}
+                           user-id (assoc :user-id user-id)
+                           team-id (assoc :team-id team-id)
+                           redirect (assoc :redirect redirect))
+        combined-state   (merge decoded-state updated-state)
+        new-state-string (encode-state-string combined-state)]
+    (.. parsed-url -searchParams (set "state" new-state-string))
+    (.toString parsed-url)))
 
 (def network-error
  {:title "Network error"
