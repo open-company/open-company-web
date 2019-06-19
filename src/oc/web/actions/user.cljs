@@ -154,12 +154,13 @@
 (defn login-with-slack [auth-url]
   (let [auth-url-with-redirect (utils/slack-link-with-state
                                  (:href auth-url)
-                                 nil
-                                 "open-company-auth" oc-urls/slack-lander-check)]
+                                 {:team-id "open-company-auth"
+                                  :redirect oc-urls/slack-lander-check})]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
 (defn login-with-google [auth-url]
+  (js/console.log (:href auth-url))
   (router/redirect! (:href auth-url))
   (dis/dispatch! [:login-with-google]))
 
