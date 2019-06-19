@@ -396,7 +396,6 @@
       js/atob
       edn/read-string))
 
-
 (defn auth-link-with-state [original-url {:keys [user-id team-id redirect redirect-origin] :as state}]
   (let [parsed-url       (js/URL. original-url)
         old-state-string (.. parsed-url -searchParams (get "state"))
