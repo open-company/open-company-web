@@ -17,10 +17,7 @@
                                 :eventAction "click"
                                 :eventLabel event-name}))
 
-(rum/defcs pricing < {:did-mount (fn [s]
-                      (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
-                        (js/OCWebSetupMarketingSiteJS))
-                      s)}
+(rum/defcs pricing
   [s]
   [:div
     [:div.pricing-wrap
