@@ -14,7 +14,6 @@
 
 (defn load-page
   [window]
-  (println base-dir)
   (println "Loading " init-url)
   (.loadURL window init-url))
 
