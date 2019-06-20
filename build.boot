@@ -199,7 +199,8 @@
         (cljs-repl)
         (reload :asset-path "/public"
                 :on-jsload 'oc.web.core/on-js-reload)
-        (cljs :optimizations :none
+        (cljs :ids #{"public/oc"}
+              :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true
                                  :parallel-build true
@@ -215,7 +216,8 @@
         (watch)
         (sass)
         (build-prod-site)
-        (cljs :optimizations :advanced
+        (cljs :ids #{"public/oc"}
+              :optimizations :advanced
               :source-map true
               :compiler-options {
                 :parallel-build true
@@ -235,7 +237,8 @@
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
-        (cljs :optimizations :advanced
+        (cljs :ids #{"public/oc"}
+              :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
                                  :externs ["public/js/externs.js"]
@@ -252,7 +255,8 @@
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
-        (cljs :optimizations :advanced
+        (cljs :ids #{"public/oc"}
+              :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
                                  :externs ["public/js/externs.js"]
@@ -273,3 +277,30 @@
     (check/with-bikeshed "-t" :options {:verbose true
                                         :max-line-length 120})
     (check/throw-on-errors)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Electron App
+
+(deftask build-electron-site []
+  (comp (p/base)
+        (p/permalink :permalink-fn page->permalink
+                     :filterer page?)
+        (p/render :renderer 'oc.core/static-page
+                  :filterer page?)
+        ;; We're not actually rendering a collection here but using the collection task
+        ;; is often a handy hack to render pages which are "unique"
+        (p/collection :renderer 'oc.core/electron-app-shell
+                      :page "app-shell.html"
+                      :filterer identity)))
+
+(deftask dev-electron
+  "Carrot electron app development build"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (from-jars)
+        (watch)
+        (build-electron-site)
+        (cljs :ids #{"electron/main" "electron/renderer"}
+              :optimizations :none
+              :compiler-options {:closure-defines {'oc.electron.main/dev? true}})
+        (target)))

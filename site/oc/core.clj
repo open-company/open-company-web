@@ -258,3 +258,8 @@
   (hp/html5 {:lang "en"}
             (:head pages/prod-app-shell)
             (:body pages/prod-app-shell)))
+
+(defn electron-app-shell [_]
+  (hp/html5 {:lang "en"}
+            (:head pages/electron-app-shell)
+            (:body pages/electron-app-shell)))
