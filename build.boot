@@ -303,3 +303,13 @@
               :optimizations :none
               :compiler-options {:closure-defines {'oc.electron.main/dev? true}})
         (target)))
+
+(deftask prod-electron
+  "Carrot electron app production build"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (prod-build)
+        (cljs :ids #{"electron/main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev? false}})
+        (target)))
