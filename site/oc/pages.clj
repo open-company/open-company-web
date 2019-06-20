@@ -1334,25 +1334,3 @@
           (when (= (env :fullstory) "true")
             (fullstory-init))
           (google-analytics-init)]})
-
-(def electron-app-shell
-  {:head [:head
-          [:meta {:charset "utf-8"}]
-          [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
-          [:link {:rel "icon" :type "image/png" :href "/img/carrot_logo.png" :sizes "64x64"}]
-          [:title "Carrot"]
-
-          [:style {:type "text/css"}
-           "body, html {
-              margin: 0; padding: 0; height: 100%; overflow: hidden;
-            }
-
-           #content {
-              position:absolute; left: 0; right: 0; bottom: 0; top: 0px;
-            }"]]
-   :body  [:body
-           [:div#content
-            [:webview {:src "https://staging.carrot.io"
-                       :preload "js/electron_renderer.js"
-                       :style {:width "100%"
-                               :height "100%"}}]]]})

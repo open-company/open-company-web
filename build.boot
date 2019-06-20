@@ -299,8 +299,7 @@
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (watch)
-        (build-electron-site)
-        (cljs :ids #{"electron/main" "electron/renderer"}
+        (cljs :ids #{"electron/main"}
               :optimizations :none
               :compiler-options {:closure-defines {'oc.electron.main/dev? true}})
         (target)))

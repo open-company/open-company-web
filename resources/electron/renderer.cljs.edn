@@ -1,3 +1,0 @@
-{:require [oc.electron.renderer]
- :compiler-options {:target :nodejs
-                    :output-to "renderer.js"}}

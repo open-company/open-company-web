@@ -24,8 +24,8 @@
   [window]
   (println base-dir)
   (if dev?
-    (.loadURL window (str "file://" (.join path base-dir "../public" default-page)))
-    (.loadURL window (str "file://" (.join path base-dir "public" default-page)))))
+    (.loadURL window (str "http://localhost:3559"))
+    (.loadURL window (str "https://staging.carrot.io"))))
 
 (defn mk-window
   [w h frame? show?]
@@ -35,8 +35,7 @@
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path base-dir "carrot.iconset/icon_512x512.png")
-                       :webPreferences #js {:nodeIntegration true
-                                            :webviewTag true}
+                       :webPreferences #js {:preload (.join path (.getAppPath app) "electron" "renderer.js")}
                        }))
 
 (defn set-csp
