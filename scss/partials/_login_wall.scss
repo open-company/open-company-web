@@ -1,6 +1,6 @@
-div.activity-not-found-container {
+div.login-wall-container {
 
-  div.activity-not-found-wrapper {
+  div.login-wall-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -12,7 +12,7 @@ div.activity-not-found-container {
       display: block;
     }
 
-    div.activity-not-found-left {
+    div.login-wall-left {
       background-color: $carrot_dark_bg_gray;
       padding: 21px;
       flex: 1;
@@ -27,7 +27,7 @@ div.activity-not-found-container {
         display: none;
       }
 
-      div.activity-not-found-logo {
+      div.login-wall-logo {
         width: 82px;
         height: 20px;
         background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
@@ -35,7 +35,7 @@ div.activity-not-found-container {
         background-repeat: no-repeat;
       }
 
-      div.activity-not-found-box {
+      div.login-wall-box {
         position: absolute;
         left: 50%;
         top: 180px;
@@ -49,7 +49,7 @@ div.activity-not-found-container {
       }
     }
 
-    div.activity-not-found-right {
+    div.login-wall-right {
       text-align: center;
       flex: 1;
       position: absolute;
@@ -64,7 +64,7 @@ div.activity-not-found-container {
         position: unset;
       }
 
-      div.activity-not-found-right-content {
+      div.login-wall-right-content {
         margin: 64px auto;
         width: 440px;
         text-align: center;

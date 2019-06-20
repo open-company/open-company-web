@@ -24,8 +24,8 @@
   [window]
   (println base-dir)
   (if dev?
-    (.loadURL window (str "http://localhost:3559"))
-    (.loadURL window (str "https://staging.carrot.io"))))
+    (.loadURL window (str "http://localhost:3559/login/desktop"))
+    (.loadURL window (str "https://staging.carrot.io/login/desktop"))))
 
 (defn mk-window
   [w h frame? show?]
