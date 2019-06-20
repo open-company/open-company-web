@@ -10,22 +10,13 @@
 (def session (.-session electron))
 (def BrowserWindow (.-BrowserWindow electron))
 
-;; Are we in development mode?
-;; TODO: Electron has its own concept of "in development", and so it might make more sense to lean on that...
-;; https://electronjs.org/docs/api/app#appispackaged
-(goog-define dev? false)
-
-(def base-dir (if dev?
-                (.join path js/__dirname "../../../")
-                js/__dirname))
-(def default-page "app-shell.html")
+(goog-define init-url "http://localhost:3559/login/desktop")
 
 (defn load-page
   [window]
   (println base-dir)
-  (if dev?
-    (.loadURL window (str "http://localhost:3559/login/desktop"))
-    (.loadURL window (str "https://staging.carrot.io/login/desktop"))))
+  (println "Loading " init-url)
+  (.loadURL window init-url))
 
 (defn mk-window
   [w h frame? show?]
@@ -34,7 +25,7 @@
                        :frame frame?
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
-                       :icon (.join path base-dir "carrot.iconset/icon_512x512.png")
+                       :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
                        :webPreferences #js {:preload (.join path (.getAppPath app) "electron" "renderer.js")}
                        }))
 
