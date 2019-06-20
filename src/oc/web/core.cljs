@@ -491,7 +491,7 @@
       (timbre/info "Routing login-wall-route" urls/login-wall)
       ; Email wall is shown only to not logged in users
       (when (jwt/jwt)
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect-404!))
       (simple-handler login-wall "login-wall" target params true))
 
     (defroute login-wall-slash-route (str urls/login-wall "/") {:keys [query-params] :as params}
@@ -503,13 +503,13 @@
     (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
       (timbre/info "Routing desktop-login-route" urls/desktop-login)
       (when (jwt/jwt)
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! urls/login))
       (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true))
 
     (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
       (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
       (when (jwt/jwt)
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! urls/login))
       (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true))
 
     (defroute home-page-route urls/home {:as params}
