@@ -72,16 +72,16 @@
        (finish-cb resp)))))
 
 (defn activity-get [org-data ap-initial-at & [finish-cb]]
-  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+  (when-let [activity-link (utils/link-for (:links org-data) "entries")]
     (activity-real-get activity-link ap-initial-at :recently-posted (:slug org-data) finish-cb)))
 
 (defn recent-activity-get [org-data ap-initial-at & [finish-cb]]
-  (when-let [recent-activity-link (utils/link-for (:links org-data) "recent-activity")]
+  (when-let [recent-activity-link (utils/link-for (:links org-data) "activity")]
     (activity-real-get recent-activity-link ap-initial-at :recent-activity (:slug org-data) finish-cb)))
 
 (defn all-posts-get [org-data ap-initial-at & [finish-cb]]
   (let [sort-type (router/current-sort-type)
-        activity-link-rel (if (= sort-type dis/default-sort-type) "recent-activity" "activity")
+        activity-link-rel (if (= sort-type dis/default-sort-type) "activity" "entries")
         activity-link (utils/link-for (:links org-data) activity-link-rel)]
     (when activity-link
       (activity-real-get activity-link ap-initial-at sort-type (:slug org-data) finish-cb))))
@@ -110,7 +110,7 @@
 
 (defn must-see-get [org-data]
   (let [current-sort-type (router/current-sort-type)
-        link-rel (if (= current-sort-type dis/default-sort-type) "recent-activity" "activity")]
+        link-rel (if (= current-sort-type dis/default-sort-type) "activity" "entries")]
     (when-let [activity-link (utils/link-for (:links org-data) link-rel)]
       (let [activity-href (:href activity-link)
             must-see-filter (str activity-href "?must-see=true")
@@ -137,7 +137,7 @@
         is-must-see (= (router/current-board-slug) "must-see")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         sort-type (router/current-sort-type)
-        board-rel (if (= sort-type :recent-activity) "recent-activity" "self")]
+        board-rel (if (= sort-type :recent-activity) "activity" "self")]
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-all-posts

@@ -57,7 +57,7 @@
   (doseq [section sections
           :when (not (is-currently-shown? section))
           :let [board-link (utils/link-for (:links section) ["item" "self"] "GET")
-                recent-board-link (utils/link-for (:links section) "recent-activity" "GET")]]
+                recent-board-link (utils/link-for (:links section) "activity" "GET")]]
     (api/get-board board-link
       (fn [{:keys [status body success]}]
         (when success
@@ -76,7 +76,7 @@
   (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)
           sort-type (router/current-sort-type)
-          link-rel (if (= sort-type :recent-activity) "recent-activity" "self")]
+          link-rel (if (= sort-type :recent-activity) "activity" "self")]
       (when (= section-uuid (:uuid utils/default-drafts-board))
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
@@ -200,7 +200,7 @@
     (when-not entry-data
       (let [board-data (dispatcher/board-data)
             sort-type (router/current-sort-type)
-            link-rel (if (= sort-type :recent-activity) "recent-activity" ["item" "self"])]
+            link-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
         (section-get sort-type (utils/link-for (:links board-data) link-rel "GET"))))))
 
 (defn ws-change-subscribe []

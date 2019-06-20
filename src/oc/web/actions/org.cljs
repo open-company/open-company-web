@@ -92,8 +92,8 @@
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
-        activity-link (utils/link-for (:links org-data) "activity")
-        recent-activity-link (utils/link-for (:links org-data) "recent-activity")]
+        activity-link (utils/link-for (:links org-data) "entries")
+        recent-activity-link (utils/link-for (:links org-data) "activity")]
     (when (router/current-activity-id)
       (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
     (sa/load-other-sections (:boards org-data))
@@ -117,7 +117,7 @@
         (do
           (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
             (sa/section-get :recently-posted board-link))
-          (when-let [recent-board-link (utils/link-for (:links board-data) "recent-activity" "GET")]
+          (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
             (sa/section-get :recent-activity recent-board-link)))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
