@@ -1215,6 +1215,7 @@
                 [:div.oc-loading-body]]]]
           [:div#oc-notifications-container]
           [:div#oc-loading]
+          [:div.preload-interstitial]
           ;; Static js files
           [:script {:type "text/javascript" :src (cdn "/js/static-js.js")}]
           ;; Google Analytics
@@ -1306,6 +1307,7 @@
                 [:div.oc-loading-body]]]]
           [:div#oc-notifications-container]
           [:div#oc-loading]
+          [:div.preload-interstitial]
           ;; Static js files
           [:script {:src (cdn "/js/static-js.js")}]
           ;; jQuery textcomplete needed by Emoji One autocomplete

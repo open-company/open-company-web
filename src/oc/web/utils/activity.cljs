@@ -160,6 +160,7 @@
       (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
       (assoc :board-name fixed-board-name)
+      (assoc :board-access (:access board-data))
       (assoc :has-comments (boolean comments-link))
       (assoc :can-comment (boolean add-comment-link))
       (assoc :stream-view-body stream-view-body)
@@ -192,13 +193,14 @@
 (defn fix-container
   "Fix container data coming from the API."
   ([container-data]
-   (fix-container container-data {}))
-  ([container-data change-data & [direction]]
-    (let [with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
-                                          (fix-entry %2 {:slug (:board-slug %2)
-                                                         :name (:board-name %2)
-                                                         :uuid (:board-uuid %2)}
-                                           change-data))
+   (fix-container container-data {} (dis/org-data)))
+  ([container-data change-data org-data & [direction]]
+    (let [all-boards (:boards org-data)
+          with-fixed-activities (reduce (fn [ret item]
+                                          (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
+                                                            all-boards))]
+                                            (assoc-in ret [:fixed-items (:uuid item)]
+                                             (fix-entry item board-data change-data))))
                                  container-data
                                  (:items container-data))
           next-links (when direction
@@ -236,7 +238,7 @@
           :sorted-comments)
       (:comments activity-data)))
 
-(defn- is-element-visible?
+(defn is-element-visible?
    "Given a DOM element return true if it's actually visible in the viewport."
   [el]
   (let [rect (.getBoundingClientRect el)

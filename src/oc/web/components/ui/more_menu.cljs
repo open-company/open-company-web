@@ -76,11 +76,13 @@
         is-mobile? (responsive/is-tablet-or-mobile?)]
     (when (or edit-link
               share-link
-              delete-link)
+              delete-link
+              mark-unread-link)
       [:div.more-menu
         {:ref "more-menu"}
         (when (or edit-link
                   delete-link
+                  mark-unread-link
                   (and (not external-share)
                        share-link))
           [:button.mlb-reset.more-menu-bt

@@ -275,13 +275,14 @@
 (defmethod dispatcher/action :all-posts-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [container-key (dispatcher/container-key org :all-posts)
+    (let [org-data (dispatcher/org-data db org)
+          container-key (dispatcher/container-key org :all-posts)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
                                                               :old-links (:links container-data)})
-          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) direction)
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)
@@ -341,14 +342,15 @@
 (defmethod dispatcher/action :must-see-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [container-key (dispatcher/container-key org :must-see)
+    (let [org-data (dispatcher/org-data db org)
+          container-key (dispatcher/container-key org :must-see)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
                                                               :old-links (:links container-data)})
 
-          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) direction)
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
           new-container-data (-> fixed-posts-data
                               (assoc :direction direction)

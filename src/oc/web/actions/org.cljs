@@ -261,7 +261,12 @@
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
         with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))]
-    (api/patch-org org-patch-link with-trimmed-name org-edit-save-cb)))
+    (api/patch-org org-patch-link with-trimmed-name
+      (fn [{:keys [success status] :as resp}]
+        (if success
+          (org-edit-save-cb resp)
+          (when (= status 422)
+            (dis/dispatch! [:input [:org-editing :error] true])))))))
 
 (defn org-avatar-edit-save-cb [{:keys [success body status]}]
   (if success
