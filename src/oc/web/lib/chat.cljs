@@ -27,14 +27,14 @@
 
 (defn chat-click []
   (timbre/info "New Intercom chat")
-  (. js/window Intercom "showNewMessage")
+  (.Intercom js/window "showNewMessage")
   ;(utils/after 500 check-intercom-dialog)
   )
 
 (defn identify []
   (when (jwt/get-key :email)
     (timbre/info "Identify user to Intercom")
-    (utils/after 1 #(. js/window Intercom "update"
+    (utils/after 1 #(.Intercom js/window "update"
                         (clj->js {:user_id (jwt/user-id)
                                   :name (jwt/get-key :name)
                                   :email (jwt/get-key :email)})))))
