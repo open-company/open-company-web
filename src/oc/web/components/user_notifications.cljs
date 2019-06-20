@@ -21,6 +21,7 @@
 
 (rum/defcs user-notifications < rum/reactive
                                 (drv/drv :user-notifications)
+                                (drv/drv :unread-notifications-count) ;; required by desktop app for dock badge count
                                 (drv/drv :show-add-post-tooltip)
                                 (rum/local false ::tray-open)
                                 (on-window-click-mixin (fn [s e]
