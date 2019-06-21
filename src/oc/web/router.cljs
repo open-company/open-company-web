@@ -105,6 +105,9 @@
 (defn current-posts-filter []
   (:board @path))
 
+(defn current-sort-type []
+  (or (:sort-type @path) :recent-activity))
+
 (defn current-activity-id []
   (:activity @path))
 
@@ -136,6 +139,11 @@
   "Cookie to save the last board slug used in a post creation"
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
+
+(defn last-sort-cookie
+  "Cookie to save the last sort selected"
+  [org-slug]
+  (str "last-sort-" (jwt/user-id) "-" (name org-slug)))
 
 (defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."

@@ -236,21 +236,33 @@
   db)
 
 (defmethod reducer :section
-  [db [_ board-data]]
+  [db [_ _sort-type board-data]]
   (let [org (utils/section-org-slug board-data)
         fixed-board-data (au/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)
 
 (defmethod reducer :ws-interaction/comment-add
-  [db [_ interaction-data]]
+  [db [_ org-slug entry-data interaction-data]]
   (let [activity-uuid (:resource-uuid interaction-data)
         activity-key (@reactions-atom (make-activity-index activity-uuid))
-        org (first activity-key)
         board-slug (nth activity-key 2)]
     (when activity-key
       (swap! reactions-atom index-comments
-             org
+             org-slug
+             board-slug
+             activity-uuid
+             [(:interaction interaction-data)])))
+  db)
+
+(defmethod reducer :ws-interaction/comment-delete
+  [db [_ org-slug interaction-data]]
+  (let [activity-uuid (:resource-uuid interaction-data)
+        activity-key (@reactions-atom (make-activity-index activity-uuid))
+        board-slug (nth activity-key 2)]
+    (when activity-key
+      (swap! reactions-atom index-comments
+             org-slug
              board-slug
              activity-uuid
              [(:interaction interaction-data)])))
