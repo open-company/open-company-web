@@ -30,6 +30,7 @@
         scroll-y-position (.. js/document -scrollingElement -scrollTop)]
     (router/set-route! route {:org org
                               :board board
+                              :sort-type (router/current-sort-type)
                               :activity activity
                               :query-params query-params
                               :back-to back-to
@@ -47,6 +48,7 @@
         back-y (or (:back-y @router/path) 0)]
     (router/set-route! route {:org org
                               :board board
+                              :sort-type (router/current-sort-type)
                               :scroll-y back-y
                               :query-params query-params})
     (.pushState (.-history js/window) #js {} (.-title js/document) to-url)))

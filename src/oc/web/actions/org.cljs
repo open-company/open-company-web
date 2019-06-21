@@ -63,25 +63,45 @@
     ;; avoid infinite loop of the Go to digest button
     ;; by changing the value of the last visited slug
     (if (pos? (count orgs))
-      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) cook/default-cookie-expire)
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
+
+(def default-board "all-posts")
+
+(defn get-default-board [org-data]
+  (let [last-board-slug default-board]
+    ; Replace default-board with the following to go back to the last visited board
+    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
+    (if (and (= last-board-slug "all-posts")
+             (utils/link-for (:links org-data) "activity"))
+      {:slug "all-posts"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (or
+          ; Get the last accessed board from the saved cookie
+          board
+          (let [sorted-boards (vec (sort-by :name boards))]
+            (first sorted-boards)))))))
 
 (defn org-loaded [org-data saved? & [email-domain]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
-    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
+    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
-        activity-link (utils/link-for (:links org-data) "activity")]
+        activity-link (utils/link-for (:links org-data) "entries")
+        recent-activity-link (utils/link-for (:links org-data) "activity")]
+    (when (router/current-activity-id)
+      (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
     (sa/load-other-sections (:boards org-data))
+    ;; Preload all posts data
     (when activity-link
-      ;; Preload all posts data
-      (aa/all-posts-get org-data ap-initial-at)
-      ;; Preload must see data
-      (aa/must-see-get org-data))
+      (aa/activity-get org-data ap-initial-at))
+    (when recent-activity-link
+      (aa/recent-activity-get org-data ap-initial-at))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
@@ -94,11 +114,14 @@
       (router/current-board-slug)
       (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
-        (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-          (sa/section-get board-link))
+        (do
+          (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+            (sa/section-get :recently-posted board-link))
+          (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
+            (sa/section-get :recent-activity recent-board-link)))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-          (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
+          (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
           (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
                      (not ap-initial-at)) ;; neither for a briefing link
             (routing-actions/maybe-404))))
@@ -112,7 +135,7 @@
            (not (utils/in? (:route @router/path) "confirm-invitation"))
            (not (utils/in? (:route @router/path) "secure-activity")))
       ;; Redirect to the first board if at least one is present
-      (let [board-to (utils/get-default-board org-data)]
+      (let [board-to (get-default-board org-data)]
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
