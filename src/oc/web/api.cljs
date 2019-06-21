@@ -412,12 +412,12 @@
     (handle-missing-link "get-all-posts" activity-link callback
      {:from from})))
 
-(defn load-more-all-posts [more-link direction callback]
+(defn load-more-items [more-link direction callback]
   (if (and more-link direction)
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
       callback)
-    (handle-missing-link "load-more-all-posts" more-link callback {:direction direction})))
+    (handle-missing-link "load-more-items" more-link callback {:direction direction})))
 
 ;; Auth
 
@@ -781,6 +781,18 @@
       (handle-missing-link "get-secure-entry" activity-link callback
        {:org-slug org-slug
         :secure-activity-id secure-activity-id}))))
+
+(defn get-current-entry [org-slug board-slug activity-uuid callback]
+  (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
+                         :method "GET"
+                         :rel ""
+                         :accept "application/vnd.open-company.entry.v1+json"}]
+    (if (and org-slug board-slug activity-uuid)
+      (storage-http (method-for-link activity-link) (relative-href activity-link)
+       {:headers (headers-for-link activity-link)}
+       callback)
+      (handle-missing-link "get-current-entry" activity-link callback
+       {:org-slug org-slug :board-slug board-slug :activity-uuid activity-uuid}))))
 
 ;; Search
 

@@ -171,27 +171,50 @@
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
 (defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."
+  "Parse board data coming from the API."
   ([board-data]
-    (fix-board board-data {}))
-
-  ([board-data changes]
+   (fix-board board-data {}))
+  ([board-data change-data & [direction]]
     (let [links (:links board-data)
-          read-only (readonly-board? links)
-          with-read-only (assoc board-data :read-only read-only)
-          with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
-                                       (fix-entry %2 board-data changes))
-                                       with-read-only (:entries board-data))
-          with-entry-count (if (:entries board-data)
-                             (assoc with-fixed-entries
-                              :entry-count
-                              (count (:fixed-items with-fixed-entries)))
-                             with-fixed-entries)
-          without-entries (dissoc with-entry-count :entries)]
-      without-entries)))
+          with-read-only (assoc board-data :read-only (readonly-board? links))
+          with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+                                          (fix-entry %2 {:slug (:board-slug %2)
+                                                         :name (:board-name %2)
+                                                         :uuid (:board-uuid %2)}
+                                           change-data))
+                                 with-read-only
+                                 (:entries board-data))
+          next-links (when direction
+                      (vec
+                       (remove
+                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
+                        links)))
+          link-to-move (when direction
+                         (if (= direction :down)
+                           (utils/link-for (:old-links board-data) "previous")
+                           (utils/link-for (:old-links board-data) "next")))
+          fixed-next-links (if direction
+                             (if link-to-move
+                               (vec (conj next-links link-to-move))
+                               next-links)
+                             links)
+          with-links (-> with-fixed-activities
+                       (dissoc :old-links)
+                       (assoc :links fixed-next-links))
+          new-items (map :uuid (:entries board-data))
+          without-items (dissoc with-links :entries)
+          with-posts-list (assoc without-items :posts-list (vec
+                                                             (case direction
+                                                              :up (concat new-items (:posts-list board-data))
+                                                              :down (concat (:posts-list board-data) new-items)
+                                                              new-items)))
+          with-saved-items (if direction
+                             (assoc with-posts-list :saved-items (count (:posts-list board-data)))
+                             with-posts-list)]
+      with-saved-items)))
 
 (defn fix-container
-  "Fix container data coming from the API."
+  "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
    (fix-container container-data {} (dis/org-data)))
   ([container-data change-data org-data & [direction]]
