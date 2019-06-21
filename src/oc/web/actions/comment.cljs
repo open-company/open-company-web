@@ -119,25 +119,19 @@
                     interaction-data])))
 
 (defn ws-comment-delete [comment-data]
-  (let [comments-key (dis/activity-comments-key
-                      (router/current-org-slug)
-                      (:resource-uuid comment-data))]
-    (dis/dispatch! [:ws-interaction/comment-delete comments-key comment-data])))
+  (dis/dispatch! [:ws-interaction/comment-delete (router/current-org-slug) comment-data]))
 
 (defn ws-comment-add [interaction-data]
   (let [org-slug   (router/current-org-slug)
-        board-slug (router/current-board-slug)
         activity-uuid (:resource-uuid interaction-data)
-        entry-data (dis/activity-data org-slug activity-uuid)
-        comments-key (dis/activity-comments-key org-slug activity-uuid)]
+        entry-data (dis/activity-data org-slug activity-uuid)]
     (when entry-data
       ;; Refresh the entry data to get the new links to interact with
       (activity-actions/get-entry entry-data))
     (dis/dispatch! [:ws-interaction/comment-add
-                    (dis/current-board-key)
+                    org-slug
                     entry-data
-                    interaction-data
-                    comments-key])))
+                    interaction-data])))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add
