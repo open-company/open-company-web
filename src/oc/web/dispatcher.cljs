@@ -130,6 +130,17 @@
                           (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
+(defn- get-container-posts [base posts-data is-board? org-slug container-slug sort-type]
+  (let [container-key (if is-board?
+                        (board-data-key org-slug container-slug sort-type)
+                        (container-key org-slug container-slug sort-type))
+        container-data (get-in base container-key)
+        items-list (:posts-list container-data)
+        container-posts (map #(when (contains? posts-data %) (get posts-data %)) items-list)]
+    (if (= container-slug utils/default-drafts-board-slug)
+      (filterv #(= (:status %) "draft") container-posts)
+      container-posts)))
+
 ;; Functions needed by derivatives
 
 (declare org-data)
@@ -238,12 +249,7 @@
                                    sort-type (:sort-type route)
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
-                              (let [container-key (if is-board?
-                                                    (board-data-key org-slug container-slug sort-type)
-                                                    (container-key org-slug container-slug sort-type))
-                                    container-data (get-in base container-key)
-                                    items-list (:posts-list container-data)]
-                                (map #(when (contains? posts-data %) (get posts-data %)) items-list)))))]
+                              (get-container-posts base posts-data is-board? org-slug container-slug sort-type))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -531,11 +537,7 @@
           all-boards-slug (map :slug (:boards org-data))
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
-     (let [container-key (if is-board?
-                           (board-data-key org-slug posts-filter sort-type)
-                           (container-key org-slug posts-filter sort-type))
-           items-list (:posts-list (get-in data container-key))]
-      (map #(when (contains? posts-data %) (get posts-data %)) items-list))))
+     (get-container-posts data posts-data is-board? org-slug posts-filter sort-type)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
