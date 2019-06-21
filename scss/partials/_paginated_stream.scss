@@ -1,4 +1,4 @@
-div.all-posts {
+div.paginated-stream {
   width: #{$board_container_width}px;
   padding-bottom: 24px;
 
@@ -8,7 +8,7 @@ div.all-posts {
     margin-top: 0px;
   }
 
-  div.all-posts-cards {
+  div.paginated-stream-cards {
     float: left;
 
     @include mobile() {
@@ -19,14 +19,14 @@ div.all-posts {
     div.loading-updates {
       width: 100%;
       text-align: center;
-      color: $oc_gray_7;
       margin-bottom: 16px;
       font-size: 14px;
       margin-top: 24px;
-      @include OC_Body_Book_Italic();
+      @include OC_Body_Book();
+      color: rgba($deep_navy, 0.5);
     }
 
-    div.all-posts-cards-inner {
+    div.paginated-stream-cards-inner {
       position: relative;
 
       div.activities-overlay {
