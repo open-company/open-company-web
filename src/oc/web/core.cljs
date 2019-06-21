@@ -503,7 +503,11 @@
     (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
       (timbre/info "Routing desktop-login-route" urls/desktop-login)
       (when (jwt/jwt)
-        (router/redirect! 
+        (js/console.log "DBG has JWT, redirect to:"
+         (if (seq (cook/get-cookie (router/last-org-cookie)))
+           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           urls/login))
+        (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
            urls/login)))
@@ -512,7 +516,11 @@
     (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
       (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
       (when (jwt/jwt)
-        (router/redirect! 
+        (js/console.log "DBG has JWT, redirect to:"
+         (if (seq (cook/get-cookie (router/last-org-cookie)))
+           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           urls/login))
+        (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
            urls/login)))
