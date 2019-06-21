@@ -236,8 +236,7 @@
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-prod-site)
-        (cljs :ids #{"public/oc"}
+        (build-prod-site) (cljs :ids #{"public/oc"}
               :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
@@ -308,10 +307,10 @@
   "Carrot electron app production build"
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
-  (comp (watch)
-        (cljs :ids #{"electron/main"}
-              :optimizations :none
-              :compiler-options {:closure-defines {'oc.electron.main/init-url "https://staging.carrot.io/login/desktop"}})
+  (comp (cljs :ids #{"electron/main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev? false
+                                                   'oc.electron.main/init-url "https://staging.carrot.io/login/desktop"}})
         (target)))
 
 (deftask prod-electron
@@ -319,6 +318,7 @@
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (cljs :ids #{"electron/main"}
-              :optimizations :none
-              :compiler-options {:closure-defines {'oc.electron.main/init-url "https://carrot.io/login/desktop"}})
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev? false
+                                                   'oc.electron.main/init-url "https://carrot.io/login/desktop"}})
         (target)))

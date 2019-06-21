@@ -10,6 +10,7 @@
 (def session (.-session electron))
 (def BrowserWindow (.-BrowserWindow electron))
 
+(goog-define dev? true)
 (goog-define init-url "http://localhost:3559/login/desktop")
 
 (defn load-page
