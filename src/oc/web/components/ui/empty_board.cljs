@@ -43,7 +43,9 @@
            is-must-see? "When someone marks a post as “must see” everyone will see it here."
            is-drafts-board? "Keep a private draft until you're ready to share it with your team."
            :else (when is-author? (str "Looks like there aren’t any posts in " (:name board-data) ".")))]
-        (when (pos? (count editable-boards))
+        (when (or (and (or is-all-posts? is-must-see? is-drafts-board?)
+                       (pos? (count editable-boards)))
+                  (not (:read-only board-data)))
           [:button.mlb-reset.create-new-post-bt
             {:on-click #(activity-actions/activity-edit)}
             "Create a new post"])]]))

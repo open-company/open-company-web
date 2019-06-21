@@ -84,15 +84,19 @@
           old-reaction-data (when reaction-found
                              (get reactions-data reaction-idx))
           is-current-user (= (jwt/get-key :user-id) (:user-id (:author reaction-data)))
+          authors-fn (if add-event? conj utils/vec-dissoc)
+          with-authors (-> reaction-data
+                        (assoc :authors (authors-fn (:authors old-reaction-data) (:name (:author reaction-data))))
+                        (assoc :author-ids (authors-fn (:author-ids old-reaction-data) (:user-id (:author reaction-data)))))
           with-reacted (if is-current-user
                          ;; If the reaction is from the current user we need to
                          ;; update the reacted, the links are the one coming with
                          ;; the WS message
-                         (assoc reaction-data :reacted add-event?)
+                         (assoc with-authors :reacted add-event?)
                          ;; If it's a reaction from another user we need to
                          ;; survive the reacted and the links from the reactions
                          ;; we already have
-                         (assoc reaction-data :reacted (if old-reaction-data (:reacted old-reaction-data) false)))
+                         (assoc with-authors :reacted (if old-reaction-data (:reacted old-reaction-data) false)))
           new-reactions-data (if reactions-data
                                (assoc reactions-data (if reaction-found reaction-idx
                                                       (count reactions-data)) with-reacted)
@@ -141,9 +145,16 @@
                               ;; and is an add interaction
                               {:reacted (when is-current-user
                                           add-event?)
+                               :authors []
+                               :author-ids []
                                :links (:links reaction-data)})
+          authors-fn (if add-event? conj utils/vec-dissoc)
           with-reacted (merge reaction-data {:count (:count interaction-data)
                                              :reacted (:reacted old-reaction-data)
+                                             :authors (authors-fn (:authors old-reaction-data)
+                                                       (:name (:author reaction-data)))
+                                             :author-ids (authors-fn (:author-ids old-reaction-data)
+                                                          (:user-id (:author reaction-data)))
                                              :links (:links old-reaction-data)})
           new-reactions-data (if reaction-idx
                                (assoc reactions-data reaction-idx with-reacted)
@@ -225,21 +236,33 @@
   db)
 
 (defmethod reducer :section
-  [db [_ board-data]]
+  [db [_ _sort-type board-data]]
   (let [org (utils/section-org-slug board-data)
         fixed-board-data (au/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (vals (:fixed-items fixed-board-data))))
   db)
 
 (defmethod reducer :ws-interaction/comment-add
-  [db [_ interaction-data]]
+  [db [_ org-slug entry-data interaction-data]]
   (let [activity-uuid (:resource-uuid interaction-data)
         activity-key (@reactions-atom (make-activity-index activity-uuid))
-        org (first activity-key)
         board-slug (nth activity-key 2)]
     (when activity-key
       (swap! reactions-atom index-comments
-             org
+             org-slug
+             board-slug
+             activity-uuid
+             [(:interaction interaction-data)])))
+  db)
+
+(defmethod reducer :ws-interaction/comment-delete
+  [db [_ org-slug interaction-data]]
+  (let [activity-uuid (:resource-uuid interaction-data)
+        activity-key (@reactions-atom (make-activity-index activity-uuid))
+        board-slug (nth activity-key 2)]
+    (when activity-key
+      (swap! reactions-atom index-comments
+             org-slug
              board-slug
              activity-uuid
              [(:interaction interaction-data)])))
