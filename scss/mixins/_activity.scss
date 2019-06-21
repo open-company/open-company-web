@@ -255,6 +255,16 @@ $h2_top_margin: 24;
     color: $color;
     letter-spacing: normal !important;
     font-weight: normal;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
   &.editing {
@@ -283,6 +293,16 @@ $h2_top_margin: 24;
     font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
   a, span[data-auto-link] {
