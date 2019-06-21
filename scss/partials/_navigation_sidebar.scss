@@ -110,6 +110,7 @@
 
 @mixin item-selected() {
   background-color: $grey_num_2;
+  outline: none;
 
   @include mobile() {
     background-color: transparent;
@@ -117,7 +118,7 @@
 
   .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
     // color: $carrot_green;
-    @include OC_Body_Book();
+    @include OC_Body_Bold();
     font-size: 14px;
     text-decoration: none;
 
@@ -151,6 +152,8 @@
 
 @mixin item-hover(){
   background-color: $grey_num_2;
+  outline: none;
+  text-decoration: none;
   -webkit-tap-highlight-color: $grey_num_2;
 
   @include mobile() {
@@ -168,16 +171,7 @@
     }
   }
 
-  &:active, &:focus {
-    text-decoration: none;
-
-    div.all-posts-label, div.must-see-label, div.drafts-label {
-      text-decoration: none;
-    }
-  }
-
   div.all-posts-label, div.drafts-label, div.must-see-label {
-
     color: $deep_navy;
     text-decoration: none;
 
@@ -268,7 +262,7 @@ div.left-navigation-sidebar {
       }
 
       @include big_web() {
-        &:not(.item-selected):hover, &:not(.item-selected):active {
+        &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
           @include item-hover();
         }
       }
@@ -443,7 +437,7 @@ div.left-navigation-sidebar {
         }
 
         @include big_web() {
-          &:not(.item-selected):hover, &:not(.item-selected):active {
+          &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
             @include item-hover();
           }
         }

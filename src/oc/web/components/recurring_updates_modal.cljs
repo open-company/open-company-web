@@ -33,32 +33,40 @@
           [:button.mlb-reset.cancel-bt
             {:on-click nav-actions/close-reminders}
             "Back"]]
-        [:div.recurring-updates-list
-          (for [reminder reminders-list
-                :let [patch-link (utils/link-for (:links reminder) "partial-update")
-                      now-year (.getFullYear (utils/js-date))
-                      next-send-date (utils/js-date (:next-send reminder))
-                      show-year (not= now-year (.getFullYear next-send-date))]]
-            [:div.recurring-updates-list-item.group
-              {:key (str "reminder-" (:uuid reminder))
-               :class (when patch-link "editable-reminder")
-               :on-click #(when patch-link
-                            (reminder-actions/edit-reminder (:uuid reminder)))}
-              [:div.reminder-assignee
-                {:title (utils/name-or-email (:assignee reminder))
-                 :data-toggle (when-not is-tablet-or-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                (user-avatar-image (:assignee reminder))]
-              [:div.reminder-data
-                [:div.reminder-title
-                  (:headline reminder)]
-                [:div.reminder-description
-                  (str
-                   (utils/name-or-email (:assignee reminder))
-                   ", "
-                   (utils/get-week-day (.getDay next-send-date) true)
-                   " "
-                   (utils/date-string next-send-date [:short-month (when show-year :year)])
-                   " (" (name (:frequency reminder)) ")")]]])]]]))
+        (if (seq reminders-list)
+          [:div.recurring-updates-list
+            (for [reminder reminders-list
+                  :let [patch-link (utils/link-for (:links reminder) "partial-update")
+                        now-year (.getFullYear (utils/js-date))
+                        next-send-date (utils/js-date (:next-send reminder))
+                        show-year (not= now-year (.getFullYear next-send-date))]]
+              [:div.recurring-updates-list-item.group
+                {:key (str "reminder-" (:uuid reminder))
+                 :class (when patch-link "editable-reminder")
+                 :on-click #(when patch-link
+                              (reminder-actions/edit-reminder (:uuid reminder)))}
+                [:div.reminder-assignee
+                  {:title (utils/name-or-email (:assignee reminder))
+                   :data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
+                  (user-avatar-image (:assignee reminder))]
+                [:div.reminder-data
+                  [:div.reminder-title
+                    (:headline reminder)]
+                  [:div.reminder-description
+                    (str
+                     (utils/name-or-email (:assignee reminder))
+                     ", "
+                     (utils/get-week-day (.getDay next-send-date) true)
+                     " "
+                     (utils/date-string next-send-date [:short-month (when show-year :year)])
+                     " (" (name (:frequency reminder)) ")")]]])]
+            [:div.recurring-updates-empty-list
+              [:div.recurring-updates-empty-list-title
+                "Set up recurring updates"]
+              [:div.recurring-updates-empty-list-desc
+                (str
+                 "Carrot reminds you when it's time to update your team. "
+                 "You can create reminders for yourself and others.")]])]]))

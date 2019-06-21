@@ -6,7 +6,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
             [oc.web.actions.org :as org-actions]
@@ -129,10 +128,10 @@
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
       (when (and @(::saving s)
-                 (:saved org-editing))
+                 (contains? org-editing :saved))
         (reset! (::saving s) false)
-        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
-        (notification-actions/show-notification {:title "Settings saved"
+        (utils/after 2500 (fn [_] (dis/dispatch! [:update [:org-editing] #(dissoc % :saved)])))
+        (notification-actions/show-notification {:title (if (:saved org-editing) "Settings saved" "Error saving, please retry")
                                                  :primary-bt-title "OK"
                                                  :primary-bt-dismiss true
                                                  :expire 10
@@ -163,8 +162,8 @@
                          (org-actions/org-edit-save org-editing))
              :disabled (or @(::saving s)
                            (:saved org-editing)
-                           (and (seq (:name org-editing))
-                                (< (count (str/trim (:name org-editing))) 3)))
+                           (not (seq (:name org-editing)))
+                           (< (count (str/trim (:name org-editing))) 3))
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
@@ -191,19 +190,17 @@
                                  clean-org-name (subs org-name 0 (min (count org-name) org-utils/org-name-max-length))]
                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:name clean-org-name
                                                                                       :has-changes true
+                                                                                      :error false
                                                                                       :rand (rand 1000)})]))}]
             (when (:error org-editing)
               [:div.error "Must be between 3 and 50 characters"])
-            [:div.org-settings-desc
-              (str ls/web-server-domain "/" (:slug org-data))]
             [:div.org-settings-label
               "Allowed email domains"
               [:i.mdi.mdi-information-outline
                 {:title "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."
                  :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                  :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
+                 :data-container "body"}]]
             [:input.org-settings-field.oc-input
               {:type "text"
                :placeholder "@domain.com"
@@ -228,7 +225,9 @@
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
               [:button.mlb-reset.advanced-settings-bt
-                {:on-click #(reset! (::show-advanced-settings s) true)}
+                {:on-click (fn [_]
+                              (reset! (::show-advanced-settings s) true)
+                              (utils/after 1000 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))}
                 "Show advanced settings"]]
             [:div.org-settings-advanced
               [:div.org-settings-advanced-title
@@ -249,8 +248,7 @@
                              "be logged in to view posts.")
                      :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                      :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+                     :data-container "body"}]]]
               [:div.org-settings-advanced-row.public-sections.group
                 (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                   :disabled false

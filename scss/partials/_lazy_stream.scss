@@ -24,3 +24,10 @@ div.lazy-stream {
     }
   }
 }
+
+div.preload-interstitial {
+  @include preload_image(cdnUrl("/img/ML/interstitial.svg"));
+  @include mobile() {
+    @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
+  }
+}

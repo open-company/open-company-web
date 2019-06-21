@@ -189,12 +189,14 @@
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
 (defn scroll-to-y [scroll-y & [duration]]
-  (.play
-    (new Scroll
-         (.-scrollingElement js/document)
-         #js [0 (.-scrollY js/window)]
-         #js [0 scroll-y]
-         (if (integer? duration) duration oc-animation-duration))))
+  (if (and duration (zero? duration))
+    (.scrollTo (.-scrollingElement js/document) 0 scroll-y)
+    (.play
+      (new Scroll
+           (.-scrollingElement js/document)
+           #js [0 (.-scrollY js/window)]
+           #js [0 scroll-y]
+           (if (integer? duration) duration oc-animation-duration)))))
 
 (defn scroll-to-bottom [elem & [animated]]
   (let [elem-scroll-top (.-scrollHeight elem)]
@@ -509,17 +511,23 @@
         "Just now"))))
 
 (defn activity-date-tooltip [entry-data]
-  (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
-        updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
-        created-str (activity-date created-at)
-        updated-str (activity-date updated-at)
+  (let [created-at (or (:published-at entry-data) (:created-at entry-data))
+        last-edit (last (:author entry-data))
+        updated-at (when (:updated-at last-edit)
+                     (:updated-at last-edit))
+        same-author? (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+        ;; Show edit only if happened at least 24 hours after publish
+        should-show-updated-at? (or (not same-author?)
+                                    (> (- (.getTime (js-date updated-at)) (.getTime (js-date created-at)))
+                                     (* 1000 60 60 24)))
+        created-str (tooltip-date created-at)
+        updated-str (tooltip-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
-                       "Posted "
-                       "Created ")
-        last-edit (last (:author entry-data))]
-    (if (= (:created-at entry-data) (:updated-at last-edit))
+                       "Posted on "
+                       "Created on ")]
+    (if-not should-show-updated-at?
       (str label-prefix created-str)
-      (if (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+      (if same-author?
         (str label-prefix created-str "\nEdited " updated-str)
         (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 
@@ -572,25 +580,6 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
-;; Get the board to show counting the last accessed and the last created
-
-(def default-board "all-posts")
-
-(defn get-default-board [org-data]
-  (let [last-board-slug default-board]
-    ; Replace default-board with the following to go back to the last visited board
-    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (and (= last-board-slug "all-posts")
-             (link-for (:links org-data) "activity"))
-      {:slug "all-posts"}
-      (let [boards (:boards org-data)
-            board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (or
-          ; Get the last accessed board from the saved cookie
-          board
-          (let [sorted-boards (vec (sort-by :name boards))]
-            (first sorted-boards)))))))
-
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
@@ -636,7 +625,7 @@
 
 (def default-headline "Untitled post")
 
-(def default-abstract "Quick summary: why this post matters...")
+(def default-abstract "Quick summary: let everyone know what your post is about...")
 
 (def max-abstract-length 280)
 

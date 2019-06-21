@@ -25,19 +25,14 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
-(defn- check-item-ready
-  "After component is mounted/re-mounted "
-  [s]
-  (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s "activity-body"))
-        comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
-    (when (or (.hasClass $item-body "ddd-truncated")
-              (pos? (count (:attachments activity-data)))
-              (pos? (count comments-data))
-              (:body-thumbnail activity-data)
-              (:fixed-video-id activity-data))
-      (reset! (::truncated s) true))
-    (reset! (::item-ready s) true)))
+(defn- stream-item-summary [activity-data]
+  (if (seq (:abstract activity-data))
+    [:div.stream-item-body
+      {:data-itemuuid (:uuid activity-data)}
+      (:abstract activity-data)]
+    [:div.stream-item-body.no-abstract
+      {:data-itemuuid (:uuid activity-data)
+       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
@@ -58,28 +53,23 @@
                          (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
                          ;; Locals
-                         (rum/local false ::truncated)
-                         (rum/local false ::item-ready)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin :abstract (* 24 3))
+                         (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
                            (item-mounted s)
-                           (check-item-ready s)
                            s)
                           :did-remount (fn [_ s]
                            (item-mounted s)
-                           (check-item-ready s)
                            s)}
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
         _ (drv/react s :comments-data)
@@ -103,12 +93,19 @@
                         :height (utils/calc-video-height 136)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
-                             is-published?)]
+                             is-published?)
+        ;; Add NEW tag besides comment summary
+        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
+                          (and (:new-at activity-data)
+                               ;; and that's after the user last read
+                               (< (.getTime (utils/js-date (:last-read-at read-data)))
+                                  (.getTime (utils/js-date (:new-at activity-data)))))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :unseen-item (:unseen activity-data)
+                                :unseen-item (or has-new-comments?
+                                                 (:unseen activity-data))
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
@@ -117,11 +114,14 @@
                    (if is-drafts-board
                      (activity-actions/activity-edit activity-data)
                      (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                           comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)
                            stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
                            emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
                            attachments-el (rum/ref-node s :stream-item-attachments)]
                        (when (and ;; More menu wasn't clicked
                                   (not (utils/event-inside? e more-menu-el))
+                                  ;; Comments summary wasn't clicked
+                                  (not (utils/event-inside? e comments-summary-el))
                                   ;; WRT wasn't clicked 
                                   (not (utils/event-inside? e stream-item-wrt-el))
                                   ;; Attachments wasn't clicked
@@ -132,10 +132,9 @@
                                   (not (utils/button-clicked? e))
                                   ;; No input field clicked
                                   (not (utils/input-clicked? e))
-                                  ;; No anchor clicked
+                                  ;; No body link was clicked
                                   (not (utils/anchor-clicked? e)))
-                         (routing-actions/open-post-modal activity-data)
-                         (utils/scroll-to-y 0)))))
+                         (routing-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-item-inner
         [:div.stream-item-header.group
@@ -143,11 +142,20 @@
             (user-avatar-image publisher)
             [:div.name
               [:div.name-inner
-                {:class utils/hide-class}
+                {:class utils/hide-class
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
                 (str
                  (:name publisher)
                  " in "
-                 (:board-name activity-data))]
+                 (:board-name activity-data)
+                 (when (= (:board-access activity-data) "private")
+                   " (private)")
+                 (when (= (:board-access activity-data) "public")
+                   " (public)"))]
               [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
@@ -186,16 +194,7 @@
                 {:ref "activity-headline"
                  :data-itemuuid (:uuid activity-data)
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-              (let [has-abstract (seq (:abstract activity-data))]
-                [:div.stream-item-body
-                  {:class (utils/class-set {:no-abstract (not has-abstract)
-                                            :item-ready @(::item-ready s)
-                                            :truncated truncated?})
-                   :data-itemuuid (:uuid activity-data)
-                   :ref :abstract
-                   :dangerouslySetInnerHTML {:__html (if has-abstract
-                                                       (:abstract activity-data)
-                                                       (:body activity-data))}}])]]
+              (stream-item-summary activity-data)]]
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit
@@ -210,7 +209,7 @@
                 {:ref "stream-item-reactions"}
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
-                  (comments-summary activity-data true)]
+                  (comments-summary activity-data true has-new-comments?)]
                 (reactions activity-data)
                 (when should-show-wrt
                   [:div.stream-item-wrt
@@ -239,5 +238,5 @@
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                       :data-title (str "Posted on " (utils/tooltip-date (:published-at activity-data)))}
+                       :data-title (utils/activity-date-tooltip activity-data)}
                       (utils/foc-date-time t)])]])]]]))
