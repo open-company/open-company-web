@@ -37,20 +37,27 @@ div.is-comments {
   div.is-comments-summary {
     float: left;
     font-size: 12px;
-    color: $deep_navy;
+    color: rgba($deep_navy, 0.5);
     @include OC_Body_Book();
     margin-top: 4px;
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    opacity: 0.5;
 
     @include big_web() {
       cursor: pointer;
 
       &:hover {
-        opacity: 1;
+        color: $deep_navy;
+
+        span.add-a-comment {
+          color: $deep_navy;
+
+          &:before {
+            opacity: 1;
+          }
+        }
       }
     }
 
@@ -58,9 +65,16 @@ div.is-comments {
       max-width: 68vw;
     }
 
+    @include new-comments-tag();
+
+    div.new-comments-tag {
+      margin-left: 8px;
+      display: inline-block;
+    }
+
     span.add-a-comment {
       padding-left: 6px;
-      color: $deep_navy;
+      color: rgba($deep_navy, 0.5);
 
       &:before {
         content: "";
@@ -72,7 +86,7 @@ div.is-comments {
         height: 15px;
         float: left;
         display: block;
-
+        opacity: 0.5;
       }
     }
   }
