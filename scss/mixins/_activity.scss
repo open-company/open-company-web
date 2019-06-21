@@ -40,6 +40,19 @@ $h2_top_margin: 24;
   }
 }
 
+@mixin new-comments-tag(){
+  div.new-comments-tag {
+    width: auto;
+    height: 17px;
+    position: relative;
+    vertical-align: inherit;
+    @include OC_Body_Bold();
+    line-height: 17px;
+    font-size: 12px;
+    color: $carrot_green;
+  }
+}
+
 @mixin must-see-tag() {
   div.must-see-tag {
     @include image-2x("/img/ML/must_see_tag");
@@ -59,7 +72,6 @@ $h2_top_margin: 24;
     }
   }
 }
-
 
 @mixin must-see(){
   div.must-see {
