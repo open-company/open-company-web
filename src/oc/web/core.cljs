@@ -502,7 +502,8 @@
 
     (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
       (timbre/info "Routing desktop-login-route" urls/desktop-login)
-      (when (jwt/jwt)
+      (if (jwt/jwt)
+        (do
         (js/console.log "DBG has JWT, redirect to:"
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
@@ -511,11 +512,12 @@
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
            urls/login)))
-      (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true))
+        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
     (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
       (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
-      (when (jwt/jwt)
+      (if (jwt/jwt)
+        (do
         (js/console.log "DBG has JWT, redirect to:"
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
@@ -524,7 +526,7 @@
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
            urls/login)))
-      (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true))
+        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
