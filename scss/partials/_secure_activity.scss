@@ -140,7 +140,7 @@ div.secure-activity-container {
       }
 
       div.activity-title {
-        @include activity-title(36px, 47px);
+        @include activity-title(36px, 40px);
         color: $deep_navy;
 
         .emojione {

@@ -259,9 +259,12 @@ div.cmail-outer {
         }
 
         div.cmail-content-headline {
-          font-size: 32px;
-          line-height: 40px;
-          min-height: 40px;
+          min-height: 34px;
+          @include activity-title(32px, 34px);
+
+          @include mobile() {
+            @include activity-title(32px, 40px);
+          }
         }
 
         div.cmail-content-abstract-container {
