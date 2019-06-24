@@ -106,7 +106,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :unseen-item (or has-new-comments?
                                                  (:unseen activity-data))
-                                :unread-item (:unread activity-data)
+                                :unread-item (or (:unread activity-data)
+                                                 has-new-comments?)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        ;; click on the whole tile only for draft editing
