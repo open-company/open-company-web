@@ -141,7 +141,7 @@
 
     {:will-mount (fn [s]
       (let [org-data @(drv/get-ref s :org-data)]
-        (org-actions/get-org org-data)
+        (org-actions/get-org org-data true)
         (team-actions/force-team-refresh (:team-id org-data)))
       s)
      :did-mount (fn [s]
