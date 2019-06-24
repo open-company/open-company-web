@@ -1,27 +1,35 @@
 {
   "name": "carrot-desktop",
-  "productName": "Carrot",
   "author": "Open Company",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/open-company/open-company-web"
   },
-  "scripts": {
-    "start": "electron ."
+  "build": {
+    "appId": "io.carrot.desktop",
+    "productName": "Carrot Desktop",
+    "copyright": "Copyright © 2019 Open Company LLC",
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "carrot.iconset/icon.icns",
+      "publish": ["github"]
+    }
   },
-  "config": {
-    "forge": "./forge.config.js"
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "devDependencies": {
-    "@electron-forge/cli": "beta",
-    "@electron-forge/maker-dmg": "^6.0.0-beta.39",
-    "@electron-forge/maker-zip": "^6.0.0-beta.39",
-    "appdmg": "^0.6.0",
-    "electron": "^5.0.2"
+    "electron": "^5.0.2",
+    "electron-builder": "^20.44.4"
   },
   "dependencies": {
-    "update-electron-app": "^1.4.2"
+    "electron-updater": "^4.0.6"
   }
 }
