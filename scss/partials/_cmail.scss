@@ -367,29 +367,45 @@ div.cmail-outer {
           }
         }
 
+        div.cmail-mobile-header-bt-separator {
+          width: 1px;
+          height: 24px;
+          margin: -3px 16px 0;
+          background-color: $ultra_light_grey;
+          float: right;
+        }
+
+        button.mobile-attachment-button {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 14px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 24px;
+          height: 24px;
+          margin-top: -3px;
+          padding: 0;
+          float: right;
+          opacity: 0.5;
+        }
+
         button.mobile-post-button {
-          display: none;
+          display: block;
+          float: right;
+          color: $carrot_green;
+          width: auto;
+          height: 24px;
+          text-align: right;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 24px;
+          madgin: 0;
+          padding: 0;
+          position: relative;
+          margin-top: -3px;
 
-          @include tablet() {
-            display: block;
-            float: right;
-            color: $carrot_green;
-            width: 40px;
-            height: 24px;
-            text-align: right;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 24px;
-            float: right;
-            madgin: 0;
-            padding: 0;
-            position: relative;
-            margin-top: -3px;
-
-            &.disabled {
-              opacity: 0.4;
-              cursor: not-allowed;
-            }
+          &.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
           }
         }
       }
@@ -853,6 +869,10 @@ div.cmail-outer {
 
       div.rich-body-editor-outer-container {
         position: relative;
+
+        @include tablet() {
+          min-height: calc(100vh - 334px);
+        }
       }
 
       div.rich-body-editor-container {
