@@ -233,13 +233,12 @@
              :on-change (fn [e]
                           (let [next-section-name (clojure.string/trim (.. e -target -value))]
                             (when (not= @(::section-name s) next-section-name)
+                              (reset! (::section-name s) next-section-name)
                               (when @(::section-name-check-timeout s)
                                 (.clearTimeout js/window @(::section-name-check-timeout s)))
                               (reset! (::section-name-check-timeout s)
                                (utils/after 500
-                                (fn []
-                                  (reset! (::section-name s) next-section-name)
-                                  (check-section-name-error s)))))))}]
+                                #(check-section-name-error s))))))}]
           (when (or (:section-name-error section-editing)
                     (:section-error section-editing))
             [:div.section-editor-error-label
