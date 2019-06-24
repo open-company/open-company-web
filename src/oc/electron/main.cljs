@@ -1,5 +1,13 @@
 (ns oc.electron.main)
 
+;; By default, this module will check for updates at app startup, then every ten
+;; minutes. When an update is found, it will automatically be downloaded in the
+;; background. When the download completes, a dialog is displayed allowing the
+;; user to restart the app.
+;; Repository URL is found in resources/package.json file.
+;; https://electronjs.org/docs/tutorial/updates#using-updateelectronjsorg
+((js/require "update-electron-app"))
+
 (def main-window (atom nil))
 
 (def path (js/require "path"))

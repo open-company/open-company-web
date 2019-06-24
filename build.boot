@@ -293,7 +293,7 @@
                       :filterer identity)))
 
 (deftask dev-electron
-  "Carrot electron app development build"
+  "Carrot electron app loading localhost:3559"
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
@@ -304,7 +304,7 @@
         (target)))
 
 (deftask staging-electron
-  "Carrot electron app production build"
+  "Carrot electron app loading staging.carrot.io"
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (cljs :ids #{"electron/main"}
@@ -314,7 +314,7 @@
         (target)))
 
 (deftask prod-electron
-  "Carrot electron app production build"
+  "Carrot electron app loading production carrot.io"
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (cljs :ids #{"electron/main"}
