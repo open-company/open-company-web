@@ -325,7 +325,7 @@
    :unread-notifications-count [[:unread-notifications]
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
-                                    (js/console.log (str "Unread notification count updated: " ncount))
+                                    (timbre/info "Unread notification count updated: " ncount)
                                     (when js/window.isDesktop
                                       (js/window.setBadgeCount ncount))
                                     ncount))]
