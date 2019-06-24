@@ -1,7 +1,7 @@
 (ns oc.web.lib.ziggeo
   (:require [oc.web.local-settings :as ls]))
 
-(defonce ziggeo-initialized false)
+(defonce ziggeo-initialized (atom false))
 
 (defn init-ziggeo [& [debug]]
   (when (compare-and-set! ziggeo-initialized false true)
