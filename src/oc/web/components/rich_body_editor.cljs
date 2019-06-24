@@ -307,11 +307,11 @@
         placeholder (or (:placeholder options) "What would you like to share?")
         body-el (rum/ref-node s "body")
         media-picker-opts {:buttons (clj->js media-config)
+                           :hidePlaceholderOnExpand false
                            :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
                                                          :alwaysExpanded (:use-inline-media-picker options)}
                            ; :saveSelectionClickElementId default-mutli-picker-button-id
-                           :delegateMethods #js {:onPickerClick (partial on-picker-click s)
-                                                 :willExpand #(reset! (::did-change s) true)}}
+                           :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
         media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
         file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
         buttons (if show-subtitle
@@ -350,7 +350,8 @@
                                                    "details" "summary" "nav" "abbr"
                                                    "table" "thead" "tbody" "tr" "th" "td"]))}
                  :placeholder #js {:text placeholder
-                                   :hideOnClick false}
+                                   :hideOnClick false
+                                   :hide-on-click false}
                  :keyboardCommands #js {:commands #js [
                                     #js {
                                       :command "bold"
