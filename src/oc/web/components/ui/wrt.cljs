@@ -54,7 +54,11 @@
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
 
-                 {:after-render (fn [s]
+                 {:will-mount (fn [s]
+                   (when-let [activity-data @(drv/get-ref s :wrt-activity-data)]
+                     (activity-actions/request-reads-data (:uuid activity-data)))
+                   s)
+                  :after-render (fn [s]
                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                    (when @(::search-active s)
                       (when (compare-and-set! (::search-focused s) false true)
@@ -253,15 +257,9 @@
         wrt-show (drv/react s :wrt-show)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-count-container
-      {:on-mouse-over #(when (and (not is-mobile?)
-                                  (not (:reads read-data)))
-                        (activity-actions/request-reads-data item-id))}
       [:div.wrt-count
         {:ref :wrt-count
-         :on-click #(do
-                    (when (not (:reads read-data))
-                      (activity-actions/request-reads-data item-id))
-                    (nav-actions/show-wrt item-id))
+         :on-click #(nav-actions/show-wrt item-id)
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " viewer" (when (not= read-count 1) "s"))
