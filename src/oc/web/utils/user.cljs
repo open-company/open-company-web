@@ -1,5 +1,6 @@
 (ns oc.web.utils.user
-  (:require [oc.web.lib.jwt :as jwt]
+  (:require [clojure.edn :as edn]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -108,3 +109,26 @@
   (let [slack-orgs-with-bot (map :slack-org-id bots-data)
         slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
     (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
+
+;; Encode and decode state string for OAuth
+
+(defn- encode-state-string
+  [data]
+  (-> data
+      pr-str
+      js/btoa))
+
+(defn- decode-state-string
+  [s]
+  (-> s
+      js/atob
+      edn/read-string))
+
+(defn auth-link-with-state [original-url {:keys [user-id team-id redirect redirect-origin] :as state}]
+  (let [parsed-url       (js/URL. original-url)
+        old-state-string (.. parsed-url -searchParams (get "state"))
+        decoded-state    (decode-state-string old-state-string)
+        combined-state   (merge decoded-state state)
+        new-state-string (encode-state-string combined-state)]
+    (.. parsed-url -searchParams (set "state" new-state-string))
+    (.toString parsed-url)))

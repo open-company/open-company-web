@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -34,10 +35,10 @@
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/auth-link-with-state (:href auth-link)
-                                                   {:user-id (:user-id user-data)
-                                                    :team-id (:team-id team-data)
-                                                    :redirect redirect})]
+        fixed-auth-url (uu/auth-link-with-state (:href auth-link)
+                                                {:user-id (:user-id user-data)
+                                                 :team-id (:team-id team-data)
+                                                 :redirect redirect})]
     (router/redirect! fixed-auth-url)))
 
 (defn maybe-show-integration-added-notification? []
