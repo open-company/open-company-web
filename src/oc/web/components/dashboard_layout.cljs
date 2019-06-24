@@ -58,6 +58,12 @@
                                     (activity-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
+                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                                s)
+                               :did-remount (fn [_ s]
+                                (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+                                  (.tooltip "hide")
+                                  (.tooltip "fixTitle"))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)

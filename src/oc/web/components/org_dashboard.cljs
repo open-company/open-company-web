@@ -82,7 +82,7 @@
                              (refresh-board-data s)
                              (init-whats-new)
                              s)
-                            :did-remount (fn [s]
+                            :did-remount (fn [_ s]
                              (init-whats-new)
                              s)}
   [s]
