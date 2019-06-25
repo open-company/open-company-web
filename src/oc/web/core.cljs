@@ -536,7 +536,9 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! urls/home))
+      (router/redirect! (if js/window.isDesktop
+                          urls/desktop-login
+                          urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
