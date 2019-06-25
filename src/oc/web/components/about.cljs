@@ -172,8 +172,8 @@
                      "amazing people regardless of where they "
                      "call home.")]
                   [:a
-                    {:href "#"
-                     :on-click #(chat/chat-click)}
+                    {:class "intercom-chat-link"
+                     :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                     "Say hello"]]]
               [:div.about-bottom-copy-row.group
                 [:div.about-bottom-copy-left
