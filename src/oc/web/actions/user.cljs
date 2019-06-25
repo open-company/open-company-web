@@ -102,12 +102,14 @@
       (cook/set-cookie! router/login-redirect-cookie url))))
 
 (defn maybe-save-login-redirect []
-  (let [url-pathname (.. js/window -location -pathname)]
+  (let [url-pathname (.. js/window -location -pathname)
+        is-login-route? (or (= url-pathname oc-urls/login-wall)
+                            (= url-pathname oc-urls/desktop-login))]
     (cond
-      (and (= url-pathname oc-urls/login-wall)
+      (and is-login-route?
            (:login-redirect (:query-params @dis/app-state)))
       (save-login-redirect (:login-redirect (:query-params @dis/app-state)))
-      (not= url-pathname oc-urls/login)
+      (not is-login-route?)
       (save-login-redirect))))
 
 (defn login-redirect []
