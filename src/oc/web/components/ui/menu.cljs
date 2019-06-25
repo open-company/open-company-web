@@ -175,7 +175,8 @@
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a
-          {:on-click #(chat/chat-click)}
+          {:class "intercom-chat-link"
+           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
           [:div.oc-menu-item.support
             "Get support"]]
         [:div.oc-menu-separator]

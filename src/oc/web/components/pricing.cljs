@@ -174,8 +174,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#"
-               :on-click #(chat/chat-click)}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -192,8 +192,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#"
-               :on-click #(chat/chat-click)}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Get in touch with us"]]]]
 
         shared-misc/testimonials-section
