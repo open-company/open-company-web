@@ -124,7 +124,7 @@ div.wrt-popup-container {
       padding: 12px 16px;
 
       @include mobile() {
-        position: relative;
+        position: fixed;
         border-bottom: 1px solid $ultra_light_grey;
         z-index: 2;
       }
@@ -172,6 +172,10 @@ div.wrt-popup-container {
         overflow-x: hidden;
         overflow-y: auto;
         height: calc(100% - 56px);
+      }
+
+      @include mobile() {
+        padding-top: 80px;
       }
 
       div.wrt-chart-container {
@@ -312,13 +316,13 @@ div.wrt-popup-container {
             }
           }
 
-          &.seen {
+          &.seen, &.sent {
             div.wrt-popup-list-row-name, div.wrt-popup-list-row-seen {
               width: calc(100% - 24px - 8px);
             }
           }
 
-          &:not(.seen) {
+          &:not(.seen), &:not(.sent) {
             @include big_web() {
               &:hover {
                 button.send-reminder-bt {

@@ -186,7 +186,8 @@
                           slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
-                   :class (when (:seen u) "seen")}
+                   :class (utils/class-set {:seen (:seen u)
+                                            :sent user-sending-notice})}
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
@@ -198,9 +199,10 @@
                     (if (:seen u)
                       ;; Show time the read happened
                       (str "Viewed " (string/lower (utils/time-since (:read-at u))))
-                      (if (and user-sending-notice
-                               (not= user-sending-notice :loading))
-                        user-sending-notice
+                      (if user-sending-notice
+                        (if (= user-sending-notice :loading)
+                          "Sending..."
+                          user-sending-notice)
                         "Unopened"))]
                   ;; Send reminder button
                   (when (and (not (:seen u))
@@ -224,7 +226,7 @@
                                      ;; Show the share popup
                                      (activity-actions/activity-share activity-data [wrt-share]
                                       (fn [{:keys [success body]}]
-                                        (when success
+                                        (if success
                                           (let [resp (first body)
                                                 user-label (if (= (:medium wrt-share) "email")
                                                              (str "Sent to: " (:email u))
@@ -233,7 +235,9 @@
                                                                       (not= (:display-name slack-user) "-"))
                                                                (str "Sent to: @" (:display-name slack-user) " (Slack)")
                                                                (str "Sent via Slack")))]
-                                            (swap! (::sending-notice s) assoc (:user-id u) user-label)
+                                            (swap! (::sending-notice s) assoc (:user-id u) user-label))
+                                          (do
+                                            (swap! (::sending-notice s) assoc (:user-id u) "An error occurred, please retry...")
                                             (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u)))))))))}
                       "Send"])])]])]]))
 

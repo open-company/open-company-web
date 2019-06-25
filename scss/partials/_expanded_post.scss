@@ -70,7 +70,7 @@ div.expanded-post {
   }
 
   div.expanded-post-headline {
-    @include activity-title(36px, 47px);
+    @include activity-title(36px, 40px);
     margin-top: 16px;
 
     @include mobile() {

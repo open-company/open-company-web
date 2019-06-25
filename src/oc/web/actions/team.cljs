@@ -118,7 +118,7 @@
 
 (defn author-change-cb [{:keys [success]}]
   (when success
-    (org-actions/get-org)))
+    (org-actions/get-org nil true)))
 
 (defn remove-author [author]
   (let [remove-author-link (utils/link-for (:links author) "remove")]
