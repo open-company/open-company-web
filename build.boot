@@ -299,7 +299,7 @@
   (comp (from-jars)
         (watch)
         (cljs :ids #{"electron/main"}
-              :optimizations :none
+              :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/init-url "http://localhost:3559/login/desktop"}})
         (target)))
 
