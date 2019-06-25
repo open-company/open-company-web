@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -48,8 +49,8 @@
   (rum/local #{} ::removing)
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
-        (org-actions/get-org org-data)
-        (team-actions/force-team-refresh (:team-id org-data)))
+      (org-actions/get-org org-data true)
+      (team-actions/teams-get))
     s)
    :after-render (fn [s]
     (doto (js/$ "[data-toggle=\"tooltip\"]")
@@ -65,9 +66,12 @@
   (let [org-data (drv/react s :org-data)
         invite-users-data (drv/react s :invite-data)
         team-data (:team-data invite-users-data)
+        team-roster (:team-roster invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         org-authors (:authors org-data)
-        all-users (:users team-data)
+        all-users (if team-data
+                    (:users team-data)
+                    (filter :user-id (:users team-roster)))
         filtered-users (if (seq @(::query s))
                          (filter #(user-match @(::query s) %) all-users)
                          all-users)
@@ -78,17 +82,22 @@
         sorted-users (if self-user
                        (concat [self-user] other-sorted-users)
                        other-sorted-users)
-        team-roster (:team-roster invite-users-data)]
+        user-role (user-store/user-role org-data cur-user-data)
+        is-admin-or-author? (#{:admin :author} user-role)
+        is-admin? (jwt/is-admin? (:team-id org-data))]
     [:div.team-management-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/close-all-panels}]
       [:div.team-management
         [:div.team-management-header
           [:div.team-management-header-title
-            "Manage team"]
-          [:button.mlb-reset.save-bt
-            {:on-click #(nav-actions/show-org-settings :invite)}
-            "Invite"]
+            (if is-admin?
+              "Manage team"
+              "View team")]
+          (when is-admin-or-author?
+            [:button.mlb-reset.save-bt
+              {:on-click #(nav-actions/show-org-settings :invite)}
+              "Invite"])
           [:button.mlb-reset.cancel-bt
             {:on-click #(nav-actions/show-org-settings nil)}
             "Back"]]
@@ -197,30 +206,35 @@
                       [:span.current-user " (you)"])]
                   (when pending?
                     [:div.pending-user
-                      " (pending: "
-                      [:button.mlb-reset.resend-pending-bt
-                        {:on-click resend-fn
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :title (str "Resend invitation via " (if (seq fixed-display-name) "slack" "email"))}
-                        "resend"]
-                      [:button.mlb-reset.remove-pending-bt
-                        {:on-click remove-fn
-                         :data-toggle "tooltip"
-                         :data-placement "top"
-                         :data-container "body"
-                         :title "Cancel invitation"}
-                        "cancel"]
+                      " (pending"
+                      (when is-admin?
+                        ": ")
+                      (when is-admin?
+                        [:button.mlb-reset.resend-pending-bt
+                          {:on-click resend-fn
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"
+                           :title (str "Resend invitation via " (if (seq fixed-display-name) "slack" "email"))}
+                          "resend"])
+                      (when is-admin?
+                        [:button.mlb-reset.remove-pending-bt
+                          {:on-click remove-fn
+                           :data-toggle "tooltip"
+                           :data-placement "top"
+                           :data-container "body"
+                           :title "Cancel invitation"}
+                          "cancel"])
                       ")"])]
                 [:div.user-role
-                  (if current-user
+                  (if (or current-user
+                          (not is-admin?))
                     [:span.self-user-type (name user-type)]
                     (user-type-dropdown {:user-id (:user-id user)
                                          :user-type user-type
                                          :disabled? removing?
                                          :on-change #(team-actions/switch-user-type user user-type % user author)
-                                         :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                         :hide-admin (not is-admin?)
                                          :on-remove (if (and (not= "pending" (:status user))
                                                              (not= (:user-id user) (:user-id cur-user-data)))
                                                       remove-fn

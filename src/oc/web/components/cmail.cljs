@@ -466,8 +466,8 @@
             {:on-click close-cb}]
           [:div.cmail-mobile-header-title
             (if (= (:status cmail-data) "published")
-              "New post"
-              "Edit post")
+              "Edit"
+              "New")
             (when (not= (:status cmail-data) "published")
               (if (or (:has-changes cmail-data)
                       (:auto-saving cmail-data))
@@ -481,7 +481,10 @@
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
               "Save"
-              "Post")]]
+              "Post")]
+          [:div.cmail-mobile-header-bt-separator]
+          [:button.mlb-reset.mobile-attachment-button
+            {:on-click #(add-attachment s)}]]
         [:div.cmail-header.group
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
