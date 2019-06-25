@@ -53,9 +53,9 @@
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
+                 mixins/refresh-tooltips-mixin
 
                  {:after-render (fn [s]
-                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                    (when @(::search-active s)
                       (when (compare-and-set! (::search-focused s) false true)
                         (.focus (rum/ref-node s :search-field))))

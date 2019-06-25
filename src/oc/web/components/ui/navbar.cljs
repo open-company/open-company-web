@@ -30,12 +30,8 @@
                     (drv/drv :navbar-data)
                     (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
+                    ui-mixins/refresh-tooltips-mixin
                     (rum/local false ::show-sections-list)
-                    {:did-mount (fn [s]
-                     (when-not (utils/is-test-env?)
-                       (when-not (responsive/is-tablet-or-mobile?)
-                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
-                     s)}
   [s]
   (let [{:keys [org-data
                 board-data

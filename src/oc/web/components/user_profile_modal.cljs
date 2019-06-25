@@ -5,6 +5,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-stores]
@@ -125,14 +126,10 @@
   (rum/local false ::email-error)
   (rum/local false ::password-error)
   (rum/local false ::current-password-error)
+  ;; Mixins
+  ui-mixins/refresh-tooltips-mixin
   {:will-mount (fn [s]
     (user-actions/get-user nil)
-    s)
-   :after-render (fn [s]
-    (when-not (utils/is-test-env?)
-      (doto (js/$ "[data-toggle=\"tooltip\"]")
-        (.tooltip "fixTitle")
-        (.tooltip "hide")))
     s)
     :did-remount (fn [old-state new-state]
     (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
