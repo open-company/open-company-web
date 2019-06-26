@@ -70,6 +70,7 @@
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
+        current-user-id (jwt/user-id)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
         _ (drv/react s :comments-data)
@@ -80,7 +81,7 @@
         publisher (if is-published?
                     (:publisher activity-data)
                     (first (:author activity-data)))
-        is-publisher? (= (:user-id publisher) (jwt/user-id))
+        is-publisher? (= (:user-id publisher) current-user-id)
         dom-node-class (str "stream-item-" (:uuid activity-data))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
@@ -99,11 +100,14 @@
                           (and (:new-at activity-data)
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at read-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))]
+                                  (.getTime (utils/js-date (:new-at activity-data)))))
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
+                                :follow-up-item (and (map? assigned-follow-up-data)
+                                                     (not (:completed? assigned-follow-up-data)))
                                 :unseen-item (or has-new-comments?
                                                  (:unseen activity-data))
                                 :unread-item (:unread activity-data)
@@ -156,7 +160,8 @@
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
-              [:div.must-see-tag.big-web-tablet-only]]]
+              [:div.must-see-tag.big-web-tablet-only]
+              [:div.follow-up-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
             (more-menu activity-data dom-element-id
@@ -164,8 +169,10 @@
               :show-edit? true
               :show-delete? true
               :show-move? (not is-mobile?)
-              :show-unread (not (:unread activity-data))}))]
+              :show-unread (not (:unread activity-data))
+              :assigned-follow-up-data assigned-follow-up-data}))]
         [:div.must-see-tag.mobile-only]
+        [:div.follow-up-tag.mobile-only]
         [:div.new-tag.mobile-only "NEW"]
         [:div.stream-item-body-ext.group
           [:div.thumbnail-container.group
