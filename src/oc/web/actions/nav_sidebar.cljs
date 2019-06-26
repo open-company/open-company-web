@@ -144,6 +144,7 @@
   (when e
     (.preventDefault e)
     (.stopPropagation e))
-  (show-org-settings :integrations))
+  (when-not (responsive/is-mobile-size?)
+    (show-org-settings :integrations)))
 
 (set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)
