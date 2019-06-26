@@ -16,9 +16,10 @@
 (def BrowserWindow (.-BrowserWindow electron))
 
 (goog-define dev? true)
-(goog-define origin "http://localhost:3559")
+(goog-define web-origin "http://localhost:3559")
+(goog-define auth-origin "http://localhost:3003")
 (goog-define init-path "/login/desktop")
-(def init-url (str origin init-path))
+(def init-url (str web-origin init-path))
 
 (defn- load-page
   [window]
@@ -49,6 +50,19 @@
                                      {"Content-Security-Policy" ["default-src \"none\""]})]
            (callback (clj->js merged-details)))))))
 
+(def slack-origin "https://slack.com")
+(def slack-origin-re #"^https://.*\.slack\.com$")
+(def google-accounts-origin "https://accounts.google.com")
+
+(defn- allowed-origin?
+  [o]
+  (or
+    (= o web-origin)
+    (= o auth-origin)
+    (= o slack-origin)
+    (= o google-accounts-origin)
+    (re-matches slack-origin-re o)))
+
 (defn- prevent-navigation-extenral-to-carrot
   []
   (.on app "web-contents-created"
@@ -57,14 +71,14 @@
         (fn [event navigation-url]
           (let [parsed-url    (URL. navigation-url)
                 target-origin (.-origin parsed-url)]
-            (println "Attempting to navigate to: " navigation-url)
-            (when (not= target-origin origin)
+            (println "Attempting to navigate to origin: " target-origin)
+            (when (not (allowed-origin? target-origin))
+              (println "Navigation prevented")
               (.preventDefault event)))))
       (.on contents "new-window"
         (fn [event navigation-url]
           (.preventDefault event)
-          (.openExternal shell navigation-url)))
-      )))
+          (.openExternal shell navigation-url))))))
 
 (defn- init-browser
   []
