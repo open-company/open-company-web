@@ -33,8 +33,7 @@
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
-                       :webPreferences #js {:contextIsolation true
-                                            :enableRemoteModule false
+                       :webPreferences #js {:enableRemoteModule false
                                             :preload (.join path (.getAppPath app) "electron" "renderer.js")}
                        }))
 
