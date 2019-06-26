@@ -7,19 +7,6 @@
     "type": "git",
     "url": "https://github.com/open-company/open-company-web"
   },
-  "build": {
-    "appId": "io.carrot.desktop",
-    "productName": "Carrot Desktop",
-    "copyright": "Copyright © 2019 Open Company LLC",
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "icon": "carrot.iconset/icon.icns",
-      "publish": ["github"]
-    }
-  },
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
