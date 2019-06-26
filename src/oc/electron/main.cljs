@@ -89,9 +89,15 @@
   (when dev? (.openDevTools @main-window))
   (.on @main-window "close" #(reset! main-window nil)))
 
+(defn mac?
+  []
+  (= (.-platform js/process) "darwin"))
+
 (defn init
   []
-  (.on app "window-all-closed" #(.quit app))
+  (.on app "window-all-closed" #(when (not (mac?))
+                                  (.quit app)))
+  (.on app "activate" #(when (nil? @main-window) (init-browser)))
   (.on app "ready" init-browser)
   (.on ipc-main "set-badge-count" (fn [event arg] (.setBadgeCount app arg)))
   (set! *main-cli-fn* (fn [] nil)))
