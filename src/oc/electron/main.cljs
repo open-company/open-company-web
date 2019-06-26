@@ -49,16 +49,6 @@
                                      {"Content-Security-Policy" ["default-src \"none\""]})]
            (callback (clj->js merged-details)))))))
 
-;; app.on('web-contents-created', (event, contents) => {
-;; contents.on('will-navigate', (event, navigationUrl) => {
-;; const parsedUrl = new URL(navigationUrl)
-
-;; if (parsedUrl.origin !== 'https://example.com') {
-;; event.preventDefault()
-;; }
-;; })
-;; })
-
 (defn- prevent-navigation-extenral-to-carrot
   []
   (.on app "web-contents-created"
