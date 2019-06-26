@@ -63,7 +63,7 @@
     (= o google-accounts-origin)
     (re-matches slack-origin-re o)))
 
-(defn- prevent-navigation-extenral-to-carrot
+(defn- prevent-navigation-external-to-carrot
   []
   (.on app "web-contents-created"
     (fn [event contents]
@@ -83,7 +83,7 @@
 (defn- init-browser
   []
   (set-csp)
-  (prevent-navigation-extenral-to-carrot)
+  (prevent-navigation-external-to-carrot)
   (reset! main-window (mk-window 1280 720 true true))
   (load-page @main-window)
   (when dev? (.openDevTools @main-window))
