@@ -73,6 +73,26 @@ $h2_top_margin: 24;
   }
 }
 
+@mixin follow-up-tag() {
+  div.follow-up-tag {
+    @include image-2x("/img/ML/follow_up_tag");
+    background-size: 77px 10px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba($sea_blue, 0.2);
+    height: 18px;
+    width: 86px;
+    margin-right: 8px;
+    position: relative;
+    vertical-align: top;
+    border-radius: 4px;
+
+    &.white-bg {
+      background-color: white;
+    }
+  }
+}
+
 @mixin must-see(){
   div.must-see {
     display: inline;
