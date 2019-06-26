@@ -4,11 +4,11 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -23,7 +23,8 @@
                                 (drv/drv :user-notifications)
                                 (drv/drv :show-add-post-tooltip)
                                 (rum/local false ::tray-open)
-                                (on-window-click-mixin (fn [s e]
+                                ui-mixins/refresh-tooltips-mixin
+                                (ui-mixins/on-window-click-mixin (fn [s e]
                                  (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
                                    (close-tray s))))
   [s]

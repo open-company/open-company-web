@@ -30,7 +30,6 @@
                     (drv/drv :navbar-data)
                     (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
-                    ui-mixins/refresh-tooltips-mixin
                     (rum/local false ::show-sections-list)
   [s]
   (let [{:keys [org-data
