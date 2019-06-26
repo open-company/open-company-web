@@ -988,3 +988,17 @@
 (defn change-sort-type [type]
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))
+
+(defn complete-follow-up [entity-data assigned-follow-up]
+  (let [complete-follow-up-link (utils/link-for (:links assigned-follow-up) "mark-complete" "POST")]
+    (api/complete-follow-up complete-follow-up-link
+     (fn [{:keys [success status body]}]
+       (when success
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
+
+(defn create-self-follow-up [entry-data create-follow-up-link]
+  (when create-follow-up-link
+    (api/create-follow-ups create-follow-up-link {:self true}
+     (fn [{:keys [status body success]}]
+      (when success
+        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
