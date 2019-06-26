@@ -58,6 +58,48 @@ div.more-menu {
     }
   }
 
+  button.more-menu-complete-follow-up-bt {
+    height: 24px;
+    display: inline;
+    background-image: cdnUrl("/img/ML/follow_up_complete.svg");
+    background-size: 14px 14px;
+    background-position: left center;
+    padding: 0 0 0 24px;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    margin-left: 16px;
+    display: inline-block;
+
+    @include mobile() {
+      width: 32px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+    }
+  }
+
+  button.more-menu-create-follow-up-bt {
+    height: 24px;
+    display: inline;
+    background-image: cdnUrl("/img/ML/follow_up_add.svg");
+    background-size: 16px 16px;
+    background-position: left center;
+    padding: 0 0 0 24px;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    margin-left: 16px;
+    display: inline-block;
+
+    @include mobile() {
+      width: 32px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+    }
+  }
+
   ul.more-menu-list {
     position: absolute;
     top: 24px;

@@ -67,13 +67,18 @@
                          s)}
   [s entity-data share-container-id
    {:keys [will-open will-close external-share tooltip-position show-unread
-           show-edit? show-delete? edit-cb delete-cb show-move?]}]
+           show-edit? show-delete? edit-cb delete-cb show-move?
+           assigned-follow-up-data]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
         mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
         editable-boards (drv/react s :editable-boards)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
+        complete-follow-up-link (when (and assigned-follow-up-data
+                                           (not (:completed? assigned-follow-up-data)))
+                                  (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))]
     (when (or edit-link
               share-link
               delete-link
@@ -170,7 +175,33 @@
                           (when (fn? will-close)
                             (will-close))
                           (activity-actions/activity-share-show entity-data share-container-id))
-             :data-toggle "tooltip"
+             :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
-             :title "Share"}])])))
+             :title "Share"}])
+        (if complete-follow-up-link
+          [:button.mlb-reset.more-menu-complete-follow-up-bt
+            {:type "button"
+             :ref "more-menu-complete-follow-up-bt"
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/complete-follow-up entity-data assigned-follow-up-data))
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :title "Complete follow up"}]
+          (when create-follow-up-link
+            [:button.mlb-reset.more-menu-create-follow-up-bt
+              {:type "button"
+               :ref "more-menu-create-follow-up-bt"
+               :data-container "body"
+               :on-click #(do
+                            (reset! (::showing-menu s) false)
+                            (when (fn? will-close)
+                              (will-close))
+                            (activity-actions/create-self-follow-up entity-data create-follow-up-link))
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement (or tooltip-position "top")
+               :title "Create follow up"}]))])))
