@@ -300,7 +300,7 @@
         (watch)
         (cljs :ids #{"electron/main"}
               :optimizations :simple
-              :compiler-options {:closure-defines {'oc.electron.main/init-url "http://localhost:3559/login/desktop"}})
+              :compiler-options {:closure-defines {'oc.electron.main/origin   "http://localhost:3559"}})
         (target)))
 
 (deftask staging-electron
@@ -309,8 +309,8 @@
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (cljs :ids #{"electron/main"}
               :optimizations :simple
-              :compiler-options {:closure-defines {'oc.electron.main/dev? false
-                                                   'oc.electron.main/init-url "https://staging.carrot.io/login/desktop"}})
+              :compiler-options {:closure-defines {'oc.electron.main/dev?   false
+                                                   'oc.electron.main/origin "https://staging.carrot.io"}})
         (target)))
 
 (deftask prod-electron
@@ -319,6 +319,6 @@
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (cljs :ids #{"electron/main"}
               :optimizations :simple
-              :compiler-options {:closure-defines {'oc.electron.main/dev? false
-                                                   'oc.electron.main/init-url "https://carrot.io/login/desktop"}})
+              :compiler-options {:closure-defines {'oc.electron.main/dev?   false
+                                                   'oc.electron.main/origin "https://carrot.io"}})
         (target)))

@@ -6,22 +6,26 @@
 (def main-window (atom nil))
 
 (def path (js/require "path"))
+(def URL (.-URL (js/require "url")))
 (def electron (js/require "electron"))
 
 (def app (.-app electron))
 (def ipc-main (.-ipcMain electron))
 (def session (.-session electron))
+(def shell (.-shell electron))
 (def BrowserWindow (.-BrowserWindow electron))
 
 (goog-define dev? true)
-(goog-define init-url "http://localhost:3559/login/desktop")
+(goog-define origin "http://localhost:3559")
+(goog-define init-path "/login/desktop")
+(def init-url (str origin init-path))
 
-(defn load-page
+(defn- load-page
   [window]
   (println "Loading " init-url)
   (.loadURL window init-url))
 
-(defn mk-window
+(defn- mk-window
   [w h frame? show?]
   (BrowserWindow. #js {:width w
                        :height h
@@ -29,10 +33,11 @@
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
-                       :webPreferences #js {:preload (.join path (.getAppPath app) "electron" "renderer.js")}
+                       :webPreferences #js {:contextIsolation true
+                                            :preload (.join path (.getAppPath app) "electron" "renderer.js")}
                        }))
 
-(defn set-csp
+(defn- set-csp
   []
   ;; Define Content Security Policy
   ;; https://electronjs.org/docs/tutorial/security#6-define-a-content-security-policy
@@ -44,9 +49,37 @@
                                      {"Content-Security-Policy" ["default-src \"none\""]})]
            (callback (clj->js merged-details)))))))
 
-(defn init-browser
+;; app.on('web-contents-created', (event, contents) => {
+;; contents.on('will-navigate', (event, navigationUrl) => {
+;; const parsedUrl = new URL(navigationUrl)
+
+;; if (parsedUrl.origin !== 'https://example.com') {
+;; event.preventDefault()
+;; }
+;; })
+;; })
+
+(defn- prevent-navigation-extenral-to-carrot
+  []
+  (.on app "web-contents-created"
+    (fn [event contents]
+      (.on contents "will-navigate"
+        (fn [event navigation-url]
+          (let [parsed-url    (URL. navigation-url)
+                target-origin (.-origin parsed-url)]
+            (println "Attempting to navigate to: " navigation-url)
+            (when (not= target-origin origin)
+              (.preventDefault event)))))
+      (.on contents "new-window"
+        (fn [event navigation-url]
+          (.preventDefault event)
+          (.openExternal shell navigation-url)))
+      )))
+
+(defn- init-browser
   []
   (set-csp)
+  (prevent-navigation-extenral-to-carrot)
   (reset! main-window (mk-window 1280 720 true true))
   (load-page @main-window)
   (when dev? (.openDevTools @main-window))
