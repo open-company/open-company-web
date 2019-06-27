@@ -43,7 +43,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
@@ -74,7 +74,7 @@
                   :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+(defonce sentry (sentry/sentry-setup))
 
 ;; Avoid warnings
 

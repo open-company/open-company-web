@@ -3,7 +3,7 @@
             [taoensso.sente :as s]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]))
 
 ;; Connection check

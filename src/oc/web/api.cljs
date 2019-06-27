@@ -11,7 +11,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]

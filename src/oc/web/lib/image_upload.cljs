@@ -2,7 +2,7 @@
   (:require [oc.web.local-settings :as ls]
             [cljsjs.filestack]
             [goog.object :as gobj]
-            [oc.web.lib.raven :as sentry]))
+            [oc.web.lib.sentry :as sentry]))
 
 (def _fs (atom nil))
 
