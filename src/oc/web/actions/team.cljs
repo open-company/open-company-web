@@ -42,7 +42,7 @@
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
            (let [activities-read (dis/activity-read-data)]
              (doseq [[activity-uuid read-data] activities-read]
-               (dis/dispatch! [:activity-reads (router/current-org-slug) activity-uuid (:reads read-data) fixed-roster-data])))))))))
+               (dis/dispatch! [:activity-reads (router/current-org-slug) activity-uuid (:count read-data) (:reads read-data) fixed-roster-data])))))))))
 
 (defn enumerate-channels-cb [team-id {:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))
