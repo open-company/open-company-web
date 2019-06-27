@@ -66,7 +66,7 @@
   Refresh the list of reminders when finished.
   "
   [reminder-data]
-  (dis/dispatch! [:save-reminder (router/current-org-slug)])
+  (dis/dispatch! [:save-reminder (router/current-org-slug) reminder-data])
   (let [reminders-data (dis/reminders-data)
         reminders-link (utils/link-for (:links reminders-data) "self")
         refresh-reminders #(api/get-reminders reminders-link reminders-loaded)]
@@ -74,17 +74,26 @@
       (let [update-reminder-link (utils/link-for (:links reminder-data) "partial-update")]
         (api/update-reminder update-reminder-link reminder-data
          (fn [{:keys [status success body]}]
-           (when success
+           (if success
              (notification-actions/show-notification {:title "Reminder updated"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
-                                                      :id :reminder-updated}))
+                                                      :expire 3
+                                                      :id :reminder-updated})
+             (do
+              (dis/dispatch! [:save-reminder/error (router/current-org-slug) reminder-data])
+              (notification-actions/show-notification {:title "An error occurred"
+                                                       :description "Please try again"
+                                                       :primary-bt-title "OK"
+                                                       :primary-bt-dismiss true
+                                                       :expire 3
+                                                       :id :reminder-update-failed})
+              (nav-actions/edit-reminder (:uuid reminder-data))))
            (refresh-reminders))))
       (let [add-reminder-link (utils/link-for (:links reminders-data) "create")]
         (api/add-reminder add-reminder-link reminder-data
          (fn [{:keys [status success body]}]
-           (when success
+           (if success
              (let [self-reminder (= (:user-id (:assignee reminder-data))
                                     (:user-id (dis/current-user-data)))]
                (notification-actions/show-notification {:title (if self-reminder
@@ -93,7 +102,16 @@
                                                         :primary-bt-title "OK"
                                                         :primary-bt-dismiss true
                                                         :expire 3
-                                                        :id :reminder-created})))
+                                                        :id :reminder-create}))
+             (do
+              (dis/dispatch! [:save-reminder/error (router/current-org-slug) reminder-data])
+              (notification-actions/show-notification {:title "An error occurred"
+                                                       :description "Please try again"
+                                                       :primary-bt-title "OK"
+                                                       :primary-bt-dismiss true
+                                                       :expire 3
+                                                       :id :reminder-update-failed})
+              (nav-actions/show-new-reminder)))
            (refresh-reminders)))))))
 
 (defn cancel-edit-reminder

@@ -40,10 +40,12 @@
                 [:div.attachment-info
                   {:class (when editable? "editable")}
                   [:div.attachment-icon]
-                  [:span.attachment-name
-                    {:class utils/hide-class}
-                    file-name]
-                  [:span.attachment-description subtitle]
+                  [:div.attachment-labels
+                    {:class (when editable? "edit")}
+                    [:span.attachment-name
+                      {:class utils/hide-class}
+                      file-name]
+                    [:span.attachment-description subtitle]]
                   (when editable?
                     [:button.mlb-reset.remove-attachment-bt
                       {:data-toggle (when-not is-mobile? "" "tooltip")
