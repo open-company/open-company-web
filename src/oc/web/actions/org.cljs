@@ -158,7 +158,9 @@
 
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-integration-added-notification?)
-  (fullstory/track-org org-data))
+  (fullstory/track-org org-data)
+  ;; Change page title when an org page is loaded
+  (set! (.-title js/document) (str "Carrot | " (:name org-data))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
