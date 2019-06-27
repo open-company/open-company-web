@@ -321,6 +321,27 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- follow-ups-header [cmail-data is-mobile?]
+  [:div.follow-ups-header
+    {:on-click (fn [_]
+                 (nav-actions/show-follow-ups-picker nil
+                  (fn [users-list]
+                    (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
+                                                                     :follow-ups users-list
+                                                                     :follow-up (not (zero? (count users-list)))})]))))}
+    (when-not is-mobile?
+      [:div.follow-up-tag])
+    [:div.follow-ups-label
+      "Follow ups will be created for "
+      [:span.follow-ups-label-count
+        (count (:follow-ups cmail-data)) " "
+        (if (= (count (:follow-ups cmail-data)) 1)
+          "person"
+          "people")]
+      " in the “"
+      (:board-name cmail-data)
+      "” section."]])
+
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
@@ -486,6 +507,9 @@
           [:div.cmail-mobile-header-bt-separator]
           [:button.mlb-reset.mobile-attachment-button
             {:on-click #(add-attachment s)}]]
+        (when (and (:follow-up cmail-data)
+                   is-mobile?)
+          (follow-ups-header cmail-data true))
         [:div.cmail-header.group
           (let [long-tooltip (not= (:status cmail-data) "published")]
             [:div.close-bt-container
@@ -573,25 +597,9 @@
               "Post")]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
-          (when (:follow-up cmail-data)
-            [:div.follow-ups-header
-              {:on-click (fn [_]
-                           (nav-actions/show-follow-ups-picker nil
-                            (fn [users-list]
-                              (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
-                                                                               :follow-ups users-list
-                                                                               :follow-up (not (zero? (count users-list)))})]))))}
-              [:div.follow-up-tag.white-bg]
-              [:div.follow-ups-label
-                "Follow ups will be created for "
-                [:span.follow-ups-label-count
-                  (count (:follow-ups cmail-data)) " "
-                  (if (= (count (:follow-ups cmail-data)) 1)
-                    "person"
-                    "people")]
-                " in the “"
-                (:board-name cmail-data)
-                "” section."]])
+          (when (and (:follow-up cmail-data)
+                     (not is-mobile?))
+          (follow-ups-header cmail-data true))
           [:div.cmail-content
             ;; Video elements
             ; FIXME: disable video on mobile for now

@@ -697,7 +697,7 @@ div.cmail-outer {
 
     div.follow-ups-header {
       width: 100%;
-      height: 40px;
+      min-height: 40px;
       background-color: $sea_blue;
       padding: 20px;
       display: flex;
@@ -706,6 +706,16 @@ div.cmail-outer {
       cursor: pointer;
 
       @include follow-up-tag();
+
+      @include tablet() {
+        text-align: center;
+        width: 100%;
+        padding: 8px 32px;
+
+        div.follow-up-tag {
+          display: none;
+        }
+      }
 
       div.follow-ups-label {
         color: white;

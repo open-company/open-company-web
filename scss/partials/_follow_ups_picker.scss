@@ -18,6 +18,21 @@ div.follow-ups-picker {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include tablet() {
+      left: 12px;
+      right: unset;
+      top: 16px;
+      background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      display: block;
+      z-index: 3;
+    }
   }
 
   div.follow-ups-picker-container {
@@ -32,6 +47,12 @@ div.follow-ups-picker {
     overflow-x: hidden;
     overflow-y: scroll;
 
+    @include tablet() {
+      width: 100%;
+      top: 0;
+      left: 0;
+    }
+
     div.follow-ups-picker-header {
       width: calc(100% + 48px);
       height: 56px;
@@ -45,6 +66,14 @@ div.follow-ups-picker {
         color: $deep_navy;
         line-height: 32px;
         float: left;
+
+        @include tablet() {
+          margin-left: 24px;
+          width: 150px;
+          position: absolute;
+          left: 50%;
+          margin-left: -75px;
+        }
       }
       
       button.save-bt {

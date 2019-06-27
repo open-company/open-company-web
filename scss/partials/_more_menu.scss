@@ -120,6 +120,16 @@ div.more-menu {
       width: 120px;
     }
 
+    &.has-create-follow-up, &.has-read-unread.has-create-follow-up {
+      left: calc(100% - 146px);
+      width: 140px;
+    }
+
+    &.has-complete-follow-up, &.has-read-unread.has-complete-follow-up {
+      left: calc(100% - 126px);
+      width: 160px;
+    }
+
     @include mobile() {
       top: 40px;
       bottom: unset;
