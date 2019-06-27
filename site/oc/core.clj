@@ -39,8 +39,8 @@
     [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
     ;; Static js files
     [:script {:src (pages/cdn "/js/static-js.js")}]
-    ;; Drift
-    [:script {:src (pages/cdn "/js/drift.js")}]
+    ;; Intercom (Support chat)
+    [:script {:src (pages/cdn "/js/intercom.js")}]
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
     [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
@@ -177,8 +177,8 @@
           [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]
           [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]
           [:div.column-item [:a {:href "/press-kit"} "Press Kit"]]
-          [:div.column-item [:a {:href "#"
-                                 :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+          [:div.column-item [:a {:class "intercom-chat-link"
+                                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                               "Contact"]]]
 
         [:div.column.column-support

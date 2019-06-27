@@ -124,7 +124,7 @@ div.section-editor-container {
         }
       }
 
-      div.section-editor-add-name {
+      input.section-editor-add-name {
         border-radius: 4px;
         background-color: $ultra_light_grey;
         height: 32px;
@@ -139,6 +139,8 @@ div.section-editor-container {
         margin-top: 8px;
         overflow-y: auto;
         overflow-x: hidden;
+        outline: none;
+        border: none;
         border: 1px solid $ultra_light_grey;
 
         &.preflight-error {
