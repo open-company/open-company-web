@@ -2,6 +2,8 @@
   (:require [goog.net.cookies :as cks]
             [oc.web.local-settings :as ls]))
 
+(def default-cookie-expire (* 60 60 24 6))
+
 (def cookies-static-obj (goog.net.Cookies. js/document))
 
 (defn- ^:private cookie-name [c-name]

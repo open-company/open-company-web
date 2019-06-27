@@ -580,25 +580,6 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
-;; Get the board to show counting the last accessed and the last created
-
-(def default-board "all-posts")
-
-(defn get-default-board [org-data]
-  (let [last-board-slug default-board]
-    ; Replace default-board with the following to go back to the last visited board
-    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (and (= last-board-slug "all-posts")
-             (link-for (:links org-data) "activity"))
-      {:slug "all-posts"}
-      (let [boards (:boards org-data)
-            board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (or
-          ; Get the last accessed board from the saved cookie
-          board
-          (let [sorted-boards (vec (sort-by :name boards))]
-            (first sorted-boards)))))))
-
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.append (js/$ (.-body js/document)) $container)
@@ -642,7 +623,7 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-headline "Untitled post")
+(def default-headline "Title")
 
 (def default-abstract "Quick summary: let everyone know what your post is about...")
 

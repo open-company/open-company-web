@@ -177,10 +177,21 @@
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
 
+(defn- read-sort-type-from-cookie
+  "Read the sort order from the cookie, fallback to the default,
+   if it's on drafts board force the recently posted sort since that has only that"
+  [params]
+  (let [last-sort-cookie (cook/get-cookie (router/last-sort-cookie (:org params)))]
+    (if (or (= last-sort-cookie "recently-posted")
+            (= (:board params) utils/default-drafts-board-slug))
+      :recently-posted
+      dis/default-sort-type)))
+
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
         board (:board params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
         first-ever-cookie-name (when (= route "all-posts")
@@ -198,7 +209,7 @@
       (do
         (pre-routing query-params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -224,6 +235,7 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
@@ -236,6 +248,7 @@
      {:org org
       :board board
       :activity entry
+      :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
     (post-routing)

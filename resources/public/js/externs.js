@@ -175,12 +175,8 @@ ZiggeoApi.V2.Player.get = function(){};
 var Headway = function(){};
 Headway.init = function(){};
 Headway.show = function(){};
-// Drift
-var drift = function(){};
-drift.api = {};
-drift.api.startInteraction = function(){};
-drift.identify = function(){};
-drift.track = function(){};
+// Intercom (Chat support)
+var Intercom = function(){};
 // Homepage animation
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};

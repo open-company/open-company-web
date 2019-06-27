@@ -16,13 +16,12 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.components.all-posts :refer (all-posts)]
+            [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.expanded-post :refer (expanded-post)]
-            [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
@@ -40,16 +39,14 @@
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
+                              (drv/drv :sort-type)
                               ;; Locals
-                              ;; Commenting out board sorting for now
-                              ; (rum/local :default ::board-sort)
-                              ; (rum/local false ::sorting-menu-expanded)
+                              (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              ;; Commenting out board sorting for now
-                              ; (on-window-click-mixin (fn [s e]
-                              ;  (when (and @(::sorting-menu-expanded s)
-                              ;             (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
-                              ;   (reset! (::sorting-menu-expanded s) false))))
+                              (on-window-click-mixin (fn [s e]
+                               (when (and @(::sorting-menu-expanded s)
+                                          (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
+                                (reset! (::sorting-menu-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -61,6 +58,12 @@
                                     (activity-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
+                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                                s)
+                               :did-remount (fn [_ s]
+                                (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+                                  (.tooltip "hide")
+                                  (.tooltip "fixTitle"))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -80,7 +83,7 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        ; board-sort (::board-sort s)
+        board-sort (drv/react s :sort-type)
         show-drafts (pos? (:count drafts-link))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
@@ -172,25 +175,27 @@
                          :data-container "body"
                          :title (str (:name board-data) " settings")
                          :on-click #(nav-actions/show-section-editor)}]])]
-                ; (when-not is-mobile?
-                ;   (let [default-sort (= @board-sort :default)]
-                ;     [:div.board-sort.group
-                ;       {:ref :board-sort-menu}
-                ;       [:button.mlb-reset.board-sort-bt
-                ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                ;         (if default-sort "Recent activity" "Recently posted")]
-                ;       [:div.board-sort-menu
-                ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when default-sort "active")
-                ;            :on-click #(reset! board-sort :defautl)}
-                ;           "Recent activity"]
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when-not default-sort "active")
-                ;            :on-click #(reset! board-sort :own)}
-                ;           "Recently posted"]]]))
-                ])
-            
+                (when (not= (router/current-board-slug) utils/default-drafts-board-slug)
+                  (let [default-sort (= board-sort dis/default-sort-type)]
+                    [:div.board-sort.group
+                      {:ref :board-sort-menu}
+                      [:button.mlb-reset.board-sort-bt
+                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                        (if default-sort "Recent activity" "Recently posted")]
+                      [:div.board-sort-menu
+                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                        [:div.board-sort-menu-item
+                          {:class (when default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recent-activity))}
+                          "Recent activity"]
+                        [:div.board-sort-menu-item
+                          {:class (when-not default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recently-posted))}
+                          "Recently posted"]]]))])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -202,21 +207,8 @@
               ;; Empty board
               empty-board?
               (empty-board)
-              ;; All Posts
-              (and (or is-all-posts
-                       is-must-see)
-                   ;; Commenting out grid view switcher for now
-                   ; (= @board-switch :stream)
-                   )
-              (rum/with-key (lazy-stream all-posts)
-               (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-              ;; Layout boards activities
+              ;; Paginated board/container
               :else
-              (cond
-                ;; Commenting out grid view switcher for now
-                ;; Entries grid view
-                ; (= @board-switch :grid)
-                ; (entries-layout)
-                ;; Entries stream view
-                :else
-                (lazy-stream section-stream)))]]]))
+              (rum/with-key (lazy-stream paginated-stream)
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
+              )]]]))

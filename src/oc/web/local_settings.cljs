@@ -36,10 +36,6 @@
 (def jwt-cookie-domain "localhost")
 (def jwt-cookie-secure false)
 
-;; Recurly
-(def recurly-id "opencompany-staging")
-(def recurly-plan "local")
-
 ;; Deploy key (cache buster)
 (def deploy-key "")
 

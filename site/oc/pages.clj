@@ -595,8 +595,8 @@
             [:div.tear-subtitle
               "A team of more than 250? Let's create a custom plan."]
             [:a.tear-start-bt
-              {:href "#"
-               :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Contact Us"]
             [:div.tear-feature-separator]
             [:div.tear-feature
@@ -671,8 +671,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#"
-               :onclick "drift.api.startInteraction({ interactionId: 43239 }); return false;"}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -689,8 +689,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#"
-               :onclick "drift.api.startInteraction({ interactionId: 43234 }); return false;"}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Get in touch with us"]]]]
 
       testimonials-section
@@ -811,8 +811,8 @@
               [:div.press-kit-intro-footer-right
                 "We’re always happy to talk about Carrot."
                 [:a
-                  {:href "#"
-                   :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                  {:class "intercom-chat-link"
+                   :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                   "SAY HELLO"]]]]]
 
         [:div.core-ft
@@ -936,8 +936,8 @@
                 [:li "Email: "
                      [:a {:href "mailto:hello@carrot.io"} "hello@carrot.io"]]
                 [:li "Chat: "
-                     [:a {:onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"
-                          :href "#"}
+                     [:a {:class "intercom-chat-link"
+                          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                       "Say hello"]]
                 [:li "Social: "
                      [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]
@@ -1103,8 +1103,8 @@
                    "amazing people regardless of where they "
                    "call home.")]
                 [:a
-                  {:href "#"
-                   :onclick "drift.api.startInteraction({ interactionId: 43229 }); return false;"}
+                  {:class "intercom-chat-link"
+                   :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                    "Say hello"]]]
             [:div.about-bottom-copy-row.group
               [:div.about-bottom-copy-left
@@ -1161,7 +1161,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot | Leadership communication for growing and distributed teams"]
+          [:title "Carrot | Asynchronous communication for teams"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css
@@ -1203,8 +1203,8 @@
           ;; Ziggeo
           ziggeo-css
           ziggeo-js
-          ;; Drift (Support): not enabled for local dev
-          ;; [:script {:src (cdn "/js/drift.js")}]
+          ;; Intercom (Support)
+          [:script {:src (cdn "/js/intercom.js")}]
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
    :body [:body
@@ -1280,7 +1280,7 @@
           [:link {:rel "icon" :type "image/png" :href (cdn "/img/carrot_logo.png") :sizes "64x64"}]
           ;; The above 3 meta tags *must* come first in the head;
           ;; any other head content must come *after* these tags
-          [:title "Carrot | Leadership communication for growing and distributed teams"]
+          [:title "Carrot | Asynchronous communication for teams"]
           ;; Reset IE
           "<!--[if lt IE 9]><script src=\"//html5shim.googlecode.com/svn/trunk/html5.js\"></script><![endif]-->"
           bootstrap-css
@@ -1323,8 +1323,8 @@
           bootstrap-js
           ;; Google Analytics
           [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js" :async true}]
-          ;; Drift (Support)
-          [:script {:src (cdn "/js/drift.js")}]
+          ;; Intercom (Support)
+          [:script {:src (cdn "/js/intercom.js")}]
           ;; Headway (What's New)
           [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
           ;; Compiled oc.min.js from our CDN

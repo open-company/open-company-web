@@ -59,10 +59,12 @@
         (activity-actions/must-see-get org-data)
 
         :default
-        (when-let* [fixed-board-data (or board-data
-                     (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
-                    board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
-          (section-actions/section-get board-link))))))))
+        (let [sort-type (router/current-sort-type)
+              board-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
+          (when-let* [fixed-board-data (or board-data
+                       (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
+                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+            (section-actions/section-get sort-type board-link)))))))))
 
 (defn- init-whats-new []
   (when-not (responsive/is-tablet-or-mobile?)
@@ -82,7 +84,7 @@
                              (refresh-board-data s)
                              (init-whats-new)
                              s)
-                            :did-remount (fn [s]
+                            :did-remount (fn [_ s]
                              (init-whats-new)
                              s)}
   [s]
@@ -142,7 +144,8 @@
                                       container-data))
                              (not (nil? posts-data))
                              (or (and (router/current-activity-id)
-                                      (not ((set (keys posts-data)) (router/current-activity-id))))
+                                      (not ((set (keys posts-data)) (router/current-activity-id)))
+                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))
                                  (and ap-initial-at
                                       (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
         show-activity-not-found (and (not jwt)
