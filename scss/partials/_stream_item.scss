@@ -126,6 +126,14 @@ div.stream-item {
           }
         }
       }
+
+      div.must-see-tag {
+        display: none;
+      }
+
+      div.follow-up-tag {
+        display: inline-block;
+      }
     }
   }
 
@@ -215,7 +223,7 @@ div.stream-item {
         }
       }
 
-      div.must-see-tag {
+      div.follow-up-tag, div.must-see-tag {
         margin-top: 2px;
       }
     }
@@ -246,7 +254,7 @@ div.stream-item {
 
   @include follow-up-tag();
 
-  div.must-see-tag {
+  div.follow-up-tag, div.must-see-tag {
     display: none;
 
     @include mobile() {
@@ -254,7 +262,7 @@ div.stream-item {
     }
   }
 
-  & > div.new-tag, & > div.must-see-tag {
+  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
     margin-top: 16px;
   }
 
