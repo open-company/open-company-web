@@ -28,3 +28,4 @@ forms-analyzed.txt
 resources/electron/electron-builder.yml
 # See resources/electron-builder.example.env
 resources/electron/electron-builder.env
+resources/electron-builder.env
