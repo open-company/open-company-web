@@ -4,6 +4,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
@@ -24,6 +25,7 @@
                                 (drv/drv :show-add-post-tooltip)
                                 (rum/local false ::tray-open)
                                 ui-mixins/refresh-tooltips-mixin
+                                (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
                                 (ui-mixins/on-window-click-mixin (fn [s e]
                                  (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
                                    (close-tray s))))

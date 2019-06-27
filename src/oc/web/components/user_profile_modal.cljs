@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as s]
             [goog.object :as googobj]
+            [cljsjs.moment-timezone]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
