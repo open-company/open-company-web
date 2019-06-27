@@ -10,6 +10,7 @@
   (* rate-in-minutes-to-check-for-updates 60 1000))
 
 (def main-window (atom nil))
+(def quitting? (atom false))
 
 (def path (js/require "path"))
 (def URL (.-URL (js/require "url")))
@@ -26,6 +27,10 @@
 (goog-define auth-origin "http://localhost:3003")
 (goog-define init-path "/login/desktop")
 (def init-url (str web-origin init-path))
+
+(defn mac?
+  []
+  (= (.-platform js/process) "darwin"))
 
 (defn- load-page
   [window]
@@ -88,22 +93,32 @@
 
 (defn- init-browser
   []
-  (set-csp)
-  (prevent-navigation-external-to-carrot)
-  (reset! main-window (mk-window 1280 720 true true))
-  (load-page @main-window)
-  (when dev? (.openDevTools @main-window))
-  (.on @main-window "close" #(reset! main-window nil)))
-
-(defn mac?
-  []
-  (= (.-platform js/process) "darwin"))
+  (if (some? @main-window)
+    (.show @main-window)
+    (do (set-csp)
+        (prevent-navigation-external-to-carrot)
+        (reset! main-window (mk-window 1280 720 true true))
+        (load-page @main-window)
+        (when dev? (.openDevTools @main-window))
+        ;; -- Main window event handlers --
+        (.on @main-window "close" #(if @quitting?
+                                     (reset! main-window nil)
+                                     (do (.preventDefault %)
+                                         (.hide @main-window)))))))
 
 (defn init
   []
+  (set! *main-cli-fn* (fn [] nil))
+
+  ;; -- App event handlers --
   (.on app "window-all-closed" #(when (not (mac?))
                                   (.quit app)))
-  (.on app "activate" #(when (nil? @main-window) (init-browser)))
+  (.on app "activate" #(when-let [w @main-window]
+                         (.show w)))
+  (.on app "before-quit" #(reset! quitting? true))
   (.on app "ready" init-browser)
+
+  ;; -- Inter-process Communication event handlers --
+  ;; see resources/electron/renderer.js
   (.on ipc-main "set-badge-count" (fn [event arg] (.setBadgeCount app arg)))
-  (set! *main-cli-fn* (fn [] nil)))
+  )
