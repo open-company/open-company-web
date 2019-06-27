@@ -118,7 +118,8 @@
                             utils/default-section
                             (section-for-editing initial-section-data))]
      (when (string? (:name fixed-section-data))
-       (reset! (::section-name s) (clojure.string/trim (:name fixed-section-data))))
+       (reset! (::section-name s) (clojure.string/trim
+        (.text (js/$ (str "<div>" (:name fixed-section-data) "</div>"))))))
      (reset! (::editing-existing-section s) (not new-section))
      (when-not (empty? (:name fixed-section-data))
        (reset! (::initial-section-name s) (:name fixed-section-data)))
@@ -208,7 +209,7 @@
                           (when (and (not disable-bt)
                                      (compare-and-set! (::saving s) false true))
                             (let [section-node (rum/ref-node s "section-name")
-                                  section-name (.-innerText section-node)
+                                  section-name (.-value section-node)
                                   personal-note-node (rum/ref-node s "personal-note")
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
@@ -222,28 +223,22 @@
         [:div.section-editor-add
           [:div.section-editor-add-label
             [:span.section-name "Section name"]]
-          [:div.section-editor-add-name.oc-input
-            {:content-editable true
+          [:input.section-editor-add-name.oc-input
+            {:value @(::section-name s)
              :placeholder "Section name"
              :ref "section-name"
              :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
                                        :preflight-error (:section-name-error section-editing)})
-             :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
-             :on-key-up (fn [e]
-                          (let [next-section-name (clojure.string/trim (.. e -target -innerText))]
+             :max-length 50
+             :on-change (fn [e]
+                          (let [next-section-name (clojure.string/trim (.. e -target -value))]
                             (when (not= @(::section-name s) next-section-name)
+                              (reset! (::section-name s) next-section-name)
                               (when @(::section-name-check-timeout s)
                                 (.clearTimeout js/window @(::section-name-check-timeout s)))
                               (reset! (::section-name-check-timeout s)
                                (utils/after 500
-                                (fn []
-                                  (reset! (::section-name s) next-section-name)
-                                  (check-section-name-error s)))))))
-             :on-key-press (fn [e]
-                             (when (or (>= (count (.. e -target -innerText)) 50)
-                                      (= (.-key e) "Enter"))
-                              (utils/event-stop e)))
-             :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
+                                #(check-section-name-error s))))))}]
           (when (or (:section-name-error section-editing)
                     (:section-error section-editing))
             [:div.section-editor-error-label
