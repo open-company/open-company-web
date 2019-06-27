@@ -25,6 +25,6 @@ forms-read.txt
 forms-analyzed.txt
 
 # See resources/electron-builder.example.yml
-resources/electron-builder.yml
+resources/electron/electron-builder.yml
 # See resources/electron-builder.example.env
-resources/electron-builder.env
+resources/electron/electron-builder.env

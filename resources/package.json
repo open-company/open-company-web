@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "pack": "electron-builder --config electron/electron-builder.yml --dir",
+    "dist": "electron-builder --config electron/electron-builder.yml"
   },
   "devDependencies": {
     "electron": "^5.0.2",
