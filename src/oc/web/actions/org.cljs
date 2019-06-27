@@ -84,7 +84,7 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
-(defn org-loaded [org-data saved? & [email-domain]]
+(defn org-loaded [org-data saved? & [email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
@@ -94,14 +94,15 @@
         boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")]
-    (when (router/current-activity-id)
-      (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
-    (sa/load-other-sections (:boards org-data))
-    ;; Preload all posts data
-    (when activity-link
-      (aa/activity-get org-data ap-initial-at))
-    (when recent-activity-link
-      (aa/recent-activity-get org-data ap-initial-at))
+    (when complete-refresh?
+      (when (router/current-activity-id)
+        (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
+      (sa/load-other-sections (:boards org-data))
+      ;; Preload all posts data
+      (when activity-link
+        (aa/activity-get org-data ap-initial-at))
+      (when recent-activity-link
+        (aa/recent-activity-get org-data ap-initial-at)))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
@@ -157,16 +158,18 @@
 
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-integration-added-notification?)
-  (fullstory/track-org org-data))
+  (fullstory/track-org org-data)
+  ;; Change page title when an org page is loaded
+  (set! (.-title js/document) (str "Carrot | " (:name org-data))))
 
-(defn get-org-cb [{:keys [status body success]}]
+(defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data false)))
+    (org-loaded org-data false nil (not prevent-complete-refresh?))))
 
-(defn get-org [& [org-data]]
+(defn get-org [& [org-data prevent-complete-refresh?]]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link get-org-cb)))
+    (api/get-org org-link (partial get-org-cb prevent-complete-refresh?))))
 
 ;; Org redirect
 

@@ -4,16 +4,21 @@
             [oc.web.utils.activity :as au]))
 
 (defn truncate-element-mixin [element-class height]
-  {:did-mount (fn [s]
-    ; Truncate body text with dotdotdot
-    (when-let [dom-node (rum/dom-node s)]
-      (let [$dom-node (js/$ element-class dom-node)]
-        (.dotdotdot $dom-node
-          #js {:height height
-               :wrap "word"
-               :watch true
-               :ellipsis "..."})))
-    s)})
+  (letfn [(truncate-fn [s]
+            ; Truncate body text with dotdotdot
+            (when-let [dom-node (rum/dom-node s)]
+              (let [$dom-node (js/$ element-class dom-node)]
+                (.dotdotdot $dom-node
+                 #js {:height height
+                      :wrap "word"
+                      :watch true
+                      :ellipsis "..."}))))]
+    {:did-mount (fn [s]
+      (truncate-fn s)
+      s)
+     :did-remount (fn [_ s]
+      (truncate-fn s)
+      s)}))
 
 (def truncate-comments-mixin
   {:init (fn [s]
