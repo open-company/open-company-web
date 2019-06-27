@@ -82,9 +82,10 @@
     ; team link may not be present for non-admins, if so they can still get team users from the roster
     (if team-link
       (team-get team-link)
-      (when channels-link (enumerate-channels team)))
+      (when channels-link
+        (utils/after 2500 #(enumerate-channels team))))
     (when roster-link
-      (roster-get roster-link))))
+      (utils/after 2500 #(roster-get roster-link)))))
 
 (defn teams-get-cb [{:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))]
