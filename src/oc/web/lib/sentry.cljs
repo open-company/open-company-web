@@ -10,6 +10,7 @@
                   :hasJWT (not (not (jwt/jwt)))}
        :sourceRoot ls/web-server
        :release ls/deploy-key
+       :debug true
        :dsn dsn})
 
 (defn sentry-setup []
@@ -34,16 +35,28 @@
 (defn capture-message [msg]
   (.captureMessage js/Sentry msg))
 
+(defn set-extra-context! [scope ctx & [prefix]]
+  (doseq [k (keys ctx)]
+    (if (map? (get ctx k))
+      (set-extra-context! scope (get ctx k) (str prefix (when prefix ":") (name k)))
+      (.setExtra scope (str prefix (name k)) (clj->js (get ctx k))))))
+
+(defn capture-message-with-extra-context! [ctx message]
+  (.withScope js/Sentry (fn [scope]
+    (set-extra-context! scope ctx)
+    (capture-message message))))
+
+(defn capture-error-with-extra-context! [ctx error-name & [error-message]]
+  (.withScope js/Sentry (fn [scope]
+    (set-extra-context! scope ctx)
+    (let [err (js/Error. (or error-message error-name))]
+      (set! (.-name err) (or error-name "Error"))
+      (capture-error err)))))
+
 (defn capture-error-with-message [error-name & [error-message]]
   (let [err (js/Error. (or error-message error-name))]
     (set! (.-name err) (or error-name "Error"))
     (capture-error err)))
 
 (defn set-user-context! [ctx]
-  (.setUserContext js/Sentry (when ctx (clj->js ctx))))
-
-(defn set-extra-context! [ctx]
-  (.setExtraContext js/Sentry (when ctx (clj->js ctx))))
-
-(defn clear-extra-context! []
-  (.setExtraContext js/Sentry))
+  (.setUser js/Sentry (when ctx (clj->js ctx))))
