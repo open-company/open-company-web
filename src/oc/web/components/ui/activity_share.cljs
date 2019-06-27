@@ -10,8 +10,8 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.org-settings :as org-settings]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]
@@ -124,7 +124,7 @@
         ;                      (if has-bot?
         ;                        (dis/dispatch! [:input [:activity-share-medium] :slack])
         ;                        (when (jwt/is-admin? (:team-id org-data))
-        ;                          (org-settings/show-modal :main)))))}
+        ;                          (nav-actions/show-org-settings :integrations)))))}
         ;       "Slack"]])
         ; [:div.activity-share-divider-line
         ;   {:class (when-not has-bot? "no-tabs")}]
