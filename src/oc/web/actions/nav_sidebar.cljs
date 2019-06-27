@@ -139,6 +139,11 @@
 (defn hide-wrt []
   (pop-panel))
 
+;; Follow-ups users picker
+
+(defn show-follow-ups-picker [activity-uuid]
+  (push-panel (keyword (str "follow-ups-picker-" (or activity-uuid "")))))
+
 ;; Integrations
 
 (defn open-integrations-panel [e]

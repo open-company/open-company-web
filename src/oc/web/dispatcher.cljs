@@ -213,6 +213,14 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
+   :follow-ups-activity-data [[:base :org-slug :current-panel]
+                              (fn [base org-slug current-panel]
+                                (when current-panel
+                                  (let [panel-name (name current-panel)
+                                        activity-uuid (subs panel-name (count "follow-ups-picker-") (count panel-name))]
+                                    (if (seq activity-uuid)
+                                      (get-in base (activity-key org-slug activity-uuid))
+                                      (get base :cmail-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
                           (fn [base team-data current-user-data team-roster invite-users]

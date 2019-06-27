@@ -257,6 +257,13 @@
       (add-remove-item-from-must-see org-slug :recent-activity activity-data)
       (add-remove-item-from-must-see org-slug :recently-posted activity-data))))
 
+(defmethod dispatcher/action :follow-up-toggle
+  [db [_ org-slug activity-data]]
+  (let [with-updated-activity-data (if (:uuid activity-data)
+                                    (assoc-in db (dispatcher/activity-key org-slug (:uuid activity-data)) activity-data)
+                                    db)]
+      (assoc with-updated-activity-data :cmail-data activity-data)))
+
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug sort-type fixed-board-data]]
   (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data) sort-type)

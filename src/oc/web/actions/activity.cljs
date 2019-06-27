@@ -1,6 +1,7 @@
 (ns oc.web.actions.activity
   (:require-macros [if-let.core :refer (when-let*)])
-  (:require [taoensso.timbre :as timbre]
+  (:require [defun.core :refer (defun-)]
+            [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -820,6 +821,50 @@
                                            (router/current-org-slug)
                                            (json->cljs body)
                                            nil]))))))
+
+(defun- author-for-user
+  ([user :guard map?]
+   (select-keys user [:user-id :avatar-url :name]))
+  ([users :guard seq?]
+   (vec (map author-for-user users))))
+
+(defn follow-up-users-for-activity [activity-data team-roster]
+  (let [all-team-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
+        board-data (dis/board-data (:board-slug activity-data))
+        private-board? (= (:access board-data) "private")
+        filtered-board-users (when private-board?
+                               (concat (:viewers board-data) (:authors board-data)))]
+    (if private-board?
+      (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
+      all-team-users)))
+
+(defn cmail-toggle-follow-up [activity-data]
+  (let [follow-up (:follow-up activity-data)
+        turning-on? (not follow-up)
+        follow-ups-toggled (merge activity-data {:follow-up (not (:follow-up activity-data))
+                                                 :follow-ups (author-for-user activity-data)})
+        with-toggled-follow-up (assoc activity-data :follow-up turning-on?)
+        with-follow-up-users (if turning-on?
+                               (assoc with-toggled-follow-up :follow-ups (follow-up-users-for-activity activity-data (dis/team-roster)))
+                               (dissoc with-toggled-follow-up :follow-ups))
+        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
+    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-up-users])
+    (when patch-entry-link
+      (api/patch-entry patch-entry-link with-follow-up-users nil
+                        (fn [entry-data edit-key {:keys [success body status]}]
+                          (if success
+                            (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
+                              (api/get-org org-link
+                                (fn [{:keys [status body success]}]
+                                  (let [api-org-data (json->cljs body)]
+                                    (dis/dispatch! [:org-loaded api-org-data false])
+                                    ;; TODO refresh follow-up list of entries
+                                    ))))
+                            (dis/dispatch! [:activity-get/finish
+                                             status
+                                             (router/current-org-slug)
+                                             (json->cljs body)
+                                             nil])))))))
 
 ;; Video handling
 

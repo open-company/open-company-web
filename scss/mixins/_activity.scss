@@ -88,7 +88,8 @@ $h2_top_margin: 24;
     border-radius: 4px;
 
     &.white-bg {
-      background-color: white;
+      @include image-2x("/img/ML/follow_up_tag_white");
+      background-color: rgba(white, 0.2);
     }
   }
 }

@@ -18,6 +18,7 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -507,8 +508,8 @@
                         "Shrink"
                         "Expand")}]]
           [:div.cmail-header-vertical-separator]
-          [:div.cmail-header-board-must-see-container.group
-            {:class (when (:must-see cmail-data) "must-see-on")}
+          [:div.cmail-header-board-follow-ups-container.group
+            {:class (when (:follow-up cmail-data) "follow-ups-on")}
             [:div.board-name.oc-input
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
@@ -530,18 +531,15 @@
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
-            [:div.must-see-toggle-container
-              {:class (when (:must-see cmail-data) "on")}
-              [:div.must-see-toggle
-                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+            [:div.follow-ups-toggle-container
+              {:class (when (:follow-up cmail-data) "on")}
+              [:div.follow-ups-toggle
+                {:on-mouse-down #(activity-actions/cmail-toggle-follow-up cmail-data)
                  :data-toggle "tooltip"
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title "Must See"}
-                [:span.must-see-toggle-circle]]]
-            (when (:must-see cmail-data)
-              [:div.must-see-tag
-                {:class (when-not is-fullscreen? "white-bg")}])]
+                 :title "Follow up"}
+                [:span.follow-ups-toggle-circle]]]]
           (when is-fullscreen?
             [:div.cmail-header-right-buttons
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
@@ -575,6 +573,20 @@
               "Post")]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
+          (when (:follow-up cmail-data)
+            [:div.follow-ups-header
+              {:on-click #(nav-actions/show-follow-ups-picker (:uuid cmail-data))}
+              [:div.follow-up-tag.white-bg]
+              [:div.follow-ups-label
+                "Follow ups will be created for "
+                [:span.follow-ups-label-count
+                  (count (:follow-ups cmail-data)) " "
+                  (if (> (count (:follow-ups cmail-data)) 1)
+                    "people"
+                    "person")]
+                " in the “"
+                (:board-name cmail-data)
+                "” section."]])
           [:div.cmail-content
             ;; Video elements
             ; FIXME: disable video on mobile for now

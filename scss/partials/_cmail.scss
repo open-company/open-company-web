@@ -111,7 +111,7 @@ div.cmail-outer {
           display: none;
         }
 
-        div.cmail-header-board-must-see-container {
+        div.cmail-header-board-follow-ups-container {
           float: unset;
           position: absolute;
           left: 50%;
@@ -128,18 +128,18 @@ div.cmail-outer {
             }
           }
 
-          div.must-see-toggle-container {
+          div.follow-ups-toggle-container {
             &.on {
-              div.must-see-toggle {
+              div.follow-ups-toggle {
                 background-color: rgba($sea_blue, 0.2);
               }
             }
 
-            div.must-see-toggle {
+            div.follow-ups-toggle {
               background-color: $ultra_light_grey;
 
-              span.must-see-toggle-circle {
-                background-color: $deep_navy;
+              span.follow-ups-toggle-circle {
+                background-color: rgba($deep_navy, 0.5);
                 background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
               }
             }
@@ -247,7 +247,7 @@ div.cmail-outer {
       div.cmail-content {
         width: 640px;
         margin: 0 auto;
-        padding: 66px 0 18px;
+        padding: 32px 0 18px;
         min-height: 100%;
         max-height: unset;
         overflow-x: auto;
@@ -430,7 +430,7 @@ div.cmail-outer {
         background-color: $grey_num_2;
       }
 
-      div.cmail-header-board-must-see-container {
+      div.cmail-header-board-follow-ups-container {
         float: left;
         height: 32px;
         width: 208px;
@@ -443,13 +443,13 @@ div.cmail-outer {
           float: unset;
         }
 
-        &.must-see-on {
+        &.follow-ups-on {
           width: 304px;
 
           @include tablet() {
             width: 100%;
 
-            div.must-see-tag {
+            div.follow-up-tag {
               margin-left: 0;
               margin-top: 16px;
               background-color: rgba($sea_blue, 0.2) !important;
@@ -513,7 +513,7 @@ div.cmail-outer {
           }
         }
 
-        div.must-see-toggle-container {
+        div.follow-ups-toggle-container {
           float: left;
           position: relative;
           width: 32px;
@@ -526,10 +526,10 @@ div.cmail-outer {
           }
 
           &.on {
-            div.must-see-toggle {
+            div.follow-ups-toggle {
               background-color: $chalk_blue; //rgba($sea_blue, 0.2);
 
-              span.must-see-toggle-circle {
+              span.follow-ups-toggle-circle {
                 margin-left: 12px;
                 background-color: $sea_blue;
                 background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
@@ -537,7 +537,7 @@ div.cmail-outer {
             }
           }
 
-          div.must-see-toggle {
+          div.follow-ups-toggle {
             width: 32px;
             height: 16px;
             position: absolute;
@@ -547,7 +547,7 @@ div.cmail-outer {
             border-radius: 100px;
             cursor: pointer;
 
-            span.must-see-toggle-circle {
+            span.follow-ups-toggle-circle {
               display: block;
               width: 20px;
               height: 20px;
@@ -567,25 +567,25 @@ div.cmail-outer {
 
           @include tablet() {
             &.on {
-              div.must-see-toggle {
+              div.follow-ups-toggle {
                 background-color: rgba($sea_blue, 0.2);
               }
             }
 
-            div.must-see-toggle {
+            div.follow-ups-toggle {
               background-color: $ultra_light_grey;
 
-              span.must-see-toggle-circle {
-                background-color: $deep_navy;
+              span.follow-ups-toggle-circle {
+                background-color: rgba($deep_navy, 0.5);
                 background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
               }
             }
           }
         }
 
-        @include must-see-tag();
+        @include follow-up-tag();
 
-        div.must-see-tag {
+        div.follow-up-tag {
           float: left;
           margin: 7px 0 0 16px;
         }
@@ -691,6 +691,32 @@ div.cmail-outer {
 
         @include tablet() {
           display: none;
+        }
+      }
+    }
+
+    div.follow-ups-header {
+      width: 100%;
+      height: 40px;
+      background-color: $sea_blue;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+
+      @include follow-up-tag();
+
+      div.follow-ups-label {
+        color: white;
+        @include OC_Body_Book();
+        font-size: 14px;
+        margin-left: 8px;
+
+        span.follow-ups-label-count {
+          color: white;
+          text-decoration: underline;
+
         }
       }
     }
@@ -948,7 +974,7 @@ div.cmail-outer {
       div.saving-saved {
         height: 35px;
         @include OC_Body_Book();
-        color: $ui_grey;
+        color: rgba($deep_navy, 0.5);
         font-size: 14px;
         line-height: 41px;
         margin: 0px 16px 0px 0px;

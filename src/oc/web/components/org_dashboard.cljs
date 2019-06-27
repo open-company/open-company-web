@@ -33,6 +33,7 @@
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
+            [oc.web.components.ui.follow-ups-picker :refer (follow-ups-picker)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
@@ -172,7 +173,9 @@
                                  (s/starts-with? (name open-panel) "reminder-"))
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
-                            (s/starts-with? (name open-panel) "wrt-"))]
+                            (s/starts-with? (name open-panel) "wrt-"))
+        show-follow-ups-picker (and open-panel
+                                    (s/starts-with? (name open-panel) "follow-ups-picker-"))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -264,6 +267,8 @@
         ;; cmail editor
         (when show-cmail
           (cmail))
+        (when show-follow-ups-picker
+          (follow-ups-picker))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
         (when-not is-mobile?
