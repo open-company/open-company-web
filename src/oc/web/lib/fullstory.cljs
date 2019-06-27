@@ -9,10 +9,11 @@
           user-data (if is-id-token?
                       (jwt/get-id-token-contents)
                       (jwt/get-contents))]
-      (.identify js/FS (:user-id user-data)
-       (clj->js {:displayName (or (:name user-data) (str (:first-name user-data) " " (:last-name user-data)))
-                 :securePostId (boolean is-id-token?)
-                 :email (:email user-data)})))))
+      (when (map? user-data)
+        (.identify js/FS (:user-id user-data)
+         (clj->js {:displayName (or (:name user-data) (str (:first-name user-data) " " (:last-name user-data)))
+                   :securePostId (boolean is-id-token?)
+                   :email (:email user-data)}))))))
 
 (defn track-org [org-data]
   (when (and (exists? js/FS)
