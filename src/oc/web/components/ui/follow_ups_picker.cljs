@@ -22,9 +22,13 @@
     (reset! (::users-list s) users-list)
     (reset! (::active-user-ids s) active-users-list)))
 
+(defn- get-users-list [s]
+  (filterv #((set @(::active-user-ids s)) (:user-id %)) @(::users-list s)))
+
 (rum/defcs follow-ups-picker < rum/reactive
                                (rum/local [] ::users-list)
                                (rum/local [] ::active-user-ids)
+                               (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
                                {:will-mount (fn [s]
@@ -37,7 +41,8 @@
   (let [activity-data (drv/react s :follow-ups-activity-data)
         team-roster (drv/react s :team-roster)
         users-list @(::users-list s)
-        active-user-ids @(::active-user-ids s)]
+        active-user-ids @(::active-user-ids s)
+        follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)]
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -46,14 +51,17 @@
           [:div.follow-ups-picker-header-title
             "Create follow ups"]
           [:button.mlb-reset.save-bt
-            {:on-click #(nav-actions/close-all-panels)}
+            {:on-click #(do
+                         (when (fn? follow-ups-picker-callback)
+                           (follow-ups-picker-callback (get-users-list s)))
+                         (nav-actions/close-all-panels))}
             "Save"]]
         [:div.follow-ups-picker-body
           [:div.follow-ups-users-count
             (str (count active-user-ids) " "
-            (if (> (count active-user-ids) 1)
-              "people"
-              "person"))]
+            (if (= (count active-user-ids) 1)
+              "person"
+              "people"))]
           [:div.follow-ups-users-list
             (for [u users-list
                   :let [active? ((set active-user-ids) (:user-id u))]]

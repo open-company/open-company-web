@@ -213,6 +213,7 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
+   :follow-ups-picker-callback [[:base] (fn [base] (:follow-ups-picker-callback base))]
    :follow-ups-activity-data [[:base :org-slug :current-panel]
                               (fn [base org-slug current-panel]
                                 (when current-panel

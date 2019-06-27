@@ -575,15 +575,20 @@
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           (when (:follow-up cmail-data)
             [:div.follow-ups-header
-              {:on-click #(nav-actions/show-follow-ups-picker (:uuid cmail-data))}
+              {:on-click (fn [_]
+                           (nav-actions/show-follow-ups-picker nil
+                            (fn [users-list]
+                              (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
+                                                                               :follow-ups users-list
+                                                                               :follow-up (not (zero? (count users-list)))})]))))}
               [:div.follow-up-tag.white-bg]
               [:div.follow-ups-label
                 "Follow ups will be created for "
                 [:span.follow-ups-label-count
                   (count (:follow-ups cmail-data)) " "
-                  (if (> (count (:follow-ups cmail-data)) 1)
-                    "people"
-                    "person")]
+                  (if (= (count (:follow-ups cmail-data)) 1)
+                    "person"
+                    "people")]
                 " in the “"
                 (:board-name cmail-data)
                 "” section."]])
