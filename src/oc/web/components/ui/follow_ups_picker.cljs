@@ -1,9 +1,11 @@
 (ns oc.web.components.ui.follow-ups-picker
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn- set-users-list
@@ -13,21 +15,19 @@
   [s first-setup]
   (let [activity-data @(drv/get-ref s :follow-ups-activity-data)
         team-roster @(drv/get-ref s :team-roster)
-        users-list (activity-actions/follow-up-users-for-activity activity-data team-roster)
+        users-list (:users team-roster)
         all-user-ids (map :user-id users-list)
-        active-base-list (if first-setup
-                            (map :user-id (:follow-ups activity-data))
-                            @(::active-user-ids s))
-        active-users-list (filterv #((set all-user-ids) %)  active-base-list)]
+        filtered-follow-ups (if first-setup
+                              (filterv #((set all-user-ids) (-> % :assignee :user-id)) (:follow-ups activity-data))
+                              (filterv #((set all-user-ids) (-> % :assignee :user-id)) @(::follow-ups s)))]
+    (js/console.log "DBG follow-up-pickers/set-users-list first-setup" first-setup)
+    (js/console.log "DBG     filtered-follow-ups" filtered-follow-ups)
     (reset! (::users-list s) users-list)
-    (reset! (::active-user-ids s) active-users-list)))
-
-(defn- get-users-list [s]
-  (filterv #((set @(::active-user-ids s)) (:user-id %)) @(::users-list s)))
+    (reset! (::follow-ups s) filtered-follow-ups)))
 
 (rum/defcs follow-ups-picker < rum/reactive
                                (rum/local [] ::users-list)
-                               (rum/local [] ::active-user-ids)
+                               (rum/local [] ::follow-ups)
                                (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
@@ -41,8 +41,10 @@
   (let [activity-data (drv/react s :follow-ups-activity-data)
         team-roster (drv/react s :team-roster)
         users-list @(::users-list s)
-        active-user-ids @(::active-user-ids s)
+        follow-ups @(::follow-ups s)
         follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)]
+    (js/console.log "DBG follow-ups-picker/render users-list" users-list)
+    (js/console.log "DBG    follow-ups" follow-ups)
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -53,18 +55,21 @@
           [:button.mlb-reset.save-bt
             {:on-click #(do
                          (when (fn? follow-ups-picker-callback)
-                           (follow-ups-picker-callback (get-users-list s)))
+                           (follow-ups-picker-callback @(::follow-ups s)))
                          (nav-actions/close-all-panels))}
             "Save"]]
         [:div.follow-ups-picker-body
           [:div.follow-ups-users-count
-            (str (count active-user-ids) " "
-            (if (= (count active-user-ids) 1)
+            (str (count follow-ups) " "
+            (if (= (count follow-ups) 1)
               "person"
               "people"))]
           [:div.follow-ups-users-list
             (for [u users-list
-                  :let [active? ((set active-user-ids) (:user-id u))]]
+                  :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
+                        disabled? (or (:completed? f)
+                                      (and (map? (:author f))
+                                           (not= (-> f :author :user-id) (jwt/user-id))))]]
               [:div.follow-ups-user-item.group
                 {:key (str "follow-ups-user-" (:user-id u))}
                 [:div.follow-ups-user-left.group
@@ -72,11 +77,17 @@
                   [:div.user-name
                     (utils/name-or-email u)]]
                 [:div.follow-ups-user-right.group
-                  (if active?
-                    [:button.mlb-reset.remove-bt
-                      {:on-click #(let [filtered-users (filterv (fn [id] (not= id (:user-id u))) active-user-ids)]
-                                    (reset! (::active-user-ids s) filtered-users))}
-                      "Remove"]
-                    [:button.mlb-reset.add-bt
-                      {:on-click #(reset! (::active-user-ids s) (conj active-user-ids (:user-id u)))}
-                      "Add"])]])]]]]))
+                  (carrot-checkbox {:selected f
+                                    :disabled disabled?
+                                    :tooltip (when disabled?
+                                              (if (:completed? f)
+                                                "Follow-up completed"
+                                                "Follow-up created"))
+                                    :tooltip-placement "left"
+                                    :did-change-cb (fn [v]
+                                                     (reset! (::follow-ups s)
+                                                      (if v
+                                                        (conj follow-ups {:assignee (activity-actions/author-for-user u)
+                                                                          :completed? false})
+                                                        (filterv (fn [f] (not= (-> f :assignee :user-id) (:user-id u)))
+                                                         follow-ups))))})]])]]]]))

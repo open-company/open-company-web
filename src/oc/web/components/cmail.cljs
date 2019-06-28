@@ -330,7 +330,7 @@
                                                                      :follow-ups users-list
                                                                      :follow-up (not (zero? (count users-list)))})]))))}
     (when-not is-mobile?
-      [:div.follow-up-tag])
+      [:div.follow-up-tag.white-bg])
     [:div.follow-ups-label
       "Follow ups will be created for "
       [:span.follow-ups-label-count

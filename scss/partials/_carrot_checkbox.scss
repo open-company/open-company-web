@@ -16,8 +16,9 @@ div.carrot-checkbox {
   }
 
   &.disabled {
-    opacity: 0.4;
+    border: 1.5px solid $light_navy;
+    background-color: $light_navy;
+    opacity: 0.5;
     cursor: not-allowed;
-    pointer-events: none;
   }
 }

@@ -1,6 +1,6 @@
 (ns oc.web.actions.activity
   (:require-macros [if-let.core :refer (when-let*)])
-  (:require [defun.core :refer (defun-)]
+  (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
@@ -822,7 +822,7 @@
                                            (json->cljs body)
                                            nil]))))))
 
-(defun- author-for-user
+(defun author-for-user
   ([user :guard map?]
    (if (contains? user :name)
     (select-keys user [:user-id :avatar-url :name])

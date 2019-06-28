@@ -107,7 +107,7 @@ div.follow-ups-picker {
 
           div.follow-ups-user-left {
             float: left;
-            width: calc(100% - 44px);
+            width: calc(100% - 16px);
 
             @include user-profile(24);
 
@@ -132,18 +132,18 @@ div.follow-ups-picker {
 
           div.follow-ups-user-right {
             float: right;
-            width: 44px;
+            width: 16px;
             text-align: right;
 
-            button {
-              padding: 0;
-              width: auto;
-              @include OC_Body_Book();
-              font-size: 12px;
-              line-height: 24px;
-              color: rgba($deep_navy, 0.5);
-              height: 24px;
-            }
+            // button.follow-up-check {
+            //   padding: 0;
+            //   width: auto;
+            //   @include OC_Body_Book();
+            //   font-size: 12px;
+            //   line-height: 24px;
+            //   color: rgba($deep_navy, 0.5);
+            //   height: 24px;
+            // }
           }
         }
       }
