@@ -851,7 +851,6 @@
     (map follow-up-from-user follow-up-users)))
 
 (defn cmail-toggle-follow-up [activity-data]
-  (js/console.log "DBG team-roster:" (:users (dis/team-roster)))
   (let [follow-up (:follow-up activity-data)
         turning-on? (not follow-up)
         activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
@@ -1030,7 +1029,7 @@
           initial-cmail-state (if is-published?
                                 {:fullscreen true :auto true}
                                 {})]
-      (cmail-show fixed-activity-data initial-cmail-state))))
+      (cmail-show with-follow-up initial-cmail-state))))
 
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
