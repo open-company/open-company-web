@@ -328,7 +328,7 @@ npx electron-builder -c.mac.type=distribution -c.mac.identity="OpenCompany, LLC 
 
 This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
 Navigate your way there, and if you're ready to roll the release out to customers, you can Publish the draft. Existing client installations
-will sense the new update, and automatically update in the background.
+will sense the new update, and automatically install it in the background.
 
 ## Participation
 
