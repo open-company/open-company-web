@@ -15,13 +15,11 @@
   [s first-setup]
   (let [activity-data @(drv/get-ref s :follow-ups-activity-data)
         team-roster @(drv/get-ref s :team-roster)
-        users-list (:users team-roster)
+        users-list (activity-actions/follow-up-users activity-data team-roster)
         all-user-ids (map :user-id users-list)
         filtered-follow-ups (if first-setup
                               (filterv #((set all-user-ids) (-> % :assignee :user-id)) (:follow-ups activity-data))
                               (filterv #((set all-user-ids) (-> % :assignee :user-id)) @(::follow-ups s)))]
-    (js/console.log "DBG follow-up-pickers/set-users-list first-setup" first-setup)
-    (js/console.log "DBG     filtered-follow-ups" filtered-follow-ups)
     (reset! (::users-list s) users-list)
     (reset! (::follow-ups s) filtered-follow-ups)))
 
@@ -43,8 +41,6 @@
         users-list @(::users-list s)
         follow-ups @(::follow-ups s)
         follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)]
-    (js/console.log "DBG follow-ups-picker/render users-list" users-list)
-    (js/console.log "DBG    follow-ups" follow-ups)
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]

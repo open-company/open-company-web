@@ -836,29 +836,33 @@
   (hash-map :assignee (author-for-user user)
             :completed? false))
 
-(defn follow-up-users-for-activity [activity-data team-roster]
+(defn follow-up-users [activity-data team-roster]
   (let [all-team-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
         board-data (dis/board-data (:board-slug activity-data))
         private-board? (= (:access board-data) "private")
         filtered-board-users (when private-board?
-                               (concat (:viewers board-data) (:authors board-data)))
-        follow-up-users (if private-board?
-                          (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
-                          all-team-users)]
+                               (concat (:viewers board-data) (:authors board-data)))]
+    (if private-board?
+      (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
+      all-team-users)))
+
+(defn- follow-ups-for-activity [activity-data team-roster]
+  (let [follow-up-users (follow-up-users activity-data team-roster)]
     (map follow-up-from-user follow-up-users)))
 
 (defn cmail-toggle-follow-up [activity-data]
+  (js/console.log "DBG team-roster:" (:users (dis/team-roster)))
   (let [follow-up (:follow-up activity-data)
         turning-on? (not follow-up)
-        follow-up-users (follow-up-users-for-activity activity-data (dis/team-roster))
+        activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
         with-toggled-follow-up (assoc activity-data :follow-up turning-on?)
-        with-follow-up-users (if turning-on?
-                               (assoc with-toggled-follow-up :follow-ups follow-up-users)
-                               (dissoc with-toggled-follow-up :follow-ups))
+        with-follow-ups (if turning-on?
+                          (assoc with-toggled-follow-up :follow-ups activity-follow-ups)
+                          (dissoc with-toggled-follow-up :follow-ups))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-up-users])
+    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-ups])
     (when patch-entry-link
-      (api/patch-entry patch-entry-link with-follow-up-users nil
+      (api/patch-entry patch-entry-link with-follow-ups nil
                         (fn [entry-data edit-key {:keys [success body status]}]
                           (if success
                             (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
