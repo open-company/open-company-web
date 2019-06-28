@@ -479,7 +479,11 @@
                            (:has-changes cmail-data))
                     (cancel-clicked s)
                     (activity-actions/cmail-hide)))
-        follow-up? (pos? (count (:follow-ups cmail-data)))]
+        follow-up? (pos? (count (:follow-ups cmail-data)))
+        can-remove-follow-ups? (every? #(and (not (:completed? %))
+                                             (or (not (:author %))
+                                                 (= (-> % :author :user-id) (jwt/user-id))))
+                                (:follow-ups cmail-data))]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?})}
       [:div.cmail-container
@@ -556,9 +560,11 @@
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:div.follow-ups-toggle-container
-              {:class (when follow-up? "on")}
+              {:class (utils/class-set {:on follow-up?
+                                        :disabled (not can-remove-follow-ups?)})}
               [:div.follow-ups-toggle
-                {:on-mouse-down #(activity-actions/cmail-toggle-follow-up cmail-data)
+                {:on-mouse-down #(when can-remove-follow-ups?
+                                   (activity-actions/cmail-toggle-follow-up cmail-data))
                  :data-toggle "tooltip"
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"

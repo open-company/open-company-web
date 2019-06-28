@@ -129,6 +129,13 @@ div.cmail-outer {
           }
 
           div.follow-ups-toggle-container {
+            &.disabled {
+              div.follow-ups-toggle {
+                opacity: 0.5;
+                cursor: not-allowed;
+              }
+            }
+
             &.on {
               div.follow-ups-toggle {
                 background-color: rgba($sea_blue, 0.2);
