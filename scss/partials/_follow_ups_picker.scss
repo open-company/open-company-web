@@ -124,6 +124,10 @@ div.follow-ups-picker {
             float: left;
             width: calc(100% - 16px);
 
+            &.disabled {
+              opacity: 0.5;
+            }
+
             @include user-profile(24);
 
             div.user-avatar-img-container {

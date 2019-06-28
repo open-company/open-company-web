@@ -96,8 +96,17 @@
                                       (and (map? (:author f))
                                            (not= (-> f :author :user-id) (jwt/user-id))))]]
               [:div.follow-ups-user-item.group
-                {:key (str "follow-ups-user-" (:user-id u))}
+                {:key (str "follow-ups-user-" (:user-id u))
+                 :on-click (fn [_]
+                             (when-not disabled?
+                               (reset! (::follow-ups s)
+                                (if f
+                                  (filterv (fn [f] (not= (-> f :assignee :user-id) (:user-id u)))
+                                   follow-ups)
+                                  (conj follow-ups {:assignee (activity-actions/author-for-user u)
+                                                    :completed? false})))))}
                 [:div.follow-ups-user-left.group
+                  {:class (when disabled? "disabled")}
                   (user-avatar-image u)
                   [:div.user-name
                     (utils/name-or-email u)]]
@@ -108,11 +117,4 @@
                                               (if (:completed? f)
                                                 "Follow-up completed"
                                                 "Follow-up created"))
-                                    :tooltip-placement "left"
-                                    :did-change-cb (fn [v]
-                                                     (reset! (::follow-ups s)
-                                                      (if v
-                                                        (conj follow-ups {:assignee (activity-actions/author-for-user u)
-                                                                          :completed? false})
-                                                        (filterv (fn [f] (not= (-> f :assignee :user-id) (:user-id u)))
-                                                         follow-ups))))})]])]]]]))
+                                    :tooltip-placement "left"})]])]]]]))
