@@ -236,7 +236,8 @@
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (sass :output-style :compressed)
-        (build-prod-site) (cljs :ids #{"public/oc"}
+        (build-prod-site)
+        (cljs :ids #{"public/oc"}
               :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
@@ -279,18 +280,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Electron App
-
-(deftask build-electron-site []
-  (comp (p/base)
-        (p/permalink :permalink-fn page->permalink
-                     :filterer page?)
-        (p/render :renderer 'oc.core/static-page
-                  :filterer page?)
-        ;; We're not actually rendering a collection here but using the collection task
-        ;; is often a handy hack to render pages which are "unique"
-        (p/collection :renderer 'oc.core/electron-app-shell
-                      :page "app-shell.html"
-                      :filterer identity)))
 
 (deftask dev-electron
   "Carrot electron app loading localhost:3559"
