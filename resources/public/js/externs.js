@@ -150,6 +150,7 @@ var init_fullstory = function(){};
 var FS = function(){};
 FS.setUserVars = function(){};
 FS.getCurrentSessionURL = function(){};
+FS.identify = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -175,12 +176,8 @@ ZiggeoApi.V2.Player.get = function(){};
 var Headway = function(){};
 Headway.init = function(){};
 Headway.show = function(){};
-// Drift
-var drift = function(){};
-drift.api = {};
-drift.api.startInteraction = function(){};
-drift.identify = function(){};
-drift.track = function(){};
+// Intercom (Chat support)
+var Intercom = function(){};
 // Homepage animation
 var OCWebSetupMarketingSiteJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
@@ -188,3 +185,4 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// Fullstory
