@@ -599,7 +599,7 @@
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           (when (and (:follow-up cmail-data)
                      (not is-mobile?))
-          (follow-ups-header cmail-data true))
+            (follow-ups-header cmail-data false))
           [:div.cmail-content
             ;; Video elements
             ; FIXME: disable video on mobile for now

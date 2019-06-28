@@ -824,28 +824,36 @@
 
 (defun- author-for-user
   ([user :guard map?]
-   (select-keys user [:user-id :avatar-url :name]))
-  ([users :guard seq?]
+   (if (contains? user :name)
+    (select-keys user [:user-id :avatar-url :name])
+    (-> user
+      (select-keys [:user-id :avatar-url])
+      (assoc :name (clojure.string/trim (str (:first-name user) " " (:last-name user)))))))
+  ([users :guard sequential?]
    (vec (map author-for-user users))))
+
+(defn- follow-up-from-user [user]
+  (hash-map :assignee (author-for-user user)
+            :completed? false))
 
 (defn follow-up-users-for-activity [activity-data team-roster]
   (let [all-team-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
         board-data (dis/board-data (:board-slug activity-data))
         private-board? (= (:access board-data) "private")
         filtered-board-users (when private-board?
-                               (concat (:viewers board-data) (:authors board-data)))]
-    (if private-board?
-      (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
-      all-team-users)))
+                               (concat (:viewers board-data) (:authors board-data)))
+        follow-up-users (if private-board?
+                          (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
+                          all-team-users)]
+    (map follow-up-from-user follow-up-users)))
 
 (defn cmail-toggle-follow-up [activity-data]
   (let [follow-up (:follow-up activity-data)
         turning-on? (not follow-up)
-        follow-ups-toggled (merge activity-data {:follow-up (not (:follow-up activity-data))
-                                                 :follow-ups (author-for-user activity-data)})
+        follow-up-users (follow-up-users-for-activity activity-data (dis/team-roster))
         with-toggled-follow-up (assoc activity-data :follow-up turning-on?)
         with-follow-up-users (if turning-on?
-                               (assoc with-toggled-follow-up :follow-ups (follow-up-users-for-activity activity-data (dis/team-roster)))
+                               (assoc with-toggled-follow-up :follow-ups follow-up-users)
                                (dissoc with-toggled-follow-up :follow-ups))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
     (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-up-users])
