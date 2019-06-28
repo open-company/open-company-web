@@ -1021,6 +1021,7 @@
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
+          with-follow-up (assoc fixed-activity-data :follow-up (pos? (count (:follow-ups fixed-activity-data))))
           is-published? (= (:status fixed-activity-data) "published")
           initial-cmail-state (if is-published?
                                 {:fullscreen true :auto true}
