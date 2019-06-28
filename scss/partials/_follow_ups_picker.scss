@@ -108,6 +108,7 @@ div.follow-ups-picker {
             color: $carrot_green;
             font-size: 14px;
             @include OC_Body_Book();
+            padding: 0;
           }
         }
       }

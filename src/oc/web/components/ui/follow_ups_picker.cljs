@@ -77,7 +77,7 @@
                                                         users-list)))}
                   "Select all"]
                 :else
-                [:button.mlb-reset.select-all
+                [:button.mlb-reset.deselect-all
                   {:on-click (fn [_]
                               (reset! (::follow-ups s)
                                (remove nil?
@@ -85,7 +85,8 @@
                                       (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
                                         (when (or (:completed? f)
                                                   (and (map? (:author f))
-                                                       (not= (-> f :author :user-id) (jwt/user-id)))))))
+                                                       (not= (-> f :author :user-id) (jwt/user-id))))
+                                          f)))
                                 users-list))))}
                   "Deselect all"])]]
           [:div.follow-ups-users-list
