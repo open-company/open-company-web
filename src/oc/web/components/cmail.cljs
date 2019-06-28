@@ -327,8 +327,7 @@
                  (nav-actions/show-follow-ups-picker nil
                   (fn [users-list]
                     (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
-                                                                     :follow-ups users-list
-                                                                     :follow-up (not (zero? (count users-list)))})]))))}
+                                                                     :follow-ups users-list})]))))}
     (when-not is-mobile?
       [:div.follow-up-tag.white-bg])
     [:div.follow-ups-label
@@ -479,7 +478,8 @@
                   (if (and (= (:status cmail-data) "published")
                            (:has-changes cmail-data))
                     (cancel-clicked s)
-                    (activity-actions/cmail-hide)))]
+                    (activity-actions/cmail-hide)))
+        follow-up? (pos? (count (:follow-ups cmail-data)))]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?})}
       [:div.cmail-container
@@ -507,7 +507,7 @@
           [:div.cmail-mobile-header-bt-separator]
           [:button.mlb-reset.mobile-attachment-button
             {:on-click #(add-attachment s)}]]
-        (when (and (:follow-up cmail-data)
+        (when (and follow-up?
                    is-mobile?)
           (follow-ups-header cmail-data true))
         [:div.cmail-header.group
@@ -533,7 +533,7 @@
                         "Expand")}]]
           [:div.cmail-header-vertical-separator]
           [:div.cmail-header-board-follow-ups-container.group
-            {:class (when (:follow-up cmail-data) "follow-ups-on")}
+            {:class (when follow-up? "follow-ups-on")}
             [:div.board-name.oc-input
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
@@ -556,7 +556,7 @@
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:div.follow-ups-toggle-container
-              {:class (when (:follow-up cmail-data) "on")}
+              {:class (when follow-up? "on")}
               [:div.follow-ups-toggle
                 {:on-mouse-down #(activity-actions/cmail-toggle-follow-up cmail-data)
                  :data-toggle "tooltip"
@@ -597,7 +597,7 @@
               "Post")]]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
-          (when (and (:follow-up cmail-data)
+          (when (and follow-up?
                      (not is-mobile?))
             (follow-ups-header cmail-data false))
           [:div.cmail-content
