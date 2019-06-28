@@ -180,9 +180,13 @@
          :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
+      (when is-mobile?
+        [:div.expanded-post-mobile-reactions
+          (reactions activity-data)])
       [:div.expanded-post-footer.group
         (comments-summary activity-data true)
-        (reactions activity-data)
+        (when-not is-mobile?
+          (reactions activity-data))
         (when user-is-part-of-the-team
           [:div.expanded-post-wrt-container
             (when should-show-post-added-tooltip?

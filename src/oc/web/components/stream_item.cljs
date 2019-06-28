@@ -141,21 +141,24 @@
           [:div.stream-header-head-author
             (user-avatar-image publisher)
             [:div.name
-              [:div.name-inner
-                {:class utils/hide-class
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (str
-                 (:name publisher)
-                 " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))]
+              [:div.mobile-name
+                [:div.name-inner
+                  {:class utils/hide-class
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                   :data-title (utils/activity-date-tooltip activity-data)}
+                  (str
+                   (:name publisher)
+                   " in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)"))]
+                [:div.mobile-time-since
+                  (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
               [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
@@ -195,6 +198,10 @@
                  :data-itemuuid (:uuid activity-data)
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
               (stream-item-summary activity-data)]]
+            (when (and (not is-drafts-board)
+                       is-mobile?)
+                [:div.stream-item-mobile-reactions
+                  (reactions activity-data)])
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit
@@ -210,7 +217,8 @@
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
                   (comments-summary activity-data true has-new-comments?)]
-                (reactions activity-data)
+                (when-not is-mobile?
+                  (reactions activity-data))
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
@@ -219,7 +227,7 @@
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
                     [:div.stream-item-attachments-count
-                      (count activity-attachments) " Attachment" (when (> (count activity-attachments) 1) "s")]
+                      (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
                     [:div.stream-item-attachments-list
                       (for [atc activity-attachments]
                         [:a.stream-item-attachments-item
