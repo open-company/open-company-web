@@ -92,10 +92,24 @@ div.follow-ups-picker {
     div.follow-ups-picker-body {
       margin-top: 24px;
 
-      div.follow-ups-users-count {
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: $light_navy;
+      div.follow-ups-picker-body-head {
+
+        div.follow-ups-users-count {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $light_navy;
+          float: left;
+        }
+
+        div.follow-ups-users-bt {
+          float: right;
+
+          button.select-all, button.deselect-all {
+            color: $carrot_green;
+            font-size: 14px;
+            @include OC_Body_Book();
+          }
+        }
       }
 
       div.follow-ups-users-list {

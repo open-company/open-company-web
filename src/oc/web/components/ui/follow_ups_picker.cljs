@@ -55,11 +55,39 @@
                          (nav-actions/close-all-panels))}
             "Save"]]
         [:div.follow-ups-picker-body
-          [:div.follow-ups-users-count
-            (str (count follow-ups) " "
-            (if (= (count follow-ups) 1)
-              "person"
-              "people"))]
+          [:div.follow-ups-picker-body-head.group
+            [:div.follow-ups-users-count
+              (cond
+                (zero? (count follow-ups))
+                "No one selected"
+                (= (count follow-ups) 1)
+                "1 person"
+                :else
+                (str (count follow-ups) " people"))]
+            [:div.follow-ups-users-bt
+              (cond
+                (< (count follow-ups) (count users-list))
+                [:button.mlb-reset.select-all
+                  {:on-click (fn [_]
+                              (reset! (::follow-ups s) (map (fn [user]
+                                                              (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
+                                                                (or f
+                                                                    (hash-map :assignee (activity-actions/author-for-user user)
+                                                                              :completed? false))))
+                                                        users-list)))}
+                  "Select all"]
+                :else
+                [:button.mlb-reset.select-all
+                  {:on-click (fn [_]
+                              (reset! (::follow-ups s)
+                               (remove nil?
+                                (map (fn [user]
+                                      (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
+                                        (when (or (:completed? f)
+                                                  (and (map? (:author f))
+                                                       (not= (-> f :author :user-id) (jwt/user-id)))))))
+                                users-list))))}
+                  "Deselect all"])]]
           [:div.follow-ups-users-list
             (for [u users-list
                   :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
