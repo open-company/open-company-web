@@ -239,7 +239,7 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
-  p {
+  p, ul > li, i {
     min-height: #{$line_height}px;
   }
 
