@@ -851,7 +851,7 @@
     (map follow-up-from-user follow-up-users)))
 
 (defn cmail-toggle-follow-up [activity-data]
-  (let [follow-up (pos? (count (:follow-up activity-data)))
+  (let [follow-up (pos? (count (:follow-ups activity-data)))
         turning-on? (not follow-up)
         activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
         with-follow-ups (if turning-on?
@@ -1023,12 +1023,11 @@
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
-          with-follow-up (assoc fixed-activity-data :follow-up (pos? (count (:follow-ups fixed-activity-data))))
           is-published? (= (:status fixed-activity-data) "published")
           initial-cmail-state (if is-published?
                                 {:fullscreen true :auto true}
                                 {})]
-      (cmail-show with-follow-up initial-cmail-state))))
+      (cmail-show fixed-activity-data initial-cmail-state))))
 
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
