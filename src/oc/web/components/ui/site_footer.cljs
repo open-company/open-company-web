@@ -34,8 +34,8 @@
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
           [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]
           [:div.column-item [:a {:href oc-urls/press-kit} "Press Kit"]]
-          [:div.column-item [:a {:href "#"
-                                 :on-click #(chat/chat-click 43229)}
+          [:div.column-item [:a {:class "intercom-chat-link"
+                                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                               "Contact"]]]
 
         [:div.column.column-support

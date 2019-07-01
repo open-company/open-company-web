@@ -70,7 +70,7 @@ div.expanded-post {
   }
 
   div.expanded-post-headline {
-    @include activity-title(36px, 47px);
+    @include activity-title(36px, 40px);
     margin-top: 16px;
 
     @include mobile() {
@@ -141,10 +141,27 @@ div.expanded-post {
     }
   }
 
+  div.expanded-post-mobile-reactions {
+    display: none;
+
+    @include mobile() {
+      display: block;
+      height: 48px;
+      margin: 24px 0 0;
+      padding-bottom: 16px;
+      border-bottom: 1px solid $ultra_light_grey;
+    }
+  }
+
   div.expanded-post-footer {
     margin-top: 24px;
     min-height: 26px;
     position: relative;
+
+    @include mobile() {
+      margin-top: 10px;
+      min-height: 20px;
+    }
 
     div.is-comments {
       margin-right: 16px;
@@ -182,6 +199,10 @@ div.expanded-post {
       float: left;
       position: relative;
       margin-top: 4px;
+
+      @include mobile() {
+        margin-top: 0;
+      }
 
       div.post-added-tooltip-container {
         position: absolute;
@@ -233,6 +254,13 @@ div.expanded-post {
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid $ultra_light_grey;
+
+    @include mobile() {
+      margin-top: 14px;
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      padding: 16px;
+    }
 
     div.stream-comments {
       width: calc(100% + 32px);

@@ -6,7 +6,8 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.routing :as routing-actions]
-            [oc.web.actions.section :as section-actions]))
+            [oc.web.actions.section :as section-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
 ;; :menu
@@ -144,6 +145,13 @@
   (when e
     (.preventDefault e)
     (.stopPropagation e))
-  (show-org-settings :integrations))
+  (if (responsive/is-mobile-size?)
+    (let [alert-data {:action "mobile-integrations-link"
+                      :message "Carrot integrations need to be configured in a desktop browser."
+                      :solid-button-style :green
+                      :solid-button-title "OK, got it"
+                      :solid-button-cb #(alert-modal/hide-alert)}]
+      (alert-modal/show-alert alert-data))
+    (show-org-settings :integrations)))
 
 (set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)

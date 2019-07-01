@@ -17,6 +17,27 @@ div.dashboard-layout {
     }
   }
 
+  button.mobile-floating-compose-bt {
+    display: none;
+
+    @include mobile() {
+      display: block;
+      background-image: cdnUrl("/img/ML/white_pen.svg");
+      background-size: 16px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 48px;
+      height: 48px;
+      background-color: $carrot_green;
+      border-radius: 6px;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
+    }
+  }
+
   div.dashboard-layout-container {
     padding: 0;
     margin: 0 auto;
@@ -205,7 +226,9 @@ div.dashboard-layout {
         border-bottom: 1px solid $ultra_light_grey;
 
         @include mobile() {
-          display: none;
+          height: 35px;
+          border-bottom: none;
+          padding: 0;
         }
           
         div.board-name {
@@ -217,8 +240,7 @@ div.dashboard-layout {
           @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
           @include mobile() {
-            float: unset;
-            text-align: center;
+            display: none;
           }
 
           div.board-name-with-icon {
@@ -400,7 +422,10 @@ div.dashboard-layout {
           position: relative;
 
           @include mobile() {
-            display: none;
+            width: 100%;
+            height: 35px;
+            background-color: $grey_num_2;
+            border-bottom: 1px solid $grey_num_3;
           }
 
           button.board-sort-bt {
@@ -413,6 +438,25 @@ div.dashboard-layout {
             margin: 0;
             position: relative;
 
+            @include mobile(){
+              width: 100%;
+              height: 35px;
+              line-height: 35px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              color: $ui_grey;
+              opacity: 1;
+            }
+
+            @include big_web() {
+              opacity: 0.5;
+
+              &:hover, &:active, &:focus, &.active {
+                opacity: 1;
+              }
+            }
+
             &:after {
               content: "";
               width: 8px;
@@ -424,6 +468,14 @@ div.dashboard-layout {
               background-size: 8px 4px;
               background-repeat: no-repeat;
               background-position: center;
+
+              @include mobile() {
+                position: relative;
+                top: unset;
+                right: unset;
+                margin-left: 6px;
+                opacity: 0.6;
+              }
             }
           }
 
@@ -440,6 +492,13 @@ div.dashboard-layout {
             display: none;
             z-index: 100;
 
+            @include mobile() {
+              right: unset;
+              left: 50%;
+              margin-left: -69px;
+              top: 38px;
+            }
+
             &.show-menu {
               display: block;
             }
@@ -448,12 +507,13 @@ div.dashboard-layout {
               height: 34px;
               @include OC_Body_Book();
               font-size: 14px;
-              opacity: 0.5;
               padding: 8px 16px;
               cursor: pointer;
 
-              &.active, &:hover {
-                opacity: 1;
+              &.active, &:hover, &:active, &:focus {
+                background-color: $feint_emerald;
+                color: $carrot_green;
+                -webkit-tap-highlight-color: $feint_emerald;
               }
             }
           }

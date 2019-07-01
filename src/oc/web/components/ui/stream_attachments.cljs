@@ -31,7 +31,7 @@
                       file-name (:file-name atch)
                       size (:file-size atch)
                       subtitle (when size
-                                 (filesize size :binary false :format "%.2f"))]]
+                                 (clojure.string/lower-case (str "(" (filesize size :binary false :format "%.2f") ")")))]]
             [:div.stream-attachments-item.group
               {:key atch-key}
               [:a.group
@@ -40,10 +40,12 @@
                 [:div.attachment-info
                   {:class (when editable? "editable")}
                   [:div.attachment-icon]
-                  [:span.attachment-name
-                    {:class utils/hide-class}
-                    file-name]
-                  [:span.attachment-description subtitle]
+                  [:div.attachment-labels
+                    {:class (when editable? "edit")}
+                    [:span.attachment-name
+                      {:class utils/hide-class}
+                      file-name]
+                    [:span.attachment-description subtitle]]
                   (when editable?
                     [:button.mlb-reset.remove-attachment-bt
                       {:data-toggle (when-not is-mobile? "" "tooltip")

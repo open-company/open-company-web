@@ -55,7 +55,8 @@ div.user-notifications {
     width: 375px;
 
     &.hidden-tray {
-      display: none;
+      top: -99999px;
+      right: -99999px;
     }
 
     @include mobile() {

@@ -39,7 +39,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.ziggeo :as ziggeo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -48,7 +47,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
-            [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
@@ -177,10 +175,21 @@
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
 
+(defn- read-sort-type-from-cookie
+  "Read the sort order from the cookie, fallback to the default,
+   if it's on drafts board force the recently posted sort since that has only that"
+  [params]
+  (let [last-sort-cookie (cook/get-cookie (router/last-sort-cookie (:org params)))]
+    (if (or (= last-sort-cookie "recently-posted")
+            (= (:board params) utils/default-drafts-board-slug))
+      :recently-posted
+      dis/default-sort-type)))
+
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
         board (:board params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
         first-ever-cookie-name (when (= route "all-posts")
@@ -198,7 +207,7 @@
       (do
         (pre-routing query-params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -224,6 +233,7 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
@@ -236,6 +246,7 @@
      {:org org
       :board board
       :activity entry
+      :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
     (post-routing)
@@ -647,8 +658,7 @@
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when handle-url-change
-    (router/setup-navigation! handle-url-change))
-  (ziggeo/init-ziggeo true))
+    (router/setup-navigation! handle-url-change)))
 
 (defn on-js-reload []
   (.clear js/console)

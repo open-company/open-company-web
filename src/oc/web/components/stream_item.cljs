@@ -25,19 +25,14 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
-(defn- check-item-ready
-  "After component is mounted/re-mounted "
-  [s]
-  (let [activity-data (first (:rum/args s))
-        $item-body (js/$ (rum/ref-node s "activity-body"))
-        comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
-    (when (or (.hasClass $item-body "ddd-truncated")
-              (pos? (count (:attachments activity-data)))
-              (pos? (count comments-data))
-              (:body-thumbnail activity-data)
-              (:fixed-video-id activity-data))
-      (reset! (::truncated s) true))
-    (reset! (::item-ready s) true)))
+(defn- stream-item-summary [activity-data]
+  (if (seq (:abstract activity-data))
+    [:div.stream-item-body
+      {:data-itemuuid (:uuid activity-data)}
+      (:abstract activity-data)]
+    [:div.stream-item-body.no-abstract
+      {:data-itemuuid (:uuid activity-data)
+       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
@@ -58,28 +53,23 @@
                          (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
                          ;; Locals
-                         (rum/local false ::truncated)
-                         (rum/local false ::item-ready)
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin :abstract (* 24 3))
+                         (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
                           :did-mount (fn [s]
                            (item-mounted s)
-                           (check-item-ready s)
                            s)
                           :did-remount (fn [_ s]
                            (item-mounted s)
-                           (check-item-ready s)
                            s)}
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        truncated? @(::truncated s)
         ;; Fallback to the activity inline comments if we didn't load
         ;; the full comments just yet
         _ (drv/react s :comments-data)
@@ -103,12 +93,19 @@
                         :height (utils/calc-video-height 136)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         should-show-wrt (and user-is-part-of-the-team
-                             is-published?)]
+                             is-published?)
+        ;; Add NEW tag besides comment summary
+        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
+                          (and (:new-at activity-data)
+                               ;; and that's after the user last read
+                               (< (.getTime (utils/js-date (:last-read-at read-data)))
+                                  (.getTime (utils/js-date (:new-at activity-data)))))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :unseen-item (:unseen activity-data)
+                                :unseen-item (or has-new-comments?
+                                                 (:unseen activity-data))
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
@@ -144,21 +141,24 @@
           [:div.stream-header-head-author
             (user-avatar-image publisher)
             [:div.name
-              [:div.name-inner
-                {:class utils/hide-class
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (str
-                 (:name publisher)
-                 " in "
-                 (:board-name activity-data)
-                 (when (= (:board-access activity-data) "private")
-                   " (private)")
-                 (when (= (:board-access activity-data) "public")
-                   " (public)"))]
+              [:div.mobile-name
+                [:div.name-inner
+                  {:class utils/hide-class
+                   :data-toggle (when-not is-mobile? "tooltip")
+                   :data-placement "top"
+                   :data-container "body"
+                   :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                   :data-title (utils/activity-date-tooltip activity-data)}
+                  (str
+                   (:name publisher)
+                   " in "
+                   (:board-name activity-data)
+                   (when (= (:board-access activity-data) "private")
+                     " (private)")
+                   (when (= (:board-access activity-data) "public")
+                     " (public)"))]
+                [:div.mobile-time-since
+                  (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
               [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
           (when is-published?
@@ -197,16 +197,11 @@
                 {:ref "activity-headline"
                  :data-itemuuid (:uuid activity-data)
                  :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-              (let [has-abstract (seq (:abstract activity-data))]
-                [:div.stream-item-body
-                  {:class (utils/class-set {:no-abstract (not has-abstract)
-                                            :item-ready @(::item-ready s)
-                                            :truncated truncated?})
-                   :data-itemuuid (:uuid activity-data)
-                   :ref :abstract
-                   :dangerouslySetInnerHTML {:__html (if has-abstract
-                                                       (:abstract activity-data)
-                                                       (:body activity-data))}}])]]
+              (stream-item-summary activity-data)]]
+            (when (and (not is-drafts-board)
+                       is-mobile?)
+                [:div.stream-item-mobile-reactions
+                  (reactions activity-data)])
             (if is-drafts-board
               [:div.stream-item-footer.group
                 [:div.stream-body-draft-edit
@@ -221,8 +216,9 @@
                 {:ref "stream-item-reactions"}
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
-                  (comments-summary activity-data true)]
-                (reactions activity-data)
+                  (comments-summary activity-data true has-new-comments?)]
+                (when-not is-mobile?
+                  (reactions activity-data))
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
@@ -231,7 +227,7 @@
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
                     [:div.stream-item-attachments-count
-                      (count activity-attachments) " Attachment" (when (> (count activity-attachments) 1) "s")]
+                      (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
                     [:div.stream-item-attachments-list
                       (for [atc activity-attachments]
                         [:a.stream-item-attachments-item
