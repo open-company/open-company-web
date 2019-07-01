@@ -315,8 +315,8 @@
         media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
         file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
         buttons (if show-subtitle
-                  ["bold" "italic" "unorderedlist" "anchor" "h2"]
-                  ["bold" "italic" "unorderedlist" "anchor"])
+                  ["bold" "italic" "unorderedlist" "anchor" "quote" "h2"]
+                  ["bold" "italic" "unorderedlist" "anchor" "quote"])
         users-list (:mention-users @(drv/get-ref s :team-roster))
         extensions (if mobile-editor
                       #js {"autolist" (js/AutoList.)
@@ -325,7 +325,8 @@
                            "mention" (mention-utils/mention-ext users-list)
                            "media-picker" media-picker-ext
                            "fileDragging" false
-                           "carrotFileDragging" file-dragging-ext})
+                           "carrotFileDragging" file-dragging-ext
+                           "autoquote" (js/AutoQuote.)})
         options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                  :buttonLabels "fontawesome"
                  :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})

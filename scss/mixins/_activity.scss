@@ -239,6 +239,10 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
+  p, blockquote {
+    min-height: #{$line-height}px;
+  }
+
   * {
     color: $color;
   }
@@ -364,6 +368,11 @@ $h2_top_margin: 24;
       margin: 0 0 0 -16px;
       max-width: calc(100% + 32px);
     }
+  }
+
+  blockquote {
+    border-left: 4px solid $ultra_light_grey;
+    padding: 0 12px;
   }
 }
 
