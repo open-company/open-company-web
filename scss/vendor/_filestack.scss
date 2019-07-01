@@ -49,6 +49,10 @@ div.fsp-picker {
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
     border-radius: 8px;
 
+    @include tablet() {
+      border-radius: 0;
+    }
+
     div.fst-sidebar {
       background-color: white;
     }
