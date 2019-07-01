@@ -465,8 +465,6 @@
                           @(::saving s))
                      (and (not published?)
                           @(::publishing s)))
-        is-fullscreen? (and (not is-mobile?)
-                            (:fullscreen cmail-state))
         close-cb (fn [_]
                   (if (au/has-content? (assoc cmail-data
                                          :body
@@ -485,7 +483,6 @@
                                                  (= (-> % :author :user-id) (jwt/user-id))))
                                 (:follow-ups cmail-data))]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen is-fullscreen?})}
       [:div.cmail-container
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
@@ -526,16 +523,6 @@
                  :title (if long-tooltip
                           "Save & Close"
                           "Close")}]])
-          [:div.fullscreen-bt-container
-            [:button.mlb-reset.fullscreen-bt
-              {:on-click #(activity-actions/cmail-toggle-fullscreen)
-               :data-toggle "tooltip"
-               :data-placement "auto"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if is-fullscreen?
-                        "Shrink"
-                        "Expand")}]]
-          [:div.cmail-header-vertical-separator]
           [:div.cmail-header-board-follow-ups-container.group
             {:class (when follow-up? "follow-ups-on")}
             [:div.board-name.oc-input
@@ -570,29 +557,28 @@
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :title "Follow up"}
                 [:span.follow-ups-toggle-circle]]]]
-          (when is-fullscreen?
-            [:div.cmail-header-right-buttons
-              (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                             :width 24
-                             :height 24
-                             :position "bottom"
-                             :tooltip-position "bottom"
-                             :default-field-selector "div.cmail-content div.rich-body-editor"
-                             :container-selector "div.cmail-content"})
-              [:button.mlb-reset.attachment-button
-                {:on-click #(add-attachment s)
+          [:div.cmail-header-right-buttons
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :width 24
+                           :height 24
+                           :position "bottom"
+                           :tooltip-position "bottom"
+                           :default-field-selector "div.cmail-content div.rich-body-editor"
+                           :container-selector "div.cmail-content"})
+            [:button.mlb-reset.attachment-button
+              {:on-click #(add-attachment s)
+               :data-toggle "tooltip"
+               :data-placement "auto"
+               :data-container "body"
+               :title "Add attachment"}]
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                  :data-toggle "tooltip"
-                 :data-placement "auto"
+                 :data-placement "bottom"
                  :data-container "body"
-                 :title "Add attachment"}]
-              [:div.delete-button-container
-                [:button.mlb-reset.delete-button
-                  {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                   :data-toggle "tooltip"
-                   :data-placement "bottom"
-                   :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                   :on-click #(delete-clicked s % cmail-data)}]]])
+                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                 :on-click #(delete-clicked s % cmail-data)}]]]
           [:button.mlb-reset.post-button
             {:ref "post-btn"
              :on-click #(post-clicked s)
@@ -699,7 +685,7 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
-                               :fullscreen is-fullscreen?
+                               :fullscreen true
                                :dispatch-input-key :cmail-data
                                :start-video-recording-cb #(video-record-clicked s)
                                :cmd-enter-cb #(post-clicked s)
@@ -711,27 +697,6 @@
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
       [:div.cmail-footer
-        (when-not is-fullscreen?
-          [:div.cmail-footer-right
-            [:div.delete-button-container
-              [:button.mlb-reset.delete-button
-                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :on-click #(delete-clicked s % cmail-data)}]]
-            [:button.mlb-reset.attachment-button
-              {:on-click #(add-attachment s)
-               :data-toggle "tooltip"
-               :data-placement "top"
-               :data-container "body"
-               :title "Add attachment"}]
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :width 24
-                           :height 24
-                           :position "top"
-                           :default-field-selector "div.cmail-content div.rich-body-editor"
-                           :container-selector "div.cmail-content"})])
         (when (and (not= (:status cmail-data) "published")
                    (not is-mobile?))
           (if (or (:has-changes cmail-data)
