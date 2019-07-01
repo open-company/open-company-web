@@ -623,7 +623,8 @@ div.cmail-outer {
         position: relative;
 
         @include tablet() {
-          padding: 0 0 16px 0;
+          padding: 0 0 16px;
+          margin: 16px 0 0;
         }
 
         div.cmail-content-abstract-counter {
