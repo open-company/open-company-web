@@ -24,6 +24,11 @@ div.reactions {
       margin-left: 4px;
       background-color: $ultra_light_grey;
 
+      @include mobile() {
+        height: 32px;
+        font-size: 12px;
+      }
+
       &:first-child {
         margin-left: 0px;
       }
@@ -33,6 +38,11 @@ div.reactions {
         float: left;
         font-size: 15px;
         margin-left: 2px;
+
+        @include mobile() {
+          font-size: 17px;
+          margin-left: 3px;
+        }
       }
 
       div.count {
@@ -42,6 +52,11 @@ div.reactions {
         height: 15px;
         text-align: center;
         margin-left: -1px;
+
+        @include mobile() {
+          margin-top: 3px;
+          height: 16px;
+        }
       }
 
       &.can-react {
@@ -84,15 +99,21 @@ div.reactions {
         }
 
         span.reaction {
-          margin: 0 0 0 5px;
-          opacity: 0.4;
+          margin: 0 0 0 4px;
+          opacity: 0.5;
           display: inline-block;
-          width: 23px;
-          height: 15px;
+          width: 24px;
+          height: 16px;
           background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
-          background-size: 23px 15px;
+          background-size: 24px 16px;
           background-position: center;
           background-repeat: no-repeat;
+
+          @include mobile() {
+            // width: 25px;
+            // height: 17px;
+            margin: 0 0 0 7px;
+          }
         }
       }
     }

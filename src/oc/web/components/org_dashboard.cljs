@@ -22,7 +22,6 @@
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
-            [oc.web.components.org-settings :refer (org-settings)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
@@ -39,7 +38,6 @@
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
-            [oc.web.components.ui.made-with-carrot-modal :refer (made-with-carrot-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
@@ -96,7 +94,6 @@
                 container-data
                 posts-data
                 ap-initial-at
-                made-with-carrot-modal-data
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
@@ -211,9 +208,6 @@
           ;; Team management
           (= open-panel :team)
           (team-management-modal)
-          ;; Billing
-          (= open-panel :billing)
-          (org-settings)
           ;; User settings
           (= open-panel :profile)
           (user-profile-modal)
@@ -226,9 +220,6 @@
           ;; Edit a reminder
           show-reminder-edit?
           (edit-recurring-update-modal)
-          ;; Made with carrot modal
-          made-with-carrot-modal-data
-          (made-with-carrot-modal)
           ;; Mobile create a new section
           show-section-editor
           (section-editor board-data

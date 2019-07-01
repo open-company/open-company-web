@@ -601,15 +601,11 @@ div.cmail-outer {
         border: none;
         outline: none;
         cursor: text;
+        @include activity-title();
         color: $deep_navy;
         white-space: pre-wrap;
         word-wrap: break-word;
-        min-height: 34px;
-        @include activity-title(32px, 34px);
-
-        @include mobile() {
-          @include activity-title(32px, 40px);
-        }
+        min-height: 28px;
 
         &:empty:before {
           content: attr(placeholder);
