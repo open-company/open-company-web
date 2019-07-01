@@ -239,6 +239,10 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
+  p {
+    min-height: #{$line_height}px;
+  }
+
   * {
     color: $color;
   }
