@@ -311,20 +311,50 @@ are largely automated, but there is a bit of one-time setup. First, we need to c
 with a few secrets:
 
 ```
-cp electron-builder.example.env electron-builder.env
+cp resources/electron-builder.example.env resources/electron-builder.env
 ```
 
 Edit this file appropriately. You can generate a GitHub token for yourself [here](https://github.com/settings/tokens).
+This file is ignored by git.
 
-Next, you'll need to have the appropriate Apple certificates installed to your Mac's keychain (ask an admin). With these
-in place, use the following to build, sign, and publish a desktop release:
+Next, you'll need to have the appropriate Apple certificates installed to your Mac's keychain, as well as any development
+provisioning profiles (ask an admin). Download the provisioning profiles to your local filesystem.
+With these in place, use the following to build, sign, and publish a desktop release.
+
+#### Staging Release
+
+This will produce a development build runnable by the devices specified in the supplied provisioning profile.
 
 ```
-boot staging-electron   # or prod-electron
+# Bump the version in resources/package.json to X.Y.Z-B, where B is the current build number
+vim resources/package.json
+
+boot staging-electron
+cd target/
+yarn install
+npx electron-builder -c.mac.provisioningProfile=/path/to/your/Carrot_MacOS_Development_Profile.provisionprofile --publish always
+```
+
+Keep in mind that this can take a while (~10 minutes) due to requiring Apple's servers to notarize the application.
+
+This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
+Because this is a development build in Apple's eyes, _it is only runnable by the devices included in the supplied provisioning profile._ You should
+not publish this build in the GitHub Release panel, and instead should distribute it to testers manually.
+
+
+#### Production Release
+
+```
+# Bump the version in resources/package.json to X.Y.Z (drop the build number)
+vim resources/package.json
+
+boot prod-electron
 cd target/
 yarn install
 npx electron-builder -c.mac.type=distribution -c.mac.identity="OpenCompany, LLC (XXXXXXXXXX) --publish always"
 ```
+
+Keep in mind that this can take a while (~10 minutes) due to requiring Apple's servers to notarize the application.
 
 This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
 Navigate your way there, and if you're ready to roll the release out to customers, you can Publish the draft. Existing client installations
