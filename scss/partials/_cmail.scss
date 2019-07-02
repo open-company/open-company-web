@@ -231,10 +231,14 @@ div.cmail-outer {
           }
 
           @include tablet() {
-            width: calc(100% - 16px - 32px);
             background-image: cdnUrl("/img/ML/select_arrows.svg");
             background-color: $ultra_light_grey;
             color: $deep_navy;
+            width: 100%;
+
+            &.has-follow-ups-button {
+              width: calc(100% - 16px - 32px);
+            }
 
             &:hover, &.open {
               background-color: $more_ultra_light_grey;
@@ -270,7 +274,7 @@ div.cmail-outer {
             padding: 0;
             float: left;
             margin-left: 16px;
-            margin-top: 8px;
+            margin-top: 4px;
           }
         }
 
@@ -496,7 +500,7 @@ div.cmail-outer {
         text-align: center;
         width: 100%;
         height: auto;
-        padding: 8px 32px;
+        padding: 8px 48px;
 
         div.follow-up-tag {
           display: none;
@@ -530,6 +534,43 @@ div.cmail-outer {
 
         &:hover {
           opacity: 1;
+        }
+      }
+
+      div.mobile-follow-ups-remove-menu-container {
+        display: none;
+
+        @include tablet() {
+          display: block;
+          position: absolute;
+          right: 16px;
+          top: 16px;
+
+          button.mobile-follow-ups-remove-menu {
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_white.svg");
+            background-size: 18px 4px;
+            background-position: center;
+            padding: 0;
+            background-repeat: no-repeat;
+          }
+
+          button.mobile-follow-ups-remove {
+            background-color: white;
+            border-radius: 4px;
+            padding: 16px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            color: $light_navy;
+            position: absolute;
+            right: 0;
+            top: 20px;
+            border: 1px solid $mid_light_grey;
+            box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+            z-index: 2;
+          }
         }
       }
     }
