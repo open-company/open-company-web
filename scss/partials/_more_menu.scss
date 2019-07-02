@@ -119,17 +119,12 @@ div.more-menu {
     padding: 8px 0;
     list-style-type: none;
 
-    &.has-read-unread {
-      left: calc(100% - 166px);
-      width: 120px;
-    }
-
-    &.has-create-follow-up, &.has-read-unread.has-create-follow-up {
+    &.has-create-follow-up {
       left: calc(100% - 146px);
       width: 140px;
     }
 
-    &.has-complete-follow-up, &.has-read-unread.has-complete-follow-up {
+    &.has-complete-follow-up {
       left: calc(100% - 126px);
       width: 160px;
     }

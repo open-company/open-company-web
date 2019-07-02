@@ -145,8 +145,7 @@
                                                :show-edit? true
                                                :edit-cb (partial start-editing s)
                                                :show-delete? true
-                                               :delete-cb (partial delete-clicked s activity-data)
-                                               :show-unread false})]
+                                               :delete-cb (partial delete-clicked s activity-data)})]
                 [:div.stream-comment-floating-buttons
                   {:class (utils/class-set {:can-edit can-show-edit-bt?
                                             :can-delete can-show-delete-bt?})}

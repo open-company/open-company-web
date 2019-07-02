@@ -172,7 +172,6 @@
               :show-edit? true
               :show-delete? true
               :show-move? (not is-mobile?)
-              :show-unread (not (:unread activity-data))
               :assigned-follow-up-data assigned-follow-up-data}))]
         [:div.must-see-tag.mobile-only]
         [:div.follow-up-tag.mobile-only]

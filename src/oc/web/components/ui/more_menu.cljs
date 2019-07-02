@@ -66,13 +66,12 @@
                          (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                          s)}
   [s entity-data share-container-id
-   {:keys [will-open will-close external-share tooltip-position show-unread
+   {:keys [will-open will-close external-share tooltip-position
            show-edit? show-delete? edit-cb delete-cb show-move?
            assigned-follow-up-data]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
-        mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
         editable-boards (drv/react s :editable-boards)
         is-mobile? (responsive/is-tablet-or-mobile?)
         create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
@@ -81,8 +80,7 @@
                                   (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))]
     (when (or edit-link
               share-link
-              delete-link
-              mark-unread-link)
+              delete-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (when (or @(::move-activity s)
@@ -90,7 +88,6 @@
                   "menu-expanded")}
         (when (or edit-link
                   delete-link
-                  mark-unread-link
                   (and (not external-share)
                        share-link))
           [:button.mlb-reset.more-menu-bt
@@ -110,8 +107,7 @@
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
-            {:class (utils/class-set {:has-read-unread mark-unread-link
-                                      :has-complete-follow-up (and is-mobile?
+            {:class (utils/class-set {:has-complete-follow-up (and is-mobile?
                                                                    complete-follow-up-link)
                                       :has-create-follow-up (and is-mobile?
                                                                  create-follow-up-link)})}
@@ -153,22 +149,6 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (when mark-unread-link
-              (if show-unread
-                [:li.unread
-                  {:on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (activity-actions/mark-unread entity-data))}
-                  "Mark unread"]
-                [:li.read
-                  {:on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (activity-actions/send-item-read (:uuid entity-data) true))}
-                  "Mark as read"]))
             (when is-mobile?
               (if complete-follow-up-link
                 [:li.complete-follow-up

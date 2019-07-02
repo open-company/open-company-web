@@ -140,7 +140,6 @@
           :show-delete? true
           :show-move? (not is-mobile?)
           :tooltip-position "bottom"
-          :show-unread true
           :assigned-follow-up-data assigned-follow-up-data})]
       (when has-video
         [:div.group
