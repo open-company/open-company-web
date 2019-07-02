@@ -3,7 +3,6 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -45,9 +44,9 @@
                                (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
-                               ui-mixins/refresh-tooltips-mixin
                                {:will-mount (fn [s]
                                  (set-users-list s true)
+                                 (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                  s)
                                 :did-remount (fn [_ s]
                                  (set-users-list s false)
