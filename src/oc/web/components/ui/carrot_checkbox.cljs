@@ -14,7 +14,8 @@
                               s)}
   [{:keys [selected disabled did-change-cb tooltip tooltip-placement]}]
   [:div.carrot-checkbox
-    {:on-click #(when-not disabled
+    {:on-click #(when (and (not disabled)
+                           (fn? did-change-cb))
                   (did-change-cb (not selected)))
      :data-toggle (if tooltip "tooltip" "")
      :data-placement (if tooltip (or tooltip-placement "top") "")
