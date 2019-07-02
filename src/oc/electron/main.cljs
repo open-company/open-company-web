@@ -107,7 +107,7 @@
         (load-page @main-window)
         (when dev? (.openDevTools @main-window))
         ;; -- Main window event handlers --
-        (.on @main-window "close" #(if (@quitting? (win32?))
+        (.on @main-window "close" #(if (or @quitting? (win32?))
                                      (reset! main-window nil)
                                      (do (.preventDefault %)
                                          (.hide @main-window)))))))
