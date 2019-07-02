@@ -858,23 +858,7 @@
                           (assoc activity-data :follow-ups activity-follow-ups)
                           (dissoc activity-data :follow-ups))
         patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-ups])
-    (when patch-entry-link
-      (api/patch-entry patch-entry-link with-follow-ups nil
-                        (fn [entry-data edit-key {:keys [success body status]}]
-                          (if success
-                            (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
-                              (api/get-org org-link
-                                (fn [{:keys [status body success]}]
-                                  (let [api-org-data (json->cljs body)]
-                                    (dis/dispatch! [:org-loaded api-org-data false])
-                                    ;; TODO refresh follow-up list of entries
-                                    ))))
-                            (dis/dispatch! [:activity-get/finish
-                                             status
-                                             (router/current-org-slug)
-                                             (json->cljs body)
-                                             nil])))))))
+    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-ups])))
 
 ;; Video handling
 
