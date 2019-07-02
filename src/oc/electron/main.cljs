@@ -107,7 +107,7 @@
         ;; -- Main window event handlers --
         (.on @main-window "ready-to-show" #(when (win32?)
                                              (.removeMenu @main-window)))
-        (.on @main-window "close" #(if @quitting?
+        (.on @main-window "close" #(if (@quitting? (win32?))
                                      (reset! main-window nil)
                                      (do (.preventDefault %)
                                          (.hide @main-window)))))))
