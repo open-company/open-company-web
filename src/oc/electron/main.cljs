@@ -102,11 +102,11 @@
     (do (set-csp)
         (prevent-navigation-external-to-carrot)
         (reset! main-window (mk-window 1280 720 true true))
+        (when (win32?)
+          (.setMenuBarVisibility @main-window false))
         (load-page @main-window)
         (when dev? (.openDevTools @main-window))
         ;; -- Main window event handlers --
-        (.on @main-window "ready-to-show" #(when (win32?)
-                                             (.removeMenu @main-window)))
         (.on @main-window "close" #(if @quitting?
                                      (reset! main-window nil)
                                      (do (.preventDefault %)
