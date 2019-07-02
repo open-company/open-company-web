@@ -222,15 +222,9 @@ div.follow-ups-picker {
             width: 16px;
             text-align: right;
 
-            // button.follow-up-check {
-            //   padding: 0;
-            //   width: auto;
-            //   @include OC_Body_Book();
-            //   font-size: 12px;
-            //   line-height: 24px;
-            //   color: rgba($deep_navy, 0.5);
-            //   height: 24px;
-            // }
+            div.carrot-checkbox {
+              margin-top: 4px;
+            }
           }
         }
       }

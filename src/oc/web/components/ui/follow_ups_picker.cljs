@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -44,6 +45,7 @@
                                (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
+                               ui-mixins/refresh-tooltips-mixin
                                {:will-mount (fn [s]
                                  (set-users-list s true)
                                  s)
@@ -125,6 +127,13 @@
                                            (not= (-> f :author :user-id) (jwt/user-id))))]]
               [:div.follow-ups-user-item.group
                 {:key (str "follow-ups-user-" (:user-id u))
+                 :title (when disabled?
+                          (if (:completed? f)
+                            "Follow-up completed"
+                            "Follow-up created"))
+                 :data-toggle (when disabled? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
                  :on-click (fn [_]
                              (when-not disabled?
                                (reset! (::follow-ups s)
@@ -139,10 +148,7 @@
                   [:div.user-name
                     (utils/name-or-email u)]]
                 [:div.follow-ups-user-right.group
-                  (carrot-checkbox {:selected f
-                                    :disabled disabled?
-                                    :tooltip (when disabled?
-                                              (if (:completed? f)
-                                                "Follow-up completed"
-                                                "Follow-up created"))
-                                    :tooltip-placement "left"})]])]]]]))
+                  (carrot-checkbox {:selected (if disabled?
+                                                (:completed? f)
+                                                f)
+                                    :disabled disabled?})]])]]]]))

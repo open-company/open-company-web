@@ -5,6 +5,7 @@ div.carrot-checkbox {
   width: 16px;
   height: 16px;
   cursor: pointer;
+  background-color: transparent;
 
   &.selected {
     border: 1.5px solid $carrot_green;
@@ -17,8 +18,11 @@ div.carrot-checkbox {
 
   &.disabled {
     border: 1.5px solid $light_navy;
-    background-color: $light_navy;
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  &.selected.disabled {
+    background-color: $light_navy;
   }
 }
