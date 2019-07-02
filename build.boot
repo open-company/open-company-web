@@ -287,7 +287,9 @@
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (watch)
-        (cljs :ids #{"electron/main"}
+        ;; double backslash necessary for building on Windows
+        ;; https://github.com/boot-clj/boot-cljs/pull/118
+        (cljs :ids #{"electron\\main"}
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        true
                                                    'oc.electron.main/web-origin  "http://localhost:3559"
@@ -298,7 +300,7 @@
   "Carrot electron app loading staging.carrot.io"
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
-  (comp (cljs :ids #{"electron/main"}
+  (comp (cljs :ids #{"electron\\main"}
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        false
                                                    'oc.electron.main/web-origin  "https://staging.carrot.io"
@@ -309,7 +311,7 @@
   "Carrot electron app loading production carrot.io"
   []
   (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
-  (comp (cljs :ids #{"electron/main"}
+  (comp (cljs :ids #{"electron\\main"}
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        false
                                                    'oc.electron.main/web-origin  "https://carrot.io"
