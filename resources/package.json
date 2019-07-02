@@ -27,7 +27,7 @@
       "sign": false
     },
     "win": {
-      "target": "appx",
+      "target": ["appx"],
       "icon": "carrot.iconset/icon.ico"
     },
     "afterSign": "electron/notarize.js",
