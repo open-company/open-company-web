@@ -1017,7 +1017,7 @@
      (fn [{:keys [success status body]}]
        (when success
          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-       (notification-actions/show-notification {:title (if success "Follow up completed" "An error occurred")
+       (notification-actions/show-notification {:title (if success "Follow-up completed" "An error occurred")
                                                :description (when-not success "Please try again")
                                                :dismiss true
                                                :expire 3
@@ -1030,7 +1030,7 @@
      (fn [{:keys [status body success]}]
       (when success
         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-      (notification-actions/show-notification {:title (if success "Follow up created" "An error occurred")
+      (notification-actions/show-notification {:title (if success "Follow-up created" "An error occurred")
                                                :description (when-not success "Please try again")
                                                :dismiss true
                                                :expire 3

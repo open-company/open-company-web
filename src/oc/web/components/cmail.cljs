@@ -331,7 +331,7 @@
     (when-not is-mobile?
       [:div.follow-up-tag.white-bg])
     [:div.follow-ups-label
-      "Follow ups will be created for "
+      "Follow-ups will be created for "
       [:span.follow-ups-label-count
         (count (:follow-ups cmail-data)) " "
         (if (= (count (:follow-ups cmail-data)) 1)
@@ -577,7 +577,7 @@
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :on-click #(delete-clicked s % cmail-data)}]]]
           [:button.mlb-reset.follow-up-button
-            {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow up" "Create follow up")
+            {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
              :data-toggle "tooltip"
              :data-placement "bottom"
              :data-container "body"

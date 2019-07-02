@@ -158,7 +158,7 @@
                                 (when (fn? will-close)
                                   (will-close))
                                 (activity-actions/complete-follow-up entity-data assigned-follow-up-data))}
-                  "Complete follow up"]
+                  "Complete follow-up"]
                 (when create-follow-up-link
                   [:li.create-follow-up
                     {:ref "more-menu-create-follow-up-bt"
@@ -168,7 +168,7 @@
                                   (when (fn? will-close)
                                     (will-close))
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Create follow up"])))])
+                    "Create follow-up"])))])
         (when (and external-share
                    share-link)
           [:button.mlb-reset.more-menu-share-bt
@@ -196,7 +196,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Complete follow up"}]
+               :title "Complete follow-up"}]
             (when create-follow-up-link
               [:button.mlb-reset.more-menu-create-follow-up-bt
                 {:type "button"
@@ -209,4 +209,4 @@
                               (activity-actions/create-self-follow-up entity-data create-follow-up-link))
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
-                 :title "Create follow up"}])))])))
+                 :title "Create follow-up"}])))])))

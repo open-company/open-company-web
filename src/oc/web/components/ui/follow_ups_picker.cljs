@@ -63,7 +63,7 @@
       [:div.follow-ups-picker-container
         [:div.follow-ups-picker-header
           [:div.follow-ups-picker-header-title
-            "Create follow ups"]
+            "Create follow-ups"]
           [:button.mlb-reset.save-bt
             {:on-click #(do
                          (when (fn? follow-ups-picker-callback)
