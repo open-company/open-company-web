@@ -1000,9 +1000,9 @@
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
     (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
     (api/mark-unread mark-unread-link (:board-uuid activity-data)
-     (fn [{:keys [error success]}]
+     (fn [{:keys [success]}]
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
-                                               :description (when error "Please try again")
+                                               :description (when-not success "Please try again")
                                                :dismiss true
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
@@ -1016,11 +1016,23 @@
     (api/complete-follow-up complete-follow-up-link
      (fn [{:keys [success status body]}]
        (when success
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+       (notification-actions/show-notification {:title (if success "Follow up completed" "An error occurred")
+                                               :description (when-not success "Please try again")
+                                               :dismiss true
+                                               :expire 3
+                                               :id (if success :self-follow-up-completed
+                                                    :self-follow-up-completed-error)})))))
 
 (defn create-self-follow-up [entry-data create-follow-up-link]
   (when create-follow-up-link
     (api/create-follow-ups create-follow-up-link {:self true}
      (fn [{:keys [status body success]}]
       (when success
-        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
+        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+      (notification-actions/show-notification {:title (if success "Follow up created" "An error occurred")
+                                               :description (when-not success "Please try again")
+                                               :dismiss true
+                                               :expire 3
+                                               :id (if success :self-follow-up-created
+                                                    :self-follow-up-created-error)})))))
