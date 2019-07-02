@@ -23,9 +23,24 @@
     (reset! (::users-list s) users-list)
     (reset! (::follow-ups s) filtered-follow-ups)))
 
+(defn user-match [query user]
+  (let [r (js/RegExp (str "^.*(" query ").*$") "i")]
+    (or (and (:name user) (.match (:name user) r))
+        (and (:first-name user) (.match (:first-name user) r))
+        (and (:last-name user) (.match (:last-name user) r))
+        (and (:email user) (.match (:email user) r)))))
+
+(defn- filter-users [s]
+  (let [users-list @(::users-list s)
+        query @(::query s)]
+    (if (seq query)
+      (filterv #(user-match query %) users-list)
+      users-list)))
+
 (rum/defcs follow-ups-picker < rum/reactive
                                (rum/local [] ::users-list)
                                (rum/local [] ::follow-ups)
+                               (rum/local "" ::query)
                                (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
@@ -40,7 +55,8 @@
         team-roster (drv/react s :team-roster)
         users-list @(::users-list s)
         follow-ups @(::follow-ups s)
-        follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)]
+        follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)
+        filtered-users-list (filter-users s)]
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -53,44 +69,56 @@
                          (when (fn? follow-ups-picker-callback)
                            (follow-ups-picker-callback @(::follow-ups s)))
                          (nav-actions/close-all-panels))}
-            "Save"]]
+            "Save"]
+          [:button.mlb-reset.cancel-bt
+            {:on-click #(nav-actions/close-all-panels)}
+            "Cancel"]]
         [:div.follow-ups-picker-body
+          [:div.follow-ups-picker-section-count
+            (str (:board-name activity-data) " has " (count users-list) " member" (when (not= (count users-list) 1) "s"))]
           [:div.follow-ups-picker-body-head.group
             [:div.follow-ups-users-count
               (cond
                 (zero? (count follow-ups))
                 "No one selected"
                 (= (count follow-ups) 1)
-                "1 person"
+                "1 person selected"
                 :else
-                (str (count follow-ups) " people"))]
+                (str (count follow-ups) " people selected"))]
             [:div.follow-ups-users-bt
-              (cond
-                (< (count follow-ups) (count users-list))
-                [:button.mlb-reset.select-all
-                  {:on-click (fn [_]
-                              (reset! (::follow-ups s) (map (fn [user]
-                                                              (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
-                                                                (or f
-                                                                    (hash-map :assignee (activity-actions/author-for-user user)
-                                                                              :completed? false))))
-                                                        users-list)))}
-                  "Select all"]
-                :else
-                [:button.mlb-reset.deselect-all
-                  {:on-click (fn [_]
-                              (reset! (::follow-ups s)
-                               (remove nil?
-                                (map (fn [user]
-                                      (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
-                                        (when (or (:completed? f)
-                                                  (and (map? (:author f))
-                                                       (not= (-> f :author :user-id) (jwt/user-id))))
-                                          f)))
-                                users-list))))}
-                  "Deselect all"])]]
+              (when-not (seq @(::query s))
+                (cond
+                  (< (count follow-ups) (count users-list))
+                  [:button.mlb-reset.select-all
+                    {:on-click (fn [_]
+                                (reset! (::follow-ups s) (map (fn [user]
+                                                                (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
+                                                                  (or f
+                                                                      (hash-map :assignee (activity-actions/author-for-user user)
+                                                                                :completed? false))))
+                                                          users-list)))}
+                    "Select all"]
+                  :else
+                  [:button.mlb-reset.deselect-all
+                    {:on-click (fn [_]
+                                (reset! (::follow-ups s)
+                                 (remove nil?
+                                  (map (fn [user]
+                                        (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
+                                          (when (or (:completed? f)
+                                                    (and (map? (:author f))
+                                                         (not= (-> f :author :user-id) (jwt/user-id))))
+                                            f)))
+                                  users-list))))}
+                    "Deselect all"]))]]
+          [:div.follow-ups-users-search
+            [:input.follow-ups-query.oc-input
+              {:value @(::query s)
+               :type "search"
+               :on-change #(reset! (::query s) (.. % -target -value))
+               :placeholder "Add member by name..."}]]
           [:div.follow-ups-users-list
-            (for [u users-list
+            (for [u filtered-users-list
                   :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
                         disabled? (or (:completed? f)
                                       (and (map? (:author f))

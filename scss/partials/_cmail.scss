@@ -255,80 +255,22 @@ div.cmail-outer {
           }
         }
 
-        div.follow-ups-toggle-container {
-          float: left;
-          position: relative;
-          width: 32px;
-          height: 20px;
-          margin-top: 6px;
-          margin-left: 16px;
-
-          .tooltip {
-            width: 97px;
-          }
-
-          &.on {
-            div.follow-ups-toggle {
-              background-color: rgba($sea_blue, 0.2);
-
-              span.follow-ups-toggle-circle {
-                margin-left: 12px;
-                background-color: $sea_blue;
-                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
-              }
-            }
-          }
-
-          &.disabled {
-            div.follow-ups-toggle {
-              opacity: 0.5;
-              cursor: not-allowed;
-            }
-          }
-
-          div.follow-ups-toggle {
-            width: 32px;
-            height: 16px;
-            position: absolute;
-            top: 2px;
-            left: 0px;
-            background-color: $ultra_light_grey;
-            border-radius: 100px;
-            cursor: pointer;
-
-            span.follow-ups-toggle-circle {
-              display: block;
-              width: 20px;
-              height: 20px;
-              position: absolute;
-              top: -2px;
-              left: 0px;
-              border-radius: 50%;
-              background-color: rgba($deep_navy, 0.5);
-              background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
-              background-size: 8px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
-              transition: margin-left 180ms ease-in, background-color 180ms ease-in;
-              box-shadow: 0 2px 2px 0 rgba(0,0,0,0.12);
-            }
-          }
+        button.mobile-follow-up-button {
+          display: none;
 
           @include tablet() {
-            &.on {
-              div.follow-ups-toggle {
-                background-color: rgba($sea_blue, 0.2);
-              }
-            }
-
-            div.follow-ups-toggle {
-              background-color: $ultra_light_grey;
-
-              span.follow-ups-toggle-circle {
-                background-color: rgba($deep_navy, 0.5);
-                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
-              }
-            }
+            display: block;
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/follow_up_add.svg");
+            background-size: 14px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            padding: 0;
+            float: left;
+            margin-left: 16px;
+            margin-top: 8px;
           }
         }
 
@@ -343,9 +285,9 @@ div.cmail-outer {
       div.cmail-header-right-buttons {
         position: absolute;
         height: 32px;
-        right: 96px;
+        right: 120px;
         top: 12px;
-        padding: 4px 20px 4px 0px;
+        padding: 4px 11px 4px 0px;
         border-right: 1px solid $ultra_light_grey;
 
         @include tablet() {
@@ -419,6 +361,32 @@ div.cmail-outer {
             left: unset;
             top: 28px;
           }
+        }
+      }
+
+      button.follow-up-button {
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/follow_up_add.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: absolute;
+        right: 83px;
+        top: 16px;
+        opacity: 0.5;
+        padding: 0;
+
+        &:not(.disabled):hover {
+          opacity: 1;
+        }
+
+        &.disabled {
+          cursor: not-allowed;
+        }
+
+        @include tablet() {
+          display: none;
         }
       }
 
@@ -515,19 +483,21 @@ div.cmail-outer {
 
     div.follow-ups-header {
       width: 100%;
-      min-height: 40px;
+      height: 40px;
       background-color: $sea_blue;
-      padding: 20px;
+      padding: 10px 16px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
+      position: relative;
 
       @include follow-up-tag();
 
       @include tablet() {
         text-align: center;
         width: 100%;
+        height: auto;
         padding: 8px 32px;
 
         div.follow-up-tag {
@@ -545,6 +515,24 @@ div.cmail-outer {
           color: white;
           text-decoration: underline;
 
+        }
+      }
+
+      button.remove-follow-up-button {
+        position: absolute;
+        right: 16px;
+        top: 8px;
+        width: auto;
+        height: 24px;
+        padding: 0;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 24px;
+        color: white;
+        opacity: 0.5;
+
+        &:hover {
+          opacity: 1;
         }
       }
     }
