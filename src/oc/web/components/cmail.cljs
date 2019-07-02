@@ -577,7 +577,7 @@
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :on-click #(delete-clicked s % cmail-data)}]]]
           [:button.mlb-reset.follow-up-button
-            {:title "Follow up"
+            {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow up" "Create follow up")
              :data-toggle "tooltip"
              :data-placement "bottom"
              :data-container "body"
