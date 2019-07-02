@@ -32,6 +32,10 @@
   []
   (= (.-platform js/process) "darwin"))
 
+(defn win32?
+  []
+  (= (.-platform js/process) "win32"))
+
 (defn- load-page
   [window]
   (println "Loading " init-url)
@@ -101,6 +105,8 @@
         (load-page @main-window)
         (when dev? (.openDevTools @main-window))
         ;; -- Main window event handlers --
+        (.on @main-window "ready-to-show" #(when (win32?)
+                                             (.removeMenu @main-window)))
         (.on @main-window "close" #(if @quitting?
                                      (reset! main-window nil)
                                      (do (.preventDefault %)
