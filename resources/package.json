@@ -26,6 +26,10 @@
     "dmg": {
       "sign": false
     },
+    "win": {
+      "target": "appx",
+      "icon": "carrot.iconset/icon.ico"
+    },
     "afterSign": "electron/notarize.js",
     "icon": "carrot.iconset/icon.icns",
     "publish": ["github"]
