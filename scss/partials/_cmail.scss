@@ -285,13 +285,37 @@ div.cmail-outer {
       div.cmail-header-right-buttons {
         position: absolute;
         height: 32px;
-        right: 120px;
+        right: 97px;
         top: 12px;
-        padding: 4px 11px 4px 0px;
+        padding: 4px 19px 4px 0px;
         border-right: 1px solid $ultra_light_grey;
 
         @include tablet() {
           display: none;
+        }
+
+        button.follow-up-button {
+          width: 24px;
+          height: 24px;
+          background-image: cdnUrl("/img/ML/follow_up_add.svg");
+          background-size: 14px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.5;
+          padding: 0;
+          float: left;
+
+          &:not(.disabled):hover {
+            opacity: 1;
+          }
+
+          &.disabled {
+            cursor: not-allowed;
+          }
+
+          @include tablet() {
+            display: none;
+          }
         }
 
         div.delete-button-container {
@@ -338,7 +362,7 @@ div.cmail-outer {
 
         div.emoji-picker {
           float: left;
-          margin-left: 0;
+          margin-left: 8px;
 
           button.emoji-button {
             width: 24px;
@@ -361,32 +385,6 @@ div.cmail-outer {
             left: unset;
             top: 28px;
           }
-        }
-      }
-
-      button.follow-up-button {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/follow_up_add.svg");
-        background-size: 14px 14px;
-        background-position: center;
-        background-repeat: no-repeat;
-        position: absolute;
-        right: 83px;
-        top: 16px;
-        opacity: 0.5;
-        padding: 0;
-
-        &:not(.disabled):hover {
-          opacity: 1;
-        }
-
-        &.disabled {
-          cursor: not-allowed;
-        }
-
-        @include tablet() {
-          display: none;
         }
       }
 
@@ -509,7 +507,6 @@ div.cmail-outer {
         color: white;
         @include OC_Body_Book();
         font-size: 14px;
-        margin-left: 8px;
 
         span.follow-ups-label-count {
           color: white;

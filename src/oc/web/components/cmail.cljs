@@ -322,28 +322,40 @@
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (defn- follow-ups-header [cmail-data is-mobile? can-toggle-follow-ups?]
-  [:div.follow-ups-header
-    {:on-click (fn [_]
-                 (nav-actions/show-follow-ups-picker nil
-                  (fn [users-list]
-                    (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
-                                                                     :follow-ups users-list})]))))}
-    (when-not is-mobile?
-      [:div.follow-up-tag.white-bg])
-    [:div.follow-ups-label
-      "Follow-ups will be created for "
-      [:span.follow-ups-label-count
-        (count (:follow-ups cmail-data)) " "
-        (if (= (count (:follow-ups cmail-data)) 1)
-          "person"
-          "people")]
-      " in the “"
-      (:board-name cmail-data)
-      "” section."]
-    (when (and can-toggle-follow-ups?
-               (not is-mobile?))
-      [:button.mlb-reset.remove-follow-up-button
-        "Remove"])])
+  (let [published-entry? (= (:status cmail-data) "published")
+        completed-follow-ups (filterv :completed? (:follow-ups cmail-data))]
+    [:div.follow-ups-header
+      {:on-click (fn [_]
+                   (nav-actions/show-follow-ups-picker nil
+                    (fn [users-list]
+                      (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
+                                                                       :follow-ups users-list})]))))}
+      (when-not is-mobile?
+        [:div.follow-up-tag.white-bg])
+      [:div.follow-ups-label
+        "Follow-ups "
+        (when-not published-entry?
+          "will be ")
+        "created for "
+        [:span.follow-ups-label-count
+          (count (:follow-ups cmail-data)) " "
+          (if (= (count (:follow-ups cmail-data)) 1)
+            "person"
+            "people")]
+        (when (and published-entry?
+                   (seq completed-follow-ups))
+          (str " (" (count completed-follow-ups) " completed)"))
+        " in the “"
+        (:board-name cmail-data)
+        "” section."]
+      (when (and can-toggle-follow-ups?
+                 (not is-mobile?))
+        [:button.mlb-reset.remove-follow-up-button
+          {:on-click (fn [e]
+                       (utils/event-stop e)
+                       (when can-toggle-follow-ups?
+                         (activity-actions/cmail-toggle-follow-up cmail-data)))}
+          "Remove"])]))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
@@ -555,6 +567,15 @@
                             (activity-actions/cmail-toggle-follow-up cmail-data))
                :class (when-not can-toggle-follow-ups? "disabled")}]]
           [:div.cmail-header-right-buttons
+            (when-not (seq (:follow-ups cmail-data))
+              [:button.mlb-reset.follow-up-button
+                {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
+                 :data-toggle "tooltip"
+                 :data-placement "bottom"
+                 :data-container "body"
+                 :on-click #(when can-toggle-follow-ups?
+                              (activity-actions/cmail-toggle-follow-up cmail-data))
+                 :class (when-not can-toggle-follow-ups? "disabled")}])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 24
                            :height 24
@@ -576,14 +597,6 @@
                  :data-container "body"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :on-click #(delete-clicked s % cmail-data)}]]]
-          [:button.mlb-reset.follow-up-button
-            {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
-             :data-toggle "tooltip"
-             :data-placement "bottom"
-             :data-container "body"
-             :on-click #(when can-toggle-follow-ups?
-                          (activity-actions/cmail-toggle-follow-up cmail-data))
-             :class (when-not can-toggle-follow-ups? "disabled")}]
           [:button.mlb-reset.post-button
             {:ref "post-btn"
              :on-click #(post-clicked s)
