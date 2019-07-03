@@ -93,7 +93,9 @@
   (let [ap-initial-at (:ap-initial-at @dis/app-state)
         boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "entries")
-        recent-activity-link (utils/link-for (:links org-data) "activity")]
+        recent-activity-link (utils/link-for (:links org-data) "activity")
+        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
+        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups")] ;; FIXME: change rel to "recent-follow-ups"
     (when complete-refresh?
       (when (router/current-activity-id)
         (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
@@ -102,12 +104,17 @@
       (when activity-link
         (aa/activity-get org-data ap-initial-at))
       (when recent-activity-link
-        (aa/recent-activity-get org-data ap-initial-at)))
+        (aa/recent-activity-get org-data ap-initial-at))
+      (when follow-ups-link
+        (aa/follow-ups-get org-data))
+      (when recent-follow-ups-link
+        (aa/recent-follow-ups-get org-data)))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
            (or (= (router/current-board-slug) "all-posts")
-               (= (router/current-board-slug) "must-see")))
+               (= (router/current-board-slug) "must-see")
+               (= (router/current-board-slug) "follow-ups")))
       (when-not activity-link
         (check-org-404))
 
