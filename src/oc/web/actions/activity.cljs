@@ -51,7 +51,52 @@
     (when (seq cleaned-ids)
       (api/request-reads-count cleaned-ids))))
 
+;; Follow-ups stream
+
+(defn follow-ups-get-finish [sort-type {:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          posts-data-key (dis/posts-data-key org)
+          follow-ups-data (when success (json->cljs body))
+          fixed-follow-ups (au/fix-container (:collection follow-ups-data) (dis/change-data) org-data)]
+      (request-reads-count (keys (:fixed-items fixed-follow-ups)))
+      (watch-boards (:fixed-items fixed-follow-ups))
+      (dis/dispatch! [:follow-ups-get/finish org sort-type fixed-follow-ups]))))
+
+(defn- follow-ups-real-get [follow-ups-link sort-type org-slug finish-cb]
+  (api/get-all-posts follow-ups-link nil
+   (fn [resp]
+     (follow-ups-get-finish sort-type resp)
+     (when (fn? finish-cb)
+       (finish-cb resp)))))
+
+(defn follow-ups-get [org-data & [finish-cb]]
+  (when-let [follow-ups-link (utils/link-for (:links org-data) "follow-ups")]
+    (follow-ups-real-get follow-ups-link :recently-posted (:slug org-data) finish-cb)))
+
+(defn recent-follow-ups-get [org-data & [finish-cb]]
+  (when-let [recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups")]
+    (follow-ups-real-get recent-follow-ups-link :recent-activity (:slug org-data) finish-cb)))
+
+(defn follow-ups-sort-get [org-data & [finish-cb]]
+  (let [sort-type (router/current-sort-type)
+        follow-ups-link-rel (if (= sort-type dis/default-sort-type) "follow-ups" "follow-ups")  ;; FIXME: change first rel to "recent-follow-ups"
+        follow-ups-link (utils/link-for (:links org-data) follow-ups-link-rel)]
+    (when follow-ups-link
+      (follow-ups-real-get follow-ups-link sort-type (:slug org-data) finish-cb))))
+
+(defn follow-ups-more-finish [direction sort-type {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
+  (dis/dispatch! [:follow-ups-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
+
+(defn follow-ups-more [more-link direction]
+  (api/load-more-items more-link direction (partial follow-ups-more-finish direction (router/current-sort-type)))
+  (dis/dispatch! [:follow-ups-more (router/current-org-slug) (router/current-sort-type)]))
+
 ;; All Posts
+
 (defn all-posts-get-finish [sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
@@ -794,34 +839,6 @@
        (swap! wrt-timeouts-list dissoc activity-id)
        (send-item-read activity-id))))))
 
-(defn toggle-must-see [activity-data]
-  (let [must-see (:must-see activity-data)
-        must-see-toggled (update-in activity-data [:must-see] not)
-        org-data (dis/org-data)
-        must-see-count (:must-see-count dis/org-data)
-        new-must-see-count (if-not must-see
-                             (inc must-see-count)
-                             (dec must-see-count))
-        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (dis/dispatch! [:org-loaded
-                    (assoc org-data :must-see-count new-must-see-count)
-                    false])
-    (dis/dispatch! [:must-see-toggle (router/current-org-slug) must-see-toggled])
-    (api/patch-entry patch-entry-link must-see-toggled :must-see
-                      (fn [entry-data edit-key {:keys [success body status]}]
-                        (if success
-                          (let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
-                            (api/get-org org-link
-                              (fn [{:keys [status body success]}]
-                                (let [api-org-data (json->cljs body)]
-                                  (dis/dispatch! [:org-loaded api-org-data false])
-                                  (must-see-get api-org-data)))))
-                          (dis/dispatch! [:activity-get/finish
-                                           status
-                                           (router/current-org-slug)
-                                           (json->cljs body)
-                                           nil]))))))
-
 (defun author-for-user
   ([user :guard map?]
    (if (contains? user :name)
@@ -959,10 +976,6 @@
   (dis/dispatch! [:input [:cmail-state] nil])
   (dom-utils/unlock-page-scroll))
 
-(defn cmail-toggle-must-see []
-  (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
-                                                   :has-changes true})]))
-
 (defonce cmail-reopen-only-one (atom false))
 
 (defn cmail-reopen? []
@@ -1022,7 +1035,9 @@
                                                :dismiss true
                                                :expire 3
                                                :id (if success :self-follow-up-completed
-                                                    :self-follow-up-completed-error)})))))
+                                                    :self-follow-up-completed-error)})
+       ;; TODO: refresh follow-ups stream
+       ))))
 
 (defn create-self-follow-up [entry-data create-follow-up-link]
   (when create-follow-up-link
@@ -1035,4 +1050,6 @@
                                                :dismiss true
                                                :expire 3
                                                :id (if success :self-follow-up-created
-                                                    :self-follow-up-created-error)})))))
+                                                    :self-follow-up-created-error)})
+      ;; TODO: refresh follow-ups stream
+      ))))
