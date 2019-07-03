@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
@@ -30,12 +31,18 @@
         (and (:last-name user) (.match (:last-name user) r))
         (and (:email user) (.match (:email user) r)))))
 
+(defn- sort-users [users-list]
+  (let [self-user (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) users-list))
+        other-users (filterv #(not= (-> % :assignee :user-id) (jwt/user-id)) users-list)]
+    (vec (concat self-user (sort-by #(-> % :assignee :name) other-users)))))
+
 (defn- filter-users [s]
   (let [users-list @(::users-list s)
-        query @(::query s)]
-    (if (seq query)
-      (filterv #(user-match query %) users-list)
-      users-list)))
+        query @(::query s)
+        users (if (seq query)
+                (filterv #(user-match query %) users-list)
+                users-list)]
+    (sort-users users)))
 
 (rum/defcs follow-ups-picker < rum/reactive
                                (rum/local [] ::users-list)
@@ -57,7 +64,9 @@
         users-list @(::users-list s)
         follow-ups @(::follow-ups s)
         follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)
-        filtered-users-list (filter-users s)]
+        filtered-users-list (filter-users s)
+        current-user-id (jwt/user-id)
+        is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -108,7 +117,7 @@
                                         (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
                                           (when (or (:completed? f)
                                                     (and (map? (:author f))
-                                                         (not= (-> f :author :user-id) (jwt/user-id))))
+                                                         (not= (-> f :author :user-id) current-user-id)))
                                             f)))
                                   users-list))))}
                     "Deselect all"]))]]
@@ -123,7 +132,7 @@
                   :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
                         disabled? (or (:completed? f)
                                       (and (map? (:author f))
-                                           (not= (-> f :author :user-id) (jwt/user-id))))]]
+                                           (not= (-> f :author :user-id) current-user-id)))]]
               [:div.follow-ups-user-item.group
                 {:key (str "follow-ups-user-" (:user-id u))
                  :title (when disabled?
@@ -145,7 +154,10 @@
                   {:class (when disabled? "disabled")}
                   (user-avatar-image u)
                   [:div.user-name
-                    (utils/name-or-email u)]]
+                    (str
+                     (utils/name-or-email u)
+                     (when (= (:user-id u) current-user-id)
+                       (str " (you)")))]]
                 [:div.follow-ups-user-right.group
                   (carrot-checkbox {:selected (if disabled?
                                                 (:completed? f)
