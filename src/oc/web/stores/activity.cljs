@@ -378,8 +378,8 @@
         recent-follow-up-data (get-in db recent-follow-up-key)]
     (-> db
       (assoc-in activity-key entry-data)
-      (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list follow-ups-data)))
-      (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list recent-follow-ups-data))))))
+      (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list follow-up-data)))
+      (assoc-in (conj recent-follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list recent-follow-up-data))))))
 
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]
