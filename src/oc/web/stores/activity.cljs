@@ -11,8 +11,8 @@
   [db org-slug activity-data]
   (let [;; Add/remove item from AP
         is-published? (= (:status activity-data) "published")
-        ap-key (dispatcher/container-key org-slug :all-posts dispatcher/default-sort-type)
-        recent-ap-key (dispatcher/container-key org-slug :all-posts dispatcher/other-sort-type)
+        ap-key (dispatcher/container-key org-slug :all-posts dispatcher/other-sort-type)
+        recent-ap-key (dispatcher/container-key org-slug :all-posts dispatcher/default-sort-type)
         old-ap-data (get-in db ap-key)
         old-recent-ap-data (get-in db recent-ap-key)
         old-ap-data-posts (get old-ap-data :posts-list)
@@ -41,8 +41,8 @@
         user-follow-up (first (filterv #(= (-> % :assignee :user-id) (j/user-id)) (:follow-ups activity-data)))
         is-follow-ups? (and (not= (:status activity-data) "draft")
                             (not (:completed? user-follow-up)))
-        fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-        recent-fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
+        fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
+        recent-fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
         old-fu-data (get-in db fu-key)
         old-recent-fu-data (get-in db recent-fu-key)
         old-fu-data-posts (get old-fu-data :posts-list)
@@ -368,6 +368,18 @@
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)))
     db))
+
+(defmethod dispatcher/action :follow-up-complete
+  [db [_ org-slug entry-data]]
+  (let [activity-key (dispatcher/activity-key org-slug (:uuid entry-data))
+        follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
+        follow-up-data (get-in db follow-up-key)
+        recent-follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
+        recent-follow-up-data (get-in db recent-follow-up-key)]
+    (-> db
+      (assoc-in activity-key entry-data)
+      (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list follow-ups-data)))
+      (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list recent-follow-ups-data))))))
 
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]

@@ -1024,8 +1024,14 @@
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))
 
-(defn complete-follow-up [entity-data assigned-follow-up]
-  (let [complete-follow-up-link (utils/link-for (:links assigned-follow-up) "mark-complete" "POST")]
+(defn complete-follow-up [entry-data assigned-follow-up]
+  (let [self-follow-up-index (utils/index-of (:follow-ups entry-data) #(= (-> % :assignee :user-id) (jwt/user-id)))
+        self-follow-up (get (:follow-ups entry-data) self-follow-up-index)
+        with-completed-follow-up (assoc-in entry-data [:follow-ups self-follow-up-index]
+                                  (merge self-follow-up-index {:completed? true
+                                                               :completed-at (utils/as-of-now)}))
+        complete-follow-up-link (utils/link-for (:links assigned-follow-up) "mark-complete" "POST")]
+    (dis/dispatch! [:follow-up-complete (router/current-org-slug) with-completed-follow-up])
     (api/complete-follow-up complete-follow-up-link
      (fn [{:keys [success status body]}]
        (when success
@@ -1035,21 +1041,20 @@
                                                :dismiss true
                                                :expire 3
                                                :id (if success :self-follow-up-completed
-                                                    :self-follow-up-completed-error)})
-       ;; TODO: refresh follow-ups stream
-       ))))
+                                                    :self-follow-up-completed-error)})))))
 
 (defn create-self-follow-up [entry-data create-follow-up-link]
-  (when create-follow-up-link
-    (api/create-follow-ups create-follow-up-link {:self true}
-     (fn [{:keys [status body success]}]
-      (when success
-        (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-      (notification-actions/show-notification {:title (if success "Follow-up created" "An error occurred")
-                                               :description (when-not success "Please try again")
-                                               :dismiss true
-                                               :expire 3
-                                               :id (if success :self-follow-up-created
-                                                    :self-follow-up-created-error)})
-      ;; TODO: refresh follow-ups stream
-      ))))
+  (let [org-data (dis/org-data)]
+    (when create-follow-up-link
+      (api/create-follow-ups create-follow-up-link {:self true}
+       (fn [{:keys [status body success]}]
+        (when success
+          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+        (notification-actions/show-notification {:title (if success "Follow-up created" "An error occurred")
+                                                 :description (when-not success "Please try again")
+                                                 :dismiss true
+                                                 :expire 3
+                                                 :id (if success :self-follow-up-created
+                                                      :self-follow-up-created-error)})
+        (follow-ups-get org-data)
+        (recent-follow-ups-get org-data))))))
