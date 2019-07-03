@@ -93,11 +93,15 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         is-all-posts (= (router/current-board-slug) "all-posts")
+        is-follow-ups (= (router/current-board-slug) "follow-ups")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
-        show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
+        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "activity"))
+        show-follow-ups (and user-is-part-of-the-team?
+                             (utils/link-for (:links org-data) "follow-ups"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
@@ -123,6 +127,15 @@
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
+        (when show-follow-ups
+          [:a.follow-ups.hover-item.group
+            {:class (utils/class-set {:item-selected is-follow-ups})
+             :href (oc-urls/follow-ups)
+             :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
+            [:div.follow-ups-icon]
+            [:div.follow-ups-label
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
+              "Follow-ups"]])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-posts (dis/draft-posts-data)

@@ -545,6 +545,14 @@
       (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
       (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
+    (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
+      (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
+      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+
+    (defroute follow-ups-slash-route (str (urls/follow-ups ":org") "/") {:as params}
+      (timbre/info "Routing follow-ups-slash-route" (str (urls/follow-ups ":org") "/"))
+      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
