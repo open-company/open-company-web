@@ -11,10 +11,6 @@ div.stream-comments {
             div.stream-comment-floating-buttons {
               display: none;
             }
-
-            div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
-              display: none;
-            }
           }
         }
       }
@@ -36,10 +32,6 @@ div.stream-comments {
           background-color: #F5F5F5;
 
           div.stream-comment-floating-buttons {
-            display: block;
-          }
-
-          div.stream-comment-header div.stream-comment-author-right div.stream-comment-author-timestamp {
             display: block;
           }
         }
@@ -247,7 +239,6 @@ div.stream-comments {
             float: left;
             margin-left: 8px;
             line-height: 14px;
-            display: none;
           }
         }
       }

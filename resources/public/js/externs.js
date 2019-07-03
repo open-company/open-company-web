@@ -150,6 +150,7 @@ var init_fullstory = function(){};
 var FS = function(){};
 FS.setUserVars = function(){};
 FS.getCurrentSessionURL = function(){};
+FS.identify = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -184,3 +185,4 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// Fullstory
