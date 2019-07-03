@@ -184,7 +184,7 @@ div.org-settings-modal {
           margin-top: 7px;
 
           &:disabled, &.disabled {
-            color:$deep_navy;
+            color:rgba($deep_navy, 0.5);
             opacity: 1;
           }
         }
