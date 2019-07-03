@@ -12,6 +12,7 @@
                           :show-login-overlay false}))
 
 (def default-sort-type :recent-activity)
+(def other-sort-type :recently-posted)
 
 ;; Data key paths
 
@@ -151,6 +152,11 @@
 (declare activity-read-data)
 (declare activity-data-get)
 
+;; Container helpers
+
+(defn- is-container? [container-slug]
+  (#{"all-posts" "must-see" "follow-ups"} container-slug))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -238,9 +244,7 @@
    :container-data      [[:base :org-slug :board-slug :sort-type]
                          (fn [base org-slug board-slug sort-type]
                            (when (and org-slug board-slug)
-                             (let [is-container? (or (= board-slug "all-posts")
-                                                     (= board-slug "must-see"))
-                                   container-key (if is-container?
+                             (let [container-key (if (is-container? (router/current-board-slug))
                                                    (container-key org-slug board-slug sort-type)
                                                    (board-data-key org-slug board-slug sort-type))]
                                (get-in base container-key))))]
@@ -722,8 +726,7 @@
   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type))))
 
 (defn print-container-data []
-  (if (or (= (router/current-board-slug) "all-posts")
-          (= (router/current-board-slug) "must-see"))
+  (if (is-container? (router/current-board-slug))
     (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
     (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))))
 
