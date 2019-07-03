@@ -598,7 +598,7 @@
       (utils/after 100 #(utils/remove-tooltips))))
   (do
     (timbre/error "Error: div#app is not defined!")
-    (sentry/capture-message "Error: div#app is not defined!")))
+    (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn init []
   ;; Setup timbre log level

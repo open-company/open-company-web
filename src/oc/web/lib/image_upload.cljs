@@ -72,7 +72,7 @@
             (when (fn? success-cb)
               (success-cb url))))))
     (catch :default e
-      (sentry/capture-error e)
+      (sentry/capture-error! e)
       (when (fn? error-cb)
         (error-cb e)))))
 
@@ -112,6 +112,6 @@
             (when (fn? success-cb)
               (success-cb url)))))
       (catch :default e
-        (sentry/capture-error e)
+        (sentry/capture-error! e)
         (when (fn? error-cb)
           (error-cb e))))))

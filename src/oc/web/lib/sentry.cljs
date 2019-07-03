@@ -4,7 +4,7 @@
             [oc.web.lib.jwt :as jwt]
             [cljsjs.sentry-browser]))
 
-(defn initParameters [dsn]
+(defn init-parameters [dsn]
   #js {:whitelistUrls ls/local-whitelist-array
        :tags #js {:isMobile (responsive/is-mobile-size?)
                   :hasJWT (not (not (jwt/jwt)))}
@@ -15,7 +15,7 @@
 
 (defn sentry-setup []
   (when (and (exists? js/Sentry) ls/local-dsn)
-    (.init js/Sentry (initParameters ls/local-dsn))
+    (.init js/Sentry (init-parameters ls/local-dsn))
     (when (jwt/jwt)
       (.setUser js/Sentry (clj->js {:user-id (jwt/get-key :user-id)
                                     :id (jwt/get-key :user-id)
@@ -29,10 +29,10 @@
     (catch :default e
       (.captureException js/Sentry e))))
 
-(defn capture-error [e]
+(defn capture-error! [e]
   (.captureException js/Sentry e))
 
-(defn capture-message [msg]
+(defn capture-message! [msg]
   (.captureMessage js/Sentry msg))
 
 (defn set-extra-context! [scope ctx & [prefix]]
@@ -44,19 +44,19 @@
 (defn capture-message-with-extra-context! [ctx message]
   (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
-    (capture-message message))))
+    (capture-message! message))))
 
 (defn capture-error-with-extra-context! [ctx error-name & [error-message]]
   (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (let [err (js/Error. (or error-message error-name))]
       (set! (.-name err) (or error-name "Error"))
-      (capture-error err)))))
+      (capture-error! err)))))
 
 (defn capture-error-with-message [error-name & [error-message]]
   (let [err (js/Error. (or error-message error-name))]
     (set! (.-name err) (or error-name "Error"))
-    (capture-error err)))
+    (capture-error! err)))
 
 (defn set-user-context! [ctx]
   (.setUser js/Sentry (when ctx (clj->js ctx))))

@@ -19,7 +19,7 @@
 (defn get-token []
   (when (or (not js/window.location.pathname)
             (not js/window.location.search))
-    (sentry/capture-message (str "Window.location problem:"
+    (sentry/capture-message! (str "Window.location problem:"
                                 " windown.location.pathname:" js/window.location.pathname
                                 " window.location.search:" js/window.location.search
                                 " return:" (str js/window.location.pathname js/window.location.search))))
