@@ -54,6 +54,9 @@
         (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-get org-data ap-initial-at)
 
+        (= (router/current-board-slug) "follow-ups")
+        (activity-actions/follow-ups-sort-get org-data ap-initial-at)
+
         (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-get org-data)
 
@@ -117,12 +120,14 @@
                      ;; Board specified
                      (and (not= (router/current-board-slug) "all-posts")
                           (not= (router/current-board-slug) "must-see")
+                          (not= (router/current-board-slug) "follow-ups")
                           (not ap-initial-at)
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
                      (and (or (= (router/current-board-slug) "all-posts")
                               (= (router/current-board-slug) "must-see")
+                              (= (router/current-board-slug) "follow-ups")
                               ap-initial-at)
                           ;; But no all-posts data yet
                          (not container-data)))
@@ -132,6 +137,7 @@
                                org-data
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")
+                               (not= (router/current-board-slug) "follow-ups")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
                              (or (and (router/current-activity-id)
