@@ -367,9 +367,9 @@
     (if (and (= status 404)
              (= activity-uuid (router/current-activity-id)))
       (routing-actions/maybe-404)
-      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (when success (json->cljs body)) nil]))
     (when (fn? loaded-cb)
-      (utils/after 100 #(loaded-cb success))))))
+      (utils/after 100 #(loaded-cb success status))))))
 
 (declare entry-revert)
 
