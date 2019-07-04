@@ -23,7 +23,7 @@
                                     :last-name (jwt/get-key :last-name)})))))
 
 (defn test-sentry []
-  (js/setTimeout #(.captureMessage js/Sentry "Message from clojure" 1000))
+  (js/setTimeout #(.captureMessage js/Sentry "Message from clojure" "info") 1000)
   (try
     (throw (js/errorThrowingCode.))
     (catch :default e
@@ -33,7 +33,7 @@
   (.captureException js/Sentry e))
 
 (defn capture-message! [msg]
-  (.captureMessage js/Sentry msg))
+  (.captureMessage js/Sentry msg "info"))
 
 (defn set-extra-context! [scope ctx & [prefix]]
   (doseq [k (keys ctx)]
