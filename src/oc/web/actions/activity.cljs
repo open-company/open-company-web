@@ -1026,10 +1026,9 @@
 
 (defn complete-follow-up [entry-data assigned-follow-up]
   (let [self-follow-up-index (utils/index-of (:follow-ups entry-data) #(= (-> % :assignee :user-id) (jwt/user-id)))
-        self-follow-up (get (:follow-ups entry-data) self-follow-up-index)
-        with-completed-follow-up (assoc-in entry-data [:follow-ups self-follow-up-index]
-                                  (merge self-follow-up-index {:completed? true
-                                                               :completed-at (utils/as-of-now)}))
+        with-completed-follow-up (update-in entry-data [:follow-ups self-follow-up-index] merge
+                                  {:completed? true
+                                   :completed-at (utils/as-of-now)})
         complete-follow-up-link (utils/link-for (:links assigned-follow-up) "mark-complete" "POST")]
     (dis/dispatch! [:follow-up-complete (router/current-org-slug) with-completed-follow-up])
     (api/complete-follow-up complete-follow-up-link
