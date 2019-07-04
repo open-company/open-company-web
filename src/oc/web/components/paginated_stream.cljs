@@ -26,14 +26,14 @@
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
   [s e]
-  (let [scroll-top (.-scrollTop (.-scrollingElement js/document))
+  (let [scroll-top (.-scrollTop (.. js/window -document -scrollingElement))
         direction (if (> @(::last-scroll s) scroll-top)
                     :up
                     (if (< @(::last-scroll s) scroll-top)
                       :down
                       :stale))
         min-scroll 60
-        max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
+        max-scroll (- (.-scrollHeight (.. js/window -document -body)) (.-innerHeight js/window))]
     ;; scrolling up
     (when (and (not @(::top-loading s))
                @(::has-prev s)
@@ -126,7 +126,7 @@
                           (check-pagination s)
                          s)
                          :did-mount (fn [s]
-                          (reset! (::last-scroll s) (.-scrollTop (.-body js/document)))
+                          (reset! (::last-scroll s) (.-scrollTop (.. js/window -document -body)))
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                           (check-pagination s)

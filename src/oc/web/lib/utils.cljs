@@ -191,11 +191,11 @@
 (defn scroll-to-y [scroll-y & [duration]]
   (if (and duration (zero? duration))
     (if (js/isEdge)
-      (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
-      (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
+      (set! (.. js/window -document -scrollingElement -scrollTop) scroll-y)
+      (.scrollTo (.. js/window -document -scrollingElement) 0 scroll-y))
     (.play
       (new Scroll
-           (.-scrollingElement js/document)
+           (.. js/window -document -scrollingElement)
            #js [0 (.-scrollY js/window)]
            #js [0 scroll-y]
            (if (integer? duration) duration oc-animation-duration)))))
@@ -281,14 +281,14 @@
       false)))
 
 (defn to-end-of-content-editable [content-editable-element]
-  (if (.-createRange js/document)
-    (let [rg (.createRange js/document)]
+  (if (.. js/window -document -createRange)
+    (let [rg (.createRange (js/window -document))]
       (.selectNodeContents rg content-editable-element)
       (.collapse rg false)
       (let [selection (.getSelection js/window)]
         (.removeAllRanges selection)
         (.addRange selection rg)))
-    (let [rg (.createTextRange (.-body js/document))]
+    (let [rg (.createTextRange (.. js/window -document -body))]
       (.moveToElementText rg content-editable-element)
       (.collapse rg false)
       (.select rg))))
@@ -536,7 +536,7 @@
 (defn ios-copy-to-clipboard [el]
   (let [old-ce (.-contentEditable el)
         old-ro (.-readOnly el)
-        rg (.createRange js/document)]
+        rg (.createRange (.-document js/window))]
     (set! (.-contentEditable el) true)
     (set! (.-readOnly el) false)
     (.selectNodeContents rg el)
@@ -552,7 +552,7 @@
     (when (and (responsive/is-tablet-or-mobile?)
                (js/isSafari))
       (ios-copy-to-clipboard el))
-    (.execCommand js/document "copy")
+    (.execCommand (.-document js/window) "copy")
     (catch :default e
       false)))
 
@@ -560,7 +560,7 @@
   (let [body-without-tags (-> body strip-img-tags strip-br-tags strip-empty-tags)
         hidden-class (str "activity-body-" (int (rand 10000)))
         $body-content (js/$ (str "<div class=\"" hidden-class " hidden\">" body-without-tags "</div>"))
-        appened-body (.append (js/$ (.-body js/document)) $body-content)
+        appened-body (.append (js/$ (.. js/window -document -body)) $body-content)
         _ (.each (js/$ (str "." hidden-class " .carrot-no-preview")) #(this-as this
                                                                         (let [$this (js/$ this)]
                                                                           (.remove $this))))
@@ -584,7 +584,7 @@
 
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.append (js/$ (.-body js/document)) $container)
+        _ (.append (js/$ (.. js/window -document -body)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))

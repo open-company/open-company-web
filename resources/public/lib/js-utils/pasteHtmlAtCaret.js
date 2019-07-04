@@ -9,9 +9,9 @@ function pasteHtmlAtCaret(html, sel, selectPastedContent) {
             // Range.createContextualFragment() would be useful here but is
             // only relatively recently standardized and is not supported in
             // some browsers (IE9, for one)
-            var el = document.createElement("div");
+            var el = window.document.createElement("div");
             el.innerHTML = html;
-            var frag = document.createDocumentFragment(), node, lastNode;
+            var frag = window.document.createDocumentFragment(), node, lastNode;
             while ( (node = el.firstChild) ) {
                 lastNode = frag.appendChild(node);
             }
@@ -78,7 +78,7 @@ function getInputSelection(el) {
         start = el.selectionStart;
         end = el.selectionEnd;
     } else {
-        range = document.selection.createRange();
+        range = window.document.selection.createRange();
 
         if (range && range.parentElement() == el) {
             len = el.value.length;

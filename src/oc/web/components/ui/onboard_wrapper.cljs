@@ -180,7 +180,7 @@
              (fn []
                (dis/dispatch! [:update [:org-editing] #(dissoc % :logo-url)])
                (gdom/removeNode img)))
-            (gdom/append (.-body js/document) img)
+            (gdom/append (.. js/window -document -body) img)
             (set! (.-src img) (:logo-url first-team)))))
       (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
@@ -431,7 +431,7 @@
                   {:logo-width (.-width img)
                    :logo-height (.-height img)})])
                (gdom/removeNode img)))
-            (gdom/append (.-body js/document) img)
+            (gdom/append (.. js/window -document -body) img)
             (set! (.-src img) (:logo-url first-team)))))
       (dis/dispatch!
        [:update
@@ -498,7 +498,7 @@
                                                               :logo-height (.-height img)})])
                                                           (gdom/removeNode img)))
                                   (set! (.-className img) "hidden")
-                                  (gdom/append (.-body js/document) img)
+                                  (gdom/append (.. js/window -document -body) img)
                                   (set! (.-src img) url)))
                               nil
                               (fn [_])
@@ -884,7 +884,7 @@
 
 (defn vertical-center-mixin [class-selector]
   {:after-render (fn [s]
-                   (let [el (js/document.querySelector class-selector)]
+                   (let [el (.querySelector (.-document js/window) class-selector)]
                      (set! (.-marginTop (.-style el)) (str (* -1 (/ (.-clientHeight el) 2)) "px")))
                    s)})
 

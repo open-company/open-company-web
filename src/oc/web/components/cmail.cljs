@@ -175,7 +175,7 @@
     (js/replaceSelectedText pasted-data)
     ; call the headline-on-change to check for content length
     (headline-on-change state)
-    (when (= (.-activeElement js/document) (.-body js/document))
+    (when (= (.. js/window -document -activeElement) (.. js/window -document -body))
       (when-let [headline-el (rum/ref-node state "headline")]
         ; move cursor at the end
         (utils/to-end-of-content-editable headline-el)))))
@@ -313,7 +313,7 @@
     (alert-modal/show-alert alert-data)))
 
 (defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
+  (or (.-clientWidth (.. js/window -document -documentElement))
       (.-innerWidth js/window)))
 
 (defn calc-video-height [s]

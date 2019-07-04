@@ -26,7 +26,7 @@ function OCStaticMailchimpApiSubmit(e, form, success, fail){
 
 function OCStaticGetCookie(name) {
   // Give a cookie name return its value
-  var value = "; " + document.cookie;
+  var value = "; " + window.document.cookie;
   var parts = value.split("; " + name + "=");
   if (parts.length == 2)
     return decodeURI(parts.pop().split(";").shift());
@@ -126,14 +126,14 @@ function OCWebSetupMarketingSiteJS(){
   });
 }
 
-document.addEventListener("DOMContentLoaded", function(_) {
+window.document.addEventListener("DOMContentLoaded", function(_) {
 
   if ($("#youtube-player").length > 0) {
     OCYTVideoInit();
   }
 
   if(OCStaticGetParameterByName("ref") === "producthunt"){
-    $(document.body).addClass("ph-banner");
+    $(window.document.body).addClass("ph-banner");
   }
 
   // Initialize tooltips
@@ -282,7 +282,7 @@ function isIE(){
 
 function OCStaticSiteMobileMenuToggle(){
   var menuClass = "mobile-menu-expanded";
-  var body = document.body;
+  var body = window.document.body;
   if (body.classList.contains(menuClass)) {
     body.querySelector("div.site-mobile-menu").classList.add("hidden");
     body.classList.remove(menuClass);
@@ -301,7 +301,7 @@ function OCStaticStartFixFixedPositioning(sel) {
   var fixFixedPosition = function() {
     $navbar.css({
       position: 'absolute',
-      top: document.body.scrollTop + 'px'
+      top: window.document.body.scrollTop + 'px'
     });
   };
   var resetFixedPosition = function() {
@@ -309,10 +309,10 @@ function OCStaticStartFixFixedPositioning(sel) {
       position: 'fixed',
       top: ''
     });
-    $(document).off('scroll', updateScrollTop);
+    $(window.document).off('scroll', updateScrollTop);
   };
   var updateScrollTop = function() {
-    $navbar.css('top', document.body.scrollTop + 'px');
+    $navbar.css('top', window.document.body.scrollTop + 'px');
   };
 
   $('input, textarea, [contenteditable=true]').on({
@@ -321,7 +321,7 @@ function OCStaticStartFixFixedPositioning(sel) {
       setTimeout(fixFixedPosition, 100);
       // Keep the fixed element absolutely positioned at the top
       // when the keyboard is visible
-      $(document).scroll(updateScrollTop);
+      $(window.document).scroll(updateScrollTop);
     },
     blur: resetFixedPosition
   });
@@ -329,11 +329,11 @@ function OCStaticStartFixFixedPositioning(sel) {
 
 
 function OCStaticShowPHBanner(){
-  $(document.body).addClass("ph-banner");
+  $(window.document.body).addClass("ph-banner");
 }
 
 function OCStaticHidePHBanner(){
-  $(document.body).removeClass("ph-banner");
+  $(window.document.body).removeClass("ph-banner");
 }
 
 var OCYTVideoPlayer = null,
@@ -343,16 +343,16 @@ OCUTVScriptAdded = false;
 function OCYTVideoInit() {
   if (!OCUTVScriptAdded) {
     OCUTVScriptAdded = true;
-    var tag = document.createElement('script');
+    var tag = window.document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
+    var firstScriptTag = window.document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
 }
 
 function onYouTubeIframeAPIReady() {
-  var winWidth = document.documentElement.clientWidth || window.innerWidth,
-  winHeight = document.documentElement.clientHeight || window.innerHeight;
+  var winWidth = window.document.documentElement.clientWidth || window.innerWidth,
+  winHeight = window.document.documentElement.clientHeight || window.innerHeight;
   OCYTVideoPlayer = new YT.Player('youtube-player', {
     height: Math.min(winHeight, 608).toString(),
     width: Math.min(winWidth, 1080).toString(),
@@ -376,7 +376,7 @@ function OCYTVideoOnPlayerReady(event) {
 }
 
 function OCStaticShowAnimationLightbox() {
-  $(document.body).addClass('show-animation-lightbox no-scroll');
+  $(window.document.body).addClass('show-animation-lightbox no-scroll');
 
   if (OCYTVideoFinished) {
     OCYTVideoPlayer.seekTo(0);
@@ -394,7 +394,7 @@ function OCYTVideoOnPlayerStateChange(event){
 
 function OCStaticHideAnimationLightbox(e) {
   OCYTVideoPlayer.pauseVideo();
-  $(document.body).removeClass('show-animation-lightbox no-scroll');
+  $(window.document.body).removeClass('show-animation-lightbox no-scroll');
   if (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -407,8 +407,8 @@ function OCStaticTextareaSaveSelection() {
         if (sel.getRangeAt && sel.rangeCount) {
             return sel.getRangeAt(0);
         }
-    } else if (document.selection && document.selection.createRange) {
-        return document.selection.createRange();
+    } else if (window.document.selection && window.document.selection.createRange) {
+        return window.document.selection.createRange();
     }
     return null;
 }
@@ -419,7 +419,7 @@ function OCStaticTextareaRestoreSelection(range) {
             var sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
-        } else if (document.selection && range.select) {
+        } else if (window.document.selection && range.select) {
             range.select();
         }
     }

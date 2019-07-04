@@ -6,15 +6,15 @@ function log(){
 function PlaceCaretAtEnd(el) {
   el.focus();
   if (typeof window.getSelection != "undefined"
-        && typeof document.createRange != "undefined") {
-    var range = document.createRange();
+        && typeof window.document.createRange != "undefined") {
+    var range = window.document.createRange();
     range.selectNodeContents(el);
     range.collapse(false);
     var sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-  } else if (typeof document.body.createTextRange != "undefined") {
-    var textRange = document.body.createTextRange();
+  } else if (typeof window.document.body.createTextRange != "undefined") {
+    var textRange = window.document.body.createTextRange();
     textRange.moveToElementText(el);
     textRange.collapse(false);
     textRange.select();
@@ -126,7 +126,7 @@ function PlaceCaretAtEnd(el) {
       // If we have a selector for an external picker
       if (this.saveSelectionClickElementId !== undefined) {
         var target = event.target,
-            el = document.getElementById(this.saveSelectionClickElementId);
+            el = window.document.getElementById(this.saveSelectionClickElementId);
         // And the target of the click is the same of the given selector
         if (target === el) {
           // Save the current selection
@@ -177,12 +177,12 @@ function PlaceCaretAtEnd(el) {
       var range, sel, el, textEl;
 
       position = position || 0;
-      range = document.createRange();
+      range = window.document.createRange();
       sel = window.getSelection();
       el = $el.get(0);
 
       if (!el.childNodes.length) {
-          textEl = document.createTextNode(' ');
+          textEl = window.document.createTextNode(' ');
           el.appendChild(textEl);
       }
 
@@ -794,7 +794,7 @@ function PlaceCaretAtEnd(el) {
     if (e.preventDefault){
       e.preventDefault();
     }
-    var p = document.querySelector("#" + uniqueID).parentNode;
+    var p = window.document.querySelector("#" + uniqueID).parentNode;
     p.parentNode.removeChild(p);
     $("div.media-picker-body").blur();
     $("div.media-picker-body").focus();

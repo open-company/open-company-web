@@ -10,11 +10,11 @@
 (def distance-from-bottom 80)
 
 (defn calc-max-height [s]
-  (let [win-height (or (.-clientHeight (.-documentElement js/document))
+  (let [win-height (or (.-clientHeight (.. js/window -document -documentElement))
                        (.-innerHeight js/window))
         dom-node (rum/dom-node s)
-        scroll-top (.-scrollTop (.-scrollingElement js/document))
-        body-rect (.getBoundingClientRect (.-body js/document))
+        scroll-top (.-scrollTop (.. js/window -document -scrollingElement))
+        body-rect (.getBoundingClientRect (.. js/window -document -body))
         elem-rect (.getBoundingClientRect dom-node)
         offset-top (- (.-top elem-rect) (+ (.-top body-rect) scroll-top))]
     (reset! (::container-max-height s) (- win-height offset-top 8 distance-from-bottom))))

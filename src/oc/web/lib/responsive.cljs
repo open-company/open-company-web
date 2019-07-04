@@ -10,16 +10,16 @@
 (def navbar-height 56)
 
 (defn ww []
-  (when (and js/document
-             (.-body js/document)
-             (.-clientWidth (.-body js/document)))
-    (.-clientWidth (.-body js/document))))
+  (when (and (.-document js/window)
+             (.. js/window -document -body)
+             (.. js/window -document -body -clientWidth))
+    (.. js/window -document -body -clientWidth)))
 
 (def _mobile (atom -1))
 
 (defn set-browser-type! []
   (let [force-mobile-cookie (cook/get-cookie :force-browser-type)
-        is-big-web (if (.-body js/document)
+        is-big-web (if (.. js/window -document -body)
                      (>= (ww) big-web-min-width)
                      true) ; to not break tests
         fixed-browser-type (if (nil? force-mobile-cookie)

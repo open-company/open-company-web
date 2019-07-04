@@ -15,7 +15,7 @@
 
 (defn emojiable-active?
   []
-  (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0))
+  (>= (.indexOf (.-className (.. js/window -document -activeElement)) emojiable-class) 0))
 
 (defn remove-markers [s]
   (when-let  [caret-pos @(::caret-pos s)]
@@ -35,7 +35,7 @@
   (remove-markers s)
   (let [caret-pos (::caret-pos s)
         emojiable-active (emojiable-active?)
-        active-element (.-activeElement js/document)]
+        active-element (.. js/window -document -activeElement)]
     (if emojiable-active
       (do
         (reset! (::last-active-element s) active-element)
@@ -54,9 +54,9 @@
           (js/pasteTextAtSelection @(::last-active-element s) (gobj/get emoji "native"))))))
 
 (defn check-focus [s _]
-  (let [container-selector (or (:container-selector (first (:rum/args s))) "document.body")
-        container-node (.querySelector js/document container-selector)
-        active-element (.-activeElement js/document)]
+  (let [container-selector (or (:container-selector (first (:rum/args s))) "body")
+        container-node (.querySelector (.-document js/window) container-selector)
+        active-element (.. js/window -document -activeElement)]
     ;; Enabled when:
     ;; active element is emojiable and active element is descendant of container
     (reset! (::disabled s)
@@ -80,11 +80,11 @@
    :will-mount (fn [s]
                  (check-focus s nil)
                  (let [focusin (events/listen
-                                js/document
+                                (.-document js/window)
                                 EventType/FOCUSIN
                                 (partial check-focus s))
                        focusout (events/listen
-                                 js/document
+                                 (.-document js/window)
                                  EventType/FOCUSOUT
                                  (partial check-focus s))
                        ff-click (when js/isFireFox
@@ -157,7 +157,7 @@
               :onClick (fn [emoji event]
                          (when (and default-field-selector
                                     (not @(::caret-pos s)))
-                           (utils/to-end-of-content-editable (.querySelector js/document default-field-selector))
+                           (utils/to-end-of-content-editable (.querySelector (.-document js/window) default-field-selector))
                            (save-caret-position s))
                          (let [add-emoji? (boolean @(::caret-pos s))]
                            (when add-emoji?

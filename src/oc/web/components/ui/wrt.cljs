@@ -247,7 +247,7 @@
 
 (defn- under-middle-screen? [el]
   (let [el-offset-top (aget (.offset (js/$ el)) "top")
-        fixed-top-position (- el-offset-top (.-scrollTop (.-scrollingElement js/document)))
+        fixed-top-position (- el-offset-top (.-scrollTop (.. js/window -document -scrollingElement)))
         win-height (.-innerHeight js/window)]
     (>= fixed-top-position (/ win-height 2))))
 

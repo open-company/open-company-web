@@ -26,7 +26,7 @@
             [goog.events.EventType :as EventType]))
 
 (defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
+  (or (.-clientWidth (.. js/window -document -documentElement))
       (.-innerWidth js/window)))
 
 (rum/defcs secure-activity < rum/reactive

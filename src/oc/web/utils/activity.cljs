@@ -127,7 +127,7 @@
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
     (let [$container (.html (js/$ "<div/>") inner-html)
-          _ (.append (js/$ (.-body js/document)) $container)
+          _ (.append (js/$ (.. js/window -document -body)) $container)
           has-images (pos? (.-length (.find $container "img")))
           _ (.remove (js/$ "img" $container))
           empty-paragraph-rx (js/RegExp "^(<br\\s*/?>)?$" "i")
@@ -270,7 +270,7 @@
   (let [rect (.getBoundingClientRect el)
         zero-pos? #(or (zero? %)
                        (pos? %))
-        doc-element (.-documentElement js/document)
+        doc-element (.. js/window -document -documentElement)
         win-height (or (.-clientHeight doc-element)
                        (.-innerHeight js/window))]
     (or      ;; Item top is more then the navbar height
@@ -289,7 +289,7 @@
         rect (.getBoundingClientRect el)
         zero-pos? #(or (zero? %)
                        (pos? %))
-        doc-element (.-documentElement js/document)
+        doc-element (.. js/window -document -documentElement)
         win-height (or (.-clientHeight doc-element)
                        (.-innerHeight js/window))]
            ;; Item top is more then the navbar height

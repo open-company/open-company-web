@@ -90,7 +90,7 @@
         (set! (.-onerror img) #(logo-add-error img))
         (set! (.-onload img) #(logo-on-load org-avatar-editing url img))
         (set! (.-className img) "hidden")
-        (gdom/append (.-body js/document) img)
+        (gdom/append (.. js/window -document -body) img)
         (set! (.-src img) url)))
     nil
     (fn [err]

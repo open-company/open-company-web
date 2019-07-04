@@ -4,7 +4,7 @@
 
 (def default-cookie-expire (* 60 60 24 6))
 
-(def cookies-static-obj (goog.net.Cookies. js/document))
+(def cookies-static-obj (goog.net.Cookies. (.-document js/window)))
 
 (defn- ^:private cookie-name [c-name]
   (str ls/cookie-name-prefix (name c-name)))

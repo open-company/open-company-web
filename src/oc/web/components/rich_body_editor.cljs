@@ -211,7 +211,7 @@
            (set! (.-onload img) #(img-on-load s editable url img))
            (set! (.-onerror img) #(img-on-load s editable nil nil))
            (set! (.-className img) "hidden")
-           (gdom/append (.-body js/document) img)
+           (gdom/append (.. js/window -document -body) img)
            (set! (.-src img) url)
            (reset! (::media-photo s) {:res res :url url})
            ;; if the image is a vector image

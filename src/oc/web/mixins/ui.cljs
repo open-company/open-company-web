@@ -58,7 +58,7 @@
     (when (or (fn? load-next-fn)
               (fn? load-prev-fn))
       (let [win-height (.-innerHeight js/window)
-            total-scroll-height (.. js/document -body -scrollHeight)
+            total-scroll-height (.. js/window -document -body -scrollHeight)
             scroll-offset (- total-scroll-height win-height)
             current-scroll (.-scrollY js/window)
             scroll-index (:-scroll-index s)
@@ -222,7 +222,7 @@
 
 (defn on-window-click-mixin [callback]
   {:did-mount (fn [s]
-   (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
+   (let [on-click-listener (events/listen (.getElementById (.-document js/window) "app") EventType/CLICK
                             (fn [e]
                              (callback s e)))]
     (assoc s :on-click-out-listener on-click-listener)))
@@ -235,7 +235,7 @@
 
 (defn on-window-resize-mixin [callback]
   {:did-mount (fn [s]
-   (let [on-resize-listener (events/listen (.getElementById js/document "app") EventType/RESIZE
+   (let [on-resize-listener (events/listen (.getElementById (.-document js/window) "app") EventType/RESIZE
                              (fn [e]
                               (callback s e)))]
     (assoc s :on-resize-listener on-resize-listener)))

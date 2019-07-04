@@ -101,7 +101,7 @@
                       rewrite-to)]
     ;; Push state only if the query string has parameters or the history will have duplicates.
     (when (seq (.-search l))
-      (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
+      (.pushState (.-history js/window) #js {} (.. js/window -document -title) with-search))))
 
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Setup timbre log level
@@ -592,7 +592,7 @@
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (if (js/isEdge)
-          (set! (.. js/document -scrollingElement -scrollTop) 0)
+          (set! (.. js/window -document -scrollingElement -scrollTop) 0)
           (js/window.scrollTo 0 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))

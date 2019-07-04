@@ -78,7 +78,7 @@
                            (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
-                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
+                             (utils/after 100 #(set! (.-scrollTop (.. js/window -document -body)) 0))
                              (refresh-board-data s)
                              (init-whats-new)
                              s)

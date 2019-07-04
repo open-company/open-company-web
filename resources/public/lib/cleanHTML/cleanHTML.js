@@ -250,15 +250,15 @@ function replaceSelectionWithHtml(html) {
     if (window.getSelection && window.getSelection().getRangeAt) {
         range = window.getSelection().getRangeAt(0);
         range.deleteContents();
-        var div = document.createElement("p");
+        var div = window.document.createElement("p");
         div.innerHTML = html;
-        var frag = document.createDocumentFragment(), child;
+        var frag = window.document.createDocumentFragment(), child;
         while ( (child = div.firstChild) ) {
             frag.appendChild(child);
         }
         range.insertNode(frag);
-    } else if (document.selection && document.selection.createRange) {
-        range = document.selection.createRange();
+    } else if (window.document.selection && window.document.selection.createRange) {
+        range = window.document.selection.createRange();
         range.pasteHTML(html);
     }
 }
@@ -313,10 +313,10 @@ function replaceSelectedText(replacementText) {
         if (sel.rangeCount) {
             range = sel.getRangeAt(0);
             range.deleteContents();
-            range.insertNode(document.createTextNode(replacementText));
+            range.insertNode(window.document.createTextNode(replacementText));
         }
-    } else if (document.selection && document.selection.createRange) {
-        range = document.selection.createRange();
+    } else if (window.document.selection && window.document.selection.createRange) {
+        range = window.document.selection.createRange();
         range.text = replacementText;
     }
 }

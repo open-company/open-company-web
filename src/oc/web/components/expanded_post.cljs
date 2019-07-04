@@ -33,7 +33,7 @@
       (reset! (::comment-height s) cur-height))))
 
 (defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
+  (or (.-clientWidth (.. js/window -document -documentElement))
       (.-innerWidth js/window)))
 
 (defn set-mobile-video-height! [s]

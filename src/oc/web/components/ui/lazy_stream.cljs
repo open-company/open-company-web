@@ -15,6 +15,6 @@
       (stream-comp)
       [:div.lazy-stream-interstitial
         {:style {:height (str (+ (:scroll-y @router/path)
-                                 (or (.. js/document -documentElement -clientHeight)
+                                 (or (.. js/window -document -documentElement -clientHeight)
                                      (.-innerHeight js/window)))
                            "px")}}])])

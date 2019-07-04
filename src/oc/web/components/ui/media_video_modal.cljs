@@ -131,7 +131,7 @@
         valid-url (valid-video-url? @(::video-url s))
         scrolling-element-selector (if fullscreen :div.cmail-content-outer :div.cmail-content)
         scrolling-element (sel1 [scrolling-element-selector])
-        win-height (or (.-clientHeight (.-documentElement js/document))
+        win-height (or (.-clientHeight (.. js/window -document -documentElement))
                        (.-innerHeight js/window))
         fixed-win-height (if fullscreen win-height (- win-height 52)) ;; Remove bottom padding of Cmail view
         top-offset-limit (.-offsetTop (sel1 [:div.rich-body-editor-outer-container]))

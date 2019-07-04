@@ -35,7 +35,7 @@
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
 (defn win-width []
-  (or (.-clientWidth (.-documentElement js/document))
+  (or (.-clientWidth (.. js/window -document -documentElement))
       (.-innerWidth js/window)))
 
 (defn calc-video-height [s]

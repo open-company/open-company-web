@@ -85,9 +85,9 @@
                                 EventType/KEYDOWN
                                 (fn [e]
                                   (when (and (= (.-key e) "Escape")
-                                             (= (.-activeElement js/document) add-comment-node))
+                                             (= (.. js/window -document -activeElement) add-comment-node))
                                     (.blur add-comment-node))
-                                  (when (and (= (.-activeElement js/document) add-comment-node)
+                                  (when (and (= (.. js/window -document -activeElement) add-comment-node)
                                              (.-metaKey e)
                                              (= (.-key e) "Enter"))
                                     (send-clicked s)))))

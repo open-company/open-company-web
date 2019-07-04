@@ -27,7 +27,7 @@
         post-url (oc-urls/entry board activity)
         query-params (router/query-params)
         route [org board activity "activity"]
-        scroll-y-position (.. js/document -scrollingElement -scrollTop)]
+        scroll-y-position (.. js/window -document -scrollingElement -scrollTop)]
     (router/set-route! route {:org org
                               :board board
                               :sort-type (router/current-sort-type)
@@ -37,7 +37,7 @@
                               :back-y scroll-y-position})
     (when-not scroll-to-top
       (utils/scroll-to-y 0 0))
-    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
+    (.pushState (.-history js/window) #js {} (.. js/window -document -title) post-url)))
 
 (defn dismiss-post-modal []
   (let [org (router/current-org-slug)
@@ -51,4 +51,4 @@
                               :sort-type (router/current-sort-type)
                               :scroll-y back-y
                               :query-params query-params})
-    (.pushState (.-history js/window) #js {} (.-title js/document) to-url)))
+    (.pushState (.-history js/window) #js {} (.. js/window -document -title) to-url)))

@@ -160,7 +160,7 @@
   (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data)
   ;; Change page title when an org page is loaded
-  (set! (.-title js/document) (str "Carrot | " (:name org-data))))
+  (set! (.. js/window -document -title) (str "Carrot | " (:name org-data))))
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
@@ -240,7 +240,7 @@
     (when-let [org-data (when success (json->cljs body))]
       ;; rewrite history so when user come back here we load org data and patch them
       ;; instead of creating them
-      (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
+      (.replaceState js/history #js {} (.. js/window -document -title) (oc-urls/sign-up-update-team (:slug org-data)))
       (org-loaded org-data false email-domain)
       (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))
