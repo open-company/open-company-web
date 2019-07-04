@@ -282,7 +282,7 @@
 
 (defn to-end-of-content-editable [content-editable-element]
   (if (.. js/window -document -createRange)
-    (let [rg (.createRange (js/window -document))]
+    (let [rg (.createRange (.-document js/window))]
       (.selectNodeContents rg content-editable-element)
       (.collapse rg false)
       (let [selection (.getSelection js/window)]
