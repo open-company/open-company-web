@@ -188,37 +188,6 @@ nav.oc-navbar {
                   }
                 }
               }
-
-              button.mobile-section-item-compose {
-                border-radius: 6px;
-                background-color: $carrot_green;
-                margin: 8px;
-                text-align: center;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 40px;
-                width: calc(100% - 16px);
-                opacity: 1;
-
-                span.compose-green-icon {
-                  width: 12px;
-                  height: 22px;
-                  background-image: cdnUrl("/img/ML/white_pen.svg");
-                  background-size: 12px 12px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                }
-
-                span.compose-green-label {
-                  @include OC_Body_Bold();
-                  font-size: 16px;
-                  line-height: 22px;
-                  color: white;
-                  margin-left: 8px;
-                  margin-top: 1px;
-                }
-              }
             }
           }
         }

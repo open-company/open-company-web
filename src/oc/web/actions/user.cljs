@@ -1,6 +1,7 @@
 (ns oc.web.actions.user
   (:require-macros [if-let.core :refer (when-let*)])
-  (:require [taoensso.timbre :as timbre]
+  (:require [cljsjs.moment-timezone]
+            [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -11,13 +12,13 @@
             [oc.web.local-settings :as ls]
             [oc.web.utils.user :as user-utils]
             [oc.web.stores.user :as user-store]
+            [oc.web.ws.notify-client :as ws-nc]
             [oc.web.lib.fullstory :as fullstory]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
-            [oc.web.ws.notify-client :as ws-nc]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -239,7 +240,7 @@
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/user-profile)))))))
+          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/sign-up-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))

@@ -8,9 +8,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.user :as user-store]
             [oc.web.components.ui.menu :as menu]
-            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
@@ -31,11 +29,6 @@
                     (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
                     (rum/local false ::show-sections-list)
-                    {:did-mount (fn [s]
-                     (when-not (utils/is-test-env?)
-                       (when-not (responsive/is-tablet-or-mobile?)
-                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))
-                     s)}
   [s]
   (let [{:keys [org-data
                 board-data
@@ -58,9 +51,6 @@
                                 (not user-settings)
                                 (not search-active)
                                 (not mobile-user-notifications))
-         user-role (user-store/user-role org-data current-user-data)
-         can-compose? (or (= user-role :admin)
-                          (= user-role :author))
         section-name (cond
                       (= (router/current-board-slug) "all-posts")
                       "All Posts"
@@ -118,12 +108,7 @@
                         {:key (str "mobile-section-" (:slug board))
                          :class (when (= (router/current-board-slug) (:slug board)) "active")
                          :on-click #(mobile-nav! % (:slug board))}
-                        (:name board)])
-                    (when can-compose?
-                      [:button.mlb-reset.mobile-section-item-compose
-                        {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
-                        [:span.compose-green-icon]
-                        [:span.compose-green-label "New post"]])]])]
+                        (:name board)])]])]
             [:div.navbar-center
               {:class (when search-active "search-active")}
               (search-box)])

@@ -6,9 +6,9 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
@@ -53,7 +53,7 @@
 (rum/defcs more-menu < rum/reactive
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
-                       (on-window-click-mixin (fn [s e]
+                       (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
                           (when-let* [args (vec (:rum/args s))
                                       opts (get args 2)
@@ -61,10 +61,8 @@
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))
+                       ui-mixins/refresh-tooltips-mixin
                        (drv/drv :editable-boards)
-                       {:did-mount (fn [s]
-                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                         s)}
   [s entity-data share-container-id
    {:keys [will-open will-close external-share tooltip-position show-unread
            show-edit? show-delete? edit-cb delete-cb show-move?]}]
