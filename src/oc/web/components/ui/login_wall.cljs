@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user-actions]))
@@ -114,4 +115,13 @@
                    :on-click login-action
                    :disabled (or (not (seq @(::email s)))
                                  (not (seq @(::pswd s))))}
-                  "Continue"]]]]]]]))
+                  "Continue"]
+                [:div.footer-link
+                  "Don't have an account yet?  "
+                  [:a
+                    {:href oc-urls/sign-up
+                     :on-click (fn [e]
+                                 (utils/event-stop e)
+                                 (router/nav! oc-urls/sign-up))}
+                    "Sign up here"]]
+               ]]]]]]))

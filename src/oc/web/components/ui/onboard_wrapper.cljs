@@ -145,7 +145,10 @@
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href oc-urls/login} "Sign in"]]]]))
+          [:a {:href (if js/window.isDesktop
+                       oc-urls/desktop-login
+                       oc-urls/login)}
+           "Sign in"]]]]))
 
 (defn- profile-setup-team-data
   ""
