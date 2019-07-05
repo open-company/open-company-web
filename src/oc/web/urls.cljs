@@ -92,11 +92,6 @@
 
 (def login-wall "/login-wall")
 
-;; User
-
-(def user-profile "/profile")
-(def user-notifications "/profile/notifications")
-
 ;; Organizations
 
 (defn org

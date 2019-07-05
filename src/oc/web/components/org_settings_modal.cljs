@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.responsive :as responsive]
@@ -112,6 +113,7 @@
   (drv/drv :org-editing)
   (drv/drv :org-avatar-editing)
   (drv/drv :org-settings-team-management)
+  ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
@@ -121,9 +123,6 @@
     (reset-form s)
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
-    s)
-   :did-mount (fn [s]
-    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
     s)
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
