@@ -947,15 +947,16 @@
   (when (compare-and-set! cmail-reopen-only-one false true)
     ;; Make sure the new param is alone and not with an access param that means
     ;; it was adding a slack team or bot
-    (if (and (contains? (router/query-params) :new)
-             (not (contains? (router/query-params) :access)))
-      (let [new-data (get-board-for-edit (router/query-param :new))
-            with-headline (if (router/query-param :headline)
-                           (assoc new-data :headline (router/query-param :headline))
-                           new-data)]
-        (cmail-show with-headline {:auto true}))
-      (utils/after 5000
-       #(let [edit-param (router/query-param :edit)
+    (utils/after 5000
+     #(if (and (contains? (router/query-params) :new)
+               (not (contains? (router/query-params) :access)))
+        (let [new-data (get-board-for-edit (router/query-param :new))
+              with-headline (if (router/query-param :headline)
+                             (assoc new-data :headline (router/query-param :headline))
+                             new-data)]
+          (when new-data
+            (cmail-show with-headline {:auto true})))
+        (let [edit-param (router/query-param :edit)
               edit-activity (dis/activity-data edit-param)]
           (if edit-activity
             (cmail-show edit-activity {:auto true})
