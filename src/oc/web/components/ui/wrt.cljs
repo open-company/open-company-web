@@ -53,13 +53,13 @@
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
+                 mixins/refresh-tooltips-mixin
 
                  {:will-mount (fn [s]
                    (when-let [activity-data @(drv/get-ref s :wrt-activity-data)]
                      (activity-actions/request-reads-data (:uuid activity-data)))
                    s)
                   :after-render (fn [s]
-                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                    (when @(::search-active s)
                       (when (compare-and-set! (::search-focused s) false true)
                         (.focus (rum/ref-node s :search-field))))
