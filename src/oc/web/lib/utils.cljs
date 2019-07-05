@@ -217,6 +217,11 @@
 (defn after [ms fn]
   (js/setTimeout fn ms))
 
+(defn maybe-after [ms fn]
+  (if (zero? ms)
+   (fn)
+   (js/setTimeout fn ms)))
+
 (defn every [ms fn]
   (js/setInterval fn ms))
 
