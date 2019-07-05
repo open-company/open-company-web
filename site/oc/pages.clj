@@ -37,7 +37,7 @@
   ;; From https://stackoverflow.com/questions/5087549/access-denied-to-jquery-script-on-ie
   ;; Github: https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest
   [:script
-    {:src "//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"
+    {:src "//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.4/jquery.xdomainrequest.min.js"
      :crossorigin "anonymous"}])
 
 (def ziggeo-css
