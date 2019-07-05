@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -17,7 +18,6 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
@@ -43,7 +43,8 @@
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              (on-window-click-mixin (fn [s e]
+                              ui-mixins/refresh-tooltips-mixin
+                              (ui-mixins/on-window-click-mixin (fn [s e]
                                (when (and @(::sorting-menu-expanded s)
                                           (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
                                 (reset! (::sorting-menu-expanded s) false))))
@@ -58,7 +59,6 @@
                                     (activity-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
-                                (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                 s)
                                :did-remount (fn [_ s]
                                 (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
