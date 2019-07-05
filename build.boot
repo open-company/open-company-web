@@ -293,7 +293,7 @@
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        true
                                                    'oc.electron.main/web-origin  "http://localhost:3559"
-                                                   'oc.electron.main/auth-origin "https://localhost:3003"}})
+                                                   'oc.electron.main/auth-origin "http://localhost:3003"}})
         (target)))
 
 (deftask staging-electron
