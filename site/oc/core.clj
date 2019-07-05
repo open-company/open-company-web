@@ -13,7 +13,7 @@
 (defn head []
   [:head
     [:meta {:charset "utf-8"}]
-    ; [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
+    [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
     [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
@@ -37,6 +37,7 @@
     [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
     ;; jQuery needed by Bootstrap JavaScript
     [:script {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" :type "text/javascript"}]
+    [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js" :type "text/javascript"}]
     ;; Static js files
     [:script {:src (pages/cdn "/js/static-js.js")}]
     ;; Intercom (Support chat)
