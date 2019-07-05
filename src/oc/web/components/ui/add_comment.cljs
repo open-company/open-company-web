@@ -42,12 +42,12 @@
   (when-not @(::medium-editor s)
     (let [add-comment-node (rum/ref-node s "add-comment")
           users-list (:mention-users @(drv/get-ref s :team-roster))]
-      (when (pos? (count users-list)))
+      (when (seq users-list)
         (let [medium-editor (cu/setup-medium-editor add-comment-node users-list)]
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
             "editableInput"
-            #(enable-add-comment? s))))))
+            #(enable-add-comment? s)))))))
 
 (rum/defcs add-comment < rum/reactive
                          rum/static
@@ -78,6 +78,7 @@
                                  activity-data (first (:rum/args s))
                                  add-comment-focus @(drv/get-ref s :add-comment-focus)
                                  should-focus-field? (= (:uuid activity-data) add-comment-focus)]
+
                              (setup-medium-editor-when-needed s)
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
@@ -103,7 +104,7 @@
                                 #(utils/to-end-of-content-editable add-comment-node))))
                            s)
                           :did-remount (fn [_ s]
-                            (setup-medium-editor-when-needed s)
+                           (setup-medium-editor-when-needed s)
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)
