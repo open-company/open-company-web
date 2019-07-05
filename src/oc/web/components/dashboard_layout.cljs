@@ -93,6 +93,11 @@
                                      (not (:read-only board-data)))]
       ;; Entries list
       [:div.dashboard-layout.group
+        (when (and is-mobile?
+                   (not current-activity-id)
+                   can-compose)
+          [:button.mlb-reset.mobile-floating-compose-bt
+            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
         [:div.dashboard-layout-container.group
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (when-not is-mobile?

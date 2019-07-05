@@ -31,7 +31,7 @@
                       file-name (:file-name atch)
                       size (:file-size atch)
                       subtitle (when size
-                                 (filesize size :binary false :format "%.2f"))]]
+                                 (clojure.string/lower-case (str "(" (filesize size :binary false :format "%.2f") ")")))]]
             [:div.stream-attachments-item.group
               {:key atch-key}
               [:a.group

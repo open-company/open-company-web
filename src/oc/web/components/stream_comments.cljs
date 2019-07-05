@@ -222,7 +222,8 @@
                        :title "Cancel edit"}
                       "Cancel"]]]
                 (when (and (:can-react comment-data)
-                           (seq (:reactions comment-data)))
+                           (or (responsive/is-tablet-or-mobile?)
+                               (seq (:reactions comment-data))))
                   [:div.stream-comment-reactions-footer.group
                     (reactions comment-data false activity-data)]))]])]
       [:div.stream-comments-empty])])
