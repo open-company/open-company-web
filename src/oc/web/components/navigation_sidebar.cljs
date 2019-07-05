@@ -73,15 +73,9 @@
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
-                                  s)
-                                 :did-update (fn [s]
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)

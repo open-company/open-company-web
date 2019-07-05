@@ -242,7 +242,7 @@
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/user-profile)))))))
+          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/sign-up-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
