@@ -591,7 +591,9 @@
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (js/window.scrollTo 0 0))
+        (if (js/isEdge)
+          (set! (.. js/document -scrollingElement -scrollTop) 0)
+          (js/window.scrollTo 0 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips
