@@ -126,18 +126,10 @@ div.stream-item {
           }
         }
       }
-
-      div.must-see-tag {
-        display: none;
-      }
-
-      div.follow-up-tag {
-        display: inline-block;
-      }
     }
   }
 
-  &.must-see-item {
+  &:not(.follow-up-item).must-see-item {
     div.stream-item-inner {
       border-left: 4px solid $sea_blue;
     }
