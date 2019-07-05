@@ -199,6 +199,25 @@ div.login-wall-container {
             width: 100%;
           }
         }
+
+        div.footer-link {
+          margin-top: 24px;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: $light_navy;
+          text-align: center;
+
+          a {
+            @include OC_Body_Book();
+            font-size: 16px;
+            color: $carrot_green;
+            margin-left: 4px;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
       }
     }
   }
