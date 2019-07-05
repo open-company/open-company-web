@@ -260,6 +260,15 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
+  p, ul > li, i {
+    min-height: #{$line_height}px;
+  }
+
+  i:empty {
+    display: grid;
+    min-width: 1px;
+  }
+
   * {
     color: $color;
   }
