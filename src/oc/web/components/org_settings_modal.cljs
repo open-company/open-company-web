@@ -8,6 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.responsive :as responsive]
@@ -112,6 +113,7 @@
   (drv/drv :org-editing)
   (drv/drv :org-avatar-editing)
   (drv/drv :org-settings-team-management)
+  ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
@@ -121,9 +123,6 @@
     (reset-form s)
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
-    s)
-   :did-mount (fn [s]
-    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
     s)
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
@@ -201,18 +200,26 @@
                  :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                  :data-placement "top"
                  :data-container "body"}]]
-            [:input.org-settings-field.oc-input
-              {:type "text"
-               :placeholder "@domain.com"
-               :auto-capitalize "none"
-               :value (:domain um-domain-invite)
-               :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
-               :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :on-key-press (fn [e]
-                               (when (= (.-key e) "Enter")
-                                 (let [domain (:domain um-domain-invite)]
-                                   (when (utils/valid-domain? domain)
-                                     (team-actions/email-domain-team-add domain)))))}]
+            [:div.org-settings-field-container.oc-input.group
+              [:input.org-settings-field.email-domain-field
+                {:type "text"
+                 :placeholder "@domain.com"
+                 :auto-capitalize "none"
+                 :value (:domain um-domain-invite)
+                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
+                 :on-key-press (fn [e]
+                                 (when (= (.-key e) "Enter")
+                                   (let [domain (:domain um-domain-invite)]
+                                     (when (utils/valid-domain? domain)
+                                       (team-actions/email-domain-team-add domain)))))}]
+              [:button.mlb-reset.add-email-domain-bt
+                {:disabled (not (utils/valid-domain? (:domain um-domain-invite)))
+                 :on-click (fn [e]
+                             (let [domain (:domain um-domain-invite)]
+                               (when (utils/valid-domain? domain)
+                                 (team-actions/email-domain-team-add domain))))}
+                "Add"]]
             [:div.org-settings-email-domains
               (for [domain (:email-domains team-data)]
                 [:div.org-settings-email-domain-row
