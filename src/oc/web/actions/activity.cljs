@@ -693,7 +693,7 @@
       (dis/dispatch! [:activities-count (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
-      (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (:reads (:data data)) (dis/team-roster)]))))
+      (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (count (:reads (:data data))) (:reads (:data data)) (dis/team-roster)]))))
 
 ;; AP Seen
 
@@ -947,19 +947,21 @@
   (when (compare-and-set! cmail-reopen-only-one false true)
     ;; Make sure the new param is alone and not with an access param that means
     ;; it was adding a slack team or bot
-    (if (and (contains? (router/query-params) :new)
-             (not (contains? (router/query-params) :access)))
-      (let [new-data (get-board-for-edit (router/query-param :new))
-            with-headline (if (router/query-param :headline)
-                           (assoc new-data :headline (router/query-param :headline))
-                           new-data)]
-        (cmail-show with-headline))
-      (let [edit-param (router/query-param :edit)
-            edit-activity (dis/activity-data edit-param)]
-        (if edit-activity
-          (cmail-show edit-activity)
-          (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-            (cmail-show (dis/activity-data activity-uuid))))))))
+    (utils/after 5000
+     #(if (and (contains? (router/query-params) :new)
+               (not (contains? (router/query-params) :access)))
+        (let [new-data (get-board-for-edit (router/query-param :new))
+              with-headline (if (router/query-param :headline)
+                             (assoc new-data :headline (router/query-param :headline))
+                             new-data)]
+          (when new-data
+            (cmail-show with-headline {:auto true})))
+        (let [edit-param (router/query-param :edit)
+              edit-activity (dis/activity-data edit-param)]
+          (if edit-activity
+            (cmail-show edit-activity {:auto true})
+            (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
+              (cmail-show (dis/activity-data activity-uuid) {:auto true}))))))))
 
 (defn activity-edit
   ([]
