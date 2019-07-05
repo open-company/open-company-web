@@ -101,9 +101,14 @@
         route (drv/react s :route)
         back-to-slug (or (:back-to route) (:board route))
         is-all-posts? (= back-to-slug "all-posts")
+        is-follow-ups? (= back-to-slug "follow-ups")
         back-to-label (str "Back to "
-                           (if is-all-posts?
+                           (cond
+                             is-all-posts?
                              "All posts"
+                             is-follow-ups?
+                             "Follow-ups"
+                             :else
                              (:name (dis/board-data back-to-slug))))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
