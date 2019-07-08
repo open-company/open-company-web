@@ -1231,8 +1231,8 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
           ;; jQuery needed by Bootstrap JavaScript
-          ie-jquery-fix
           jquery
+          ie-jquery-fix
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
           ;; Rangy
@@ -1300,8 +1300,8 @@
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
           ;; jQuery needed by Bootstrap JavaScript
-          ie-jquery-fix
           jquery
+          ie-jquery-fix
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
