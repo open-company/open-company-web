@@ -180,7 +180,7 @@
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
+        is-follow-ups (= (router/current-board-slug) "follow-ups")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         sort-type (router/current-sort-type)
         board-rel (if (= sort-type :recent-activity) "activity" "self")]
@@ -190,8 +190,8 @@
       (if (= sort-type :recent-activity)
         (recent-activity-get org-data (:ap-initial-at @dis/app-state))
         (activity-get org-data (:ap-initial-at @dis/app-state)))
-      is-must-see
-      (must-see-get org-data)
+      is-follow-ups
+      (follow-ups-sort-get org-data)
       :else
       (sa/section-get sort-type (utils/link-for (:links board-data) board-rel "GET")))))
 
@@ -717,6 +717,7 @@
             change-type (:change-type change-data)
             ;; In case another user is adding a new post mark it as unread
             ;; directly to avoid delays in the newly added post propagation
+            org-data (dis/org-data)
             dispatch-unread (when (and (= change-type :add)
                                        (not= (:user-id change-data) (jwt/user-id)))
                               (fn [{:keys [success]}]
@@ -728,11 +729,14 @@
         ;; Refresh the AP in case of items added or removed
         (when (or (= change-type :add)
                   (= change-type :delete))
+          ;; Refresh the count of drafts and follow-ups
+          (api/get-org (utils/link-for (:links org-data) "self") refresh-org-data-cb)
+          ;; Refresh specific containers/sections
           (cond
             (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread)
+            (all-posts-get org-data (dis/ap-initial-at) dispatch-unread)
             (= (router/current-board-slug) "follow-ups")
-            (follow-ups-get (dis/org-data) dispatch-unread)
+            (follow-ups-get org-data dispatch-unread)
             :else
             (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
