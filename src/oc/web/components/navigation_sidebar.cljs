@@ -133,7 +133,7 @@
                :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
               [:div.follow-ups-icon]
               [:div.follow-ups-label
-                {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
+                {:class (utils/class-set {:new (pos? follow-ups-count)})}
                 "Follow-ups"]
               (when (pos? follow-ups-count)
                 [:span.count follow-ups-count])]))
