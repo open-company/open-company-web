@@ -128,6 +128,7 @@ var OCStaticStartFixFixedPositioning = function(){};
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};
 var isIE = function(){};
+var isEdge = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -185,4 +186,7 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// Electron
+window.isDesktop = {};
+window.setBadgeCount = function() {};
 // Fullstory

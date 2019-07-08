@@ -28,6 +28,13 @@
     {:rel "stylesheet"
      :href "//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"}])
 
+(def ie-jquery-fix
+  ;; From https://stackoverflow.com/questions/5087549/access-denied-to-jquery-script-on-ie
+  ;; Github: https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest
+  [:script
+    {:src "//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.4/jquery.xdomainrequest.min.js"
+     :crossorigin "anonymous"}])
+
 (def jquery
   [:script
     {:src "//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"
@@ -1224,6 +1231,7 @@
           [:script {:type "text/javascript" :src "/lib/autotrack/google-analytics.js"}]
           (google-analytics-init)
           ;; jQuery needed by Bootstrap JavaScript
+          ie-jquery-fix
           jquery
           ;; Truncate html string
           [:script {:type "text/javascript" :src "/lib/truncate/jquery.dotdotdot.js"}]
@@ -1292,6 +1300,7 @@
           ;; App single CSS
           [:link {:type "text/css" :rel "stylesheet" :href (cdn "/main.css")}]
           ;; jQuery needed by Bootstrap JavaScript
+          ie-jquery-fix
           jquery
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features

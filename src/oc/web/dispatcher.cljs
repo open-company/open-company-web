@@ -358,6 +358,16 @@
                             (fn [base org-slug]
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
+   :unread-notifications  [[:user-notifications]
+                           (fn [notifications]
+                             (filter :unread notifications))]
+   :unread-notifications-count [[:unread-notifications]
+                                (fn [notifications]
+                                  (let [ncount (count notifications)]
+                                    (timbre/info "Unread notification count updated: " ncount)
+                                    (when js/window.isDesktop
+                                      (js/window.setBadgeCount ncount))
+                                    ncount))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]

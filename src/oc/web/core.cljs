@@ -56,7 +56,7 @@
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
             [oc.web.components.ui.notifications :refer (notifications)]
-            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]))
+            [oc.web.components.ui.login-wall :refer (login-wall)]))
 
 (enable-console-print!)
 
@@ -495,7 +495,7 @@
     (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
       (when (jwt/jwt)
-        (router/redirect! urls/home))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
     (defroute login-wall-route urls/login-wall {:keys [query-params] :as params}
@@ -503,13 +503,31 @@
       ; Email wall is shown only to not logged in users
       (when (jwt/jwt)
         (router/redirect-404!))
-      (simple-handler activity-not-found "login-wall" target params true))
+      (simple-handler login-wall "login-wall" target params true))
 
     (defroute login-wall-slash-route (str urls/login-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing login-wall-slash-route" (str urls/login-wall "/"))
       (when (jwt/jwt)
         (router/redirect-404!))
-      (simple-handler activity-not-found "login-wall" target params true))
+      (simple-handler login-wall "login-wall" target params true))
+
+    (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
+      (timbre/info "Routing desktop-login-route" urls/desktop-login)
+      (if (jwt/jwt)
+        (router/redirect!
+         (if (seq (cook/get-cookie (router/last-org-cookie)))
+           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           urls/login))
+        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
+
+    (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
+      (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
+      (if (jwt/jwt)
+        (router/redirect!
+         (if (seq (cook/get-cookie (router/last-org-cookie)))
+           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           urls/login))
+        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
@@ -519,7 +537,9 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! urls/home))
+      (router/redirect! (if js/window.isDesktop
+                          urls/desktop-login
+                          urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
@@ -599,7 +619,9 @@
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (js/window.scrollTo 0 0))
+        (if (js/isEdge)
+          (set! (.. js/document -scrollingElement -scrollTop) 0)
+          (js/window.scrollTo 0 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips

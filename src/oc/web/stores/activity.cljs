@@ -394,7 +394,7 @@
     (update-in db dispatcher/activities-read-key merge new-items-count)))
 
 (defmethod dispatcher/action :activity-reads
-  [db [_ org-slug item-id read-data team-roster]]
+  [db [_ org-slug item-id read-data-count read-data team-roster]]
   (let [activity-data   (dispatcher/activity-data org-slug item-id db)
         board-data      (dispatcher/board-data db org-slug (:board-slug activity-data))
         fixed-read-data (vec (map #(assoc % :seen true) read-data))
@@ -410,7 +410,7 @@
         unseen-ids      (clojure.set/difference all-ids seen-ids)
         unseen-users    (vec (map (fn [user-id]
                          (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
-    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data)
+    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count read-data-count
                                                                 :reads fixed-read-data
                                                                 :item-id item-id
                                                                 :unreads unseen-users
