@@ -56,7 +56,8 @@
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3))
+                         (when-not (js/isEdge)
+                           (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3)))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
