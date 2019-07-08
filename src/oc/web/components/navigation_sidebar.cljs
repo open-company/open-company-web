@@ -108,7 +108,6 @@
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))
-        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
@@ -127,7 +126,7 @@
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
         (when show-follow-ups
-          (let [follow-ups-count (if follow-ups-data (count (:posts-list follow-ups-data)) (:count follow-ups-link))]
+          (let [follow-ups-count (if follow-ups-data (count (:posts-list follow-ups-data)) (:follow-ups-count org-data))]
             [:a.follow-ups.hover-item.group
               {:class (utils/class-set {:item-selected is-follow-ups})
                :href (oc-urls/follow-ups)
