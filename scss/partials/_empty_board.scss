@@ -35,17 +35,10 @@ div.empty-board {
       margin: 0 auto;
       background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
 
-      // &.ap-section {
-      //   background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
-      // }
-
-      // &.must-see {
-      //   background-image: cdnUrl("/img/ML/empty_state_ms.svg");
-      // }
-
-      // &.drafts {
-      //   background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-      // }
+      &.drafts {
+        background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+        background-size: 56px 56px;
+      }
 
       &.follow-ups {
         background-image: cdnUrl("/img/ML/empty_state_follow_ups_section.svg");
