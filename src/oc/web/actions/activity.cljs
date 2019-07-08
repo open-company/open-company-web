@@ -865,7 +865,7 @@
 
 (defn- follow-ups-for-activity [activity-data team-roster]
   (let [follow-up-users (follow-up-users activity-data team-roster)]
-    (map follow-up-from-user follow-up-users)))
+    (map follow-up-from-user (filterv #(not= (:user-id %) (jwt/user-id)) follow-up-users))))
 
 (defn cmail-toggle-follow-up [activity-data]
   (let [follow-up (pos? (count (:follow-ups activity-data)))
