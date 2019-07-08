@@ -78,7 +78,9 @@
                                   (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))]
     (when (or edit-link
               share-link
-              delete-link)
+              delete-link
+              create-follow-up-link
+              complete-follow-up-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (when (or @(::move-activity s)
