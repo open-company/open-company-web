@@ -36,8 +36,8 @@
     ;; Favicon
     [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
     ;; jQuery needed by Bootstrap JavaScript
-    pages/ie-jquery-fix
     pages/jquery
+    pages/ie-jquery-fix
     ;; Static js files
     [:script {:src (pages/cdn "/js/static-js.js")}]
     ;; Intercom (Support chat)
