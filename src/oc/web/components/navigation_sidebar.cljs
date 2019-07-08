@@ -55,6 +55,8 @@
                                 (drv/drv :editable-boards)
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :hide-left-navbar)
+                                (drv/drv :drafts-data)
+                                (drv/drv :follow-ups-data)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -105,7 +107,10 @@
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
         editable-boards (drv/react s :editable-boards)
-        can-compose (pos? (count editable-boards))]
+        can-compose (pos? (count editable-boards))
+        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
+        follow-ups-data (drv/react s :follow-ups-data)
+        drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})}
       [:div.left-navigation-sidebar-content
@@ -122,18 +127,20 @@
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
         (when show-follow-ups
-          [:a.follow-ups.hover-item.group
-            {:class (utils/class-set {:item-selected is-follow-ups})
-             :href (oc-urls/follow-ups)
-             :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
-            [:div.follow-ups-icon]
-            [:div.follow-ups-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
-              "Follow-ups"]])
+          (let [follow-ups-count (if follow-ups-data (count (:posts-list follow-ups-data)) (:count follow-ups-link))]
+            [:a.follow-ups.hover-item.group
+              {:class (utils/class-set {:item-selected is-follow-ups})
+               :href (oc-urls/follow-ups)
+               :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
+              [:div.follow-ups-icon]
+              [:div.follow-ups-label
+                {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
+                "Follow-ups"]
+              (when (pos? follow-ups-count)
+                [:span.count follow-ups-count])]))
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
-                draft-posts (dis/draft-posts-data)
-                draft-count (or (count draft-posts) (:count drafts-link))]
+                draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
                                  (= (router/current-board-slug) (:slug drafts-board)))

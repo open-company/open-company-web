@@ -206,6 +206,12 @@
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
+   :drafts-data         [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (board-data-key org-slug :drafts other-sort-type)))]
+   :follow-ups-data     [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (container-key org-slug :follow-ups default-sort-type)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug

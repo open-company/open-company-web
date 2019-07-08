@@ -41,7 +41,7 @@
     font-size: 12px;
     line-height: 16px;
     text-align: center;
-    color: $light_navy;
+    color: $deep_navy;
     width: 16px;
     height: 16px;
     display: inline-block;
@@ -56,10 +56,6 @@
     font-size: 14px;
     color: $deep_navy;
     text-decoration: none;
-
-    &.new {
-      color: $deep_navy;
-    }
   }
 
   &:active, &:focus {
@@ -90,7 +86,7 @@
   }
 
   div.follow-ups-label {
-    @include OC_Body_Bold();
+    @include OC_Body_Book();
     font-size: 14px;
     color: $deep_navy;
     text-decoration: none;
