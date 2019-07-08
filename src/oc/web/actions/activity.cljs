@@ -730,11 +730,11 @@
                   (= change-type :delete))
           (cond
             (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread))
+            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread)
             (= (router/current-board-slug) "follow-ups")
             (follow-ups-get (dis/org-data) dispatch-unread)
             :else
-            (sa/section-change section-uuid dispatch-unread))
+            (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid)))))
