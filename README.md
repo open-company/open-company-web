@@ -248,6 +248,117 @@ For more info on testing:
 
 - React simulate wrapper: [bensu/cljs-react-test](https://github.com/bensu/cljs-react-test)
 
+## Desktop Application
+
+The Carrot desktop application is built using the [Electron](https://electronjs.org) framework. Via Electron,
+we're able to launch a thin application shell (a modified Chromium browser) that loads the Carrot web application,
+and provides it with hooks for accessing native desktop features.
+
+The primary source files to be aware of when developing on the desktop application are:
+
+- [main.cljs](./src/oc/electron/main.cljs): _the main electron process is configured and launched here_
+- [renderer.js](./resources/electron/renderer.js): _the electron renderer process, which injects native features into the hosted Carrot web page_
+- [package.json](./resources/package.json): _node dependency manifest, and home of build/sign/publish configuration_
+
+### Developing locally
+
+Because the desktop application simply loads the Carrot web app, the steps to develop locally are largely the same.
+With your local Carrot environment running (i.e. `boot dev`), in a separate terminal, run:
+
+```
+boot dev-electron
+```
+
+This will compile the main electron process, and place the output in the `target/` directory. From there,
+we can launch the application:
+
+```
+cd target/
+yarn install
+yarn start
+```
+
+NB: you'll need to install the [yarn](https://yarnpkg.com) package manager for this to work.
+
+If all goes well, the desktop application should open in a new window, and load `localhost:3559`. Hot-reloading
+should work, so from here development is identical to the Carrot web app!
+
+### Packaging for deployment
+
+There are two environments against which we can package the Carrot desktop app: staging and production:
+
+```
+# staging
+boot staging-electron
+
+# production
+boot prod-electron
+```
+
+Both of these commands result in a production-ready build located in the `target/` directory, and each
+will load the respective Carrot web application upon launch. From here, you're free to test locally
+if you so wish:
+
+```
+cd target/
+yarn install
+yarn start
+```
+
+To actually distribute the application, we first need to package the app (DMG on Mac, EXE installer on Windows),
+codesign the resulting artifact, and then publish the signed artifact to GitHub releases. Luckily these steps
+are largely automated, but there is a bit of one-time setup. First, we need to configure our environment
+with a few secrets:
+
+```
+cp resources/electron-builder.example.env resources/electron-builder.env
+```
+
+Edit this file appropriately. You can generate a GitHub token for yourself [here](https://github.com/settings/tokens).
+This file is ignored by git.
+
+Next, you'll need to have the appropriate Apple certificates installed to your Mac's keychain, as well as any development
+provisioning profiles (ask an admin). Download the provisioning profiles to your local filesystem.
+With these in place, use the following to build, sign, and publish a desktop release.
+
+#### Staging Release
+
+This will produce a development build runnable by the devices specified in the supplied provisioning profile.
+
+```
+# Bump the version in resources/package.json to X.Y.Z-B, where B is the current build number
+vim resources/package.json
+
+boot staging-electron
+cd target/
+yarn install
+npx electron-builder -c.mac.provisioningProfile=/path/to/your/Carrot_MacOS_Development_Profile.provisionprofile --publish always
+```
+
+Keep in mind that this can take a while (~10 minutes) due to requiring Apple's servers to notarize the application.
+
+This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
+Because this is a development build in Apple's eyes, _it is only runnable by the devices included in the supplied provisioning profile._ You should
+not publish this build in the GitHub Release panel, and instead should distribute it to testers manually.
+
+
+#### Production Release
+
+```
+# Bump the version in resources/package.json to X.Y.Z (drop the build number)
+vim resources/package.json
+
+boot prod-electron
+cd target/
+yarn install
+npx electron-builder -c.mac.type=distribution -c.mac.identity="OpenCompany, LLC (XXXXXXXXXX) --publish always"
+```
+
+Keep in mind that this can take a while (~10 minutes) due to requiring Apple's servers to notarize the application.
+
+This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
+Navigate your way there, and if you're ready to roll the release out to customers, you can Publish the draft. Existing client installations
+will sense the new update, and automatically install it in the background.
 
 ## Participation
 
