@@ -728,8 +728,12 @@
         ;; Refresh the AP in case of items added or removed
         (when (or (= change-type :add)
                   (= change-type :delete))
-          (if (= (router/current-board-slug) "all-posts")
+          (cond
+            (= (router/current-board-slug) "all-posts")
             (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread))
+            (= (router/current-board-slug) "follow-ups")
+            (follow-ups-get (dis/org-data) dispatch-unread)
+            :else
             (sa/section-change section-uuid dispatch-unread))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
