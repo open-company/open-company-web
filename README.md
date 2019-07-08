@@ -342,7 +342,7 @@ Because this is a development build in Apple's eyes, _it is only runnable by the
 not publish this build in the GitHub Release panel, and instead should distribute it to testers manually.
 
 
-#### Production Release
+#### Production Release (Mac)
 
 ```
 # Bump the version in resources/package.json to X.Y.Z (drop the build number)
@@ -359,6 +359,18 @@ Keep in mind that this can take a while (~10 minutes) due to requiring Apple's s
 This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
 Navigate your way there, and if you're ready to roll the release out to customers, you can Publish the draft. Existing client installations
 will sense the new update, and automatically install it in the background.
+
+#### Production Release (Windows)
+
+```
+boot prod-electron-windows
+cd target/
+yarn install
+npx electron-builder --win --publish always"
+```
+
+This will build, sign, and publish an EXE to GitHub Releases alongside any existing Mac builds with the same version. This EXE
+is an installer, and is completely self-contained.
 
 ## Participation
 

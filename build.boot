@@ -317,3 +317,14 @@
                                                    'oc.electron.main/web-origin  "https://carrot.io"
                                                    'oc.electron.main/auth-origin "https://beta-auth.carrot.io"}})
         (target)))
+
+(deftask prod-electron-windows
+  "Carrot electron app loading production carrot.io"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (cljs :ids #{"electron\\main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        false
+                                                   'oc.electron.main/web-origin  "https://carrot.io"
+                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"}})
+        (target)))

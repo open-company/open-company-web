@@ -27,7 +27,7 @@
       "sign": false
     },
     "win": {
-      "target": ["appx"],
+      "target": ["nsis"],
       "icon": "carrot.iconset/icon.ico"
     },
     "afterSign": "electron/notarize.js",
