@@ -120,9 +120,9 @@
         (utils/maybe-after activity-delay #(aa/recent-activity-get org-data ap-initial-at)))
       ;; Preload follow-ups data
       (when follow-ups-link
-        (utils/maybe-after activity-delay #(aa/follow-ups-get org-data)))
+        (utils/maybe-after follow-ups-delay #(aa/follow-ups-get org-data)))
       (when recent-follow-ups-link
-        (utils/maybe-after activity-delay #(aa/recent-follow-ups-get org-data))))
+        (utils/maybe-after follow-ups-delay #(aa/recent-follow-ups-get org-data))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
