@@ -105,6 +105,7 @@
 (defn maybe-save-login-redirect []
   (let [url-pathname (.. js/window -location -pathname)
         is-login-route? (or (= url-pathname oc-urls/login-wall)
+                            (= url-pathname oc-urls/login)
                             (= url-pathname oc-urls/desktop-login))]
     (cond
       (and is-login-route?
