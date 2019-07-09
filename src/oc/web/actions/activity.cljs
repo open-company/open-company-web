@@ -515,7 +515,6 @@
                                                :description notification-message
                                                :primary-bt-dismiss true
                                                :primary-bt-title "OK"
-                                               :primary-bt-inline true
                                                :expire 3
                                                :id :publish-follow-ups}))))
 
