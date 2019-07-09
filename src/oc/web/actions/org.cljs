@@ -97,7 +97,7 @@
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
         follow-ups-link (utils/link-for (:links org-data) "follow-ups")
-        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups") ;; FIXME: change rel to "recent-follow-ups"
+        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
         is-all-posts? (= (router/current-board-slug) "all-posts")
         activity-delay (if is-all-posts?
                          0

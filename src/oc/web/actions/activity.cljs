@@ -81,7 +81,7 @@
 
 (defn follow-ups-sort-get [org-data & [finish-cb]]
   (let [sort-type (router/current-sort-type)
-        follow-ups-link-rel (if (= sort-type dis/default-sort-type) "follow-ups" "follow-ups")  ;; FIXME: change first rel to "recent-follow-ups"
+        follow-ups-link-rel (if (= sort-type dis/default-sort-type) "follow-ups-activity" "follow-ups")
         follow-ups-link (utils/link-for (:links org-data) follow-ups-link-rel)]
     (when follow-ups-link
       (follow-ups-real-get follow-ups-link sort-type (:slug org-data) finish-cb))))
