@@ -307,6 +307,17 @@
                                                    'oc.electron.main/auth-origin "https://staging-auth.carrot.io"}})
         (target)))
 
+(deftask staging-electron-windows
+  "Carrot electron app loading staging.carrot.io"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (cljs :ids #{"electron\\main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        false
+                                                   'oc.electron.main/web-origin  "https://staging.carrot.io"
+                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"}})
+        (target)))
+
 (deftask prod-electron
   "Carrot electron app loading production carrot.io"
   []
