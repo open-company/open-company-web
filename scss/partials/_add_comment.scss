@@ -42,7 +42,7 @@ div.add-comment-box-container {
       position: absolute;
       bottom: 0;
       left: 40px;
-      width: calc(100% - 24px - 16px - 50px);
+      width: calc(100% - 24px - 16px);
       position: relative;
       max-height: 200px;
       border-radius: 4px;
@@ -119,12 +119,15 @@ div.add-comment-box-container {
       //   }
       // }
     }
+  }
+
+  div.add-comment-footer {
+    margin-top: 12px;
+    height: 24px;
+    position: relative;
 
     button.send-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 0;
-      width: 50px;
+      float: right;
       height: 24px;
       padding: 0;
       margin: 0;
@@ -132,6 +135,7 @@ div.add-comment-box-container {
       color: $carrot_green;
       @include OC_Body_Bold();
       font-size: 16px;
+      padding: 0 0 0 8px;
 
       @include mobile() {
         right: 10px;
@@ -154,40 +158,40 @@ div.add-comment-box-container {
       }
     }
 
-    div.add-comment-footer {
-      margin-top: 16px;
-      height: 40px;
-      position: relative;
+    div.buttons-separator {
+      width: 1px;
+      height: 16px;
+      float: right;
+      background-color: $ultra_light_grey;
+      margin: 4px 8px 0;
+    }
 
-      button.cancel-btn {
-        float: right;
-        width: 112px;
-        height: 40px;
-        padding: 10px 24px;
-        text-align: center;
-        color: $ui_grey;
-        @include OC_Body_Bold();
-        font-size: 14px;
+    button.complete-follow-up {
+      float: right;
+      background-image: cdnUrl("/img/ML/follow_up_complete_with_comment_icon.svg");
+      background-size: 16px 16px;
+      background-position: left 0px top 4px;
+      background-repeat: no-repeat;
+      // with: 156px;
+      height: 24px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      line-height: 24px;
+      color: rgba($deep_navy, 0.5);
+      padding: 0 8px 0 24px;
 
-        &:disabled {
-          color: $light_ui_grey;
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 1 !important;
+
+        @include mobile() {
+          opacity: 0.5;
         }
-      }
 
-      button.reply-btn {
-        float: right;
-        width: 112px;
-        height: 40px;
-        padding: 10px 24px;
-        background-color: $carrot_green;
-        text-align: center;
-        color: white;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        border-radius: 6px;
-
-        &:disabled {
-          background-color: $light_ui_grey;
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
         }
       }
     }

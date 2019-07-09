@@ -3,6 +3,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -10,6 +11,7 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn enable-add-comment? [s]
@@ -126,7 +128,12 @@
                            s)}
   [s activity-data]
   (let [_ (drv/react s :add-comment-data)
-        current-user-data (drv/react s :current-user-data)]
+        current-user-data (drv/react s :current-user-data)
+        follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+        show-follow-up-button? (and follow-up
+                                    (not (:completed? follow-up)))
+        complete-follow-up-link (when show-follow-up-button?
+                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         (user-avatar-image current-user-data)
@@ -135,8 +142,15 @@
            {:ref "add-comment"
             :content-editable true
             :class utils/hide-class
-            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
+            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]]
+      [:div.add-comment-footer
         [:button.mlb-reset.send-btn
           {:on-click #(send-clicked s)
            :disabled @(::add-button-disabled s)}
-          "Send"]]]))
+          "Send"]
+        (when show-follow-up-button?
+          [:div.buttons-separator])
+        (when show-follow-up-button?
+          [:button.mlb-reset.complete-follow-up
+            {:on-click #(activity-actions/complete-follow-up activity-data follow-up)}
+            "Complete follow-up"])]]))
