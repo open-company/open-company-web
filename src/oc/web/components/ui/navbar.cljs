@@ -56,6 +56,8 @@
                       "All Posts"
                       (= (router/current-board-slug) "must-see")
                       "Must See"
+                      (= (router/current-board-slug) "follow-ups")
+                      "Follow-up"
                       :else
                       (:name board-data))
         create-link (utils/link-for (:links org-data) "create")
@@ -63,6 +65,8 @@
         boards (navigation-sidebar/filter-boards all-boards)
         show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
                             (utils/link-for (:links org-data) "activity"))
+        show-follow-ups (and (jwt/user-is-part-of-the-team (:team-id org-data))
+                             (utils/link-for (:links org-data) "follow-ups"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         show-boards (or create-link (pos? (count boards)))
@@ -98,6 +102,11 @@
                         {:class (when (= (router/current-board-slug) "all-posts") "active")
                          :on-click #(mobile-nav! % "all-posts")}
                         "All Posts"])
+                    (when show-follow-ups
+                      [:button.mlb-reset.mobile-section-item.follow-ups
+                        {:class (when (= (router/current-board-slug) "follow-ups") "active")
+                         :on-click #(mobile-nav! % "follow-ups")}
+                        "Follow-up"])
                     (when drafts-link
                       [:button.mlb-reset.mobile-section-item.drafts
                         {:class (when (= (router/current-board-slug) utils/default-drafts-board-slug) "active")
