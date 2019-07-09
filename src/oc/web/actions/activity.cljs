@@ -322,7 +322,8 @@
 (declare send-item-read)
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)]
+  (let [org-slug (router/current-org-slug)
+        is-published? (= (:status activity-data) "published")]
     (when (and (router/current-activity-id)
                (not= board-slug (router/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
@@ -333,22 +334,16 @@
     ;; reset initial revision after successful save.
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc (:uuid activity-data))
-    (let [is-published? (= (:status activity-data) "published")
-          old-activity-data (when (and is-published?
-                                       (:uuid activity-data))
-                              (dis/activity-data (router/current-org-slug) (:uuid activity-data)))]
-      (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
-      ;; Send item read
-      (when is-published?
-        (send-item-read (:uuid activity-data))
-        (when (and old-activity-data
-                   (> (count (:follow-ups activity-data)) (count (:follow-ups old-activity-data))))
-          (notification-actions/show-notification {:title "Follow-up requested"
-                                                   :description "You requested additional follow-ups."
-                                                   :primary-bt-dismiss true
-                                                   :primary-bt-title "OK"
-                                                   :expire 3
-                                                   :id :publish-follow-ups}))))))
+    (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
+    ;; Send item read
+    (when is-published?
+      (send-item-read (:uuid activity-data))
+      (notification-actions/show-notification {:title "Changes have been saved"
+                                               :primary-bt-dismiss true
+                                               :primary-bt-title "OK"
+                                               :primary-bt-inline true
+                                               :expire 3
+                                               :id :entry-updated-notification}))))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
