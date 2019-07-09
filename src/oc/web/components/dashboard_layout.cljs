@@ -152,7 +152,7 @@
                                                    "All posts"
 
                                                    is-follow-ups
-                                                   "Follow-up"
+                                                   "Follow-ups"
 
                                                    is-must-see
                                                    "Must see"

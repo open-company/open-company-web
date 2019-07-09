@@ -134,7 +134,7 @@
               [:div.follow-ups-icon]
               [:div.follow-ups-label
                 {:class (utils/class-set {:new (pos? follow-ups-count)})}
-                "Follow-up"]
+                "Follow-ups"]
               (when (pos? follow-ups-count)
                 [:span.count follow-ups-count])]))
         (when drafts-link

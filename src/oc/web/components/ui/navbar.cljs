@@ -57,7 +57,7 @@
                       (= (router/current-board-slug) "must-see")
                       "Must See"
                       (= (router/current-board-slug) "follow-ups")
-                      "Follow-up"
+                      "Follow-ups"
                       :else
                       (:name board-data))
         create-link (utils/link-for (:links org-data) "create")
@@ -106,7 +106,7 @@
                       [:button.mlb-reset.mobile-section-item.follow-ups
                         {:class (when (= (router/current-board-slug) "follow-ups") "active")
                          :on-click #(mobile-nav! % "follow-ups")}
-                        "Follow-up"])
+                        "Follow-ups"])
                     (when drafts-link
                       [:button.mlb-reset.mobile-section-item.drafts
                         {:class (when (= (router/current-board-slug) utils/default-drafts-board-slug) "active")
