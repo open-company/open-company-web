@@ -362,6 +362,15 @@ will sense the new update, and automatically install it in the background.
 
 #### Production Release (Windows)
 
+To build on windows, you'll first need to install a few tools:
+
+- [Java](https://www.java.com/en/download/)
+- [Node LTE](https://nodejs.org/en/)
+- [boot.exe](https://github.com/boot-clj/boot#windows)
+- [Yarn](https://yarnpkg.com)
+
+Now you're able to run the following:
+
 ```
 boot prod-electron-windows
 cd target/
