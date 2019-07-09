@@ -369,7 +369,7 @@ To build on windows, you'll first need to install a few tools:
 - [boot.exe](https://github.com/boot-clj/boot#windows)
 - [Yarn](https://yarnpkg.com)
 
-Now you're able to run the following:
+Now you're able to run the following from the Windows PowerShell:
 
 ```
 boot prod-electron-windows
