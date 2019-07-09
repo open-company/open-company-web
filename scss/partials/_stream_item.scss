@@ -188,6 +188,7 @@ div.stream-item {
         }
 
         div.mobile-name {
+          display: inline-block;
 
           @include mobile() {
             display: flex;
