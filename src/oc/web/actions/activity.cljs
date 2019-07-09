@@ -333,10 +333,22 @@
     ;; reset initial revision after successful save.
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc (:uuid activity-data))
-    (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
-    ;; Send item read
-    (when (= (:status activity-data) "published")
-      (send-item-read (:uuid activity-data)))))
+    (let [is-published? (= (:status activity-data) "published")
+          old-activity-data (when (and is-published?
+                                       (:uuid activity-data))
+                              (dis/activity-data (router/current-org-slug) (:uuid activity-data)))]
+      (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
+      ;; Send item read
+      (when is-published?
+        (send-item-read (:uuid activity-data))
+        (when (and old-activity-data
+                   (> (count (:follow-ups activity-data)) (count (:follow-ups old-activity-data))))
+          (notification-actions/show-notification {:title "Follow-up requested"
+                                                   :description "You requested additional follow-ups."
+                                                   :primary-bt-dismiss true
+                                                   :primary-bt-title "OK"
+                                                   :expire 3
+                                                   :id :publish-follow-ups}))))))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
@@ -471,6 +483,8 @@
                  entry-create-link (utils/link-for (:links entry-board-data) "create")]
              (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
+(declare follow-ups-for-activity)
+
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
   (au/save-last-used-section board-slug)
@@ -484,7 +498,26 @@
   ;; Send item read
   (send-item-read (:uuid activity-data))
   ;; Show the first post added tooltip if needed
-  (nux-actions/show-post-added-tooltip (:uuid activity-data)))
+  (nux-actions/show-post-added-tooltip (:uuid activity-data))
+  ;; Show follow-ups notifications if needed
+  (when (pos? (count (:follow-ups activity-data)))
+    (let [follow-ups (:follow-ups activity-data)
+          activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
+          available-users-set (set (map #(-> % :assignee :user-id) activity-follow-ups))
+          actual-follow-ups-set (set (map #(-> % :assignee :user-id) follow-ups))
+          notification-message (if (>= (count actual-follow-ups-set) (count available-users-set))
+                                (str "You requested a follow-up from everyone in " (:board-name activity-data) ".")
+                                (str "You've requested a follow-up from " (count actual-follow-ups-set)
+                                 (if (= (count actual-follow-ups-set) 1)
+                                  " person."
+                                  " people.")))]
+      (notification-actions/show-notification {:title "Follow-up requested"
+                                               :description notification-message
+                                               :primary-bt-dismiss true
+                                               :primary-bt-title "OK"
+                                               :primary-bt-inline true
+                                               :expire 3
+                                               :id :publish-follow-ups}))))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
