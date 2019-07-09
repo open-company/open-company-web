@@ -366,11 +366,16 @@ will sense the new update, and automatically install it in the background.
 boot prod-electron-windows
 cd target/
 yarn install
-npx electron-builder --win --publish always"
+npx electron-builder --win --publish always
 ```
 
 This will build, sign, and publish an EXE to GitHub Releases alongside any existing Mac builds with the same version. This EXE
 is an installer, and is completely self-contained.
+
+To produce a test build without releasing it replace the last command with:
+```
+npx electron-builder --win
+```
 
 ## Participation
 
