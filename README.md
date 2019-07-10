@@ -368,6 +368,8 @@ To build on windows, you'll first need to install a few tools:
 - [Node LTE](https://nodejs.org/en/)
 - [boot.exe](https://github.com/boot-clj/boot#windows)
 - [Yarn](https://yarnpkg.com)
+- [Ruby](rubyinstaller.org/downloads)
+- [SASS](https://sass-lang.com/install)
 
 Now you're able to run the following from the Windows PowerShell:
 
