@@ -1082,6 +1082,7 @@
 
 (defn create-self-follow-up [entry-data create-follow-up-link]
   (let [org-data (dis/org-data)]
+    (dis/dispatch! [:follow-up-create-self (:slug org-data) entry-data])
     (when create-follow-up-link
       (api/create-follow-ups create-follow-up-link {:self true}
        (fn [{:keys [status body success]}]

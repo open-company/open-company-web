@@ -375,11 +375,18 @@
         follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
         follow-up-data (get-in db follow-up-key)
         recent-follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-        recent-follow-up-data (get-in db recent-follow-up-key)]
+        recent-follow-up-data (get-in db recent-follow-up-key)
+        org-key (dispatcher/org-data-key org-slug)]
     (-> db
+      (update-in (conj org-key :follow-ups-count) dec)
       (assoc-in activity-key entry-data)
       (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list follow-up-data)))
       (assoc-in (conj recent-follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list recent-follow-up-data))))))
+
+(defmethod dispatcher/action :follow-up-create-self
+  [db [_ org-slug activity-data]]
+  (let [org-key (dispatcher/org-data-key org-slug)]
+    (update-in db (conj org-key :follow-ups-count) inc)))
 
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]

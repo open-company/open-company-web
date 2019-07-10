@@ -126,16 +126,15 @@
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
         (when show-follow-ups
-          (let [follow-ups-count (if follow-ups-data (count (:posts-list follow-ups-data)) (:follow-ups-count org-data))]
-            [:a.follow-ups.hover-item.group
-              {:class (utils/class-set {:item-selected is-follow-ups})
-               :href (oc-urls/follow-ups)
-               :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
-              [:div.follow-ups-icon]
-              [:div.follow-ups-label
-                "Follow-ups"]
-              (when (pos? follow-ups-count)
-                [:span.count follow-ups-count])]))
+          [:a.follow-ups.hover-item.group
+            {:class (utils/class-set {:item-selected is-follow-ups})
+             :href (oc-urls/follow-ups)
+             :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
+            [:div.follow-ups-icon]
+            [:div.follow-ups-label
+              "Follow-ups"]
+            (when (pos? (:follow-ups-count org-data))
+              [:span.count (:follow-ups-count org-data)])])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
