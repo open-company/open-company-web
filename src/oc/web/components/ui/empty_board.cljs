@@ -38,13 +38,13 @@
            ; is-all-posts? "Stay up to date"
            is-must-see? "Highlight what's important"
            is-drafts-board? "Jot down your ideas and notes"
-           is-follow-ups? "Looks like you’re all caught up!"
+           is-follow-ups? "You’re all caught up!"
            :else (if is-author? "Create a post to get started" "There's nothing to see here"))]
         [:div.empty-board-subtitle
           (cond
            is-all-posts? "All posts is a stream of what’s new in Carrot."
            is-must-see? "When someone marks a post as “must see” everyone will see it here."
-           is-follow-ups? "Mark a post for follow up to get reminders."
+           is-follow-ups? "Posts that require action or that you'd like to read later will show up here."
            is-drafts-board? "Keep a private draft until you're ready to share it with your team."
            :else (when is-author? (str "Looks like there aren’t any posts in " (:name board-data) ".")))]
         (when (and (not is-follow-ups?)
