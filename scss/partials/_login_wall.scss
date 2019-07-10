@@ -8,6 +8,9 @@ div.login-wall-container {
     height: 100vh;
     display: flex;
 
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+
     @include mobile(){
       display: block;
     }
@@ -173,6 +176,8 @@ div.login-wall-container {
             border: 1px solid rgba(#B1B8C0, 0.5);
             margin-top: 16px;
             padding: 6px 12px;
+
+            -webkit-app-region: no-drag;
           }
 
           a.forgot-password {
