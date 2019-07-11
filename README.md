@@ -307,52 +307,70 @@ yarn start
 
 To actually distribute the application, we first need to package the app (DMG on Mac, EXE installer on Windows),
 codesign the resulting artifact, and then publish the signed artifact to GitHub releases. Luckily these steps
-are largely automated, but there is a bit of one-time setup. First, we need to configure our environment
-with a few secrets:
+are largely automated, but there is a bit of one-time setup.
+
+#### One-time Setup
+
+First, you'll need to have the appropriate Apple certificates installed to your Mac's keychain (ask an admin).
+You'll also need the team's provisioning profile to perform development builds. Get this from a team member,
+and download it to your local system. Place the file in a well known place (e.g. your `~/code/carrot` directory**.
+**Do not put it in the repository**.
+
+Next, we need to configure our environment with a few secrets:
 
 ```
 cp resources/electron-builder.example.env resources/electron-builder.env
 ```
 
-Edit this file appropriately. You can generate a GitHub token for yourself [here](https://github.com/settings/tokens).
-This file is ignored by git.
+Edit this file appropriately. You can generate a GitHub token for yourself [here](https://github.com/settings/tokens). Make
+sure to select the `write:packages` scope. Note that this file is ignored by git.
 
-Next, you'll need to have the appropriate Apple certificates installed to your Mac's keychain, as well as any development
-provisioning profiles (ask an admin). Download the provisioning profiles to your local filesystem.
 With these in place, use the following to build, sign, and publish a desktop release.
 
-#### Staging Release
+Finally, be sure to log in to [developer.apple.com](https://developer.apple.com) at least one time to accept their terms
+of service and fully activate your account.
+
+#### Staging Release (Mac)
 
 This will produce a development build runnable by the devices specified in the supplied provisioning profile.
 
 ```
-# Bump the version in resources/package.json to X.Y.Z-B, where B is the current build number
+# Bump the version in resources/package.json to X.Y.Z
 vim resources/package.json
+
+git add .
+git commit -m "Bump desktop version"
+git push
 
 boot staging-electron
 cd target/
 yarn install
-npx electron-builder -c.mac.provisioningProfile=/path/to/your/Carrot_MacOS_Development_Profile.provisionprofile --publish always
+npx electron-builder -c.mac.type=development -c.mac.provisioningProfile=/path/to/your/Carrot_MacOS_Development_Profile.provisionprofile --publish always
 ```
+
+NOTE: `/path/to/your/Carrot_MacOS_Development_Profile.provisionprofile` is the path that you saved the provisioning profile to from the above step
+(e.g. `/Users/me/code/carrot/Carrot_MacOS.provisionprofile`). **Make sure to use an absolute path in the command line argument; relative paths will not work!**
 
 Keep in mind that this can take a while (~10 minutes) due to requiring Apple's servers to notarize the application.
 
 This will build, sign, notarize, and publish a tagged draft release to [GitHub Releases](https://github.com/open-company/open-company-web/releases).
+The tag will match the version number specified in `resources/package.json`.
+
 Because this is a development build in Apple's eyes, _it is only runnable by the devices included in the supplied provisioning profile._ You should
 not publish this build in the GitHub Release panel, and instead should distribute it to testers manually.
 
-
 #### Production Release (Mac)
 
-```
-# Bump the version in resources/package.json to X.Y.Z (drop the build number)
-vim resources/package.json
+NOTE: You should have bumped the desktop version in your feature branch before merging, so you won't need to do that again.
 
+```
 boot prod-electron
 cd target/
 yarn install
 npx electron-builder -c.mac.type=distribution -c.mac.identity="OpenCompany, LLC (XXXXXXXXXX) --publish always"
 ```
+
+You can find the proper value for the `-c.mac.identity` value in your Mac Keychain.
 
 Keep in mind that this can take a while (~10 minutes) due to requiring Apple's servers to notarize the application.
 
@@ -362,7 +380,9 @@ will sense the new update, and automatically install it in the background.
 
 #### Production Release (Windows)
 
-To build on windows, you'll first need to install a few tools:
+Be sure to follow the same one-time setup that we did above on your Windows machine. Ask an admin for the relevant Windows certs.
+
+To build on windows, you'll need to install a few tools:
 
 - [Java](https://www.java.com/en/download/)
 - [Node LTE](https://nodejs.org/en/)
