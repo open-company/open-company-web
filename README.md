@@ -361,7 +361,8 @@ not publish this build in the GitHub Release panel, and instead should distribut
 
 #### Production Release (Mac)
 
-NOTE: You should have bumped the desktop version in your feature branch before merging, so you won't need to do that again.
+_Before performing this step, be sure that your changes have been fully merged into `master`. All prod desktop
+builds should be made from the `master` branch._
 
 ```
 boot prod-electron
@@ -392,6 +393,9 @@ To build on windows, you'll need to install a few tools:
 - [SASS](https://sass-lang.com/install)
 
 Now you're able to run the following from the Windows PowerShell:
+
+_Before performing this step, be sure that your changes have been fully merged into `master`. All prod desktop
+builds should be made from the `master` branch._
 
 ```
 boot prod-electron-windows
