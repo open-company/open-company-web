@@ -380,8 +380,7 @@
     (-> db
       (update-in (conj org-key :follow-ups-count) dec)
       (assoc-in activity-key entry-data)
-      (assoc-in (conj follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list follow-up-data)))
-      (assoc-in (conj recent-follow-up-key :posts-list) (filterv #(= % (:uuid entry-data)) (:posts-list recent-follow-up-data))))))
+      (add-remove-item-from-follow-ups org-slug entry-data))))
 
 (defmethod dispatcher/action :follow-up-create-self
   [db [_ org-slug activity-data]]
