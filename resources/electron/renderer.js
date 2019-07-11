@@ -10,6 +10,8 @@ console.log("Carrot desktop engage!");
 // desktop funcitonality.
 
 window.isDesktop = true;
+window.isWin32 = (process.platform === "win32");
+window.isMac = (process.platform === "darwin");
 
 window.setBadgeCount = function(count) {
   console.log("Sending badge count IPC: " + count);
