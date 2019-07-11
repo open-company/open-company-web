@@ -81,7 +81,6 @@
         (login-overlays-handler))
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
-          (when js/window.isMac {:style {:padding-left "60px"}})
           [:div.navbar-left
             (orgs-dropdown)]
           (if is-mobile?

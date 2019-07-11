@@ -34,9 +34,7 @@
       (login-overlays-handler)
       [:div.login-wall-wrapper
         [:div.login-wall-left
-          [:div.login-wall-logo
-
-           (when js/window.isMac {:style {:margin-top "20px"}})]
+          [:div.login-wall-logo]
           [:div.login-wall-box]]
         [:div.login-wall-right
           [:div.login-wall-right-content
