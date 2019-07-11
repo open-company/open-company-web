@@ -12,7 +12,8 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "add-comment")]
@@ -36,9 +37,17 @@
 (defn- send-clicked [s]
   (let [add-comment-div (rum/ref-node s "add-comment")
         comment-body (cu/add-comment-content add-comment-div)
-        activity-data (first (:rum/args s))]
+        activity-data (first (:rum/args s))
+        complete? @(::complete-follow-up s)]
     (set! (.-innerHTML add-comment-div) "")
-    (comment-actions/add-comment activity-data comment-body)))
+    (comment-actions/add-comment activity-data comment-body)
+    (when complete?
+      (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+            show-follow-up-button? (and follow-up
+                                        (not (:completed? follow-up)))
+            complete-follow-up-link (when show-follow-up-button?
+                                      (utils/link-for (:links follow-up) "mark-complete" "POST"))]
+        (activity-actions/complete-follow-up activity-data follow-up)))))
 
 (defn setup-medium-editor-when-needed [s]
   (when-not @(::medium-editor s)
@@ -68,6 +77,7 @@
                          (rum/local nil ::focus-listener)
                          (rum/local nil ::blur-listener)
                          (rum/local "" ::initial-add-comment)
+                         (rum/local false ::complete-follow-up)
                          {:will-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
@@ -152,5 +162,9 @@
           [:div.buttons-separator])
         (when show-follow-up-button?
           [:button.mlb-reset.complete-follow-up
-            {:on-click #(activity-actions/complete-follow-up activity-data follow-up)}
+            {:class (when-not @(::complete-follow-up s) "unselected")
+             :on-click #(do
+                         (utils/event-stop %)
+                         (swap! (::complete-follow-up s) not))}
+            (carrot-checkbox {:selected @(::complete-follow-up s)})
             "Complete follow-up"])]]))

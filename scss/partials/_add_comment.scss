@@ -168,17 +168,27 @@ div.add-comment-box-container {
 
     button.complete-follow-up {
       float: right;
-      background-image: cdnUrl("/img/ML/follow_up_complete_with_comment_icon.svg");
-      background-size: 16px 16px;
-      background-position: left 0px top 4px;
-      background-repeat: no-repeat;
-      // with: 156px;
       height: 24px;
       @include OC_Body_Book();
       font-size: 14px;
       line-height: 24px;
-      color: rgba($deep_navy, 0.5);
+      color: $deep_navy;
       padding: 0 8px 0 24px;
+      position: relative;
+
+      div.carrot-checkbox {
+        position: absolute;
+        top: 4px;
+        left: 0px;
+      }
+
+      &.unselected {
+        opacity: 0.5;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
 
       &:disabled {
         cursor: not-allowed;
