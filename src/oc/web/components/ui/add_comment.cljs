@@ -89,8 +89,8 @@
                            (let [add-comment-node (rum/ref-node s "add-comment")
                                  activity-data (first (:rum/args s))
                                  add-comment-focus @(drv/get-ref s :add-comment-focus)
-                                 should-focus-field? (= (:uuid activity-data) add-comment-focus)]
-
+                                 should-focus-field? (= (:uuid activity-data) add-comment-focus)
+                                 follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))]
                              (setup-medium-editor-when-needed s)
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
@@ -113,7 +113,11 @@
                              (when should-focus-field?
                                (.focus add-comment-node)
                                (utils/after 0
-                                #(utils/to-end-of-content-editable add-comment-node))))
+                                #(utils/to-end-of-content-editable add-comment-node)))
+                             ;; Default to complete follow-up on add comment if user has one
+                             (when (and follow-up
+                                        (not (:completed? follow-up)))
+                               (reset! (::complete-follow-up s) true)))
                            s)
                           :did-remount (fn [_ s]
                            (setup-medium-editor-when-needed s)
@@ -140,10 +144,12 @@
   (let [_ (drv/react s :add-comment-data)
         current-user-data (drv/react s :current-user-data)
         follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+        complete-follow-up-link (when follow-up
+                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))
         show-follow-up-button? (and follow-up
-                                    (not (:completed? follow-up)))
-        complete-follow-up-link (when show-follow-up-button?
-                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))]
+                                    (not (:completed? follow-up))
+                                    complete-follow-up-link
+                                    (not (responsive/is-mobile-size?)))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         (user-avatar-image current-user-data)
@@ -163,6 +169,10 @@
         (when show-follow-up-button?
           [:button.mlb-reset.complete-follow-up
             {:class (when-not @(::complete-follow-up s) "unselected")
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :title "Complete follow-up when the comment is posted"
              :on-click #(do
                          (utils/event-stop %)
                          (swap! (::complete-follow-up s) not))}
