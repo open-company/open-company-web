@@ -3,6 +3,7 @@ div.stream-attachments {
 
   @include mobile() {
     width: 100%;
+    margin-top: 16px;
   }
 
   div.stream-attachments-content {
@@ -42,6 +43,13 @@ div.stream-attachments {
           background-repeat: no-repeat;
           background-position: center;
           float: left;
+
+          @include mobile() {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            width: 14px;
+            opacity: 0.7;
+          }
         }
 
         div.attachment-labels {
@@ -71,7 +79,7 @@ div.stream-attachments {
           span.attachment-description {
             @include OC_Body_Book();
             font-size: 12px;
-            color: $light_ui_grey;
+            color: rgba($deep_navy, 0.5);
             white-space: nowrap;
             line-height: 20px;
             display: block;

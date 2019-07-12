@@ -128,6 +128,7 @@ var OCStaticStartFixFixedPositioning = function(){};
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};
 var isIE = function(){};
+var isEdge = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -150,6 +151,7 @@ var init_fullstory = function(){};
 var FS = function(){};
 FS.setUserVars = function(){};
 FS.getCurrentSessionURL = function(){};
+FS.identify = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -184,3 +186,9 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// Electron
+window.isDesktop = {};
+window.isWin32 = {};
+window.isMac = {};
+window.setBadgeCount = function() {};
+// Fullstory

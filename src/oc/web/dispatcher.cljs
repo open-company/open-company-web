@@ -196,7 +196,6 @@
                               (:current-user-data base)))]
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
-   :made-with-carrot-modal [[:base] (fn [base] (:made-with-carrot-modal base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
@@ -340,6 +339,16 @@
                             (fn [base org-slug]
                               (when (and base org-slug)
                                 (get-in base (user-notifications-key org-slug))))]
+   :unread-notifications  [[:user-notifications]
+                           (fn [notifications]
+                             (filter :unread notifications))]
+   :unread-notifications-count [[:unread-notifications]
+                                (fn [notifications]
+                                  (let [ncount (count notifications)]
+                                    (timbre/info "Unread notification count updated: " ncount)
+                                    (when js/window.isDesktop
+                                      (js/window.setBadgeCount ncount))
+                                    ncount))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]
@@ -367,7 +376,6 @@
                                :board-data board-data
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
-                               :made-with-carrot-modal-data (:made-with-carrot-modal base)
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
