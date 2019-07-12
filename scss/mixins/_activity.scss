@@ -347,10 +347,10 @@ $h2_top_margin: 24;
     }
   }
 
-  a, span[data-auto-link] {
+  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
     text-decoration: none;
     color: $carrot_green;
-    background-color: transparent;
+    background-color: transparent !important;
   }
 
   a:hover {
