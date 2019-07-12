@@ -1,8 +1,9 @@
 {
   "name": "Carrot",
   "author": "Open Company",
-  "version": "0.1.8",
+  "version": "1.0.0",
   "main": "index.js",
+  "license": "CC-BY-NC-SA-4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/open-company/open-company-web"
