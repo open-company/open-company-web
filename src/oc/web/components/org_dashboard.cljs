@@ -97,7 +97,7 @@
                 is-showing-alert
                 show-section-add-cb
                 activity-share-container
-                show-cmail
+                cmail-state
                 showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
@@ -253,7 +253,8 @@
               (rum/portal (activity-share) portal-element)
               (activity-share))))
         ;; cmail editor
-        (when show-cmail
+        (when (and cmail-state
+                   is-mobile?)
           (cmail))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
@@ -265,7 +266,7 @@
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (not show-cmail)
+                       (not cmail-state)
                        (not open-panel)))
           [:div.page
             (navbar)

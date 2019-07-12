@@ -352,7 +352,11 @@
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
 
-                   {:will-mount (fn [s]
+                   {:init (fn [s]
+                     (dis/dispatch! [:input [:cmail-state] {:key (utils/guid)
+                                                            :collapsed true}])
+                     s)
+                    :will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
                           initial-body (if (seq (:body cmail-data))
                                          (:body cmail-data)
@@ -372,9 +376,6 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
-                    (utils/after 500
-                     #(when-let [body-el (body-element)]
-                        (utils/to-end-of-content-editable body-el)))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -459,7 +460,12 @@
                     (cancel-clicked s)
                     (activity-actions/cmail-hide)))]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen is-fullscreen?})}
+      {:class (utils/class-set {:fullscreen is-fullscreen?
+                                :quick-post-collapsed (:collapsed cmail-state)})
+       :key (str "cmail-" (:key cmail-state))
+       :on-click #(when-not cmail-state
+                    (activity-actions/cmail-show (activity-actions/get-board-for-edit) {:collapsed false
+                                                                                        :key (:key cmail-state)}))}
       [:div.cmail-container
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
@@ -497,15 +503,6 @@
                  :title (if long-tooltip
                           "Save & Close"
                           "Close")}]])
-          [:div.fullscreen-bt-container
-            [:button.mlb-reset.fullscreen-bt
-              {:on-click #(activity-actions/cmail-toggle-fullscreen)
-               :data-toggle "tooltip"
-               :data-placement "auto"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if is-fullscreen?
-                        "Shrink"
-                        "Expand")}]]
           [:div.cmail-header-vertical-separator]
           [:div.cmail-header-board-must-see-container.group
             {:class (when (:must-see cmail-data) "must-see-on")}
@@ -679,9 +676,50 @@
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
-      [:div.cmail-footer
-        (when-not is-fullscreen?
+      (if is-fullscreen?
+        [:div.cmail-footer
+          (when (and (not= (:status cmail-data) "published")
+                     (not is-mobile?))
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.saving-saved "Saved"])))]
+        [:div.cmail-footer
+          [:div.fullscreen-bt-container
+            [:button.mlb-reset.fullscreen-bt
+              {:on-click #(activity-actions/cmail-toggle-fullscreen)}
+              "Full-screen"]]
           [:div.cmail-footer-right
+            [:button.mlb-reset.post-button
+              {:ref "post-btn"
+               :on-click #(post-clicked s)
+               :class (utils/class-set {:disabled disabled?
+                                        :loading working?})}
+              (if (= (:status cmail-data) "published")
+                "Save"
+                "Post")]
+            [:div.board-name.oc-input
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
+               :class (when show-sections-picker "active")}
+              [:div.board-name-inner
+                (:board-name cmail-data)]]
+            (when show-sections-picker
+              [:div.section-picker-container
+                {:ref :picker-container}
+                (sections-picker (:board-slug cmail-data)
+                 (fn [board-data note dismiss-action]
+                   (dis/dispatch! [:input [:show-sections-picker] false])
+                   (when (and board-data
+                              (seq (:name board-data)))
+                    (dis/dispatch! [:input [:cmail-data]
+                     (merge cmail-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)
+                                        :has-changes true
+                                        :invite-note note})])
+                    (when (fn? dismiss-action)
+                      (dismiss-action)))))])
             [:div.delete-button-container
               [:button.mlb-reset.delete-button
                 {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
@@ -700,11 +738,11 @@
                            :height 24
                            :position "top"
                            :default-field-selector "div.cmail-content div.rich-body-editor"
-                           :container-selector "div.cmail-content"})])
-        (when (and (not= (:status cmail-data) "published")
-                   (not is-mobile?))
-          (if (or (:has-changes cmail-data)
-                  (:auto-saving cmail-data))
-            [:div.saving-saved "Saving..."]
-            (when (false? (:auto-saving cmail-data))
-              [:div.saving-saved "Saved"])))]]]))
+                           :container-selector "div.cmail-content"})]
+          (when (and (not= (:status cmail-data) "published")
+                     (not is-mobile?))
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.saving-saved "Saved"])))])]]))

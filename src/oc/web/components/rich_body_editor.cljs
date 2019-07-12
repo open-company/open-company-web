@@ -312,7 +312,8 @@
             media-picker-opts {:buttons (clj->js media-config)
                                :hidePlaceholderOnExpand false
                                :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
-                                                             :alwaysExpanded (:use-inline-media-picker options)}
+                                                             :alwaysExpanded (:use-inline-media-picker options)
+                                                             :initiallyVisible (:use-inline-media-picker options)}
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))

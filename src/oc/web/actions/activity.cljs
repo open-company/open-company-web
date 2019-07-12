@@ -926,7 +926,7 @@
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
   (dis/dispatch! [:input [:cmail-data] nil])
-  (dis/dispatch! [:input [:cmail-state] nil])
+  (dis/dispatch! [:input [:cmail-state] {:collapsed true :key (utils/guid)}])
   (dom-utils/unlock-page-scroll))
 
 (defn cmail-toggle-fullscreen []

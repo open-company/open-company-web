@@ -1,20 +1,14 @@
 div.cmail-outer {
-  position: fixed;
-  bottom: 0px;
-  right: 24px;
-  width: 580px;
-  z-index: #{$navbar_zindex + 116};
-  background-color: white;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  // bottom: 0px;
+  // right: 24px;
+  width: 100%;
+  margin-bottom: 24px;
 
   @include tablet() {
     position: relative;
     bottom: unset;
     right: unset;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
     height: initial;
     min-height: 100vh;
     background-color: white;
@@ -23,6 +17,39 @@ div.cmail-outer {
     overflow-x: hidden;
     overflow-y: auto;
     background-color: $grey_num_2;
+    margin-bottom: 0;
+  }
+
+  &.quick-post-collapsed {
+    div.cmail-container {
+      div.cmail-content-outer {
+        padding: 16px 40px;
+
+        div.cmail-content {
+          height: 24px;
+          min-height: 24px;
+
+          div.cmail-content-headline {
+            display: none;
+          }
+
+          div.rich-body-editor-outer-container {
+            div.rich-body-editor-container {
+              margin-top: 0;
+              height: 24px;
+
+              div.rich-body-editor {
+                margin-top: 0;
+              }
+            }
+          }
+        }
+      }
+
+      div.cmail-footer {
+        display: none;
+      }
+    }
   }
 
   &.fullscreen {
@@ -31,10 +58,12 @@ div.cmail-outer {
     position: fixed;
     top: 0;
     left: 0;
-    rigth: 0;
+    right: 0;
     bottom: 0;
     background-color: $carrot_modal_bg;
     border-radius: 0;
+    z-index: #{$navbar_zindex + 116};
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
 
     @include tablet() {
       position: relative;
@@ -74,6 +103,7 @@ div.cmail-outer {
         left: 0;
         width: 100vw;
         z-index: 1;
+        display: block;
 
         div.close-bt-container {
           position: absolute;
@@ -233,8 +263,7 @@ div.cmail-outer {
       }
 
       div.cmail-content-outer {
-        padding-top: 56px;
-        padding-bottom: 0;
+        padding: 56px 0 0;
         overflow-x: hidden;
         overflow-y: auto;
         height: 100%;
@@ -242,6 +271,9 @@ div.cmail-outer {
         top: 0;
         left: 0;
         width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
       }
 
       div.cmail-content {
@@ -417,10 +449,12 @@ div.cmail-outer {
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       padding: 12px 16px;
+      display: none;
 
       @include no-user-select();
 
       @include tablet() {
+        display: block;
         width: 100%;
         min-height: 56px;
         height: auto;
@@ -695,10 +729,15 @@ div.cmail-outer {
       }
     }
 
+    div.cmail-content-outer {
+      padding: 24px 40px;
+      border-radius: 4px;
+      border: 1px solid $mid_light_grey;
+      box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
+    }
+
     div.cmail-content {
-      padding: 24px 16px;
-      min-height: 212px;
-      max-height: calc(100vh - 208px);
+      min-height: 112px;
       overflow-y: auto;
       overflow-x: hidden;
       height: auto;
@@ -761,6 +800,11 @@ div.cmail-outer {
         padding: 0 0 16px;
         border-bottom: 1px solid $ultra_light_grey;
         position: relative;
+        display: none;
+
+        @include tablet() {
+          display: block;
+        }
 
         div.cmail-content-abstract-counter {
           height: 26px;
@@ -935,9 +979,9 @@ div.cmail-outer {
     }
 
     div.cmail-footer {
-      height: 52px;
+      height: 32px;
       width: 100%;
-      padding: 0px 16px 12px;
+      margin-top: 16px;
 
       @include tablet() {
         display: none;
@@ -953,6 +997,32 @@ div.cmail-outer {
         float: right;
       }
 
+      div.fullscreen-bt-container {
+        float: left;
+
+        @include tablet() {
+          display: none;
+        }
+
+        button.fullscreen-bt {
+          height: 32px;
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
+          background-size: 12px 12px;
+          background-position: top 10px left 10px;
+          background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          padding: 7px 10px 7px 30px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+        }
+
+        .tooltip {
+          margin-top: -16px;
+        }
+      }
+
       div.cmail-footer-right {
         float: right;
 
@@ -961,12 +1031,11 @@ div.cmail-outer {
 
           button.delete-button {
             width: 22px;
-            height: 20px;
+            height: 32px;
             background-image: cdnUrl("/img/ML/cmail_delete.svg");
             background-size: 14px 16px;
             background-position: center;
             background-repeat: no-repeat;
-            margin-top: 10px;
             opacity: 0.4;
             padding: 0;
 
@@ -987,10 +1056,10 @@ div.cmail-outer {
           color: $deep_navy;
           position: relative;
           float: right;
-          margin-right: 16px;
+          margin-right: 8px;
           padding: 0;
           width: 24px;
-          height: 40px;
+          height: 32px;
           opacity: 0.4;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
           background-size: 14px 16px;
@@ -1004,12 +1073,11 @@ div.cmail-outer {
 
         div.emoji-picker {
           float: right;
-          margin-right: 16px;
-          margin-top: 8px;
+          margin-right: 8px;
 
           button.emoji-button {
             width: 24px;
-            height: 24px;
+            height: 32px;
             background-position: center;
             background-size: 16px 16px;
             padding: 0px;
@@ -1026,6 +1094,87 @@ div.cmail-outer {
           div.picker-container {
             right: -16px;
             left: unset;
+          }
+        }
+
+        button.post-button {
+          float: right;
+          background-color: $carrot_green;
+          color: white;
+          width: 56px;
+          height: 32px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          border-radius: 4px;
+          margin-left: 16px;
+
+          &.disabled {
+            cursor: not-allowed;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
+        div.board-name {
+          width: 160px;
+          height: 32px;
+          cursor: pointer;
+          position: relative;
+          float: right;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 16px;
+          padding: 7px 8px;
+          background-image: cdnUrl("/img/ML/select_arrows.svg");
+          background-size: 8px 10px;
+          background-position: top 11px right 8px;
+          background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          margin-left: 16px;
+
+          @include big_web() {
+            &:hover, &.active {
+              background-color: $more_ultra_light_grey;
+            }
+          }
+
+          div.board-name-inner {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: calc(100% - 16px);
+            white-space: nowrap;
+          }
+
+          @include tablet() {
+            width: calc(100% - 16px - 32px);
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            background-color: $ultra_light_grey;
+            color: $deep_navy;
+
+            &:hover, &.open {
+              background-color: $more_ultra_light_grey;
+            }
+          }
+        }
+
+        div.sections-picker {
+          position: absolute;
+          top: 40px;
+          left: 0;
+          z-index: #{$navbar_zindex + 156};
+          max-height: 370px;
+          overflow: auto;
+
+          @include tablet() {
+            width: calc(100% - 16px - 32px);
           }
         }
       }

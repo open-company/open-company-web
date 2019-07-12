@@ -385,7 +385,7 @@
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
-                               :show-cmail (boolean (:cmail-state base))
+                               :cmail-state (:cmail-state base)
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]

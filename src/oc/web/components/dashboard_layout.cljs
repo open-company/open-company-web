@@ -14,6 +14,7 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
@@ -40,6 +41,7 @@
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
                               (drv/drv :sort-type)
+                              (drv/drv :cmail-state)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -90,7 +92,8 @@
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))]
+                                     (not (:read-only board-data)))
+        cmail-state (drv/react s :cmail-state)]
       ;; Entries list
       [:div.dashboard-layout.group
         (when (and is-mobile?
@@ -105,6 +108,9 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
+            (when (and (not is-mobile?)
+                       can-compose)
+              (cmail))
             (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                   non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                          "decisions to keep you and your team pulling in the same direction.")
