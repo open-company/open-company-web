@@ -913,7 +913,9 @@
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
 (defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:fullscreen (or (:fullscrreen cmail-state) (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
+  (let [cmail-default-state {:fullscreen (if (contains? cmail-state :fullscreen)
+                                           (:fullscrreen cmail-state)
+                                           (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
     (when (:fullscreen cmail-default-state)
