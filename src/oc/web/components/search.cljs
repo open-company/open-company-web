@@ -20,7 +20,7 @@
         activity-url (oc-urls/entry (:board-slug result) (:uuid result))]
     [:div.search-result
      {:on-click (fn [s]
-                  (search/result-clicked activity-url)
+                  (search/result-clicked result activity-url)
                   s)}
      [:div.search-result-box
       (user-avatar-image {:user-id (first (:author-id result))
