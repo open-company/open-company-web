@@ -247,9 +247,9 @@
                                     false)
                        fixed-items (:fixed-items board-data)
                        entry-saved (if fixed-items
-                                         ;; board creation
-                                         (first (vals fixed-items))
-                                         json-body)]
+                                     ;; board creation
+                                     (first (vals fixed-items))
+                                     json-body)]
                    (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
@@ -945,23 +945,25 @@
 
 (defn cmail-reopen? []
   (when (compare-and-set! cmail-reopen-only-one false true)
-    ;; Make sure the new param is alone and not with an access param that means
-    ;; it was adding a slack team or bot
-    (utils/after 5000
-     #(if (and (contains? (router/query-params) :new)
-               (not (contains? (router/query-params) :access)))
-        (let [new-data (get-board-for-edit (router/query-param :new))
-              with-headline (if (router/query-param :headline)
-                             (assoc new-data :headline (router/query-param :headline))
-                             new-data)]
-          (when new-data
-            (cmail-show with-headline {:auto true})))
-        (let [edit-param (router/query-param :edit)
-              edit-activity (dis/activity-data edit-param)]
-          (if edit-activity
-            (cmail-show edit-activity {:auto true})
-            (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-              (cmail-show (dis/activity-data activity-uuid) {:auto true}))))))))
+      ;; Make sure the new param is alone and not with an access param that means
+      ;; it was adding a slack team or bot
+      (utils/after 5000
+       ;; If cmail is already open let's not reopen it
+       #(when-not (:cmail-state @dis/app-state)
+          (if (and (contains? (router/query-params) :new)
+                   (not (contains? (router/query-params) :access)))
+            (let [new-data (get-board-for-edit (router/query-param :new))
+                  with-headline (if (router/query-param :headline)
+                                 (assoc new-data :headline (router/query-param :headline))
+                                 new-data)]
+              (when new-data
+                (cmail-show with-headline {:auto true})))
+            (let [edit-param (router/query-param :edit)
+                  edit-activity (dis/activity-data edit-param)]
+              (if edit-activity
+                (cmail-show edit-activity {:auto true})
+                (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
+                  (cmail-show (dis/activity-data activity-uuid) {:auto true})))))))))
 
 (defn activity-edit
   ([]
