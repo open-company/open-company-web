@@ -1,6 +1,6 @@
-div.activity-not-found-container {
+div.login-wall-container {
 
-  div.activity-not-found-wrapper {
+  div.login-wall-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -8,11 +8,14 @@ div.activity-not-found-container {
     height: 100vh;
     display: flex;
 
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+
     @include mobile(){
       display: block;
     }
 
-    div.activity-not-found-left {
+    div.login-wall-left {
       background-color: $carrot_dark_bg_gray;
       padding: 21px;
       flex: 1;
@@ -27,7 +30,7 @@ div.activity-not-found-container {
         display: none;
       }
 
-      div.activity-not-found-logo {
+      div.login-wall-logo {
         width: 82px;
         height: 20px;
         background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
@@ -35,10 +38,10 @@ div.activity-not-found-container {
         background-repeat: no-repeat;
       }
 
-      div.activity-not-found-box {
+      div.login-wall-box {
         position: absolute;
         left: 50%;
-        top: 180px;
+        top: 201px;
         margin-left: -147px;
         margin-top: 0px;
         width: 294px;
@@ -49,7 +52,7 @@ div.activity-not-found-container {
       }
     }
 
-    div.activity-not-found-right {
+    div.login-wall-right {
       text-align: center;
       flex: 1;
       position: absolute;
@@ -64,7 +67,7 @@ div.activity-not-found-container {
         position: unset;
       }
 
-      div.activity-not-found-right-content {
+      div.login-wall-right-content {
         margin: 64px auto;
         width: 440px;
         text-align: center;
@@ -173,6 +176,8 @@ div.activity-not-found-container {
             border: 1px solid rgba(#B1B8C0, 0.5);
             margin-top: 16px;
             padding: 6px 12px;
+
+            -webkit-app-region: no-drag;
           }
 
           a.forgot-password {
@@ -188,7 +193,7 @@ div.activity-not-found-container {
         button.continue-btn {
           width: 340px;
           height: 48px;
-          margin: 40px auto 0px;
+          margin: 40px auto 20px;
           background-color: $sea_blue;
           color: white;
           border-radius: 100px;
@@ -197,6 +202,25 @@ div.activity-not-found-container {
 
           @include mobile() {
             width: 100%;
+          }
+        }
+
+        div.footer-link {
+          margin-top: 24px;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: $light_navy;
+          text-align: center;
+
+          a {
+            @include OC_Body_Book();
+            font-size: 16px;
+            color: $carrot_green;
+            margin-left: 4px;
+
+            &:hover {
+              text-decoration: underline;
+            }
           }
         }
       }

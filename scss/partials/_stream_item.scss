@@ -188,6 +188,7 @@ div.stream-item {
         }
 
         div.mobile-name {
+          display: inline-block;
 
           @include mobile() {
             display: flex;
@@ -434,6 +435,10 @@ div.stream-item {
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
+
+        &.no-abstract {
+          max-height: #{24 * 3}px;
+        }
 
         @include mobile() {
           margin-top: 4px;

@@ -38,8 +38,8 @@
                              (rum/local 0 ::mobile-video-height)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
+                             ui-mixins/refresh-tooltips-mixin
                              {:did-mount (fn [s]
-                               (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
                                (let [activity-data @(drv/get-ref s :secure-activity-data)
                                      comments-data @(drv/get-ref s :comments-data)]
                                 (comment-utils/get-comments-if-needed activity-data comments-data))

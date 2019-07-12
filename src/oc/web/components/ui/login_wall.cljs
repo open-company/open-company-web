@@ -1,17 +1,22 @@
-(ns oc.web.components.ui.activity-not-found
+(ns oc.web.components.ui.login-wall
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.user :as user-actions]))
+            [oc.web.actions.user :as user-actions]
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defcs activity-not-found < rum/reactive
-                                (drv/drv :auth-settings)
-                                (drv/drv :login-with-email-error)
-                                (rum/local "" ::email)
-                                (rum/local "" ::pswd)
-  [s]
+(def default-title "Please log in to continue")
+(def default-desc "You need to be logged in to view a post.")
+
+(rum/defcs login-wall < rum/reactive
+                        (drv/drv :auth-settings)
+                        (drv/drv :login-with-email-error)
+                        (rum/local "" ::email)
+                        (rum/local "" ::pswd)
+  [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
         login-enabled (and auth-settings
                            (not (nil?
@@ -25,17 +30,16 @@
                         (user-actions/maybe-save-login-redirect)
                         (user-actions/login-with-email @(::email s) @(::pswd s)))
         login-with-email-error (drv/react s :login-with-email-error)]
-    [:div.activity-not-found-container
-      [:div.activity-not-found-wrapper
-        [:div.activity-not-found-left
-          [:div.activity-not-found-logo]
-          [:div.activity-not-found-box]]
-        [:div.activity-not-found-right
-          [:div.activity-not-found-right-content
-            [:div.login-title
-              "Please log in to continue"]
-            [:div.login-description
-              "You need to be logged in to view a post."]
+    [:div.login-wall-container
+      (login-overlays-handler)
+      [:div.login-wall-wrapper
+        [:div.login-wall-left
+          [:div.login-wall-logo]
+          [:div.login-wall-box]]
+        [:div.login-wall-right
+          [:div.login-wall-right-content
+            [:div.login-title (or title default-title)]
+            [:div.login-description (or desc default-desc)]
             [:button.mlb-reset.signup-with-slack
               {:on-touch-start identity
                :on-click #(do
@@ -113,4 +117,13 @@
                    :on-click login-action
                    :disabled (or (not (seq @(::email s)))
                                  (not (seq @(::pswd s))))}
-                  "Continue"]]]]]]]))
+                  "Continue"]
+                [:div.footer-link
+                  "Don't have an account yet?  "
+                  [:a
+                    {:href oc-urls/sign-up
+                     :on-click (fn [e]
+                                 (utils/event-stop e)
+                                 (router/nav! oc-urls/sign-up))}
+                    "Sign up here"]]
+               ]]]]]]))

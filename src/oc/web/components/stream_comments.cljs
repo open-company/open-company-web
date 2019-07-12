@@ -8,13 +8,13 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.reactions :refer (reactions)]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -101,7 +101,8 @@
                              (rum/local nil ::show-picker)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
-                             (on-window-click-mixin (fn [s e]
+                             ui-mixins/refresh-tooltips-mixin
+                             (ui-mixins/on-window-click-mixin (fn [s e]
                               (when (and @(::show-picker s)
                                          (not (utils/event-inside? e
                                           (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
@@ -149,7 +150,12 @@
                                                :show-unread false})]
                 [:div.stream-comment-floating-buttons
                   {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                            :can-delete can-show-delete-bt?})}
+                                            :can-delete can-show-delete-bt?})
+                   :key (str "stream-comment-floating-buttons"
+                         (when can-show-edit-bt?
+                           "-edit")
+                         (when can-show-delete-bt?
+                           "-delete"))}
                   (when can-show-edit-bt?
                     [:button.mlb-reset.edit-bt
                       {:data-toggle "tooltip"
