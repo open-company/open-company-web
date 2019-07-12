@@ -7,6 +7,9 @@ nav.oc-navbar {
   transition: height 230ms;
   border-bottom: 1px solid $ultra_light_grey;
 
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+
   &.showing-orgs-dropdown {
     overflow: visible;
   }

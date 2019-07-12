@@ -1,7 +1,7 @@
 {
   "name": "Carrot",
   "author": "Open Company",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
       "sign": false
     },
     "win": {
-      "target": ["appx"],
+      "target": ["nsis"],
       "icon": "carrot.iconset/icon.ico"
     },
     "afterSign": "electron/notarize.js",

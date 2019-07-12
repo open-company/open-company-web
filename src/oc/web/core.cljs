@@ -104,6 +104,14 @@
       (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
 
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
+  ;; Add Electron classes if needed
+  (let [body (sel1 [:body])]
+    (when js/window.isDesktop
+      (dommy/add-class! body :electron))
+    (when js/window.isMac
+      (dommy/add-class! body :mac-electron))
+    (when js/window.isWin32
+      (dommy/add-class! body :win-electron)))
   ;; Setup timbre log level
   (when (:log-level query-params)
     (logging/config-log-level! (:log-level query-params)))

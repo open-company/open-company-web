@@ -188,5 +188,7 @@ var OCYTVideoInit = function(){};
 var OCWebStaticOpenIntegrationsPanel = function() {};
 // Electron
 window.isDesktop = {};
+window.isWin32 = {};
+window.isMac = {};
 window.setBadgeCount = function() {};
 // Fullstory
