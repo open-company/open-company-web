@@ -463,7 +463,7 @@
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
        :key (str "cmail-" (:key cmail-state))
-       :on-click #(when-not cmail-state
+       :on-click #(when (:collapsed cmail-state)
                     (activity-actions/cmail-show (activity-actions/get-board-for-edit) {:collapsed false
                                                                                         :key (:key cmail-state)}))}
       [:div.cmail-container
