@@ -42,16 +42,21 @@
   (.loadURL window init-url))
 
 (defn- mk-window
-  [w h frame? show?]
-  (BrowserWindow. #js {:width w
+  [w h show?]
+  (let [mac-frame-settings (when (mac?) {:titleBarStyle "hiddenInset"})
+        win-frame-settings (when (win32?) {:frame true})]
+    (BrowserWindow. (clj->js
+                     (merge
+                      mac-frame-settings
+                      win-frame-settings
+                      {:width w
                        :height h
-                       :frame frame?
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
                        :webPreferences #js {:enableRemoteModule false
                                             :preload (.join path (.getAppPath app) "electron" "renderer.js")}
-                       }))
+                       })))))
 
 (defn- set-csp
   []
@@ -101,7 +106,7 @@
     (.show @main-window)
     (do (set-csp)
         (prevent-navigation-external-to-carrot)
-        (reset! main-window (mk-window 1280 720 true true))
+        (reset! main-window (mk-window 1280 720 true))
         (when (win32?)
           (.setMenuBarVisibility @main-window false))
         (load-page @main-window)
