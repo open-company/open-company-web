@@ -83,7 +83,7 @@
         empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
-        can-compose (pos? (count all-boards))
+        can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -102,7 +102,7 @@
         {:class (when current-activity-id "expanded-post-view")}
         (when (and is-mobile?
                    (not current-activity-id)
-                   can-compose)
+                   can-compose?)
           [:button.mlb-reset.mobile-floating-compose-bt
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
         [:div.dashboard-layout-container.group
@@ -113,7 +113,7 @@
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
             (when (and (not is-mobile?)
-                       can-compose)
+                       can-compose?)
               (rum/with-key (cmail) (str "cmail-" (:key cmail-state))))
             (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                   non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
@@ -139,7 +139,7 @@
                       (when (and is-admin-or-author
                                  (not is-second-user))
                         [:button.mlb-reset.add-post-bt
-                          {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+                          {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                           [:span.add-post-bt-pen]
                           "New post"])
                     [:div.add-post-tooltip-box.big-web-only
