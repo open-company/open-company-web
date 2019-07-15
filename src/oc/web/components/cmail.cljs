@@ -454,7 +454,8 @@
                   (if (and (= (:status cmail-data) "published")
                            (:has-changes cmail-data))
                     (cancel-clicked s)
-                    (activity-actions/cmail-hide)))]
+                    (activity-actions/cmail-hide)))
+        long-tooltip (not= (:status cmail-data) "published")]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
@@ -488,17 +489,16 @@
           [:button.mlb-reset.mobile-attachment-button
             {:on-click #(add-attachment s)}]]
         [:div.cmail-header.group
-          (let [long-tooltip (not= (:status cmail-data) "published")]
-            [:div.close-bt-container
-              {:class (when long-tooltip "long-tooltip")}
-              [:button.mlb-reset.close-bt
-                {:on-click close-cb
-                 :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "auto"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if long-tooltip
-                          "Save & Close"
-                          "Close")}]])
+          [:div.close-bt-container
+            {:class (when long-tooltip "long-tooltip")}
+            [:button.mlb-reset.close-bt
+              {:on-click close-cb
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement "auto"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title (if long-tooltip
+                        "Save & Close"
+                        "Close")}]]
           [:div.cmail-header-vertical-separator]
           [:div.cmail-header-board-must-see-container.group
             {:class (when (:must-see cmail-data) "must-see-on")}
@@ -566,6 +566,18 @@
             (if (= (:status cmail-data) "published")
               "Save"
               "Post")]]
+        (when (and (not (:collapsed cmail-state))
+                   (not is-fullscreen?))
+          [:div.dismiss-inline-cmail-container
+            {:class (when long-tooltip "long-tooltip")}
+            [:button.mlb-reset.dismiss-inline-cmail
+              {:on-click close-cb
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement "auto"
+               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :title (if long-tooltip
+                        "Save & Close"
+                        "Close")}]])
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
