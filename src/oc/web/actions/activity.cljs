@@ -349,7 +349,8 @@
 
   ([edit-key edited-data section-editing entry-save-cb]
      (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
-           fixed-edit-key (or edit-key :entry-editing)]
+           fixed-edit-key (or edit-key :entry-editing)
+           org-data (dis/org-data)]
        (dis/dispatch! [:entry-save fixed-edit-key])
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
@@ -357,7 +358,7 @@
            ;; Save existing post to new board
            (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
                  final-board-data (assoc section-editing :entries [fixed-entry-data])
-                 create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+                 create-board-link (utils/link-for (:links org-data) "create")]
              (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                (fn [{:keys [success status body] :as response}]
                  (if (= status 409)
@@ -372,7 +373,7 @@
            ;; Save new post to new board
            (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
                  final-board-data (assoc section-editing :entries [fixed-entry-data])
-                 create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+                 create-board-link (utils/link-for (:links org-data) "create")]
              (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                (fn [{:keys [success status body] :as response}]
                  (if (= status 409)
@@ -381,7 +382,7 @@
                    (entry-save-cb fixed-edited-data fixed-edit-key response)))))
            ;; Save new post to existing board
            (let [org-slug (router/current-org-slug)
-                 entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
+                 entry-board-data (first (filter #(= (:slug %) (:board-slug fixed-edited-data)) (:boards org-data)))
                  entry-create-link (utils/link-for (:links entry-board-data) "create")]
              (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
 
