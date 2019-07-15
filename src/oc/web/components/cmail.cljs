@@ -17,6 +17,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -95,7 +96,7 @@
     (utils/clean-body-html (.-innerHTML body-el))))
 
 (defn real-close []
-  (activity-actions/cmail-hide))
+  (cmail-actions/cmail-hide))
 
 ;; Local cache for outstanding edits
 
@@ -454,15 +455,15 @@
                   (if (and (= (:status cmail-data) "published")
                            (:has-changes cmail-data))
                     (cancel-clicked s)
-                    (activity-actions/cmail-hide)))
+                    (cmail-actions/cmail-hide)))
         long-tooltip (not= (:status cmail-data) "published")]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
        :on-click #(when (:collapsed cmail-state)
-                    (activity-actions/cmail-show (activity-actions/get-board-for-edit) {:collapsed false
-                                                                                        :fullscreen false
-                                                                                        :key (:key cmail-state)}))}
+                    (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
+                                                                                  :fullscreen false
+                                                                                  :key (:key cmail-state)}))}
       [:div.cmail-container
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
@@ -526,7 +527,7 @@
             [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
-                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                {:on-mouse-down #(cmail-actions/cmail-toggle-must-see)
                  :data-toggle "tooltip"
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -696,7 +697,7 @@
         [:div.cmail-footer
           [:div.fullscreen-bt-container
             [:button.mlb-reset.fullscreen-bt
-              {:on-click #(activity-actions/cmail-toggle-fullscreen)}
+              {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
             [:button.mlb-reset.post-button

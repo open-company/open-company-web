@@ -15,6 +15,7 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.cmail :refer (cmail)]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
@@ -59,7 +60,7 @@
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
                                   (when (utils/is-admin-or-author? org-data)
-                                    (activity-actions/cmail-reopen?)))
+                                    (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
                                 s)
