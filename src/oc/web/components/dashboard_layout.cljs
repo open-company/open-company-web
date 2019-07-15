@@ -51,11 +51,7 @@
                                (when (and @(::sorting-menu-expanded s)
                                           (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
                                 (reset! (::sorting-menu-expanded s) false))))
-                              {:init (fn [s]
-                                (dis/dispatch! [:input [:cmail-state] {:key (utils/activity-uuid)
-                                                                       :collapsed true}])
-                                s)
-                               :before-render (fn [s]
+                              {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
                                 s)

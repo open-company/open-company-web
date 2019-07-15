@@ -9,7 +9,9 @@
             [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false}))
+                          :show-login-overlay false
+                          :cmail-state {:key (utils/activity-uuid)
+                                        :collapsed true}}))
 
 (def default-sort-type :recent-activity)
 
