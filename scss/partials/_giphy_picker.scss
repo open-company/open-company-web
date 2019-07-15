@@ -6,6 +6,7 @@ div.giphy-picker {
   border: 1px solid $ultra_light_grey;
   padding: 16px 8px;
   background-color: white;
+  z-index: #{$navbar_zindex + 126};
 
   div.giphy-picker-container {
 

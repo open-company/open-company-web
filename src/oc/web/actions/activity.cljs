@@ -189,7 +189,8 @@
 
 (defn entry-edit
   [initial-entry-data]
-  (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 30))
+  (cook/set-cookie! (edit-open-cookie)
+   (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 30))
   (load-cached-item initial-entry-data :entry-editing))
 
 (defn entry-edit-dismiss
@@ -250,7 +251,7 @@
                                      ;; board creation
                                      (first (vals fixed-items))
                                      json-body)]
-                   (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
+                   (cook/set-cookie! (edit-open-cookie) (str (:board-slug entry-saved) "/" (:uuid entry-saved)) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
                    (when (and (nil? (:uuid entry-map))
@@ -918,17 +919,20 @@
                                            (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
-    (when (:fullscreen cmail-default-state)
-      (dom-utils/lock-page-scroll))
-    (when-not (:auto cmail-state)
-      (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
+    (if (:fullscreen cmail-default-state)
+      (dom-utils/lock-page-scroll)
+      (when-not (:collapsed cmail-state)
+        (cook/remove-cookie! (cmail-fullscreen-cookie))))
+    (when (and (not (:auto cmail-state))
+               (not (:collapsed cmail-state)))
+      (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 60 24 365)))
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
-  (dis/dispatch! [:input [:cmail-data] nil])
-  (dis/dispatch! [:input [:cmail-state] {:collapsed true :key (utils/guid)}])
+  (dis/dispatch! [:input [:cmail-data] (get-default-section)])
+  (dis/dispatch! [:input [:cmail-state] {:collapsed true :key (utils/activity-uuid)}])
   (dom-utils/unlock-page-scroll))
 
 (defn cmail-toggle-fullscreen []
@@ -951,7 +955,8 @@
       ;; it was adding a slack team or bot
       (utils/after 5000
        ;; If cmail is already open let's not reopen it
-       #(when-not (:cmail-state @dis/app-state)
+       #(when (or (not (:cmail-state @dis/app-state))
+                  (:collapsed (:cmail-state @dis/app-state)))
           (if (and (contains? (router/query-params) :new)
                    (not (contains? (router/query-params) :access)))
             (let [new-data (get-board-for-edit (router/query-param :new))
@@ -959,13 +964,23 @@
                                  (assoc new-data :headline (router/query-param :headline))
                                  new-data)]
               (when new-data
-                (cmail-show with-headline {:auto true})))
+                (cmail-show with-headline {:auto true :key (utils/activity-uuid)})))
             (let [edit-param (router/query-param :edit)
                   edit-activity (dis/activity-data edit-param)]
               (if edit-activity
-                (cmail-show edit-activity {:auto true})
-                (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-                  (cmail-show (dis/activity-data activity-uuid) {:auto true})))))))))
+                (cmail-show edit-activity {:auto true :key (utils/activity-uuid)})
+                (when-let [edit-cookie (cook/get-cookie (edit-open-cookie))]
+                  (if (= edit-cookie "true")
+                    (cmail-show {} {:auto true :key (utils/activity-uuid)})
+                    (let [[board-slug activity-uuid] (clojure.string/split edit-cookie #"/")
+                          activity-data (dis/activity-data activity-uuid)]
+                      (if activity-data
+                        (cmail-show (dis/activity-data activity-uuid) {:auto true :key (utils/activity-uuid)})
+                        (when (and board-slug activity-uuid)
+                          (get-entry-with-uuid board-slug activity-uuid
+                           (fn [success status]
+                            (when success
+                             (cmail-show (dis/activity-data activity-uuid) {:auto true :key (utils/activity-uuid)}))))))))))))))))
 
 (defn activity-edit
   ([]
