@@ -42,6 +42,7 @@
                               (drv/drv :hide-left-navbar)
                               (drv/drv :sort-type)
                               (drv/drv :cmail-state)
+                              (drv/drv :cmail-data)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -50,7 +51,11 @@
                                (when (and @(::sorting-menu-expanded s)
                                           (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
                                 (reset! (::sorting-menu-expanded s) false))))
-                              {:before-render (fn [s]
+                              {:init (fn [s]
+                                (dis/dispatch! [:input [:cmail-state] {:key (utils/activity-uuid)
+                                                                       :collapsed true}])
+                                s)
+                               :before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
                                 s)
@@ -93,7 +98,8 @@
                                      (not is-all-posts)
                                      (not is-must-see)
                                      (not (:read-only board-data)))
-        cmail-state (drv/react s :cmail-state)]
+        cmail-state (drv/react s :cmail-state)
+        _cmail-data (drv/react s :cmail-data)]
       ;; Entries list
       [:div.dashboard-layout.group
         (when (and is-mobile?
@@ -110,7 +116,7 @@
           [:div.board-container.group
             (when (and (not is-mobile?)
                        can-compose)
-              (cmail))
+              (rum/with-key (cmail) (str "cmail-" (:key cmail-state))))
             (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                   non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                          "decisions to keep you and your team pulling in the same direction.")
