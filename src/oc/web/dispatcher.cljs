@@ -509,16 +509,14 @@
   ([] (editable-boards-data @app-state (router/current-org-slug)))
   ([org-slug] (editable-boards-data @app-state org-slug))
   ([data org-slug]
-  (let [boards-key (boards-key org-slug)
-        boards (get-in data boards-key)
+  (let [org-data (org-data data org-slug)
         filtered-boards (filterv
                          (fn [board]
-                            (let [links (-> board :board-data :links)]
-                              (some #(when (= (:rel %) "create") %) links)))
-                         (vals boards))]
+                            (some #(when (= (:rel %) "create") %) (:links board)))
+                         (:boards org-data))]
     (zipmap
-     (map #(-> % :board-data :slug) filtered-boards)
-     (map :board-data filtered-boards)))))
+     (map #(:slug %) filtered-boards)
+     filtered-boards))))
 
 (defn container-data
   "Get container data."
