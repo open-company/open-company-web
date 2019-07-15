@@ -121,7 +121,7 @@ function PlaceCaretAtEnd(el) {
         return;
       }
       // If the inline plus button is enabled
-      if (this.inlinePlusButtonOptions.inlineButtons) {
+      if (this.inlinePlusButtonOptions.inlineButtons && !this.inlinePlusButtonOptions.alwaysExpanded) {
         // If the user clicked inside the editor or on the picker
         if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
            !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
