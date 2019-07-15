@@ -466,7 +466,6 @@
              upload-progress-cb
              dispatch-input-key
              attachment-dom-selector
-             start-video-recording-cb
              fullscreen]}]
   [:div.rich-body-editor-outer-container
     [:div.rich-body-editor-container

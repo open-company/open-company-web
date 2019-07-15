@@ -198,25 +198,7 @@
 
 (defn- is-publishable? [s cmail-data]
   (and (seq (:board-slug cmail-data))
-       (or (and @(::record-video s)
-                @(::video-uploading s))
-           (not @(::record-video s)))
        (not (zero? (count (fix-headline cmail-data))))))
-
-(defn video-record-clicked [s]
-  (nux-actions/dismiss-edit-tooltip)
-  (let [cmail-data @(drv/get-ref s :cmail-data)
-        start-recording-fn #(do
-                              (reset! (::record-video s) true)
-                              (reset! (::video-picking-cover s) false)
-                              (reset! (::video-uploading s) false))]
-    (cond
-      (:fixed-video-id cmail-data)
-      (activity-actions/prompt-remove-video :cmail-data cmail-data)
-      @(::record-video s)
-      (reset! (::record-video s) false)
-      :else
-      (start-recording-fn))))
 
 (defn show-post-error [s message]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
@@ -256,19 +238,9 @@
               (reset! (::publishing s) true)
               (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
         (do
-          (cond
-            ;; Missing headline error
-            (zero? (count fixed-headline))
-            (show-post-error s "A title is required in order to save or share this post.")
-            ;; User needs to pick a cover shot
-            (and @(::record-video s)
-                 (not @(::video-uploading s))
-                 @(::video-picking-cover s))
-            (show-post-error s "Please pick a cover image for your video.")
-            ;; Video still recording
-            (and @(::record-video s)
-                 (not @(::video-uploading s)))
-            (show-post-error s "Please finish video recording."))
+          (when ;; Missing headline error
+                (zero? (count fixed-headline))
+            (show-post-error s "A title is required in order to save or share this post."))
           (reset! (::disable-post s) false)))))
 
 (defn- disable-post-bt? [s]
@@ -341,9 +313,6 @@
                    (rum/local false ::disable-post)
                    (rum/local false ::publish-after-autosave)
                    (rum/local nil ::autosave-timer)
-                   (rum/local false ::record-video)
-                   (rum/local false ::video-uploading)
-                   (rum/local false ::video-picking-cover)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
                    (rum/local false ::abstract-focused)
@@ -585,30 +554,12 @@
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
-              (when (and (:fixed-video-id cmail-data)
-                         (not @(::record-video s)))
+              (when (:fixed-video-id cmail-data)
                 (ziggeo-player {:video-id (:fixed-video-id cmail-data)
                                 :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
-            ; FIXME: disable video on mobile for now
-            (when-not is-mobile?
-              (when @(::record-video s)
-                (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
-                                  :upload-started-cb #(do
-                                                        (activity-actions/uploading-video % :cmail-data)
-                                                        (reset! (::video-picking-cover s) false)
-                                                        (reset! (::video-uploading s) true))
-                                  :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
-                                  :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
-                                  :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
-                                  :width (:width video-size)
-                                  :height (:height video-size)
-                                  :remove-recorder-cb (fn []
-                                    (when (:video-id cmail-data)
-                                      (activity-actions/remove-video :cmail-data cmail-data))
-                                    (reset! (::record-video s) false))})))
             ; Headline element
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
               {:class utils/hide-class
@@ -676,7 +627,6 @@
                                :show-h2 true
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
-                               :start-video-recording-cb #(video-record-clicked s)
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
