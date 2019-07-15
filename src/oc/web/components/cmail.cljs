@@ -202,12 +202,13 @@
 
 (defn show-post-error [s message]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
+        is-fullscreen? (:fullscreen @(drv/get-ref s :cmail-state))
         post-bt-ref (if is-mobile? "mobile-post-btn" "post-btn")]
     (when-let [$post-btn (js/$ (rum/ref-node s post-bt-ref))]
       (if-not (.data $post-btn "bs.tooltip")
         (.tooltip $post-btn
          (clj->js {:container "body"
-                   :placement (if is-mobile? "bottom" "top")
+                   :placement (if (or is-fullscreen? is-mobile?) "bottom" "top")
                    :trigger "manual"
                    :template (str "<div class=\"tooltip post-btn-tooltip\">"
                                     "<div class=\"tooltip-arrow\"></div>"
@@ -238,10 +239,10 @@
               (reset! (::publishing s) true)
               (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
         (do
-          (when ;; Missing headline error
-                (zero? (count fixed-headline))
-            (show-post-error s "A title is required in order to save or share this post."))
-          (reset! (::disable-post s) false)))))
+          (reset! (::disable-post s) false)
+          ;; Missing headline error
+          (when (zero? (count fixed-headline))
+            (show-post-error s "A title is required in order to save or share this post."))))))
 
 (defn- disable-post-bt? [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)]
@@ -251,13 +252,11 @@
 
 (defn post-clicked [s]
   (clean-body s)
-  (let [disabled? (disable-post-bt? s)]
-    (when-not disabled?
-      (reset! (::disable-post s) true)
-      (let [cmail-data @(drv/get-ref s :cmail-data)]
-        (if (:auto-saving cmail-data)
-          (reset! (::publish-after-autosave s) true)
-          (real-post-action s))))))
+  (reset! (::disable-post s) true)
+  (let [cmail-data @(drv/get-ref s :cmail-data)]
+    (if (:auto-saving cmail-data)
+      (reset! (::publish-after-autosave s) true)
+      (real-post-action s))))
 
 (defn fix-tooltips [s]
   (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
@@ -528,14 +527,15 @@
                    :data-container "body"
                    :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :on-click #(delete-clicked s % cmail-data)}]]])
-          [:button.mlb-reset.post-button
-            {:ref "post-btn"
-             :on-click #(post-clicked s)
-             :class (utils/class-set {:disabled disabled?
-                                      :loading working?})}
-            (if (= (:status cmail-data) "published")
-              "Save"
-              "Post")]]
+          (when is-fullscreen?
+            [:button.mlb-reset.post-button
+              {:ref "post-btn"
+               :on-click #(post-clicked s)
+               :class (utils/class-set {:disabled disabled?
+                                        :loading working?})}
+              (if (= (:status cmail-data) "published")
+                "Save"
+                "Post")])]
         (when (and (not (:collapsed cmail-state))
                    (not is-fullscreen?))
           [:div.dismiss-inline-cmail-container
@@ -650,14 +650,15 @@
               {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
-            [:button.mlb-reset.post-button
-              {:ref "post-btn"
-               :on-click #(post-clicked s)
-               :class (utils/class-set {:disabled disabled?
-                                        :loading working?})}
-              (if (= (:status cmail-data) "published")
-                "Save"
-                "Post")]
+            (when-not is-fullscreen?
+              [:button.mlb-reset.post-button
+                {:ref "post-btn"
+                 :on-click #(post-clicked s)
+                 :class (utils/class-set {:disabled disabled?
+                                          :loading working?})}
+                (if (= (:status cmail-data) "published")
+                  "Save"
+                  "Post")])
             [:div.board-name.oc-input
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container-footer))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))

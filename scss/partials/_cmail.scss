@@ -1,7 +1,5 @@
 div.cmail-outer {
   position: relative;
-  // bottom: 0px;
-  // right: 24px;
   width: 100%;
   margin-bottom: 24px;
 
@@ -345,7 +343,7 @@ div.cmail-outer {
 
       div.cmail-footer {
         width: 240px;
-        margin: 0 auto;
+        margin: 0 auto 32px;
         position: absolute;
         bottom: 0;
         right: 0;
