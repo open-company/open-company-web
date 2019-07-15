@@ -785,11 +785,16 @@ div.cmail-outer {
         border: none;
         outline: none;
         cursor: text;
-        @include activity-title();
+        @include activity-title(22px, 28px);
         color: $deep_navy;
         white-space: pre-wrap;
         word-wrap: break-word;
         min-height: 28px;
+
+        @include tablet() {
+          @include activity-title();
+          min-height: 30px;
+        }
 
         &:empty:before {
           content: attr(placeholder);
@@ -926,7 +931,7 @@ div.cmail-outer {
       div.rich-body-editor-container {
         position: relative;
         height: auto;
-        margin-top: 16px;
+        margin-top: 8px;
 
         div.medium-editor-media-picker {
           margin-top: 0;
@@ -951,7 +956,7 @@ div.cmail-outer {
           }
 
           @media screen and (min-height: 556px) {
-            min-height: 182px;
+            min-height: 76px;
           }
 
           @include tablet() {
