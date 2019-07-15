@@ -13,7 +13,10 @@
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defcs home-page
+(rum/defcs home-page < {:did-mount (fn [s]
+                                    (when (exists? (.-OCWebSetupStaticPagesJS js/window))
+                                      (js/OCWebSetupStaticPagesJS))
+                                    s)}
   [s]
   [:div
     (site-header)

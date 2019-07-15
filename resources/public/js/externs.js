@@ -179,6 +179,7 @@ Headway.show = function(){};
 // Intercom (Chat support)
 var Intercom = function(){};
 // Homepage animation
+var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};

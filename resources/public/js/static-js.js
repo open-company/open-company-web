@@ -93,6 +93,39 @@ if (jwt) {
   }
 }
 
+function OCWebSetupStaticPagesJS(){
+  var switchFn = function() {
+    $("button.keep-aligned-section-next-bt").toggleClass("active");
+    var $switchContainer = $("div.slack-email-switch-container");
+    $switchContainer.toggleClass("show-slack");
+    $switchContainer.toggleClass("show-email");
+    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1");
+    $("img.keep-aligned-section-screenshot.screenshot-1").toggleClass("carion-1-alt");
+  };
+  $("button.slack-email-switch-bt").on("click", function(){
+    var $switchContainer = $("div.slack-email-switch-container");
+    if ($(this).hasClass("email-bt") && $switchContainer.hasClass("show-email")) {
+      return;
+    }
+    if ($(this).hasClass("slack-bt") && $switchContainer.hasClass("show-slack")) {
+      return;
+    }
+    switchFn();
+  })
+  $("button.keep-aligned-section-next-bt").on("click", switchFn);
+
+  $("div.pricing-toggle").on("click", function(){
+    var $teamColumn = $("div.pricing-column.team-column");
+    if ($teamColumn.hasClass("monthly")) {
+      $teamColumn.removeClass("monthly");
+      $teamColumn.addClass("annual");
+    } else {
+      $teamColumn.removeClass("annual");
+      $teamColumn.addClass("monthly");
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function(_) {
 
   if ($("#youtube-player").length > 0) {
@@ -115,6 +148,8 @@ document.addEventListener("DOMContentLoaded", function(_) {
       }
     });
   }
+
+  OCWebSetupStaticPagesJS();
 
   $(window).on("click", function(e){
     $target = $(e.target);

@@ -17,7 +17,10 @@
                                 :eventAction "click"
                                 :eventLabel event-name}))
 
-(rum/defcs pricing
+(rum/defcs pricing < {:did-mount (fn [s]
+                      (when (exists? (.-OCWebSetupStaticPagesJS js/window))
+                        (js/OCWebSetupStaticPagesJS))
+                      s)}
   [s]
   [:div
     [:div.pricing-wrap
