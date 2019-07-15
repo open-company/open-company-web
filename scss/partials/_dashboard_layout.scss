@@ -3,6 +3,12 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  &.expanded-post-view {
+    div.cmail-outer {
+      display: none;
+    }
+  }
+
   @include mobile() {
     &.sticky-board-name {
       padding-top: 48px;

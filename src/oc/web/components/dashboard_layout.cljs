@@ -98,6 +98,7 @@
         _cmail-data (drv/react s :cmail-data)]
       ;; Entries list
       [:div.dashboard-layout.group
+        {:class (when current-activity-id "expanded-post-view")}
         (when (and is-mobile?
                    (not current-activity-id)
                    can-compose)
