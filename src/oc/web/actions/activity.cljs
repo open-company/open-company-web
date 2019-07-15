@@ -953,34 +953,37 @@
   (when (compare-and-set! cmail-reopen-only-one false true)
       ;; Make sure the new param is alone and not with an access param that means
       ;; it was adding a slack team or bot
-      (utils/after 5000
+      (utils/after 100
        ;; If cmail is already open let's not reopen it
        #(when (or (not (:cmail-state @dis/app-state))
                   (:collapsed (:cmail-state @dis/app-state)))
-          (if (and (contains? (router/query-params) :new)
-                   (not (contains? (router/query-params) :access)))
-            (let [new-data (get-board-for-edit (router/query-param :new))
-                  with-headline (if (router/query-param :headline)
-                                 (assoc new-data :headline (router/query-param :headline))
-                                 new-data)]
-              (when new-data
-                (cmail-show with-headline {:auto true :key (utils/activity-uuid)})))
-            (let [edit-param (router/query-param :edit)
-                  edit-activity (dis/activity-data edit-param)]
-              (if edit-activity
-                (cmail-show edit-activity {:auto true :key (utils/activity-uuid)})
-                (when-let [edit-cookie (cook/get-cookie (edit-open-cookie))]
-                  (if (= edit-cookie "true")
-                    (cmail-show {} {:auto true :key (utils/activity-uuid)})
-                    (let [[board-slug activity-uuid] (clojure.string/split edit-cookie #"/")
-                          activity-data (dis/activity-data activity-uuid)]
-                      (if activity-data
-                        (cmail-show (dis/activity-data activity-uuid) {:auto true :key (utils/activity-uuid)})
-                        (when (and board-slug activity-uuid)
-                          (get-entry-with-uuid board-slug activity-uuid
-                           (fn [success status]
-                            (when success
-                             (cmail-show (dis/activity-data activity-uuid) {:auto true :key (utils/activity-uuid)}))))))))))))))))
+          (let [cmail-state {:auto true :fullscreen true :key (utils/activity-uuid)}]
+            (if (and (contains? (router/query-params) :new)
+                     (not (contains? (router/query-params) :access)))
+              ;; We have the new GET parameter, let's open a new post with the specified headline if any
+              (let [new-data (get-board-for-edit (router/query-param :new))
+                    with-headline (if (router/query-param :headline)
+                                   (assoc new-data :headline (router/query-param :headline))
+                                   new-data)]
+                (when new-data
+                  (cmail-show with-headline cmail-state)))
+              ;; We have the edit paramter or the edit cookie saved
+              (when-let [edit-activity-param (or (router/query-param :edit) (cook/get-cookie (edit-open-cookie)))]
+                (if (= edit-activity-param "true")
+                  ;; If it's simply true open a new post with the data saved in the local DB
+                  (cmail-show {} cmail-state)
+                  ;; If it's composed by board-slug/activity-uuid
+                  (let [[board-slug activity-uuid] (clojure.string/split edit-activity-param #"/")
+                        edit-activity-data (dis/activity-data activity-uuid)]
+                    (if edit-activity-data
+                      ;; Open the activity in edit if it's already present in the app-state
+                      (cmail-show edit-activity-data cmail-state)
+                      ;; Load it from the server if it's not
+                      (when (and board-slug activity-uuid)
+                        (get-entry-with-uuid board-slug activity-uuid
+                         (fn [success status]
+                           (when success
+                             (cmail-show (dis/activity-data activity-uuid) cmail-state)))))))))))))))
 
 (defn activity-edit
   ([]
@@ -989,11 +992,8 @@
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
-          is-published? (= (:status fixed-activity-data) "published")
-          initial-cmail-state (if is-published?
-                                {:fullscreen true :auto true}
-                                {})]
-      (cmail-show fixed-activity-data initial-cmail-state))))
+          is-published? (= (:status fixed-activity-data) "published")]
+      (cmail-show fixed-activity-data {:fullscreen true}))))
 
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
