@@ -352,11 +352,7 @@
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
 
-                   {:init (fn [s]
-                     (dis/dispatch! [:input [:cmail-state] {:key (utils/guid)
-                                                            :collapsed true}])
-                     s)
-                    :will-mount (fn [s]
+                   {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
                           initial-body (if (seq (:body cmail-data))
                                          (:body cmail-data)
@@ -462,7 +458,6 @@
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
-       :key (str "cmail-" (:key cmail-state))
        :on-click #(when (:collapsed cmail-state)
                     (activity-actions/cmail-show (activity-actions/get-board-for-edit) {:collapsed false
                                                                                         :fullscreen false
@@ -514,7 +509,7 @@
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
-              [:div.section-picker-container
+              [:div.sections-picker-container
                 {:ref :picker-container}
                 (sections-picker (:board-slug cmail-data)
                  (fn [board-data note dismiss-action]
@@ -701,14 +696,14 @@
                 "Save"
                 "Post")]
             [:div.board-name.oc-input
-              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container-footer))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
                :class (when show-sections-picker "active")}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
-              [:div.section-picker-container
-                {:ref :picker-container}
+              [:div.sections-picker-container
+                {:ref :picker-container-footer}
                 (sections-picker (:board-slug cmail-data)
                  (fn [board-data note dismiss-action]
                    (dis/dispatch! [:input [:show-sections-picker] false])
