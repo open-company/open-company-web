@@ -992,8 +992,9 @@
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
-          is-published? (= (:status fixed-activity-data) "published")]
-      (cmail-show fixed-activity-data {:fullscreen true}))))
+          is-published? (= (:status fixed-activity-data) "published")
+          cmail-state {:fullscreen true :key (utils/activity-uuid)}]
+      (cmail-show fixed-activity-data cmail-state))))
 
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
