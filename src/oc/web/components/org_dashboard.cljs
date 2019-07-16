@@ -55,7 +55,7 @@
         (activity-actions/all-posts-get org-data ap-initial-at)
 
         (= (router/current-board-slug) "follow-ups")
-        (activity-actions/follow-ups-sort-get org-data ap-initial-at)
+        (activity-actions/follow-ups-sort-get org-data)
 
         (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-get org-data)
