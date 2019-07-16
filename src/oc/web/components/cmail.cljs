@@ -200,27 +200,6 @@
   (and (seq (:board-slug cmail-data))
        (not (zero? (count (fix-headline cmail-data))))))
 
-(defn show-post-error [s message]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        is-fullscreen? (:fullscreen @(drv/get-ref s :cmail-state))
-        post-bt-ref (if is-mobile? "mobile-post-btn" "post-btn")]
-    (when-let [$post-btn (js/$ (rum/ref-node s post-bt-ref))]
-      (if-not (.data $post-btn "bs.tooltip")
-        (.tooltip $post-btn
-         (clj->js {:container "body"
-                   :placement (if (or is-fullscreen? is-mobile?) "bottom" "top")
-                   :trigger "manual"
-                   :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                    "<div class=\"tooltip-arrow\"></div>"
-                                    "<div class=\"tooltip-inner\"></div>"
-                                  "</div>")
-                   :title message}))
-        (doto $post-btn
-          (.attr "data-original-title" message)
-          (.tooltip "fixTitle")))
-      (utils/after 10 #(.tooltip $post-btn "show"))
-      (utils/after 5000 #(.tooltip $post-btn "hide")))))
-
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         fixed-headline (fix-headline cmail-data)
@@ -248,15 +227,18 @@
       (reset! (::publish-after-autosave s) true)
       (real-post-action s))))
 
-(defn fix-tooltips [s]
+(defn fix-tooltips
+  "Fix the tooltips of "
+  [s]
   (.each (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
    (fn [idx el]
      (let [$el (js/$ el)]
-       (if (seq (.attr $el "title"))
-         (doto (js/$ el)
-           (.tooltip "hide")
-           (.tooltip "fixTitle"))
-         (.tooltip $el "destroy"))))))
+       (when-not (.hasClass $el "mobile-post-button")
+         (if (seq (.attr $el "title"))
+           (doto (js/$ el)
+             (.tooltip "hide")
+             (.tooltip "fixTitle"))
+           (.tooltip $el "destroy")))))))
 
 ;; Delete handling
 
@@ -336,6 +318,7 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -424,7 +407,6 @@
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
         long-tooltip (not= (:status cmail-data) "published")]
-    (js/console.log "DBG cmail/render post-button-title" post-button-title)
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
@@ -448,12 +430,22 @@
                   [:span.saving-saved " (saved)"])))]
           [:button.mlb-reset.mobile-post-button
             {:ref "mobile-post-btn"
-             :on-click #(post-clicked s)
-             :data-toggle "tooltip"
-             :data-placement "bottom"
-             :data-trigger "click"
-             :data-container "body"
-             :title post-button-title
+             :on-click (fn [_]
+                         (if show-post-bt-tooltip?
+                           (let [$bt (js/$ (rum/ref-node s "mobile-post-btn"))]
+                             (.tooltip $bt (clj->js {:placement "bottom"
+                                                     :trigger "manual"
+                                                     :container "body"
+                                                     ; :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                     ;                  "<div class=\"tooltip-arrow\"></div>"
+                                                     ;                  "<div class=\"tooltip-inner\"></div>"
+                                                     ;                "</div>")
+                                                     :title post-button-title}))
+                             (utils/after 0 #(.tooltip $bt "show"))
+                             (utils/after 3000 #(.tooltip $bt "destroy")))
+                           (when-not disabled?
+                             (post-clicked s))))
+             ; :title post-button-title
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
