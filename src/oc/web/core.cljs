@@ -178,7 +178,6 @@
         bot-access (when (contains? query-params :access)
                       (:access query-params))
         next-app-state {:loading loading
-                        :ap-initial-at (when has-at-param (:at query-params))
                         :panel-stack panel-stack
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))

@@ -46,12 +46,11 @@
              (router/current-board-slug))
     (utils/after 100 (fn []
      (let [{:keys [org-data
-                   board-data
-                   ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
+                   board-data]} @(drv/get-ref s :org-dashboard-data)]
        (cond
 
         (= (router/current-board-slug) "all-posts")
-        (activity-actions/all-posts-get org-data ap-initial-at)
+        (activity-actions/all-posts-get org-data)
 
         (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-get org-data)
@@ -92,7 +91,6 @@
                 board-data
                 container-data
                 posts-data
-                ap-initial-at
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
@@ -116,13 +114,11 @@
                      ;; Board specified
                      (and (not= (router/current-board-slug) "all-posts")
                           (not= (router/current-board-slug) "must-see")
-                          (not ap-initial-at)
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
                      (and (or (= (router/current-board-slug) "all-posts")
-                              (= (router/current-board-slug) "must-see")
-                              ap-initial-at)
+                              (= (router/current-board-slug) "must-see"))
                           ;; But no all-posts data yet
                          (not container-data)))
         org-not-found (and (not (nil? orgs))
@@ -133,18 +129,12 @@
                                (not= (router/current-board-slug) "must-see")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
-                             (or (and (router/current-activity-id)
-                                      board-data)
-                                 (and ap-initial-at
-                                      (not (jwt/user-is-part-of-the-team (:team-id org-data))))
-                                 (and ap-initial-at
-                                      container-data))
+                             (and (router/current-activity-id)
+                                  board-data)
                              (not (nil? posts-data))
                              (or (and (router/current-activity-id)
                                       (not ((set (keys posts-data)) (router/current-activity-id)))
-                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))
-                                 (and ap-initial-at
-                                      (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
+                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))))
         show-login-wall (and (not jwt)
                              (or force-login-wall
                                  (and (router/current-activity-id)
@@ -152,8 +142,7 @@
                                          section-not-found
                                          entry-not-found))))
         show-activity-removed (and jwt
-                                   (or (router/current-activity-id)
-                                       ap-initial-at)
+                                   (router/current-activity-id)
                                    (or org-not-found
                                        section-not-found
                                        entry-not-found))

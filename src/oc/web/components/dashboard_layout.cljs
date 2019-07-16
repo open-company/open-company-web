@@ -33,7 +33,6 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
-                              (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)

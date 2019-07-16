@@ -64,27 +64,27 @@
       (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org sort-type fixed-all-posts]))))
 
-(defn- activity-real-get [activity-link ap-initial-at sort-type org-slug finish-cb]
-  (api/get-all-posts activity-link ap-initial-at
+(defn- activity-real-get [activity-link sort-type org-slug finish-cb]
+  (api/get-all-posts activity-link
    (fn [resp]
      (all-posts-get-finish sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
-(defn activity-get [org-data ap-initial-at & [finish-cb]]
+(defn activity-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "entries")]
-    (activity-real-get activity-link ap-initial-at :recently-posted (:slug org-data) finish-cb)))
+    (activity-real-get activity-link :recently-posted (:slug org-data) finish-cb)))
 
-(defn recent-activity-get [org-data ap-initial-at & [finish-cb]]
+(defn recent-activity-get [org-data & [finish-cb]]
   (when-let [recent-activity-link (utils/link-for (:links org-data) "activity")]
-    (activity-real-get recent-activity-link ap-initial-at :recent-activity (:slug org-data) finish-cb)))
+    (activity-real-get recent-activity-link :recent-activity (:slug org-data) finish-cb)))
 
-(defn all-posts-get [org-data ap-initial-at & [finish-cb]]
+(defn all-posts-get [org-data & [finish-cb]]
   (let [sort-type (router/current-sort-type)
         activity-link-rel (if (= sort-type dis/default-sort-type) "activity" "entries")
         activity-link (utils/link-for (:links org-data) activity-link-rel)]
     (when activity-link
-      (activity-real-get activity-link ap-initial-at sort-type (:slug org-data) finish-cb))))
+      (activity-real-get activity-link sort-type (:slug org-data) finish-cb))))
 
 (defn all-posts-more-finish [direction sort-type {:keys [success body]}]
   (when success
@@ -142,8 +142,8 @@
     (cond
       is-all-posts
       (if (= sort-type :recent-activity)
-        (recent-activity-get org-data (:ap-initial-at @dis/app-state))
-        (activity-get org-data (:ap-initial-at @dis/app-state)))
+        (recent-activity-get org-data)
+        (activity-get org-data))
       is-must-see
       (must-see-get org-data)
       :else
@@ -662,7 +662,7 @@
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
         (when (= (router/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data) (dis/ap-initial-at))))))
+          (all-posts-get (dis/org-data))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
@@ -683,7 +683,7 @@
         (when (or (= change-type :add)
                   (= change-type :delete))
           (if (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) (dis/ap-initial-at) dispatch-unread))
+            (all-posts-get (dis/org-data) dispatch-unread))
             (sa/section-change section-uuid dispatch-unread))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
