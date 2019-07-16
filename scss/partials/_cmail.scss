@@ -780,6 +780,9 @@ div.cmail-outer {
       @include tablet() {
         background-color: transparent;
         padding: 24px 0;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
       }
     }
 
