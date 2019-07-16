@@ -9,7 +9,8 @@
   [{:keys [title click] :as notification-data}]
   (when js/window.isDesktop
     (let [notif (js/Notification. title)]
-      (set! (.-onclick notif) #(click)))))
+      (set! (.-onclick notif) #(do (js/window.showDesktopWindow)
+                                   (click))))))
 
 (defn show-notification [notification-data]
   (let [expiration-time (or (:expire notification-data) default-expiration-time)

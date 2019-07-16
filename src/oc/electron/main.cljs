@@ -132,4 +132,6 @@
   ;; -- Inter-process Communication event handlers --
   ;; see resources/electron/renderer.js
   (.on ipc-main "set-badge-count" (fn [event arg] (.setBadgeCount app arg)))
+  (.on ipc-main "show-desktop-window" (fn [event arg] (when @main-window
+                                                        (.show @main-window))))
   )
