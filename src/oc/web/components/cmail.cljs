@@ -330,10 +330,13 @@
                                  (activity-actions/cmail-toggle-follow-up cmail-data)))]
     [:div.follow-ups-header
       {:on-click (fn [_]
-                   (nav-actions/show-follow-ups-picker nil
-                    (fn [users-list]
-                      (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
-                                                                       :follow-ups users-list})]))))}
+                   (if @(::mobile-follow-ups-remove-menu s)
+                     (reset! (::mobile-follow-ups-remove-menu s) false)
+                     (nav-actions/show-follow-ups-picker nil
+                      (fn [users-list]
+                        (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
+                                                                         :follow-ups users-list})])))))
+       :ref :follow-ups-header}
       (when-not is-mobile?
         [:div.follow-up-tag.white-bg])
       [:div.follow-ups-label
@@ -399,6 +402,10 @@
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
+                   (mixins/on-window-click-mixin (fn [s e]
+                    (when (and @(::mobile-follow-ups-remove-menu s)
+                               (not (utils/event-inside? e (rum/ref-node s :follow-ups-header))))
+                      (reset! (::mobile-follow-ups-remove-menu s) false))))
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)

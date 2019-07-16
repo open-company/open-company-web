@@ -502,7 +502,7 @@ div.cmail-outer {
             width: 100%;
 
             &.has-follow-ups-button {
-              width: calc(100% - 16px - 32px);
+              width: calc(100% - 4px - 32px);
             }
 
             &:hover, &.open {
@@ -520,7 +520,25 @@ div.cmail-outer {
           overflow: auto;
 
           @include tablet() {
-            width: calc(100% - 16px - 32px);
+            width: calc(100% - 4px - 32px);
+          }
+        }
+
+        button.mobile-follow-up-button {
+          display: none;
+
+          @include tablet() {
+            width: 24px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/follow_up_add.svg");
+            background-size: 16px 16px;
+            background-position: top 50% right 0;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            padding: 0;
+            margin-left: 8px;
+            display: block;
+            float: left;
           }
         }
 
