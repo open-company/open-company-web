@@ -621,18 +621,20 @@
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
                     "OK, got it"]]])
-            (rich-body-editor {:on-change (partial body-on-change s)
-                               :use-inline-media-picker true
-                               :initial-body @(::initial-body s)
-                               :show-placeholder @(::show-placeholder s)
-                               :show-h2 true
-                               :fullscreen is-fullscreen?
-                               :dispatch-input-key :cmail-data
-                               :cmd-enter-cb #(post-clicked s)
-                               :upload-progress-cb (fn [is-uploading?]
-                                                     (reset! (::uploading-media s) is-uploading?))
-                               :media-config ["gif" "photo" "video"]
-                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
+            (rum/with-key
+             (rich-body-editor {:on-change (partial body-on-change s)
+                                :use-inline-media-picker true
+                                :initial-body @(::initial-body s)
+                                :show-placeholder @(::show-placeholder s)
+                                :show-h2 true
+                                :fullscreen is-fullscreen?
+                                :dispatch-input-key :cmail-data
+                                :cmd-enter-cb #(post-clicked s)
+                                :upload-progress-cb (fn [is-uploading?]
+                                                      (reset! (::uploading-media s) is-uploading?))
+                                :media-config ["gif" "photo" "video"]
+                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
+             (str "cmail-rich-body-editor-" (:key cmail-state)))
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
