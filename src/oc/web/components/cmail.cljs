@@ -238,17 +238,7 @@
             (do
               (reset! (::publishing s) true)
               (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
-        (do
-          (reset! (::disable-post s) false)
-          ;; Missing headline error
-          (when (zero? (count fixed-headline))
-            (show-post-error s "A title is required in order to save or share this post."))))))
-
-(defn- disable-post-bt? [s]
-  (let [cmail-data @(drv/get-ref s :cmail-data)]
-    (or @(::publishing s)
-        (not (is-publishable? s cmail-data))
-        @(::disable-post s))))
+        (reset! (::disable-post s) false))))
 
 (defn post-clicked [s]
   (clean-body s)
@@ -259,9 +249,14 @@
       (real-post-action s))))
 
 (defn fix-tooltips [s]
-  (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-    (.tooltip "hide")
-    (.tooltip "fixTitle")))
+  (.each (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+   (fn [idx el]
+     (let [$el (js/$ el)]
+       (if (seq (.attr $el "title"))
+         (doto (js/$ el)
+           (.tooltip "hide")
+           (.tooltip "fixTitle"))
+         (.tooltip $el "destroy"))))))
 
 ;; Delete handling
 
@@ -405,7 +400,11 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        disabled? (disable-post-bt? s)
+        show-post-bt-tooltip? (not (is-publishable? s cmail-data))
+        post-button-title (if show-post-bt-tooltip? "Please add a title" "")
+        disabled? (or show-post-bt-tooltip?
+                      @(::publishing s)
+                      @(::disable-post s))
         working? (or (and published?
                           @(::saving s))
                      (and (not published?)
@@ -425,6 +424,7 @@
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
         long-tooltip (not= (:status cmail-data) "published")]
+    (js/console.log "DBG cmail/render post-button-title" post-button-title)
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
@@ -449,6 +449,11 @@
           [:button.mlb-reset.mobile-post-button
             {:ref "mobile-post-btn"
              :on-click #(post-clicked s)
+             :data-toggle "tooltip"
+             :data-placement "bottom"
+             :data-trigger "click"
+             :data-container "body"
+             :title post-button-title
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
@@ -530,6 +535,10 @@
           (when is-fullscreen?
             [:button.mlb-reset.post-button
               {:ref "post-btn"
+               :data-toggle "tooltip"
+               :data-placement "bottom"
+               :data-container "body"
+               :title post-button-title
                :on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
                                         :loading working?})}
@@ -654,6 +663,10 @@
               [:button.mlb-reset.post-button
                 {:ref "post-btn"
                  :on-click #(post-clicked s)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :title post-button-title
                  :class (utils/class-set {:disabled disabled?
                                           :loading working?})}
                 (if (= (:status cmail-data) "published")
