@@ -125,7 +125,7 @@
   ;; https://electronjs.org/docs/tutorial/notifications#windows
   ;; When testing, add `node_modules\electron\dist\electron.exe` to your Start Menu
   (when (win32?)
-    (.setAppUserModelId app (.-execPath js/process)))
+    (.setAppUserModelId app "io.carrot.desktop"))
 
   ;; -- App event handlers --
   (.on app "window-all-closed" #(when (not (mac?))

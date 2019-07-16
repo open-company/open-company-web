@@ -31,6 +31,10 @@
       "target": ["nsis"],
       "icon": "carrot.iconset/icon.ico"
     },
+    "nsis": {
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
     "afterSign": "electron/notarize.js",
     "icon": "carrot.iconset/icon.icns",
     "publish": ["github"]
