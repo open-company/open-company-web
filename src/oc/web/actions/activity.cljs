@@ -115,7 +115,7 @@
       (let [activity-href (:href activity-link)
             must-see-filter (str activity-href "?must-see=true")
             must-see-link (assoc activity-link :href must-see-filter)]
-        (api/get-all-posts must-see-link nil (partial must-see-get-finish current-sort-type))))))
+        (api/get-all-posts must-see-link (partial must-see-get-finish current-sort-type))))))
 
 (defn must-see-more-finish [direction sort-type {:keys [success body]}]
   (when success
