@@ -294,6 +294,7 @@
                    (rum/local false ::abstract-focused)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
+                   (rum/local nil ::latest-key)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
@@ -319,6 +320,26 @@
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
                     (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+                    s)
+                   :will-update (fn [s]
+                    (let [cmail-state @(drv/get-ref s :cmail-state)]
+                      (when (not= @(::latest-key s) (:key cmail-state))
+                        (when @(::latest-key s)
+                          (let [cmail-data @(drv/get-ref s :cmail-data)
+                                initial-body (if (seq (:body cmail-data))
+                                               (:body cmail-data)
+                                               "")
+                                initial-headline (utils/emojify
+                                                   (if (seq (:headline cmail-data))
+                                                     (:headline cmail-data)
+                                                     ""))]
+                            (when-not (seq (:uuid cmail-data))
+                              (nux-actions/dismiss-add-post-tooltip))
+                            (reset! (::initial-body s) initial-body)
+                            (reset! (::initial-headline s) initial-headline)
+                            (reset! (::initial-uuid s) (:uuid cmail-data))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
+                        (reset! (::latest-key s) (:ley cmail-state))))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -565,6 +586,7 @@
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
               {:class utils/hide-class
                :content-editable true
+               :key (str "cmail-headline-" (:key cmail-state))
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
@@ -591,6 +613,7 @@
               [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
                 {:class utils/hide-class
                  :ref "abstract"
+                 :key (str "cmail-abstract-" (:key cmail-state))
                  :rows 1
                  :placeholder utils/default-abstract
                  :value (or (:abstract cmail-data) "")
@@ -621,20 +644,19 @@
                   [:button.mlb-reset.edit-tooltip-bt
                     {:on-click #(nux-actions/dismiss-edit-tooltip)}
                     "OK, got it"]]])
-            (rum/with-key
-             (rich-body-editor {:on-change (partial body-on-change s)
-                                :use-inline-media-picker true
-                                :initial-body @(::initial-body s)
-                                :show-placeholder @(::show-placeholder s)
-                                :show-h2 true
-                                :fullscreen is-fullscreen?
-                                :dispatch-input-key :cmail-data
-                                :cmd-enter-cb #(post-clicked s)
-                                :upload-progress-cb (fn [is-uploading?]
-                                                      (reset! (::uploading-media s) is-uploading?))
-                                :media-config ["gif" "photo" "video"]
-                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
-             (str "cmail-rich-body-editor-" (:key cmail-state)))
+            (rich-body-editor {:on-change (partial body-on-change s)
+                               :use-inline-media-picker true
+                               :initial-body @(::initial-body s)
+                               :show-placeholder @(::show-placeholder s)
+                               :show-h2 true
+                               :fullscreen is-fullscreen?
+                               :dispatch-input-key :cmail-data
+                               :cmd-enter-cb #(post-clicked s)
+                               :upload-progress-cb (fn [is-uploading?]
+                                                     (reset! (::uploading-media s) is-uploading?))
+                               :media-config ["gif" "photo" "video"]
+                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)
+                               :cmail-key (:key cmail-state)})
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]

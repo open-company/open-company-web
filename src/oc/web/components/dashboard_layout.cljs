@@ -114,7 +114,7 @@
           [:div.board-container.group
             (when (and (not is-mobile?)
                        can-compose?)
-              (rum/with-key (cmail) (str "cmail-" (:key cmail-state))))
+              (cmail))
             (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                   non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                          "decisions to keep you and your team pulling in the same direction.")
