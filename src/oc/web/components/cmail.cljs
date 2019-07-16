@@ -696,7 +696,7 @@
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 24
                            :height 24
-                           :position "top"
+                           :position "bottom"
                            :default-field-selector "div.cmail-content div.rich-body-editor"
                            :container-selector "div.cmail-content"})]
           (when (and (not= (:status cmail-data) "published")
