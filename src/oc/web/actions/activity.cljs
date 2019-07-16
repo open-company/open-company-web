@@ -65,7 +65,7 @@
       (dis/dispatch! [:follow-ups-get/finish org sort-type fixed-follow-ups]))))
 
 (defn- follow-ups-real-get [follow-ups-link sort-type org-slug finish-cb]
-  (api/get-all-posts follow-ups-link nil
+  (api/get-all-posts follow-ups-link
    (fn [resp]
      (follow-ups-get-finish sort-type resp)
      (when (fn? finish-cb)
