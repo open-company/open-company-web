@@ -38,15 +38,13 @@ div.stream-attachments {
         div.attachment-icon {
           width: 18px;
           height: 20px;
-          background-image: cdnUrl("/img/ML/attachment_icon.svg");
-          background-size: 18px 20px;
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 14px 16px;
           background-repeat: no-repeat;
           background-position: center;
           float: left;
 
           @include mobile() {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 14px 16px;
             width: 14px;
             opacity: 0.7;
           }
