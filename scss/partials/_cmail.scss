@@ -742,7 +742,7 @@ div.cmail-outer {
     div.dismiss-inline-cmail-container {
       position: absolute;
       top: 0;
-      left: -40px;
+      left: -48px;
       
       @include tablet() {
         display: none;
@@ -1050,8 +1050,8 @@ div.cmail-outer {
         color: $ui_grey;
         font-size: 14px;
         line-height: 35px;
-        margin: 0px 16px 0px 0px;
-        float: right;
+        margin: 0px 0px 0px 16px;
+        float: left;
       }
 
       div.fullscreen-bt-container {
