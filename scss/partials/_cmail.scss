@@ -9,7 +9,6 @@ div.cmail-outer {
     right: unset;
     height: initial;
     min-height: 100vh;
-    background-color: white;
     width: 100%;
     box-shadow: none;
     overflow-x: hidden;
@@ -777,6 +776,11 @@ div.cmail-outer {
       border: 1px solid $mid_light_grey;
       box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
       background-color: white;
+
+      @include tablet() {
+        background-color: transparent;
+        padding: 24px 0;
+      }
     }
 
     div.cmail-content {
