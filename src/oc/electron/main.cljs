@@ -121,6 +121,12 @@
   []
   (set! *main-cli-fn* (fn [] nil))
 
+  ;; Required for desktop notifications to work on Windows
+  ;; https://electronjs.org/docs/tutorial/notifications#windows
+  ;; When testing, add `node_modules\electron\dist\electron.exe` to your Start Menu
+  (when (win32?)
+    (.setAppUserModelId app (.-execPath js/process)))
+
   ;; -- App event handlers --
   (.on app "window-all-closed" #(when (not (mac?))
                                   (.quit app)))
