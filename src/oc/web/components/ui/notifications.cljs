@@ -64,7 +64,7 @@
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss app-update slack-bot mention mention-author
-             click] :as notification-data}
+             click dismiss-x] :as notification-data}
       light-theme]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
@@ -97,8 +97,10 @@
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
                         (dismiss %)))
+         :class (when dismiss-x "dismiss-x")
          :ref :dismiss-bt}
-        "OK"])
+        (when-not dismiss-x
+          "OK")])
     [:div.notification-title.group
       {:class (when-not (seq description) "no-description")}
       (when slack-icon

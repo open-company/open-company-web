@@ -409,17 +409,20 @@
 (def update-verbage
   (if js/window.isDesktop
     "Update"
-    "Reload"))
+    "Refresh page"))
 
 (def app-update-error
-  {:title "There's a new version of Carrot!"
+  {:title "New version of Carrot available!"
    :app-update true
    :id :app-update-error
    :expire 0
-   :dismiss false
-   :primary-bt-title update-verbage
-   :primary-bt-inline true
-   :primary-bt-cb #(js/window.location.reload)})
+   :dismiss true
+   :dismiss-bt true
+   :dismiss-x true
+   :secondary-bt-title update-verbage
+   :secondary-bt-style :green
+   :secondary-bt-class :update-app-bt
+   :secondary-bt-cb #(js/window.location.reload)})
 
 (def internal-error
   {:title "Internal error occurred"
