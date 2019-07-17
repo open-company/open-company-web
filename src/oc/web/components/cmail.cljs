@@ -31,6 +31,8 @@
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]))
 
+(def missing-title-tooltip "Please add a title")
+
 ;; Attachments handling
 
 (defn media-attachment-dismiss-picker
@@ -151,7 +153,8 @@
   (when-let [headline (rum/ref-node state "headline")]
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
-                                                       :has-changes true})]))))
+                                                       :has-changes true})])
+      (reset! (::post-button-title state) (if (seq (str emojied-headline)) "" missing-title-tooltip)))))
 
 (defn- abstract-on-change [state]
   (let [abstract (rum/ref-node state "abstract")]
@@ -228,17 +231,20 @@
       (real-post-action s))))
 
 (defn fix-tooltips
-  "Fix the tooltips of "
+  "Fix the tooltips"
   [s]
   (.each (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-   (fn [idx el]
-     (let [$el (js/$ el)]
-       (when-not (.hasClass $el "mobile-post-button")
-         (if (seq (.attr $el "data-tt-title"))
-           (doto (js/$ el)
-             (.tooltip "hide")
-             (.tooltip "fixTitle"))
-           (.tooltip $el "destroy")))))))
+    (fn [_ el]
+      ; (.tooltip "hide")
+      (let [$el (js/$ el)]
+        (if (.hasClass $el "post-button")
+          (if (seq (.attr $el "data-tt-title"))
+            (doto $el
+              (.tooltip)
+              ; (.tooltip "hide")
+              (.tooltip "fixTitle"))
+            (.tooltip $el "destroy"))
+          (.tooltip $el "fixTitle"))))))
 
 ;; Delete handling
 
@@ -295,9 +301,11 @@
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
+                   (rum/local "" ::post-button-title)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
+                   mixins/refresh-tooltips-mixin
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -313,13 +321,13 @@
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
+                      (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*"))))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
-                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -338,6 +346,7 @@
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
+                            (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
                             (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
                         (reset! (::latest-key s) (:ley cmail-state))))
                     s)
@@ -405,7 +414,7 @@
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
-        post-button-title (if show-post-bt-tooltip? "Please add a title" "")
+        post-button-title @(::post-button-title s)
         disabled? (or show-post-bt-tooltip?
                       @(::publishing s)
                       @(::disable-post s))
@@ -482,8 +491,6 @@
               {:on-click close-cb
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement "auto"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :data-tt-title (if long-tooltip "Save & Close" "Close")
                :title (if long-tooltip
                         "Save & Close"
                         "Close")}]]
@@ -537,16 +544,13 @@
                  :data-toggle "tooltip"
                  :data-placement "auto"
                  :data-container "body"
-                 :data-tt-title "Add attachment"
                  :title "Add attachment"}]
               [:div.delete-button-container
                 [:button.mlb-reset.delete-button
                   {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                   :data-tt-title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :on-click #(delete-clicked s % cmail-data)}]]])
           (when is-fullscreen?
             [:button.mlb-reset.post-button
@@ -570,8 +574,6 @@
               {:on-click close-cb
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement "auto"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :data-tt-title (if long-tooltip "Save & Close" "Close")
                :title (if long-tooltip
                         "Save & Close"
                         "Close")}]])
@@ -718,17 +720,14 @@
             [:div.delete-button-container
               [:button.mlb-reset.delete-button
                 {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                 :data-tt-title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :on-click #(delete-clicked s % cmail-data)}]]
             [:button.mlb-reset.attachment-button
               {:on-click #(add-attachment s)
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
-               :data-tt-title "Add attachment"
                :title "Add attachment"}]
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 24
