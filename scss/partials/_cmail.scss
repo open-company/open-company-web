@@ -288,7 +288,8 @@ div.cmail-outer {
           margin-top: 32px;
 
           div.rich-body-editor {
-            min-height: calc(100vh - 334px);
+            padding-bottom: 30vh;
+            min-height: calc(70vh - 334px);
             @include activity-body(18, 26, $deep_navy);
 
             @media screen and (min-height: 556px) {
