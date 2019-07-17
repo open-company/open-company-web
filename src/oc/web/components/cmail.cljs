@@ -234,7 +234,7 @@
    (fn [idx el]
      (let [$el (js/$ el)]
        (when-not (.hasClass $el "mobile-post-button")
-         (if (seq (.attr $el "title"))
+         (if (seq (.attr $el "data-tt-title"))
            (doto (js/$ el)
              (.tooltip "hide")
              (.tooltip "fixTitle"))
@@ -483,6 +483,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement "auto"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :data-tt-title (if long-tooltip "Save & Close" "Close")
                :title (if long-tooltip
                         "Save & Close"
                         "Close")}]]
@@ -536,10 +537,12 @@
                  :data-toggle "tooltip"
                  :data-placement "auto"
                  :data-container "body"
+                 :data-tt-title "Add attachment"
                  :title "Add attachment"}]
               [:div.delete-button-container
                 [:button.mlb-reset.delete-button
                   {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                   :data-tt-title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
@@ -552,6 +555,7 @@
                :data-placement "bottom"
                :data-container "body"
                :title post-button-title
+               :data-tt-title post-button-title
                :on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
                                         :loading working?})}
@@ -567,6 +571,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement "auto"
                :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+               :data-tt-title (if long-tooltip "Save & Close" "Close")
                :title (if long-tooltip
                         "Save & Close"
                         "Close")}]])
@@ -683,6 +688,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :title post-button-title
+                 :data-tt-title post-button-title
                  :class (utils/class-set {:disabled disabled?
                                           :loading working?})}
                 (if (= (:status cmail-data) "published")
@@ -712,6 +718,7 @@
             [:div.delete-button-container
               [:button.mlb-reset.delete-button
                 {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-tt-title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -721,6 +728,7 @@
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
+               :data-tt-title "Add attachment"
                :title "Add attachment"}]
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 24
