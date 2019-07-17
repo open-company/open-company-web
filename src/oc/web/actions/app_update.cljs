@@ -44,7 +44,6 @@
         (notification-actions/show-notification {:title "New version of Carrot available!"
                                                  :app-update true
                                                  :id :app-update-error
-                                                 :dismiss true
                                                  :dismiss-bt true
                                                  :dismiss-x true
                                                  :secondary-bt-title update-verbage
