@@ -190,5 +190,6 @@ var OCWebStaticOpenIntegrationsPanel = function() {};
 window.isDesktop = {};
 window.isWin32 = {};
 window.isMac = {};
+window.showDesktopWindow = function() {};
 window.setBadgeCount = function() {};
 // Fullstory
