@@ -1,6 +1,5 @@
 (ns oc.web.actions.app-update
   (:require [oc.web.api :as api]
-            [oc.web.lib.utils :as utils]
             [oc.web.actions.notifications :as notification-actions]))
 
 (defonce app-update-cicle (atom false))
@@ -19,7 +18,7 @@
   (when @app-update-timeout
     (.clearTimeout js/window @app-update-timeout))
   (reset! app-update-timeout
-   (utils/after interval real-app-update-check)))
+   (.setTimeout js/window real-app-update-check interval)))
 
 (defn- app-update-notification-dismissed
   "App update notification was dismissed, let's set a new timeout with a longer wait time."
@@ -30,6 +29,11 @@
   ;; Set a new interval
   (set-app-update-timeout default-app-update-dismiss-interval))
 
+(def update-verbage
+  (if js/window.isDesktop
+    "Update"
+    "Refresh page"))
+
 (defn- real-app-update-check
   "Check for app updates, show the notification if necessary, set a new timeout else."
   []
@@ -37,9 +41,18 @@
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (if (= status 404)
-        (notification-actions/show-notification
-         (merge utils/app-update-error {:expire 0
-                                        :dismiss app-update-notification-dismissed}))
+        (notification-actions/show-notification {:title "New version of Carrot available!"
+                                                 :app-update true
+                                                 :id :app-update-error
+                                                 :dismiss true
+                                                 :dismiss-bt true
+                                                 :dismiss-x true
+                                                 :secondary-bt-title update-verbage
+                                                 :secondary-bt-style :green
+                                                 :secondary-bt-class :update-app-bt
+                                                 :secondary-bt-cb #(js/window.location.reload)
+                                                 :expire 0
+                                                 :dismiss app-update-notification-dismissed})
         (set-app-update-timeout default-app-update-interval)))))
 
 (defn start-app-update-check

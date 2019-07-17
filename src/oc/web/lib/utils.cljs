@@ -406,24 +406,6 @@
   :id :generic-network-error
   :dismiss true})
 
-(def update-verbage
-  (if js/window.isDesktop
-    "Update"
-    "Refresh page"))
-
-(def app-update-error
-  {:title "New version of Carrot available!"
-   :app-update true
-   :id :app-update-error
-   :expire 0
-   :dismiss true
-   :dismiss-bt true
-   :dismiss-x true
-   :secondary-bt-title update-verbage
-   :secondary-bt-style :green
-   :secondary-bt-class :update-app-bt
-   :secondary-bt-cb #(js/window.location.reload)})
-
 (def internal-error
   {:title "Internal error occurred"
    :description (str "An internal error occurrent, we have been informed of the "
