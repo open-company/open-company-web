@@ -37,7 +37,7 @@
               [:a.group
                 {:href (:file-url atch)
                  :target "_blank"}
-                [:div.attachment-info
+                [:div.attachment-info.group
                   {:class (when editable? "editable")}
                   [:div.attachment-icon]
                   [:div.attachment-labels
