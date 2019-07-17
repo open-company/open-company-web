@@ -32,6 +32,7 @@
             [oc.web.actions.nux :as na]
             [oc.web.actions.jwt :as ja]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.app-update :as app-update-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.api :as api]
@@ -652,6 +653,9 @@
   (ra/subscribe)
   (ca/subscribe)
   (user-actions/subscribe)
+
+  ;; Start the app update check cicle
+  (app-update-actions/start-app-update-check)
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))

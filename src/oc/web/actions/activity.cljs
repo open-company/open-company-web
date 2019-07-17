@@ -609,10 +609,6 @@
        (cb resp)))))
 
 (defn secure-activity-chain []
-  (api/web-app-version-check
-    (fn [{:keys [success body status]}]
-      (when (= status 404)
-        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
   ;; Quick check on token
   (when-let [info (jwt/get-id-token-contents)]
     (when (not= (:secure-uuid info)
