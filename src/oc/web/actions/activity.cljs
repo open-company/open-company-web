@@ -608,41 +608,6 @@
      (when (fn? cb)
        (cb resp)))))
 
-(defn secure-activity-chain []
-  (api/web-app-version-check
-    (fn [{:keys [success body status]}]
-      (when (= status 404)
-        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
-  ;; Quick check on token
-  (when-let [info (jwt/get-id-token-contents)]
-    (when (not= (:secure-uuid info)
-                (router/current-secure-activity-id))
-      (routing-actions/maybe-404)))
-  (let [org-slug (router/current-org-slug)]
-    (api/get-auth-settings (fn [body]
-      (when body
-        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-          (api/get-user user-link (fn [success data]
-            (dis/dispatch! [:user-data (when success (json->cljs data))]))))
-        (dis/dispatch! [:auth-settings body])
-        (api/get-entry-point org-slug
-          (fn [success body]
-            (let [collection (:collection body)]
-              (if success
-                (let [orgs (:items collection)]
-                  (dis/dispatch! [:entry-point orgs collection])
-                  (when-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-                    (when (and (not (jwt/jwt)) (jwt/id-token))
-                      (get-org org-data
-                       (fn [success]
-                         (if success
-                           (connect-change-service)
-                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))
-                  (secure-activity-get (fn []
-                    ;; Delay comment load
-                    (comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))))
-                (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
-
 ;; Change reaction
 
 (defn activity-change [section-uuid activity-uuid]
