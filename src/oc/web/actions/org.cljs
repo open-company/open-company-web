@@ -104,14 +104,19 @@
                                 0
                                 other-resources-delay)]
     (when complete-refresh?
-      (when (router/current-activity-id)
-        (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
-      (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
-      ;; Preload all posts data
-      (when activity-link
-        (utils/maybe-after activity-delay #(aa/activity-get org-data ap-initial-at)))
-      (when recent-activity-link
-        (utils/maybe-after activity-delay #(aa/recent-activity-get org-data ap-initial-at))))
+      ;; Load secure activity
+      (if (router/current-secure-activity-id)
+        (aa/secure-activity-get)
+        (do
+          ;; Load the current activity
+          (when (router/current-activity-id)
+            (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
+          (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
+          ;; Preload all posts data
+          (when activity-link
+            (utils/maybe-after activity-delay #(aa/activity-get org-data ap-initial-at)))
+          (when recent-activity-link
+            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data ap-initial-at))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (and (not ap-initial-at)
