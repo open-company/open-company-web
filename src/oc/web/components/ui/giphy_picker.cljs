@@ -28,13 +28,6 @@
         adjusted-position (if (> relative-position win-height) ;; 286 is the top offset of the body
                             (max 0 (- top-position (- relative-position win-height) 16))
                             top-position)]
-    (js/console.log "DBG giphy-picker/render win-height" win-height)
-    (js/console.log "DBG    top-offset-limit" top-offset-limit)
-    (js/console.log "DBG    scroll-top" scroll-top)
-    (js/console.log "DBG    top-position" top-position)
-    (js/console.log "DBG    relative" relative-position)
-    (js/console.log "DBG    adjusted-position" adjusted-position)
-
     [:div.giphy-picker
       {:style {:top (str adjusted-position "px")}}
       (react-utils/build (.-Selector js/ReactGiphySelector)
