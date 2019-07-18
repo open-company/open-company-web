@@ -43,8 +43,7 @@
   (when-not @(::medium-editor s)
     (let [add-comment-node (rum/ref-node s "add-comment")
           users-list (:mention-users @(drv/get-ref s :team-roster))]
-      (when (or (not (jwt/jwt))
-                (seq users-list))
+      (when (seq users-list)
         (let [medium-editor (cu/setup-medium-editor add-comment-node users-list)]
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
@@ -105,7 +104,7 @@
                                (utils/after 0
                                 #(utils/to-end-of-content-editable add-comment-node))))
                            s)
-                          :did-remount (fn [_ s]
+                          :will-update (fn [s]
                            (setup-medium-editor-when-needed s)
                            s)
                           :will-unmount (fn [s]
@@ -128,6 +127,8 @@
                            s)}
   [s activity-data]
   (let [_ (drv/react s :add-comment-data)
+        _ (drv/react s :add-comment-focus)
+        _ (drv/react s :team-roster)
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
       [:div.add-comment-box
