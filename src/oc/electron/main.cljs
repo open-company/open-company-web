@@ -1,13 +1,8 @@
-(ns oc.electron.main)
+(ns oc.electron.main
+  (:require [oc.electron.auto-update :as auto-update]))
 
-(def auto-updater (.-autoUpdater (js/require "electron-updater")))
-(.checkForUpdatesAndNotify auto-updater)
-
-(def rate-in-minutes-to-check-for-updates 5)
-(js/setInterval
-  (fn []
-    (.checkForUpdatesAndNotify auto-updater))
-  (* rate-in-minutes-to-check-for-updates 60 1000))
+;; Begin checking for updates
+(auto-update/start-update-cycle!)
 
 (def main-window (atom nil))
 (def quitting? (atom false))
