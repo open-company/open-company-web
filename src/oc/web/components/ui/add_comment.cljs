@@ -3,6 +3,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -42,7 +43,8 @@
   (when-not @(::medium-editor s)
     (let [add-comment-node (rum/ref-node s "add-comment")
           users-list (:mention-users @(drv/get-ref s :team-roster))]
-      (when (seq users-list)
+      (when (or (not (jwt/jwt))
+                (seq users-list))
         (let [medium-editor (cu/setup-medium-editor add-comment-node users-list)]
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
