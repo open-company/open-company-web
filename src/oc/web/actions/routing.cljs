@@ -10,7 +10,8 @@
   (dis/dispatch! [:container/status (dis/change-data) true]))
 
 (defn maybe-404 []
-  (if (jwt/jwt)
+  (if (or (jwt/jwt)
+          (jwt/id-token))
     (router/redirect-404!)
     (dis/dispatch! [:show-login-wall])))
 
