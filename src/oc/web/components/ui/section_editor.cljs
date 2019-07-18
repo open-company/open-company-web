@@ -209,7 +209,7 @@
                           (when (and (not disable-bt)
                                      (compare-and-set! (::saving s) false true))
                             (let [section-node (rum/ref-node s "section-name")
-                                  section-name (.-value section-node)
+                                  section-name (clojure.string/trim (.-value section-node))
                                   personal-note-node (rum/ref-node s "personal-note")
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
@@ -231,7 +231,7 @@
                                        :preflight-error (:section-name-error section-editing)})
              :max-length 50
              :on-change (fn [e]
-                          (let [next-section-name (clojure.string/trim (.. e -target -value))]
+                          (let [next-section-name (.. e -target -value)]
                             (when (not= @(::section-name s) next-section-name)
                               (reset! (::section-name s) next-section-name)
                               (when @(::section-name-check-timeout s)
