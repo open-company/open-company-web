@@ -10,7 +10,6 @@
 (rum/defcs giphy-picker < (rum/local 0 ::offset-top)
                           {:will-mount (fn [s]
                             (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
-                              (js/console.log "DBG media-picker offsetTop" (.-offsetTop picker-el))
                               (reset! (::offset-top s) (.-offsetTop picker-el)))
                            s)}
   [s {:keys [fullscreen pick-emoji-cb]}]
