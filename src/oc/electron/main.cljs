@@ -6,6 +6,11 @@
 (goog-define init-path "/login/desktop")
 (goog-define sentry-dsn false)
 
+;; Setup sentry
+(def sentry (js/require "@sentry/electron"))
+(when sentry-dsn
+  (.init sentry #js {:dsn sentry-dsn}))
+
 (def auto-updater (.-autoUpdater (js/require "electron-updater")))
 (.checkForUpdatesAndNotify auto-updater)
 
@@ -14,11 +19,6 @@
   (fn []
     (.checkForUpdatesAndNotify auto-updater))
   (* rate-in-minutes-to-check-for-updates 60 1000))
-
-;; Setup sentry
-(def sentry (js/require "@sentry/electron"))
-(when sentry-dsn
-  (.init sentry #js {:dsn sentry-dsn}))
 
 (def main-window (atom nil))
 (def quitting? (atom false))
