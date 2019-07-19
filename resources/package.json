@@ -1,7 +1,7 @@
 {
   "name": "Carrot",
   "author": "Open Company",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "license": "CC-BY-NC-SA-4.0",
   "repository": {
@@ -30,6 +30,10 @@
     "win": {
       "target": ["nsis"],
       "icon": "carrot.iconset/icon.ico"
+    },
+    "nsis": {
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     },
     "afterSign": "electron/notarize.js",
     "icon": "carrot.iconset/icon.icns",
