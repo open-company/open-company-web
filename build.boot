@@ -304,7 +304,9 @@
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        false
                                                    'oc.electron.main/web-origin  "https://staging.carrot.io"
-                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"}})
+                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://d4318ef3fbba49668211f37c56157a19@sentry.io/1509179"
+                                                   }})
         (target)))
 
 (deftask staging-electron-windows
@@ -315,7 +317,9 @@
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        false
                                                    'oc.electron.main/web-origin  "https://staging.carrot.io"
-                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"}})
+                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://d4318ef3fbba49668211f37c56157a19@sentry.io/1509179"
+                                                   }})
         (target)))
 
 (deftask prod-electron
@@ -326,7 +330,9 @@
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        false
                                                    'oc.electron.main/web-origin  "https://carrot.io"
-                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"}})
+                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://760ab937836c444895614a24d8fd7b23@sentry.io/1509184"
+                                                   }})
         (target)))
 
 (deftask prod-electron-windows
@@ -337,5 +343,7 @@
               :optimizations :simple
               :compiler-options {:closure-defines {'oc.electron.main/dev?        false
                                                    'oc.electron.main/web-origin  "https://carrot.io"
-                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"}})
+                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://760ab937836c444895614a24d8fd7b23@sentry.io/1509184"
+                                                   }})
         (target)))

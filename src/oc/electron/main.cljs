@@ -1,5 +1,11 @@
 (ns oc.electron.main)
 
+(goog-define dev? true)
+(goog-define web-origin "http://localhost:3559")
+(goog-define auth-origin "http://localhost:3003")
+(goog-define init-path "/login/desktop")
+(goog-define sentry-dsn false)
+
 (def auto-updater (.-autoUpdater (js/require "electron-updater")))
 (.checkForUpdatesAndNotify auto-updater)
 
@@ -8,6 +14,11 @@
   (fn []
     (.checkForUpdatesAndNotify auto-updater))
   (* rate-in-minutes-to-check-for-updates 60 1000))
+
+;; Setup sentry
+(def sentry (js/require "@sentry/electron"))
+(when sentry-dsn
+  (.init sentry #js {:dsn sentry-dsn}))
 
 (def main-window (atom nil))
 (def quitting? (atom false))
@@ -22,10 +33,6 @@
 (def shell (.-shell electron))
 (def BrowserWindow (.-BrowserWindow electron))
 
-(goog-define dev? true)
-(goog-define web-origin "http://localhost:3559")
-(goog-define auth-origin "http://localhost:3003")
-(goog-define init-path "/login/desktop")
 (def init-url (str web-origin init-path))
 
 (defn mac?
