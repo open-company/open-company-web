@@ -309,6 +309,7 @@
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
+                          cmail-state @(drv/get-ref s :cmail-state)
                           initial-body (if (seq (:body cmail-data))
                                          (:body cmail-data)
                                          "")
@@ -322,7 +323,8 @@
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
                       (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
-                      (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*"))))
+                      (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
+                      (reset! (::latest-key s) (:key cmail-state)))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
@@ -331,6 +333,7 @@
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
+                      ;; If the state key changed let's reset the initial values
                       (when (not= @(::latest-key s) (:key cmail-state))
                         (when @(::latest-key s)
                           (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -348,7 +351,7 @@
                             (reset! (::initial-uuid s) (:uuid cmail-data))
                             (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
                             (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
-                        (reset! (::latest-key s) (:ley cmail-state))))
+                        (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
