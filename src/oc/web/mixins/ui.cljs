@@ -261,11 +261,13 @@
   "Given a React reference to a component node, listens on all the events on that textarea element
    and resize its frame to make sure it doesn't scroll and the no extra blank space."
   [ref & [initially-focused]]
-  (letfn [(init-textarea [el]
-            (let [observe (utils/observe)
+  (letfn [(init-textarea [s el-ref]
+            (let [el (rum/ref-node s el-ref)
+                  observe (utils/observe)
                   resize-fn (fn []
-                              (set! (.-height (.-style el)) "auto")
-                              (set! (.-height (.-style el)) (str (.-scrollHeight el) "px")))
+                              (let [e (rum/ref-node s el-ref)]
+                                (set! (.-height (.-style e)) "auto")
+                                (set! (.-height (.-style e)) (str (.-scrollHeight e) "px"))))
                   delayed-resize-fn (fn [] (utils/after 0 resize-fn))]
             (observe el "change" resize-fn)
             (observe el "cut" delayed-resize-fn)
@@ -276,6 +278,5 @@
               (.focus el))
             (resize-fn)))]
     {:did-mount (fn [s]
-      (when-let [el (rum/ref-node s ref)]
-        (init-textarea el))
+      (init-textarea s ref)
       s)}))
