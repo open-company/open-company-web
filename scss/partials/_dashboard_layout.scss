@@ -4,7 +4,7 @@ div.dashboard-layout {
   overflow: visible;
 
   &.expanded-post-view {
-    div.cmail-outer {
+    div.cmail-outer:not(.fullscreen) {
       display: none;
     }
   }
