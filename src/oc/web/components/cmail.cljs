@@ -514,7 +514,7 @@
                     (dis/dispatch! [:input [:cmail-data]
                      (merge cmail-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)
-                                        :has-changes true
+                                        :has-changes (:has-changes cmail-data)
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
@@ -713,7 +713,7 @@
                     (dis/dispatch! [:input [:cmail-data]
                      (merge cmail-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)
-                                        :has-changes true
+                                        :has-changes (:has-changes cmail-data)
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
