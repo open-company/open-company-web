@@ -651,18 +651,18 @@
                                   (and (.-metaKey e)
                                        (= "Enter" (.-key e)))
                                   (post-clicked s)))}]]
-            (when show-edit-tooltip
-              [:div.edit-tooltip-outer-container
-                [:div.edit-tooltip-container.group
-                  [:div.edit-tooltip-title
-                    "Quick summary"]
-                  [:div.edit-tooltip
-                    (str
-                     "Help everyone know what your post is about. "
-                     "This is what your team sees first.")]
-                  [:button.mlb-reset.edit-tooltip-bt
-                    {:on-click #(nux-actions/dismiss-edit-tooltip)}
-                    "OK, got it"]]])
+            ; (when show-edit-tooltip
+            ;   [:div.edit-tooltip-outer-container
+            ;     [:div.edit-tooltip-container.group
+            ;       [:div.edit-tooltip-title
+            ;         "Quick summary"]
+            ;       [:div.edit-tooltip
+            ;         (str
+            ;          "Help everyone know what your post is about. "
+            ;          "This is what your team sees first.")]
+            ;       [:button.mlb-reset.edit-tooltip-bt
+            ;         {:on-click #(nux-actions/dismiss-edit-tooltip)}
+            ;         "OK, got it"]]])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :initial-body @(::initial-body s)

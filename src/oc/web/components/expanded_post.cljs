@@ -189,17 +189,17 @@
           (reactions activity-data))
         (when user-is-part-of-the-team
           [:div.expanded-post-wrt-container
-            (when should-show-post-added-tooltip?
-              [:div.post-added-tooltip-container
-                {:ref :post-added-tooltip}
-                [:div.post-added-tooltip-title
-                  "Post analytics"]
-                [:div.post-added-tooltip
-                  (str "Invite your team to Carrot so you can know who read your "
-                   "post and when. Click here to access your post analytics anytime.")]
-                [:button.mlb-reset.post-added-tooltip-bt
-                  {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                  "OK, got it"]])
+            ; (when should-show-post-added-tooltip?
+            ;   [:div.post-added-tooltip-container
+            ;     {:ref :post-added-tooltip}
+            ;     [:div.post-added-tooltip-title
+            ;       "Post analytics"]
+            ;     [:div.post-added-tooltip
+            ;       (str "Invite your team to Carrot so you can know who read your "
+            ;        "post and when. Click here to access your post analytics anytime.")]
+            ;     [:button.mlb-reset.post-added-tooltip-bt
+            ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+            ;       "OK, got it"]])
             (wrt-count activity-data reads-data)])]
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data)
