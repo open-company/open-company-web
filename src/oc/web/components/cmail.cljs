@@ -603,6 +603,8 @@
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
                :on-click    #(headline-on-change s)
+               :on-focus #(headline-on-change s)
+               :on-blur #(headline-on-change s)
                :on-key-down (fn [e]
                               (headline-on-change s)
                               (cond
