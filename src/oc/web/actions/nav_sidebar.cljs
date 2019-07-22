@@ -3,6 +3,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.cmail :as cmail-actions]
@@ -30,6 +31,8 @@
              (.-preventDefault e))
     (.preventDefault e))
   (cmail-actions/cmail-hide)
+  (nux-actions/dismiss-post-added-tooltip)
+  (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
     (if (= current-path url)
       (do
