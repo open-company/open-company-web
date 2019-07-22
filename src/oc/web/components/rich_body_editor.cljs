@@ -312,7 +312,8 @@
             media-picker-opts {:buttons (clj->js media-config)
                                :hidePlaceholderOnExpand false
                                :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
-                                                             :alwaysExpanded (:use-inline-media-picker options)}
+                                                             :alwaysExpanded (:use-inline-media-picker options)
+                                                             :initiallyVisible (:use-inline-media-picker options)}
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
@@ -436,8 +437,16 @@
                                    (when-not (:nux props)
                                      (utils/after 300 #(setup-editor s))))
                                  s)
-                                :did-remount (fn [_ s]
+                                :did-remount (fn [o s]
                                  (setup-editor s)
+                                 (when (not= (:cmail-key (first (:rum/args o))) (:cmail-key (first (:rum/args s))))
+                                   (when @(::editor s)
+                                     (.destroy @(::editor s)))
+                                   (reset! (::editor s) nil)
+                                   (reset! (::media-picker-ext s) nil)
+                                   (reset! (::did-change s) false)
+                                   (reset! (::initializing-editor s) false)
+                                   (utils/after 10 #(setup-editor s)))
                                  s)
                                 :will-update (fn [s]
                                  (let [data @(drv/get-ref s :media-input)
@@ -448,7 +457,7 @@
                                       (when (or (= video-data :dismiss)
                                                 (map? video-data))
                                         (reset! (::media-video s) false)
-                                        (dis/dispatch! [:input [:media-input :media-video] nil]))
+                                        (dis/dispatch! [:update [:media-input] #(dissoc % :media-video)]))
                                       (if (map? video-data)
                                         (media-video-add s @(::media-picker-ext s) video-data)
                                         (media-video-add s @(::media-picker-ext s) nil))))
@@ -465,9 +474,10 @@
              upload-progress-cb
              dispatch-input-key
              attachment-dom-selector
-             start-video-recording-cb
-             fullscreen]}]
+             fullscreen
+             cmail-key]}]
   [:div.rich-body-editor-outer-container
+    {:key (str "rich-body-editor-" cmail-key)}
     [:div.rich-body-editor-container
       [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
         {:ref "body"

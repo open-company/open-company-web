@@ -3,7 +3,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.actions.cmail :as cmail-actions]))
 
 (defn routing [route-path]
   (dis/dispatch! [:routing route-path])
@@ -35,6 +36,7 @@
                               :query-params query-params
                               :back-to back-to
                               :back-y scroll-y-position})
+    (cmail-actions/cmail-hide)
     (when-not scroll-to-top
       (utils/scroll-to-y 0 0))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
