@@ -1,28 +1,57 @@
 div.cmail-outer {
-  position: fixed;
-  bottom: 0px;
-  right: 24px;
-  width: 580px;
-  z-index: #{$navbar_zindex + 116};
-  background-color: white;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: 100%;
+  margin-bottom: 24px;
 
   @include tablet() {
     position: relative;
     bottom: unset;
     right: unset;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
     height: initial;
     min-height: 100vh;
-    background-color: white;
     width: 100%;
     box-shadow: none;
     overflow-x: hidden;
     overflow-y: auto;
     background-color: $grey_num_2;
+    margin-bottom: 0;
+  }
+
+  &.quick-post-collapsed {
+    div.cmail-container {
+
+      div.dismiss-inline-cmail-container {
+        display: none;
+      }
+
+      div.cmail-content-outer {
+        padding: 16px 40px;
+
+        div.cmail-content {
+          height: 24px;
+          min-height: 24px;
+
+          div.cmail-content-headline {
+            display: none;
+          }
+
+          div.rich-body-editor-outer-container {
+            div.rich-body-editor-container {
+              margin-top: 0;
+              height: 24px;
+
+              div.rich-body-editor {
+                margin-top: 0;
+              }
+            }
+          }
+        }
+      }
+
+      div.cmail-footer {
+        display: none;
+      }
+    }
   }
 
   &.fullscreen {
@@ -31,10 +60,12 @@ div.cmail-outer {
     position: fixed;
     top: 0;
     left: 0;
-    rigth: 0;
+    right: 0;
     bottom: 0;
     background-color: $carrot_modal_bg;
     border-radius: 0;
+    z-index: #{$navbar_zindex + 116};
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
 
     @include tablet() {
       position: relative;
@@ -74,6 +105,7 @@ div.cmail-outer {
         left: 0;
         width: 100vw;
         z-index: 1;
+        display: block;
 
         div.close-bt-container {
           position: absolute;
@@ -232,9 +264,12 @@ div.cmail-outer {
         }
       }
 
+      div.dismiss-inline-cmail-container {
+        display: none;
+      }
+
       div.cmail-content-outer {
-        padding-top: 56px;
-        padding-bottom: 0;
+        padding: 56px 0 0;
         overflow-x: hidden;
         overflow-y: auto;
         height: 100%;
@@ -242,6 +277,10 @@ div.cmail-outer {
         top: 0;
         left: 0;
         width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
       }
 
       div.cmail-content {
@@ -252,6 +291,7 @@ div.cmail-outer {
         max-height: unset;
         overflow-x: auto;
         overflow-y: auto;
+        overflow-x: visible;
 
         @include tablet() {
           padding: 16px 16px 24px;
@@ -270,6 +310,7 @@ div.cmail-outer {
         div.cmail-content-abstract-container {
           margin-top: 24px;
           padding-bottom: 32px;
+          display: block;
 
           textarea.cmail-content-abstract {
             background-color: transparent;
@@ -302,12 +343,17 @@ div.cmail-outer {
 
       div.cmail-footer {
         width: 240px;
-        margin: 0 auto;
+        margin: 0 auto 32px;
         position: absolute;
         bottom: 0;
         right: 0;
         left: unset;
         background-color: transparent;
+
+        div.saving-saved {
+          float: right;
+          margin: 0px 16px 0px 0px;
+        }
       }
     }
   }
@@ -315,6 +361,7 @@ div.cmail-outer {
   div.cmail-container {
     width: 100%;
     height: 100%;
+    position: relative;
 
     @include tablet() {
       width: 100vw;
@@ -406,7 +453,6 @@ div.cmail-outer {
 
           &.disabled {
             opacity: 0.4;
-            cursor: not-allowed;
           }
         }
       }
@@ -418,10 +464,12 @@ div.cmail-outer {
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       padding: 12px 16px;
+      display: none;
 
       @include no-user-select();
 
       @include tablet() {
+        display: block;
         width: 100%;
         min-height: 56px;
         height: auto;
@@ -696,12 +744,58 @@ div.cmail-outer {
       }
     }
 
+    div.dismiss-inline-cmail-container {
+      position: absolute;
+      top: 0;
+      left: -48px;
+      
+      @include tablet() {
+        display: none;
+      }
+
+      button.dismiss-inline-cmail {
+        width: 32px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+      }
+
+      &.long-tooltip {
+        .tooltip {
+          width: 122px;
+        }
+      }
+
+      .tooltip {
+        margin-top: -16px;
+      }
+    }
+
+    div.cmail-content-outer {
+      padding: 24px 40px;
+      border-radius: 4px;
+      border: 1px solid $mid_light_grey;
+      box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
+      background-color: white;
+
+      @include tablet() {
+        background-color: transparent;
+        padding: 24px 0;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+
     div.cmail-content {
-      padding: 24px 16px;
-      min-height: 212px;
-      max-height: calc(100vh - 208px);
+      min-height: 112px;
       overflow-y: auto;
-      overflow-x: hidden;
+      overflow-x: auto;
+      overflow: visible;
       height: auto;
 
       @include tablet() {
@@ -742,11 +836,16 @@ div.cmail-outer {
         border: none;
         outline: none;
         cursor: text;
-        @include activity-title();
+        @include activity-title(22px, 28px);
         color: $deep_navy;
         white-space: pre-wrap;
         word-wrap: break-word;
         min-height: 28px;
+
+        @include tablet() {
+          @include activity-title();
+          min-height: 30px;
+        }
 
         &:empty:before {
           content: attr(placeholder);
@@ -762,6 +861,11 @@ div.cmail-outer {
         padding: 0 0 16px;
         border-bottom: 1px solid $ultra_light_grey;
         position: relative;
+        display: none;
+
+        @include tablet() {
+          display: block;
+        }
 
         div.cmail-content-abstract-counter {
           height: 26px;
@@ -798,7 +902,6 @@ div.cmail-outer {
 
         textarea.cmail-content-abstract {
           @include activity-abstract(18px, 26px);
-          height: 26px;
           width: 100%;
           background-color: transparent;
           border: none;
@@ -807,6 +910,7 @@ div.cmail-outer {
           overflow: hidden;
           padding: 0;
           margin: 0;
+          min-height: 26px;
 
           @include placeholder(){
             color: rgba($deep_navy, 0.5) !important;
@@ -877,7 +981,7 @@ div.cmail-outer {
       div.rich-body-editor-container {
         position: relative;
         height: auto;
-        margin-top: 16px;
+        margin-top: 8px;
 
         div.medium-editor-media-picker {
           margin-top: 0;
@@ -902,7 +1006,7 @@ div.cmail-outer {
           }
 
           @media screen and (min-height: 556px) {
-            min-height: 182px;
+            min-height: 76px;
           }
 
           @include tablet() {
@@ -936,9 +1040,9 @@ div.cmail-outer {
     }
 
     div.cmail-footer {
-      height: 52px;
+      height: 32px;
       width: 100%;
-      padding: 0px 16px 12px;
+      margin-top: 16px;
 
       @include tablet() {
         display: none;
@@ -949,25 +1053,51 @@ div.cmail-outer {
         @include OC_Body_Book();
         color: $ui_grey;
         font-size: 14px;
-        line-height: 41px;
-        margin: 0px 16px 0px 0px;
-        float: right;
+        line-height: 35px;
+        margin: 0px 0px 0px 16px;
+        float: left;
+      }
+
+      div.fullscreen-bt-container {
+        float: left;
+
+        @include tablet() {
+          display: none;
+        }
+
+        button.fullscreen-bt {
+          height: 32px;
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
+          background-size: 12px 12px;
+          background-position: top 10px left 10px;
+          background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          padding: 7px 10px 7px 30px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+        }
+
+        .tooltip {
+          margin-top: -16px;
+        }
       }
 
       div.cmail-footer-right {
         float: right;
+        position: relative;
 
         div.delete-button-container {
           float: right;
 
           button.delete-button {
             width: 22px;
-            height: 20px;
+            height: 32px;
             background-image: cdnUrl("/img/ML/cmail_delete.svg");
             background-size: 14px 16px;
             background-position: center;
             background-repeat: no-repeat;
-            margin-top: 10px;
             opacity: 0.4;
             padding: 0;
 
@@ -988,10 +1118,10 @@ div.cmail-outer {
           color: $deep_navy;
           position: relative;
           float: right;
-          margin-right: 16px;
+          margin-right: 8px;
           padding: 0;
           width: 24px;
-          height: 40px;
+          height: 32px;
           opacity: 0.4;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
           background-size: 14px 16px;
@@ -1005,12 +1135,11 @@ div.cmail-outer {
 
         div.emoji-picker {
           float: right;
-          margin-right: 16px;
-          margin-top: 8px;
+          margin-right: 8px;
 
           button.emoji-button {
             width: 24px;
-            height: 24px;
+            height: 32px;
             background-position: center;
             background-size: 16px 16px;
             padding: 0px;
@@ -1027,6 +1156,93 @@ div.cmail-outer {
           div.picker-container {
             right: -16px;
             left: unset;
+          }
+        }
+
+        button.post-button {
+          float: right;
+          background-color: $carrot_green;
+          color: white;
+          width: 56px;
+          height: 32px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          border-radius: 4px;
+          margin-left: 16px;
+
+          &.disabled {
+            cursor: not-allowed;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+
+          @include tablet() {
+            display: none;
+          }
+        }
+
+        div.board-name {
+          width: 160px;
+          height: 32px;
+          cursor: pointer;
+          position: relative;
+          float: right;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 16px;
+          padding: 7px 8px;
+          background-image: cdnUrl("/img/ML/select_arrows.svg");
+          background-size: 8px 10px;
+          background-position: top 11px right 8px;
+          background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          margin-left: 16px;
+
+          @include big_web() {
+            &:hover, &.active {
+              background-color: $more_ultra_light_grey;
+            }
+          }
+
+          div.board-name-inner {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: calc(100% - 16px);
+            white-space: nowrap;
+          }
+
+          @include tablet() {
+            width: calc(100% - 16px - 32px);
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            background-color: $ultra_light_grey;
+            color: $deep_navy;
+
+            &:hover, &.open {
+              background-color: $more_ultra_light_grey;
+            }
+          }
+        }
+
+        div.sections-picker-container {
+          position: absolute;
+          top: 40px;
+          left: 102px;
+          z-index: #{$navbar_zindex + 156};
+          max-height: 370px;
+
+          div.sections-picker {
+            overflow: auto;
+            position: relative;
+            top: unset;
+            left: unset;
+
+            @include tablet() {
+              width: calc(100% - 16px - 32px);
+            }
           }
         }
       }

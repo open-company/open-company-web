@@ -5,6 +5,7 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -28,7 +29,7 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
+  (cmail-actions/cmail-hide)
   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
     (if (= current-path url)
       (do
