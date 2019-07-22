@@ -317,7 +317,8 @@
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
                                                ""))]
-                      (when-not (seq (:uuid cmail-data))
+                      (when (and (not (seq (:uuid cmail-data)))
+                                 (not (:collapsed cmail-state)))
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
@@ -344,7 +345,8 @@
                                                    (if (seq (:headline cmail-data))
                                                      (:headline cmail-data)
                                                      ""))]
-                            (when-not (seq (:uuid cmail-data))
+                            (when (and (not (seq (:uuid cmail-data)))
+                                       (not (:collapsed cmail-state)))
                               (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
@@ -444,6 +446,7 @@
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
        :on-click #(when (:collapsed cmail-state)
+                    (nux-actions/dismiss-add-post-tooltip)
                     (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
@@ -646,7 +649,8 @@
                                   (and (.-metaKey e)
                                        (= "Enter" (.-key e)))
                                   (post-clicked s)))}]]
-            (when show-edit-tooltip
+            (when (and show-edit-tooltip
+                       is-fullscreen?)
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
