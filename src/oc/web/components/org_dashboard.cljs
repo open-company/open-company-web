@@ -33,7 +33,7 @@
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]
+            [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
@@ -97,7 +97,7 @@
                 is-showing-alert
                 show-section-add-cb
                 activity-share-container
-                show-cmail
+                cmail-state
                 showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
@@ -145,19 +145,19 @@
                                       (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))
                                  (and ap-initial-at
                                       (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
-        show-activity-not-found (and (not jwt)
-                                     (or force-login-wall
-                                         (and (router/current-activity-id)
-                                              (or org-not-found
-                                                  section-not-found
-                                                  entry-not-found))))
+        show-login-wall (and (not jwt)
+                             (or force-login-wall
+                                 (and (router/current-activity-id)
+                                     (or org-not-found
+                                         section-not-found
+                                         entry-not-found))))
         show-activity-removed (and jwt
                                    (or (router/current-activity-id)
                                        ap-initial-at)
                                    (or org-not-found
                                        section-not-found
                                        entry-not-found))
-        is-loading (and (not show-activity-not-found)
+        is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
         is-showing-mobile-search (and is-mobile? search-active?)
@@ -169,14 +169,17 @@
                                  (s/starts-with? (name open-panel) "reminder-"))
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
-                            (s/starts-with? (name open-panel) "wrt-"))]
+                            (s/starts-with? (name open-panel) "wrt-"))
+        show-mobile-cmail? (and cmail-state
+                                (not (:collapsed cmail-state))
+                                is-mobile?)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
                                   :mobile-or-tablet is-mobile?
-                                  :activity-not-found show-activity-not-found
+                                  :login-wall show-login-wall
                                   :activity-removed show-activity-removed
                                   :expanded-activity (router/current-activity-id)
                                   :show-menu (= open-panel :menu)})}
@@ -191,8 +194,8 @@
           show-activity-removed
           (activity-removed)
           ;; Activity not found
-          show-activity-not-found
-          (activity-not-found)
+          show-login-wall
+          (login-wall)
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)
@@ -253,7 +256,7 @@
               (rum/portal (activity-share) portal-element)
               (activity-share))))
         ;; cmail editor
-        (when show-cmail
+        (when show-mobile-cmail?
           (cmail))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
@@ -265,7 +268,7 @@
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (not show-cmail)
+                       (not show-mobile-cmail?)
                        (not open-panel)))
           [:div.page
             (navbar)
