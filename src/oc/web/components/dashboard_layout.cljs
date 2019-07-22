@@ -112,9 +112,6 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
-            (when (and (not is-mobile?)
-                       can-compose?)
-              (cmail))
             (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
                   non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
                                          "decisions to keep you and your team pulling in the same direction.")
@@ -144,6 +141,9 @@
                           "New post"])
                     [:div.add-post-tooltip-box.big-web-only
                       {:class (when is-second-user "second-user")}]]]))
+            (when (and (not is-mobile?)
+                       can-compose?)
+               (cmail))
             (when-not current-activity-id
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
