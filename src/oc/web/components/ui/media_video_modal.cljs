@@ -1,7 +1,6 @@
 (ns oc.web.components.ui.media-video-modal
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
-            [oops.core :refer (oget+)]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.dispatcher :as dis]
@@ -129,36 +128,18 @@
   [s {:keys [fullscreen dismiss-cb]}]
   (let [current-user-data (drv/react s :current-user-data)
         valid-url (valid-video-url? @(::video-url s))
-        scrolling-element-selector (if fullscreen :div.cmail-content-outer :div.cmail-content)
-        scrolling-element (sel1 [scrolling-element-selector])
+        scrolling-element (if fullscreen (sel1 [:div.cmail-content-outer]) (.-scrollingElement js/document))
         win-height (or (.-clientHeight (.-documentElement js/document))
                        (.-innerHeight js/window))
-        fixed-win-height (if fullscreen win-height (- win-height 52)) ;; Remove bottom padding of Cmail view
         top-offset-limit (.-offsetTop (sel1 [:div.rich-body-editor-outer-container]))
-        top-limit (if fullscreen
-                    0
-                    ;; On Cmail the top limit is not 0 but it's the dark bar, so let's
-                    ;; calculate the distance btw the rich body editor and the top of the bar
-                    ;; and remove the bar height
-                    (+ (* -1 top-offset-limit)
-                       56))
-        offset-top (if fullscreen
-                    ;; On Bmail the offset is directly the top offset of the body container
-                    top-offset-limit
-                    ;; On cmail let's get the distance of Cmail from the top of the page
-                    ;; and add the distance between the rich-body-editor container
-                    ;; and the first fixed element (that is the limit to calculate the absolute offset)
-                    (+ (oget+ (.offset (js/$ (sel1 [:div.cmail-outer]))) :top)
-                       top-offset-limit))
-        ; offset-height (.-scrollHeight scrolling-element)
         scroll-top (.-scrollTop scrolling-element)
         top-position (max 0 @(::offset-top s))
         relative-position (+ top-position
-                             offset-top
+                             top-offset-limit
                              (* scroll-top -1)
                              media-video-modal-height)
-        adjusted-position (if (> relative-position fixed-win-height) ;; 286 is the top offset of the body
-                            (max top-limit (- top-position (- relative-position fixed-win-height) 16))
+        adjusted-position (if (> relative-position win-height) ;; 286 is the top offset of the body
+                            (max 0 (- top-position (- relative-position win-height) 16))
                             top-position)]
     [:div.media-video-modal-container
       {:class (when @(::video-url-focused s) "video-url-focused")
