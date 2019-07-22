@@ -15,6 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -104,7 +105,7 @@
                                 other-resources-delay)]
     (when complete-refresh?
       (when (router/current-activity-id)
-        (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
+        (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
       (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
       ;; Preload all posts data
       (when activity-link

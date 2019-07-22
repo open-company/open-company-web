@@ -251,8 +251,12 @@ div.org-settings-modal {
             float: right;
             @include OC_Body_Book();
             font-size: 12px;
-            color: $ui_grey;
+            color: $deep_navy;
             opacity: 0.5;
+
+            &:hover {
+              opacity: 1;
+            }
           }
         }
       }

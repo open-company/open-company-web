@@ -121,6 +121,12 @@
   []
   (set! *main-cli-fn* (fn [] nil))
 
+  ;; Required for desktop notifications to work on Windows
+  ;; https://electronjs.org/docs/tutorial/notifications#windows
+  ;; When testing, add `node_modules\electron\dist\electron.exe` to your Start Menu
+  (when (win32?)
+    (.setAppUserModelId app "io.carrot.desktop"))
+
   ;; -- App event handlers --
   (.on app "window-all-closed" #(when (not (mac?))
                                   (.quit app)))
@@ -132,4 +138,6 @@
   ;; -- Inter-process Communication event handlers --
   ;; see resources/electron/renderer.js
   (.on ipc-main "set-badge-count" (fn [event arg] (.setBadgeCount app arg)))
+  (.on ipc-main "show-desktop-window" (fn [event arg] (when @main-window
+                                                        (.show @main-window))))
   )

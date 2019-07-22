@@ -95,7 +95,7 @@
                 is-showing-alert
                 show-section-add-cb
                 activity-share-container
-                show-cmail
+                cmail-state
                 showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
@@ -158,7 +158,10 @@
                                  (s/starts-with? (name open-panel) "reminder-"))
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
-                            (s/starts-with? (name open-panel) "wrt-"))]
+                            (s/starts-with? (name open-panel) "wrt-"))
+        show-mobile-cmail? (and cmail-state
+                                (not (:collapsed cmail-state))
+                                is-mobile?)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -242,7 +245,7 @@
               (rum/portal (activity-share) portal-element)
               (activity-share))))
         ;; cmail editor
-        (when show-cmail
+        (when show-mobile-cmail?
           (cmail))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
@@ -254,7 +257,7 @@
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (not show-cmail)
+                       (not show-mobile-cmail?)
                        (not open-panel)))
           [:div.page
             (navbar)
