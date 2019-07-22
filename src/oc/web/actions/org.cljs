@@ -15,6 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -92,8 +93,7 @@
              (= (router/current-org-slug) (:slug org-data)))
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
-  (let [ap-initial-at (:ap-initial-at @dis/app-state)
-        boards (:boards org-data)
+  (let [boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
         is-all-posts? (= (router/current-board-slug) "all-posts")
@@ -110,17 +110,16 @@
         (do
           ;; Load the current activity
           (when (router/current-activity-id)
-            (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
+            (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
           (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
           ;; Preload all posts data
           (when activity-link
-            (utils/maybe-after activity-delay #(aa/activity-get org-data ap-initial-at)))
+            (utils/maybe-after activity-delay #(aa/activity-get org-data)))
           (when recent-activity-link
-            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data ap-initial-at))))))
+            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
-      (and (not ap-initial-at)
-           (or (= (router/current-board-slug) "all-posts")
+      (and (or (= (router/current-board-slug) "all-posts")
                (= (router/current-board-slug) "must-see")))
       (when-not activity-link
         (check-org-404))
@@ -137,8 +136,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
-          (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
-                     (not ap-initial-at)) ;; neither for a briefing link
+          (when (not (router/current-activity-id)) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))

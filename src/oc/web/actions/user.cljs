@@ -80,6 +80,7 @@
        (fn [orgs collection]
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+             ;; We got the org we were looking for
              (org-actions/get-org org-data)
              (if (router/current-secure-activity-id)
                (activity-actions/secure-activity-get
