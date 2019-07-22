@@ -73,6 +73,11 @@
 (def slack-origin "https://slack.com")
 (def slack-origin-re #"^https://.*\.slack\.com$")
 (def google-accounts-origin "https://accounts.google.com")
+(def filestack-api-origin "https://www.filestackapi.com")
+(def filestack-static-origin "https://static.filestackapi.com")
+(def dropbox-origin "https://www.dropbox.com")
+(def onedrive-origin "https://login.live.com")
+(def box-origin "https://www.box.com")
 
 (defn- allowed-origin?
   [o]
@@ -81,24 +86,34 @@
     (= o auth-origin)
     (= o slack-origin)
     (= o google-accounts-origin)
+    (= o filestack-api-origin)
+    (= o filestack-static-origin)
+    (= o dropbox-origin)
+    (= o onedrive-origin)
+    (= o box-origin)
     (re-matches slack-origin-re o)))
 
 (defn- prevent-navigation-external-to-carrot
   []
   (.on app "web-contents-created"
-    (fn [event contents]
-      (.on contents "will-navigate"
-        (fn [event navigation-url]
-          (let [parsed-url    (URL. navigation-url)
-                target-origin (.-origin parsed-url)]
-            (println "Attempting to navigate to origin: " target-origin)
-            (when (not (allowed-origin? target-origin))
-              (println "Navigation prevented")
-              (.preventDefault event)))))
-      (.on contents "new-window"
-        (fn [event navigation-url]
-          (.preventDefault event)
-          (.openExternal shell navigation-url))))))
+       (fn [event contents]
+         (.on contents "will-navigate"
+              (fn [event navigation-url]
+                (let [parsed-url    (URL. navigation-url)
+                      target-origin (.-origin parsed-url)]
+                  (println "Attempting to navigate to origin: " target-origin)
+                  (when (not (allowed-origin? target-origin))
+                    (println "Navigation prevented")
+                    (.preventDefault event)))))
+         (.on contents "new-window"
+              (fn [event navigation-url]
+                (let [parsed-url    (URL. navigation-url)
+                      target-origin (.-origin parsed-url)]
+                  (println "Attempting to open new window at: " target-origin)
+                  (when (not (allowed-origin? target-origin))
+                    (println "New window not whitelisted, opening in external browser")
+                    (.preventDefault event)
+                    (.openExternal shell navigation-url))))))))
 
 (defn- init-browser
   []
