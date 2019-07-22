@@ -26,6 +26,18 @@
   ;; Let the change service know we saw the board
   (ws-cc/container-seen uuid))
 
+(defn request-reads-count
+  "Request the reads count data only for the items we don't have already."
+  [section]
+  (let [user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
+    (when (and user-is-part-of-the-team
+               (not= (:slug section) utils/default-drafts-board-slug)
+               (seq (:entries section)))
+      (let [item-ids (map :uuid (:entries section))
+            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
+        (when (seq cleaned-ids)
+          (api/request-reads-count cleaned-ids))))))
+
 (defn section-get-finish
   [sort-type section]
   (let [is-currently-shown (is-currently-shown? section)
@@ -43,13 +55,7 @@
           (watch-single-section section))))
 
     ;; Retrieve reads count if there are items in the loaded section
-    (when (and user-is-part-of-the-team
-               (not= (:slug section) utils/default-drafts-board-slug)
-               (seq (:entries section)))
-      (let [item-ids (map :uuid (:entries section))
-            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
-        (when (seq cleaned-ids)
-          (api/request-reads-count cleaned-ids))))
+    (request-reads-count section)
     (dispatcher/dispatch! [:section sort-type (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
@@ -269,16 +275,9 @@
          (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
 
-(defn request-reads-count
-  "Request the reads count data only for the items we don't have already."
-  [item-ids]
-  (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
-    (when (seq cleaned-ids)
-      (api/request-reads-count cleaned-ids))))
-
 (defn section-more-finish [direction {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (json->cljs body)))))
+    (request-reads-count (json->cljs body)))
   (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) (router/current-board-slug)
    direction (router/current-sort-type) (when success (json->cljs body))]))
 

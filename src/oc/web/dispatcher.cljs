@@ -171,7 +171,6 @@
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
-   :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
@@ -368,9 +367,9 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :ap-initial-at :show-sections-picker :entry-editing :jwt :wrt-show]
+                            :show-sections-picker :entry-editing :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 ap-initial-at show-sections-picker entry-editing jwt wrt-show]
+                                 show-sections-picker entry-editing jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -382,7 +381,6 @@
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
-                               :ap-initial-at ap-initial-at
                                :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
@@ -427,11 +425,6 @@
   (flux/dispatch actions payload))
 
 ;; Data
-
-(defn ap-initial-at
-  "Get ap-initial-at."
-  ([] (ap-initial-at @app-state))
-  ([data] (:ap-initial-at data)))
 
 (defn bot-access
   ""
@@ -564,7 +557,7 @@
   ([org-slug]
     (draft-posts-data @app-state org-slug))
   ([data org-slug]
-    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug :recently-posted)))
 
 (defn activity-data
   "Get activity data."
