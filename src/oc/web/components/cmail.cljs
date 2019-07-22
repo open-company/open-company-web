@@ -646,7 +646,8 @@
                                   (and (.-metaKey e)
                                        (= "Enter" (.-key e)))
                                   (post-clicked s)))}]]
-            (when show-edit-tooltip
+            (when (and show-edit-tooltip
+                       is-fullscreen?)
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
