@@ -564,7 +564,7 @@
   ([org-slug]
     (draft-posts-data @app-state org-slug))
   ([data org-slug]
-    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug :recently-posted)))
 
 (defn activity-data
   "Get activity data."
