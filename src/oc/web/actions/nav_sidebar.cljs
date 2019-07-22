@@ -30,7 +30,6 @@
              (.-preventDefault e))
     (.preventDefault e))
   (cmail-actions/cmail-hide)
-  (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
     (if (= current-path url)
       (do
