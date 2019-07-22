@@ -47,12 +47,11 @@
              (router/current-board-slug))
     (utils/after 100 (fn []
      (let [{:keys [org-data
-                   board-data
-                   ap-initial-at]} @(drv/get-ref s :org-dashboard-data)]
+                   board-data]} @(drv/get-ref s :org-dashboard-data)]
        (cond
 
         (= (router/current-board-slug) "all-posts")
-        (activity-actions/all-posts-get org-data ap-initial-at)
+        (activity-actions/all-posts-get org-data)
 
         (= (router/current-board-slug) "follow-ups")
         (activity-actions/follow-ups-sort-get org-data)
@@ -96,12 +95,11 @@
                 board-data
                 container-data
                 posts-data
-                ap-initial-at
                 is-sharing-activity
                 is-showing-alert
                 show-section-add-cb
                 activity-share-container
-                show-cmail
+                cmail-state
                 showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
@@ -121,14 +119,12 @@
                      (and (not= (router/current-board-slug) "all-posts")
                           (not= (router/current-board-slug) "must-see")
                           (not= (router/current-board-slug) "follow-ups")
-                          (not ap-initial-at)
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
                      (and (or (= (router/current-board-slug) "all-posts")
                               (= (router/current-board-slug) "must-see")
-                              (= (router/current-board-slug) "follow-ups")
-                              ap-initial-at)
+                              (= (router/current-board-slug) "follow-ups"))
                           ;; But no all-posts data yet
                          (not container-data)))
         org-not-found (and (not (nil? orgs))
@@ -140,18 +136,12 @@
                                (not= (router/current-board-slug) "follow-ups")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
-                             (or (and (router/current-activity-id)
-                                      board-data)
-                                 (and ap-initial-at
-                                      (not (jwt/user-is-part-of-the-team (:team-id org-data))))
-                                 (and ap-initial-at
-                                      container-data))
+                             (and (router/current-activity-id)
+                                  board-data)
                              (not (nil? posts-data))
                              (or (and (router/current-activity-id)
                                       (not ((set (keys posts-data)) (router/current-activity-id)))
-                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))
-                                 (and ap-initial-at
-                                      (not ((set (map :published-at (vals posts-data))) ap-initial-at)))))
+                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))))
         show-login-wall (and (not jwt)
                              (or force-login-wall
                                  (and (router/current-activity-id)
@@ -159,8 +149,7 @@
                                          section-not-found
                                          entry-not-found))))
         show-activity-removed (and jwt
-                                   (or (router/current-activity-id)
-                                       ap-initial-at)
+                                   (router/current-activity-id)
                                    (or org-not-found
                                        section-not-found
                                        entry-not-found))
@@ -178,7 +167,10 @@
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))
         show-follow-ups-picker (and open-panel
-                                    (s/starts-with? (name open-panel) "follow-ups-picker-"))]
+                                    (s/starts-with? (name open-panel) "follow-ups-picker-"))
+        show-mobile-cmail? (and cmail-state
+                                (not (:collapsed cmail-state))
+                                is-mobile?)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -262,7 +254,7 @@
               (rum/portal (activity-share) portal-element)
               (activity-share))))
         ;; cmail editor
-        (when show-cmail
+        (when show-mobile-cmail?
           (cmail))
         (when show-follow-ups-picker
           (follow-ups-picker))
@@ -276,7 +268,7 @@
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (not show-cmail)
+                       (not show-mobile-cmail?)
                        (not open-panel)))
           [:div.page
             (navbar)

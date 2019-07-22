@@ -9,11 +9,19 @@ console.log("Carrot desktop engage!");
 // we allow the web page to access a controlled set of native
 // desktop funcitonality.
 
+// NOTE: you need to add these fields/functions to externs.js
+// in order for them to avoid munging in production builds!
+
 window.isDesktop = true;
 window.isWin32 = (process.platform === "win32");
 window.isMac = (process.platform === "darwin");
 
+window.showDesktopWindow = function() {
+  console.log("Sending show-desktop-window IPC");
+  ipcRenderer.send('show-desktop-window');
+}
+
 window.setBadgeCount = function(count) {
-  console.log("Sending badge count IPC: " + count);
+  console.log("Sending set-badge-count IPC: " + count);
   ipcRenderer.send('set-badge-count', count);
 };

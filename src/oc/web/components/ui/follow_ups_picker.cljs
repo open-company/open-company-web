@@ -5,6 +5,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -16,7 +17,7 @@
   [s first-setup]
   (let [activity-data @(drv/get-ref s :follow-ups-activity-data)
         team-roster @(drv/get-ref s :team-roster)
-        users-list (activity-actions/follow-up-users activity-data team-roster)
+        users-list (cmail-actions/follow-up-users activity-data team-roster)
         all-user-ids (map :user-id users-list)
         filtered-follow-ups (if first-setup
                               (filterv #((set all-user-ids) (-> % :assignee :user-id)) (:follow-ups activity-data))
@@ -104,7 +105,7 @@
                                 (reset! (::follow-ups s) (map (fn [user]
                                                                 (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
                                                                   (or f
-                                                                      (hash-map :assignee (activity-actions/author-for-user user)
+                                                                      (hash-map :assignee (cmail-actions/author-for-user user)
                                                                                 :completed? false))))
                                                           users-list)))}
                     "Select all"]
@@ -148,7 +149,7 @@
                                 (if f
                                   (filterv (fn [f] (not= (-> f :assignee :user-id) (:user-id u)))
                                    follow-ups)
-                                  (conj follow-ups {:assignee (activity-actions/author-for-user u)
+                                  (conj follow-ups {:assignee (cmail-actions/author-for-user u)
                                                     :completed? false})))))}
                 [:div.follow-ups-user-left.group
                   {:class (when disabled? "disabled")}

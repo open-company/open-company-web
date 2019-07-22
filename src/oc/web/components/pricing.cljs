@@ -18,8 +18,8 @@
                                 :eventLabel event-name}))
 
 (rum/defcs pricing < {:did-mount (fn [s]
-                      (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
-                        (js/OCWebSetupMarketingSiteJS))
+                      (when (exists? (.-OCWebSetupStaticPagesJS js/window))
+                        (js/OCWebSetupStaticPagesJS))
                       s)}
   [s]
   [:div

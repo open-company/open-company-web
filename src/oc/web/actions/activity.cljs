@@ -1,7 +1,6 @@
 (ns oc.web.actions.activity
   (:require-macros [if-let.core :refer (when-let*)])
-  (:require [defun.core :refer (defun)]
-            [taoensso.timbre :as timbre]
+  (:require [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
@@ -18,6 +17,7 @@
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
             [oc.web.actions.routing :as routing-actions]
@@ -65,7 +65,7 @@
       (dis/dispatch! [:follow-ups-get/finish org sort-type fixed-follow-ups]))))
 
 (defn- follow-ups-real-get [follow-ups-link sort-type org-slug finish-cb]
-  (api/get-all-posts follow-ups-link nil
+  (api/get-all-posts follow-ups-link
    (fn [resp]
      (follow-ups-get-finish sort-type resp)
      (when (fn? finish-cb)
@@ -110,27 +110,27 @@
       (watch-boards (:fixed-items fixed-all-posts))
       (dis/dispatch! [:all-posts-get/finish org sort-type fixed-all-posts]))))
 
-(defn- activity-real-get [activity-link ap-initial-at sort-type org-slug finish-cb]
-  (api/get-all-posts activity-link ap-initial-at
+(defn- activity-real-get [activity-link sort-type org-slug finish-cb]
+  (api/get-all-posts activity-link
    (fn [resp]
      (all-posts-get-finish sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
-(defn activity-get [org-data ap-initial-at & [finish-cb]]
+(defn activity-get [org-data & [finish-cb]]
   (when-let [activity-link (utils/link-for (:links org-data) "entries")]
-    (activity-real-get activity-link ap-initial-at :recently-posted (:slug org-data) finish-cb)))
+    (activity-real-get activity-link :recently-posted (:slug org-data) finish-cb)))
 
-(defn recent-activity-get [org-data ap-initial-at & [finish-cb]]
+(defn recent-activity-get [org-data & [finish-cb]]
   (when-let [recent-activity-link (utils/link-for (:links org-data) "activity")]
-    (activity-real-get recent-activity-link ap-initial-at :recent-activity (:slug org-data) finish-cb)))
+    (activity-real-get recent-activity-link :recent-activity (:slug org-data) finish-cb)))
 
-(defn all-posts-get [org-data ap-initial-at & [finish-cb]]
+(defn all-posts-get [org-data & [finish-cb]]
   (let [sort-type (router/current-sort-type)
         activity-link-rel (if (= sort-type dis/default-sort-type) "activity" "entries")
         activity-link (utils/link-for (:links org-data) activity-link-rel)]
     (when activity-link
-      (activity-real-get activity-link ap-initial-at sort-type (:slug org-data) finish-cb))))
+      (activity-real-get activity-link sort-type (:slug org-data) finish-cb))))
 
 (defn all-posts-more-finish [direction sort-type {:keys [success body]}]
   (when success
@@ -161,7 +161,7 @@
       (let [activity-href (:href activity-link)
             must-see-filter (str activity-href "?must-see=true")
             must-see-link (assoc activity-link :href must-see-filter)]
-        (api/get-all-posts must-see-link nil (partial must-see-get-finish current-sort-type))))))
+        (api/get-all-posts must-see-link (partial must-see-get-finish current-sort-type))))))
 
 (defn must-see-more-finish [direction sort-type {:keys [success body]}]
   (when success
@@ -188,8 +188,8 @@
     (cond
       is-all-posts
       (if (= sort-type :recent-activity)
-        (recent-activity-get org-data (:ap-initial-at @dis/app-state))
-        (activity-get org-data (:ap-initial-at @dis/app-state)))
+        (recent-activity-get org-data)
+        (activity-get org-data))
       is-follow-ups
       (follow-ups-sort-get org-data)
       :else
@@ -200,43 +200,12 @@
     (api/get-org org-link refresh-org-data-cb)))
 
 ;; Entry
-(defn get-entry-cache-key
-  [entry-uuid]
-  (str (or
-        entry-uuid
-        (router/current-org-slug))
-   "-entry-edit"))
-
-(defn remove-cached-item
-  [item-uuid]
-  (uc/remove-item (get-entry-cache-key item-uuid)))
-
-(defn load-cached-item
-  [entry-data edit-key & [completed-cb]]
-  (let [cache-key (get-entry-cache-key (:uuid entry-data))]
-    (uc/get-item cache-key
-     (fn [item err]
-       (if (and (not err)
-                (map? item)
-                (= (:updated-at entry-data) (:updated-at item)))
-         (let [entry-to-save (merge item (select-keys entry-data [:links :board-slug :board-name]))]
-           (dis/dispatch! [:input [edit-key] entry-to-save]))
-         (do
-           ;; If we got an item remove it since it won't be used
-           ;; since we have an updated version of it already
-           (when item
-             (remove-cached-item (:uuid entry-data)))
-           (dis/dispatch! [:input [edit-key] entry-data])))
-       (when (fn? completed-cb)
-         (completed-cb))))))
-
-(defn- edit-open-cookie []
-  (str "edit-open-" (jwt/user-id) "-" (:slug (dis/org-data))))
 
 (defn entry-edit
   [initial-entry-data]
-  (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 30))
-  (load-cached-item initial-entry-data :entry-editing))
+  (cook/set-cookie! (cmail-actions/edit-open-cookie)
+   (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 30))
+  (cmail-actions/load-cached-item initial-entry-data :entry-editing))
 
 (defn entry-edit-dismiss
   []
@@ -260,7 +229,7 @@
   [activity-data activate]
   (if activate
     (do
-      (load-cached-item activity-data :modal-editing-data)
+      (cmail-actions/load-cached-item activity-data :modal-editing-data)
       (dis/dispatch! [:modal-editing-activate]))
     (dis/dispatch! [:modal-editing-deactivate])))
 
@@ -270,7 +239,7 @@
 (defn entry-save-on-exit
   [edit-key activity-data entry-body section-editing]
   (let [entry-map (assoc activity-data :body entry-body)
-        cache-key (get-entry-cache-key (:uuid activity-data))]
+        cache-key (cmail-actions/get-entry-cache-key (:uuid activity-data))]
     ;; Save the entry in the local cache without auto-saving or
     ;; we it will be picked up it won't be autosaved
     (uc/set-item cache-key (dissoc entry-map :auto-saving)
@@ -281,7 +250,7 @@
                     (:has-changes entry-map)
                     (not (:auto-saving entry-map)))
            ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving true :has-changes false :body (:body entry-map)})])
+           (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :has-changes false :body (:body entry-map)})])
            (entry-save edit-key entry-map section-editing
              (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
                (if-not success
@@ -296,12 +265,12 @@
                                      ;; board creation
                                      (first (vals fixed-items))
                                      json-body)]
-                   (cook/set-cookie! (edit-open-cookie) (:uuid entry-saved) (* 60 60 24 365))
+                   (cook/set-cookie! (cmail-actions/edit-open-cookie) (str (:board-slug entry-saved) "/" (:uuid entry-saved)) (* 60 60 24 365))
                    ;; remove the initial document cache now that we have a uuid
                    ;; uuid didn't exist before
                    (when (and (nil? (:uuid entry-map))
                               (:uuid entry-saved))
-                     (remove-cached-item (:uuid entry-map)))
+                     (cmail-actions/remove-cached-item (:uuid entry-map)))
                    ;; set the initial version number after the first auto save
                    ;; this is used to revert if user decides to lose the changes
                    (when (nil? (get @initial-revision (:uuid entry-saved)))
@@ -330,7 +299,7 @@
     (au/save-last-used-section board-slug)
     (refresh-org-data)
     ;; Remove saved cached item
-    (remove-cached-item initial-uuid)
+    (cmail-actions/remove-cached-item initial-uuid)
     ;; reset initial revision after successful save.
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc (:uuid activity-data))
@@ -355,7 +324,7 @@
         org-slug (router/current-org-slug)
         saved-activity-data (first (vals (:fixed-items fixed-board-data)))]
     (au/save-last-used-section (:slug fixed-board-data))
-    (remove-cached-item (:uuid activity-data))
+    (cmail-actions/remove-cached-item (:uuid activity-data))
     ;; reset initial revision after successful save.
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc (:uuid activity-data))
@@ -414,21 +383,11 @@
             (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
              nil])))))))
 
-(defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
-  (api/get-current-entry (router/current-org-slug) board-slug activity-uuid
-   (fn [{:keys [status success body]}]
-    (if (and (= status 404)
-             (= activity-uuid (router/current-activity-id)))
-      (routing-actions/maybe-404)
-      (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (when success (json->cljs body)) nil]))
-    (when (fn? loaded-cb)
-      (utils/after 100 #(loaded-cb success status))))))
-
 (declare entry-revert)
 
 (defn entry-clear-local-cache [item-uuid edit-key item]
   "Removes user local cache and also reverts any auto saved drafts."
-  (remove-cached-item item-uuid)
+  (cmail-actions/remove-cached-item item-uuid)
   ;; revert draft to old version
   (timbre/debug "Reverting to " @initial-revision item-uuid)
   (when (not= "published" (:status item))
@@ -442,7 +401,8 @@
 
   ([edit-key edited-data section-editing entry-save-cb]
      (let [fixed-edited-data (assoc-in edited-data [:status] (or (:status edited-data) "draft"))
-           fixed-edit-key (or edit-key :entry-editing)]
+           fixed-edit-key (or edit-key :entry-editing)
+           org-data (dis/org-data)]
        (dis/dispatch! [:entry-save fixed-edit-key])
        (if (:links fixed-edited-data)
          (if (and (= (:board-slug fixed-edited-data) utils/default-section-slug)
@@ -450,7 +410,7 @@
            ;; Save existing post to new board
            (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
                  final-board-data (assoc section-editing :entries [fixed-entry-data])
-                 create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+                 create-board-link (utils/link-for (:links org-data) "create")]
              (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                (fn [{:keys [success status body] :as response}]
                  (if (= status 409)
@@ -465,7 +425,7 @@
            ;; Save new post to new board
            (let [fixed-entry-data (dissoc fixed-edited-data :board-slug :board-name :invite-note)
                  final-board-data (assoc section-editing :entries [fixed-entry-data])
-                 create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+                 create-board-link (utils/link-for (:links org-data) "create")]
              (api/create-board create-board-link final-board-data (:invite-note fixed-edited-data)
                (fn [{:keys [success status body] :as response}]
                  (if (= status 409)
@@ -474,18 +434,16 @@
                    (entry-save-cb fixed-edited-data fixed-edit-key response)))))
            ;; Save new post to existing board
            (let [org-slug (router/current-org-slug)
-                 entry-board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-edited-data))
+                 entry-board-data (first (filter #(= (:slug %) (:board-slug fixed-edited-data)) (:boards org-data)))
                  entry-create-link (utils/link-for (:links entry-board-data) "create")]
              (api/create-entry entry-create-link fixed-edited-data fixed-edit-key entry-save-cb)))))))
-
-(declare follow-ups-for-activity)
 
 (defn entry-publish-finish [initial-uuid edit-key board-slug activity-data]
   ;; Save last used section
   (au/save-last-used-section board-slug)
   (refresh-org-data)
   ;; Remove entry cached edits
-  (remove-cached-item initial-uuid)
+  (cmail-actions/remove-cached-item initial-uuid)
   ;; reset initial revision after successful publish.
   ;; need a new revision number on the next edit.
   (swap! initial-revision dissoc (:uuid activity-data))
@@ -497,7 +455,7 @@
   ;; Show follow-ups notifications if needed
   (when (pos? (count (:follow-ups activity-data)))
     (let [follow-ups (:follow-ups activity-data)
-          activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
+          activity-follow-ups (cmail-actions/follow-ups-for-activity activity-data (dis/team-roster))
           available-users-set (set (map #(-> % :assignee :user-id) activity-follow-ups))
           actual-follow-ups-set (set (map #(-> % :assignee :user-id) follow-ups))
           notification-message (if (>= (count actual-follow-ups-set) (count available-users-set))
@@ -523,7 +481,7 @@
   (let [board-slug (:slug new-board-data)
         saved-activity-data (first (:entries new-board-data))]
     (au/save-last-used-section (:slug new-board-data))
-    (remove-cached-item entry-uuid)
+    (cmail-actions/remove-cached-item entry-uuid)
     ;; reset initial revision after successful publish.
     ;; need a new revision number on the next edit.
     (swap! initial-revision dissoc entry-uuid)
@@ -572,7 +530,7 @@
 (defn activity-delete [activity-data]
   ;; Make sure the WRT sample is dismissed
   (nux-actions/dismiss-post-added-tooltip)
-  (remove-cached-item (:uuid activity-data))
+  (cmail-actions/remove-cached-item (:uuid activity-data))
   (when (:links activity-data)
     (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
       (api/delete-entry activity-delete-link activity-delete-finish)
@@ -736,7 +694,7 @@
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
         (when (= (router/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data) (dis/ap-initial-at))))))
+          (all-posts-get (dis/org-data))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
@@ -762,7 +720,7 @@
           ;; Refresh specific containers/sections
           (cond
             (= (router/current-board-slug) "all-posts")
-            (all-posts-get org-data (dis/ap-initial-at) dispatch-unread)
+            (all-posts-get org-data dispatch-unread)
             (= (router/current-board-slug) "follow-ups")
             (follow-ups-get org-data dispatch-unread)
             :else
@@ -875,44 +833,6 @@
        (swap! wrt-timeouts-list dissoc activity-id)
        (send-item-read activity-id))))))
 
-(defun author-for-user
-  ([user :guard map?]
-   (if (contains? user :name)
-    (select-keys user [:user-id :avatar-url :name])
-    (-> user
-      (select-keys [:user-id :avatar-url])
-      (assoc :name (clojure.string/trim (str (:first-name user) " " (:last-name user)))))))
-  ([users :guard sequential?]
-   (vec (map author-for-user users))))
-
-(defn- follow-up-from-user [user]
-  (hash-map :assignee (author-for-user user)
-            :completed? false))
-
-(defn follow-up-users [activity-data team-roster]
-  (let [all-team-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
-        board-data (dis/board-data (:board-slug activity-data))
-        private-board? (= (:access board-data) "private")
-        filtered-board-users (when private-board?
-                               (concat (:viewers board-data) (:authors board-data)))]
-    (if private-board?
-      (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
-      all-team-users)))
-
-(defn- follow-ups-for-activity [activity-data team-roster]
-  (let [follow-up-users (follow-up-users activity-data team-roster)]
-    (map follow-up-from-user (filterv #(not= (:user-id %) (jwt/user-id)) follow-up-users))))
-
-(defn cmail-toggle-follow-up [activity-data]
-  (let [follow-up (pos? (count (:follow-ups activity-data)))
-        turning-on? (not follow-up)
-        activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
-        with-follow-ups (if turning-on?
-                          (assoc activity-data :follow-ups activity-follow-ups)
-                          (dissoc activity-data :follow-ups))
-        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-ups])))
-
 ;; Video handling
 
 (defn uploading-video [video-id edit-key]
@@ -973,98 +893,23 @@
   (let [org-data (dis/org-data)]
     (utils/link-for (:links org-data) "delete-samples" "DELETE")))
 
-;; Last used and default section for editing
-
-(defn get-default-section []
-  (let [org-slug (router/current-org-slug)
-        editable-boards (dis/editable-boards-data org-slug)
-        cookie-value (au/last-used-section)
-        board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
-        filtered-boards (filterv #(not (:draft %)) (vals editable-boards))
-        board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
-    {:board-name (:name board-data)
-     :board-slug (:slug board-data)}))
-
-(defn get-board-for-edit [& [board-slug]]
-  (let [board-data (if (seq board-slug)
-                    (dis/board-data (router/current-org-slug) board-slug)
-                    (dis/board-data))]
-    (if (or (not board-data)
-            (= (:slug board-data) utils/default-drafts-board-slug)
-            (not (utils/link-for (:links board-data) "create")))
-      (get-default-section)
-      {:board-slug (:slug board-data)
-       :board-name (:name board-data)})))
-
-;; Cmail
-
-(defn- cmail-fullscreen-cookie []
-  (str "cmail-fullscreen-" (jwt/user-id)))
-
-(defn- cmail-fullscreen-save [fullscreen?]
-  (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
-
-(defn cmail-show [initial-entry-data & [cmail-state]]
-  (let [cmail-default-state {:fullscreen (= (cook/get-cookie (cmail-fullscreen-cookie)) "true")}
-        cleaned-cmail-state (dissoc cmail-state :auto)
-        fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
-    (when (:fullscreen cmail-default-state)
-      (dom-utils/lock-page-scroll))
-    (when-not (:auto cmail-state)
-      (cook/set-cookie! (edit-open-cookie) (or (:uuid initial-entry-data) true) (* 60 60 24 365)))
-    (load-cached-item initial-entry-data :cmail-data
-     #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
-
-(defn cmail-hide []
-  (cook/remove-cookie! (edit-open-cookie))
-  (dis/dispatch! [:input [:cmail-data] nil])
-  (dis/dispatch! [:input [:cmail-state] nil])
-  (dom-utils/unlock-page-scroll))
-
-(defn cmail-toggle-fullscreen []
-  (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
-    (cmail-fullscreen-save next-fullscreen-value)
-    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])
-    (if next-fullscreen-value
-      (dom-utils/lock-page-scroll)
-      (dom-utils/unlock-page-scroll))))
-
-(defonce cmail-reopen-only-one (atom false))
-
-(defn cmail-reopen? []
-  (when (compare-and-set! cmail-reopen-only-one false true)
-      ;; Make sure the new param is alone and not with an access param that means
-      ;; it was adding a slack team or bot
-      (utils/after 5000
-       ;; If cmail is already open let's not reopen it
-       #(when-not (:cmail-state @dis/app-state)
-          (if (and (contains? (router/query-params) :new)
-                   (not (contains? (router/query-params) :access)))
-            (let [new-data (get-board-for-edit (router/query-param :new))
-                  with-headline (if (router/query-param :headline)
-                                 (assoc new-data :headline (router/query-param :headline))
-                                 new-data)]
-              (when new-data
-                (cmail-show with-headline {:auto true})))
-            (let [edit-param (router/query-param :edit)
-                  edit-activity (dis/activity-data edit-param)]
-              (if edit-activity
-                (cmail-show edit-activity {:auto true})
-                (when-let [activity-uuid (cook/get-cookie (edit-open-cookie))]
-                  (cmail-show (dis/activity-data activity-uuid) {:auto true})))))))))
-
 (defn activity-edit
   ([]
-    (activity-edit (get-board-for-edit)))
+    (let [cmail-state (:cmail-state @dis/app-state)
+          cmail-data (:cmail-data @dis/app-state)
+          next-cmail-data (if (and cmail-data
+                                   cmail-state
+                                   (not (:collapsed cmail-state)))
+                             cmail-data
+                             (cmail-actions/get-default-section))]
+      (activity-edit next-cmail-data)))
   ([activity-data]
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
                                 (assoc activity-data :must-see (= (router/current-board-slug) "must-see"))
                                 activity-data)
           is-published? (= (:status fixed-activity-data) "published")
-          initial-cmail-state (if is-published?
-                                {:fullscreen true :auto true}
-                                {})]
-      (cmail-show fixed-activity-data initial-cmail-state))))
+          cmail-state {:fullscreen true :key (utils/activity-uuid)}]
+      (cmail-actions/cmail-show fixed-activity-data cmail-state))))
 
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]

@@ -180,7 +180,7 @@ Headway.show = function(){};
 // Intercom (Chat support)
 var Intercom = function(){};
 // Homepage animation
-var OCWebSetupMarketingSiteJS = function(){};
+var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
@@ -190,5 +190,6 @@ var OCWebStaticOpenIntegrationsPanel = function() {};
 window.isDesktop = {};
 window.isWin32 = {};
 window.isMac = {};
+window.showDesktopWindow = function() {};
 window.setBadgeCount = function() {};
 // Fullstory
