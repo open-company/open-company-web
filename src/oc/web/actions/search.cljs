@@ -3,8 +3,8 @@
             [oc.web.api :as api]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.actions.activity :as aa]
             [oc.web.dispatcher :as dispatcher]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 
@@ -50,7 +50,7 @@
                           (alert-modal/show-alert alert-data))))]
     (if post-loaded?
       (open-post-cb true nil)
-      (aa/get-entry-with-uuid (:board-slug entry-result) (:uuid entry-result) open-post-cb))))
+      (cmail-actions/get-entry-with-uuid (:board-slug entry-result) (:uuid entry-result) open-post-cb))))
 
 (defn focus []
   (dispatcher/dispatch! [:search-focus]))

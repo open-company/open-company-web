@@ -9,7 +9,9 @@
             [oc.web.lib.utils :as utils]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false}))
+                          :show-login-overlay false
+                          :cmail-state {:key (utils/activity-uuid)
+                                        :collapsed true}}))
 
 (def default-sort-type :recent-activity)
 
@@ -385,7 +387,7 @@
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
-                               :show-cmail (boolean (:cmail-state base))
+                               :cmail-state (:cmail-state base)
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
@@ -507,16 +509,14 @@
   ([] (editable-boards-data @app-state (router/current-org-slug)))
   ([org-slug] (editable-boards-data @app-state org-slug))
   ([data org-slug]
-  (let [boards-key (boards-key org-slug)
-        boards (get-in data boards-key)
+  (let [org-data (org-data data org-slug)
         filtered-boards (filterv
                          (fn [board]
-                            (let [links (-> board :board-data :links)]
-                              (some #(when (= (:rel %) "create") %) links)))
-                         (vals boards))]
+                            (some #(when (= (:rel %) "create") %) (:links board)))
+                         (:boards org-data))]
     (zipmap
-     (map #(-> % :board-data :slug) filtered-boards)
-     (map :board-data filtered-boards)))))
+     (map #(:slug %) filtered-boards)
+     filtered-boards))))
 
 (defn container-data
   "Get container data."
