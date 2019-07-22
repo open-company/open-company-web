@@ -93,7 +93,7 @@ if (jwt) {
   }
 }
 
-function OCWebSetupMarketingSiteJS(){
+function OCWebSetupStaticPagesJS(){
   var switchFn = function() {
     $("button.keep-aligned-section-next-bt").toggleClass("active");
     var $switchContainer = $("div.slack-email-switch-container");
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
-  OCWebSetupMarketingSiteJS();
+  OCWebSetupStaticPagesJS();
 
   $(window).on("click", function(e){
     $target = $(e.target);
