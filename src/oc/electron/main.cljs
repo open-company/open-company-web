@@ -1,5 +1,6 @@
 (ns oc.electron.main
-  (:require [oc.electron.auto-update :as auto-update]))
+  (:require [oc.electron.auto-update :as auto-update]
+            [taoensso.timbre :as timbre :refer [info]]))
 
 ;; Begin checking for updates
 (auto-update/start-update-cycle!)
@@ -33,7 +34,7 @@
 
 (defn- load-page
   [window]
-  (println "Loading " init-url)
+  (info "Loading " init-url)
   (.loadURL window init-url))
 
 (defn- mk-window
@@ -86,9 +87,9 @@
         (fn [event navigation-url]
           (let [parsed-url    (URL. navigation-url)
                 target-origin (.-origin parsed-url)]
-            (println "Attempting to navigate to origin: " target-origin)
+            (info "Attempting to navigate to origin: " target-origin)
             (when (not (allowed-origin? target-origin))
-              (println "Navigation prevented")
+              (info "Navigation prevented")
               (.preventDefault event)))))
       (.on contents "new-window"
         (fn [event navigation-url]

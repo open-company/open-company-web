@@ -9,7 +9,8 @@
   3. Extend the regularly occuring update checks to `extended-rate-ms` as to not annoy
      the user with constant notifications if they choose not to restart the app right away
 
-  Upon restarting the app, the update will be installed.")
+  Upon restarting the app, the update will be installed."
+  (:require [taoensso.timbre :as timbre :refer [info]]))
 
 ;; See https://www.electron.build/auto-update for details on the `electron-updater` API
 (def auto-updater (.-autoUpdater (js/require "electron-updater")))
@@ -26,7 +27,7 @@
 
 (defn- check-for-updates
   []
-  (js/console.log "Checking for Carrot desktop updates")
+  (info "Checking for Carrot desktop updates")
   (.checkForUpdatesAndNotify auto-updater))
 
 (defn start-update-cycle!
@@ -37,7 +38,7 @@
      (let [js-interval (js/setInterval check-for-updates rate-ms)]
        (.addListener auto-updater "update-available" on-update-available)
        (reset! auto-updater-js-interval js-interval)
-       (js/console.log "Started Carrot desktop auto-update cycle")))))
+       (info "Started Carrot desktop auto-update cycle")))))
 
 (defn stop-update-cycle!
   []
@@ -48,6 +49,6 @@
 
 (defn- on-update-available
   [info]
-  (js/console.log "Carrot desktop update available" info)
+  (info "Carrot desktop update available" info)
   (stop-update-cycle!)
   (start-update-cycle! extended-rate-ms))
