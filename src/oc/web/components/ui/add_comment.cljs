@@ -48,7 +48,8 @@
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
             "editableInput"
-            #(enable-add-comment? s)))))))
+            #(enable-add-comment? s))
+          (utils/after 100 #(enable-add-comment? s)))))))
 
 (rum/defcs add-comment < rum/reactive
                          rum/static
