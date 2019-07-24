@@ -60,8 +60,10 @@
           posts-data-key (dis/posts-data-key org)
           follow-ups-data (when success (json->cljs body))
           fixed-follow-ups (au/fix-container (:collection follow-ups-data) (dis/change-data) org-data)]
-      (request-reads-count (keys (:fixed-items fixed-follow-ups)))
-      (watch-boards (:fixed-items fixed-follow-ups))
+      (when (= (router/current-board-slug) "follow-ups")
+        (cook/set-cookie! (router/last-board-cookie org) "follow-ups" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-follow-ups)))
+        (watch-boards (:fixed-items fixed-follow-ups)))
       (dis/dispatch! [:follow-ups-get/finish org sort-type fixed-follow-ups]))))
 
 (defn- follow-ups-real-get [follow-ups-link sort-type org-slug finish-cb]
@@ -150,8 +152,8 @@
           must-see-data (when success (json->cljs body))
           must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "must-see")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" cook/default-cookie-expire))
-      (watch-boards (:fixed-items must-see-posts))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" cook/default-cookie-expire)
+        (watch-boards (:fixed-items must-see-posts)))
       (dis/dispatch! [:must-see-get/finish org sort-type must-see-posts]))))
 
 (defn must-see-get [org-data]
