@@ -105,9 +105,9 @@
           all-posts-data (when success (json->cljs body))
           fixed-all-posts (au/fix-container (:collection all-posts-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "all-posts")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365)))
-      (request-reads-count (keys (:fixed-items fixed-all-posts)))
-      (watch-boards (:fixed-items fixed-all-posts))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-all-posts)))
+        (watch-boards (:fixed-items fixed-all-posts)))
       (dis/dispatch! [:all-posts-get/finish org sort-type fixed-all-posts]))))
 
 (defn- activity-real-get [activity-link sort-type org-slug finish-cb]
