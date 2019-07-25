@@ -16,9 +16,14 @@
   .image-modal-content {
     margin: auto;
     display: block;
+    max-width: 700px;
     max-height: 100%;
     animation-name: zoom;
     animation-duration: 0.6s;
+
+    @include mobile() {
+      max-width: 100%;
+    }
   }
 
   @keyframes zoom {
