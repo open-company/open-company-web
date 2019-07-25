@@ -200,7 +200,6 @@
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
-                  (js/console.log "DBG user" u)
                   [:div.wrt-popup-list-row-name
                     (user-lib/name-for u)
                     (when is-self-user?
