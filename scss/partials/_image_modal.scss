@@ -1,4 +1,7 @@
 .image-modal-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -8,19 +11,14 @@
   overflow: auto;
   background-color: rgb(0, 0, 0); // fallback color
   background-color: rgba(0, 0, 0, 0.9);
+  padding: 10% 0;
 
   .image-modal-content {
     margin: auto;
     display: block;
-    width: 80%;
-    max-width: 700px;
+    max-height: 100%;
     animation-name: zoom;
     animation-duration: 0.6s;
-
-    // full-width images on mobile
-    @include mobile() {
-      width: 100%;
-    }
   }
 
   @keyframes zoom {
