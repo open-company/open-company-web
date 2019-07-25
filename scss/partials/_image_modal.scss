@@ -27,6 +27,7 @@
 
     @include mobile() {
       max-width: 100%;
+      touch-action: auto;
     }
   }
 
