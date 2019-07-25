@@ -10,8 +10,12 @@
   height: 100%;
   overflow: auto;
   background-color: rgb(0, 0, 0); // fallback color
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.8);
   padding: 10% 0;
+
+  @include mobile {
+    background-color: $oc_gray_8;
+  }
 
   .image-modal-content {
     margin: auto;
@@ -34,17 +38,20 @@
 
   .image-modal-close {
     position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.5s;
+    top: 2%;
+    right: 2%;
+    width: 30px;
+    height: 30px;
+    background-size: 30px 30px;
+    background-image: cdnUrl("/img/ML/white_close.svg");
+    background-repeat: no-repeat;
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/black_close.svg");
+    }
 
     &:hover, &:focus {
       cursor: pointer;
-      text-decoration: none;
-      color: #bbb;
     }
   }
 }

@@ -7,8 +7,7 @@
     [:div.image-modal-container
       {:on-click on-close}
       [:span.image-modal-close
-        {:on-click on-close}
-        "X"]
+        {:on-click on-close}]
       [:img.image-modal-content
         {:src src}]
       ]))
