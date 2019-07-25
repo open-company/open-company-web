@@ -3,6 +3,7 @@
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.team :as team-actions]
@@ -116,12 +117,12 @@
               {:key (str "slack-users-dd-" (:slack-org-id user) "-" (:slack-id user))
                :on-click #(do
                            (on-change user)
-                           (reset! (::slack-user s) (utils/name-or-email user))
+                           (reset! (::slack-user s) (user-lib/name-for user))
                            (reset! (::show-users-dropdown s) false)
                            (when (fn? on-blur)
                               (on-blur))
                            (reset! (::typing s) false))}
               (user-avatar-image user)
               [:div.user-name
-                (utils/name-or-email user)
+                (user-lib/name-for user)
                 [:span.slack-org (get slack-orgs-map (:slack-org-id user))]]])])]))

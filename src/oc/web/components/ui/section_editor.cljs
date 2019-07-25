@@ -4,6 +4,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -32,8 +33,8 @@
         (>= (.search lower-email lower-query) 0))))
 
 (defn compare-users [user-1 user-2]
-  (compare (string/lower (utils/name-or-email user-1))
-           (string/lower (utils/name-or-email user-2))))
+  (compare (string/lower (user-lib/name-for user-1))
+           (string/lower (user-lib/name-for user-2))))
 
 (defn filter-users
   "Given a list of users and a query string, return those that match the given query."
@@ -363,7 +364,7 @@
                              :ref (str "add-user-" (:user-id user))}
                             (user-avatar-image user)
                             [:div.name
-                              (utils/name-or-email user)]])
+                              (user-lib/name-for user)]])
                         [:div.section-editor-private-users-result.no-more-invites
                           [:div.name
                             (str
@@ -414,10 +415,10 @@
                       authors (filter (comp author-ids :user-id) (:users team-data))
                       viewers (filter (comp viewer-ids :user-id) (:users team-data))
                       complete-authors (map
-                                        #(merge % {:type :author :display-name (utils/name-or-email %)})
+                                        #(merge % {:type :author :display-name (user-lib/name-for %)})
                                         authors)
                       complete-viewers (map
-                                        #(merge % {:type :viewer :display-name (utils/name-or-email %)})
+                                        #(merge % {:type :viewer :display-name (user-lib/name-for %)})
                                         viewers)
                       all-users (concat complete-authors complete-viewers)
                       sorted-users (sort compare-users all-users)]
@@ -438,7 +439,7 @@
                                       (reset! (::show-edit-user-dropdown s) next-user-id)))}
                       (user-avatar-image user)
                       [:div.name
-                        (utils/name-or-email user)]
+                        (user-lib/name-for user)]
                       (if self
                         (if (and (seq (:slug section-editing))
                                  (> (count (:authors section-data)) 1))

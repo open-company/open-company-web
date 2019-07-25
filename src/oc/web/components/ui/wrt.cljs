@@ -3,6 +3,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -29,7 +30,7 @@
 (defn- sort-users [user-id users]
   (let [{:keys [self-user other-users]}
          (group-by #(if (= (:user-id %) user-id) :self-user :other-users) users)
-        sorted-other-users (sort-by utils/name-or-email other-users)]
+        sorted-other-users (sort-by user-lib/name-for other-users)]
     (remove nil? (concat self-user sorted-other-users))))
 
 (defn dropdown-label [val total]
@@ -68,10 +69,10 @@
   (let [activity-data (drv/react s :wrt-activity-data)
         read-data (drv/react s :wrt-read-data)
         item-id (:uuid activity-data)
-        seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
+        seen-users (vec (sort-by user-lib/name-for (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
-        unseen-users (vec (sort-by utils/name-or-email (:unreads read-data)))
-        all-users (sort-by utils/name-or-email (concat seen-users unseen-users))
+        unseen-users (vec (sort-by user-lib/name-for (:unreads read-data)))
+        all-users (sort-by user-lib/name-for (concat seen-users unseen-users))
         read-count (:count read-data)
         query (::query s)
         lower-query (string/lower @query)
@@ -199,8 +200,9 @@
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
+                  (js/console.log "DBG user" u)
                   [:div.wrt-popup-list-row-name
-                    (utils/name-or-email u)
+                    (user-lib/name-for u)
                     (when is-self-user?
                       " (you)")]
                   [:div.wrt-popup-list-row-seen

@@ -373,23 +373,6 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn name-or-email [user]
-  (let [user-name (:name user)
-        first-name (:first-name user)
-        last-name (:last-name user)]
-    (cond
-      (and (seq first-name)
-           (seq last-name))
-      (str first-name " " last-name)
-      (seq first-name)
-      first-name
-      (seq last-name)
-      last-name
-      (seq user-name)
-      user-name
-      :else
-      (:email user))))
-
 (defn slack-link-with-state [original-url user-id team-id redirect]
   (clojure.string/replace
    original-url
