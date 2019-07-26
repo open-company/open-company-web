@@ -237,7 +237,7 @@ div.cmail-outer {
 
           div.emoji-picker {
             float: left;
-            margin-left: 0;
+            margin-left: 10px;
 
             button.emoji-button {
               width: 24px;
@@ -876,6 +876,15 @@ div.cmail-outer {
       }
     }
 
+    &:not(.fullscreen) > {
+      div.follow-ups-header {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+
     div.follow-ups-header {
       width: 100%;
       height: 40px;
@@ -1012,6 +1021,17 @@ div.cmail-outer {
         border: none;
         box-shadow: none;
         border-radius: 0;
+      }
+
+      &.has-follow-ups {
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+
+        @include tablet() {
+          border-radius: 0;
+        }
       }
     }
 
@@ -1312,6 +1332,31 @@ div.cmail-outer {
       div.cmail-footer-right {
         float: right;
         position: relative;
+
+        button.follow-up-button {
+          width: 24px;
+          height: 32px;
+          background-image: cdnUrl("/img/ML/follow_up_add.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.5;
+          padding: 0;
+          float: left;
+          margin-right: 8px;
+
+          &:not(.disabled):hover {
+            opacity: 1;
+          }
+
+          &.disabled {
+            cursor: not-allowed;
+          }
+
+          @include tablet() {
+            display: none;
+          }
+        }
 
         div.delete-button-container {
           float: right;

@@ -551,8 +551,8 @@
           [:button.mlb-reset.mobile-attachment-button
             {:on-click #(add-attachment s)}]]
         (when (and follow-up?
-                     is-mobile?)
-            (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
+                   is-mobile?)
+          (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
         [:div.cmail-header.group
           [:div.close-bt-container
             {:class (when long-tooltip "long-tooltip")}
@@ -652,9 +652,11 @@
                         "Save & Close"
                         "Close")}]])
         [:div.cmail-content-outer
-          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
+          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
+                                    :has-follow-ups follow-up?})}
           (when (and follow-up?
-                     (not is-mobile?))
+                     (not is-mobile?)
+                     is-fullscreen?)
             (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
           [:div.cmail-content
             ;; Video elements
@@ -747,6 +749,10 @@
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
+      (when (and follow-up?
+                 (not is-mobile?)
+                 (not is-fullscreen?))
+        (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
       (if is-fullscreen?
         [:div.cmail-footer
           (when (and (not= (:status cmail-data) "published")
@@ -762,6 +768,16 @@
               {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
+            (when (and (not (seq (:follow-ups cmail-data)))
+                       (not is-fullscreen?))
+              [:button.mlb-reset.follow-up-button
+                {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
+                 :data-toggle "tooltip"
+                 :data-placement "bottom"
+                 :data-container "body"
+                 :on-click #(when can-toggle-follow-ups?
+                              (cmail-actions/cmail-toggle-follow-up cmail-data))
+                 :class (when-not can-toggle-follow-ups? "disabled")}])
             (when-not is-fullscreen?
               [:button.mlb-reset.post-button
                 {:ref "post-btn"
