@@ -200,16 +200,16 @@
 (defn- fix-abstract [cmail-data]
   (utils/trim (:abstract cmail-data)))
 
-(defn- is-publishable? [s cmail-data]
+(defn- is-publishable? [cmail-data]
   (and (seq (:board-slug cmail-data))
-       (not (zero? (count (fix-headline cmail-data))))))
+       (seq (fix-headline cmail-data))))
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         fixed-headline (fix-headline cmail-data)
         fixed-abstract (fix-abstract cmail-data)
         published? (= (:status cmail-data) "published")]
-      (if (is-publishable? s cmail-data)
+      (if (is-publishable? cmail-data)
         (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline :abstract fixed-abstract})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
@@ -473,7 +473,7 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        show-post-bt-tooltip? (not (is-publishable? s cmail-data))
+        show-post-bt-tooltip? (not (is-publishable? cmail-data))
         post-button-title @(::post-button-title s)
         disabled? (or show-post-bt-tooltip?
                       @(::publishing s)
