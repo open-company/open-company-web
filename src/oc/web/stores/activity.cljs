@@ -380,15 +380,6 @@
         (assoc-in posts-data-key new-items-map)))
     db))
 
-(defmethod dispatcher/action :reset-ap-initial-at
-  [db [_ org-slug]]
-  (if (:ap-initial-at db)
-    (let [containers-key (dispatcher/containers-key org-slug)]
-      (-> db
-        (update-in containers-key dissoc :all-posts)
-        (dissoc :ap-initial-at)))
-    db))
-
 (defmethod dispatcher/action :uploading-video
   [db [_ org-slug video-id]]
   (let [uploading-video-key (dispatcher/uploading-video-key org-slug video-id)]
