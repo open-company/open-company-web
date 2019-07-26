@@ -2,6 +2,17 @@
   (:require [oc.electron.auto-update :as auto-update]
             [taoensso.timbre :as timbre :refer [info]]))
 
+(goog-define dev? true)
+(goog-define web-origin "http://localhost:3559")
+(goog-define auth-origin "http://localhost:3003")
+(goog-define init-path "/login/desktop")
+(goog-define sentry-dsn false)
+
+;; Setup sentry
+(def sentry (js/require "@sentry/electron"))
+(when sentry-dsn
+  (.init sentry #js {:dsn sentry-dsn}))
+
 ;; Begin checking for updates
 (auto-update/start-update-cycle!)
 
@@ -18,10 +29,6 @@
 (def shell (.-shell electron))
 (def BrowserWindow (.-BrowserWindow electron))
 
-(goog-define dev? true)
-(goog-define web-origin "http://localhost:3559")
-(goog-define auth-origin "http://localhost:3003")
-(goog-define init-path "/login/desktop")
 (def init-url (str web-origin init-path))
 
 (defn mac?
@@ -69,6 +76,11 @@
 (def slack-origin "https://slack.com")
 (def slack-origin-re #"^https://.*\.slack\.com$")
 (def google-accounts-origin "https://accounts.google.com")
+(def filestack-api-origin "https://www.filestackapi.com")
+(def filestack-static-origin "https://static.filestackapi.com")
+(def dropbox-origin "https://www.dropbox.com")
+(def onedrive-origin "https://login.live.com")
+(def box-origin "https://www.box.com")
 
 (defn- allowed-origin?
   [o]
@@ -77,24 +89,34 @@
     (= o auth-origin)
     (= o slack-origin)
     (= o google-accounts-origin)
+    (= o filestack-api-origin)
+    (= o filestack-static-origin)
+    (= o dropbox-origin)
+    (= o onedrive-origin)
+    (= o box-origin)
     (re-matches slack-origin-re o)))
 
 (defn- prevent-navigation-external-to-carrot
   []
   (.on app "web-contents-created"
-    (fn [event contents]
-      (.on contents "will-navigate"
-        (fn [event navigation-url]
-          (let [parsed-url    (URL. navigation-url)
-                target-origin (.-origin parsed-url)]
-            (info "Attempting to navigate to origin: " target-origin)
-            (when (not (allowed-origin? target-origin))
-              (info "Navigation prevented")
-              (.preventDefault event)))))
-      (.on contents "new-window"
-        (fn [event navigation-url]
-          (.preventDefault event)
-          (.openExternal shell navigation-url))))))
+       (fn [event contents]
+         (.on contents "will-navigate"
+              (fn [event navigation-url]
+                (let [parsed-url    (URL. navigation-url)
+                      target-origin (.-origin parsed-url)]
+                  (info "Attempting to navigate to origin: " target-origin)
+                  (when (not (allowed-origin? target-origin))
+                    (info "Navigation prevented")
+                    (.preventDefault event)))))
+         (.on contents "new-window"
+              (fn [event navigation-url]
+                (let [parsed-url    (URL. navigation-url)
+                      target-origin (.-origin parsed-url)]
+                  (info "Attempting to open new window at: " target-origin)
+                  (when (not (allowed-origin? target-origin))
+                    (info "New window not whitelisted, opening in external browser")
+                    (.preventDefault event)
+                    (.openExternal shell navigation-url))))))))
 
 (defn- init-browser
   []
