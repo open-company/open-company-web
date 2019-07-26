@@ -1,4 +1,6 @@
-(ns oc.electron.main)
+(ns oc.electron.main
+  (:require [oc.electron.auto-update :as auto-update]
+            [taoensso.timbre :as timbre :refer [info]]))
 
 (goog-define dev? true)
 (goog-define web-origin "http://localhost:3559")
@@ -11,14 +13,8 @@
 (when sentry-dsn
   (.init sentry #js {:dsn sentry-dsn}))
 
-(def auto-updater (.-autoUpdater (js/require "electron-updater")))
-(.checkForUpdatesAndNotify auto-updater)
-
-(def rate-in-minutes-to-check-for-updates 5)
-(js/setInterval
-  (fn []
-    (.checkForUpdatesAndNotify auto-updater))
-  (* rate-in-minutes-to-check-for-updates 60 1000))
+;; Begin checking for updates
+(auto-update/start-update-cycle!)
 
 (def main-window (atom nil))
 (def quitting? (atom false))
@@ -45,7 +41,7 @@
 
 (defn- load-page
   [window]
-  (println "Loading " init-url)
+  (info "Loading " init-url)
   (.loadURL window init-url))
 
 (defn- mk-window
@@ -98,9 +94,9 @@
         (fn [event navigation-url]
           (let [parsed-url    (URL. navigation-url)
                 target-origin (.-origin parsed-url)]
-            (println "Attempting to navigate to origin: " target-origin)
+            (info "Attempting to navigate to origin: " target-origin)
             (when (not (allowed-origin? target-origin))
-              (println "Navigation prevented")
+              (info "Navigation prevented")
               (.preventDefault event)))))
       (.on contents "new-window"
         (fn [event navigation-url]
