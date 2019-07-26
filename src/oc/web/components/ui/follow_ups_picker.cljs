@@ -116,9 +116,11 @@
                                  (remove nil?
                                   (map (fn [user]
                                         (let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id user)) follow-ups))]
-                                          (when (or (:completed? f)
-                                                    (and (map? (:author f))
-                                                         (not= (-> f :author :user-id) current-user-id)))
+                                          ;; Can't override follow-ups that are not assigned to self
+                                          ;; and that are completed or were created by the user himself
+                                          (when (and (not= (-> f :author :user-id) current-user-id)
+                                                     (or (:completed? f)
+                                                         (= (-> f :author :user-id) (-> f :assignee :user-id))))
                                             f)))
                                   users-list))))}
                     "Deselect all"]))]]
@@ -133,6 +135,7 @@
                   :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
                         disabled? (or (:completed? f)
                                       (and (map? (:author f))
+                                           (not= (-> f :author :user-id) (-> f :assignee :user-id))
                                            (not= (-> f :author :user-id) current-user-id)))]]
               [:div.follow-ups-user-item.group
                 {:key (str "follow-ups-user-" (:user-id u))
