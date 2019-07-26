@@ -2,6 +2,7 @@
   (:require [defun.core :refer (defun)]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -172,11 +173,9 @@
 
 (defun author-for-user
   ([user :guard map?]
-   (if (contains? user :name)
-    (select-keys user [:user-id :avatar-url :name])
-    (-> user
-      (select-keys [:user-id :avatar-url])
-      (assoc :name (clojure.string/trim (str (:first-name user) " " (:last-name user)))))))
+   (-> user
+    (select-keys [:user-id :avatar-url])
+    (assoc :name (user-lib/name-for user))))
   ([users :guard sequential?]
    (vec (map author-for-user users))))
 

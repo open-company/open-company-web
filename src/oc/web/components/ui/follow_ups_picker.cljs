@@ -2,7 +2,6 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
-            [oc.lib.user :as user-lib]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.cmail :as cmail-actions]
@@ -156,7 +155,7 @@
                   (user-avatar-image u)
                   [:div.user-name
                     (str
-                     (user-lib/name-for u)
+                     (:name u)
                      (when (= (:user-id u) current-user-id)
                        (str " (you)")))]]
                 [:div.follow-ups-user-right.group
