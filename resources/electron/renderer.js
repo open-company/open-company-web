@@ -12,14 +12,14 @@ console.log("Carrot desktop engage!");
 // NOTE: you need to add these fields/functions to externs.js
 // in order for them to avoid munging in production builds!
 
-window.isDesktop = true;
+window.OCCarrotDesktop = {};
 
-window.showDesktopWindow = function() {
+window.OCCarrotDesktop.showDesktopWindow = function() {
   console.log("Sending show-desktop-window IPC");
   ipcRenderer.send('show-desktop-window');
 }
 
-window.setBadgeCount = function(count) {
+window.OCCarrotDesktop.setBadgeCount = function(count) {
   console.log("Sending set-badge-count IPC: " + count);
   ipcRenderer.send('set-badge-count', count);
 };

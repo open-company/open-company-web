@@ -187,7 +187,7 @@ var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
 // Electron
-window.isDesktop = {};
-window.showDesktopWindow = function() {};
-window.setBadgeCount = function() {};
+OCCarrotDesktop = {};
+OCCarrotDesktop.showDesktopWindow = function() {};
+OCCarrotDesktop.setBadgeCount = function() {};
 // Fullstory

@@ -347,8 +347,8 @@
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
                                     (timbre/info "Unread notification count updated: " ncount)
-                                    (when js/window.isDesktop
-                                      (js/window.setBadgeCount ncount))
+                                    (when js/window.OCCarrotDesktop
+                                      (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]

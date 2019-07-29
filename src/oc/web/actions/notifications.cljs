@@ -7,9 +7,9 @@
 
 (defn- potentially-show-desktop-notification!
   [{:keys [title click] :as notification-data}]
-  (when js/window.isDesktop
+  (when js/window.OCCarrotDesktop
     (let [notif (js/Notification. title)]
-      (set! (.-onclick notif) #(do (js/window.showDesktopWindow)
+      (set! (.-onclick notif) #(do (js/window.OCCarrotDesktop.showDesktopWindow)
                                    (click))))))
 
 (defn show-notification [notification-data]

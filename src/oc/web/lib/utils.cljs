@@ -407,7 +407,7 @@
   :dismiss true})
 
 (def update-verbage
-  (if js/window.isDesktop
+  (if js/window.OCCarrotDesktop
     "Update"
     "Reload"))
 

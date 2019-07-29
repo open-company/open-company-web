@@ -65,7 +65,7 @@
 
 (defn- detect-desktop-app
   []
-  (when-not js/window.isDesktop
+  (when-not js/window.OCCarrotDesktop
     (cond
       (js/window.isMac) {:title "Mac app"
                          :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
