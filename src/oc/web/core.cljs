@@ -240,6 +240,7 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
+        comment (:comment params)
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
@@ -249,10 +250,11 @@
      (vec
       (remove
        nil?
-       [org board (when entry entry) route]))
+       [org board (when entry entry) (when comment comment) route]))
      {:org org
       :board board
       :activity entry
+      :comment comment
       :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
@@ -602,6 +604,14 @@
 
     (defroute entry-slash-route (str (urls/entry ":org" ":board" ":entry") "/") {:as params}
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
+      (entry-handler target params))
+
+    (defroute comment-route (urls/comment-url ":org" ":board" ":entry" ":comment") {:as params}
+      (timbre/info "Routing comment-route" (urls/comment-url ":org" ":board" ":entry" ":comment"))
+      (entry-handler target params))
+
+    (defroute comment-slash-route (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/") {:as params}
+      (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/"))
       (entry-handler target params))
 
     (defroute not-found-route "*" []

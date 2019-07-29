@@ -67,11 +67,12 @@
         title (notification-title notification)
         reminder-data (:reminder notification)
         reminder? (:reminder? notification)
-        entry-uuid (:entry-id notification)]
+        entry-uuid (:entry-id notification)
+        interaction-uuid (:interaction-id notification)]
     (when (seq title)
       {:uuid entry-uuid
        :board-slug (:slug board-data)
-       :interaction-id (:interaction-id notification)
+       :interaction-id interaction-uuid
        :is-interaction is-interaction
        :unread unread
        :mention? (:mention? notification)
@@ -89,10 +90,13 @@
                     #(ui-compose)))
                 (when (and (:slug board-data)
                            entry-uuid)
-                  #(if (seq (get (dis/posts-data) entry-uuid))
-                     (router/nav! (oc-urls/entry (:slug board-data) entry-uuid))
-                     (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
-                      (fn [s] (when s (router/nav! (oc-urls/entry (:slug board-data) entry-uuid))))))))})))
+                  (let [url (if interaction-uuid
+                              (oc-urls/comment-url (:slug board-data) entry-uuid interaction-uuid)
+                              (oc-urls/entry (:slug board-data) entry-uuid))]
+                    #(if (seq (get (dis/posts-data) entry-uuid))
+                       (router/nav! url)
+                       (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
+                        (fn [s] (when s (router/nav! url))))))))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))
