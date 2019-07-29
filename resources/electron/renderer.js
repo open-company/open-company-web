@@ -13,8 +13,6 @@ console.log("Carrot desktop engage!");
 // in order for them to avoid munging in production builds!
 
 window.isDesktop = true;
-window.isWin32 = (process.platform === "win32");
-window.isMac = (process.platform === "darwin");
 
 window.showDesktopWindow = function() {
   console.log("Sending show-desktop-window IPC");

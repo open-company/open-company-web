@@ -188,8 +188,6 @@ var OCYTVideoInit = function(){};
 var OCWebStaticOpenIntegrationsPanel = function() {};
 // Electron
 window.isDesktop = {};
-window.isWin32 = {};
-window.isMac = {};
 window.showDesktopWindow = function() {};
 window.setBadgeCount = function() {};
 // Fullstory

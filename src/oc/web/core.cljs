@@ -108,9 +108,9 @@
   (let [body (sel1 [:body])]
     (when js/window.isDesktop
       (dommy/add-class! body :electron))
-    (when js/window.isMac
+    (when (js/window.isMac)
       (dommy/add-class! body :mac-electron))
-    (when js/window.isWin32
+    (when (js/window.isWindows)
       (dommy/add-class! body :win-electron)))
   ;; Setup timbre log level
   (when (:log-level query-params)
