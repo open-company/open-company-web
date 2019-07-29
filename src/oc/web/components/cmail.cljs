@@ -22,6 +22,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
+            [oc.web.components.carrot-abstract :refer (carrot-abstract)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
@@ -32,6 +33,7 @@
             [clojure.contrib.humanize :refer (filesize)]))
 
 (def missing-title-tooltip "Please add a title")
+(def abstract-max-length-exceeded-tooltip "Abstract too long")
 
 ;; Attachments handling
 
@@ -87,8 +89,6 @@
      (utils/after 400 #(media-attachment-dismiss-picker s)))))
 
 ;; Data handling
-
-(def abstract-show-counter-from 200)
 
 (defn- body-element []
   (sel1 [:div.rich-body-editor]))
@@ -154,12 +154,17 @@
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
-      (reset! (::post-button-title state) (if (seq (str emojied-headline)) "" missing-title-tooltip)))))
+      (reset! (::post-button-title state) (if (seq (str emojied-headline)) @(::post-button-title state) missing-title-tooltip)))))
 
 (defn- abstract-on-change [state]
-  (let [abstract (rum/ref-node state "abstract")]
-    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.-value abstract)
-                                                     :has-changes true})])))
+  (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))
+        abstract-text (.text $abstract)
+        exceeds-limit (> (count abstract-text) utils/max-abstract-length)]
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.text $abstract)
+                                                     :has-changes true})])
+    (reset! (::abstract-exceeds-limit state) exceeds-limit)
+    (reset! (::abstract-length state) (count abstract-text))
+    (reset! (::post-button-title state) (if exceeds-limit abstract-max-length-exceeded-tooltip @(::post-button-title state)))))
 
 ;; Headline setup and paste handler
 
@@ -285,6 +290,7 @@
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
+                   (rum/local "" ::initial-abstract)
                    (rum/local true ::show-placeholder)
                    (rum/local nil ::initial-uuid)
                    (rum/local nil ::headline-input-listener)
@@ -297,14 +303,14 @@
                    (rum/local nil ::autosave-timer)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
-                   (rum/local false ::abstract-focused)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
                    (rum/local "" ::post-button-title)
+                   (rum/local false ::abstract-exceeds-limit)
+                   (rum/local 0 ::abstract-length)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
-                   (mixins/autoresize-textarea "abstract")
                    mixins/refresh-tooltips-mixin
 
                    {:will-mount (fn [s]
@@ -316,12 +322,16 @@
                           initial-headline (utils/emojify
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
-                                               ""))]
+                                               ""))
+                          initial-abstract (if (seq (:abstract cmail-data))
+                                             (:abstract cmail-data)
+                                             "")]
                       (when (and (not (seq (:uuid cmail-data)))
                                  (not (:collapsed cmail-state)))
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
+                      (reset! (::initial-abstract s) initial-abstract)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
                       (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
@@ -344,12 +354,16 @@
                                 initial-headline (utils/emojify
                                                    (if (seq (:headline cmail-data))
                                                      (:headline cmail-data)
-                                                     ""))]
+                                                     ""))
+                                initial-abstract (if (seq (:abstract cmail-data))
+                                                   (:abstract cmail-data)
+                                                   "")]
                             (when (and (not (seq (:uuid cmail-data)))
                                        (not (:collapsed cmail-state)))
                               (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
+                            (reset! (::initial-abstract s) initial-abstract)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
                             (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
                             (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
@@ -472,10 +486,6 @@
                              (.tooltip $bt (clj->js {:placement "bottom"
                                                      :trigger "manual"
                                                      :container "body"
-                                                     ; :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                     ;                  "<div class=\"tooltip-arrow\"></div>"
-                                                     ;                  "<div class=\"tooltip-inner\"></div>"
-                                                     ;                "</div>")
                                                      :title post-button-title}))
                              (utils/after 0 #(.tooltip $bt "show"))
                              (utils/after 3000 #(.tooltip $bt "destroy")))
@@ -621,34 +631,17 @@
                                   (utils/to-end-of-content-editable (body-element)))))
                :dangerouslySetInnerHTML @(::initial-headline s)}]
             ;; Abstract
-            [:div.cmail-content-abstract-container
-              (let [abstract-length (count (or (:abstract cmail-data) ""))
-                    should-show-counter? (and @(::abstract-focused s) (> abstract-length abstract-show-counter-from))]
-                [:div.cmail-content-abstract-counter
-                  {:class (when should-show-counter? "show-counter")}
-                  (str "Character limit " abstract-length "/" utils/max-abstract-length)])
-              [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
-                {:class utils/hide-class
-                 :ref "abstract"
-                 :key (str "cmail-abstract-" (:key cmail-state))
-                 :rows 1
-                 :placeholder utils/default-abstract
-                 :value (or (:abstract cmail-data) "")
-                 :max-length utils/max-abstract-length
-                 :on-change #(abstract-on-change s)
-                 :on-focus #(reset! (::abstract-focused s) true)
-                 :on-blur #(reset! (::abstract-focused s) false)
-                 ; :on-click    #(abstract-on-change s)
-                 :on-key-down (fn [e]
-                                (cond
-                                  (and (= (.-key e) "Enter")
-                                       (not (.-metaKey e)))
-                                  (do
-                                    (utils/event-stop e)
-                                    (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor])))
-                                  (and (.-metaKey e)
-                                       (= "Enter" (.-key e)))
-                                  (post-clicked s)))}]]
+            (when (or is-mobile?
+                      is-fullscreen?)
+              ; (rum/with-key 
+              ;  (str "carrot-abstract-" (:key cmail-state)))
+              (carrot-abstract {:initial-value @(::initial-abstract s)
+                                :value (:abstract cmail-data)
+                                :exceeds-limit @(::abstract-exceeds-limit s)
+                                :abstract-length @(::abstract-length s)
+                                :on-change-cb #(abstract-on-change s)
+                                :post-clicked #(post-clicked s)
+                                :cmail-key (:key cmail-state)}))
             (when (and show-edit-tooltip
                        is-fullscreen?)
               [:div.edit-tooltip-outer-container
