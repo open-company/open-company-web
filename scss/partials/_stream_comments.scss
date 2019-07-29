@@ -116,8 +116,8 @@ div.stream-comments {
           }
         }
 
-        &.indented-comment {
-          padding: 8px 16px 8px 40px;
+        &.indented-comment div.stream-comment-inner{
+          padding-left: 56px;
         }
 
         div.stream-comment-floating-buttons {
@@ -361,7 +361,7 @@ div.stream-comments {
       }
 
       div.add-comment-box-container {
-        padding-left: 40px;
+        padding: 0 16px 0 56px;
         margin-bottom: 24px;
       }
     }
