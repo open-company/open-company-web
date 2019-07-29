@@ -191,8 +191,7 @@
                                                  :show-unread false})]
                   [:div.stream-comment-floating-buttons
                     {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                              :can-delete can-show-delete-bt?
-                                              :can-share (seq (:url comment-data))})
+                                              :can-delete can-show-delete-bt?})
                      :key (str "stream-comment-floating-buttons"
                            (when can-show-edit-bt?
                              "-edit")
@@ -238,6 +237,7 @@
                                    (reset! (::show-picker s) nil))}))]))
               [:div.stream-comment-author-avatar
                 (user-avatar-image (:author comment-data))]
+
               [:div.stream-comment-right
                 [:div.stream-comment-header.group
                   {:class utils/hide-class}

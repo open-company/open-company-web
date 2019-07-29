@@ -139,6 +139,7 @@
                                   (not (utils/input-clicked? e))
                                   ;; No body link was clicked
                                   (not (utils/anchor-clicked? e)))
+                         (nux-actions/dismiss-post-added-tooltip)
                          (routing-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-item-inner
