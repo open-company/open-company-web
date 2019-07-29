@@ -63,6 +63,16 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
+(defn- detect-desktop-app
+  []
+  (when-not js/window.isDesktop
+    (cond
+      (js/window.isMac) {:title "Mac app"
+                         :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
+      (js/window.isWindows) {:title "Windows app"
+                             :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+      :default nil)))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
@@ -84,7 +94,8 @@
         org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
-                                 is-admin-or-author?)]
+                                 is-admin-or-author?)
+        desktop-app-data (detect-desktop-app)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -179,6 +190,11 @@
            :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
           [:div.oc-menu-item.support
             "Get support"]]
+        (when desktop-app-data
+          [:a
+            {:href (:href desktop-app-data)}
+            [:div.oc-menu-item.native-app
+              (:title desktop-app-data)]])
         [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out

@@ -178,6 +178,17 @@ div.menu {
           border-radius: 4px;
         }
       }
+
+      &.native-app::after {
+        content: "BETA";
+        font-family: $circular_bold;
+        margin-left: 0.5em;
+        padding: 0.3em;
+        color: $light_navy;
+        background-color: $oc_gray_6;
+        border-radius: 4px;
+        opacity: 0.5;
+      }
     }
   }
 }
