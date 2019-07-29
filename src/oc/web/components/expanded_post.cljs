@@ -54,7 +54,8 @@
 
 (def interactive-images-mixin
   {:did-mount make-images-interactive!
-   :did-remount make-images-interactive!})
+   :did-remount (fn [_ new-state]
+                  (make-images-interactive! new-state))})
 
 (defn- load-comments [s]
   (let [activity-data @(drv/get-ref s :activity-data)]
