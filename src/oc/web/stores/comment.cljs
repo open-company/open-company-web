@@ -24,12 +24,16 @@
   ([comment-map :guard map?]
     (let [edit-comment-link (utils/link-for (:links comment-map) "partial-update")
           delete-comment-link (utils/link-for (:links comment-map) "delete")
-          can-react? (utils/link-for (:links comment-map) "react"  "POST")]
+          can-react? (utils/link-for (:links comment-map) "react"  "POST")
+          reply-parent (or (:parent-uuid comment-map) (:uuid comment-map))
+          is-root-comment (empty? (:parent-uuid comment-map))]
       (-> comment-map
         (assoc :is-emoji (is-emoji (:body comment-map)))
         (assoc :can-edit (boolean edit-comment-link))
         (assoc :can-delete (boolean delete-comment-link))
-        (assoc :can-react can-react?)))))
+        (assoc :can-react can-react?)
+        (assoc :reply-parent reply-parent)
+        (assoc :thread-root is-root-comment)))))
 
 (defmethod dispatcher/action :add-comment-change
   [db [_ org-slug activity-uuid comment-body]]
@@ -46,13 +50,14 @@
   (assoc db :add-comment-focus focus-uuid))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ activity-data comment-body comments-key]]
+  [db [_ activity-data comment-body parent-comment-uuid comments-key]]
   (let [comments-data (get-in db comments-key)
         user-data (if (jwt/jwt)
                     (jwt/get-contents)
                     (jwt/get-id-token-contents))
         new-comment-data (parse-comment {:body comment-body
                                          :created-at (utils/as-of-now)
+                                         :parent-uuid parent-comment-uuid
                                          :author {:name (:name user-data)
                                                   :avatar-url (:avatar-url user-data)
                                                   :user-id (:user-id user-data)}})

@@ -646,9 +646,10 @@
       callback)
     (handle-missing-link "get-comments" comments-link callback)))
 
-(defn add-comment [add-comment-link comment-body callback]
+(defn add-comment [add-comment-link comment-body parent-comment-uuid callback]
   (if (and add-comment-link comment-body)
-    (let [json-data (cljs->json {:body comment-body})]
+    (let [json-data (cljs->json {:body comment-body
+                                 :parent-uuid parent-comment-uuid})]
       (interaction-http (method-for-link add-comment-link) (relative-href add-comment-link)
         {:headers (headers-for-link add-comment-link)
          :json-params json-data}

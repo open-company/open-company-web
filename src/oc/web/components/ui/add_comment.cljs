@@ -31,12 +31,12 @@
     (when (zero? (count (.-innerText add-comment-node)))
       (comment-actions/add-comment-blur))))
 
-(defn- send-clicked [s]
+(defn- send-clicked [s parent-comment-uuid]
   (let [add-comment-div (rum/ref-node s "add-comment")
         comment-body (cu/add-comment-content add-comment-div)
         activity-data (first (:rum/args s))]
     (set! (.-innerHTML add-comment-div) "")
-    (comment-actions/add-comment activity-data comment-body)))
+    (comment-actions/add-comment activity-data comment-body parent-comment-uuid)))
 
 (defn setup-medium-editor-when-needed [s]
   (when-not @(::medium-editor s)
@@ -97,7 +97,7 @@
                                   (when (and (= (.-activeElement js/document) add-comment-node)
                                              (.-metaKey e)
                                              (= (.-key e) "Enter"))
-                                    (send-clicked s)))))
+                                    (send-clicked s (second (:rum/args s)))))))
                              (when should-focus-field?
                                (.focus add-comment-node)
                                (utils/after 0
@@ -124,7 +124,7 @@
                              (events/unlistenByKey @(::blur-listener s))
                              (reset! (::blur-listener s) nil))
                            s)}
-  [s activity-data]
+  [s activity-data parent-comment-uuid]
   (let [_ (drv/react s :add-comment-data)
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
@@ -137,6 +137,6 @@
             :class utils/hide-class
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
         [:button.mlb-reset.send-btn
-          {:on-click #(send-clicked s)
+          {:on-click #(send-clicked s parent-comment-uuid)
            :disabled @(::add-button-disabled s)}
           "Send"]]]))

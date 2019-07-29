@@ -24,7 +24,7 @@
   ;; Remove cached comment for activity
   (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))
 
-(defn add-comment [activity-data comment-body]
+(defn add-comment [activity-data comment-body parent-comment-uuid]
   (add-comment-blur)
   ;; Send WRT read on comment add
   (activity-actions/send-item-read (:uuid activity-data))
@@ -35,8 +35,9 @@
     (dis/dispatch! [:comment-add
                     activity-data
                     comment-body
+                    parent-comment-uuid
                     comments-key])
-    (api/add-comment add-comment-link comment-body
+    (api/add-comment add-comment-link comment-body parent-comment-uuid
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
