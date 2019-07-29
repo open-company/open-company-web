@@ -85,8 +85,6 @@
             {:on-click #(nav-actions/close-all-panels)}
             "Cancel"]]
         [:div.follow-ups-picker-body
-          [:div.follow-ups-picker-section-count
-            (str (:board-name activity-data) " has " (count users-list) " member" (when (not= (count users-list) 1) "s"))]
           [:div.follow-ups-picker-body-head.group
             [:div.follow-ups-users-count
               (cond
