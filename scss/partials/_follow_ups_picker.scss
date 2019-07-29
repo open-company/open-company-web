@@ -114,17 +114,6 @@ div.follow-ups-picker {
         padding: 0 16px;
       }
 
-      div.follow-ups-picker-section-count {
-        height: 50px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
-        color: $light_navy;
-        padding: 18px 0;
-        text-align: center;
-        border-bottom: 1px solid $ultra_light_grey;
-      }
-
       div.follow-ups-picker-body-head {
         margin-top: 16px;
         height: 22px;
