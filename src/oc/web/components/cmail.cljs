@@ -633,8 +633,6 @@
             ;; Abstract
             (when (or is-mobile?
                       is-fullscreen?)
-              ; (rum/with-key 
-              ;  (str "carrot-abstract-" (:key cmail-state)))
               (carrot-abstract {:initial-value @(::initial-abstract s)
                                 :value (:abstract cmail-data)
                                 :exceeds-limit @(::abstract-exceeds-limit s)
