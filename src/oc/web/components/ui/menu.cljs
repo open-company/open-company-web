@@ -70,7 +70,7 @@
       (js/window.isMac) {:title "Mac app"
                          :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
       (js/window.isWindows) {:title "Windows app"
-                             :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+                             :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot-Setup.exe"}
       :default nil)))
 
 (rum/defcs menu < rum/reactive
