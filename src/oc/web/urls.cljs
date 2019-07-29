@@ -32,6 +32,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
+(def desktop-login "/login/desktop")
 (def sign-up "/sign-up")
 (def sign-up-slack "/sign-up/slack")
 (def sign-up-profile "/sign-up/profile")
@@ -91,11 +92,6 @@
 (def email-wall "/email-required")
 
 (def login-wall "/login-wall")
-
-;; User
-
-(def user-profile "/profile")
-(def user-notifications "/profile/notifications")
 
 ;; Organizations
 

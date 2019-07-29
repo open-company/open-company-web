@@ -38,6 +38,17 @@
     (set! (.-innerHTML add-comment-div) "")
     (comment-actions/add-comment activity-data comment-body)))
 
+(defn setup-medium-editor-when-needed [s]
+  (when-not @(::medium-editor s)
+    (let [add-comment-node (rum/ref-node s "add-comment")
+          users-list (:mention-users @(drv/get-ref s :team-roster))]
+      (when (seq users-list)
+        (let [medium-editor (cu/setup-medium-editor add-comment-node users-list)]
+          (reset! (::medium-editor s) medium-editor)
+          (.subscribe medium-editor
+            "editableInput"
+            #(enable-add-comment? s)))))))
+
 (rum/defcs add-comment < rum/reactive
                          rum/static
                          ;; Mixins
@@ -64,15 +75,11 @@
                           :did-mount (fn [s]
                            (utils/after 2500 #(js/emojiAutocomplete))
                            (let [add-comment-node (rum/ref-node s "add-comment")
-                                 users-list (:mention-users @(drv/get-ref s :team-roster))
-                                 medium-editor (cu/setup-medium-editor add-comment-node users-list)
                                  activity-data (first (:rum/args s))
                                  add-comment-focus @(drv/get-ref s :add-comment-focus)
                                  should-focus-field? (= (:uuid activity-data) add-comment-focus)]
-                             (reset! (::medium-editor s) medium-editor)
-                             (.subscribe medium-editor
-                              "editableInput"
-                              #(enable-add-comment? s))
+
+                             (setup-medium-editor-when-needed s)
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
                                #(focus-add-comment s)))
@@ -95,6 +102,9 @@
                                (.focus add-comment-node)
                                (utils/after 0
                                 #(utils/to-end-of-content-editable add-comment-node))))
+                           s)
+                          :did-remount (fn [_ s]
+                           (setup-medium-editor-when-needed s)
                            s)
                           :will-unmount (fn [s]
                            (when @(::medium-editor s)

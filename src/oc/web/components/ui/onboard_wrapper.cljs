@@ -145,7 +145,10 @@
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href oc-urls/login} "Sign in"]]]]))
+          [:a {:href (if js/window.isDesktop
+                       oc-urls/desktop-login
+                       oc-urls/login)}
+           "Sign in"]]]]))
 
 (defn- profile-setup-team-data
   ""
@@ -325,9 +328,7 @@
                :on-change #(dis/dispatch! [:input [:edit-user-profile :last-name] (.. % -target -value)])}]]
           (when-not has-org?
             [:div.field-label.company-name
-              "Company name"
-              (when (:error org-editing)
-                [:span.error "Must be at least 3 characters"])])
+              "Company name"])
           (when-not has-org?
             [:input.field.oc-input
               {:type "text"
@@ -335,10 +336,18 @@
                :placeholder "Enter a team name..."
                :class (utils/class-set {:error (:error org-editing)
                                         utils/hide-class true})
-               :max-length org-utils/org-name-max-length
+               :max-length 50 ;org-utils/org-name-max-length
                :value (:name org-editing)
-               :on-change #(dis/dispatch! [:input [:org-editing]
-                 (merge org-editing {:error nil :name (.. % -target -value)})])}])
+               :on-change #(let [new-name (.. % -target -value)
+                                 clean-org-name (subs new-name 0 (min (count new-name)
+                                                 org-utils/org-name-max-length))]
+                             (dis/dispatch! [:input [:org-editing] (merge org-editing {:error nil
+                                                                                       :name clean-org-name
+                                                                                       ;; Enforce a change in the app-state
+                                                                                       ;; to make sure the name is truncated
+                                                                                       :rand (rand 1000)})]))}])
+          (when (:error org-editing)
+            [:div.error "Must be between 3 and 50 characters"])
           (when-not has-org?
             [:div.field-label.email-domain-field-label.group
               [:span.field-label-span "Email domain — optional"]
@@ -508,9 +517,7 @@
               [:div.add-picture-link-subtitle
                 "A 160x160 transparent Gif or PNG works best."]])
           [:div.field-label
-            "Company name"
-            (when (:error org-editing)
-              [:span.error "Must be at least 3 characters"])]
+            "Company name"]
           [:input.field.oc-input
             {:type "text"
              :ref "org-name"
@@ -519,6 +526,8 @@
              :value (:name org-editing)
              :on-change #(dis/dispatch! [:input [:org-editing]
                (merge org-editing {:error nil :name (.. % -target -value)})])}]
+          (when (:error org-editing)
+            [:div.error "Must be between 3 and 50 characters"])
                  ;; Email domains row
           [:div.org-email-domains-row.group
             [:div.field-label
@@ -943,12 +952,13 @@
         "Thanks for verifying"
         [:button.mlb-reset.continue
           {:on-click #(let [org (utils/get-default-org orgs)]
-                        (if org
-                          (if (and (empty? (jwt/get-key :first-name))
-                                   (empty? (jwt/get-key :last-name)))
-                            (router/nav! oc-urls/confirm-invitation-profile)
-                            (router/nav! (oc-urls/org (:slug org))))
-                          (router/nav! oc-urls/login)))
+                        (router/nav!
+                         (if org
+                           (if (and (empty? (jwt/get-key :first-name))
+                                    (empty? (jwt/get-key :last-name)))
+                             oc-urls/confirm-invitation-profile
+                             (oc-urls/org (:slug org)))
+                          oc-urls/sign-up-profile)))
            :on-touch-start identity}
           "Get Started"]]
       :else

@@ -11,9 +11,7 @@
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -75,15 +73,9 @@
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
-                                  s)
-                                 :did-update (fn [s]
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)

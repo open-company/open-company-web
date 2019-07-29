@@ -53,9 +53,13 @@
 
                  mixins/no-scroll-mixin
                  mixins/first-render-mixin
+                 mixins/refresh-tooltips-mixin
 
-                 {:after-render (fn [s]
-                   (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
+                 {:will-mount (fn [s]
+                   (when-let [activity-data @(drv/get-ref s :wrt-activity-data)]
+                     (activity-actions/request-reads-data (:uuid activity-data)))
+                   s)
+                  :after-render (fn [s]
                    (when @(::search-active s)
                       (when (compare-and-set! (::search-focused s) false true)
                         (.focus (rum/ref-node s :search-field))))
@@ -186,7 +190,8 @@
                           slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
-                   :class (when (:seen u) "seen")}
+                   :class (utils/class-set {:seen (:seen u)
+                                            :sent user-sending-notice})}
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
@@ -198,9 +203,10 @@
                     (if (:seen u)
                       ;; Show time the read happened
                       (str "Viewed " (string/lower (utils/time-since (:read-at u))))
-                      (if (and user-sending-notice
-                               (not= user-sending-notice :loading))
-                        user-sending-notice
+                      (if user-sending-notice
+                        (if (= user-sending-notice :loading)
+                          "Sending..."
+                          user-sending-notice)
                         "Unopened"))]
                   ;; Send reminder button
                   (when (and (not (:seen u))
@@ -224,7 +230,7 @@
                                      ;; Show the share popup
                                      (activity-actions/activity-share activity-data [wrt-share]
                                       (fn [{:keys [success body]}]
-                                        (when success
+                                        (if success
                                           (let [resp (first body)
                                                 user-label (if (= (:medium wrt-share) "email")
                                                              (str "Sent to: " (:email u))
@@ -233,7 +239,9 @@
                                                                       (not= (:display-name slack-user) "-"))
                                                                (str "Sent to: @" (:display-name slack-user) " (Slack)")
                                                                (str "Sent via Slack")))]
-                                            (swap! (::sending-notice s) assoc (:user-id u) user-label)
+                                            (swap! (::sending-notice s) assoc (:user-id u) user-label))
+                                          (do
+                                            (swap! (::sending-notice s) assoc (:user-id u) "An error occurred, please retry...")
                                             (utils/after 5000 #(swap! (::sending-notice s) dissoc (:user-id u)))))))))}
                       "Send"])])]])]]))
 
@@ -253,15 +261,9 @@
         wrt-show (drv/react s :wrt-show)
         is-mobile? (responsive/is-tablet-or-mobile?)]
     [:div.wrt-count-container
-      {:on-mouse-over #(when (and (not is-mobile?)
-                                  (not (:reads read-data)))
-                        (activity-actions/request-reads-data item-id))}
       [:div.wrt-count
         {:ref :wrt-count
-         :on-click #(do
-                    (when (not (:reads read-data))
-                      (activity-actions/request-reads-data item-id))
-                    (nav-actions/show-wrt item-id))
+         :on-click #(nav-actions/show-wrt item-id)
          :class (when (pos? (count (:reads read-data))) "has-read-list")}
         (if read-count
           (str read-count " viewer" (when (not= read-count 1) "s"))

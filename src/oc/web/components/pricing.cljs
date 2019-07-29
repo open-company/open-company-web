@@ -18,8 +18,8 @@
                                 :eventLabel event-name}))
 
 (rum/defcs pricing < {:did-mount (fn [s]
-                      (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
-                        (js/OCWebSetupMarketingSiteJS))
+                      (when (exists? (.-OCWebSetupStaticPagesJS js/window))
+                        (js/OCWebSetupStaticPagesJS))
                       s)}
   [s]
   [:div
@@ -98,8 +98,8 @@
               [:div.tear-subtitle
                 "A team of more than 250? Let's create a custom plan."]
               [:a.tear-start-bt
-                {:href "#"
-                 :onclick "drift.api.startInteraction({ interactionId: 43235 }); return false;"}
+                {:class "intercom-chat-link"
+                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                 "Contact Us"]
               [:div.tear-feature-separator]
               [:div.tear-feature
@@ -174,8 +174,8 @@
           [:div.faq-row-answer
             "Yes! We offer eligible nonprofit organizations a 50% discount. "
             [:a
-              {:href "#"
-               :on-click #(chat/chat-click 43239)}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Contact us"]
             " to see if your organization is eligible."]]
 
@@ -192,8 +192,8 @@
             "Still have more questions?"]
           [:div.faq-row-answer
             [:a.chat-with-us
-              {:href "#"
-               :on-click #(chat/chat-click 43234)}
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Get in touch with us"]]]]
 
         shared-misc/testimonials-section

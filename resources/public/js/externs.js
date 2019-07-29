@@ -128,6 +128,7 @@ var OCStaticStartFixFixedPositioning = function(){};
 var OnPaste_StripFormatting = function(){};
 var isSafari = function(){};
 var isIE = function(){};
+var isEdge = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -150,6 +151,7 @@ var init_fullstory = function(){};
 var FS = function(){};
 FS.setUserVars = function(){};
 FS.getCurrentSessionURL = function(){};
+FS.identify = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -175,16 +177,19 @@ ZiggeoApi.V2.Player.get = function(){};
 var Headway = function(){};
 Headway.init = function(){};
 Headway.show = function(){};
-// Drift
-var drift = function(){};
-drift.api = {};
-drift.api.startInteraction = function(){};
-drift.identify = function(){};
-drift.track = function(){};
+// Intercom (Chat support)
+var Intercom = function(){};
 // Homepage animation
-var OCWebSetupMarketingSiteJS = function(){};
+var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// Electron
+window.isDesktop = {};
+window.isWin32 = {};
+window.isMac = {};
+window.showDesktopWindow = function() {};
+window.setBadgeCount = function() {};
+// Fullstory

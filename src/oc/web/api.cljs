@@ -156,8 +156,11 @@
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status response)
-        ; when a request get a 401 logout the user (presumably using an old token, or attempting anonymous access)
-        (when (= status 401)
+        ; when a request gets a 401, redirect the user to logout
+        ; (presumably they are using an old token, or attempting anonymous access),
+        ; but only if they are already logged in
+        (when (and jwt
+                   (= status 401))
           (router/redirect! oc-urls/logout))
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
@@ -397,24 +400,20 @@
 
 ;; All Posts
 
-(defn get-all-posts [activity-link from callback]
+(defn get-all-posts [activity-link callback]
   (if activity-link
-    (let [href (relative-href activity-link)
-          final-href (if from
-                       (str href "?start=" from "&direction=around")
-                       href)]
-      (storage-http (method-for-link activity-link) final-href
+    (let [href (relative-href activity-link)]
+      (storage-http (method-for-link activity-link) href
         {:headers (headers-for-link activity-link)}
         callback))
-    (handle-missing-link "get-all-posts" activity-link callback
-     {:from from})))
+    (handle-missing-link "get-all-posts" activity-link callback)))
 
-(defn load-more-all-posts [more-link direction callback]
+(defn load-more-items [more-link direction callback]
   (if (and more-link direction)
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
       callback)
-    (handle-missing-link "load-more-all-posts" more-link callback {:direction direction})))
+    (handle-missing-link "load-more-items" more-link callback {:direction direction})))
 
 ;; Auth
 
@@ -778,6 +777,18 @@
       (handle-missing-link "get-secure-entry" activity-link callback
        {:org-slug org-slug
         :secure-activity-id secure-activity-id}))))
+
+(defn get-current-entry [org-slug board-slug activity-uuid callback]
+  (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
+                         :method "GET"
+                         :rel ""
+                         :accept "application/vnd.open-company.entry.v1+json"}]
+    (if (and org-slug board-slug activity-uuid)
+      (storage-http (method-for-link activity-link) (relative-href activity-link)
+       {:headers (headers-for-link activity-link)}
+       callback)
+      (handle-missing-link "get-current-entry" activity-link callback
+       {:org-slug org-slug :board-slug board-slug :activity-uuid activity-uuid}))))
 
 ;; Search
 

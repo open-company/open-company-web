@@ -10,7 +10,6 @@
             [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
-            [oc.web.components.ui.try-it-form :refer (try-it-form)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
@@ -64,8 +63,8 @@
                 [:div.press-kit-intro-footer-right
                   "We’re always happy to talk about Carrot."
                   [:a
-                    {:href "#"
-                     :on-click #(chat/chat-click 43229)}
+                    {:class "intercom-chat-link"
+                     :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                     "SAY HELLO"]]]]]
 
           [:div.core-ft
@@ -189,8 +188,8 @@
                   [:li "Email: "
                        [:a {:href oc-urls/contact-mail-to} oc-urls/contact-email]]
                   [:li "Chat: "
-                     [:a {:on-click #(chat/chat-click 43229)
-                          :href "#"}
+                     [:a {:class "intercom-chat-link"
+                          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                       "Say hello"]]
                   [:li "Social: "
                        [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]

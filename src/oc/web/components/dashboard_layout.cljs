@@ -9,19 +9,21 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.cmail :refer (cmail)]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
-            [oc.web.components.all-posts :refer (all-posts)]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
+            [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.expanded-post :refer (expanded-post)]
-            [oc.web.components.section-stream :refer (section-stream)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
@@ -33,22 +35,22 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
-                              (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
+                              (drv/drv :sort-type)
+                              (drv/drv :cmail-state)
+                              (drv/drv :cmail-data)
                               ;; Locals
-                              ;; Commenting out board sorting for now
-                              ; (rum/local :default ::board-sort)
-                              ; (rum/local false ::sorting-menu-expanded)
+                              (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              ;; Commenting out board sorting for now
-                              ; (on-window-click-mixin (fn [s e]
-                              ;  (when (and @(::sorting-menu-expanded s)
-                              ;             (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
-                              ;   (reset! (::sorting-menu-expanded s) false))))
+                              ui-mixins/refresh-tooltips-mixin
+                              (ui-mixins/on-window-click-mixin (fn [s e]
+                               (when (and @(::sorting-menu-expanded s)
+                                          (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
+                                (reset! (::sorting-menu-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -57,9 +59,14 @@
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
                                   (when (utils/is-admin-or-author? org-data)
-                                    (activity-actions/cmail-reopen?)))
+                                    (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
+                                s)
+                               :did-remount (fn [_ s]
+                                (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+                                  (.tooltip "hide")
+                                  (.tooltip "fixTitle"))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -75,20 +82,28 @@
         empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
-        can-compose (pos? (count all-boards))
+        can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        ; board-sort (::board-sort s)
+        board-sort (drv/react s :sort-type)
         show-drafts (pos? (:count drafts-link))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))]
+                                     (not (:read-only board-data)))
+        cmail-state (drv/react s :cmail-state)
+        _cmail-data (drv/react s :cmail-data)]
       ;; Entries list
       [:div.dashboard-layout.group
+        {:class (when current-activity-id "expanded-post-view")}
+        (when (and is-mobile?
+                   (not current-activity-id)
+                   can-compose?)
+          [:button.mlb-reset.mobile-floating-compose-bt
+            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
         [:div.dashboard-layout-container.group
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (when-not is-mobile?
@@ -120,11 +135,14 @@
                       (when (and is-admin-or-author
                                  (not is-second-user))
                         [:button.mlb-reset.add-post-bt
-                          {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+                          {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
                           [:span.add-post-bt-pen]
                           "New post"])
                     [:div.add-post-tooltip-box.big-web-only
                       {:class (when is-second-user "second-user")}]]]))
+            (when (and (not is-mobile?)
+                       can-compose?)
+               (cmail))
             (when-not current-activity-id
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
@@ -171,25 +189,27 @@
                          :data-container "body"
                          :title (str (:name board-data) " settings")
                          :on-click #(nav-actions/show-section-editor)}]])]
-                ; (when-not is-mobile?
-                ;   (let [default-sort (= @board-sort :default)]
-                ;     [:div.board-sort.group
-                ;       {:ref :board-sort-menu}
-                ;       [:button.mlb-reset.board-sort-bt
-                ;         {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                ;         (if default-sort "Recent activity" "Recently posted")]
-                ;       [:div.board-sort-menu
-                ;         {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when default-sort "active")
-                ;            :on-click #(reset! board-sort :defautl)}
-                ;           "Recent activity"]
-                ;         [:div.board-sort-menu-item
-                ;           {:class (when-not default-sort "active")
-                ;            :on-click #(reset! board-sort :own)}
-                ;           "Recently posted"]]]))
-                ])
-            
+                (when (not= (router/current-board-slug) utils/default-drafts-board-slug)
+                  (let [default-sort (= board-sort dis/default-sort-type)]
+                    [:div.board-sort.group
+                      {:ref :board-sort-menu}
+                      [:button.mlb-reset.board-sort-bt
+                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                        (if default-sort "Recent activity" "Recently posted")]
+                      [:div.board-sort-menu
+                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                        [:div.board-sort-menu-item
+                          {:class (when default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recent-activity))}
+                          "Recent activity"]
+                        [:div.board-sort-menu-item
+                          {:class (when-not default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recently-posted))}
+                          "Recently posted"]]]))])
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
@@ -201,21 +221,8 @@
               ;; Empty board
               empty-board?
               (empty-board)
-              ;; All Posts
-              (and (or is-all-posts
-                       is-must-see)
-                   ;; Commenting out grid view switcher for now
-                   ; (= @board-switch :stream)
-                   )
-              (rum/with-key (all-posts)
-               (str "all-posts-component-" (if is-all-posts "AP" "MS") "-" (drv/react s :ap-initial-at)))
-              ;; Layout boards activities
+              ;; Paginated board/container
               :else
-              (cond
-                ;; Commenting out grid view switcher for now
-                ;; Entries grid view
-                ; (= @board-switch :grid)
-                ; (entries-layout)
-                ;; Entries stream view
-                :else
-                (section-stream)))]]]))
+              (rum/with-key (lazy-stream paginated-stream)
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
+              )]]]))

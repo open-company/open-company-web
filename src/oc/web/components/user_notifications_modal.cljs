@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
             [oc.web.utils.user :as user-utils]
@@ -51,14 +52,10 @@
   ;; Locals
   (rum/local false ::loading)
   (rum/local false ::show-success)
+  ;; Mixins
+  ui-mixins/refresh-tooltips-mixin
   {:will-mount (fn [s]
    (user-actions/get-user nil)
-   s)
-   :after-render (fn [s]
-   (when-not (utils/is-test-env?)
-     (doto (js/$ "[data-toggle=\"tooltip\"]")
-       (.tooltip "fixTitle")
-       (.tooltip "hide")))
    s)
   :did-remount (fn [old-state new-state]
    (let [user-data (:user-data @(drv/get-ref new-state :edit-user-profile))]
@@ -130,7 +127,7 @@
                 {:value "in-app"}
                 "In-app only"]]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Reminders"]
+            [:div.field-label "Recurring update reminders"]
             [:select.field-value.oc-input
               {:value (:reminder-medium current-user-data)
                :on-change #(change! s :reminder-medium (.. % -target -value))}

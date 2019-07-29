@@ -70,7 +70,6 @@
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
-  (drv/drv :show-post-added-tooltip)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -85,9 +84,6 @@
     s)
    :did-remount (fn [_ s]
     (load-comments s)
-    s)
-   :will-unmount (fn [s]
-    (nux-actions/dismiss-post-added-tooltip)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -117,10 +113,7 @@
                         :height (utils/calc-video-height 638)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
         activities-read (drv/react s :activities-read)
-        reads-data (get activities-read (:uuid activity-data))
-        post-add-tooltip (drv/react s :show-post-added-tooltip)
-        should-show-post-added-tooltip? (and post-add-tooltip
-                                             (= post-add-tooltip (router/current-activity-id)))]
+        reads-data (get activities-read (:uuid activity-data))]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
@@ -150,38 +143,45 @@
                           :video-image (:video-image activity-data)
                           :video-processed (:video-processed activity-data)})])
       [:div.expanded-post-headline
+        {:class utils/hide-class}
         (:headline activity-data)]
       [:div.expanded-post-author.group
         (user-avatar-image publisher)
         [:div.expanded-post-author-inner
+          {:data-toggle (when-not is-mobile? "tooltip")
+           :data-placement "top"
+           :data-container "body"
+           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+           :data-title (utils/activity-date-tooltip activity-data)
+           :class utils/hide-class}
           (str (:name publisher) " in "
-               (:board-name activity-data) " on "
+               (:board-name activity-data)
+               (when (= (:board-access activity-data) "private")
+                 " (private)")
+               (when (= (:board-access activity-data) "public")
+                 " (public)")
+               " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
           (when (:must-see activity-data)
             [:div.must-see-tag])]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract
+          {:class utils/hide-class}
           (:abstract activity-data)])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
+         :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
+      (when is-mobile?
+        [:div.expanded-post-mobile-reactions
+          (reactions activity-data)])
       [:div.expanded-post-footer.group
         (comments-summary activity-data true)
-        (reactions activity-data)
+        (when-not is-mobile?
+          (reactions activity-data))
         (when user-is-part-of-the-team
           [:div.expanded-post-wrt-container
-            (when should-show-post-added-tooltip?
-              [:div.post-added-tooltip-container
-                {:ref :post-added-tooltip}
-                [:div.post-added-tooltip-title
-                  "Post analytics"]
-                [:div.post-added-tooltip
-                  (str "Invite your team to Carrot so you can know who read your "
-                   "post and when. Click here to access your post analytics anytime.")]
-                [:button.mlb-reset.post-added-tooltip-bt
-                  {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                  "OK, got it"]])
             (wrt-count activity-data reads-data)])]
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data)

@@ -1,5 +1,5 @@
 div.org-dashboard {
-  background-color: $oc_gray_8;
+  background-color: $grey_num_2;
 
   @include mobile() {
     background-color: $grey_num_2;
@@ -13,12 +13,12 @@ div.org-dashboard {
     z-index: 1132;
   }
 
-  &.activity-not-found div.page {
+  &.login-wall div.page {
     display: none;
   }
 
   @include mobile() {
-    &.activity-not-found div.page, &.activity-removed div.page {
+    &.login-wall div.page, &.activity-removed div.page {
       display: none;
     }
   }
@@ -55,7 +55,7 @@ div.org-dashboard {
     }
 
     div.org-dashboard-container {
-      background-color: $oc_gray_8;
+      background-color: $grey_num_2;
 
       @include big_web() {
         min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
@@ -127,7 +127,7 @@ div.org-dashboard div.org-dashboard-inner {
 
   @include big_web(){
     min-height: 100vh;
-    padding-top: #{$navbar_height + $carrot_trend_collapsed_height}px;
+    padding-top: #{$navbar_height}px;
   }
   @include mobile(){
     background-color: $grey_num_2;

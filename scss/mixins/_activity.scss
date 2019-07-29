@@ -40,6 +40,19 @@ $h2_top_margin: 24;
   }
 }
 
+@mixin new-comments-tag(){
+  div.new-comments-tag {
+    width: auto;
+    height: 17px;
+    position: relative;
+    vertical-align: inherit;
+    @include OC_Body_Bold();
+    line-height: 17px;
+    font-size: 12px;
+    color: $carrot_green;
+  }
+}
+
 @mixin must-see-tag() {
   div.must-see-tag {
     @include image-2x("/img/ML/must_see_tag");
@@ -59,7 +72,6 @@ $h2_top_margin: 24;
     }
   }
 }
-
 
 @mixin must-see(){
   div.must-see {
@@ -162,7 +174,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-title($font_size: 22px, $line_height: 28px){
+@mixin activity-title($font_size: 26px, $line_height: 30px){
   @include OC_Title();
   font-size: $font_size;
   color: $deep_navy;
@@ -227,6 +239,15 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
+  p, ul > li, i {
+    min-height: #{$line_height}px;
+  }
+
+  i:empty {
+    display: grid;
+    min-width: 1px;
+  }
+
   * {
     color: $color;
   }
@@ -255,6 +276,16 @@ $h2_top_margin: 24;
     color: $color;
     letter-spacing: normal !important;
     font-weight: normal;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
   &.editing {
@@ -283,11 +314,22 @@ $h2_top_margin: 24;
     font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
-  a, span[data-auto-link] {
+  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
     text-decoration: none;
     color: $carrot_green;
+    background-color: transparent !important;
   }
 
   a:hover {
@@ -508,7 +550,13 @@ $h2_top_margin: 24;
     line-height: 50px;
   }
 
-  a {
+  a, span[data-auto-link] {
+    text-decoration: none;
     color: $carrot_green;
+    background-color: transparent;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 }

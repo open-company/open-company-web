@@ -9,7 +9,7 @@
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.reaction :as reaction-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.mixins.ui :as ui-mixins]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
@@ -18,15 +18,10 @@
 (def default-reaction-number 5)
 
 (rum/defcs reactions < (rum/local false ::show-picker)
-                       (on-window-click-mixin (fn [s e]
+                       ui-mixins/refresh-tooltips-mixin
+                       (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
-                       {:did-remount (fn [_ s]
-                        (when-not (responsive/is-tablet-or-mobile?)
-                          (doto (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
-                            (.tooltip "fixTitle")
-                            (.tooltip "hide")))
-                        s)}
   [s entity-data hide-last-reaction? optional-activity-data]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means

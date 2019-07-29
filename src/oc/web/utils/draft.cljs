@@ -12,6 +12,7 @@
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-title "Yes"
+                    :solid-button-style :red
                     :solid-button-cb #(do
                                        (activity-actions/activity-delete draft)
                                        (alert-modal/hide-alert))}]

@@ -6,9 +6,9 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.utils.org :as org-utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.lib.responsive :as responsive]
@@ -41,7 +41,7 @@
          (empty? (:domain um-domain-invite)))))
 
 (defn reset-form [s]
-  (let [org-data (first (:rum/args s))
+  (let [org-data @(drv/get-ref s :org-data)
         um-domain-invite (:um-domain-invite @(drv/get-ref s :org-settings-team-management))]
     (org-actions/org-edit-setup org-data)
     (dis/dispatch! [:input [:um-domain-invite :domain] ""])
@@ -113,26 +113,24 @@
   (drv/drv :org-editing)
   (drv/drv :org-avatar-editing)
   (drv/drv :org-settings-team-management)
+  ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local false ::saving)
   (rum/local false ::show-advanced-settings)
   {:will-mount (fn [s]
     (let [org-data @(drv/get-ref s :org-data)]
-      (org-actions/get-org org-data))
+      (org-actions/get-org org-data true))
     (reset-form s)
     (let [content-visibility-data (:content-visibility @(drv/get-ref s :org-data))]
       (reset! (::show-advanced-settings s) (some #(content-visibility-data %) (keys content-visibility-data))))
     s)
-   :did-mount (fn [s]
-    (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-    s)
    :will-update (fn [s]
     (let [org-editing @(drv/get-ref s :org-editing)]
       (when (and @(::saving s)
-                 (:saved org-editing))
+                 (contains? org-editing :saved))
         (reset! (::saving s) false)
-        (utils/after 2500 #(dis/dispatch! [:input [:org-editing :saved] false]))
-        (notification-actions/show-notification {:title "Settings saved"
+        (utils/after 2500 (fn [_] (dis/dispatch! [:update [:org-editing] #(dissoc % :saved)])))
+        (notification-actions/show-notification {:title (if (:saved org-editing) "Settings saved" "Error saving, please retry")
                                                  :primary-bt-title "OK"
                                                  :primary-bt-dismiss true
                                                  :expire 10
@@ -163,8 +161,8 @@
                          (org-actions/org-edit-save org-editing))
              :disabled (or @(::saving s)
                            (:saved org-editing)
-                           (and (seq (:name org-editing))
-                                (< (count (str/trim (:name org-editing))) 3)))
+                           (not (seq (:name org-editing)))
+                           (< (count (str/trim (:name org-editing))) 3))
            :class (when (:saved org-editing) "no-disable")}
             "Save"]
           [:button.mlb-reset.cancel-bt
@@ -184,31 +182,44 @@
               "Company name"]
             [:input.org-settings-field.oc-input
               {:type "text"
-              :value (or (:name org-editing) "")
-              :on-change #(dis/dispatch! [:input [:org-editing] (merge org-editing {:name (.. % -target -value)
-                                                                                    :has-changes true})])}]
-            [:div.org-settings-desc
-              (str ls/web-server-domain "/" (:slug org-data))]
+               :class (when (:error org-editing) "error")
+               :value (or (:name org-editing) "")
+               :max-length org-utils/org-name-max-length
+               :on-change #(let [org-name (.. % -target -value)
+                                 clean-org-name (subs org-name 0 (min (count org-name) org-utils/org-name-max-length))]
+                            (dis/dispatch! [:input [:org-editing] (merge org-editing {:name clean-org-name
+                                                                                      :has-changes true
+                                                                                      :error false
+                                                                                      :rand (rand 1000)})]))}]
+            (when (:error org-editing)
+              [:div.error "Must be between 3 and 50 characters"])
             [:div.org-settings-label
               "Allowed email domains"
               [:i.mdi.mdi-information-outline
                 {:title "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."
                  :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                  :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]
-            [:input.org-settings-field.oc-input
-              {:type "text"
-               :placeholder "@domain.com"
-               :auto-capitalize "none"
-               :value (:domain um-domain-invite)
-               :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
-               :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
-               :on-key-press (fn [e]
-                               (when (= (.-key e) "Enter")
-                                 (let [domain (:domain um-domain-invite)]
-                                   (when (utils/valid-domain? domain)
-                                     (team-actions/email-domain-team-add domain)))))}]
+                 :data-container "body"}]]
+            [:div.org-settings-field-container.oc-input.group
+              [:input.org-settings-field.email-domain-field
+                {:type "text"
+                 :placeholder "@domain.com"
+                 :auto-capitalize "none"
+                 :value (:domain um-domain-invite)
+                 :pattern "@?[a-z0-9.-]+\\.[a-z]{2,4}$"
+                 :on-change #(dis/dispatch! [:input [:um-domain-invite :domain] (.. % -target -value)])
+                 :on-key-press (fn [e]
+                                 (when (= (.-key e) "Enter")
+                                   (let [domain (:domain um-domain-invite)]
+                                     (when (utils/valid-domain? domain)
+                                       (team-actions/email-domain-team-add domain)))))}]
+              [:button.mlb-reset.add-email-domain-bt
+                {:disabled (not (utils/valid-domain? (:domain um-domain-invite)))
+                 :on-click (fn [e]
+                             (let [domain (:domain um-domain-invite)]
+                               (when (utils/valid-domain? domain)
+                                 (team-actions/email-domain-team-add domain))))}
+                "Add"]]
             [:div.org-settings-email-domains
               (for [domain (:email-domains team-data)]
                 [:div.org-settings-email-domain-row
@@ -221,7 +232,9 @@
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced
               [:button.mlb-reset.advanced-settings-bt
-                {:on-click #(reset! (::show-advanced-settings s) true)}
+                {:on-click (fn [_]
+                              (reset! (::show-advanced-settings s) true)
+                              (utils/after 1000 #(.tooltip (js/$ "[data-toggle=\"tooltip\"]"))))}
                 "Show advanced settings"]]
             [:div.org-settings-advanced
               [:div.org-settings-advanced-title
@@ -242,8 +255,7 @@
                              "be logged in to view posts.")
                      :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                      :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}]]]
+                     :data-container "body"}]]]
               [:div.org-settings-advanced-row.public-sections.group
                 (carrot-checkbox {:selected (:disallow-public-board content-visibility-data)
                                   :disabled false

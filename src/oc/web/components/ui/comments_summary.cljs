@@ -7,6 +7,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-author-name [author]
@@ -33,7 +35,7 @@
 (rum/defcs comments-summary < rum/static
                               rum/reactive
                               (drv/drv :comments-data)
-  [s entry-data show-zero-comments?]
+  [s entry-data show-zero-comments? should-show-new-tag?]
   (let [all-comments-data (drv/react s :comments-data)
         _comments-data (get all-comments-data (:uuid entry-data))
         comments-data (:sorted-comments _comments-data)
@@ -50,16 +52,25 @@
                          (count comments-data)
                          (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))
-        short-label? (and (responsive/is-mobile-size?)
+        is-mobile? (responsive/is-mobile-size?)
+        short-label? (and is-mobile?
                           (> (count (:reactions entry-data)) 1))
-        faces-to-render (take max-face-pile comments-authors)]
+        faces-to-render (take max-face-pile comments-authors)
+        face-pile-width (if (pos? face-pile-count)
+                          (if is-mobile?
+                            (+ 8 (* 12 face-pile-count))
+                            (+ 10 (* 18 face-pile-count)))
+                            0)]
     (when (and comments-count
                (or show-zero-comments?
                    (not (zero? comments-count))))
       [:div.is-comments
+        {:on-click (fn [e]
+                     (routing-actions/open-post-modal entry-data true)
+                     (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
         [:div.is-comments-authors.group
-          {:style {:width (str (if (pos? face-pile-count) (+ 10 (* 18 face-pile-count)) 0) "px")}
+          {:style {:width (str face-pile-width "px")}
            :class (when (> (count faces-to-render) 1) "show-border")}
           (for [user-data faces-to-render]
             [:div.is-comments-author
@@ -68,12 +79,15 @@
         ; Comments count
         [:div.is-comments-summary
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))
-                                    utils/hide-class true})}
+                                    :add-a-comment (not (pos? comments-count))})}
           (if (pos? comments-count)
-            (str comments-count
+            [:div.group
+              comments-count
               (when-not short-label?
-                (str " comment" (when (not= comments-count 1) "s"))))
+                (str " comment" (when (not= comments-count 1) "s")))
+              (when should-show-new-tag?
+                [:div.new-comments-tag
+                  "(NEW)"])]
             [:span.add-a-comment
               (if short-label?
                 "Comment"

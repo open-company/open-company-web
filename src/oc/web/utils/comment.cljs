@@ -1,6 +1,6 @@
 (ns oc.web.utils.comment
   (:require [cljsjs.medium-editor]
-            [defun.core :refer (defun-)]
+            [defun.core :refer (defun)]
             [goog.object :as gobj]
             [cuerdas.core :as string]
             [oc.web.api :as api]
@@ -76,12 +76,13 @@
                                         :activity-uuid (:uuid activity-data)}]))
 
 (defn get-comments [activity-data]
-  (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
-        comments-link (utils/link-for (:links activity-data) "comments")]
-    (dis/dispatch! [:comments-get
-                    comments-key
-                    activity-data])
-    (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))
+  (when activity-data
+    (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
+          comments-link (utils/link-for (:links activity-data) "comments")]
+      (dis/dispatch! [:comments-get
+                      comments-key
+                      activity-data])
+      (api/get-comments comments-link #(get-comments-finished comments-key activity-data %)))))
 
 (defn get-comments-if-needed [activity-data all-comments-data]
   (let [comments-link (utils/link-for (:links activity-data) "comments")
@@ -99,7 +100,7 @@
     (when should-load-comments?
       (get-comments activity-data))))
 
-(defun- sort-comments
+(defun sort-comments
   ([comments :guard nil?]
    [])
   ([comments :guard map?]

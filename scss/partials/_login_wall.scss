@@ -1,0 +1,229 @@
+div.login-wall-container {
+
+  div.login-wall-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+
+    @include mobile(){
+      display: block;
+    }
+
+    div.login-wall-left {
+      background-color: $carrot_dark_bg_gray;
+      padding: 21px;
+      flex: 1;
+      position: absolute;
+      position: fixed;
+      top: 0px;
+      bottom: 0px;
+      left: 0px;
+      width: 50%;
+
+      @include mobile(){
+        display: none;
+      }
+
+      div.login-wall-logo {
+        width: 82px;
+        height: 20px;
+        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
+        background-size: 82px 20px;
+        background-repeat: no-repeat;
+      }
+
+      div.login-wall-box {
+        position: absolute;
+        left: 50%;
+        top: 201px;
+        margin-left: -147px;
+        margin-top: 0px;
+        width: 294px;
+        height: 301px;
+        @include image-2x("/img/ML/carrot_box");
+        background-size: 294px 301px;
+        background-repeat: no-repeat;
+      }
+    }
+
+    div.login-wall-right {
+      text-align: center;
+      flex: 1;
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      right: 0px;
+      width: 50%;
+
+      @include mobile(){
+        flex: unset;
+        width: 100%;
+        position: unset;
+      }
+
+      div.login-wall-right-content {
+        margin: 64px auto;
+        width: 440px;
+        text-align: center;
+
+        @include mobile() {
+          width: 100%;
+          padding: 0px 24px;
+          margin: 40px auto;
+        }
+
+        div.login-title {
+          @include OC_Title();
+          font-size: 32px;
+          color: $deep_navy;
+        }
+
+        div.login-description {
+          @include OC_Body_Bold();
+          font-size: 16px;
+          color: $deep_navy;
+          margin-top: 16px;
+        }
+
+        button.signup-with-slack {
+          margin-top: 40px;
+
+          @include mobile() {
+            margin-top: 26px;
+          }
+        }
+
+        button.signup-with-google {
+          margin-top: 16px;
+        }
+
+        button.signup-with-slack, button.signup-with-google {
+          width: 340px;
+          height: 40px;
+          border: 1px solid $medium_light_grey;
+          color: $light_ui_grey;
+          border-radius: 100px;
+          text-align: center;
+
+          div.signup-with-slack-content, div.signup-with-google-content {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            color: $deep_navy;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            div.slack-icon {
+              width: 21px;
+              height: 21px;
+              background-image: cdnUrl("/img/ML/slack_normal.svg");
+              background-repeat: no-repeat;
+              background-size: 21px 21px;
+              float: left;
+              margin-right: 16px;
+            }
+
+            div.google-icon {
+              width: 21px;
+              height: 21px;
+              background-image: cdnUrl("/img/ML/google_signin.svg");
+              background-repeat: no-repeat;
+              float: left;
+              margin-right: 16px;
+            }
+          }
+
+          @include mobile() {
+            width: 100%;
+          }
+        }
+
+        div.or-login {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $deep_navy;
+          margin: 24px auto 0;
+        }
+
+        div.fields-container {
+          width: 340px;
+          margin: 16px auto 0px;
+          text-align: left;
+
+          @include mobile() {
+            width: 100%;
+          }
+
+          div.field-label {
+            margin-top: 16px;
+            @include OC_Body_Bold();
+            font-size: 12px;
+            color: $deep_navy;
+            margin-top: 16px;
+          }
+
+          input.field-content {
+            width: 100%;
+            height: 40px;
+            border-radius: 4px;
+            border: 1px solid rgba(#B1B8C0, 0.5);
+            margin-top: 16px;
+            padding: 6px 12px;
+
+            -webkit-app-region: no-drag;
+          }
+
+          a.forgot-password {
+            display: block;
+            text-align: center;
+            margin: 16px auto 0;
+            color: $carrot_green;
+            @include OC_Body_Bold();
+            font-size: 13px;
+          }
+        }
+
+        button.continue-btn {
+          width: 340px;
+          height: 48px;
+          margin: 40px auto 20px;
+          background-color: $sea_blue;
+          color: white;
+          border-radius: 100px;
+          @include OC_Body_Bold();
+          font-size: 16px;
+
+          @include mobile() {
+            width: 100%;
+          }
+        }
+
+        div.footer-link {
+          margin-top: 24px;
+          @include OC_Body_Book();
+          font-size: 16px;
+          color: $light_navy;
+          text-align: center;
+
+          a {
+            @include OC_Body_Book();
+            font-size: 16px;
+            color: $carrot_green;
+            margin-left: 4px;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+}

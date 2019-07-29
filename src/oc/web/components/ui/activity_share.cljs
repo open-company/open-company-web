@@ -10,9 +10,10 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.org-settings :as org-settings]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
@@ -45,7 +46,6 @@
                             ;; Locals
                             (rum/local {:note ""} ::slack-data)
                             (rum/local false ::dismiss)
-                            (rum/local false ::copied)
                             (rum/local false ::sharing)
                             (rum/local false ::shared)
                             (rum/local (rand 1000) ::slack-channels-dropdown-key)
@@ -124,7 +124,7 @@
         ;                      (if has-bot?
         ;                        (dis/dispatch! [:input [:activity-share-medium] :slack])
         ;                        (when (jwt/is-admin? (:team-id org-data))
-        ;                          (org-settings/show-modal :main)))))}
+        ;                          (nav-actions/show-org-settings :integrations)))))}
         ;       "Slack"]])
         ; [:div.activity-share-divider-line
         ;   {:class (when-not has-bot? "no-tabs")}]
@@ -165,12 +165,15 @@
                               (utils/event-stop e)
                               (let [url-input (rum/ref-node s "activity-share-url-field")]
                                 (highlight-url s)
-                                (when (utils/copy-to-clipboard url-input)
-                                  (reset! (::copied s) true)
-                                  (utils/after 2000 #(reset! (::copied s) false)))))}
-                  (if @(::copied s)
-                    "Copied!"
-                    "Copy URL")]]]])
+                                (let [copied? (utils/copy-to-clipboard url-input)]
+                                  (notification-actions/show-notification {:title (if copied? "Share URL copied to clipboard" "Error copying the share URL")
+                                                                           :description (when-not copied? "Please try copying the URL manually")
+                                                                           :primary-bt-title "OK"
+                                                                           :primary-bt-dismiss true
+                                                                           :primary-bt-inline copied?
+                                                                           :expire 3
+                                                                           :id (if copied? :share-url-copied :share-url-copy-error)}))))}
+                  "Copy URL"]]]])
         (when (= medium :slack)
           [:div.activity-share-share
             {:class utils/hide-class}

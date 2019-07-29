@@ -2,8 +2,10 @@
   (:require [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.utils.activity :as activity-utils]))
 
 (def user-avatar-filestack-config
@@ -88,9 +90,13 @@
                     #(ui-compose)))
                 (when (and (:slug board-data)
                            entry-uuid)
-                  (if interaction-uuid
-                    #(router/nav! (oc-urls/comment-url (:slug board-data) entry-uuid interaction-uuid))
-                    #(router/nav! (oc-urls/entry (:slug board-data) entry-uuid)))))})))
+                  (let [url (if interaction-uuid
+                              (oc-urls/comment-url (:slug board-data) entry-uuid interaction-uuid)
+                              (oc-urls/entry (:slug board-data) entry-uuid))]
+                    #(if (seq (get (dis/posts-data) entry-uuid))
+                       (router/nav! url)
+                       (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
+                        (fn [s] (when s (router/nav! url))))))))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))

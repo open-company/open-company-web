@@ -34,17 +34,14 @@
           [:div.column-item [:a {:href oc-urls/blog :target "_blank"} "Blog"]]
           [:div.column-item [:a {:href oc-urls/oc-twitter :target "_blank"} "Twitter"]]
           [:div.column-item [:a {:href oc-urls/press-kit} "Press Kit"]]
-          [:div.column-item [:a {:href "#"
-                                 :on-click #(chat/chat-click 43229)}
+          [:div.column-item [:a {:class "intercom-chat-link"
+                                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                               "Contact"]]]
 
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help center"]]
-          [:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
-          [:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
-          [:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]]]
+          [:div.column-item [:a {:href oc-urls/help :target "_blank"} "Help center"]]]]
       [:div.left-column.group
         [:img.logo
           {:src (utils/cdn "/img/ML/carrot_wordmark.svg")}]
