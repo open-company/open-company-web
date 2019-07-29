@@ -240,7 +240,7 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
-        comment (:comment (:params params))
+        comment (:comment params)
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
