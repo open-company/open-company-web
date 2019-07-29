@@ -238,6 +238,23 @@ function OCStaticGetParameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+function isMac() {
+  var platform = window.navigator.platform;
+  var macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+  return (macosPlatforms.indexOf(platform) !== -1);
+}
+
+function isWindows() {
+  var platform = window.navigator.platform;
+  var windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+  return (windowsPlatforms.indexOf(platform) !== -1);
+}
+
+function isLinux() {
+  var platform = window.navigator.platform;
+  return /Linux/.test(platform);
+}
+
 function isSafari(){
   var ua = navigator.userAgent.toLowerCase(); 
   if (ua.indexOf('safari') > -1) { 
