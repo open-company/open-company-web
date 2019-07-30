@@ -509,8 +509,11 @@
   (cond
 
    (some #{status} [401 404])
-   ;; Force a 4040 in case user is visiting a secure activity url
-   (routing-actions/maybe-404 (some? (router/current-secure-activity-id)))
+   ;; Force a 404 in case user is visiting a secure activity as anonymous
+   ;; that don't exists, the secure activity are always visible
+   (routing-actions/maybe-404 (and (not (jwt/jwt))
+                                   (not (jwt/id-token))
+                                   (some? (router/current-secure-activity-id))))
 
    ;; The id token will have a current activity id, shared urls will not.
    ;; if the ids don't match return a 404
