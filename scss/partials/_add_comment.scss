@@ -38,17 +38,27 @@ div.add-comment-box-container {
       padding: 9px 14px;
     }
 
-    div.add-comment-internal{
+    div.add-comment-internal {
       position: absolute;
       bottom: 0;
       left: 40px;
-      width: calc(100% - 24px - 16px - 50px);
+      width: calc(100% - 40px);
       position: relative;
-      max-height: 200px;
       border-radius: 4px;
       border: 1px solid $mid_light_grey;
       overflow-x: hidden;
       overflow-y: auto;
+
+      // position: relative;
+      // height: auto;
+      // margin-top: 8px;
+
+      div.medium-editor-media-picker {
+        margin-top: 8px;
+        top: 0;
+        left: unset;
+        right: 16px;
+      }
 
       @include mobile() {
         width: 100%;
@@ -120,74 +130,62 @@ div.add-comment-box-container {
       // }
     }
 
-    button.send-btn {
-      position: absolute;
-      bottom: 8px;
-      right: 0;
-      width: 50px;
-      height: 24px;
-      padding: 0;
-      margin: 0;
-      text-align: right;
-      color: $carrot_green;
-      @include OC_Body_Bold();
-      font-size: 16px;
-
-      @include mobile() {
-        right: 10px;
-        width: 40px;
-      }
-
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 1 !important;
-
-        @include mobile() {
-          color: rgba($light_navy, 0.5);
-        }
-
-        @include big_web() {
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-    }
-
     div.add-comment-footer {
+      height: 32px;
+      width: 100%;
       margin-top: 16px;
-      height: 40px;
-      position: relative;
 
-      button.cancel-btn {
+      div.emoji-picker {
         float: right;
-        width: 112px;
-        height: 40px;
-        padding: 10px 24px;
-        text-align: center;
-        color: $ui_grey;
-        @include OC_Body_Bold();
-        font-size: 14px;
+        margin-right: 8px;
 
-        &:disabled {
-          color: $light_ui_grey;
+        button.emoji-button {
+          width: 24px;
+          height: 32px;
+          background-position: center;
+          background-size: 16px 16px;
+          padding: 0px;
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          cursor: pointer;
+        }
+
+        @include tablet() {
+          display: none;
+        }
+
+        div.picker-container {
+          right: -16px;
+          left: unset;
         }
       }
 
-      button.reply-btn {
+      button.send-btn {
         float: right;
-        width: 112px;
-        height: 40px;
-        padding: 10px 24px;
+        height: 32px;
+        padding: 7px 16px;
+        margin: 0 0 0 16px;
         background-color: $carrot_green;
-        text-align: center;
         color: white;
         @include OC_Body_Bold();
         font-size: 14px;
-        border-radius: 6px;
+        line-height: 18px;
+        border-radius: 4px;
 
         &:disabled {
-          background-color: $light_ui_grey;
+          cursor: not-allowed;
+          opacity: 1 !important;
+
+          @include mobile() {
+            color: rgba($light_navy, 0.5);
+          }
+
+          @include big_web() {
+            &:hover {
+              opacity: 1;
+            }
+          }
         }
       }
     }
