@@ -12,10 +12,13 @@
             [oc.web.utils.mention :as mention-utils]))
 
 (defn setup-medium-editor [comment-node users-list]
-  (let [config {:toolbar false
+  (let [extentions (if (seq users-list)
+                     #js {"mention" (mention-utils/mention-ext users-list)}
+                     #js {})
+        config {:toolbar false
                 :anchorPreview false
                 :imageDragging false
-                :extensions #js {"mention" (mention-utils/mention-ext users-list)}
+                :extensions extentions
                 :autoLink true
                 :anchor false
                 :targetBlank true

@@ -4,6 +4,7 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
