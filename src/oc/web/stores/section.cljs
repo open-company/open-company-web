@@ -111,7 +111,7 @@
                                        (:private-notifications section-data))
         current-authors (filterv #(not= % (:user-id user)) (:authors section-data))
         current-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))
-        next-authors (if (= user-type :author)
+        next-authors (if (#{:admin :author} user-type)
                        (vec (conj current-authors (:user-id user)))
                        current-authors)
         next-viewers (if (= user-type :viewer)
