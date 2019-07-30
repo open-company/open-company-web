@@ -19,7 +19,7 @@
   ;; only watch the currently visible board.
   (ws-ic/board-unwatch (fn [rep]
     (timbre/debug rep "Watching on socket " (:uuid section))
-        (ws-ic/boards-watch [(:uuid section)]))))
+    (ws-ic/boards-watch [(:uuid section)]))))
 
 (defn section-seen
   [uuid]
@@ -50,12 +50,11 @@
         (when-let [section-uuid (:uuid section)]
           (utils/after 10 #(section-seen section-uuid)))
         ;; only watch the currently visible board.
-        ; only for logged in users
-        (when (jwt/jwt)
-          (watch-single-section section))))
-
-    ;; Retrieve reads count if there are items in the loaded section
-    (request-reads-count section)
+        ; only for logged in users and if the board is currently shown
+        (when (= (router/current-board-slug) (:slug section))
+          (watch-single-section section)
+          ;; Retrieve reads count if there are items in the loaded section
+          (request-reads-count section))))
     (dispatcher/dispatch! [:section sort-type (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
@@ -284,3 +283,7 @@
 (defn section-more [more-link direction]
   (api/load-more-items more-link direction (partial section-more-finish direction))
   (dispatcher/dispatch! [:section-more (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)]))
+
+(defn setup-section-editing [section-slug]
+  (when-let [board-data (dispatcher/board-data (router/current-org-slug) section-slug)]
+    (dispatcher/dispatch! [:setup-section-editing board-data])))
