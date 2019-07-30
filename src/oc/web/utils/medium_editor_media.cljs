@@ -61,7 +61,7 @@
                        (reset! (:me/media-attachment-did-success state) false)
                        (media-attachment-dismiss-picker state editable)))))
 
-(defn attachment-upload-success-cb [state editable res]
+(defn attachment-upload-success-cb [state options editable res]
   (reset! (:me/media-attachment-did-success state) true)
   (let [url (oget res :url)]
     (if-not url
@@ -77,7 +77,7 @@
                              :file-type mimetype
                              :file-size size
                              :file-url url}
-            dispatch-input-key (:dispatch-input-key (first (:rum/args state)))]
+            dispatch-input-key (:dispatch-input-key options)]
         (reset! (:me/media-attachment state) false)
         (activity-actions/add-attachment dispatch-input-key attachment-data)
         (utils/after 1000 #(reset! (:me/media-attachment-did-success state) false))))))
@@ -91,13 +91,13 @@
         media-picker-ext (.getExtensionByName editor "media-picker")]
     media-picker-ext))
 
-(defn add-attachment [s editable]
+(defn add-attachment [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
     (.saveSelection editable)
     (reset! (:me/media-attachment s) true)
     (iu/upload!
      nil
-     (partial attachment-upload-success-cb s editable)
+     (partial attachment-upload-success-cb s options editable)
      nil
      (partial attachment-upload-error-cb s editable)
      (fn []
@@ -146,21 +146,22 @@
 
 (defn media-photo-add-error
   "Show an error alert view for failed uploads."
-  [s]
+  [s options]
   (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "media-photo-upload-error"
                     :title "Sorry!"
                     :message "An error occurred with your image."
                     :solid-button-title "OK"
                     :solid-button-cb #(alert-modal/hide-alert)}
-        upload-progress-cb (:upload-progress-cb (first (:rum/args s)))]
-    (upload-progress-cb false)
+        upload-progress-cb (:upload-progress-cb options)]
+    (when (fn? upload-progress-cb)
+      (upload-progress-cb false))
     (reset! (:me/upload-lock s) false)
     (alert-modal/show-alert alert-data)))
 
-(defn media-photo-add-if-finished [s editable]
+(defn media-photo-add-if-finished [s options editable]
   (let [image @(:me/media-photo s)
-        upload-progress-cb (:upload-progress-cb (first (:rum/args s)))]
+        upload-progress-cb (:upload-progress-cb options)]
     (when (and (contains? image :url)
                (contains? image :width)
                (contains? image :height)
@@ -169,15 +170,16 @@
       (reset! (:me/media-photo s) nil)
       (reset! (:me/media-photo-did-success s) false)
       (reset! (:me/upload-lock s) false)
-      (upload-progress-cb false))))
+      (when (fn? upload-progress-cb)
+        (upload-progress-cb false)))))
 
-(defn img-on-load [s editable url img]
+(defn img-on-load [s options editable url img]
   (if (and url img)
     (do
       (reset! (:me/media-photo s) (merge @(:me/media-photo s) {:width (.-width img) :height (.-height img)}))
       (gdom/removeNode img)
-      (media-photo-add-if-finished s editable))
-    (media-photo-add-error s)))
+      (media-photo-add-if-finished s options editable))
+    (media-photo-add-error s options)))
 
 (defn media-photo-dismiss-picker
   "Called every time the image picke close, reset to inital state."
@@ -186,20 +188,19 @@
     (reset! (:me/media-photo s) false)
     (.addPhoto editable nil nil nil nil)))
 
-(defn add-photo [s editable]
+(defn add-photo [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
     (.saveSelection editable)
     (reset! (:me/media-photo s) true)
-    (let [props (first (:rum/args s))
-          upload-progress-cb (:upload-progress-cb props)]
+    (let [upload-progress-cb (:upload-progress-cb options)]
       (iu/upload! {:accept "image/*"}
        ;; success-cb
        (fn [res]
          (reset! (:me/media-photo-did-success s) true)
          (let [url (oget res :url)
                img   (gdom/createDom "img")]
-           (set! (.-onload img) #(img-on-load s editable url img))
-           (set! (.-onerror img) #(img-on-load s editable nil nil))
+           (set! (.-onload img) #(img-on-load s options editable url img))
+           (set! (.-onerror img) #(img-on-load s options editable nil nil))
            (set! (.-className img) "hidden")
            (gdom/append (.-body js/document) img)
            (set! (.-src img) url)
@@ -210,20 +211,20 @@
              ;l use the same url for the thumbnail since the size doesn't matter
              (do
                (reset! (:me/media-photo s) (assoc @(:me/media-photo s) :thumbnail url))
-               (media-photo-add-if-finished s editable))
+               (media-photo-add-if-finished s options editable))
              ;; else create the thumbnail
              (iu/thumbnail! url
               (fn [thumbnail-url]
                 (reset! (:me/media-photo s) (assoc @(:me/media-photo s) :thumbnail thumbnail-url))
-                (media-photo-add-if-finished s editable))
+                (media-photo-add-if-finished s options editable))
               (fn [res progress])
               (fn [res err]
-                (media-photo-add-error s))))))
+                (media-photo-add-error s options))))))
        ;; progress-cb
        (fn [res progress])
        ;; error-cb
        (fn [err]
-         (media-photo-add-error s))
+         (media-photo-add-error s options))
        ;; close-cb
        (fn []
          ;; Delay the check because this is called on cancel but also on success
@@ -233,11 +234,13 @@
        ;; selected-cb
        (fn [res]
          (reset! (:me/upload-lock s) true)
-         (upload-progress-cb true))
+         (when (fn? upload-progress-cb)
+           (upload-progress-cb true)))
        ;; started-cb
        (fn [res]
          (reset! (:me/upload-lock s) true)
-         (upload-progress-cb true))))))
+         (when (fn? upload-progress-cb)
+           (upload-progress-cb true)))))))
 
 ;; Picker cb
 
@@ -246,15 +249,15 @@
     (= type "gif")
     (add-gif s editable)
     (= type "photo")
-    (add-photo s editable)
+    (add-photo s options editable)
     (= type "video")
     (add-video s options editable)
     (= type "attachment")
-    (add-attachment s editable)))
+    (add-attachment s options editable)))
 
 ;; DND
 
-(defn file-dnd-handler [s editor-ext file]
+(defn file-dnd-handler [s options editor-ext file]
   (if (< (oget file :size) (* 5 1000 1000))
     (if (.match (.-type file) "image")
       (iu/upload-file! file
@@ -274,7 +277,7 @@
                                  :file-type mimetype
                                  :file-size size
                                  :file-url url}
-                dispatch-input-key (:dispatch-input-key (first (:rum/args s)))]
+                dispatch-input-key (:dispatch-input-key options)]
             (activity-actions/add-attachment dispatch-input-key attachment-data)))))
     (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "dnd-file-too-big"
@@ -303,18 +306,25 @@
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
-            file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
+            enable-file-dragging? (and (not mobile-editor)
+                                       (:attachments-enabled options))
+            file-dragging-ext (when enable-file-dragging?
+                                (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
             buttons (if show-subtitle
                       ["bold" "italic" "unorderedlist" "anchor" "h2"]
                       ["bold" "italic" "unorderedlist" "anchor"])
-            extensions (if mobile-editor
-                          #js {"autolist" (js/AutoList.)
-                               "mention" (mention-utils/mention-ext users-list)}
-                          #js {"autolist" (js/AutoList.)
-                               "mention" (mention-utils/mention-ext users-list)
-                               "media-picker" media-picker-ext
-                               "fileDragging" false
-                               "carrotFileDragging" file-dragging-ext})
+            clj-extentions (if mobile-editor
+                             {"autolist" (js/AutoList.)
+                              "mention" (mention-utils/mention-ext users-list)
+                              "fileDragging" false}
+                             {"autolist" (js/AutoList.)
+                              "mention" (mention-utils/mention-ext users-list)
+                              "media-picker" media-picker-ext
+                              "fileDragging" false})
+            with-file-dragging (if enable-file-dragging?
+                                 (assoc clj-extentions "carrotFileDragging" file-dragging-ext)
+                                 clj-extentions)
+            extensions (clj->js clj-extentions)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                      :buttonLabels "fontawesome"
                      :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
@@ -372,14 +382,12 @@
         (.subscribe body-editor
                     "editableKeydown"
                     (fn [e editable]
-                      (let [opts (first (:rum/args s))
-                            cmd-enter-cb (:cmd-enter-cb opts)]
-                        (when (and (fn? cmd-enter-cb)
+                      (when (and (fn? (:cmd-enter-cb options))
                                    (.-metaKey e)
                                    (= "Enter" (.-key e)))
-                          (cmd-enter-cb e)))))
+                          ((:cmd-enter-cb options) e))))
         (reset! (:me/editor s) body-editor)
         ;; Setup autocomplete
-        (let [classes (:classes (first (:rum/args s)))]
+        (let [classes (:classes options)]
           (when (string/includes? classes "emoji-autocomplete")
             (js/emojiAutocomplete)))))))
