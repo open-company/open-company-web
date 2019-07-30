@@ -192,7 +192,8 @@
             "Get support"]]
         (when desktop-app-data
           [:a
-            {:href (:href desktop-app-data)}
+            {:href (:href desktop-app-data)
+             :target "_blank"}
             [:div.oc-menu-item.native-app
               (:title desktop-app-data)]])
         [:div.oc-menu-separator]
