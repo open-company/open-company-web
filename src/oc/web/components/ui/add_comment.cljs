@@ -209,5 +209,5 @@
                          :width 24
                          :height 24
                          :position "top"
-                         :default-field-selector add-comment-class
-                         :container-selector add-comment-class})]]]))
+                         :default-field-selector (str "div." add-comment-class)
+                         :container-selector (str "div." add-comment-class)})]]]))
