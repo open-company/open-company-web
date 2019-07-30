@@ -249,3 +249,7 @@
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)))
     db))
+
+(defmethod dispatcher/action :setup-section-editing
+  [db [_ board-data]]
+  (assoc db :initial-section-editing board-data))
