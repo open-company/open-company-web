@@ -100,10 +100,8 @@
                                      (not (utils/event-inside? e (sel1 [:div.giphy-picker]))))
                             (me-media-utils/media-gif-add s @(:me/media-picker-ext s) nil)
                             (reset! (:me/showing-gif-selector s) false))))
-                         {:init (fn [s]
-                           (reset! (::add-comment-id s) (utils/activity-uuid))
-                           s)
-                          :will-mount (fn [s]
+                         {:will-mount (fn [s]
+                          (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [activity-data (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
                                 add-comment-activity-data (get add-comment-data (:uuid activity-data))]
