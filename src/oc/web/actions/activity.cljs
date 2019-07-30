@@ -850,7 +850,7 @@
                                    cmail-state
                                    (not (:collapsed cmail-state)))
                              cmail-data
-                             (cmail-actions/get-default-section))]
+                             (cmail-actions/get-board-for-edit))]
       (activity-edit next-cmail-data)))
   ([activity-data]
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))
