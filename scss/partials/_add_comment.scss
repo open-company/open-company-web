@@ -91,6 +91,10 @@ div.add-comment-box-container {
           min-height: unset;
         }
 
+        &.medium-editor-placeholder-hidden:after {
+          display: none !important;
+        }
+
         &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
           @include OC_Body_Book();
           font-size: 16px;
