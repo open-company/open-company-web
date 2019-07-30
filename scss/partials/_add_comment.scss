@@ -48,13 +48,12 @@ div.add-comment-box-container {
       border: 1px solid $mid_light_grey;
       overflow-x: hidden;
       overflow-y: auto;
-
-      // position: relative;
-      // height: auto;
-      // margin-top: 8px;
+      padding: 9px 14px;
+      background-color: white;
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
       div.medium-editor-media-picker {
-        margin-top: 8px;
+        margin-top: 0;
         top: 0;
         left: unset;
         right: 16px;
@@ -76,12 +75,9 @@ div.add-comment-box-container {
         white-space: pre-wrap;
         word-wrap: break-word;
         margin: 0;
-        padding: 9px 14px;
-        background-color: white;
         height: auto;
-        min-height: 38px;
+        min-height: 20px;
         outline: none;
-        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
         @include mobile() {
           padding: 0;
@@ -93,13 +89,6 @@ div.add-comment-box-container {
 
         &.medium-editor-placeholder-hidden:after {
           display: none !important;
-        }
-
-        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-          @include OC_Body_Book();
-          font-size: 16px;
-          color: rgba($deep_navy, 0.5);
-          font-style: normal;
         }
 
         @include tablet() {
