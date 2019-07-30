@@ -34,7 +34,7 @@ div.stream-comments {
         }
 
         div.stream-comment-inner {
-          padding: 8px 16px;
+          padding: 16px;
         }
 
         @include big_web() {
@@ -117,7 +117,9 @@ div.stream-comments {
         }
 
         &.indented-comment div.stream-comment-inner{
-          padding-left: 56px;
+          margin-left: 40px;
+          // padding-left: 56px;
+          width: calc(100% - 40px);
         }
 
         div.stream-comment-floating-buttons {

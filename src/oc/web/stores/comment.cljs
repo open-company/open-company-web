@@ -71,8 +71,14 @@
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-add/finish
-  [db [_ {:keys [activity-data]}]]
-  (assoc db :comment-add-finish true))
+  [db [_ {:keys [activity-data body]}]]
+  (-> db
+    (assoc :comment-add-finish true)
+    (assoc :add-comment-highlight (:uuid body))))
+
+(defmethod dispatcher/action :add-comment-highlight-reset
+  [db [_]]
+  (dissoc db :add-comment-highlight))
 
 (defmethod dispatcher/action :comments-get
   [db [_ comments-key activity-data]]

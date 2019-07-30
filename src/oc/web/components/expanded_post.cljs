@@ -70,6 +70,7 @@
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
+  (drv/drv :add-comment-highlight)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -113,7 +114,8 @@
                         :height (utils/calc-video-height 638)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
         activities-read (drv/react s :activities-read)
-        reads-data (get activities-read (:uuid activity-data))]
+        reads-data (get activities-read (:uuid activity-data))
+        add-comment-highlight (drv/react s :add-comment-highlight)]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
@@ -184,6 +186,6 @@
           [:div.expanded-post-wrt-container
             (wrt-count activity-data reads-data)])]
       [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data)
+        (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
           (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))

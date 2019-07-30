@@ -94,7 +94,7 @@
   (comment-actions/react-from-picker (first (:rum/args s)) comment-data (get emoji "native")))
 
 (defn- reply-to [s parent-uuid]
-  (swap! (::replying-to s) #(clojure.set/union % #{parent-uuid})))
+  (swap! (::replying-to s) #(conj % parent-uuid)))
 
 (defn- copy-comment-url [comment-url]
   (let [input-field (.createElement js/document "input")]
@@ -105,19 +105,22 @@
     (utils/copy-to-clipboard input-field)
     (.removeChild (.-body js/document) input-field)))
 
+(defn- highlight-comment [s comment-id scroll?]
+  (when-let [comment-node (rum/ref-node s (str "stream-comment-" comment-id))]
+    (utils/after 10 (fn []
+     (swap! (::highlighting-comments s) #(conj % comment-id)
+     (when scroll?
+       (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"}))
+     (utils/after 1000(fn []
+      (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
+
 (defn- maybe-highlight-comment [s]
   (let [comments-data (second (:rum/args s))]
     (when (and comments-data
                (router/current-comment-id)
                (not @(::initial-comment-scroll s)))
-      (when-let [comment-node (rum/ref-node s
-                               (str "stream-comment-" (router/current-comment-id)))]
-        (reset! (::initial-comment-scroll s) true)
-        (utils/after 10 (fn []
-         (reset! (::highlight-comment-url s) true)
-         (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"})
-         (utils/after 1000(fn []
-          (reset! (::highlight-comment-url s) false)))))))))
+      (reset! (::initial-comment-scroll s) true)
+      (highlight-comment s (router/current-comment-id) true))))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
@@ -131,7 +134,7 @@
                              (rum/local nil ::show-picker)
                              (rum/local #{} ::replying-to)
                              (rum/local {} ::comment-url-copy)
-                             (rum/local false ::highlight-comment-url)
+                             (rum/local #{} ::highlighting-comments)
                              (rum/local false ::initial-comment-scroll)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
@@ -160,10 +163,14 @@
                               (maybe-highlight-comment s)
                               (when (not= (count (second (:rum/args o))) (count (second (:rum/args s))))
                                  (reset! (::replying-to s) #{}))
+                              (let [new-added-comment (nth (:rum/args s) 2)]
+                                (when new-added-comment
+                                  (utils/after 180 #(highlight-comment s new-added-comment false))
+                                  (comment-actions/add-comment-highlight-reset)))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s activity-data comments-data collapse-comments]
+  [s activity-data comments-data new-added-comment]
   [:div.stream-comments
     {:class (when (seq @(::editing? s)) "editing")}
     (if (pos? (count comments-data))
@@ -186,15 +193,15 @@
                     showing-picker? (and (seq @(::show-picker s))
                                          (= @(::show-picker s) (:uuid comment-data)))]]
           [:div.stream-comment-outer
-            {:key (str "stream-comment-" (:created-at comment-data))}
+            {:key (str "stream-comment-" (:created-at comment-data))
+             :data-comment-uuid (:uuid comment-data)}
             [:div.stream-comment
               {:ref (str "stream-comment-" (:uuid comment-data))
                :class (utils/class-set {:editing is-editing?
                                         :editing-other-comment (not (nil? @(::editing? s)))
                                         :showing-picker showing-picker?
                                         :indented-comment is-indented-comment?
-                                        :not-highlighted (or (not @(::highlight-comment-url s))
-                                                           (not= (:uuid comment-data) (router/current-comment-id)))})}
+                                        :not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))})}
               [:div.stream-comment-inner
                 (when-not is-editing?
                   (if (responsive/is-tablet-or-mobile?)
@@ -302,7 +309,7 @@
                                (or (responsive/is-tablet-or-mobile?)
                                    (seq (:reactions comment-data))))
                       [:div.stream-comment-reactions-footer.group
-                        (reactions comment-data false activity-data)]))]]
-            (when should-show-add-comment?
-              (add-comment activity-data (:reply-parent comment-data)))]])]
+                        (reactions comment-data false activity-data)]))]]]
+          (when should-show-add-comment?
+            (add-comment activity-data (:reply-parent comment-data)))])]
       [:div.stream-comments-empty])])
