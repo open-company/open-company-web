@@ -22,7 +22,6 @@
 ;; Add commnet handling
 
 (defn enable-add-comment? [s]
-  (reset! (::did-change s) true)
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [activity-data (first (:rum/args s))
           comment-text (cu/add-comment-content add-comment-div)
@@ -53,7 +52,8 @@
    :placeholder "Leave a new comment…"
    :use-inline-media-picker true})
 
-(defn add-emoji-cb [s]
+(defn add-comment-did-change [s]
+  (reset! (::did-change s) true)
   (enable-add-comment? s))
 
 (rum/defcs add-comment < rum/reactive
@@ -113,7 +113,7 @@
                                  activity-data (first (:rum/args s))
                                  add-comment-focus @(drv/get-ref s :add-comment-focus)
                                  should-focus-field? (= (:uuid activity-data) add-comment-focus)]
-                             (me-media-utils/setup-editor s enable-add-comment? me-options)
+                             (me-media-utils/setup-editor s add-comment-did-change me-options)
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
                                #(focus-add-comment s)))
@@ -138,7 +138,7 @@
                                 #(utils/to-end-of-content-editable add-comment-node))))
                            s)
                           :did-remount (fn [_ s]
-                           (me-media-utils/setup-editor s enable-add-comment? me-options)
+                           (me-media-utils/setup-editor s add-comment-did-change me-options)
                            s)
                           :will-update (fn [s]
                            (let [data @(drv/get-ref s :media-input)
@@ -203,7 +203,7 @@
             {:on-click #(send-clicked s parent-comment-uuid)
              :disabled @(::add-button-disabled s)}
             "Post"]
-          (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+          (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
                          :width 24
                          :height 24
                          :position "top"

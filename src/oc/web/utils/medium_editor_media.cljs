@@ -105,15 +105,14 @@
 
 ;; Video
 
-(defn add-video [s editable]
-  (let [options (first (:rum/args s))]
-    (when-not (:use-inline-media-picker options)
-      (let [editable (or editable (get-media-picker-extension s))]
-        (.saveSelection editable)))
-    (dis/dispatch! [:input [:media-input :media-video] true])
-    (reset! (:me/media-video s) true)
-    (when (:use-inline-media-picker options)
-      (reset! (:me/showing-media-video-modal s) true))))
+(defn add-video [s options editable]
+  (when-not (:use-inline-media-picker options)
+    (let [editable (or editable (get-media-picker-extension s))]
+      (.saveSelection editable)))
+  (dis/dispatch! [:input [:media-input :media-video] true])
+  (reset! (:me/media-video s) true)
+  (when (:use-inline-media-picker options)
+    (reset! (:me/showing-media-video-modal s) true)))
 
 (defn get-video-thumbnail [video]
   (cond
@@ -242,14 +241,14 @@
 
 ;; Picker cb
 
-(defn on-picker-click [s editable type]
+(defn on-picker-click [s options editable type]
   (cond
     (= type "gif")
     (add-gif s editable)
     (= type "photo")
     (add-photo s editable)
     (= type "video")
-    (add-video s editable)
+    (add-video s options editable)
     (= type "attachment")
     (add-attachment s editable)))
 
@@ -302,7 +301,7 @@
                                                              :alwaysExpanded (:use-inline-media-picker options)
                                                              :initiallyVisible (:use-inline-media-picker options)}
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
-                               :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
+                               :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
             buttons (if show-subtitle
