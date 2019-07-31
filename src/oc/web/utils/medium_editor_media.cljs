@@ -311,8 +311,8 @@
             file-dragging-ext (when enable-file-dragging?
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
             buttons (if show-subtitle
-                      ["bold" "italic" "unorderedlist" "anchor" "h2"]
-                      ["bold" "italic" "unorderedlist" "anchor"])
+                      ["bold" "italic" "unorderedlist" "anchor" "quote" "h2"]
+                      ["bold" "italic" "unorderedlist" "anchor" "quote"])
             clj-extentions (if mobile-editor
                              {"autolist" (js/AutoList.)
                               "mention" (mention-utils/mention-ext users-list)
