@@ -16,7 +16,8 @@
        :aspectRatio 1}}})
 
 (defn notification-title [notification]
-  (let [reminder? (:reminder? notification)
+  (let [mention? (:mention? notification)
+        reminder? (:reminder? notification)
         author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
         reminder (when reminder?
@@ -28,18 +29,29 @@
         entry-publisher (:entry-publisher notification)
         user-id (:user-id notification)]
     (cond
+      ;; A reminder was created for current user
       (and reminder
            (= notification-type "reminder-notification"))
       (str first-name " created a new reminder for you")
+      ;; A reminder has been triggered for the current user
       (and reminder
            (= notification-type "reminder-alert"))
       (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
-      (and (:mention? notification) (:interaction-id notification))
+      ;; Current user was mentioned in a comment
+      (and mention? (:interaction-id notification))
       (str first-name " mentioned you in a comment")
-      (:mention? notification)
+      ;; Current user was mentioned in a post
+      mention?
       (str first-name " mentioned you")
-      (and (:interaction-id notification) (not= (:user-id entry-publisher) user-id))
+      ;; A comment was added to a post the current is involved in
+      (and ;; if is a commnet
+           (:interaction-id notification)
+           ;; And the recipient of the notification is different than the
+           ;; author fo the post it means we are just following this post
+           ;; because we commented too
+           (not= (:user-id entry-publisher) user-id))
       (str "Also " first-name " commented on " (:name entry-publisher) "'s post")
+      ;; A comment was added to a post the current user published
       (:interaction-id notification)
       (str first-name " commented on your post")
       :else
