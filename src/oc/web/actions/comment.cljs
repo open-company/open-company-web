@@ -8,7 +8,8 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
-            [oc.web.actions.activity :as activity-actions]))
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.notifications :as notification-actions]))
 
 (defn add-comment-focus [activity-uuid]
   (dis/dispatch! [:add-comment-focus activity-uuid]))
@@ -30,7 +31,12 @@
   (activity-actions/send-item-read (:uuid activity-data))
   (let [org-slug (router/current-org-slug)
         comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
-        add-comment-link (utils/link-for (:links activity-data) "create" "POST")]
+        comments-data (get-in @dis/app-state comments-key)
+        add-comment-link (utils/link-for (:links activity-data) "create" "POST")
+        current-user-id (jwt/user-id)
+        is-publisher? (= (-> activity-data :publisher :user-id) current-user-id)
+        first-comment-from-user? (when-not is-publisher?
+                                   (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))]
     ;; Add the comment to the app-state to show it immediately
     (dis/dispatch! [:comment-add
                     activity-data
@@ -41,6 +47,14 @@
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
+        ;; If the user is not the publisher of the post and is leaving his first comment on it
+        ;; let's inform them that they are now following the post
+        (when (and success
+                   first-comment-from-user?)
+          (notification-actions/show-notification {:title "You are now following this post."
+                                                   :dismiss true
+                                                   :expire 3
+                                                   :id :first-comment-follow-post}))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
         (when success
