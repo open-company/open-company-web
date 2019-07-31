@@ -56,16 +56,6 @@
                                   }]}}]
     (new js/MediumEditor comment-node (clj->js config))))
 
-(defn add-comment-content [add-comment-div]
-  (let [inner-html (.-innerHTML add-comment-div)
-        replace-br (.replace inner-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
-        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "")
-        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "\n")
-        final-node (.html (js/$ "<div/>") cleaned-text-1)
-        final-text (.trim (.text final-node))]
-    (when (pos? (count final-text))
-      (string/trim (.html final-node)))))
-
 (defn- is-own-comment?
   [comment-data]
   (= (jwt/user-id) (:user-id (:author comment-data))))

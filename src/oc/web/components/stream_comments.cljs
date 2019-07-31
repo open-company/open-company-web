@@ -44,7 +44,7 @@
   [e s c]
   (let [activity-data (first (:rum/args s))
         new-comment (rum/ref-node s (str "comment-body-" (:uuid c)))
-        comment-text (cu/add-comment-content new-comment)]
+        comment-text (.-innerHTML new-comment)]
     (if (pos? (count comment-text))
       (do
         (stop-editing s)

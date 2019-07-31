@@ -24,7 +24,7 @@
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [activity-data (first (:rum/args s))
-          comment-text (cu/add-comment-content add-comment-div)
+          comment-text (.-innerHTML add-comment-div)
           next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
       (comment-actions/add-comment-change activity-data comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
@@ -42,7 +42,7 @@
 
 (defn- send-clicked [s parent-comment-uuid]
   (let [add-comment-div (rum/ref-node s "editor-node")
-        comment-body (cu/add-comment-content add-comment-div)
+        comment-body (.-innerHTML add-comment-div)
         activity-data (first (:rum/args s))]
     (set! (.-innerHTML add-comment-div) "")
     (comment-actions/add-comment activity-data comment-body parent-comment-uuid)))
