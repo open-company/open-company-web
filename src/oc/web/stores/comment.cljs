@@ -55,20 +55,21 @@
 
 (defmethod dispatcher/action :comment-add
   [db [_ activity-data comment-body parent-comment-uuid comments-key]]
-  (let [comments-data (get-in db comments-key)
-        user-data (if (jwt/jwt)
-                    (jwt/get-contents)
-                    (jwt/get-id-token-contents))
-        new-comment-data (parse-comment (dispatcher/org-data db)
-                                        activity-data
-                                        {:body comment-body
-                                         :created-at (utils/as-of-now)
-                                         :parent-uuid parent-comment-uuid
-                                         :author {:name (:name user-data)
-                                                  :avatar-url (:avatar-url user-data)
-                                                  :user-id (:user-id user-data)}})
-        new-comments-data (comment-utils/sort-comments (conj comments-data new-comment-data))]
-    (assoc-in db comments-key new-comments-data)))
+  ; (let [comments-data (get-in db comments-key)
+  ;       user-data (if (jwt/jwt)
+  ;                   (jwt/get-contents)
+  ;                   (jwt/get-id-token-contents))
+  ;       new-comment-data (parse-comment (dispatcher/org-data db)
+  ;                                       activity-data
+  ;                                       {:body comment-body
+  ;                                        :created-at (utils/as-of-now)
+  ;                                        :parent-uuid parent-comment-uuid
+  ;                                        :author {:name (:name user-data)
+  ;                                                 :avatar-url (:avatar-url user-data)
+  ;                                                 :user-id (:user-id user-data)}})
+  ;       new-comments-data (comment-utils/sort-comments (conj comments-data new-comment-data))]
+  ;   (assoc-in db comments-key new-comments-data))
+  db)
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [activity-data body]}]]
