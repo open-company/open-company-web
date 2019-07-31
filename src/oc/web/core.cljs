@@ -6,6 +6,8 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            ;; Pull in functions for interfacing with Expo mobile app
+            [oc.web.expo :as expo]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
