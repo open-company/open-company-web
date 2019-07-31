@@ -35,6 +35,10 @@ div.stream-comments {
 
         div.stream-comment-inner {
           padding: 16px;
+
+          @include mobile() {
+            padding: 8px 16px;
+          }
         }
 
         @include big_web() {
