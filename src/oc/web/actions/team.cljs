@@ -88,8 +88,10 @@
         (utils/maybe-after load-delay #(team-get team-link))
         (when channels-link
           (utils/maybe-after load-delay #(enumerate-channels team))))
+      ;; Do not delay the roster load since it's needed for the mentions extention
+      ;; that needs to be initialized with the rich-body-editor or the add-comment components
       (when roster-link
-        (utils/maybe-after load-delay #(roster-get roster-link))))))
+        (roster-get roster-link)))))
 
 (defn teams-get-cb [{:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))]

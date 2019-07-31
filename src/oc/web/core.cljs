@@ -179,7 +179,6 @@
         bot-access (when (contains? query-params :access)
                       (:access query-params))
         next-app-state {:loading loading
-                        :ap-initial-at (when has-at-param (:at query-params))
                         :panel-stack panel-stack
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
@@ -263,11 +262,12 @@
     (drv-root component target)))
 
 ;; Component specific to a secure activity
-(defn secure-activity-handler [component route target params]
+(defn secure-activity-handler [component route target params pre-routing?]
   (let [org (:org params)
         secure-id (:secure-id params)
         query-params (:query-params params)]
-    (pre-routing query-params true)
+    (when pre-routing?
+      (pre-routing query-params true))
     ;; save the route
     (router/set-route!
      (vec
@@ -276,7 +276,7 @@
        [org route secure-id]))
      {:org org
       :activity (:entry params)
-      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
+      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
@@ -286,15 +286,15 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
-    (aa/secure-activity-chain)
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
 (defn entry-handler [target params]
+  (pre-routing (:query-params params) true)
   (if (and (not (jwt/jwt))
-           (:secure-uuid (jwt/get-id-token-contents
-                          (:id (:query-params params)))))
-    (secure-activity-handler secure-activity "secure-activity" target params)
+           (:secure-uuid (jwt/get-id-token-contents)))
+    (secure-activity-handler secure-activity "secure-activity" target params false)
     (board-handler "activity" target org-dashboard params)))
 
 (defn slack-lander-check [params]
@@ -584,11 +584,11 @@
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
-      (secure-activity-handler secure-activity "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params true))
 
     (defroute secure-activity-slash-route (str (urls/secure-activity ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
-      (secure-activity-handler secure-activity "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params true))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
