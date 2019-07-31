@@ -24,7 +24,9 @@
         notification-type (when reminder?
                             (:notification-type reminder))
         reminder-assignee (when reminder?
-                            (:assignee reminder))]
+                            (:assignee reminder))
+        entry-publisher (:entry-publisher notification)
+        user-id (:user-id notification)]
     (cond
       (and reminder
            (= notification-type "reminder-notification"))
@@ -36,6 +38,8 @@
       (str first-name " mentioned you in a comment")
       (:mention? notification)
       (str first-name " mentioned you")
+      (and (:interaction-id notification) (not= (:user-id entry-publisher) user-id))
+      (str "Also " first-name " commented on " (:name entry-publisher) "'s post")
       (:interaction-id notification)
       (str first-name " commented on your post")
       :else
