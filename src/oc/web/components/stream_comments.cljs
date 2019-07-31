@@ -136,6 +136,7 @@
                              (rum/local {} ::comment-url-copy)
                              (rum/local #{} ::highlighting-comments)
                              (rum/local false ::initial-comment-scroll)
+                             (rum/local nil ::show-more-menu)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              ui-mixins/refresh-tooltips-mixin
@@ -201,7 +202,8 @@
                                         :editing-other-comment (not (nil? @(::editing? s)))
                                         :showing-picker showing-picker?
                                         :indented-comment is-indented-comment?
-                                        :not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))})}
+                                        :not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))})
+               :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
               [:div.stream-comment-inner
                 (when-not is-editing?
                   (if (responsive/is-tablet-or-mobile?)
@@ -214,63 +216,96 @@
                                                    :delete-cb (partial delete-clicked s activity-data)
                                                    :show-unread false})]
                     [:div.stream-comment-floating-buttons
-                      {:class (utils/class-set {:can-edit can-show-edit-bt?
-                                                :can-delete can-show-delete-bt?
-                                                :can-reply (:reply-parent comment-data)})
-                       :key (str "stream-comment-floating-buttons"
+                      {:key (str "stream-comment-floating-buttons"
                              (when can-show-edit-bt?
                                "-edit")
                              (when can-show-delete-bt?
                                "-delete"))}
-                      (when can-show-edit-bt?
-                        [:div.bt-container.edit-bt
-                          [:button.mlb-reset
-                            {:data-toggle "tooltip"
-                             :data-placement "top"
-                             :title "Edit"
-                             :on-click (fn [_]
-                                        (start-editing s comment-data))}]])
-                      (when can-show-delete-bt?
-                        [:div.bt-container.delete-bt
-                          [:button.mlb-reset
-                            {:data-toggle "tooltip"
-                             :data-placement "top"
-                             :title "Delete"
-                             :on-click (fn [_]
-                                        (delete-clicked s activity-data comment-data))}]])
-                      (when (:url comment-data)
-                        [:div.bt-container.share-bt
-                          [:button.mlb-reset
-                            {:data-toggle "tooltip"
-                             :data-placement "top"
-                             :on-click #(do
-                                          (copy-comment-url (:url comment-data))
-                                          (notification-actions/show-notification {:title "Share link copied to clipboard"
-                                                                                   :dismiss true
-                                                                                   :id (keyword (str "comment-url-copied-"
-                                                                                    (:uuid comment-data)))}))
-                             :title "Share"}]])
-                      (when (:reply-parent comment-data)
-                        [:div.bt-container.reply-bt
-                          [:button.mlb-reset
-                            {:data-toggle "tooltip"
-                             :data-placement "top"
-                             :on-click #(reply-to s (:reply-parent comment-data))
-                             :title "Reply"}]])
-                      [:div.bt-container.react-bt
-                        [:button.mlb-reset
-                          {:data-toggle "tooltip"
-                           :data-placement "top"
-                           :title "Add reaction"
-                           :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                        (when showing-picker?
-                          (react-utils/build (.-Picker js/EmojiMart)
-                           {:native true
-                            :onClick (fn [emoji event]
-                                       (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-                                         (comment-actions/react-from-picker activity-data comment-data
-                                          (gobj/get emoji "native")))
-                                       (reset! (::show-picker s) nil))}))]]))
+                      (if (or can-show-edit-bt?
+                              can-show-delete-bt?)
+                        [:div.stream-comment-floating-buttons-inner
+                          (when (= @(::show-more-menu s) (:uuid comment-data))
+                            [:div.stream-comment-floating-buttons-more-menu
+                              (when can-show-edit-bt?
+                                [:button.mlb-reset.edit-bt
+                                  {:on-click (fn [_]
+                                              (start-editing s comment-data))}
+                                  "Edit"])
+                              (when can-show-delete-bt?
+                                [:button.mlb-reset.delete-bt
+                                  {:on-click (fn [_]
+                                              (delete-clicked s activity-data comment-data))}
+                                  "Delete"])
+                              (when (:url comment-data)
+                                [:button.mlb-reset.share-bt
+                                  {:on-click #(do
+                                                (copy-comment-url (:url comment-data))
+                                                (notification-actions/show-notification {:title "Share link copied to clipboard"
+                                                                                         :dismiss true
+                                                                                         :id (keyword (str "comment-url-copied-"
+                                                                                          (:uuid comment-data)))}))}
+                                  "Share"])])
+                          [:div.bt-container.more-menu-bt
+                            [:button.mlb-reset
+                              {:on-click (fn [_] (swap! (::show-more-menu s) #(if (= % (:uuid comment-data)) nil (:uuid comment-data))))
+                               :data-toggle "tooltip"
+                               :data-placement "top"
+                               :title "More"}]]
+                          (when (:reply-parent comment-data)
+                            [:div.bt-container.reply-bt
+                              [:button.mlb-reset
+                                {:data-toggle "tooltip"
+                                 :data-placement "top"
+                                 :on-click #(reply-to s (:reply-parent comment-data))
+                                 :title "Reply"}]])
+                          [:div.bt-container.react-bt
+                            [:button.mlb-reset
+                              {:data-toggle "tooltip"
+                               :data-placement "top"
+                               :title "Add reaction"
+                               :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
+                            (when showing-picker?
+                              (react-utils/build (.-Picker js/EmojiMart)
+                               {:native true
+                                :onClick (fn [emoji event]
+                                           (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                             (comment-actions/react-from-picker activity-data comment-data
+                                              (gobj/get emoji "native")))
+                                           (reset! (::show-picker s) nil))}))]]
+                        [:div.stream-comment-floating-buttons-inner
+                          (when (:url comment-data)
+                            [:div.bt-container.share-bt
+                              [:button.mlb-reset
+                                {:data-toggle "tooltip"
+                                 :data-placement "top"
+                                 :on-click #(do
+                                              (copy-comment-url (:url comment-data))
+                                              (notification-actions/show-notification {:title "Share link copied to clipboard"
+                                                                                       :dismiss true
+                                                                                       :id (keyword (str "comment-url-copied-"
+                                                                                        (:uuid comment-data)))}))
+                                 :title "Share"}]])
+                          (when (:reply-parent comment-data)
+                            [:div.bt-container.reply-bt
+                              [:button.mlb-reset
+                                {:data-toggle "tooltip"
+                                 :data-placement "top"
+                                 :on-click #(reply-to s (:reply-parent comment-data))
+                                 :title "Reply"}]])
+                          [:div.bt-container.react-bt
+                            [:button.mlb-reset
+                              {:data-toggle "tooltip"
+                               :data-placement "top"
+                               :title "Add reaction"
+                               :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
+                            (when showing-picker?
+                              (react-utils/build (.-Picker js/EmojiMart)
+                               {:native true
+                                :onClick (fn [emoji event]
+                                           (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+                                             (comment-actions/react-from-picker activity-data comment-data
+                                              (gobj/get emoji "native")))
+                                           (reset! (::show-picker s) nil))}))]])]))
                 [:div.stream-comment-author-avatar
                   (user-avatar-image (:author comment-data))]
 

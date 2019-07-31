@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="14px" viewBox="0 0 16 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
     <g id="Post-commenting" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Commenting:-mulit-thread" transform="translate(-900.000000, -228.000000)" fill="#FFFFFF" fill-rule="nonzero">
-            <g id="Group-5" transform="translate(304.000000, 188.000000)">
-                <g id="Group-3" transform="translate(517.000000, 34.000000)">
-                    <g id="Group-11">
-                        <g id="Group">
-                            <path d="M89.9501593,11.25 C91.8090128,11.25 93.3157895,12.8165422 93.3157895,14.75 C93.3157895,16.6816493 91.8064644,18.25 89.9501593,18.25 L79.8421053,18.25 C79.3770234,18.25 79,18.6417508 79,19.125 C79,19.6082492 79.3770234,20 79.8421053,20 L89.9501593,20 C92.7366444,20 95,17.6481307 95,14.75 C95,11.8502707 92.739395,9.5 89.9501593,9.5 L81.8751272,9.5 L83.8059847,7.49371843 C84.1348472,7.15200968 84.1348472,6.59799032 83.8059847,6.25628157 C83.4771221,5.91457281 82.9439305,5.91457281 82.615068,6.25628157 L79.2466469,9.75628157 C78.9177844,10.0979903 78.9177844,10.6520097 79.2466469,10.9937184 L82.615068,14.4937184 C82.9439305,14.8354272 83.4771221,14.8354272 83.8059847,14.4937184 C84.1348472,14.1520097 84.1348472,13.5979903 83.8059847,13.2562816 L81.8751272,11.25 L89.9501593,11.25 Z" id="Combined-Shape"></path>
-                        </g>
+        <g id="Comment-action-bar-updates" transform="translate(-367.000000, -413.000000)" fill="#FFFFFF">
+            <g id="Group-5" transform="translate(210.000000, 214.000000)">
+                <g id="Group-4" transform="translate(0.000000, 152.000000)">
+                    <g id="Action-bar-Copy" transform="translate(114.000000, 39.000000)">
+                        <path d="M55,19.317309 C55,19.9818139 54.5677307,20.1971505 54.0409577,19.8031077 L51.1,17.6031786 L44.2000077,17.6031786 C43.5372617,17.6031786 43,17.0662926 43,16.4015035 L43,9.20167506 C43,8.53800825 43.5389274,8 44.2000077,8 L53.7999923,8 C54.4627383,8 55,8.53688596 55,9.20167506 L55,19.317309 Z" id="Combined-Shape"></path>
                     </g>
                 </g>
             </g>
