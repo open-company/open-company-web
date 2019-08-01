@@ -664,6 +664,7 @@
                     "OK, got it"]]])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
+                               :media-picker-initially-visible true
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
