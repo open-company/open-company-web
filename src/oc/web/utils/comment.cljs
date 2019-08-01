@@ -56,6 +56,12 @@
                                   }]}}]
     (new js/MediumEditor comment-node (clj->js config))))
 
+(defn add-comment-content [comment-node & [print?]]
+  (let [comment-html (.-innerHTML comment-node)
+        $comment-node (js/$ comment-html)
+        _remove-mentions-popup (.remove $comment-node ".oc-mention-popup")]
+    (.html $comment-node)))
+
 (defn- is-own-comment?
   [comment-data]
   (= (jwt/user-id) (:user-id (:author comment-data))))
