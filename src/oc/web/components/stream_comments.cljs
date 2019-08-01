@@ -44,7 +44,7 @@
   [e s c]
   (let [activity-data (first (:rum/args s))
         new-comment (rum/ref-node s (str "comment-body-" (:uuid c)))
-        comment-text (.-innerHTML new-comment)]
+        comment-text (cu/add-comment-content new-comment)]
     (if (pos? (count comment-text))
       (do
         (stop-editing s)
@@ -246,12 +246,12 @@
                         ;; More menu button or share button (depends if user is author of the comment)
                         (if (or can-show-edit-bt?
                                 can-show-delete-bt?)
-                          [:button.mlb-reset.green-bt.more-menu-bt
+                          [:button.mlb-reset.floating-bt.more-menu-bt
                             {:on-click (fn [_] (swap! (::show-more-menu s) #(if (= % (:uuid comment-data)) nil (:uuid comment-data))))
                              :data-toggle "tooltip"
                              :data-placement "top"
                              :title "More"}]
-                          [:button.mlb-reset.green-bt.share-bt
+                          [:button.mlb-reset.floating-bt.share-bt
                             {:data-toggle "tooltip"
                              :data-placement "top"
                              :on-click #(do
@@ -263,14 +263,14 @@
                              :title "Share"}])
                         ;; Reply to comment
                         (when (:reply-parent comment-data)
-                          [:button.mlb-reset.green-bt.reply-bt
+                          [:button.mlb-reset.floating-bt.reply-bt
                             {:data-toggle "tooltip"
                              :data-placement "top"
                              :on-click #(reply-to s (:reply-parent comment-data))
                              :title "Reply"}])
                         ;; React container
-                        [:div.bt-container
-                          [:button.mlb-reset.green-bt.react-bt
+                        [:div.react-bt-container
+                          [:button.mlb-reset.floating-bt.react-bt
                             {:data-toggle "tooltip"
                              :data-placement "top"
                              :title "Add reaction"

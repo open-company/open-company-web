@@ -4,13 +4,9 @@
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
     <g id="Post-commenting" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Comment-action-bar-updates" transform="translate(-367.000000, -413.000000)" fill="#FFFFFF">
-            <g id="Group-5" transform="translate(210.000000, 214.000000)">
-                <g id="Group-4" transform="translate(0.000000, 152.000000)">
-                    <g id="Action-bar-Copy" transform="translate(114.000000, 39.000000)">
-                        <path d="M55,19.317309 C55,19.9818139 54.5677307,20.1971505 54.0409577,19.8031077 L51.1,17.6031786 L44.2000077,17.6031786 C43.5372617,17.6031786 43,17.0662926 43,16.4015035 L43,9.20167506 C43,8.53800825 43.5389274,8 44.2000077,8 L53.7999923,8 C54.4627383,8 55,8.53688596 55,9.20167506 L55,19.317309 Z" id="Combined-Shape"></path>
-                    </g>
-                </g>
+        <g id="Comment-action-updates" transform="translate(-911.000000, -245.000000)" fill="#34414F">
+            <g id="Group-13" transform="translate(911.000000, 244.000000)">
+                <path d="M12,12.317309 C12,12.9818139 11.5677307,13.1971505 11.0409577,12.8031077 L8.1,10.6031786 L1.20000766,10.6031786 C0.537261729,10.6031786 0,10.0662926 0,9.40150354 L0,2.20167506 C0,1.53800825 0.538927428,1 1.20000766,1 L10.7999923,1 C11.4627383,1 12,1.53688596 12,2.20167506 L12,12.317309 Z" id="Combined-Shape"></path>
             </g>
         </g>
     </g>
