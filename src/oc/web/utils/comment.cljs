@@ -107,7 +107,7 @@
   ([comments :guard sequential?]
    (let [root-comments (filterv :thread-root comments)
          sorted-roots (sort-comments root-comments nil)]
-     (apply concat (mapv #(concat [%] (sort-comments comments (:uuid %))) sorted-roots))))
+     (vec (apply concat (mapv #(concat [%] (sort-comments comments (:uuid %))) sorted-roots)))))
   ([comments :guard sequential? parent-uuid]
    (let [filtered-comments (filterv #(if parent-uuid
                                        (= (:parent-uuid %) parent-uuid)
