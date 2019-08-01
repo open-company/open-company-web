@@ -434,6 +434,16 @@
            :primary-bt-dismiss true
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
 
+(defn add-expo-push-token [push-token]
+  (let [user-data (dis/current-user-data)
+        add-token-link (utils/link-for (:links user-data) "add-expo-push-token" "POST")]
+    (when (and add-token-link push-token)
+      (api/add-expo-push-token
+       add-token-link
+       push-token
+       (fn [success]
+         (timbre/info "Successfully saved Expo push notification token"))))))
+
 ;; Initial loading
 
 (defn initial-loading [& [force-refresh]]
