@@ -25,7 +25,7 @@
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [activity-data (first (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
-          next-add-bt-disabled (or (nil? comment-text) (zero? (count comment-text)))]
+          next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))]
       (comment-actions/add-comment-change activity-data comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
@@ -37,12 +37,12 @@
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
     (enable-add-comment? s)
-    (when (zero? (count (.-innerText add-comment-node)))
+    (when (not (seq (.-innerHTML add-comment-node)))
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [s parent-comment-uuid]
   (let [add-comment-div (rum/ref-node s "editor-node")
-        comment-body (.-innerHTML add-comment-div)
+        comment-body (cu/add-comment-content add-comment-div true)
         activity-data (first (:rum/args s))]
     (set! (.-innerHTML add-comment-div) "")
     (comment-actions/add-comment activity-data comment-body parent-comment-uuid)))
@@ -54,6 +54,7 @@
 
 (defn add-comment-did-change [s]
   (reset! (::did-change s) true)
+  (reset! (::show-post-button s) true)
   (enable-add-comment? s))
 
 (rum/defcs add-comment < rum/reactive
@@ -84,6 +85,7 @@
                          (rum/local nil ::blur-listener)
                          (rum/local "" ::initial-add-comment)
                          (rum/local false ::did-change)
+                         (rum/local false ::show-post-button)
                          ;; Mixins
                          ;; Mixins
                          ui-mixins/first-render-mixin
@@ -116,7 +118,9 @@
                              (me-media-utils/setup-editor s add-comment-did-change me-options)
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
-                               #(focus-add-comment s)))
+                               #(do
+                                 (reset! (::show-post-button s) true)
+                                 (focus-add-comment s))))
                              (reset! (::blur-listener s)
                               (events/listen add-comment-node EventType/BLUR
                                #(disable-add-comment-if-needed s)))
@@ -171,10 +175,11 @@
   [s activity-data parent-comment-uuid]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
-        _add-comment-focus (drv/react s :add-comment-focus)
         _team-roster (drv/react s :team-roster)
+        add-comment-focus (drv/react s :add-comment-focus)
         current-user-data (drv/react s :current-user-data)
-        add-comment-class (str "add-comment-" @(::add-comment-id s))]
+        add-comment-class (str "add-comment-" @(::add-comment-id s))
+        show-footer? (or @(::show-post-button s) (= (:uuid activity-data) add-comment-focus))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         (user-avatar-image current-user-data)
@@ -199,6 +204,7 @@
                                          (reset! (:me/showing-gif-selector s) false)
                                          (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))}))
         [:div.add-comment-footer
+          {:class (when-not show-footer? "hidden")}
           [:button.mlb-reset.send-btn
             {:on-click #(send-clicked s parent-comment-uuid)
              :disabled @(::add-button-disabled s)}
