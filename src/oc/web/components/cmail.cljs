@@ -171,7 +171,7 @@
 
 (defn- abstract-on-change [state]
   (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
-    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.text $abstract)
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.html $abstract)
                                                      :has-changes true})])
     (check-limits state)))
 
