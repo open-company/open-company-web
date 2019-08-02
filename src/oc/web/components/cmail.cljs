@@ -403,25 +403,22 @@
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
                         (reset! (::saving s) false)
-                        (if (:error cmail-data)
-                          (reset! (::disable-post s) false)
+                        (reset! (::disable-post s) false)
+                        (when-not (:error cmail-data)
                           (real-close)))
                       (when (and @(::publishing s)
                                  (not (:publishing cmail-data)))
                         (reset! (::publishing s) false)
-                        (if (:error cmail-data)
-                          (reset! (::disable-post s) false)
-                          (let [redirect? (seq (:board-slug cmail-data))]
+                        (reset! (::disable-post s) false)
+                        (when-not (:error cmail-data)
+                          (when-let [redirect? (seq (:board-slug cmail-data))]
                             ;; Redirect to the publishing board if the slug is available
-                            (if redirect?
-                              (do
-                                (real-close)
-                                (utils/after
-                                 180
-                                 #(router/nav! (if (= (router/current-board-slug) "all-posts")
-                                                 (oc-urls/all-posts)
-                                                 (oc-urls/board (:board-slug cmail-data))))))
-                              (reset! (::disable-post s) false))))))
+                            (real-close)
+                            (utils/after
+                             180
+                             #(router/nav! (if (= (router/current-board-slug) "all-posts")
+                                             (oc-urls/all-posts)
+                                             (oc-urls/board (:board-slug cmail-data)))))))))
                     s)
                    :after-render (fn [s]
                     (fix-tooltips s)
