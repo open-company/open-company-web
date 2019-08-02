@@ -96,6 +96,10 @@ div.notifications {
         width: calc(100% - 26px);
         float: left;
       }
+
+      div.notification-description {
+        float: left;
+      }
     }
 
     &.mention-notification {
