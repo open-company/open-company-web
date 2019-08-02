@@ -40,8 +40,8 @@
                                                (:uuid activity-data) (:uuid comment-map))))))))
 
 (defmethod dispatcher/action :add-comment-change
-  [db [_ org-slug activity-uuid comment-body]]
-  (let [add-comment-activity-key (dispatcher/add-comment-activity-key org-slug activity-uuid)]
+  [db [_ org-slug activity-uuid parent-comment-uuid comment-body]]
+  (let [add-comment-activity-key (dispatcher/add-comment-activity-key org-slug (str activity-uuid "-" parent-comment-uuid))]
     (assoc-in db add-comment-activity-key comment-body)))
 
 (defmethod dispatcher/action :add-comment-remove

@@ -94,7 +94,8 @@
   (comment-actions/react-from-picker (first (:rum/args s)) comment-data (get emoji "native")))
 
 (defn- reply-to [s parent-uuid]
-  (swap! (::replying-to s) #(conj % parent-uuid)))
+  (swap! (::replying-to s) #(conj % parent-uuid))
+  (comment-actions/add-comment-focus parent-uuid))
 
 (defn- copy-comment-url [comment-url]
   (let [input-field (.createElement js/document "input")]

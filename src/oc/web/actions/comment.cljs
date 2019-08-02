@@ -17,9 +17,9 @@
 (defn add-comment-blur []
   (dis/dispatch! [:add-comment-focus nil]))
 
-(defn add-comment-change [activity-data comment-body]
+(defn add-comment-change [activity-data parent-comment-uuid comment-body]
   ;; Save the comment change in the app state to remember it
-  (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) comment-body]))
+  (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid comment-body]))
 
 (defn add-comment-cancel [activity-data]
   ;; Remove cached comment for activity

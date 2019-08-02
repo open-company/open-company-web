@@ -24,15 +24,20 @@
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [activity-data (first (:rum/args s))
+          parent-comment-uuid (second (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
           next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))]
-      (comment-actions/add-comment-change activity-data comment-text)
+      (comment-actions/add-comment-change activity-data parent-comment-uuid comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
 (defn focus-add-comment [s]
   (enable-add-comment? s)
-  (comment-actions/add-comment-focus (:uuid (first (:rum/args s)))))
+  (let [activity-data (first (:rum/args s))
+        parent-comment-uuid (second (:rum/args s))]
+    (if parent-comment-uuid
+      (comment-actions/add-comment-focus parent-comment-uuid)
+      (comment-actions/add-comment-focus (:uuid activity-data)))))
 
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
@@ -50,12 +55,22 @@
 (def me-options
   {:media-config ["gif" "photo" "video"]
    :placeholder "Leave a new comment…"
-   :use-inline-media-picker true})
+   :use-inline-media-picker true
+   :media-picker-initially-visible false})
 
 (defn add-comment-did-change [s]
   (reset! (::did-change s) true)
   (reset! (::show-post-button s) true)
   (enable-add-comment? s))
+
+(defn- should-focus-field? [s]
+  (let [activity-data (first (:rum/args s))
+        parent-comment-uuid (second (:rum/args s))
+        add-comment-focus @(drv/get-ref s :add-comment-focus)]
+    (or (and (= (:uuid activity-data) add-comment-focus)
+             (not parent-comment-uuid))
+        (and (seq parent-comment-uuid)
+             (= parent-comment-uuid add-comment-focus)))))
 
 (rum/defcs add-comment < rum/reactive
                          ;; Locals
@@ -80,9 +95,6 @@
                          (drv/drv :current-user-data)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
-                         (rum/local nil ::esc-key-listener)
-                         (rum/local nil ::focus-listener)
-                         (rum/local nil ::blur-listener)
                          (rum/local "" ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
@@ -106,40 +118,18 @@
                           (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [activity-data (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
-                                add-comment-activity-data (get add-comment-data (:uuid activity-data))]
-                            (reset! (::initial-add-comment s) (or add-comment-activity-data "")))
+                                activity-add-comment-data (get add-comment-data (:uuid activity-data))]
+                            (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
+                            (reset! (::show-post-button s) should-focus-field?))
                           s)
                           :did-mount (fn [s]
-                           (utils/after 2500 #(js/emojiAutocomplete))
-                           (let [add-comment-node (rum/ref-node s "editor-node")
-                                 activity-data (first (:rum/args s))
-                                 add-comment-focus @(drv/get-ref s :add-comment-focus)
-                                 should-focus-field? (= (:uuid activity-data) add-comment-focus)]
-                             (me-media-utils/setup-editor s add-comment-did-change me-options)
-                             (reset! (::focus-listener s)
-                              (events/listen add-comment-node EventType/FOCUS
-                               #(do
-                                 (reset! (::show-post-button s) true)
-                                 (focus-add-comment s))))
-                             (reset! (::blur-listener s)
-                              (events/listen add-comment-node EventType/BLUR
-                               #(disable-add-comment-if-needed s)))
-                             (reset! (::esc-key-listener s)
-                               (events/listen
-                                js/window
-                                EventType/KEYDOWN
-                                (fn [e]
-                                  (when (and (= (.-key e) "Escape")
-                                             (= (.-activeElement js/document) add-comment-node))
-                                    (.blur add-comment-node))
-                                  (when (and (= (.-activeElement js/document) add-comment-node)
-                                             (.-metaKey e)
-                                             (= (.-key e) "Enter"))
-                                    (send-clicked s (second (:rum/args s)))))))
-                             (when should-focus-field?
+                           (me-media-utils/setup-editor s add-comment-did-change me-options)
+                           (let [add-comment-node (rum/ref-node s "editor-node")]
+                             (when (should-focus-field? s)
                                (.focus add-comment-node)
                                (utils/after 0
                                 #(utils/to-end-of-content-editable add-comment-node))))
+                           (utils/after 2500 #(js/emojiAutocomplete))
                            s)
                           :did-remount (fn [_ s]
                            (me-media-utils/setup-editor s add-comment-did-change me-options)
@@ -162,15 +152,6 @@
                            (when @(:me/editor s)
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
-                           (when @(::esc-key-listener s)
-                             (events/unlistenByKey @(::esc-key-listener s))
-                             (reset! (::esc-key-listener s) nil))
-                           (when @(::focus-listener s)
-                             (events/unlistenByKey @(::focus-listener s))
-                             (reset! (::focus-listener s) nil))
-                           (when @(::blur-listener s)
-                             (events/unlistenByKey @(::blur-listener s))
-                             (reset! (::blur-listener s) nil))
                            s)}
   [s activity-data parent-comment-uuid]
   (let [_add-comment-data (drv/react s :add-comment-data)
@@ -178,8 +159,7 @@
         _team-roster (drv/react s :team-roster)
         add-comment-focus (drv/react s :add-comment-focus)
         current-user-data (drv/react s :current-user-data)
-        add-comment-class (str "add-comment-" @(::add-comment-id s))
-        show-footer? (or @(::show-post-button s) (= (:uuid activity-data) add-comment-focus))]
+        add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         (user-avatar-image current-user-data)
@@ -189,6 +169,17 @@
             :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden @(::did-change s)
                                      utils/hide-class true})
+            :on-focus #(focus-add-comment s)
+            :on-blur #(disable-add-comment-if-needed s)
+            :on-key-down (fn [e]
+                          (let [add-comment-node (rum/ref-node s "editor-node")]
+                            (when (and (= (.-key e) "Escape")
+                                       (= (.-activeElement js/document) add-comment-node))
+                              (.blur add-comment-node))
+                            (when (and (= (.-activeElement js/document) add-comment-node)
+                                       (.-metaKey e)
+                                       (= (.-key e) "Enter"))
+                              (send-clicked s (second (:rum/args s))))))
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
         (when @(:me/showing-media-video-modal s)
@@ -204,7 +195,7 @@
                                          (reset! (:me/showing-gif-selector s) false)
                                          (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))}))
         [:div.add-comment-footer
-          {:class (when-not show-footer? "hidden")}
+          {:class (when-not @(::show-post-button s) "hidden")}
           [:button.mlb-reset.send-btn
             {:on-click #(send-clicked s parent-comment-uuid)
              :disabled @(::add-button-disabled s)}
