@@ -19,7 +19,9 @@
             [oc.web.actions.jwt :as jwt-actions]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.actions.team :as team-actions]
+            [oc.web.utils.comment :as comment-utils]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;;User walls
@@ -78,20 +80,24 @@
        (fn [orgs collection]
          (if org-slug
            (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
+             ;; We got the org we were looking for
              (org-actions/get-org org-data)
-             (let [ap-initial-at (:ap-initial-at @dis/app-state)
-                   currently-logged-in (jwt/jwt)]
-               (when-not (or (router/current-activity-id)
-                             ap-initial-at)
-                 ;; 404 only if the user is not looking at a secure post page
-                 ;; if so the entry point response can not include the specified org
+             (if (router/current-secure-activity-id)
+               (activity-actions/secure-activity-get
+                #(comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
+               (do
+                 ;; avoid infinite loop of the Go to digest button
+                 ;; by changing the value of the last visited slug
+                 (if (pos? (count orgs))
+                   ;; we got at least one org, redirect to it next time
+                   (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) cook/default-cookie-expire)
+                   ;; no orgs present, remove the last org cookie to avoid infinite loops
+                   (cook/remove-cookie! (router/last-org-cookie)))
                  (when-not (router/current-secure-activity-id)
-                   ;; avoid infinite loop of the Go to digest button
-                   ;; by changing the value of the last visited slug
-                   (if (pos? (count orgs))
-                     (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) cook/default-cookie-expire)
-                     (cook/remove-cookie! (router/last-org-cookie)))
+                   ;; 404: secure entry can't 404 here since the org response is included in the
+                   ;; secure entry response and not in the entry point response
                    (routing-actions/maybe-404)))))
+           ;; If user is on login page and he's logged in redirect to the org page
            (when (and (jwt/jwt)
                       (utils/in? (:route @router/path) "login")
                       (pos? (count orgs)))
@@ -103,12 +109,15 @@
       (cook/set-cookie! router/login-redirect-cookie url))))
 
 (defn maybe-save-login-redirect []
-  (let [url-pathname (.. js/window -location -pathname)]
+  (let [url-pathname (.. js/window -location -pathname)
+        is-login-route? (or (= url-pathname oc-urls/login-wall)
+                            (= url-pathname oc-urls/login)
+                            (= url-pathname oc-urls/desktop-login))]
     (cond
-      (and (= url-pathname oc-urls/login-wall)
+      (and is-login-route?
            (:login-redirect (:query-params @dis/app-state)))
       (save-login-redirect (:login-redirect (:query-params @dis/app-state)))
-      (not= url-pathname oc-urls/login)
+      (not is-login-route?)
       (save-login-redirect))))
 
 (defn login-redirect []
@@ -240,7 +249,7 @@
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/user-profile)))))))
+          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/sign-up-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))

@@ -49,7 +49,9 @@ function PlaceCaretAtEnd(el) {
     pickerButtons: [],
     /* Use inline plus button */
     inlinePlusButtonOptions: {inlineButtons: true,
-                              alwaysExpanded: false},
+                              alwaysExpanded: false,
+                              initiallyVisible: false},
+    initialButtonsShown: false,
     /* Selector to identify the click that needs save the caret position */
     saveSelectionClickElementId: undefined,
     /* Contains the picker buttons */
@@ -90,6 +92,11 @@ function PlaceCaretAtEnd(el) {
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
       $('[data-toggle=\"tooltip\"]').tooltip();
+
+      if (this.inlinePlusButtonOptions.initiallyVisible) {
+        // Force show the media picker buttons
+        this.togglePicker();
+      }
     },
 
     delegate: function(event, arg) {
@@ -114,7 +121,7 @@ function PlaceCaretAtEnd(el) {
         return;
       }
       // If the inline plus button is enabled
-      if (this.inlinePlusButtonOptions.inlineButtons) {
+      if (this.inlinePlusButtonOptions.inlineButtons && !this.inlinePlusButtonOptions.alwaysExpanded) {
         // If the user clicked inside the editor or on the picker
         if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
            !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
@@ -769,8 +776,13 @@ function PlaceCaretAtEnd(el) {
         }
         var sel = this.window.getSelection(),
             element;
-        if (sel.rangeCount > 0) {
-          element = sel.getRangeAt(0).commonAncestorContainer;
+        if (sel.rangeCount > 0 || (this.inlinePlusButtonOptions.initiallyVisible && !this.initialButtonsShown)) {
+          if (this.inlinePlusButtonOptions.initiallyVisible && !this.initialButtonsShown) {
+            element = this.getEditorElements()[0];
+          }else {
+            element = sel.getRangeAt(0).commonAncestorContainer;  
+          }
+          this.initialButtonsShown = true;
           if (sel !== undefined || element !== undefined) {
             if (this.paragraphIsEmpty(element)){
               var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 1);

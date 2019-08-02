@@ -17,6 +17,7 @@
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -29,6 +30,8 @@
             [goog.Uri :as guri]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)]))
+
+(def missing-title-tooltip "Please add a title")
 
 ;; Attachments handling
 
@@ -95,7 +98,7 @@
     (utils/clean-body-html (.-innerHTML body-el))))
 
 (defn real-close []
-  (activity-actions/cmail-hide))
+  (cmail-actions/cmail-hide))
 
 ;; Local cache for outstanding edits
 
@@ -150,7 +153,8 @@
   (when-let [headline (rum/ref-node state "headline")]
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
-                                                       :has-changes true})]))))
+                                                       :has-changes true})])
+      (reset! (::post-button-title state) (if (seq (str emojied-headline)) "" missing-title-tooltip)))))
 
 (defn- abstract-on-change [state]
   (let [abstract (rum/ref-node state "abstract")]
@@ -197,45 +201,7 @@
 
 (defn- is-publishable? [s cmail-data]
   (and (seq (:board-slug cmail-data))
-       (or (and @(::record-video s)
-                @(::video-uploading s))
-           (not @(::record-video s)))
        (not (zero? (count (fix-headline cmail-data))))))
-
-(defn video-record-clicked [s]
-  (nux-actions/dismiss-edit-tooltip)
-  (let [cmail-data @(drv/get-ref s :cmail-data)
-        start-recording-fn #(do
-                              (reset! (::record-video s) true)
-                              (reset! (::video-picking-cover s) false)
-                              (reset! (::video-uploading s) false))]
-    (cond
-      (:fixed-video-id cmail-data)
-      (activity-actions/prompt-remove-video :cmail-data cmail-data)
-      @(::record-video s)
-      (reset! (::record-video s) false)
-      :else
-      (start-recording-fn))))
-
-(defn show-post-error [s message]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)
-        post-bt-ref (if is-mobile? "mobile-post-btn" "post-btn")]
-    (when-let [$post-btn (js/$ (rum/ref-node s post-bt-ref))]
-      (if-not (.data $post-btn "bs.tooltip")
-        (.tooltip $post-btn
-         (clj->js {:container "body"
-                   :placement (if is-mobile? "bottom" "top")
-                   :trigger "manual"
-                   :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                    "<div class=\"tooltip-arrow\"></div>"
-                                    "<div class=\"tooltip-inner\"></div>"
-                                  "</div>")
-                   :title message}))
-        (doto $post-btn
-          (.attr "data-original-title" message)
-          (.tooltip "fixTitle")))
-      (utils/after 10 #(.tooltip $post-btn "show"))
-      (utils/after 5000 #(.tooltip $post-btn "hide")))))
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -254,42 +220,31 @@
             (do
               (reset! (::publishing s) true)
               (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
-        (do
-          (cond
-            ;; Missing headline error
-            (zero? (count fixed-headline))
-            (show-post-error s "A title is required in order to save or share this post.")
-            ;; User needs to pick a cover shot
-            (and @(::record-video s)
-                 (not @(::video-uploading s))
-                 @(::video-picking-cover s))
-            (show-post-error s "Please pick a cover image for your video.")
-            ;; Video still recording
-            (and @(::record-video s)
-                 (not @(::video-uploading s)))
-            (show-post-error s "Please finish video recording."))
-          (reset! (::disable-post s) false)))))
-
-(defn- disable-post-bt? [s]
-  (let [cmail-data @(drv/get-ref s :cmail-data)]
-    (or @(::publishing s)
-        (not (is-publishable? s cmail-data))
-        @(::disable-post s))))
+        (reset! (::disable-post s) false))))
 
 (defn post-clicked [s]
   (clean-body s)
-  (let [disabled? (disable-post-bt? s)]
-    (when-not disabled?
-      (reset! (::disable-post s) true)
-      (let [cmail-data @(drv/get-ref s :cmail-data)]
-        (if (:auto-saving cmail-data)
-          (reset! (::publish-after-autosave s) true)
-          (real-post-action s))))))
+  (reset! (::disable-post s) true)
+  (let [cmail-data @(drv/get-ref s :cmail-data)]
+    (if (:auto-saving cmail-data)
+      (reset! (::publish-after-autosave s) true)
+      (real-post-action s))))
 
-(defn fix-tooltips [s]
-  (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-    (.tooltip "hide")
-    (.tooltip "fixTitle")))
+(defn fix-tooltips
+  "Fix the tooltips"
+  [s]
+  (.each (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+    (fn [_ el]
+      ; (.tooltip "hide")
+      (let [$el (js/$ el)]
+        (if (.hasClass $el "post-button")
+          (if (seq (.attr $el "data-tt-title"))
+            (doto $el
+              (.tooltip)
+              ; (.tooltip "hide")
+              (.tooltip "fixTitle"))
+            (.tooltip $el "destroy"))
+          (.tooltip $el "fixTitle"))))))
 
 ;; Delete handling
 
@@ -340,20 +295,21 @@
                    (rum/local false ::disable-post)
                    (rum/local false ::publish-after-autosave)
                    (rum/local nil ::autosave-timer)
-                   (rum/local false ::record-video)
-                   (rum/local false ::video-uploading)
-                   (rum/local false ::video-picking-cover)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
                    (rum/local false ::abstract-focused)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
+                   (rum/local nil ::latest-key)
+                   (rum/local "" ::post-button-title)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
+                   mixins/refresh-tooltips-mixin
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
+                          cmail-state @(drv/get-ref s :cmail-state)
                           initial-body (if (seq (:body cmail-data))
                                          (:body cmail-data)
                                          "")
@@ -361,20 +317,43 @@
                                              (if (seq (:headline cmail-data))
                                                (:headline cmail-data)
                                                ""))]
-                      (when-not (seq (:uuid cmail-data))
+                      (when (and (not (seq (:uuid cmail-data)))
+                                 (not (:collapsed cmail-state)))
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
-                      (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*"))))
+                      (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
+                      (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
+                      (reset! (::latest-key s) (:key cmail-state)))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
-                    (utils/after 500
-                     #(when-let [body-el (body-element)]
-                        (utils/to-end-of-content-editable body-el)))
+                    s)
+                   :will-update (fn [s]
+                    (let [cmail-state @(drv/get-ref s :cmail-state)]
+                      ;; If the state key changed let's reset the initial values
+                      (when (not= @(::latest-key s) (:key cmail-state))
+                        (when @(::latest-key s)
+                          (let [cmail-data @(drv/get-ref s :cmail-data)
+                                initial-body (if (seq (:body cmail-data))
+                                               (:body cmail-data)
+                                               "")
+                                initial-headline (utils/emojify
+                                                   (if (seq (:headline cmail-data))
+                                                     (:headline cmail-data)
+                                                     ""))]
+                            (when (and (not (seq (:uuid cmail-data)))
+                                       (not (:collapsed cmail-state)))
+                              (nux-actions/dismiss-add-post-tooltip))
+                            (reset! (::initial-body s) initial-body)
+                            (reset! (::initial-headline s) initial-headline)
+                            (reset! (::initial-uuid s) (:uuid cmail-data))
+                            (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
+                        (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
@@ -439,7 +418,11 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        disabled? (disable-post-bt? s)
+        show-post-bt-tooltip? (not (is-publishable? s cmail-data))
+        post-button-title @(::post-button-title s)
+        disabled? (or show-post-bt-tooltip?
+                      @(::publishing s)
+                      @(::disable-post s))
         working? (or (and published?
                           @(::saving s))
                      (and (not published?)
@@ -457,9 +440,16 @@
                   (if (and (= (:status cmail-data) "published")
                            (:has-changes cmail-data))
                     (cancel-clicked s)
-                    (activity-actions/cmail-hide)))]
+                    (cmail-actions/cmail-hide)))
+        long-tooltip (not= (:status cmail-data) "published")]
     [:div.cmail-outer
-      {:class (utils/class-set {:fullscreen is-fullscreen?})}
+      {:class (utils/class-set {:fullscreen is-fullscreen?
+                                :quick-post-collapsed (:collapsed cmail-state)})
+       :on-click #(when (:collapsed cmail-state)
+                    (nux-actions/dismiss-add-post-tooltip)
+                    (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
+                                                                                  :fullscreen false
+                                                                                  :key (:key cmail-state)}))}
       [:div.cmail-container
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
@@ -476,7 +466,22 @@
                   [:span.saving-saved " (saved)"])))]
           [:button.mlb-reset.mobile-post-button
             {:ref "mobile-post-btn"
-             :on-click #(post-clicked s)
+             :on-click (fn [_]
+                         (if show-post-bt-tooltip?
+                           (let [$bt (js/$ (rum/ref-node s "mobile-post-btn"))]
+                             (.tooltip $bt (clj->js {:placement "bottom"
+                                                     :trigger "manual"
+                                                     :container "body"
+                                                     ; :template (str "<div class=\"tooltip post-btn-tooltip\">"
+                                                     ;                  "<div class=\"tooltip-arrow\"></div>"
+                                                     ;                  "<div class=\"tooltip-inner\"></div>"
+                                                     ;                "</div>")
+                                                     :title post-button-title}))
+                             (utils/after 0 #(.tooltip $bt "show"))
+                             (utils/after 3000 #(.tooltip $bt "destroy")))
+                           (when-not disabled?
+                             (post-clicked s))))
+             ; :title post-button-title
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
@@ -486,26 +491,15 @@
           [:button.mlb-reset.mobile-attachment-button
             {:on-click #(add-attachment s)}]]
         [:div.cmail-header.group
-          (let [long-tooltip (not= (:status cmail-data) "published")]
-            [:div.close-bt-container
-              {:class (when long-tooltip "long-tooltip")}
-              [:button.mlb-reset.close-bt
-                {:on-click close-cb
-                 :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement "auto"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title (if long-tooltip
-                          "Save & Close"
-                          "Close")}]])
-          [:div.fullscreen-bt-container
-            [:button.mlb-reset.fullscreen-bt
-              {:on-click #(activity-actions/cmail-toggle-fullscreen)
-               :data-toggle "tooltip"
+          [:div.close-bt-container
+            {:class (when long-tooltip "long-tooltip")}
+            [:button.mlb-reset.close-bt
+              {:on-click close-cb
+               :data-toggle (if is-mobile? "" "tooltip")
                :data-placement "auto"
-               :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-               :title (if is-fullscreen?
-                        "Shrink"
-                        "Expand")}]]
+               :title (if long-tooltip
+                        "Save & Close"
+                        "Close")}]]
           [:div.cmail-header-vertical-separator]
           [:div.cmail-header-board-must-see-container.group
             {:class (when (:must-see cmail-data) "must-see-on")}
@@ -516,7 +510,7 @@
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
-              [:div.section-picker-container
+              [:div.sections-picker-container
                 {:ref :picker-container}
                 (sections-picker (:board-slug cmail-data)
                  (fn [board-data note dismiss-action]
@@ -526,14 +520,16 @@
                     (dis/dispatch! [:input [:cmail-data]
                      (merge cmail-data {:board-slug (:slug board-data)
                                         :board-name (:name board-data)
-                                        :has-changes true
+                                        :has-changes (or (:has-changes cmail-data)
+                                                         (seq (:uuid cmail-data))
+                                                         (:auto-saving cmail-data))
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:div.must-see-toggle-container
               {:class (when (:must-see cmail-data) "on")}
               [:div.must-see-toggle
-                {:on-mouse-down #(activity-actions/cmail-toggle-must-see)
+                {:on-mouse-down #(cmail-actions/cmail-toggle-must-see)
                  :data-toggle "tooltip"
                  :data-placement "auto"
                  :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
@@ -563,54 +559,55 @@
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                    :on-click #(delete-clicked s % cmail-data)}]]])
-          [:button.mlb-reset.post-button
-            {:ref "post-btn"
-             :on-click #(post-clicked s)
-             :class (utils/class-set {:disabled disabled?
-                                      :loading working?})}
-            (if (= (:status cmail-data) "published")
-              "Save"
-              "Post")]]
+          (when is-fullscreen?
+            [:button.mlb-reset.post-button
+              {:ref "post-btn"
+               :data-toggle "tooltip"
+               :data-placement "bottom"
+               :data-container "body"
+               :title post-button-title
+               :data-tt-title post-button-title
+               :on-click #(post-clicked s)
+               :class (utils/class-set {:disabled disabled?
+                                        :loading working?})}
+              (if (= (:status cmail-data) "published")
+                "Save"
+                "Post")])]
+        (when (and (not (:collapsed cmail-state))
+                   (not is-fullscreen?))
+          [:div.dismiss-inline-cmail-container
+            {:class (when long-tooltip "long-tooltip")}
+            [:button.mlb-reset.dismiss-inline-cmail
+              {:on-click close-cb
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement "auto"
+               :title (if long-tooltip
+                        "Save & Close"
+                        "Close")}]])
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
-              (when (and (:fixed-video-id cmail-data)
-                         (not @(::record-video s)))
+              (when (:fixed-video-id cmail-data)
                 (ziggeo-player {:video-id (:fixed-video-id cmail-data)
                                 :remove-video-cb #(activity-actions/prompt-remove-video :cmail-data cmail-data)
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
-            ; FIXME: disable video on mobile for now
-            (when-not is-mobile?
-              (when @(::record-video s)
-                (ziggeo-recorder {:start-cb (partial activity-actions/video-started-recording-cb :cmail-data)
-                                  :upload-started-cb #(do
-                                                        (activity-actions/uploading-video % :cmail-data)
-                                                        (reset! (::video-picking-cover s) false)
-                                                        (reset! (::video-uploading s) true))
-                                  :pick-cover-start-cb #(reset! (::video-picking-cover s) true)
-                                  :pick-cover-end-cb #(reset! (::video-picking-cover s) false)
-                                  :submit-cb (partial activity-actions/video-processed-cb :cmail-data)
-                                  :width (:width video-size)
-                                  :height (:height video-size)
-                                  :remove-recorder-cb (fn []
-                                    (when (:video-id cmail-data)
-                                      (activity-actions/remove-video :cmail-data cmail-data))
-                                    (reset! (::record-video s) false))})))
             ; Headline element
             [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
               {:class utils/hide-class
                :content-editable true
+               :key (str "cmail-headline-" (:key cmail-state))
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
                :on-click    #(headline-on-change s)
+               :on-focus #(headline-on-change s)
+               :on-blur #(headline-on-change s)
                :on-key-down (fn [e]
                               (headline-on-change s)
                               (cond
@@ -651,7 +648,8 @@
                                   (and (.-metaKey e)
                                        (= "Enter" (.-key e)))
                                   (post-clicked s)))}]]
-            (when show-edit-tooltip
+            (when (and show-edit-tooltip
+                       is-fullscreen?)
               [:div.edit-tooltip-outer-container
                 [:div.edit-tooltip-container.group
                   [:div.edit-tooltip-title
@@ -670,24 +668,72 @@
                                :show-h2 true
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
-                               :start-video-recording-cb #(video-record-clicked s)
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
-                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)})
+                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)
+                               :cmail-key (:key cmail-state)})
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
-      [:div.cmail-footer
-        (when-not is-fullscreen?
+      (if is-fullscreen?
+        [:div.cmail-footer
+          (when (and (not= (:status cmail-data) "published")
+                     (not is-mobile?))
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.saving-saved "Saved"])))]
+        [:div.cmail-footer
+          [:div.fullscreen-bt-container
+            [:button.mlb-reset.fullscreen-bt
+              {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
+              "Full-screen"]]
           [:div.cmail-footer-right
+            (when-not is-fullscreen?
+              [:button.mlb-reset.post-button
+                {:ref "post-btn"
+                 :on-click #(post-clicked s)
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :title post-button-title
+                 :data-tt-title post-button-title
+                 :class (utils/class-set {:disabled disabled?
+                                          :loading working?})}
+                (if (= (:status cmail-data) "published")
+                  "Save"
+                  "Post")])
+            [:div.board-name.oc-input
+              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container-footer))
+                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
+               :class (when show-sections-picker "active")}
+              [:div.board-name-inner
+                (:board-name cmail-data)]]
+            (when show-sections-picker
+              [:div.sections-picker-container
+                {:ref :picker-container-footer}
+                (sections-picker (:board-slug cmail-data)
+                 (fn [board-data note dismiss-action]
+                   (dis/dispatch! [:input [:show-sections-picker] false])
+                   (when (and board-data
+                              (seq (:name board-data)))
+                    (dis/dispatch! [:input [:cmail-data]
+                     (merge cmail-data {:board-slug (:slug board-data)
+                                        :board-name (:name board-data)
+                                        :has-changes (or (:has-changes cmail-data)
+                                                         (seq (:uuid cmail-data))
+                                                         (:auto-saving cmail-data))
+                                        :invite-note note})])
+                    (when (fn? dismiss-action)
+                      (dismiss-action)))))])
             [:div.delete-button-container
               [:button.mlb-reset.delete-button
                 {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
                  :data-toggle "tooltip"
                  :data-placement "top"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
                  :on-click #(delete-clicked s % cmail-data)}]]
             [:button.mlb-reset.attachment-button
               {:on-click #(add-attachment s)
@@ -698,13 +744,13 @@
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 24
                            :height 24
-                           :position "top"
+                           :position "bottom"
                            :default-field-selector "div.cmail-content div.rich-body-editor"
-                           :container-selector "div.cmail-content"})])
-        (when (and (not= (:status cmail-data) "published")
-                   (not is-mobile?))
-          (if (or (:has-changes cmail-data)
-                  (:auto-saving cmail-data))
-            [:div.saving-saved "Saving..."]
-            (when (false? (:auto-saving cmail-data))
-              [:div.saving-saved "Saved"])))]]]))
+                           :container-selector "div.cmail-content"})]
+          (when (and (not= (:status cmail-data) "published")
+                     (not is-mobile?))
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
+              [:div.saving-saved "Saving..."]
+              (when (false? (:auto-saving cmail-data))
+                [:div.saving-saved "Saved"])))])]]))

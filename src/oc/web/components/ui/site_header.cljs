@@ -15,8 +15,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
-            [oc.web.components.ui.site-mobile-menu :as site-mobile-menu]
-            [oc.web.components.ui.try-it-form :refer (get-started-button)]))
+            [oc.web.components.ui.site-mobile-menu :as site-mobile-menu]))
 
 ;; NB: this has a clone in oc.core/nav, every change should be reflected there and vice-versa
 

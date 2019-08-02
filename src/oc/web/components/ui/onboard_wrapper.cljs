@@ -145,7 +145,10 @@
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href oc-urls/login} "Sign in"]]]]))
+          [:a {:href (if js/window.isDesktop
+                       oc-urls/desktop-login
+                       oc-urls/login)}
+           "Sign in"]]]]))
 
 (defn- profile-setup-team-data
   ""
@@ -949,12 +952,13 @@
         "Thanks for verifying"
         [:button.mlb-reset.continue
           {:on-click #(let [org (utils/get-default-org orgs)]
-                        (if org
-                          (if (and (empty? (jwt/get-key :first-name))
-                                   (empty? (jwt/get-key :last-name)))
-                            (router/nav! oc-urls/confirm-invitation-profile)
-                            (router/nav! (oc-urls/org (:slug org))))
-                          (router/nav! oc-urls/login)))
+                        (router/nav!
+                         (if org
+                           (if (and (empty? (jwt/get-key :first-name))
+                                    (empty? (jwt/get-key :last-name)))
+                             oc-urls/confirm-invitation-profile
+                             (oc-urls/org (:slug org)))
+                          oc-urls/sign-up-profile)))
            :on-touch-start identity}
           "Get Started"]]
       :else

@@ -300,97 +300,104 @@
       (alert-modal/show-alert alert-data))))
 
 (defn- setup-editor [s]
-  (let [options (first (:rum/args s))
-        mobile-editor (responsive/is-tablet-or-mobile?)
-        show-subtitle (:show-h2 options)
-        media-config (:media-config options)
-        placeholder (or (:placeholder options) "What would you like to share?")
-        body-el (rum/ref-node s "body")
-        media-picker-opts {:buttons (clj->js media-config)
-                           :hidePlaceholderOnExpand false
-                           :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
-                                                         :alwaysExpanded (:use-inline-media-picker options)}
-                           ; :saveSelectionClickElementId default-mutli-picker-button-id
-                           :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
-        media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
-        file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
-        buttons (if show-subtitle
-                  ["bold" "italic" "unorderedlist" "anchor" "quote" "h2"]
-                  ["bold" "italic" "unorderedlist" "anchor" "quote"])
-        users-list (:mention-users @(drv/get-ref s :team-roster))
-        extensions (if mobile-editor
-                      #js {"autolist" (js/AutoList.)
-                           "mention" (mention-utils/mention-ext users-list)}
-                      #js {"autolist" (js/AutoList.)
-                           "mention" (mention-utils/mention-ext users-list)
-                           "media-picker" media-picker-ext
-                           "fileDragging" false
-                           "carrotFileDragging" file-dragging-ext
-                           "autoquote" (js/AutoQuote.)})
-        options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
-                 :buttonLabels "fontawesome"
-                 :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
-                 :extensions extensions
-                 :imageDragging false
-                 :targetBlank true
-                 :autoLink true
-                 :anchor #js {:customClassOption nil
-                              :customClassOptionText "Button"
-                              :linkValidation true
-                              :placeholderText "Paste or type a link"
-                              :targetCheckbox false
-                              :targetCheckboxText "Open in new window"}
-                 :paste #js {:forcePlainText false
-                             :cleanPastedHTML true
-                             :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
-                             :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
-                                             "textarea" "style" "javascript"]
-                             :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
-                                                   (when-not show-subtitle "h2") "h3" "h4" "h5"
-                                                   "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                   "details" "summary" "nav" "abbr"
-                                                   "table" "thead" "tbody" "tr" "th" "td"]))}
-                 :placeholder #js {:text placeholder
-                                   :hideOnClick false
-                                   :hide-on-click false}
-                 :keyboardCommands #js {:commands #js [
-                                    #js {
-                                      :command "bold"
-                                      :key "B"
-                                      :meta true
-                                      :shift false
-                                      :alt false
-                                    }
-                                    #js {
-                                      :command "italic"
-                                      :key "I"
-                                      :meta true
-                                      :shift false
-                                      :alt false
-                                    }
-                                    #js {
-                                      :command false
-                                      :key "U"
-                                      :meta true
-                                      :shift false
-                                      :alt false
-                                    }]}}
-        body-editor  (new js/MediumEditor body-el (clj->js options))]
-    (reset! (::media-picker-ext s) media-picker-ext)
-    (.subscribe body-editor
-                "editableInput"
-                (fn [event editable]
-                  (body-on-change s)))
-    (.subscribe body-editor
-                "editableKeydown"
-                (fn [e editable]
-                  (let [opts (first (:rum/args s))
-                        cmd-enter-cb (:cmd-enter-cb opts)]
-                    (when (and (fn? cmd-enter-cb)
-                               (.-metaKey e)
-                               (= "Enter" (.-key e)))
-                      (cmd-enter-cb e)))))
-    (reset! (::editor s) body-editor)))
+  (let [users-list (:mention-users @(drv/get-ref s :team-roster))]
+    (when (and (seq users-list)
+               (compare-and-set! (::initializing-editor s) false true))
+      (let [options (first (:rum/args s))
+            mobile-editor (responsive/is-tablet-or-mobile?)
+            show-subtitle (:show-h2 options)
+            media-config (:media-config options)
+            placeholder (or (:placeholder options) "What would you like to share?")
+            body-el (rum/ref-node s "body")
+            media-picker-opts {:buttons (clj->js media-config)
+                               :hidePlaceholderOnExpand false
+                               :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
+                                                             :alwaysExpanded (:use-inline-media-picker options)
+                                                             :initiallyVisible (:use-inline-media-picker options)}
+                               ; :saveSelectionClickElementId default-mutli-picker-button-id
+                               :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
+            media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
+            file-dragging-ext (when-not mobile-editor (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s)})))
+            buttons (if show-subtitle
+                      ["bold" "italic" "unorderedlist" "anchor" "quote" "h2"]
+                      ["bold" "italic" "unorderedlist" "anchor" "quote"])
+            extensions (if mobile-editor
+                          #js {"autolist" (js/AutoList.)
+                               "mention" (mention-utils/mention-ext users-list)}
+                          #js {"autolist" (js/AutoList.)
+                               "mention" (mention-utils/mention-ext users-list)
+                               "media-picker" media-picker-ext
+                               "fileDragging" false
+                               "carrotFileDragging" file-dragging-ext
+                               "autoquote" (js/AutoQuote.)})
+            options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
+                     :buttonLabels "fontawesome"
+                     :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
+                     :extensions extensions
+                     :imageDragging false
+                     :targetBlank true
+                     :autoLink true
+                     :anchor #js {:customClassOption nil
+                                  :customClassOptionText "Button"
+                                  :linkValidation true
+                                  :placeholderText "Paste or type a link"
+                                  :targetCheckbox false
+                                  :targetCheckboxText "Open in new window"}
+                     :paste #js {:forcePlainText false
+                                 :cleanPastedHTML true
+                                 :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                                 :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
+                                                 "textarea" "style" "javascript"]
+                                 :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
+                                                       (when-not show-subtitle "h2") "h3" "h4" "h5"
+                                                       "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
+                                                       "details" "summary" "nav" "abbr"
+                                                       "table" "thead" "tbody" "tr" "th" "td"]))}
+                     :placeholder #js {:text placeholder
+                                       :hideOnClick false
+                                       :hide-on-click false}
+                     :keyboardCommands #js {:commands #js [
+                                        #js {
+                                          :command "bold"
+                                          :key "B"
+                                          :meta true
+                                          :shift false
+                                          :alt false
+                                        }
+                                        #js {
+                                          :command "italic"
+                                          :key "I"
+                                          :meta true
+                                          :shift false
+                                          :alt false
+                                        }
+                                        #js {
+                                          :command false
+                                          :key "U"
+                                          :meta true
+                                          :shift false
+                                          :alt false
+                                        }]}}
+            body-editor  (new js/MediumEditor body-el (clj->js options))]
+        (reset! (::media-picker-ext s) media-picker-ext)
+        (.subscribe body-editor
+                    "editableInput"
+                    (fn [event editable]
+                      (body-on-change s)))
+        (.subscribe body-editor
+                    "editableKeydown"
+                    (fn [e editable]
+                      (let [opts (first (:rum/args s))
+                            cmd-enter-cb (:cmd-enter-cb opts)]
+                        (when (and (fn? cmd-enter-cb)
+                                   (.-metaKey e)
+                                   (= "Enter" (.-key e)))
+                          (cmd-enter-cb e)))))
+        (reset! (::editor s) body-editor)
+        ;; Setup autocomplete
+        (let [classes (:classes (first (:rum/args s)))]
+          (when (string/includes? classes "emoji-autocomplete")
+            (js/emojiAutocomplete)))))))
 
 (defn toggle-menu-cb [s show?]
   (when-let [editable @(::editor s)]
@@ -409,6 +416,7 @@
                                (rum/local false ::media-attachment-did-success)
                                (rum/local false ::showing-media-video-modal)
                                (rum/local false ::showing-gif-selector)
+                               (rum/local false ::initializing-editor)
                                ;; Image upload lock
                                (rum/local false ::upload-lock)
                                (drv/drv :media-input)
@@ -428,11 +436,18 @@
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
                                    (when-not (:nux props)
-                                     (utils/after 300 #(do
-                                      (setup-editor s)
-                                      (let [classes (:classes (first (:rum/args s)))]
-                                        (when (string/includes? classes "emoji-autocomplete")
-                                          (js/emojiAutocomplete)))))))
+                                     (utils/after 300 #(setup-editor s))))
+                                 s)
+                                :did-remount (fn [o s]
+                                 (setup-editor s)
+                                 (when (not= (:cmail-key (first (:rum/args o))) (:cmail-key (first (:rum/args s))))
+                                   (when @(::editor s)
+                                     (.destroy @(::editor s)))
+                                   (reset! (::editor s) nil)
+                                   (reset! (::media-picker-ext s) nil)
+                                   (reset! (::did-change s) false)
+                                   (reset! (::initializing-editor s) false)
+                                   (utils/after 10 #(setup-editor s)))
                                  s)
                                 :will-update (fn [s]
                                  (let [data @(drv/get-ref s :media-input)
@@ -443,7 +458,7 @@
                                       (when (or (= video-data :dismiss)
                                                 (map? video-data))
                                         (reset! (::media-video s) false)
-                                        (dis/dispatch! [:input [:media-input :media-video] nil]))
+                                        (dis/dispatch! [:update [:media-input] #(dissoc % :media-video)]))
                                       (if (map? video-data)
                                         (media-video-add s @(::media-picker-ext s) video-data)
                                         (media-video-add s @(::media-picker-ext s) nil))))
@@ -460,9 +475,10 @@
              upload-progress-cb
              dispatch-input-key
              attachment-dom-selector
-             start-video-recording-cb
-             fullscreen]}]
+             fullscreen
+             cmail-key]}]
   [:div.rich-body-editor-outer-container
+    {:key (str "rich-body-editor-" cmail-key)}
     [:div.rich-body-editor-container
       [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
         {:ref "body"

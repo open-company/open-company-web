@@ -9,6 +9,17 @@
 
 (def -no-scroll-mixin-class :no-scroll)
 
+(def refresh-tooltips-mixin
+  {:did-mount (fn [s]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+   s)
+   :did-remount (fn [_ s]
+    (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+      #(doto (js/$ %2)
+         (.tooltip "fixTitle")
+         (.tooltip "hide")))
+   s)})
+
 (def no-scroll-mixin
   "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
    If it doesn't it remember to remove it once the component is going to unmount."
@@ -250,11 +261,13 @@
   "Given a React reference to a component node, listens on all the events on that textarea element
    and resize its frame to make sure it doesn't scroll and the no extra blank space."
   [ref & [initially-focused]]
-  (letfn [(init-textarea [el]
-            (let [observe (utils/observe)
+  (letfn [(init-textarea [s el-ref]
+            (let [el (rum/ref-node s el-ref)
+                  observe (utils/observe)
                   resize-fn (fn []
-                              (set! (.-height (.-style el)) "auto")
-                              (set! (.-height (.-style el)) (str (.-scrollHeight el) "px")))
+                              (let [e (rum/ref-node s el-ref)]
+                                (set! (.-height (.-style e)) "auto")
+                                (set! (.-height (.-style e)) (str (.-scrollHeight e) "px"))))
                   delayed-resize-fn (fn [] (utils/after 0 resize-fn))]
             (observe el "change" resize-fn)
             (observe el "cut" delayed-resize-fn)
@@ -265,6 +278,5 @@
               (.focus el))
             (resize-fn)))]
     {:did-mount (fn [s]
-      (when-let [el (rum/ref-node s ref)]
-        (init-textarea el))
+      (init-textarea s ref)
       s)}))
