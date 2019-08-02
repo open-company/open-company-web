@@ -374,6 +374,10 @@ $h2_top_margin: 24;
       max-width: calc(100% + 32px);
     }
   }
+
+  blockquote, blockquote:last-child {
+    display: table;
+  }
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -592,5 +596,9 @@ $h2_top_margin: 24;
     margin: 0 auto;
     display: block;
     width: 100% !important;
+  }
+
+  blockquote, blockquote:last-child {
+    display: table;
   }
 }
