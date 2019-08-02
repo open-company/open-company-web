@@ -72,6 +72,12 @@ div.medium-editor-toolbar {
         &.medium-editor-action-anchor {
           background-image: cdnUrl("/img/ML/context_menu_anchor.svg"); 
         }
+
+        &.medium-editor-action-quote {
+          * {
+            display: initial;
+          }
+        }
       }
     }
   }

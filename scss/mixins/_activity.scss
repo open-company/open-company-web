@@ -239,11 +239,11 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
-  p, ul > li, i {
+  p, blockquote , ul > li, i {
     min-height: #{$line_height}px;
   }
 
-  i:empty {
+  i:empty, blockquote:empty {
     display: grid;
     min-width: 1px;
   }
@@ -377,6 +377,11 @@ $h2_top_margin: 24;
 
   blockquote, blockquote:last-child {
     display: table;
+  }
+
+  blockquote {
+    border-left: 4px solid $ultra_light_grey;
+    padding: 0 12px;
   }
 }
 
@@ -600,5 +605,10 @@ $h2_top_margin: 24;
 
   blockquote, blockquote:last-child {
     display: table;
+  }
+
+  blockquote {
+    border-left: 4px solid $ultra_light_grey;
+    padding: 0 12px;
   }
 }

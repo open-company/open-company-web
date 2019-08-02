@@ -320,7 +320,8 @@
                              {"autolist" (js/AutoList.)
                               "mention" (mention-utils/mention-ext users-list)
                               "media-picker" media-picker-ext
-                              "fileDragging" false})
+                              "fileDragging" false
+                              "autoquote" (js/AutoQuote.)})
             with-file-dragging (if enable-file-dragging?
                                  (assoc clj-extentions "carrotFileDragging" file-dragging-ext)
                                  clj-extentions)
