@@ -1,5 +1,6 @@
 (ns oc.web.actions.web-app-update
-  (:require [oc.web.api :as api]
+  (:require [taoensso.timbre :as timbre]
+            [oc.web.api :as api]
             [oc.web.actions.notifications :as notification-actions]))
 
 (defonce web-app-update-cycle (atom false))
@@ -37,26 +38,29 @@
 (defn- real-web-app-update-check
   "Check for app updates, show the notification if necessary, set a new timeout else."
   []
+  (timbre/debug "Checking for Carrot web app updates")
   (reset! web-app-update-timeout nil)
   (api/web-app-version-check
     (fn [{:keys [success body status]}]
       (if (= status 404)
-        (notification-actions/show-notification {:title "New version of Carrot available!"
-                                                 :web-app-update true
-                                                 :id :web-app-update-error
-                                                 :dismiss-bt true
-                                                 :dismiss-x true
-                                                 :secondary-bt-title update-verbage
-                                                 :secondary-bt-style :green
-                                                 :secondary-bt-class :update-app-bt
-                                                 :secondary-bt-cb #(js/window.location.reload)
-                                                 :expire 0
-                                                 :dismiss web-app-update-notification-dismissed})
+        (do
+          (timbre/info "New app update avalable! Showing notification to the user")
+          (notification-actions/show-notification {:title "New version of Carrot available!"
+                                                   :web-app-update true
+                                                   :id :web-app-update-error
+                                                   :dismiss web-app-update-notification-dismissed
+                                                   :dismiss-x true
+                                                   :secondary-bt-title update-verbage
+                                                   :secondary-bt-style :green
+                                                   :secondary-bt-class :update-app-bt
+                                                   :secondary-bt-cb #(js/window.location.reload)
+                                                   :expire 0}))
         (set-web-app-update-timeout! default-web-app-update-interval)))))
 
 (defn start-web-app-update-check!
   "Start the app update cycle, make sure it's started only once."
   []
   (when (compare-and-set! web-app-update-cycle false true)
+    (timbre/debug "Started Carrot web app update cycle")
     ;; Do the first check after 10 seconds from the app initialization
     (set-web-app-update-timeout! initial-web-app-update-wait))) 
