@@ -239,11 +239,19 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
-  p, blockquote , ul > li, i {
+  p, ul > li, i {
     min-height: #{$line_height}px;
   }
 
-  i:empty, blockquote:empty {
+  blockquote {
+    padding: 10px 20px;
+    min-height: #{$line_height + 20}px;
+    border-left: 4px solid $ultra_light_grey;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  i:empty, b:empty, strong:empty, li:empty {
     display: grid;
     min-width: 1px;
   }
@@ -265,6 +273,17 @@ $h2_top_margin: 24;
   & > *:last-child:not(:first-child) {
     margin: #{$line_height}px 0px 0px;
     padding-bottom: 0px;
+  }
+
+  & > blockquote:not(:last-child) {
+    margin: #{$line_height}px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  & > blockquote:last-child:not(:first-child) {
+    margin: #{$line_height}px 0px 0px;
+    padding-bottom: 10px;
   }
 
   & > img, img {
@@ -373,15 +392,6 @@ $h2_top_margin: 24;
       margin: 0 0 0 -16px;
       max-width: calc(100% + 32px);
     }
-  }
-
-  blockquote, blockquote:last-child {
-    display: table;
-  }
-
-  blockquote {
-    border-left: 4px solid $ultra_light_grey;
-    padding: 0 12px;
   }
 }
 
@@ -567,6 +577,10 @@ $h2_top_margin: 24;
     margin-bottom: 0px;
   }
 
+  & > blockquote:last-child {
+    margin-bottom: 0px;
+  }
+
   &.emoji-comment {
     font-size: 40px;
     height: 50px;
@@ -603,17 +617,17 @@ $h2_top_margin: 24;
     width: 100% !important;
   }
 
-  i:empty, blockquote:empty {
+  i:empty, b:empty, strong:empty, li:empty {
     display: grid;
     min-width: 1px;
   }
 
-  blockquote, blockquote:last-child {
-    display: table;
+  blockquote {
+    padding: 10px 20px;
+    min-height: 44px;
+    border-left: 4px solid $ultra_light_grey;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
   }
 
-  blockquote {
-    border-left: 4px solid $ultra_light_grey;
-    padding: 0 12px;
-  }
 }

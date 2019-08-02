@@ -17,10 +17,8 @@ var AutoQuote = MediumEditor.Extension.extend({
       this.subscribe('editableKeyup', this.onKeyup.bind(this));
     },
     onKeyup: function (keyUpEvent) {
-      console.log("DBG onKeyUp", keyUpEvent);
       if (MediumEditor.util.isKey(keyUpEvent, [MediumEditor.util.keyCode.SPACE])) {
         var quote_start = this.base.getSelectedParentElement().textContent.slice(0, 1);
-        console.log("DBG    quote_start", quote_start, this.base.extensions);
         if( (quote_start == ">") && this.base.getExtensionByName('quote')){
           this.base.execAction('append-blockquote');
           this.base.getSelectedParentElement().textContent = this.base.getSelectedParentElement().textContent.slice(1).trim();
