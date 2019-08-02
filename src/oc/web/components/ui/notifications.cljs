@@ -63,12 +63,12 @@
   [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
-             secondary-bt-dismiss app-update slack-bot mention mention-author
+             secondary-bt-dismiss web-app-update slack-bot mention mention-author
              click dismiss-x] :as notification-data}
       light-theme]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
-                              :app-update app-update
+                              :app-update web-app-update
                               :slack-bot slack-bot
                               :opac opac
                               :light-theme light-theme
