@@ -28,7 +28,7 @@ div.stream-comments {
       padding: 0 16px;
 
       &.closing-thread {
-        padding-bottom: 20px;
+        padding-bottom: 16px;
       }
 
       div.stream-comment:not(.indented-comment) {
@@ -46,7 +46,7 @@ div.stream-comments {
         position: relative;
 
         div.stream-comment-inner {
-          padding: 8px 0 4px;
+          padding: 8px 0;
         }
 
         @include big_web() {
