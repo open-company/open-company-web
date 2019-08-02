@@ -1,10 +1,6 @@
 (ns oc.web.expo
-  (:require [dommy.core :as dom]))
-
-(defn- handle-expo-event
-  [e]
-  (let [detail (js->clj (.-detail e) :keywordize-keys true)]
-    (js/alert (pr-str detail))))
+  (:require [dommy.core :as dom]
+            [oc.web.actions.user :as user-actions]))
 
 (defn- bridge-call!
   "Raises an event on the native side of the bridge with name `op` with accompanying `data`.
@@ -14,21 +10,30 @@
         json-event (js/JSON.stringify event)]
     (js/window.ReactNativeWebView.postMessage json-event)))
 
+(defn- parse-bridge-data
+  [json-str]
+  (js->clj (js/JSON.parse json-str) :keywordize-keys true))
+
 (defn- bridge-log!
   "Logs the given data to the native console."
   [data]
   (bridge-call! "log" data))
 
-(defn- bridge-web-ready!
-  "Informs the native side of the bridge that web is ready to receive events."
+(defn- bridge-get-push-notification-token!
+  "Requests the Expo push notification token from native, possibly displaying a permissions
+  dialog on iOS. Will call the `on-push-notification-token` fn of this ns with the fetched
+  token, or nil if the user has denied the permission."
   []
-  (bridge-call! "web-ready" {}))
+  (bridge-call! "get-push-notification-token" nil))
 
-(defn ^:export setup-bridge
-  []
-  ;; Subscribe to future events
-  (let [app (js/document.getElementById "app")]
-    (when app
-      (.addEventListener app "expoEvent" handle-expo-event)))
-  ;; Let the native side know that we're all set
-  (bridge-web-ready!))
+(defn ^:export on-push-notification-token
+  "Called by the native side of the bridge with an Expo push notification token, or nil
+  if the user has denied the notification permission."
+  [json-str]
+  (if-let [token (parse-bridge-data json-str)]
+    (user-actions/add-expo-push-token token)
+    (js/alert "Notification permission denied!")))
+
+(bridge-get-push-notification-token!)
+
+
