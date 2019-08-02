@@ -743,6 +743,43 @@ div.cmail-outer {
       }
     }
 
+    button.post-button {
+      position: relative;
+
+      @include big_web() {
+        &:hover {
+          div.post-bt-tooltip {
+            display: block;
+          }
+        }
+      }
+
+      &.tt-title div.post-bt-tooltip {
+        width: 142px;
+      }
+
+      div.post-bt-tooltip {
+        background-color: white;
+        white-space:pre-wrap;
+        max-width: none;
+        text-align: left;
+        opacity: 1;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+        line-height: 18px;
+        padding: 11px 16px;
+        border-radius: 4px;
+        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+        border: 1px solid $mid_light_grey;
+        position: absolute;
+        top: 34px;
+        right: 0px;
+        z-index: 2;
+        display: none;
+      }
+    }
+
     div.dismiss-inline-cmail-container {
       position: absolute;
       top: 0;
@@ -1168,6 +1205,10 @@ div.cmail-outer {
           font-size: 14px;
           border-radius: 4px;
           margin-left: 16px;
+
+          &.tt-title div.post-bt-tooltip {
+            right: -42px;
+          }
 
           &.disabled {
             cursor: not-allowed;

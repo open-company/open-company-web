@@ -154,7 +154,7 @@
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
-      (reset! (::post-button-title state) (if (seq (str emojied-headline)) "" missing-title-tooltip)))))
+      (reset! (::post-button-title state) (if (seq (str emojied-headline)) nil :title)))))
 
 (defn- abstract-on-change [state]
   (let [abstract (rum/ref-node state "abstract")]
@@ -233,18 +233,9 @@
 (defn fix-tooltips
   "Fix the tooltips"
   [s]
-  (.each (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-    (fn [_ el]
-      ; (.tooltip "hide")
-      (let [$el (js/$ el)]
-        (if (.hasClass $el "post-button")
-          (if (seq (.attr $el "data-tt-title"))
-            (doto $el
-              (.tooltip)
-              ; (.tooltip "hide")
-              (.tooltip "fixTitle"))
-            (.tooltip $el "destroy"))
-          (.tooltip $el "fixTitle"))))))
+  (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+    (.tooltip "hide")
+    (.tooltip "fixTitle")))
 
 ;; Delete handling
 
@@ -323,7 +314,7 @@
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
-                      (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
+                      (reset! (::post-button-title s) (if (seq (:headline cmail-data)) nil :title))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state)))
                     s)
@@ -351,7 +342,7 @@
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
-                            (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
+                            (reset! (::post-button-title s) (if (seq (:headline cmail-data)) nil :title))
                             (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
@@ -472,16 +463,12 @@
                              (.tooltip $bt (clj->js {:placement "bottom"
                                                      :trigger "manual"
                                                      :container "body"
-                                                     ; :template (str "<div class=\"tooltip post-btn-tooltip\">"
-                                                     ;                  "<div class=\"tooltip-arrow\"></div>"
-                                                     ;                  "<div class=\"tooltip-inner\"></div>"
-                                                     ;                "</div>")
-                                                     :title post-button-title}))
+                                                     :title (when (= post-button-title :title)
+                                                              missing-title-tooltip)}))
                              (utils/after 0 #(.tooltip $bt "show"))
                              (utils/after 3000 #(.tooltip $bt "destroy")))
                            (when-not disabled?
                              (post-clicked s))))
-             ; :title post-button-title
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
@@ -563,14 +550,15 @@
           (when is-fullscreen?
             [:button.mlb-reset.post-button
               {:ref "post-btn"
-               :data-toggle "tooltip"
-               :data-placement "bottom"
-               :data-container "body"
-               :title post-button-title
-               :data-tt-title post-button-title
                :on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
-                                        :loading working?})}
+                                        :loading working?
+                                        (str "tt-" (when post-button-title (name post-button-title))) true})}
+              (when post-button-title
+                [:div.post-bt-tooltip
+                  (cond
+                    (= post-button-title :title)
+                    missing-title-tooltip)])
               (if (= (:status cmail-data) "published")
                 "Save"
                 "Post")])]
@@ -609,7 +597,7 @@
                :on-focus #(headline-on-change s)
                :on-blur #(headline-on-change s)
                :on-key-down (fn [e]
-                              (headline-on-change s)
+                              (utils/after 10 #(headline-on-change s))
                               (cond
                                 (and (.-metaKey e)
                                      (= "Enter" (.-key e)))
@@ -699,10 +687,14 @@
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
-                 :title post-button-title
-                 :data-tt-title post-button-title
                  :class (utils/class-set {:disabled disabled?
-                                          :loading working?})}
+                                          :loading working?
+                                          (str "tt-" (when post-button-title (name post-button-title))) true})}
+                (when post-button-title
+                  [:div.post-bt-tooltip
+                    (cond
+                      (= post-button-title :title)
+                      missing-title-tooltip)])
                 (if (= (:status cmail-data) "published")
                   "Save"
                   "Post")])
