@@ -149,22 +149,31 @@
 (defn body-on-change [state]
   (dis/dispatch! [:input [:cmail-data :has-changes] true]))
 
+(defn- check-limits [s]
+  (let [headline (rum/ref-node s "headline")
+        $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
+        abstract-text (.text $abstract)
+        exceeds-limit (> (count abstract-text) utils/max-abstract-length)]
+    (reset! (::abstract-exceeds-limit s) exceeds-limit)
+    (reset! (::abstract-length s) (count abstract-text))
+    (reset! (::post-button-title s)
+     (cond
+      (not (seq (.-innerText headline))) :title
+      exceeds-limit :abstract
+      :else nil))))
+
 (defn- headline-on-change [state]
   (when-let [headline (rum/ref-node state "headline")]
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
-      (reset! (::post-button-title state) (if (seq (str emojied-headline)) @(::post-button-title state) missing-title-tooltip)))))
+      (check-limits state))))
 
 (defn- abstract-on-change [state]
-  (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))
-        abstract-text (.text $abstract)
-        exceeds-limit (> (count abstract-text) utils/max-abstract-length)]
+  (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
     (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.text $abstract)
                                                      :has-changes true})])
-    (reset! (::abstract-exceeds-limit state) exceeds-limit)
-    (reset! (::abstract-length state) (count abstract-text))
-    (reset! (::post-button-title state) (if exceeds-limit abstract-max-length-exceeded-tooltip @(::post-button-title state)))))
+    (check-limits state)))
 
 ;; Headline setup and paste handler
 
@@ -206,7 +215,8 @@
 
 (defn- is-publishable? [s cmail-data]
   (and (seq (:board-slug cmail-data))
-       (not (zero? (count (fix-headline cmail-data))))))
+       (not (zero? (count (fix-headline cmail-data))))
+       (not @(::abstract-exceeds-limit s))))
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -238,18 +248,9 @@
 (defn fix-tooltips
   "Fix the tooltips"
   [s]
-  (.each (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-    (fn [_ el]
-      ; (.tooltip "hide")
-      (let [$el (js/$ el)]
-        (if (.hasClass $el "post-button")
-          (if (seq (.attr $el "data-tt-title"))
-            (doto $el
-              (.tooltip)
-              ; (.tooltip "hide")
-              (.tooltip "fixTitle"))
-            (.tooltip $el "destroy"))
-          (.tooltip $el "fixTitle"))))))
+  (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
+    (.tooltip "hide")
+    (.tooltip "fixTitle")))
 
 ;; Delete handling
 
@@ -325,7 +326,9 @@
                                                ""))
                           initial-abstract (if (seq (:abstract cmail-data))
                                              (:abstract cmail-data)
-                                             "")]
+                                             "")
+                          abstract-text (.text (js/$ (str "<div>" initial-abstract "</div>")))
+                          abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
                       (when (and (not (seq (:uuid cmail-data)))
                                  (not (:collapsed cmail-state)))
                         (nux-actions/dismiss-add-post-tooltip))
@@ -333,7 +336,13 @@
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-abstract s) initial-abstract)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
-                      (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
+                      (reset! (::abstract-length s) (count abstract-text))
+                      (reset! (::abstract-exceeds-limit s) abstract-exceeds)
+                      (reset! (::post-button-title s)
+                        (cond
+                          abstract-exceeds :abstract
+                          (not (seq (:headline cmail-data))) :title
+                          :else nil))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state)))
                     s)
@@ -357,7 +366,9 @@
                                                      ""))
                                 initial-abstract (if (seq (:abstract cmail-data))
                                                    (:abstract cmail-data)
-                                                   "")]
+                                                   "")
+                                abstract-text (.text (js/$ "<div>" initial-abstract "</div>"))
+                                abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
                             (when (and (not (seq (:uuid cmail-data)))
                                        (not (:collapsed cmail-state)))
                               (nux-actions/dismiss-add-post-tooltip))
@@ -365,7 +376,13 @@
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-abstract s) initial-abstract)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
-                            (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
+                            (reset! (::abstract-length s) (count abstract-text))
+                            (reset! (::abstract-exceeds-limit s) abstract-exceeds)
+                            (reset! (::post-button-title s)
+                             (cond
+                              abstract-exceeds :abstract
+                              (not (seq (:headline cmail-data))) :title
+                              :else nil))
                             (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
@@ -486,12 +503,15 @@
                              (.tooltip $bt (clj->js {:placement "bottom"
                                                      :trigger "manual"
                                                      :container "body"
-                                                     :title post-button-title}))
+                                                     :title (cond
+                                                             (= post-button-title :title)
+                                                             missing-title-tooltip
+                                                             (= post-button-title :abstract)
+                                                             abstract-max-length-exceeded-tooltip)}))
                              (utils/after 0 #(.tooltip $bt "show"))
                              (utils/after 3000 #(.tooltip $bt "destroy")))
                            (when-not disabled?
                              (post-clicked s))))
-             ; :title post-button-title
              :class (utils/class-set {:disabled disabled?
                                       :loading working?})}
             (if (= (:status cmail-data) "published")
@@ -573,14 +593,17 @@
           (when is-fullscreen?
             [:button.mlb-reset.post-button
               {:ref "post-btn"
-               :data-toggle "tooltip"
-               :data-placement "bottom"
-               :data-container "body"
-               :title post-button-title
-               :data-tt-title post-button-title
                :on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
-                                        :loading working?})}
+                                        :loading working?
+                                        (str "tt-" (when post-button-title (name post-button-title))) true})}
+              (when post-button-title
+                [:div.post-bt-tooltip
+                  (cond
+                    (= post-button-title :title)
+                    missing-title-tooltip
+                    (= post-button-title :abstract)
+                    abstract-max-length-exceeded-tooltip)])
               (if (= (:status cmail-data) "published")
                 "Save"
                 "Post")])]
@@ -619,7 +642,7 @@
                :on-focus #(headline-on-change s)
                :on-blur #(headline-on-change s)
                :on-key-down (fn [e]
-                              (headline-on-change s)
+                              (utils/after 10 #(headline-on-change s))
                               (cond
                                 (and (.-metaKey e)
                                      (= "Enter" (.-key e)))
@@ -691,10 +714,16 @@
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
-                 :title post-button-title
-                 :data-tt-title post-button-title
                  :class (utils/class-set {:disabled disabled?
-                                          :loading working?})}
+                                          :loading working?
+                                          (str "tt-" (when post-button-title (name post-button-title))) true})}
+                (when post-button-title
+                  [:div.post-bt-tooltip
+                    (cond
+                      (= post-button-title :title)
+                      missing-title-tooltip
+                      (= post-button-title :abstract)
+                      abstract-max-length-exceeded-tooltip)])
                 (if (= (:status cmail-data) "published")
                   "Save"
                   "Post")])
