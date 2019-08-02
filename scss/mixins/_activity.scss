@@ -603,6 +603,11 @@ $h2_top_margin: 24;
     width: 100% !important;
   }
 
+  i:empty, blockquote:empty {
+    display: grid;
+    min-width: 1px;
+  }
+
   blockquote, blockquote:last-child {
     display: table;
   }
