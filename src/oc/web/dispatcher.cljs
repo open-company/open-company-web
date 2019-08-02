@@ -375,6 +375,7 @@
                                :org-data org-data
                                :container-data container-data
                                :board-data board-data
+                               :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
                                :is-sharing-activity (boolean (:activity-share base))

@@ -3,6 +3,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -47,7 +48,8 @@
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
             "editableInput"
-            #(enable-add-comment? s)))))))
+            #(enable-add-comment? s))
+          (utils/after 100 #(enable-add-comment? s)))))))
 
 (rum/defcs add-comment < rum/reactive
                          rum/static
@@ -103,7 +105,7 @@
                                (utils/after 0
                                 #(utils/to-end-of-content-editable add-comment-node))))
                            s)
-                          :did-remount (fn [_ s]
+                          :will-update (fn [s]
                            (setup-medium-editor-when-needed s)
                            s)
                           :will-unmount (fn [s]
@@ -126,6 +128,8 @@
                            s)}
   [s activity-data]
   (let [_ (drv/react s :add-comment-data)
+        _ (drv/react s :add-comment-focus)
+        _ (drv/react s :team-roster)
         current-user-data (drv/react s :current-user-data)]
     [:div.add-comment-box-container
       [:div.add-comment-box
