@@ -133,7 +133,8 @@
           [:div.back-to-board-inner
             back-to-label]]
         (more-menu activity-data dom-element-id
-         {:external-share true
+         {:external-share (not is-mobile?)
+          :external-follow-up is-mobile?
           :show-edit? true
           :show-delete? true
           :show-move? (not is-mobile?)

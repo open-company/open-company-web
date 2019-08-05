@@ -177,6 +177,7 @@
         (when is-published?
           (more-menu activity-data dom-element-id
            {:external-share (not is-mobile?)
+            :external-follow-up (not is-mobile?)
             :show-edit? true
             :show-delete? true
             :show-move? (not is-mobile?)

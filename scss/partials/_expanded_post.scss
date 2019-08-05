@@ -3,9 +3,10 @@ div.expanded-post {
   margin: 0 auto;
   padding-bottom: 24px;
 
-  @include mobile() {
+  @include tablet() {
     width: 100%;
     padding: 16px;
+    margin-top: 56px;
   }
 
   div.activity-share-container {
@@ -18,6 +19,18 @@ div.expanded-post {
   div.expanded-post-header {
     height: 32px;
 
+    @include tablet() {
+      width: 100vw;
+      height: 56px;
+      padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      border-bottom: 1px solid $grey_num_3;
+      background-color: white;
+      z-index: 2;
+    }
+
     button.back-to-board {
       float: left;
       height: 32px;
@@ -28,6 +41,11 @@ div.expanded-post {
       align-items: center;
       position: relative;
       background-color: $ultra_light_grey;
+
+      @include tablet() {
+        background-color: transparent;
+        padding: 7px 0;
+      }
 
       div.back-to-board-inner {
         @include OC_Body_Book();
@@ -73,8 +91,9 @@ div.expanded-post {
     @include activity-title(36px, 40px);
     margin-top: 16px;
 
-    @include mobile() {
+    @include tablet() {
       @include activity-title(22px, 28px);
+      margin-top: 0;
     }
   }
 
@@ -83,7 +102,7 @@ div.expanded-post {
     margin-top: 16px;
     min-height: 24px;
 
-    @include mobile() {
+    @include tablet() {
       margin-top: 8px;
     }
 
@@ -105,7 +124,7 @@ div.expanded-post {
         margin-left: 8px;
         margin-top: 2px;
 
-        @include mobile() {
+        @include tablet() {
           display: block;
           margin-left: 0;
           margin-top: 8px;
@@ -119,7 +138,7 @@ div.expanded-post {
         margin-left: 8px;
         margin-top: 2px;
 
-        @include mobile() {
+        @include tablet() {
           display: block;
           margin-left: 0;
           margin-top: 8px;
@@ -137,7 +156,7 @@ div.expanded-post {
     white-space: pre-wrap;
     word-break: break-word;
 
-    @include mobile() {
+    @include tablet() {
       margin: 16px 0;
     }
   }
@@ -158,7 +177,7 @@ div.expanded-post {
   div.expanded-post-mobile-reactions {
     display: none;
 
-    @include mobile() {
+    @include tablet() {
       display: block;
       height: 48px;
       margin: 24px 0 0;
@@ -172,7 +191,7 @@ div.expanded-post {
     min-height: 26px;
     position: relative;
 
-    @include mobile() {
+    @include tablet() {
       margin-top: 10px;
       min-height: 20px;
     }
@@ -199,7 +218,7 @@ div.expanded-post {
           top: 0;
           left: calc(100% + 8px);
 
-          @include mobile(){
+          @include tablet(){
             bottom: unset;
             right: unset;
             top: unset;
@@ -214,7 +233,7 @@ div.expanded-post {
       position: relative;
       margin-top: 4px;
 
-      @include mobile() {
+      @include tablet() {
         margin-top: 0;
       }
     }
@@ -226,7 +245,7 @@ div.expanded-post {
     padding-top: 16px;
     border-top: 1px solid $ultra_light_grey;
 
-    @include mobile() {
+    @include tablet() {
       margin-top: 14px;
       width: calc(100% + 32px);
       margin-left: -16px;

@@ -66,7 +66,7 @@
   [s entity-data share-container-id
    {:keys [will-open will-close external-share tooltip-position
            show-edit? show-delete? edit-cb delete-cb show-move?
-           assigned-follow-up-data]}]
+           assigned-follow-up-data external-follow-up]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -149,7 +149,8 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (when is-mobile?
+            (when (and is-mobile?
+                       (not external-follow-up))
               (if complete-follow-up-link
                 [:li.complete-follow-up
                   {:ref "more-menu-complete-follow-up-bt"
@@ -183,7 +184,7 @@
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
-        (when-not is-mobile?
+        (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
               {:type "button"
