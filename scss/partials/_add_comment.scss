@@ -31,13 +31,6 @@ div.add-comment-box-container {
       }
     }
 
-    // @include mobile() {
-    //   background-color: white;
-    //   border: 1px solid $mid_light_grey;
-    //   border-radius: 4px;
-    //   padding: 9px 14px;
-    // }
-
     div.add-comment-internal {
       position: absolute;
       bottom: 0;
@@ -111,6 +104,10 @@ div.add-comment-box-container {
       width: 100%;
       margin-top: 16px;
 
+      &.hide-footer * {
+        display: none;
+      }
+
       button.close-reply-bt {
         width: 22px;
         height: 32px;
@@ -145,10 +142,6 @@ div.add-comment-box-container {
           top: 0px;
           left: 0px;
           cursor: pointer;
-        }
-
-        @include tablet() {
-          display: none;
         }
 
         div.picker-container {

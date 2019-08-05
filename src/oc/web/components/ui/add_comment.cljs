@@ -213,7 +213,7 @@
                          :offset-element-selector [(keyword (str "div." container-class))]
                          :outer-container-selector [(keyword (str "div." container-class))]}))
         [:div.add-comment-footer
-          {:class (when should-hide-post-button "hidden")}
+          {:class (when should-hide-post-button "hide-footer")}
           [:button.mlb-reset.send-btn
             {:on-click #(send-clicked s parent-comment-uuid)
              :disabled @(::add-button-disabled s)}

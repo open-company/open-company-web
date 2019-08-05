@@ -407,10 +407,18 @@ div.stream-comments {
         margin-bottom: 8px;
 
         div.add-comment-box {
-          div.add-comment-internam {
+          div.add-comment-internal {
             div.add-comment {
-              min-height: 60px;
+              min-height: 92px;
+
+              @include mobile() {
+                min-height: 46px;
+              }
             }
+          }
+
+          div.add-comment-footer.hide-footer {
+            display: none;
           }
         }
       }
