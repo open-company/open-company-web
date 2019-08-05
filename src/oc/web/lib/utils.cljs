@@ -595,19 +595,22 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
+(defn clean-abstract-html [inner-html]
+  (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
+        _ (.remove (js/$ ".oc-mention-popup" $container))]
+    (.html $container)))
+
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        _ (.remove (js/$ ".oc-mention-popup" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))
         has-empty-ending-paragraph (when (seq last-p-html)
                                      (.match last-p-html reg-ex))
         _ (when has-empty-ending-paragraph
-            (.remove (js/$ "p:last-child" $container)))
-        cleaned-html (.html $container)
-        _ (.detach $container)]
-    cleaned-html))
+            (.remove (js/$ "p:last-child" $container)))]
+    (.html $container)))
 
 (defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]

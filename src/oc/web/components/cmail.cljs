@@ -171,7 +171,7 @@
 
 (defn- abstract-on-change [state]
   (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
-    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.html $abstract)
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (utils/clean-abstract-html (.html $abstract))
                                                      :has-changes true})])
     (check-limits state)))
 
@@ -235,7 +235,10 @@
             (do
               (reset! (::publishing s) true)
               (activity-actions/entry-publish (dissoc updated-cmail-data :status) section-editing :cmail-data))))
-        (reset! (::disable-post s) false))))
+        (do
+          (reset! (::show-post-tooltip s) true)
+          (utils/after 3000 #(reset! (::show-post-tooltip s) false))
+          (reset! (::disable-post s) false)))))
 
 (defn post-clicked [s]
   (clean-body s)
@@ -310,6 +313,7 @@
                    (rum/local "" ::post-button-title)
                    (rum/local false ::abstract-exceeds-limit)
                    (rum/local 0 ::abstract-length)
+                   (rum/local false ::show-post-tooltip)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
@@ -493,24 +497,18 @@
                 (when (false? (:auto-saving cmail-data))
                   [:span.saving-saved " (saved)"])))]
           [:button.mlb-reset.mobile-post-button
-            {:ref "mobile-post-btn"
-             :on-click (fn [_]
-                         (if show-post-bt-tooltip?
-                           (let [$bt (js/$ (rum/ref-node s "mobile-post-btn"))]
-                             (.tooltip $bt (clj->js {:placement "bottom"
-                                                     :trigger "manual"
-                                                     :container "body"
-                                                     :title (cond
-                                                             (= post-button-title :title)
-                                                             missing-title-tooltip
-                                                             (= post-button-title :abstract)
-                                                             abstract-max-length-exceeded-tooltip)}))
-                             (utils/after 0 #(.tooltip $bt "show"))
-                             (utils/after 3000 #(.tooltip $bt "destroy")))
-                           (when-not disabled?
-                             (post-clicked s))))
+            {:on-click #(post-clicked s)
              :class (utils/class-set {:disabled disabled?
-                                      :loading working?})}
+                                      :force-show-tooltip @(::show-post-tooltip s)
+                                      :loading working?
+                                      (str "tt-" (when post-button-title (name post-button-title))) true})}
+            (when post-button-title
+              [:div.post-bt-tooltip
+                (cond
+                  (= post-button-title :title)
+                  missing-title-tooltip
+                  (= post-button-title :abstract)
+                  abstract-max-length-exceeded-tooltip)])
             (if (= (:status cmail-data) "published")
               "Save"
               "Post")]
@@ -589,9 +587,9 @@
                    :on-click #(delete-clicked s % cmail-data)}]]])
           (when is-fullscreen?
             [:button.mlb-reset.post-button
-              {:ref "post-btn"
-               :on-click #(post-clicked s)
+              {:on-click #(post-clicked s)
                :class (utils/class-set {:disabled disabled?
+                                        :force-show-tooltip @(::show-post-tooltip s)
                                         :loading working?
                                         (str "tt-" (when post-button-title (name post-button-title))) true})}
               (when post-button-title
@@ -706,12 +704,9 @@
           [:div.cmail-footer-right
             (when-not is-fullscreen?
               [:button.mlb-reset.post-button
-                {:ref "post-btn"
-                 :on-click #(post-clicked s)
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
+                {:on-click #(post-clicked s)
                  :class (utils/class-set {:disabled disabled?
+                                          :force-show-tooltip @(::show-post-tooltip s)
                                           :loading working?
                                           (str "tt-" (when post-button-title (name post-button-title))) true})}
                 (when post-button-title
