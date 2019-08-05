@@ -121,8 +121,13 @@ div.stream-comments {
         }
 
         &.indented-comment div.stream-comment-inner {
-          margin-left: 32px;
-          width: calc(100% - 32px);
+          margin-left: 40px;
+          width: calc(100% - 40px);
+
+          @include mobile() {
+            margin-left: 32px;
+            width: calc(100% - 32px);
+          }
 
           div.stream-comment-floating-buttons {
             top: 8px;
@@ -308,7 +313,12 @@ div.stream-comments {
         }
 
         div.stream-comment-right {
-          margin-left: 32px;
+          margin-left: 40px;
+
+          @include mobile() {
+            margin-left: 32px;
+          }
+
           @include preload_image(cdnUrl("/img/ML/comment_react_emoji.svg"));
         }
 
