@@ -27,7 +27,7 @@ div.expanded-post {
       top: 0;
       left: 0;
       border-bottom: 1px solid $grey_num_3;
-      background-color: white;
+      background-color: $grey_num_2;
       z-index: 2;
     }
 
@@ -68,6 +68,10 @@ div.expanded-post {
 
     div.more-menu {
       float: right;
+
+      @include tablet() {
+        margin-top: 4px;
+      }
     }
   }
 
