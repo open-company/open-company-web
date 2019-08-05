@@ -85,6 +85,9 @@
         (when (or edit-link
                   delete-link
                   mark-unread-link
+                  can-comment-share?
+                  can-react?
+                  can-reply?
                   (and (not external-share)
                        share-link))
           [:button.mlb-reset.more-menu-bt
