@@ -595,11 +595,6 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
-(defn clean-abstract-html [inner-html]
-  (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.remove (js/$ ".oc-mention-popup" $container))]
-    (.html $container)))
-
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
