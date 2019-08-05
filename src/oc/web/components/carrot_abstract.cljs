@@ -135,12 +135,11 @@
                     (on-change-cb))
          :dangerouslySetInnerHTML {:__html initial-value}
          :on-key-down (fn [e]
-                        (cond
-                          (and (= (.-key e) "Enter")
-                               (not (.-metaKey e)))
-                          (do
-                            (utils/event-stop e)
-                            (utils/to-end-of-content-editable (sel1 [:div.rich-body-editor])))
-                          (and (.-metaKey e)
-                               (= "Enter" (.-key e)))
+                        ;; Prevent new line from being insert
+                        (when (= (.-key e) "Enter")
+                          (.preventDefault e))
+                        ;; Call post-clicjed callback if available on Meta+Enter
+                        (when (and (= (.-key e) "Enter")
+                                   (.-metaKey e)
+                                   (fn? post-clicked))
                           (post-clicked)))}]]))
