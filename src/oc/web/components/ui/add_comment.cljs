@@ -214,6 +214,10 @@
                          :outer-container-selector [(keyword (str "div." container-class))]}))
         [:div.add-comment-footer
           {:class (when should-hide-post-button "hidden")}
+          [:button.mlb-reset.send-btn
+            {:on-click #(send-clicked s parent-comment-uuid)
+             :disabled @(::add-button-disabled s)}
+            "Post"]
           (when (and parent-comment-uuid
                      (fn? dismiss-reply-cb))
             [:button.mlb-reset.close-reply-bt
@@ -221,10 +225,6 @@
                :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
                :data-placement "right"
                :title "Close"}])
-          [:button.mlb-reset.send-btn
-            {:on-click #(send-clicked s parent-comment-uuid)
-             :disabled @(::add-button-disabled s)}
-            "Post"]
           (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
                          :width 24
                          :height 24

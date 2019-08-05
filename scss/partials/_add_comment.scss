@@ -112,19 +112,23 @@ div.add-comment-box-container {
       margin-top: 16px;
 
       button.close-reply-bt {
-        width: 32px;
+        width: 22px;
         height: 32px;
-        background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
-        background-size: 12px 12px;
+        background-image: cdnUrl("/img/ML/cmail_delete.svg");
+        background-size: 14px 16px;
         background-position: center;
         background-repeat: no-repeat;
-        background-color: $ultra_light_grey;
-        border-radius: 4px;
-        float: left;
-        margin-left: 32px;
+        opacity: 0.4;
+        padding: 0;
+        float: right;
+        margin-left: 12px;
 
-        @include mobile() {
-          margin-left: 0;
+        &:hover {
+          opacity: 1;
+        }
+
+        @include tablet() {
+          display: none;
         }
       }
 
@@ -157,7 +161,7 @@ div.add-comment-box-container {
         float: right;
         height: 32px;
         padding: 7px 16px;
-        margin: 0 0 0 16px;
+        margin: 0 0 0 14px;
         background-color: $carrot_green;
         color: white;
         @include OC_Body_Bold();
