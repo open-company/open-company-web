@@ -437,6 +437,9 @@
 (defn add-expo-push-token [push-token]
   (let [user-data (dis/current-user-data)
         add-token-link (utils/link-for (:links user-data) "add-expo-push-token" "POST")]
+    ;; TODO: compare the user's current Expo push token set with this one to see if
+    ;; making this request is actually necessary. That data is not yet pulled from
+    ;; the server, so this will require backend changes.
     (when (and add-token-link push-token)
       (api/add-expo-push-token
        add-token-link
