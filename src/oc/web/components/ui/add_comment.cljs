@@ -177,7 +177,7 @@
       [:div.add-comment-box
         (user-avatar-image current-user-data)
         [:div.add-comment-internal
-          {:class (when should-hide-post-button "active")}
+          {:class (when-not should-hide-post-button "active")}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true

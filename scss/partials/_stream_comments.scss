@@ -46,6 +46,10 @@ div.stream-comments {
 
         div.stream-comment-inner {
           padding: 8px 0;
+
+          @include mobile() {
+
+          }
         }
 
         @include big_web() {
@@ -118,7 +122,7 @@ div.stream-comments {
 
         &.indented-comment div.stream-comment-inner {
           margin-left: 32px;
-          width: calc(100% - 40px);
+          width: calc(100% - 32px);
 
           div.stream-comment-floating-buttons {
             top: 8px;

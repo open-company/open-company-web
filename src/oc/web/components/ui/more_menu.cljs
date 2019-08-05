@@ -65,7 +65,8 @@
                        (drv/drv :editable-boards)
   [s entity-data share-container-id
    {:keys [will-open will-close external-share tooltip-position show-unread
-           show-edit? show-delete? edit-cb delete-cb show-move?]}]
+           show-edit? show-delete? edit-cb delete-cb show-move? can-comment-share?
+           comment-share-cb can-react? react-cb can-reply? reply-cb]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -157,7 +158,34 @@
                                 (when (fn? will-close)
                                   (will-close))
                                 (activity-actions/send-item-read (:uuid entity-data) true))}
-                  "Mark as read"]))])
+                  "Mark as read"]))
+            (when can-react?
+              [:li.react
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (react-cb)))}
+                "React"])
+            (when can-reply?
+              [:li.reply
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (reply-cb)))}
+                "Reply"])
+            (when can-comment-share?
+              [:li.comment-share
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (comment-share-cb)))}
+                "Share"])])
         (when (and external-share
                    share-link)
           [:button.mlb-reset.more-menu-share-bt

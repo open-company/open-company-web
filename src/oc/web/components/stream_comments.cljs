@@ -123,6 +123,13 @@
       (reset! (::initial-comment-scroll s) true)
       (highlight-comment s (router/current-comment-id) true))))
 
+(defn share-clicked [comment-data]
+  (copy-comment-url (:url comment-data))
+  (notification-actions/show-notification {:title "Share link copied to clipboard"
+                                           :dismiss true
+                                           :id (keyword (str "comment-url-copied-"
+                                            (:uuid comment-data)))}))
+
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
                              (drv/drv :team-roster)
@@ -217,7 +224,13 @@
                                                    :edit-cb (partial start-editing s)
                                                    :show-delete? true
                                                    :delete-cb (partial delete-clicked s activity-data)
-                                                   :show-unread false})]
+                                                   :show-unread false
+                                                   :can-comment-share? true
+                                                   :comment-share-cb #(share-clicked comment-data)
+                                                   :can-react? true
+                                                   :react-cb #(reset! (::show-picker s) (:uuid comment-data))
+                                                   :can-reply? true
+                                                   :reply-cb #(reply-to s (:reply-parent comment-data))})]
                     [:div.stream-comment-floating-buttons
                       {:key (str "stream-comment-floating-buttons"
                              (when can-show-edit-bt?
@@ -239,12 +252,7 @@
                                             (delete-clicked s activity-data comment-data))}
                                 "Delete"])
                             [:button.mlb-reset.share-bt
-                              {:on-click #(do
-                                            (copy-comment-url (:url comment-data))
-                                            (notification-actions/show-notification {:title "Share link copied to clipboard"
-                                                                                     :dismiss true
-                                                                                     :id (keyword (str "comment-url-copied-"
-                                                                                      (:uuid comment-data)))}))}
+                              {:on-click #(share-clicked comment-data)}
                               "Share"]])
                         ;; More menu button or share button (depends if user is author of the comment)
                         (if (or can-show-edit-bt?
@@ -320,11 +328,9 @@
                           {:on-click #(cancel-edit % s comment-data)
                            :title "Cancel edit"}
                           "Cancel"]]]
-                    (when (and (:can-react comment-data)
-                               (or (responsive/is-tablet-or-mobile?)
-                                   (seq (:reactions comment-data))))
+                    (when (seq (:reactions comment-data))
                       [:div.stream-comment-reactions-footer.group
-                        (reactions comment-data false activity-data)]))]]]
+                        (reactions comment-data true activity-data)]))]]]
           (when should-show-add-comment?
             (add-comment activity-data (:reply-parent comment-data)
              (fn [](swap! (::replying-to s) #(disj % (:reply-parent comment-data))))))])]
