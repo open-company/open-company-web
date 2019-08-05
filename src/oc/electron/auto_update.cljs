@@ -10,45 +10,36 @@
      the user with constant notifications if they choose not to restart the app right away
 
   Upon restarting the app, the update will be installed."
-  (:require [taoensso.timbre :as timbre :refer [info]]))
+  (:require [taoensso.timbre :as timbre :refer [info]]
+            [oc.shared.interval :as interval]))
 
 ;; See https://www.electron.build/auto-update for details on the `electron-updater` API
 (def auto-updater (.-autoUpdater (js/require "electron-updater")))
-(def auto-updater-js-interval (atom nil))
 
 (def default-rate-ms (* 5 60 1000)) ;; 5 minutes
 (def extended-rate-ms (* 24 60 60 1000)) ;; 24 hours
-
-(declare on-update-available)
-
-(defn- updater-running?
-  []
-  (some? @auto-updater-js-interval))
 
 (defn- check-for-updates
   []
   (info "Checking for Carrot desktop updates")
   (.checkForUpdatesAndNotify auto-updater))
 
-(defn start-update-cycle!
-  ([]
-   (start-update-cycle! default-rate-ms))
-  ([rate-ms]
-   (when-not (updater-running?)
-     (let [js-interval (js/setInterval check-for-updates rate-ms)]
-       (.addListener auto-updater "update-available" on-update-available)
-       (reset! auto-updater-js-interval js-interval)
-       (info "Started Carrot desktop auto-update cycle")))))
-
-(defn stop-update-cycle!
-  []
-  (when (updater-running?)
-    (js/clearInterval @auto-updater-js-interval)
-    (.removeListener auto-updater "update-available" on-update-available)
-    (reset! auto-updater-js-interval nil)))
+(defonce auto-updater-interval (interval/make-interval {:fn check-for-updates
+                                                        :ms default-rate-ms}))
 
 (defn- on-update-available
   [info]
   (info "Carrot desktop update available" info)
-  (stop-update-cycle!)
-  (start-update-cycle! extended-rate-ms))
+  (interval/restart-interval! auto-updater-interval extended-rate-ms))
+
+(defn start-update-cycle!
+  []
+  (info "Starting desktop auto updater")
+  (.addListener auto-updater "update-available" on-update-available)
+  (interval/start-interval! auto-updater-interval))
+
+(defn stop-update-cycle!
+  []
+  (info "Stopping desktop auto updater")
+  (.removeListener auto-updater "update-available" on-update-available)
+  (interval/stop-interval! auto-updater-interval))
