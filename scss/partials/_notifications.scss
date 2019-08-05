@@ -26,6 +26,10 @@ div.notifications {
       border-radius: 0px;
     }
 
+    &.clickable {
+      cursor: pointer;
+    }
+
     &.server-error {
       background-color: $carrot_orange;
 

@@ -33,7 +33,6 @@ div.stream-comments {
 
       div.stream-comment:not(.indented-comment) {
         border-top: 1px solid $ultra_light_grey;
-        // margin-top: 20px;
         padding-top: 16px;
       }
 
@@ -117,19 +116,23 @@ div.stream-comments {
           }
         }
 
-        &.indented-comment div.stream-comment-inner{
-          margin-left: 40px;
-          // padding-left: 56px;
+        &.indented-comment div.stream-comment-inner {
+          margin-left: 32px;
           width: calc(100% - 40px);
+
+          div.stream-comment-floating-buttons {
+            top: 8px;
+          }
         }
 
         div.stream-comment-floating-buttons {
           position: absolute;
           right: 16px;
-          top: 4px;
+          top: 16px;
           height: 26px;
           width: 104px;
           display: none;
+          z-index: 2;
 
           div.stream-comment-floating-buttons-inner {
             position: relative;
@@ -301,7 +304,7 @@ div.stream-comments {
         }
 
         div.stream-comment-right {
-          margin-left: 40px;
+          margin-left: 32px;
           @include preload_image(cdnUrl("/img/ML/comment_react_emoji.svg"));
         }
 
@@ -385,9 +388,17 @@ div.stream-comments {
       }
 
       div.add-comment-box-container {
-        padding: 0 0 0 40px;
+        padding: 0 0 0 32px;
         margin-top: 8px;
         margin-bottom: 8px;
+
+        div.add-comment-box {
+          div.add-comment-internam {
+            div.add-comment {
+              min-height: 60px;
+            }
+          }
+        }
       }
     }
 

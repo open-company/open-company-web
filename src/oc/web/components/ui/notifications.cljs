@@ -74,6 +74,7 @@
                               :light-theme light-theme
                               :mention-notification (and mention mention-author)
                               :dismiss dismiss
+                              :clickable (fn? click)
                               :inline-bt (or primary-bt-inline
                                              (and id
                                                   ((keyword id) #{:slack-team-added :slack-bot-added

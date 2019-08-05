@@ -153,17 +153,31 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s activity-data parent-comment-uuid]
+  [s activity-data parent-comment-uuid dismiss-reply-cb]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _team-roster (drv/react s :team-roster)
         add-comment-focus (drv/react s :add-comment-focus)
         current-user-data (drv/react s :current-user-data)
-        add-comment-class (str "add-comment-" @(::add-comment-id s))]
+        add-comment-class (str "add-comment-" @(::add-comment-id s))
+        container-class (str "add-comment-box-container-" @(::add-comment-id s))
+        is-focused? (should-focus-field? s)
+        should-hide-post-button (and ;; Hide post button onlu for the last add comment field, not
+                                     ;; for the reply to comments
+                                     (not parent-comment-uuid)
+                                     (or (not @(::show-post-button s))
+                                         (not is-focused?)
+                                         ;; Hide post button of the last add comment field
+                                         ;; when a thread comment box is focused
+                                         (and (not is-focused?)
+                                              (not parent-comment-uuid)
+                                              (seq add-comment-focus))))]
     [:div.add-comment-box-container
+      {:class container-class}
       [:div.add-comment-box
         (user-avatar-image current-user-data)
         [:div.add-comment-internal
+          {:class (when should-hide-post-button "active")}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
@@ -188,14 +202,25 @@
             (media-video-modal {:fullscreen false
                                 :dismiss-cb #(do
                                               (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)
-                                              (reset! (:me/showing-media-video-modal s) false))})])
+                                              (reset! (:me/showing-media-video-modal s) false))
+                                :offset-element-selector [(keyword (str "div." container-class))]
+                                :outer-container-selector [(keyword (str "div." container-class))]})])
         (when @(:me/showing-gif-selector s)
           (giphy-picker {:fullscreen false
                          :pick-emoji-cb (fn [gif-obj]
                                          (reset! (:me/showing-gif-selector s) false)
-                                         (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))}))
+                                         (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))
+                         :offset-element-selector [(keyword (str "div." container-class))]
+                         :outer-container-selector [(keyword (str "div." container-class))]}))
         [:div.add-comment-footer
-          {:class (when-not @(::show-post-button s) "hidden")}
+          {:class (when should-hide-post-button "hidden")}
+          (when (and parent-comment-uuid
+                     (fn? dismiss-reply-cb))
+            [:button.mlb-reset.close-reply-bt
+              {:on-click dismiss-reply-cb
+               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+               :data-placement "right"
+               :title "Close"}])
           [:button.mlb-reset.send-btn
             {:on-click #(send-clicked s parent-comment-uuid)
              :disabled @(::add-button-disabled s)}

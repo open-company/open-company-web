@@ -326,5 +326,6 @@
                       [:div.stream-comment-reactions-footer.group
                         (reactions comment-data false activity-data)]))]]]
           (when should-show-add-comment?
-            (add-comment activity-data (:reply-parent comment-data)))])]
+            (add-comment activity-data (:reply-parent comment-data)
+             (fn [](swap! (::replying-to s) #(disj % (:reply-parent comment-data))))))])]
       [:div.stream-comments-empty])])
