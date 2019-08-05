@@ -68,14 +68,13 @@ div.stream-comments {
 
             div.more-menu {
               button.more-menu-bt {
-                background-position: 0px left 4px top;
-                margin-top: -4px;
+                background-position: right 0px top 4px;
               }
 
               ul.more-menu-list {
                 width: 78px;
                 top: 20px;
-                right: 13px;
+                right: 0;
                 left: unset;
               }
             }
@@ -402,17 +401,25 @@ div.stream-comments {
       }
 
       div.add-comment-box-container {
-        padding: 0 0 0 32px;
+        margin-left: 40px;
         margin-top: 8px;
         margin-bottom: 8px;
 
+        @include mobile() {
+          margin-left: 32px;
+        }
+
         div.add-comment-box {
+          @include mobile() {
+            width: calc(100% - 32px);
+          }
+
           div.add-comment-internal {
             div.add-comment {
               min-height: 92px;
 
               @include mobile() {
-                min-height: 46px;
+                min-height: 48px;
               }
             }
           }
