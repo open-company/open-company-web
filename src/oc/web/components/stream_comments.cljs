@@ -103,17 +103,18 @@
 
 (defn- maybe-highlight-comment [s]
   (let [comments-data (second (:rum/args s))]
-    (when (and comments-data
+    (when (and (seq comments-data)
                (router/current-comment-id)
                (not @(::initial-comment-scroll s)))
-      (when-let [comment-node (rum/ref-node s
-                               (str "stream-comment-" (router/current-comment-id)))]
-        (reset! (::initial-comment-scroll s) true)
-        (utils/after 10 (fn []
-         (reset! (::highlight-comment-url s) true)
-         (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"})
-         (utils/after 1000(fn []
-          (reset! (::highlight-comment-url s) false)))))))))
+      (utils/after 500 #(do
+       (when-let [comment-node (rum/ref-node s
+                                (str "stream-comment-" (router/current-comment-id)))]
+         (reset! (::initial-comment-scroll s) true)
+         (utils/after 10 (fn []
+          (reset! (::highlight-comment-url s) true)
+          (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"})
+          (utils/after 1000(fn []
+           (reset! (::highlight-comment-url s) false)))))))))))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
