@@ -14,6 +14,7 @@
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.medium-editor-media :as me-media-utils]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -26,8 +27,9 @@
     (let [activity-data (first (:rum/args s))
           parent-comment-uuid (second (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
-          next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))]
-      (comment-actions/add-comment-change activity-data parent-comment-uuid comment-text)
+          next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))
+          edit-comment-data (get (vec (:rum/args s)) 3 nil)]
+      (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
@@ -45,12 +47,29 @@
     (when (not (seq (.-innerHTML add-comment-node)))
       (comment-actions/add-comment-blur))))
 
-(defn- send-clicked [s parent-comment-uuid]
+(defn- send-clicked [event s]
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
-        activity-data (first (:rum/args s))]
-    (set! (.-innerHTML add-comment-div) "")
-    (comment-actions/add-comment activity-data comment-body parent-comment-uuid)))
+        args (vec (:rum/args s))
+        activity-data (first args)
+        parent-comment-uuid (second args)
+        dismiss-reply-cb (get args 2)
+        edit-comment-data (get args 3 nil)
+        save-done-cb (fn [success]
+                      (reset! (::add-button-disabled s) false)
+                      (if success
+                        (when (fn? dismiss-reply-cb)
+                          (dismiss-reply-cb event false))
+                        (notification-actions/show-notification
+                         {:title "An error occurred while saving your comment."
+                          :description "Please try again"
+                          :dismiss true
+                          :expire 3
+                          :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
+    (reset! (::add-button-disabled s) true)
+    (if edit-comment-data
+      (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
+      (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))))
 
 (def me-options
   {:media-config ["gif" "photo" "video"]
@@ -66,8 +85,10 @@
 (defn- should-focus-field? [s]
   (let [activity-data (first (:rum/args s))
         parent-comment-uuid (second (:rum/args s))
-        add-comment-focus @(drv/get-ref s :add-comment-focus)]
-    (or (and (= (:uuid activity-data) add-comment-focus)
+        add-comment-focus @(drv/get-ref s :add-comment-focus)
+        edit-comment-data (get (vec (:rum/args s)) 3 nil)]
+    (or edit-comment-data
+        (and (= (:uuid activity-data) add-comment-focus)
              (not parent-comment-uuid))
         (and (seq parent-comment-uuid)
              (= parent-comment-uuid add-comment-focus)))))
@@ -118,9 +139,12 @@
                           (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [activity-data (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
-                                activity-add-comment-data (get add-comment-data (:uuid activity-data))]
+                                parent-comment-uuid (second (:rum/args s))
+                                edit-comment-data (get (vec (:rum/args s)) 3 nil)
+                                add-comment-key (str (:uuid activity-data) "-" parent-comment-uuid "-" (:uuid edit-comment-data))
+                                activity-add-comment-data (get add-comment-data add-comment-key)]
                             (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
-                            (reset! (::show-post-button s) should-focus-field?))
+                            (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
                           :did-mount (fn [s]
                            (me-media-utils/setup-editor s add-comment-did-change me-options)
@@ -153,7 +177,7 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s activity-data parent-comment-uuid dismiss-reply-cb]
+  [s activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _team-roster (drv/react s :team-roster)
@@ -189,11 +213,14 @@
                           (let [add-comment-node (rum/ref-node s "editor-node")]
                             (when (and (= (.-key e) "Escape")
                                        (= (.-activeElement js/document) add-comment-node))
-                              (.blur add-comment-node))
+                              (if edit-comment-data
+                                (when (fn? dismiss-reply-cb)
+                                  (dismiss-reply-cb e true))
+                                (.blur add-comment-node)))
                             (when (and (= (.-activeElement js/document) add-comment-node)
                                        (.-metaKey e)
                                        (= (.-key e) "Enter"))
-                              (send-clicked s (second (:rum/args s))))))
+                              (send-clicked e s))))
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
         (when @(:me/showing-media-video-modal s)
@@ -215,13 +242,15 @@
         [:div.add-comment-footer
           {:class (when should-hide-post-button "hide-footer")}
           [:button.mlb-reset.send-btn
-            {:on-click #(send-clicked s parent-comment-uuid)
+            {:on-click #(send-clicked % s)
              :disabled @(::add-button-disabled s)}
-            "Post"]
+            (if edit-comment-data
+              "Save"
+              "Post")]
           (when (and parent-comment-uuid
                      (fn? dismiss-reply-cb))
             [:button.mlb-reset.close-reply-bt
-              {:on-click dismiss-reply-cb
+              {:on-click #(dismiss-reply-cb % true)
                :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
                :data-placement "right"
                :title "Close"}])
