@@ -16,6 +16,7 @@
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -40,23 +41,21 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn wrap-img-tags-in-anchors!
-  "Wraps all `img` tags within the post's body in anchor tags to allow for opening in a new tab."
+(defn make-images-interactive!
+  "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
   [s]
   (let [body (rum/ref s "post-body")
         imgs (dom/sel body "img")]
     (doseq [img  imgs
-            :let [anchor (dom/create-element "a")
-                  href   (.-src img)]]
-      (dom/set-attr! anchor :href href :target "_blank")
-      (dom/add-class! anchor :interactable-image)
-      (dom/insert-before! anchor img)
-      (dom/remove! img)
-      (dom/replace-contents! anchor img))
+            :let [href (.-src img)]]
+      (dom/add-class! img :interactive-image)
+      (dom/listen! img :click #(reset! (::image-modal-src s) href)))
     s))
 
-(def interactable-images-mixin
-  {:did-mount wrap-img-tags-in-anchors!})
+(def interactive-images-mixin
+  {:did-mount make-images-interactive!
+   :did-remount (fn [_ new-state]
+                  (make-images-interactive! new-state))})
 
 (defn- load-comments [s]
   (let [activity-data @(drv/get-ref s :activity-data)]
@@ -75,9 +74,10 @@
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
+  (rum/local nil ::image-modal-src)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
-  interactable-images-mixin
+  interactive-images-mixin
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
@@ -120,6 +120,8 @@
       {:class dom-node-class
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
+      (image-modal/image-modal {:src @(::image-modal-src s)
+                                :on-close #(reset! (::image-modal-src s) nil)})
       [:div.activity-share-container]
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
