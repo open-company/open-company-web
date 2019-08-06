@@ -59,8 +59,11 @@
         save-done-cb (fn [success]
                       (reset! (::add-button-disabled s) false)
                       (if success
-                        (when (fn? dismiss-reply-cb)
-                          (dismiss-reply-cb false))
+                        (do
+                          (when add-comment-div
+                            (set! (.-innerHTML add-comment-div) ""))
+                          (when (fn? dismiss-reply-cb)
+                            (dismiss-reply-cb false)))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
