@@ -37,10 +37,7 @@
       (and reminder
            (= notification-type "reminder-alert"))
       (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
-      ;; Current user was mentioned in a comment
-      (and mention? (:interaction-id notification))
-      (str first-name " mentioned you")
-      ;; Current user was mentioned in a post
+      ;; Current user was mentioned in a post or comment, for comment check (seq (:interaction-id notification))
       mention?
       (str first-name " mentioned you")
       ;; A comment was added to a post the current is involved in
