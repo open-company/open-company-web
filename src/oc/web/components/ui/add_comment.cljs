@@ -187,16 +187,11 @@
         add-comment-class (str "add-comment-" @(::add-comment-id s))
         container-class (str "add-comment-box-container-" @(::add-comment-id s))
         is-focused? (should-focus-field? s)
-        should-hide-post-button (and ;; Hide post button onlu for the last add comment field, not
+        should-hide-post-button (and ;; Hide post button only for the last add comment field, not
                                      ;; for the reply to comments
                                      (not parent-comment-uuid)
-                                     (or (not @(::show-post-button s))
-                                         (not is-focused?)
-                                         ;; Hide post button of the last add comment field
-                                         ;; when a thread comment box is focused
-                                         (and (not is-focused?)
-                                              (not parent-comment-uuid)
-                                              (seq add-comment-focus))))]
+                                     (not @(::show-post-button s))
+                                     (not is-focused?))]
     [:div.add-comment-box-container
       {:class container-class}
       [:div.add-comment-box
