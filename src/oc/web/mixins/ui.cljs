@@ -287,7 +287,6 @@
   [s el-selector]
   (let [dom-node (rum/dom-node s)
         imgs (dommy/sel dom-node (str el-selector " img"))]
-    (js/console.log "DBG make-images-interactive! imgs:" imgs)
     (doseq [img  imgs
             :let [href (.-src img)]]
       (dommy/add-class! img :interactive-image)
