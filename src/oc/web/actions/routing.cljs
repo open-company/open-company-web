@@ -10,10 +10,14 @@
   (dis/dispatch! [:routing route-path])
   (dis/dispatch! [:container/status (dis/change-data) true]))
 
-(defn maybe-404 []
-  (if (jwt/jwt)
+(defn maybe-404
+  ([] (maybe-404 false))
+  ([force-404?]
+  (if (or (jwt/jwt)
+          (jwt/id-token)
+          force-404?)
     (router/redirect-404!)
-    (dis/dispatch! [:show-login-wall])))
+    (dis/dispatch! [:show-login-wall]))))
 
 ;; Post modal
 

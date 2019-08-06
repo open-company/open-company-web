@@ -114,6 +114,8 @@
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
+       :data-new-at (:new-at activity-data)
+       :data-last-read-at (:last-read-at read-data)
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
                    (if is-drafts-board
