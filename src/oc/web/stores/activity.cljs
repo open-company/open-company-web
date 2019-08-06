@@ -416,12 +416,15 @@
         all-ids         (set (map :user-id filtered-users))
         unseen-ids      (clojure.set/difference all-ids seen-ids)
         unseen-users    (vec (map (fn [user-id]
-                         (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
+                         (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))
+        current-user-id (j/user-id)
+        current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)]
     (assoc-in db (conj dispatcher/activities-read-key item-id) {:count read-data-count
                                                                 :reads fixed-read-data
                                                                 :item-id item-id
                                                                 :unreads unseen-users
-                                                                :last-read-at (:read-at (last (sort-by :read-at read-data)))
+                                                                :last-read-at (:read-at (last (sort-by :read-at
+                                                                               current-user-reads)))
                                                                 :private-access? private-access?})))
 
 (defmethod dispatcher/action :must-see-get/finish
