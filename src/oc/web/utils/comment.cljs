@@ -58,7 +58,7 @@
 
 (defn add-comment-content [comment-node & [print?]]
   (let [comment-html (.-innerHTML comment-node)
-        $comment-node (js/$ comment-html)
+        $comment-node (.html (js/$ "<div/>") comment-html)
         _remove-mentions-popup (.remove $comment-node ".oc-mention-popup")]
     (.html $comment-node)))
 
