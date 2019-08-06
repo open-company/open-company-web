@@ -16,6 +16,7 @@ div.add-comment-box-container {
 
     div.user-avatar-img-container {
       float: left;
+      margin-top: 10px;
 
       @include mobile() {
         display: none;
