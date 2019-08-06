@@ -39,7 +39,7 @@
       (str "Hi " (first (clojure.string/split (:name reminder-assignee) #"\s")) ", it's time to update your team")
       ;; Current user was mentioned in a comment
       (and mention? (:interaction-id notification))
-      (str first-name " mentioned you in a comment")
+      (str first-name " mentioned you")
       ;; Current user was mentioned in a post
       mention?
       (str first-name " mentioned you")
@@ -50,7 +50,7 @@
            ;; author fo the post it means we are just following this post
            ;; because we commented too
            (not= (:user-id entry-publisher) user-id))
-      (str "Also " first-name " commented on " (:name entry-publisher) "'s post")
+      (str first-name " replied to a thread")
       ;; A comment was added to a post the current user published
       (:interaction-id notification)
       (str first-name " commented on your post")
