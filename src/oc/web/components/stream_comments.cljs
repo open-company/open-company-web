@@ -28,13 +28,12 @@
   (reset! (::editing? s) nil))
 
 (defn cancel-edit
-  [e s comment-data]
-  (.stopPropagation e)
+  [s comment-data]
   (stop-editing s comment-data))
 
-(defn finish-edit [s comment-data event cancel?]
+(defn finish-edit [s comment-data cancel?]
   (if cancel?
-    (cancel-edit event s comment-data)
+    (cancel-edit s comment-data)
     (stop-editing s comment-data)))
 
 (defn start-editing [s comment-data]
@@ -176,7 +175,8 @@
                :data-comment-uuid (:uuid comment-data)
                :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                         :closing-thread (or (not next-comment-data)
-                                                            (empty? (:parent-uuid next-comment-data)))})}
+                                                            (empty? (:parent-uuid next-comment-data)))
+                                        :indented-comment is-indented-comment?})}
               (add-comment activity-data (:reply-parent comment-data)
                (partial finish-edit s comment-data)
                comment-data)]
@@ -185,13 +185,13 @@
                :data-comment-uuid (:uuid comment-data)
                :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                         :closing-thread (or (not next-comment-data)
-                                                            (empty? (:parent-uuid next-comment-data)))})}
+                                                            (empty? (:parent-uuid next-comment-data)))
+                                        :indented-comment is-indented-comment?})}
               [:div.stream-comment
                 {:ref (str "stream-comment-" (:uuid comment-data))
                  :class (utils/class-set {:editing is-editing?
                                           :editing-other-comment (not (nil? @(::editing? s)))
-                                          :showing-picker showing-picker?
-                                          :indented-comment is-indented-comment?})
+                                          :showing-picker showing-picker?})
                  :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
                 [:div.stream-comment-inner
                   (when-not is-editing?

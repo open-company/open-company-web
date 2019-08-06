@@ -31,9 +31,23 @@ div.stream-comments {
         padding-bottom: 16px;
       }
 
-      div.stream-comment:not(.indented-comment) {
+      &:not(.indented-comment) div.stream-comment {
         border-top: 1px solid $ultra_light_grey;
         padding-top: 16px;
+      }
+
+      &.indented-comment div.stream-comment div.stream-comment-inner {
+        margin-left: 40px;
+        width: calc(100% - 40px);
+
+        @include mobile() {
+          margin-left: 32px;
+          width: calc(100% - 32px);
+        }
+
+        div.stream-comment-floating-buttons {
+          top: 8px;
+        }
       }
 
       &.not-highlighted {
@@ -116,20 +130,6 @@ div.stream-comments {
                 outline: none;
               }
             }
-          }
-        }
-
-        &.indented-comment div.stream-comment-inner {
-          margin-left: 40px;
-          width: calc(100% - 40px);
-
-          @include mobile() {
-            margin-left: 32px;
-            width: calc(100% - 32px);
-          }
-
-          div.stream-comment-floating-buttons {
-            top: 8px;
           }
         }
 
@@ -401,31 +401,50 @@ div.stream-comments {
       }
 
       div.add-comment-box-container {
-        margin-left: 40px;
         margin-top: 8px;
         margin-bottom: 8px;
 
-        @include mobile() {
-          margin-left: 32px;
-        }
+        div.add-comment-box div.add-comment-internal div.add-comment {
+          min-height: 92px;
 
-        div.add-comment-box {
           @include mobile() {
-            width: calc(100% - 32px);
-          }
-
-          div.add-comment-internal {
-            div.add-comment {
-              min-height: 92px;
-
-              @include mobile() {
-                min-height: 48px;
-              }
-            }
+            min-height: 48px;
           }
 
           div.add-comment-footer.hide-footer {
             display: none;
+          }
+        }
+      }
+
+      &.indented-comment {
+        div.add-comment-box-container {
+          margin-left: 40px;
+          margin-top: 8px;
+          margin-bottom: 8px;
+
+          @include mobile() {
+            margin-left: 32px;
+          }
+
+          div.add-comment-box {
+            @include mobile() {
+              width: calc(100% - 32px);
+            }
+
+            div.add-comment-internal {
+              div.add-comment {
+                min-height: 92px;
+
+                @include mobile() {
+                  min-height: 48px;
+                }
+              }
+            }
+
+            div.add-comment-footer.hide-footer {
+              display: none;
+            }
           }
         }
       }
