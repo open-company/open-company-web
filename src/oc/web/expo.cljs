@@ -1,6 +1,7 @@
 (ns oc.web.expo
   "TODO: Write a couple notes here briefly explaining the bridge."
-  (:require [oc.web.actions.user :as user-actions]))
+  (:require [oc.web.actions.user :as user-actions]
+            [oc.web.utils.user :as user-utils]))
 
 (defn- bridge-call!
   "Raises an event on the native side of the bridge with name `op` and accompanying `data`.
@@ -35,6 +36,13 @@
   (if-let [token (parse-bridge-data json-str)]
     (user-actions/add-expo-push-token token)
     (js/alert "Notification permission denied!")))
+
+(defn ^:export on-push-notification-tapped
+  [json-str]
+  (when-let [push-notif (parse-bridge-data json-str)]
+    (let [fixed-notif (user-utils/fix-notification push-notif)
+          click-handler (:click fixed-notif)]
+      (click-handler))))
 
 ;; TODO: Figure out where to actually call this properly (possibly core?)
 ;; (bridge-get-push-notification-token!)
