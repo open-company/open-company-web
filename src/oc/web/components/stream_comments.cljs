@@ -175,23 +175,24 @@
                :data-comment-uuid (:uuid comment-data)
                :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                         :closing-thread (or (not next-comment-data)
-                                                            (empty? (:parent-uuid next-comment-data)))
-                                        :indented-comment is-indented-comment?})}
-              (add-comment activity-data (:reply-parent comment-data)
-               (partial finish-edit s comment-data)
-               comment-data)]
+                                                            (empty? (:parent-uuid next-comment-data)))})}
+              [:div.stream-comment
+                {:class (utils/class-set {:indented-comment is-indented-comment?})}
+                (add-comment activity-data (:reply-parent comment-data)
+                 (partial finish-edit s comment-data)
+                 comment-data)]]
             [:div.stream-comment-outer
               {:key (str "stream-comment-" (:created-at comment-data))
                :data-comment-uuid (:uuid comment-data)
                :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                         :closing-thread (or (not next-comment-data)
-                                                            (empty? (:parent-uuid next-comment-data)))
-                                        :indented-comment is-indented-comment?})}
+                                                            (empty? (:parent-uuid next-comment-data)))})}
               [:div.stream-comment
                 {:ref (str "stream-comment-" (:uuid comment-data))
                  :class (utils/class-set {:editing is-editing?
                                           :editing-other-comment (not (nil? @(::editing? s)))
-                                          :showing-picker showing-picker?})
+                                          :showing-picker showing-picker?
+                                          :indented-comment is-indented-comment?})
                  :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
                 [:div.stream-comment-inner
                   (when-not is-editing?
@@ -297,6 +298,8 @@
                      [:div.stream-comment-reactions-footer.group
                         (reactions comment-data true activity-data)])]]]
             (when should-show-add-comment?
-              (add-comment activity-data (:reply-parent comment-data)
-               (fn [_ _](swap! (::replying-to s) #(disj % (:reply-parent comment-data))))))]))]
+              [:div.stream-comment
+                {:class (utils/class-set {:indented-comment true})}
+                (add-comment activity-data (:reply-parent comment-data)
+                 (fn [_ _](swap! (::replying-to s) #(disj % (:reply-parent comment-data)))))])]))]
       [:div.stream-comments-empty])])

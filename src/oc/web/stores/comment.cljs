@@ -46,8 +46,9 @@
 
 (defmethod dispatcher/action :add-comment-remove
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid]]
-  (let [add-comment-key (dispatcher/add-comment-activity-key org-slug (str activity-uuid "-" parent-comment-uuid "-" comment-uuid))]
-    (update-in db add-comment-key dissoc activity-uuid)))
+  (let [add-comment-key (dispatcher/add-comment-key org-slug)
+        comment-key (str activity-uuid "-" parent-comment-uuid "-" comment-uuid)]
+    (update-in db add-comment-key dissoc comment-key)))
 
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]

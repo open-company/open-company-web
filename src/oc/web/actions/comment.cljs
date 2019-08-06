@@ -27,10 +27,6 @@
   ;; Save the comment change in the app state to remember it
   (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid comment-uuid comment-body]))
 
-(defn add-comment-cancel [activity-data]
-  ;; Remove cached comment for activity
-  (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data)]))
-
 (defn add-comment [activity-data comment-body parent-comment-uuid save-done-cb]
   (add-comment-blur)
   ;; Send WRT read on comment add
