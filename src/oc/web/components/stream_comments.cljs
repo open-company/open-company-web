@@ -116,6 +116,7 @@
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              ui-mixins/refresh-tooltips-mixin
+                             (ui-mixins/interactive-images-mixin "div.stream-comment-body")
                              (ui-mixins/on-window-click-mixin (fn [s e]
                               (when (and @(::show-picker s)
                                          (not (utils/event-inside? e
