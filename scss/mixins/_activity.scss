@@ -247,8 +247,6 @@ $h2_top_margin: 24;
     padding: 10px 20px;
     min-height: #{$line_height + 20}px;
     border-left: 4px solid $ultra_light_grey;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
   }
 
   i:empty, b:empty, strong:empty, li:empty {
@@ -613,8 +611,6 @@ $h2_top_margin: 24;
     padding: 10px 20px;
     min-height: 44px;
     border-left: 4px solid $ultra_light_grey;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
   }
 
 }
