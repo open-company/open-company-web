@@ -4,6 +4,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -152,9 +153,10 @@
                    (when (:private-access? read-data)
                      "private ")
                    "post."))
-                (when (:private-access? read-data)
+                (when (and (:private-access? read-data)
+                           (dis/board-data (router/current-org-slug) (:board-slug activity-data)))
                   [:button.mlb-reset.manage-section-bt
-                    {:on-click #(nav-actions/show-section-editor)}
+                    {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
                     "Manage section members?"])]]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}

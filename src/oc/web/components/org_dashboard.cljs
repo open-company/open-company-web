@@ -93,6 +93,7 @@
                 org-data
                 jwt
                 board-data
+                initial-section-editing
                 container-data
                 posts-data
                 is-sharing-activity
@@ -220,7 +221,7 @@
           (edit-recurring-update-modal)
           ;; Mobile create a new section
           show-section-editor
-          (section-editor board-data
+          (section-editor initial-section-editing
            (fn [sec-data note dismiss-action]
             (if sec-data
               (section-actions/section-save sec-data note dismiss-action)

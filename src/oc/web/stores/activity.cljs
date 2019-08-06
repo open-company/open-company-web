@@ -402,13 +402,14 @@
 (defmethod dispatcher/action :activity-reads
   [db [_ org-slug item-id read-data-count read-data team-roster]]
   (let [activity-data   (dispatcher/activity-data org-slug item-id db)
-        board-data      (dispatcher/board-data db org-slug (:board-slug activity-data))
+        org-data        (dispatcher/org-data db org-slug)
+        board-data      (first (filter #(= (:slug %) (:board-slug activity-data)) (:boards org-data)))
         fixed-read-data (vec (map #(assoc % :seen true) read-data))
         team-users      (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
         seen-ids        (set (map :user-id read-data))
         private-access? (= (:access board-data) "private")
         all-private-users (when private-access?
-                            (set (concat (map :user-id (:authors board-data)) (map :user-id (:viewers board-data)))))
+                            (set (concat (:authors board-data) (:viewers board-data))))
         filtered-users  (if private-access?
                           (filterv #(all-private-users (:user-id %)) team-users)
                           team-users)

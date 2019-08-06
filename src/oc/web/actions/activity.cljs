@@ -583,7 +583,11 @@
   (cond
 
    (some #{status} [401 404])
-   (routing-actions/maybe-404)
+   ;; Force a 404 in case user is visiting a secure activity as anonymous
+   ;; that don't exists, the secure activity are always visible
+   (routing-actions/maybe-404 (and (not (jwt/jwt))
+                                   (not (jwt/id-token))
+                                   (some? (router/current-secure-activity-id))))
 
    ;; The id token will have a current activity id, shared urls will not.
    ;; if the ids don't match return a 404
@@ -641,41 +645,6 @@
      (secure-activity-get-finish resp)
      (when (fn? cb)
        (cb resp)))))
-
-(defn secure-activity-chain []
-  (api/web-app-version-check
-    (fn [{:keys [success body status]}]
-      (when (= status 404)
-        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
-  ;; Quick check on token
-  (when-let [info (jwt/get-id-token-contents)]
-    (when (not= (:secure-uuid info)
-                (router/current-secure-activity-id))
-      (routing-actions/maybe-404)))
-  (let [org-slug (router/current-org-slug)]
-    (api/get-auth-settings (fn [body]
-      (when body
-        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-          (api/get-user user-link (fn [success data]
-            (dis/dispatch! [:user-data (when success (json->cljs data))]))))
-        (dis/dispatch! [:auth-settings body])
-        (api/get-entry-point org-slug
-          (fn [success body]
-            (let [collection (:collection body)]
-              (if success
-                (let [orgs (:items collection)]
-                  (dis/dispatch! [:entry-point orgs collection])
-                  (when-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-                    (when (and (not (jwt/jwt)) (jwt/id-token))
-                      (get-org org-data
-                       (fn [success]
-                         (if success
-                           (connect-change-service)
-                           (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))
-                  (secure-activity-get (fn []
-                    ;; Delay comment load
-                    (comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))))
-                (notification-actions/show-notification (assoc utils/network-error :expire 0)))))))))))
 
 ;; Change reaction
 
@@ -903,7 +872,7 @@
                                    cmail-state
                                    (not (:collapsed cmail-state)))
                              cmail-data
-                             (cmail-actions/get-default-section))]
+                             (cmail-actions/get-board-for-edit))]
       (activity-edit next-cmail-data)))
   ([activity-data]
     (let [fixed-activity-data (if-not (seq (:uuid activity-data))

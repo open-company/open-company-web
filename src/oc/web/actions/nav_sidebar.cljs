@@ -72,7 +72,8 @@
 
 ;; Section settings
 
-(defn show-section-editor []
+(defn show-section-editor [section-slug]
+  (section-actions/setup-section-editing section-slug)
   (push-panel :section-edit))
 
 (defn hide-section-editor []

@@ -58,7 +58,8 @@
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
             "editableInput"
-            #(enable-add-comment? s)))))))
+            #(enable-add-comment? s))
+          (utils/after 100 #(enable-add-comment? s)))))))
 
 (rum/defcs add-comment < rum/reactive
                          rum/static
@@ -119,7 +120,7 @@
                                         (not (:completed? follow-up)))
                                (reset! (::complete-follow-up s) true)))
                            s)
-                          :did-remount (fn [_ s]
+                          :will-update (fn [s]
                            (setup-medium-editor-when-needed s)
                            s)
                           :will-unmount (fn [s]
@@ -142,6 +143,8 @@
                            s)}
   [s activity-data]
   (let [_ (drv/react s :add-comment-data)
+        _ (drv/react s :add-comment-focus)
+        _ (drv/react s :team-roster)
         current-user-data (drv/react s :current-user-data)
         follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
         complete-follow-up-link (when follow-up

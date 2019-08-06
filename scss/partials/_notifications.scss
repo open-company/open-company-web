@@ -92,7 +92,7 @@ div.notifications {
     }
 
     &.dismiss-button {
-      div.notfication-title {
+      div.notification-title {
         width: calc(100% - 20px);
         float: left;
       }
@@ -130,6 +130,23 @@ div.notifications {
         float: unset;
         top: 9px;
         right: 16px;
+      }
+    }
+
+    &.app-update {
+      div.notification-title.no-description {
+        @include OC_Body_Book();
+        line-height: 18px;
+        width: calc(100% - 20px);
+        float: left;
+      }
+
+      button.notification-button {
+        float: left;
+        text-align: left;
+        font-size: 14px;
+        line-height: 18px;
+        margin-top: 4px;
       }
     }
 
@@ -175,6 +192,16 @@ div.notifications {
       padding: 0;
       margin: 0;
       color: $carrot_green;
+
+      &.dismiss-x {
+        background-image: cdnUrl("/img/ML/close_notification_white.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+        top: 8px;
+        right: 10px;
+        opacity: 0.5;
+      }
     }
 
     div.notification-description {

@@ -283,3 +283,7 @@
 (defn section-more [more-link direction]
   (api/load-more-items more-link direction (partial section-more-finish direction))
   (dispatcher/dispatch! [:section-more (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)]))
+
+(defn setup-section-editing [section-slug]
+  (when-let [board-data (dispatcher/board-data (router/current-org-slug) section-slug)]
+    (dispatcher/dispatch! [:setup-section-editing board-data])))
