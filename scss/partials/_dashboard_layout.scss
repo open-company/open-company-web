@@ -65,6 +65,7 @@ div.dashboard-layout {
       width: 100%;
       max-width: initial;
       min-width: initial;
+      padding-bottom: 52px;
     }
 
     div.dashboard-layout-mobile-tabbar {
@@ -304,7 +305,7 @@ div.dashboard-layout {
         }
 
         @include mobile() {
-          height: 35px;
+          height: 50px;
           border-bottom: none;
           padding: 0;
 
@@ -505,9 +506,26 @@ div.dashboard-layout {
 
           @include mobile() {
             width: 100%;
-            height: 35px;
+            height: 50px;
             background-color: $grey_num_2;
             border-bottom: 1px solid $grey_num_3;
+          }
+
+          button.mobile-search-bt {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              position: absolute;
+              left: 16px;
+              top: 14px;
+              background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              width: 24px;
+              height: 24px;
+            }
           }
 
           button.board-sort-bt {
@@ -521,9 +539,10 @@ div.dashboard-layout {
             position: relative;
 
             @include mobile(){
-              width: 100%;
-              height: 35px;
-              line-height: 35px;
+              width: 80%;
+              margin: 0 auto;
+              height: 50px;
+              line-height: 50px;
               display: flex;
               justify-content: center;
               align-items: center;

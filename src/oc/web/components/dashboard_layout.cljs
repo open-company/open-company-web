@@ -17,6 +17,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.actions.search :as search-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
@@ -216,6 +217,9 @@
                   (let [default-sort (= board-sort dis/default-sort-type)]
                     [:div.board-sort.group
                       {:ref :board-sort-menu}
+                      (when is-mobile?
+                        [:button.mlb-reset.mobile-search-bt
+                          {:on-click #(search-actions/active)}])
                       [:button.mlb-reset.board-sort-bt
                         {:on-click #(swap! (::sorting-menu-expanded s) not)}
                         (if default-sort "Recent activity" "Recently posted")]
