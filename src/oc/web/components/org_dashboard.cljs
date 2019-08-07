@@ -267,6 +267,5 @@
                          (and (or (not search-active?) (not search-results?))
                               (or (not open-panel)
                                   (= open-panel :menu))
-                              (not is-showing-mobile-search)
-                              (not showing-mobile-user-notifications)))
+                              (not is-showing-mobile-search)))
                  (dashboard-layout))]]])])))

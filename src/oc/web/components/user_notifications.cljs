@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.activity :as am]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
@@ -25,11 +26,25 @@
                                 (drv/drv :unread-notifications-count) ;; required by desktop app for dock badge count
                                 (drv/drv :show-add-post-tooltip)
                                 (rum/local false ::tray-open)
+                                (rum/local 0 ::old-scroll-top)
                                 ui-mixins/refresh-tooltips-mixin
                                 (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
                                 (ui-mixins/on-window-click-mixin (fn [s e]
                                  (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
                                    (close-tray s))))
+                                {:will-mount (fn [s]
+                                  (when (responsive/is-mobile-size?)
+                                    (swap! router/path assoc :back-y (.. js/document -scrollingElement -scrollTop))
+                                    (utils/scroll-to-y 0 0)
+                                    (dom-utils/lock-page-scroll))
+                                 s)
+                                 :will-unmount (fn [s]
+                                  (when (responsive/is-mobile-size?)
+                                    (dom-utils/unlock-page-scroll)
+                                    (let [old-scroll-top (or (:back-y @router/path) 0)]
+                                      (swap! router/path dissoc :back-y)
+                                      (utils/scroll-to-y old-scroll-top 0)))
+                                  s)}
   [s]
   (let [user-notifications-data (drv/react s :user-notifications)
         has-new-content (has-new-content? user-notifications-data)

@@ -215,11 +215,12 @@ div.left-navigation-sidebar {
     width: 100%;
     height: 100vh;
     display: none;
-    z-index: 10000;
+    z-index: #{$navbar_zindex + 2};
     background-color: $carrot_modal_bg;
     overflow-y: unset;
     overflow-x: unset;
     padding-bottom: 0;
+    max-height: initial;
 
     &.mobile-show-side-panel {
       display: block;
@@ -274,8 +275,12 @@ div.left-navigation-sidebar {
           background-repeat: no-repeat; 
         }
 
-        div.orgs-dropdown div.orgs-dropdown-container {
-          z-index: 2;
+        div.orgs-dropdown  {
+          width: calc(100% - 40px);
+
+          div.orgs-dropdown-container {
+            z-index: 2;
+          }
         }
       }
     }

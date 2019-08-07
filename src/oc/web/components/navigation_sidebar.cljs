@@ -1,12 +1,12 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
-            [dommy.core :as dommy]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
@@ -63,7 +63,7 @@
                                 (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
-                                (rum/local false ::last-mobile-navigation-panel)
+                                (rum/local nil ::last-mobile-navigation-panel)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -80,14 +80,19 @@
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
-                                  (let [mobile-navigation-panel @(drv/get-ref s :mobile-navigation-sidebar)
-                                        last-mobile-navigation-panel @(::last-mobile-navigation-panel s)]
-                                    (when (not= mobile-navigation-panel last-mobile-navigation-panel)
-                                      (if mobile-navigation-panel
-                                        ;; Will open panel, let's block page scroll
-                                        (dommy/add-class! (.-body js/document) :no-scroll)
-                                        ;; Will close panel, let's unblock page scroll
-                                        (dommy/remove-class! (.-body js/document) :no-scroll))))
+                                  (when (responsive/is-mobile-size?)
+                                    (let [mobile-navigation-panel (boolean @(drv/get-ref s :mobile-navigation-sidebar))
+                                          last-mobile-navigation-panel (boolean @(::last-mobile-navigation-panel s))]
+                                      (when (not= mobile-navigation-panel last-mobile-navigation-panel)
+                                        (if mobile-navigation-panel
+                                          ;; Will open panel, let's block page scroll
+                                          (do
+                                            (dom-utils/lock-page-scroll)
+                                            (reset! (::last-mobile-navigation-panel s) true))
+                                          ;; Will close panel, let's unblock page scroll
+                                          (do
+                                            (dom-utils/unlock-page-scroll)
+                                            (reset! (::last-mobile-navigation-panel s) false))))))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)

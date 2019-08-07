@@ -101,6 +101,7 @@
                                            (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (js/console.log "DB cmail lock-page-scroll")
     (if (:fullscreen cmail-default-state)
       (dom-utils/lock-page-scroll)
       (when-not (:collapsed cmail-state)

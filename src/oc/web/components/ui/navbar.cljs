@@ -78,7 +78,8 @@
           [:div.navbar-right
             (if (jwt/jwt)
               [:div.group
-                (user-notifications)
+                (when-not is-mobile?
+                  (user-notifications))
                 [:div.user-menu
                   [:div.user-menu-button
                     {:ref "user-menu"
