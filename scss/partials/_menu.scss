@@ -25,6 +25,10 @@ div.menu {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   &.expanded-user-menu {
@@ -50,16 +54,16 @@ div.menu {
 
     @include mobile() {
       top: 0;
-      left: 0;
-      right: unset;
-      width: 75vw;
+      left: unset;
+      right: 0;
+      width: 85vw;
       height: 100vh;
       border: none;
       box-shadow: none;
       transition: 230ms;
       display: block;
       text-align: left;
-      background-color: white;
+      background-color: $grey_num_2;
       display: none;
       opacity: 0;
       padding: 0 16px;
@@ -77,6 +81,7 @@ div.menu {
         height: 50px;
         position: relative;
         border-bottom: 1px solid $ultra_light_grey;
+        background-color: $grey_num_2;
       }
 
       button.mobile-close-bt {
