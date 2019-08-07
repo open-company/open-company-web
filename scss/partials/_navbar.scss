@@ -35,10 +35,6 @@ nav.oc-navbar {
     &.showing-orgs-dropdown {
       overflow: visible;
     }
-
-    &.expanded-user-menu {
-      height: 100vh;
-    }
   }
 
   z-index: $navbar_zindex;

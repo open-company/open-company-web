@@ -15,7 +15,6 @@ div.menu {
   @include mobile() {
     position: absolute;
     padding: 0;
-    background-color: $grey_num_2;
   }
 
   &.dropdown-menu {
@@ -50,11 +49,10 @@ div.menu {
     overflow-y: scroll;
 
     @include mobile() {
-      position: relative;
-      top: unset;
-      left: unset;
+      top: 0;
+      left: 0;
       right: unset;
-      width: 100%;
+      width: 75vw;
       height: 100vh;
       border: none;
       box-shadow: none;
@@ -77,9 +75,6 @@ div.menu {
 
       @include mobile() {
         height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
         position: relative;
         border-bottom: 1px solid $ultra_light_grey;
       }
@@ -90,7 +85,7 @@ div.menu {
         @include mobile() {
           display: block;
           position: absolute;
-          left: 16px;
+          right: 16px;
           top: 13px;
           width: 24px;
           height: 24px;
@@ -109,7 +104,7 @@ div.menu {
       }
 
       div.user-avatar-img-container {
-        float: right;
+        float: left;
       }
 
       div.user-name {
@@ -121,6 +116,8 @@ div.menu {
 
         @include mobile() {
           margin-left: 8px;
+          font-size: 16px;
+          line-height: 24px;
         }
       }
     }

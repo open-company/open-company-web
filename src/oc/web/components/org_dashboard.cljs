@@ -176,10 +176,6 @@
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
-          ;; User menu
-          (and is-mobile?
-               (= open-panel :menu))
-          (menu)
           ;; Activity removed
           show-activity-removed
           (activity-removed)
@@ -250,7 +246,9 @@
           (cmail))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
-        (when-not is-mobile?
+        (when (or (not is-mobile?)
+                  (and is-mobile?
+                       (= open-panel :menu)))
           (menu))
         ;; Alert modal
         (when is-showing-alert
@@ -259,14 +257,16 @@
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
                        (not show-mobile-cmail?)
-                       (not open-panel)))
+                       (or (not open-panel)
+                            (= open-panel :menu))))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
-                              (not open-panel)
+                              (or (not open-panel)
+                                  (= open-panel :menu))
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
                  (dashboard-layout))]]])])))
