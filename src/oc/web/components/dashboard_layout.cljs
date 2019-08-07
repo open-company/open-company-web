@@ -116,21 +116,29 @@
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?})}
               [:button.mlb-reset.all-posts-tab
-                {:on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (nav-actions/nav-to-url! % (oc-urls/all-posts)))
                  :class (when (= (router/current-board-slug) "all-posts")
                           "active")}]
               [:button.mlb-reset.follow-ups-tab
-                {:on-click #(nav-actions/nav-to-url! % (str (oc-urls/org) "/follow-ups"))
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (nav-actions/nav-to-url! % (str (oc-urls/org) "/follow-ups")))
                  :class (when (or (= (router/current-board-slug) "follow-ups")
                                   (= (router/current-board-slug) "must-see"))
                           "active")}]
               [:button.mlb-reset.notifications-tab
-                {:on-click #(user-actions/show-mobile-user-notifications)
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (user-actions/show-mobile-user-notifications))
                  :class (when (user-notifications/has-new-content? user-notifications-data)
                           "unread")}]
               (when can-compose?
                 [:button.mlb-reset.new-post-tab
-                  {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])])
+                  {:on-click #(do
+                                (.stopPropagation %)
+                                (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}])])
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
