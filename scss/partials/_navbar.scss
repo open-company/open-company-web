@@ -74,10 +74,10 @@ nav.oc-navbar {
         @include mobile() {
           position: absolute;
           top: 12px;
-          left: 72px;
+          left: 50%;
           width: 250px;
           height: 20px;
-          margin: 0;
+          margin: 0 0 0 -125px;
           text-align: center;
 
           div.section-name {

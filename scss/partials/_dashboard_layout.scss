@@ -539,13 +539,17 @@ div.dashboard-layout {
             position: relative;
 
             @include mobile(){
-              width: 80%;
-              margin: 0 auto;
+              width: 200px;
+              position: absolute;
+              top: 0;
+              left: 50%;
+              margin-left: -100px;
               height: 50px;
               line-height: 50px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
+              // display: flex;
+              // justify-content: center;
+              // align-items: center;
+              text-align: center;
               color: $ui_grey;
               opacity: 1;
             }
@@ -571,10 +575,10 @@ div.dashboard-layout {
               background-position: center;
 
               @include mobile() {
-                position: relative;
-                top: unset;
-                right: unset;
-                margin-left: 6px;
+                position: absolute;
+                top: 24px;
+                left: 50%;
+                margin-left: 47px;
                 opacity: 0.6;
               }
             }
