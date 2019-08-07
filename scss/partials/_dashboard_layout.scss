@@ -300,10 +300,6 @@ div.dashboard-layout {
         height: 40px;
         border-bottom: 1px solid $ultra_light_grey;
 
-        &.drafts-board {
-          height: 0;
-        }
-
         @include mobile() {
           height: 50px;
           border-bottom: none;
