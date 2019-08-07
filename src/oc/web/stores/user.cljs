@@ -4,7 +4,8 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.user :as user-utils]))
+            [oc.web.utils.user :as user-utils]
+            [oc.web.router :as router]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
@@ -273,3 +274,29 @@
         old-notifications (get-in db user-notifications-key)
         read-notifications (map #(if (= (:created-at %) (:created-at notification)) (assoc % :unread false) %) old-notifications)]
     (assoc-in db user-notifications-key read-notifications)))
+
+;; Expo push tokens
+
+(defmethod dispatcher/action :expo-push-token
+  [db [_ push-token]]
+  (cook/set-cookie! router/expo-push-token-cookie push-token)
+  (js/location.reload))
+
+(defmethod dispatcher/action :deny-push-notification-permission
+  [db [_]]
+  ;; A blank Expo push token indicates that the user was prompted, but
+  ;; denied the push notification permission.
+  (cook/set-cookie! router/expo-push-token-cookie "")
+  (js/location.reload))
+
+(defn get-expo-push-token
+  []
+  (if-let [token (cook/get-cookie router/expo-push-token-cookie)]
+    token
+    nil))
+
+(defn user-denied-push-notification-permission?
+  []
+  (if-let [token (get-expo-push-token)]
+    (empty? token)
+    false))

@@ -434,6 +434,8 @@
            :primary-bt-dismiss true
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
 
+;; Mobile push notifications
+
 (defn add-expo-push-token [push-token]
   (let [user-data            (dis/current-user-data)
         add-token-link       (utils/link-for (:links user-data) "add-expo-push-token" "POST")
@@ -443,7 +445,12 @@
        add-token-link
        push-token
        (fn [success]
+         (dis/dispatch! [:expo-push-token push-token])
          (timbre/info "Successfully saved Expo push notification token"))))))
+
+(defn deny-push-notification-permission
+  []
+  (dis/dispatch! [:deny-push-notification-permission]))
 
 ;; Initial loading
 

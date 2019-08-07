@@ -28,7 +28,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Push notification permissions
 
-(defn- bridge-request-push-notification-permission!
+(defn bridge-request-push-notification-permission!
   "Displays the native push notification permission dialog on iOS. If the user has already
   granted access, the response simply contains the push notification token. If the user denies
   access, the response will contain nil.
@@ -37,40 +37,19 @@
   []
   (bridge-call! "request-push-notification-permission" nil))
 
-(defn ^:export on-push-notification-permission
+(defn- ^:export on-push-notification-permission
   "Callback for the `bridge-request-push-notification-permission!` bridge method. Response will
   contain the push token if the user granted permission (or had already granted permission). Response
   is `nil` if the user denied the permission (or previously denied the permission)."
   [json-str]
   (if-let [token (parse-bridge-data json-str)]
     (user-actions/add-expo-push-token token)
-    (js/alert "Notification permission denied!")))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Expo push tokens
-
-(defn- bridge-get-push-notification-token!
-  "Attempts to retrieve the Expo push token that uniquely identifies this device. This bridge
-  method will NOT request push notification permission from the user. If the user had previously
-  granted the push notification permission, the response will contain the push token. Otherwise,
-  the response will contain `nil`."
-  []
-  (bridge-call! "get-push-notification-token" nil))
-
-(defn ^:export on-push-notification-token
-  "Callback for the `bridge-get-push-notification-token!` bridge method. Response contains
-  Expo push token that uniquely identifies this device if user had previously granted push notification
-  permission. Response will be `nil` if the user denied permission, or has not yet been prompted
-  for permission."
-  [json-str]
-  (if-let [token (parse-bridge-data json-str)]
-    (user-actions/add-expo-push-token token)
-    (js/alert "Notification permission denied!")))
+    (user-actions/deny-push-notification-permission)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Handling of user tapping on push notification
 
-(defn ^:export on-push-notification-tapped
+(defn- ^:export on-push-notification-tapped
   "Callback for responding to the user tapping on a native push notification. Response contains
   a push notification payload, which is literally a Carrot notification map."
   [json-str]

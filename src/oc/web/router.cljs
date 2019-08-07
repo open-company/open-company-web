@@ -167,6 +167,8 @@
 
 (def login-redirect-cookie "login-redirect")
 
+(def expo-push-token-cookie "expo-push-token")
+
 ;; Debug
 
 (defn print-router-path []
