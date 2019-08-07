@@ -126,7 +126,7 @@
                           "active")}]
               [:button.mlb-reset.notifications-tab
                 {:on-click #(user-actions/show-mobile-user-notifications)
-                 :class (when-not (user-notifications/has-new-content? user-notifications-data)
+                 :class (when (user-notifications/has-new-content? user-notifications-data)
                           "unread")}]
               (when can-compose?
                 [:button.mlb-reset.new-post-tab
