@@ -1,5 +1,6 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
+            [dommy.core :as dommy]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -11,7 +12,8 @@
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]))
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -55,11 +57,13 @@
                                 (drv/drv :editable-boards)
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :hide-left-navbar)
+                                (drv/drv :mobile-navigation-sidebar)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
+                                (rum/local false ::last-mobile-navigation-panel)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -76,6 +80,14 @@
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
+                                  (let [mobile-navigation-panel @(drv/get-ref s :mobile-navigation-sidebar)
+                                        last-mobile-navigation-panel @(::last-mobile-navigation-panel s)]
+                                    (when (not= mobile-navigation-panel last-mobile-navigation-panel)
+                                      (if mobile-navigation-panel
+                                        ;; Will open panel, let's block page scroll
+                                        (dommy/add-class! (.-body js/document) :no-scroll)
+                                        ;; Will close panel, let's unblock page scroll
+                                        (dommy/remove-class! (.-body js/document) :no-scroll))))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -103,10 +115,16 @@
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})}
+      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
+                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"
          :class (when can-compose "can-compose")}
+        (when is-mobile?
+          [:div.left-navigation-sidebar-mobile-header
+            [:button.mlb-reset.mobile-close-bt
+              {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+            (orgs-dropdown)])
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group

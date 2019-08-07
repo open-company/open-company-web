@@ -28,7 +28,6 @@
                     (drv/drv :navbar-data)
                     (drv/drv :show-add-post-tooltip)
                     (ui-mixins/render-on-resize nil)
-                    (rum/local false ::show-sections-list)
   [s]
   (let [{:keys [org-data
                 board-data
@@ -43,30 +42,13 @@
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
-         org-settings (#{:org :interations :team :invite :billing} current-panel)
-         user-settings (#{:profile :notifications} current-panel)
-         mobile-ap-active? (and (not expanded-user-menu)
-                                (not orgs-dropdown-visible)
-                                (not org-settings)
-                                (not user-settings)
-                                (not search-active)
-                                (not mobile-user-notifications))
-        section-name (cond
-                      (= (router/current-board-slug) "all-posts")
-                      "All Posts"
-                      (= (router/current-board-slug) "must-see")
-                      "Must See"
-                      :else
-                      (:name board-data))
-        create-link (utils/link-for (:links org-data) "create")
-        all-boards (:boards org-data)
-        boards (navigation-sidebar/filter-boards all-boards)
-        show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
-                            (utils/link-for (:links org-data) "activity"))
-        drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
-        drafts-link (utils/link-for (:links drafts-board) "self")
-        show-boards (or create-link (pos? (count boards)))
-        sorted-boards (navigation-sidebar/sort-boards boards)]
+         section-name (cond
+                       (= (router/current-board-slug) "all-posts")
+                       "All Posts"
+                       (= (router/current-board-slug) "must-see")
+                       "Must See"
+                       :else
+                       (:name board-data))]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -82,33 +64,14 @@
       [:div.oc-navbar-header.group
         [:div.oc-navbar-header-container.group
           [:div.navbar-left
-            (orgs-dropdown)]
+            (if is-mobile?
+              [:button.mlb-reset.mobile-ham-menu
+                {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
+              (orgs-dropdown))]
           (if is-mobile?
             [:div.navbar-center
-              [:button.mlb-reset.mobile-board-button
-                {:on-click #(swap! (::show-sections-list s) not)
-                 :ref :mobile-board-button}
-                section-name]
-              (when @(::show-sections-list s)
-                [:div.mobile-sections-list
-                  {:on-click #(reset! (::show-sections-list s) false)}
-                  [:div.mobile-sections-list-inner
-                    (when show-all-posts
-                      [:button.mlb-reset.mobile-section-item.all-posts
-                        {:class (when (= (router/current-board-slug) "all-posts") "active")
-                         :on-click #(mobile-nav! % "all-posts")}
-                        "All Posts"])
-                    (when drafts-link
-                      [:button.mlb-reset.mobile-section-item.drafts
-                        {:class (when (= (router/current-board-slug) utils/default-drafts-board-slug) "active")
-                         :on-click #(mobile-nav! % utils/default-drafts-board-slug)}
-                        "Drafts"])
-                    (for [board sorted-boards]
-                      [:button.mlb-reset.mobile-section-item
-                        {:key (str "mobile-section-" (:slug board))
-                         :class (when (= (router/current-board-slug) (:slug board)) "active")
-                         :on-click #(mobile-nav! % (:slug board))}
-                        (:name board)])]])]
+              [:div.section-name
+                section-name]]
             [:div.navbar-center
               {:class (when search-active "search-active")}
               (search-box)])

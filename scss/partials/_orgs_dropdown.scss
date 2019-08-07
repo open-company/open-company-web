@@ -2,10 +2,6 @@ div.orgs-dropdown {
   height: 32px;
   position: relative;
 
-  @include mobile() {
-    height: 40px;
-  }
-
   button.orgs-dropdown-btn {
     border: none;
     outline: none;
@@ -18,10 +14,6 @@ div.orgs-dropdown {
 
     div.org-avatar {
       height: 32px;
-
-      @include mobile() {
-        height: 40px;
-      }
     }
 
     &.dropdown-toggle {

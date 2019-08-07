@@ -107,8 +107,7 @@
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
         [:div.dashboard-layout-container.group
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
-          (when-not is-mobile?
-            (navigation-sidebar))
+          (navigation-sidebar)
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
