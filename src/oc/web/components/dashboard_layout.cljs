@@ -14,6 +14,7 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.user :as user-actions]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -25,6 +26,7 @@
             [oc.web.components.ui.empty-board :refer (empty-board)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
+            [oc.web.components.user-notifications :as user-notifications]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
@@ -43,6 +45,7 @@
                               (drv/drv :sort-type)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
+                              (drv/drv :user-notifications)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -96,18 +99,37 @@
                                      (not is-must-see)
                                      (not (:read-only board-data)))
         cmail-state (drv/react s :cmail-state)
-        _cmail-data (drv/react s :cmail-data)]
+        _cmail-data (drv/react s :cmail-data)
+        user-notifications-data (drv/react s :user-notifications)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when current-activity-id "expanded-post-view")}
-        (when (and is-mobile?
-                   (not current-activity-id)
-                   can-compose?)
-          [:button.mlb-reset.mobile-floating-compose-bt
-            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
         [:div.dashboard-layout-container.group
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (navigation-sidebar)
+          (when (and is-mobile?
+                     (not current-activity-id)
+                     (or (:collapsed cmail-state)
+                         (not cmail-state))
+                     (jwt/user-is-part-of-the-team (:team-id org-data)))
+            [:div.dashboard-layout-mobile-tabbar
+              {:class (utils/class-set {:can-compose can-compose?})}
+              [:button.mlb-reset.all-posts-tab
+                {:on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))
+                 :class (when (= (router/current-board-slug) "all-posts")
+                          "active")}]
+              [:button.mlb-reset.follow-ups-tab
+                {:on-click #(nav-actions/nav-to-url! % (str (oc-urls/org) "/follow-ups"))
+                 :class (when (or (= (router/current-board-slug) "follow-ups")
+                                  (= (router/current-board-slug) "must-see"))
+                          "active")}]
+              [:button.mlb-reset.notifications-tab
+                {:on-click #(user-actions/show-mobile-user-notifications)
+                 :class (when-not (user-notifications/has-new-content? user-notifications-data)
+                          "unread")}]
+              (when can-compose?
+                [:button.mlb-reset.new-post-tab
+                  {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])])
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group

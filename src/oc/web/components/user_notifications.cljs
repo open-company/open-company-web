@@ -13,7 +13,7 @@
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn- has-new-content? [notifications-data]
+(defn has-new-content? [notifications-data]
   (some :unread notifications-data))
 
 (defn- close-tray [s]

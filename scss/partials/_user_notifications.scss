@@ -70,7 +70,8 @@ div.user-notifications {
       background-color: white;
 
       &.hidden-tray {
-        display: block;
+        top: unset;
+        right: unset;
       }
     }
 
@@ -96,8 +97,9 @@ div.user-notifications {
           background-position: center;
           background-repeat: no-repeat;
           background-size: 14px 14px;
-          margin: -4px 16px 0 0;
-          float: left;
+          position: absolute;
+          top: 12px;
+          right: 11px;
         }
       }
 
@@ -148,6 +150,11 @@ div.user-notifications {
       max-height: calc(90vh - 100px);
       overflow-y: auto;
       overflow-x: hidden;
+
+      @include mobile() {
+        min-height: 100%;
+        max-height: initial;
+      }
 
       div.user-notifications-tray-empty {
         @include mobile() {

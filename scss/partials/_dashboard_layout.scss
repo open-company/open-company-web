@@ -67,6 +67,74 @@ div.dashboard-layout {
       min-width: initial;
     }
 
+    div.dashboard-layout-mobile-tabbar {
+      display: none;
+
+      @include mobile (){
+        display: block;
+        background-color: $grey_num_2;
+        padding: 16px 0;
+        border-top: 1px solid $grey_num_3;
+        height: 52px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        z-index: #{$navbar_zindex + 1};
+
+        &.can-compose button {
+          width: 25%;
+        }
+
+        button {
+          width: 33.3%;
+          height: 20px;
+          margin: 0;
+          padding: 0;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.5;
+
+          &.active {
+            opacity: 1;
+          }
+        }
+
+        button.all-posts-tab {
+          background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
+          backgorund-size: 22px 18px;
+        }
+
+        button.follow-ups-tab {
+          background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
+          backgorund-size: 16px 22px;
+        }
+
+        button.notifications-tab {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+          backgorund-size: 22px 18px;
+          position: relative;
+
+          &.unread:after {
+            content: "";
+            width: 4px;
+            height: 4px;
+            position: absolute;
+            bottom: -8px;
+            background-color: #FF1E00;
+            border-radius: 50%;
+            left: 50%;
+            margin-left: -2px;
+          }
+        }
+
+        button.new-post-tab {
+          background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
+          backgorund-size: 22px 18px;
+        }
+      }
+    }
+
     div.board-container {
       width: #{$board_container_width}px;
       background-color: $grey_num_2;;
