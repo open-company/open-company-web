@@ -62,6 +62,7 @@
                                     (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
+                                (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
                                 s)
                                :did-remount (fn [_ s]
                                 (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
@@ -146,6 +147,7 @@
             (when-not current-activity-id
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
+                {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
                   (when (router/current-board-slug)
@@ -189,7 +191,7 @@
                          :data-container "body"
                          :title (str (:name board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug board-data))}]])]
-                (when (not= (router/current-board-slug) utils/default-drafts-board-slug)
+                (when-not is-drafts-board
                   (let [default-sort (= board-sort dis/default-sort-type)]
                     [:div.board-sort.group
                       {:ref :board-sort-menu}

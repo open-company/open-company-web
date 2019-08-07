@@ -231,10 +231,18 @@ div.dashboard-layout {
         height: 40px;
         border-bottom: 1px solid $ultra_light_grey;
 
+        &.drafts-board {
+          height: 0;
+        }
+
         @include mobile() {
           height: 35px;
           border-bottom: none;
           padding: 0;
+
+          &.drafts-board {
+            height: 0;
+          }
         }
           
         div.board-name {

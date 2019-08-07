@@ -51,7 +51,7 @@
         to-url (oc-urls/board board)
         query-params (router/query-params)
         route [org board "dashboard"]
-        back-y (or (:back-y @router/path) 0)]
+        back-y (or (:back-y @router/path) (utils/page-scroll-top))]
     (router/set-route! route {:org org
                               :board board
                               :sort-type (router/current-sort-type)

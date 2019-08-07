@@ -725,3 +725,13 @@
   (if (.-attachEvent js/window)
     (fn [el e handler] (.attachEvent el (str "on" e) handler))
     (fn [el e handler] (.addEventListener el e handler))))
+
+(defn page-scroll-top []
+  (let [is-mobile? (responsive/is-mobile-size?)
+        board-slug (router/current-board-slug)
+        activity-id (router/current-activity-id)]
+    (if (and (not activity-id)
+             (not= board-slug default-drafts-board-slug)
+             is-mobile?)
+      35
+      0)))
