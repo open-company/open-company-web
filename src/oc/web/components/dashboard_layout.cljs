@@ -124,7 +124,7 @@
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % (str (oc-urls/org) "/follow-ups")))
+                              (nav-actions/nav-to-url! % (oc-urls/must-see)))
                  :class (when (or (= (router/current-board-slug) "follow-ups")
                                   (= (router/current-board-slug) "must-see"))
                           "active")}]
