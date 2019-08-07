@@ -203,6 +203,10 @@ div.left-navigation-sidebar {
     left: -216px;
   }
 
+  @media screen and (max-width: 975px) {
+    position: absolute; 
+  }
+
   @include mobile() {
     position: absolute;
     margin-top: 0;
