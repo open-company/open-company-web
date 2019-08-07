@@ -113,3 +113,8 @@
   (let [slack-orgs-with-bot (map :slack-org-id bots-data)
         slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
     (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
+
+(defn user-has-push-token?
+  [current-user-data push-token]
+  (let [current-push-tokens (into #{} (:expo-push-tokens current-user-data))]
+    (current-push-tokens push-token)))

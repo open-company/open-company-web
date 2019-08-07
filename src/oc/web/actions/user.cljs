@@ -435,12 +435,10 @@
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
 
 (defn add-expo-push-token [push-token]
-  (let [user-data (dis/current-user-data)
-        add-token-link (utils/link-for (:links user-data) "add-expo-push-token" "POST")]
-    ;; TODO: compare the user's current Expo push token set with this one to see if
-    ;; making this request is actually necessary. That data is not yet pulled from
-    ;; the server, so this will require backend changes.
-    (when (and add-token-link push-token)
+  (let [user-data            (dis/current-user-data)
+        add-token-link       (utils/link-for (:links user-data) "add-expo-push-token" "POST")
+        need-to-add?         (not (user-utils/user-has-push-token? user-data push-token))]
+    (when (and add-token-link push-token need-to-add?)
       (api/add-expo-push-token
        add-token-link
        push-token
