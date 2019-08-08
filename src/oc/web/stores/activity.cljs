@@ -9,59 +9,63 @@
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
    status"
   [db org-slug activity-data]
-  (let [;; Add/remove item from AP
-        is-published? (= (:status activity-data) "published")
-        ap-key (dispatcher/container-key org-slug :all-posts dispatcher/other-sort-type)
-        recent-ap-key (dispatcher/container-key org-slug :all-posts dispatcher/default-sort-type)
-        old-ap-data (get-in db ap-key)
-        old-recent-ap-data (get-in db recent-ap-key)
-        old-ap-data-posts (get old-ap-data :posts-list)
-        old-recent-ap-data-posts (get old-recent-ap-data :posts-list)
-        ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
-        recent-ap-without-uuid (utils/vec-dissoc old-recent-ap-data-posts (:uuid activity-data))
-        new-ap-data-posts (vec
-                           (if is-published?
-                             (conj ap-without-uuid (:uuid activity-data))
-                             ap-without-uuid))
-        new-recent-ap-data-posts (vec
-                                  (if is-published?
-                                    (conj recent-ap-without-uuid (:uuid activity-data))
-                                    recent-ap-without-uuid))
-        next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)
-        next-recent-ap-data (assoc old-ap-data :posts-list new-recent-ap-data-posts)]
-    (-> db
-     (assoc-in ap-key next-ap-data)
-     (assoc-in recent-ap-key next-recent-ap-data))))
+  (if (:uuid activity-data)
+    (let [;; Add/remove item from AP
+          is-published? (= (:status activity-data) "published")
+          ap-key (dispatcher/container-key org-slug :all-posts dispatcher/other-sort-type)
+          recent-ap-key (dispatcher/container-key org-slug :all-posts dispatcher/default-sort-type)
+          old-ap-data (get-in db ap-key)
+          old-recent-ap-data (get-in db recent-ap-key)
+          old-ap-data-posts (get old-ap-data :posts-list)
+          old-recent-ap-data-posts (get old-recent-ap-data :posts-list)
+          ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
+          recent-ap-without-uuid (utils/vec-dissoc old-recent-ap-data-posts (:uuid activity-data))
+          new-ap-data-posts (vec
+                             (if is-published?
+                               (conj ap-without-uuid (:uuid activity-data))
+                               ap-without-uuid))
+          new-recent-ap-data-posts (vec
+                                    (if is-published?
+                                      (conj recent-ap-without-uuid (:uuid activity-data))
+                                      recent-ap-without-uuid))
+          next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)
+          next-recent-ap-data (assoc old-ap-data :posts-list new-recent-ap-data-posts)]
+      (-> db
+       (assoc-in ap-key next-ap-data)
+       (assoc-in recent-ap-key next-recent-ap-data)))
+    db))
 
 (defn add-remove-item-from-follow-ups
   "Given an activity map adds or remove it from the follow-ups list of posts depending on the activity
    status and if the user assigned follow-up is not completed."
   [db org-slug activity-data]
-  (let [;; Add/remove item from MS
-        user-follow-up (first (filterv #(= (-> % :assignee :user-id) (j/user-id)) (:follow-ups activity-data)))
-        is-follow-ups? (and (not= (:status activity-data) "draft")
-                            (not (:completed? user-follow-up)))
-        fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
-        recent-fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-        old-fu-data (get-in db fu-key)
-        old-recent-fu-data (get-in db recent-fu-key)
-        old-fu-data-posts (get old-fu-data :posts-list)
-        old-recent-fu-data-posts (get old-recent-fu-data :posts-list)
-        fu-without-uuid (utils/vec-dissoc old-fu-data-posts (:uuid activity-data))
-        recent-fu-without-uuid (utils/vec-dissoc old-recent-fu-data-posts (:uuid activity-data))
-        new-fu-data-posts (vec
-                           (if is-follow-ups?
-                             (conj fu-without-uuid (:uuid activity-data))
-                             fu-without-uuid))
-        new-recent-fu-data-posts (vec
-                                  (if is-follow-ups?
-                                    (conj recent-fu-without-uuid (:uuid activity-data))
-                                    recent-fu-without-uuid))
-        next-fu-data (assoc old-fu-data :posts-list new-fu-data-posts)
-        next-recent-fu-data (assoc old-recent-fu-data :posts-list new-recent-fu-data-posts)]
-    (-> db
-      (assoc-in fu-key next-fu-data)
-      (assoc-in recent-fu-key next-recent-fu-data))))
+  (if (:uuid activity-data)
+    (let [;; Add/remove item from MS
+          user-follow-up (first (filterv #(= (-> % :assignee :user-id) (j/user-id)) (:follow-ups activity-data)))
+          is-follow-ups? (and (not= (:status activity-data) "draft")
+                              (not (:completed? user-follow-up)))
+          fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
+          recent-fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
+          old-fu-data (get-in db fu-key)
+          old-recent-fu-data (get-in db recent-fu-key)
+          old-fu-data-posts (get old-fu-data :posts-list)
+          old-recent-fu-data-posts (get old-recent-fu-data :posts-list)
+          fu-without-uuid (utils/vec-dissoc old-fu-data-posts (:uuid activity-data))
+          recent-fu-without-uuid (utils/vec-dissoc old-recent-fu-data-posts (:uuid activity-data))
+          new-fu-data-posts (vec
+                             (if is-follow-ups?
+                               (conj fu-without-uuid (:uuid activity-data))
+                               fu-without-uuid))
+          new-recent-fu-data-posts (vec
+                                    (if is-follow-ups?
+                                      (conj recent-fu-without-uuid (:uuid activity-data))
+                                      recent-fu-without-uuid))
+          next-fu-data (assoc old-fu-data :posts-list new-fu-data-posts)
+          next-recent-fu-data (assoc old-recent-fu-data :posts-list new-recent-fu-data-posts)]
+      (-> db
+        (assoc-in fu-key next-fu-data)
+        (assoc-in recent-fu-key next-recent-fu-data)))
+    db))
 
 (defmethod dispatcher/action :entry-edit/dismiss
   [db [_]]
@@ -271,13 +275,27 @@
     (assoc-in db activity-key fixed-activity-data)))
 
 (defmethod dispatcher/action :follow-up-toggle
-  [db [_ org-slug activity-data]]
-  (let [with-updated-activity-data (if (:uuid activity-data)
-                                    (assoc-in db (dispatcher/activity-key org-slug (:uuid activity-data)) activity-data)
-                                    db)]
+  [db [_ org-slug activity-data follow-ups]]
+  (let [should-update-post? (:uuid activity-data)
+        activity-key (when should-update-post?
+                      (dispatcher/activity-key org-slug (:uuid activity-data)))
+        post-activity-data (when should-update-post?
+                             (get-in db activity-key))
+        next-activity-data (when should-update-post?
+                             (if (seq follow-ups)
+                               (assoc post-activity-data :follow-ups follow-ups)
+                               (dissoc post-activity-data :follow-ups)))
+        with-updated-activity-data (if should-update-post?
+                                    (assoc-in db activity-key next-activity-data)
+                                    db)
+        cmail-data (get db :cmail-data)
+        next-cmail-data* (assoc cmail-data :has-changes true)
+        next-cmail-data (if (seq follow-ups)
+                           (assoc next-cmail-data* :follow-ups follow-ups)
+                           (dissoc next-cmail-data* :follow-ups))]
       (-> with-updated-activity-data
-        (assoc :cmail-data activity-data)
-        (add-remove-item-from-follow-ups org-slug activity-data))))
+        (assoc :cmail-data next-cmail-data)
+        (add-remove-item-from-follow-ups org-slug next-activity-data))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug sort-type fixed-board-data]]

@@ -200,9 +200,5 @@
 (defn cmail-toggle-follow-up [activity-data]
   (let [follow-up (pos? (count (:follow-ups activity-data)))
         turning-on? (not follow-up)
-        activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))
-        with-follow-ups (if turning-on?
-                          (assoc activity-data :follow-ups activity-follow-ups)
-                          (dissoc activity-data :follow-ups))
-        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) with-follow-ups])))
+        activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))]
+    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) activity-data (if turning-on? activity-follow-ups [])])))
