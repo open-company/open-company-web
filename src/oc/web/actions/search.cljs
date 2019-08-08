@@ -25,10 +25,12 @@
 
 (def search-history-cookie (str "search-history-" (jwt/user-id)))
 
+(def search-history-length 5)
+
 (defn search-history []
   (let [res (cook/get-cookie search-history-cookie)]
     (if (seq res)
-      (set (reverse (take 5 (reverse (js->clj (.parseJSON js/$ res))))))
+      (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
       #{})))
 
 (defn query
