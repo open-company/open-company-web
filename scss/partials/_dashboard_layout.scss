@@ -84,11 +84,11 @@ div.dashboard-layout {
         z-index: #{$navbar_zindex + 5};
 
         &.ios-tabbar {
-          height: #{$mobile_navbar_height + 31}px;
-          padding: 20px 0 52px;
+          height: #{$mobile_navbar_height + 24}px;
+          padding: 20px 0 45px;
 
           span.unread-notifications-dot {
-            bottom: 34px;
+            bottom: 27px;
           } 
         }
 
