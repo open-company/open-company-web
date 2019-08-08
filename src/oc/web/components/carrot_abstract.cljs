@@ -124,7 +124,7 @@
                                                     exceeds-limit)
                                   :exceeds-max-length exceeds-limit})}
         (str "Character limit " abstract-length "/" utils/max-abstract-length)]
-      [:div.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
+      [:div.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover.editing
         {:class utils/hide-class
          :content-editable true
          :ref "abstract"
