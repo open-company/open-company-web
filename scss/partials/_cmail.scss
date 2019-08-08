@@ -4,18 +4,20 @@ div.cmail-outer {
   margin-bottom: 24px;
 
   @include mobile() {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     bottom: unset;
     right: unset;
     height: initial;
     min-height: 100vh;
-    width: 100%;
+    width: 100vw;
     box-shadow: none;
     overflow-x: hidden;
     overflow-y: auto;
     background-color: $grey_num_2;
     margin-bottom: 0;
-    z-index: #{$navbar_zindex + 10};
+    z-index: #{$navbar_zindex + 20};
   }
 
   &.quick-post-collapsed {

@@ -14,6 +14,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -326,6 +327,8 @@
                       (reset! (::post-button-title s) (if (seq (:headline cmail-data)) "" missing-title-tooltip))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state)))
+                    (when (responsive/is-mobile-size?)
+                      (dom-utils/lock-page-scroll))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
@@ -404,6 +407,8 @@
                       (events/unlistenByKey @(::abstract-input-listener s))
                       (reset! (::abstract-input-listener s) nil))
                     (remove-autosave s)
+                    (when (responsive/is-mobile-size?)
+                      (dom-utils/unlock-page-scroll))
                     s)}
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
