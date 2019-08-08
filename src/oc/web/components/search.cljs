@@ -82,7 +82,9 @@
                 :let [q (get (vec (reverse history)) idx)]]
             [:div.search-history-row
               {:key (str "search-history-" idx)
-               :on-click #(search/query q)}
+               :on-click #(do
+                            (.val (js/$ "input.search.oc-input") q)
+                            (search/query q))}
               q]))]
       [:div.search-results {:ref "results"
                             :class (when-not search-active? "inactive")}
@@ -146,7 +148,7 @@
                           s)
                          :will-unmount (fn [s]
                           (when (responsive/is-mobile-size?)
-                            (dom-utils/lock-page-scroll))
+                            (dom-utils/unlock-page-scroll))
                           s)}
   [s]
   (when (store/should-display)
