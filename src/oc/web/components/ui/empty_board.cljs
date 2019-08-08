@@ -36,7 +36,7 @@
            ; is-all-posts? "Stay up to date"
            is-must-see? "Highlight what's important"
            is-drafts-board? "Jot down your ideas and notes"
-           :else (if is-author? "Create a post to get started" "There's nothing to see here"))]
+           :else (if (not (:read-only board-data)) "Create a post to get started" "There's nothing to see here"))]
         [:div.empty-board-subtitle
           (cond
            is-all-posts? "All posts is a stream of what’s new in Carrot."
