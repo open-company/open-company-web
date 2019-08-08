@@ -88,7 +88,7 @@
 
 (defn- maybe-highlight-comment [s]
   (let [comments-data (second (:rum/args s))]
-    (when (and comments-data
+    (when (and (seq comments-data)
                (router/current-comment-id)
                (not @(::initial-comment-scroll s)))
       (reset! (::initial-comment-scroll s) true)
