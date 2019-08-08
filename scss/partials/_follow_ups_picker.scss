@@ -19,7 +19,7 @@ div.follow-ups-picker {
     right: 336px;
     top: 12px;
 
-    @include tablet() {
+    @include mobile() {
       left: 12px;
       right: unset;
       top: 16px;
@@ -44,7 +44,7 @@ div.follow-ups-picker {
     right: 0;
     padding: 0 0 16px;
 
-    @include tablet() {
+    @include mobile() {
       width: 100%;
       top: 0;
       left: 0;
@@ -56,6 +56,11 @@ div.follow-ups-picker {
       background-color: $grey_num_2;
       padding: 12px 16px;
 
+      @include mobile(){
+        height: #{mobile_navbar_height}px;
+        padding: 14px 16px;
+      }
+
       div.follow-ups-picker-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
@@ -63,7 +68,7 @@ div.follow-ups-picker {
         line-height: 32px;
         float: left;
 
-        @include tablet() {
+        @include mobile() {
           margin-left: 24px;
           width: 150px;
           position: absolute;
@@ -83,7 +88,7 @@ div.follow-ups-picker {
         line-height: 18px;
         float: right;
 
-        @include tablet() {
+        @include mobile() {
           background-color: transparent;
           padding: 0;
           color: $carrot_green;
@@ -99,7 +104,7 @@ div.follow-ups-picker {
         margin-right: 8px;
         float: right;
 
-        @include tablet() {
+        @include mobile() {
           display: none;
         }
       }
@@ -110,7 +115,7 @@ div.follow-ups-picker {
       overflow-x: hidden;
       overflow-y: scroll;
 
-      @include tablet() {
+      @include mobile() {
         padding: 0 16px;
       }
 
