@@ -33,13 +33,15 @@
         (and (:email user) (.match (:email user) r)))))
 
 (defn- sort-users [users-list]
-  (let [self-user (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) users-list))
-        other-users (filterv #(not= (-> % :assignee :user-id) (jwt/user-id)) users-list)]
-    (vec (concat self-user (sort-by #(-> % :assignee :name) other-users)))))
+  (let [current-user-id (jwt/user-id)
+        self-user (filterv #(= (:user-id %) current-user-id) users-list)
+        other-users (filterv #(not= (:user-id %) current-user-id) users-list)]
+    (vec (concat self-user (sort-by user-lib/name-for other-users)))))
 
 (defn- filter-users [s]
   (let [users-list @(::users-list s)
         query @(::query s)
+        current-user-id (jwt/user-id)
         users (if (seq query)
                 (filterv #(user-match query %) users-list)
                 users-list)]

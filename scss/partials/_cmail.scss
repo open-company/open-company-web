@@ -882,10 +882,12 @@ div.cmail-outer {
         border-top-right-radius: 0;
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
+        margin-top: -1px;
 
         @include tablet() {
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
+          margin-top: 0;
         }
       }
     }
