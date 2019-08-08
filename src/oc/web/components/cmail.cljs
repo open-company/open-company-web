@@ -772,7 +772,7 @@
               [:button.mlb-reset.follow-up-button
                 {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
                  :data-toggle "tooltip"
-                 :data-placement "bottom"
+                 :data-placement "top"
                  :data-container "body"
                  :on-click #(when can-toggle-follow-ups?
                               (cmail-actions/cmail-toggle-follow-up cmail-data))
