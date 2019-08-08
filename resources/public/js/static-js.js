@@ -424,3 +424,12 @@ function OCStaticTextareaRestoreSelection(range) {
         }
     }
 }
+
+function isiPhoneWithoutPhysicalHomeBt(){
+  return (isSafari() &&
+          WURFL &&
+          (WURFL.complete_device_name === "Apple iPhone XR" ||
+           WURFL.complete_device_name === "Apple iPhone XS Max" ||
+           WURFL.complete_device_name === "Apple iPhone XS" ||
+           WURFL.complete_device_name === "Apple iPhone X"))
+}

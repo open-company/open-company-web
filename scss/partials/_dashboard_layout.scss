@@ -83,6 +83,15 @@ div.dashboard-layout {
         width: 100vw;
         z-index: #{$navbar_zindex + 5};
 
+        &.ios-tabbar {
+          height: #{$mobile_navbar_height + 31}px;
+          padding: 15px 0 47px;
+
+          span.unread-notifications-dot {
+            bottom: 34px;
+          } 
+        }
+
         &.can-compose {
           button {
             width: 25%;
@@ -128,7 +137,7 @@ div.dashboard-layout {
           width: 4px;
           height: 4px;
           position: absolute;
-          bottom: 8px;
+          bottom: 3px;
           background-color: #FC5E49;
           border-radius: 50%;
           right: 16.1vw;

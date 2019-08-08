@@ -116,7 +116,8 @@
                          (not cmail-state))
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
             [:div.dashboard-layout-mobile-tabbar
-              {:class (utils/class-set {:can-compose can-compose?})}
+              {:class (utils/class-set {:can-compose can-compose?
+                                        :ios-tabbar (js/isiPhoneWithoutPhysicalHomeBt)})}
               [:button.mlb-reset.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
