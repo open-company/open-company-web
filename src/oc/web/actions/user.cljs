@@ -70,10 +70,6 @@
       (notification-actions/show-notification (assoc utils/network-error :expire 0))))))
 
 (defn entry-point-get [org-slug]
-  (api/web-app-version-check
-    (fn [{:keys [success body status]}]
-      (when (= status 404)
-        (notification-actions/show-notification (assoc utils/app-update-error :expire 0)))))
   (api/get-entry-point (:org @router/path)
    (fn [success body]
      (entry-point-get-finished success body
