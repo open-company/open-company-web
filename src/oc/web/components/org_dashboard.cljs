@@ -259,6 +259,5 @@
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
                               (or (not open-panel)
-                                  (= open-panel :menu))
-                              (not is-showing-mobile-search)))
+                                  (= open-panel :menu))))
                  (dashboard-layout))]]])])))

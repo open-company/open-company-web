@@ -1,10 +1,12 @@
 (ns oc.web.actions.search
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.dispatcher :as dispatcher]
-            [oc.web.actions.cmail :as cmail-actions]
+            [oc.web.actions.cmail :as cmail-actions]        
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 
@@ -21,11 +23,23 @@
 (defn active []
   (dispatcher/dispatch! [:search-active]))
 
+(def search-history-cookie (str "search-history-" (jwt/user-id)))
+
+(defn search-history []
+  (let [res (cook/get-cookie search-history-cookie)]
+    (if (seq res)
+      (set (reverse (take 5 (reverse (js->clj (.parseJSON js/$ res))))))
+      #{})))
+
 (defn query
   "Use the search service to query for results."
   [search-query]
-  (if (> (count search-query) 1)
+  (if (seq search-query)
     (do
+      (let [old-queries (search-history)
+            without-new-query (disj old-queries search-query)
+            with-new-query (conj without-new-query search-query)]
+      (cook/set-cookie! search-history-cookie (.stringify js/JSON (clj->js with-new-query))))
       (active)
       (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
     (reset)))
