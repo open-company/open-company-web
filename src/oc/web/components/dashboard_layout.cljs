@@ -121,16 +121,6 @@
               [:button.mlb-reset.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (let [is-safari (js/isSafari)
-                                    ratio (.-devicePixelRatio js/window)
-                                    width (.. js/window -screen -width)
-                                    height (.. js/window -screen -height)
-                                    final-str (str "Safari browser: " (if is-safari "yes" "no") "\n"
-                                                   "Ratio: " ratio "\n"
-                                                   "Resolution: " width "x" height "\n"
-                                                   "Real resolution:" (* width ratio) "x" (* height ratio)"\n"
-                                                   "Detected with notch:" (if (js/isiPhoneWithoutPhysicalHomeBt) "yes" "no"))]
-                                (js/alert final-str))
                               (nav-actions/nav-to-url! % (oc-urls/all-posts)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= (router/current-board-slug) "all-posts"))
