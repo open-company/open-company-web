@@ -1,5 +1,6 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
+            [cuerdas.core :as s]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
@@ -152,15 +153,16 @@
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
         $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
-        abstract-text (.text $abstract)
-        exceeds-limit (> (count abstract-text) utils/max-abstract-length)]
+        abstract-text (s/trim (.text $abstract))
+        exceeds-limit (> (count abstract-text) utils/max-abstract-length)
+        clean-headline (s/trim (s/replace (.-innerText headline) #"\n" ""))
+        post-button-title (cond
+                           (not (seq clean-headline)) :title
+                           exceeds-limit :abstract
+                           :else nil)]
     (reset! (::abstract-exceeds-limit s) exceeds-limit)
     (reset! (::abstract-length s) (count abstract-text))
-    (reset! (::post-button-title s)
-     (cond
-      (not (seq (.-innerText headline))) :title
-      exceeds-limit :abstract
-      :else nil))))
+    (reset! (::post-button-title s) post-button-title)))
 
 (defn- headline-on-change [state]
   (when-let [headline (rum/ref-node state "headline")]
