@@ -121,7 +121,9 @@
         can-compose (pos? (count editable-boards))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
-                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})}
+                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
+                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"
          :class (when can-compose "can-compose")}

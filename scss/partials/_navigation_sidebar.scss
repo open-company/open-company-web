@@ -215,7 +215,7 @@ div.left-navigation-sidebar {
     width: 100%;
     height: 100vh;
     display: none;
-    z-index: #{$navbar_zindex + 2};
+    z-index: #{$navbar_zindex + 7};
     background-color: $carrot_modal_bg;
     overflow-y: unset;
     overflow-x: unset;
