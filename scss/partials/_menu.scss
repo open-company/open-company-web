@@ -83,6 +83,7 @@ div.menu {
         position: relative;
         border-bottom: 1px solid $ultra_light_grey;
         background-color: $grey_num_2;
+        padding: 17px 16px 17px 24px;
       }
 
       button.mobile-close-bt {
@@ -92,7 +93,7 @@ div.menu {
           display: block;
           position: absolute;
           right: 16px;
-          top: 13px;
+          top: 18px;
           width: 24px;
           height: 24px;
           padding: 0;
