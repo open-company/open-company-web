@@ -201,7 +201,7 @@
         (user-avatar-image current-user-data)
         [:div.add-comment-internal
           {:class (when-not should-hide-post-button "active")}
-          [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover
+          [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden @(::did-change s)
