@@ -63,7 +63,7 @@ div.expanded-post {
       max-height: 478px;
     }
 
-    @include tablet(){
+    @include mobile(){
       width: 100vw;
       height: calc(100vw *  0.75);
     }
@@ -109,6 +109,11 @@ div.expanded-post {
           display: block;
           margin-left: 0;
           margin-top: 8px;
+          overflow: hidden;
+          max-width: 100%;
+          text-overflow: ellipsis;
+          white-space: pre-wrap;
+          word-break: break-word;
         }
       }
     }
