@@ -426,33 +426,31 @@ function OCStaticTextareaRestoreSelection(range) {
 }
 
 function isiPhoneWithoutPhysicalHomeBt(){
-  if (isSafari()) {
-    // Really basic check for the ios platform
-    // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
-    var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  // Really basic check for the ios platform
+  // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+  var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    // Get the device pixel ratio
-    var ratio = window.devicePixelRatio || 1;
+  // Get the device pixel ratio
+  var ratio = window.devicePixelRatio || 1;
 
-    // Define the users device screen dimensions
-    var screen = {
-      width : window.screen.width * ratio,
-      height : window.screen.height * ratio
-    };
+  // Define the users device screen dimensions
+  var screen = {
+    width : window.screen.width * ratio,
+    height : window.screen.height * ratio
+  };
 
-    // iPhone X and Xs Detection
-    if (iOS && screen.width === 1125 && screen.height === 2436) {
-      return true;
-    }
-    // iPhone Xr Detection
-    if (iOS && screen.width === 828 && screen.height === 1792) {
-      return true;
-    }
+  // iPhone X and Xs Detection
+  if (iOS && screen.width === 1125 && screen.height === 2436) {
+    return true;
+  }
+  // iPhone Xr Detection
+  if (iOS && screen.width === 828 && screen.height === 1792) {
+    return true;
+  }
 
-    // iPhone Xs Max Detection
-    if (iOS && screen.width === 1242 && screen.height === 2688) {
-      return true;
-    }
+  // iPhone Xs Max Detection
+  if (iOS && screen.width === 1242 && screen.height === 2688) {
+    return true;
   }
   return false;
 }
