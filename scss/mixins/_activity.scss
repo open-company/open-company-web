@@ -239,6 +239,15 @@ $h2_top_margin: 24;
   white-space: pre-wrap;
   word-wrap: break-word;
 
+  p, ul > li, i {
+    min-height: #{$line_height}px;
+  }
+
+  i:empty {
+    display: grid;
+    min-width: 1px;
+  }
+
   * {
     color: $color;
   }
@@ -317,10 +326,10 @@ $h2_top_margin: 24;
     }
   }
 
-  a, span[data-auto-link] {
+  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
     text-decoration: none;
     color: $carrot_green;
-    background-color: transparent;
+    background-color: transparent !important;
   }
 
   a:hover {

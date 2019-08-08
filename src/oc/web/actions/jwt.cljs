@@ -15,11 +15,13 @@
 
 (defn logout
   ([]
-     (logout oc-urls/home))
+   (logout (if js/window.isDesktop
+             oc-urls/desktop-login
+             oc-urls/home)))
   ([location]
-     (cook/remove-cookie! :jwt)
-     (router/redirect! location)
-     (dis/dispatch! [:logout])))
+   (cook/remove-cookie! :jwt)
+   (router/redirect! location)
+   (dis/dispatch! [:logout])))
 
 ;; ID Token
 

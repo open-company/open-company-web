@@ -199,7 +199,8 @@
         (cljs-repl)
         (reload :asset-path "/public"
                 :on-jsload 'oc.web.core/on-js-reload)
-        (cljs :optimizations :none
+        (cljs :ids #{"public/oc"}
+              :optimizations :none
               :source-map true
               :compiler-options {:source-map-timestamp true
                                  :parallel-build true
@@ -215,7 +216,8 @@
         (watch)
         (sass)
         (build-prod-site)
-        (cljs :optimizations :advanced
+        (cljs :ids #{"public/oc"}
+              :optimizations :advanced
               :source-map true
               :compiler-options {
                 :parallel-build true
@@ -235,7 +237,8 @@
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
-        (cljs :optimizations :advanced
+        (cljs :ids #{"public/oc"}
+              :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
                                  :externs ["public/js/externs.js"]
@@ -252,7 +255,8 @@
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
-        (cljs :optimizations :advanced
+        (cljs :ids #{"public/oc"}
+              :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
                                  :externs ["public/js/externs.js"]
@@ -273,3 +277,73 @@
     (check/with-bikeshed "-t" :options {:verbose true
                                         :max-line-length 120})
     (check/throw-on-errors)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Electron App
+
+(deftask dev-electron
+  "Carrot electron app loading localhost:3559"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (from-jars)
+        (watch)
+        ;; double backslash necessary for building on Windows
+        ;; https://github.com/boot-clj/boot-cljs/pull/118
+        (cljs :ids #{"electron/main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        true
+                                                   'oc.electron.main/web-origin  "http://localhost:3559"
+                                                   'oc.electron.main/auth-origin "http://localhost:3003"}})
+        (target)))
+
+(deftask staging-electron
+  "Carrot electron app loading staging.carrot.io"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (cljs :ids #{"electron/main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        false
+                                                   'oc.electron.main/web-origin  "https://staging.carrot.io"
+                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://d4318ef3fbba49668211f37c56157a19@sentry.io/1509179"
+                                                   }})
+        (target)))
+
+(deftask staging-electron-windows
+  "Carrot electron app loading staging.carrot.io"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (cljs :ids #{"electron\\main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        false
+                                                   'oc.electron.main/web-origin  "https://staging.carrot.io"
+                                                   'oc.electron.main/auth-origin "https://staging-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://d4318ef3fbba49668211f37c56157a19@sentry.io/1509179"
+                                                   }})
+        (target)))
+
+(deftask prod-electron
+  "Carrot electron app loading production carrot.io"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (cljs :ids #{"electron/main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        false
+                                                   'oc.electron.main/web-origin  "https://carrot.io"
+                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://760ab937836c444895614a24d8fd7b23@sentry.io/1509184"
+                                                   }})
+        (target)))
+
+(deftask prod-electron-windows
+  "Carrot electron app loading production carrot.io"
+  []
+  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
+  (comp (cljs :ids #{"electron\\main"}
+              :optimizations :simple
+              :compiler-options {:closure-defines {'oc.electron.main/dev?        false
+                                                   'oc.electron.main/web-origin  "https://carrot.io"
+                                                   'oc.electron.main/auth-origin "https://beta-auth.carrot.io"
+                                                   'oc.electron.main/sentry-dsn  "https://760ab937836c444895614a24d8fd7b23@sentry.io/1509184"
+                                                   }})
+        (target)))

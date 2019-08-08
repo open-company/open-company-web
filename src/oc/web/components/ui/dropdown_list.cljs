@@ -3,7 +3,7 @@
             [dommy.core :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
+            [oc.web.mixins.ui :as ui-mixins]))
 
 (rum/defc dropdown-list
   "Component to create a dropdown list. Accept a map with these keys:
@@ -23,14 +23,13 @@
   Elements with this format will be transfomed into a divider line:
   {:value nil :label :divider-line}."
   < rum/static
-    (on-window-click-mixin (fn [s e]
+    ;; Mixins
+    (ui-mixins/on-window-click-mixin (fn [s e]
      (when-not (utils/event-inside? e (rum/ref-node s :dropdown-list))
        (let [on-blur (:on-blur (first (:rum/args s)))]
          (when (fn? on-blur)
            (on-blur))))))
-    {:did-mount (fn [s]
-     (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-     s)}
+    ui-mixins/refresh-tooltips-mixin
   [{:keys [items value on-change on-blur selected-icon unselected-icon placeholder]}]
   (let [fixed-items (map #(if-not (contains? % :label)
                             (assoc % :label (:value %))

@@ -19,12 +19,24 @@
   ;; only watch the currently visible board.
   (ws-ic/board-unwatch (fn [rep]
     (timbre/debug rep "Watching on socket " (:uuid section))
-        (ws-ic/boards-watch [(:uuid section)]))))
+    (ws-ic/boards-watch [(:uuid section)]))))
 
 (defn section-seen
   [uuid]
   ;; Let the change service know we saw the board
   (ws-cc/container-seen uuid))
+
+(defn request-reads-count
+  "Request the reads count data only for the items we don't have already."
+  [section]
+  (let [user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
+    (when (and user-is-part-of-the-team
+               (not= (:slug section) utils/default-drafts-board-slug)
+               (seq (:entries section)))
+      (let [item-ids (map :uuid (:entries section))
+            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
+        (when (seq cleaned-ids)
+          (api/request-reads-count cleaned-ids))))))
 
 (defn section-get-finish
   [sort-type section]
@@ -38,18 +50,11 @@
         (when-let [section-uuid (:uuid section)]
           (utils/after 10 #(section-seen section-uuid)))
         ;; only watch the currently visible board.
-        ; only for logged in users
-        (when (jwt/jwt)
-          (watch-single-section section))))
-
-    ;; Retrieve reads count if there are items in the loaded section
-    (when (and user-is-part-of-the-team
-               (not= (:slug section) utils/default-drafts-board-slug)
-               (seq (:entries section)))
-      (let [item-ids (map :uuid (:entries section))
-            cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
-        (when (seq cleaned-ids)
-          (api/request-reads-count cleaned-ids))))
+        ; only for logged in users and if the board is currently shown
+        (when (= (router/current-board-slug) (:slug section))
+          (watch-single-section section)
+          ;; Retrieve reads count if there are items in the loaded section
+          (request-reads-count section))))
     (dispatcher/dispatch! [:section sort-type (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
@@ -269,19 +274,16 @@
          (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
 
-(defn request-reads-count
-  "Request the reads count data only for the items we don't have already."
-  [item-ids]
-  (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dispatcher/activity-read-data))]
-    (when (seq cleaned-ids)
-      (api/request-reads-count cleaned-ids))))
-
 (defn section-more-finish [direction {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (json->cljs body)))))
+    (request-reads-count (json->cljs body)))
   (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) (router/current-board-slug)
    direction (router/current-sort-type) (when success (json->cljs body))]))
 
 (defn section-more [more-link direction]
   (api/load-more-items more-link direction (partial section-more-finish direction))
   (dispatcher/dispatch! [:section-more (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)]))
+
+(defn setup-section-editing [section-slug]
+  (when-let [board-data (dispatcher/board-data (router/current-org-slug) section-slug)]
+    (dispatcher/dispatch! [:setup-section-editing board-data])))

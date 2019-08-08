@@ -320,27 +320,31 @@
     (update-in db dispatcher/activities-read-key merge new-items-count)))
 
 (defmethod dispatcher/action :activity-reads
-  [db [_ org-slug item-id read-data team-roster]]
+  [db [_ org-slug item-id read-data-count read-data team-roster]]
   (let [activity-data   (dispatcher/activity-data org-slug item-id db)
-        board-data      (dispatcher/board-data db org-slug (:board-slug activity-data))
+        org-data        (dispatcher/org-data db org-slug)
+        board-data      (first (filter #(= (:slug %) (:board-slug activity-data)) (:boards org-data)))
         fixed-read-data (vec (map #(assoc % :seen true) read-data))
         team-users      (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
         seen-ids        (set (map :user-id read-data))
         private-access? (= (:access board-data) "private")
         all-private-users (when private-access?
-                            (set (concat (map :user-id (:authors board-data)) (map :user-id (:viewers board-data)))))
+                            (set (concat (:authors board-data) (:viewers board-data))))
         filtered-users  (if private-access?
                           (filterv #(all-private-users (:user-id %)) team-users)
                           team-users)
         all-ids         (set (map :user-id filtered-users))
         unseen-ids      (clojure.set/difference all-ids seen-ids)
         unseen-users    (vec (map (fn [user-id]
-                         (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))]
-    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count (count read-data)
+                         (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))
+        current-user-id (j/user-id)
+        current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)]
+    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count read-data-count
                                                                 :reads fixed-read-data
                                                                 :item-id item-id
                                                                 :unreads unseen-users
-                                                                :last-read-at (:read-at (last (sort-by :read-at read-data)))
+                                                                :last-read-at (:read-at (last (sort-by :read-at
+                                                                               current-user-reads)))
                                                                 :private-access? private-access?})))
 
 (defmethod dispatcher/action :must-see-get/finish
@@ -378,15 +382,6 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)))
-    db))
-
-(defmethod dispatcher/action :reset-ap-initial-at
-  [db [_ org-slug]]
-  (if (:ap-initial-at db)
-    (let [containers-key (dispatcher/containers-key org-slug)]
-      (-> db
-        (update-in containers-key dissoc :all-posts)
-        (dissoc :ap-initial-at)))
     db))
 
 (defmethod dispatcher/action :uploading-video

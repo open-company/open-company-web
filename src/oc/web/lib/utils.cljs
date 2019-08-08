@@ -190,7 +190,9 @@
 
 (defn scroll-to-y [scroll-y & [duration]]
   (if (and duration (zero? duration))
-    (.scrollTo (.-scrollingElement js/document) 0 scroll-y)
+    (if (js/isEdge)
+      (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
+      (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
     (.play
       (new Scroll
            (.-scrollingElement js/document)
@@ -216,6 +218,11 @@
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
+
+(defn maybe-after [ms fn]
+  (if (zero? ms)
+   (fn)
+   (js/setTimeout fn ms)))
 
 (defn every [ms fn]
   (js/setInterval fn ms))
@@ -398,13 +405,6 @@
   :server-error true
   :id :generic-network-error
   :dismiss true})
-
-(def app-update-error
-  {:title "App has been updated"
-   :description "You’re using an out of date version of Carrot. Please refresh your browser."
-   :app-update true
-   :id :app-update-error
-   :dismiss true})
 
 (def internal-error
   {:title "Internal error occurred"
