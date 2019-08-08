@@ -165,11 +165,13 @@
                      " (private)")
                    (when (= (:board-access activity-data) "public")
                      " (public)"))]
-                [:div.mobile-time-since
-                  (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
+                ; [:div.mobile-time-since
+                ;   (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]
+                  ]
               [:div.must-see-tag.big-web-tablet-only]]]
           [:div.activity-share-container]
-          (when is-published?
+          (when (and is-published?
+                     (not is-mobile?))
             (more-menu activity-data dom-element-id
              {:external-share (not is-mobile?)
               :show-edit? true
