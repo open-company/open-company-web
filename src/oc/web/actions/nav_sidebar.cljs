@@ -34,6 +34,7 @@
   (nux-actions/dismiss-post-added-tooltip)
   (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
   (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+  (user-actions/hide-mobile-user-notifications)
   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
     (if (= current-path url)
       (do

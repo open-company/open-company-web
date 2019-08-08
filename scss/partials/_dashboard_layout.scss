@@ -74,17 +74,23 @@ div.dashboard-layout {
       @include mobile (){
         display: block;
         background-color: $grey_num_2;
-        padding: 16px 0;
+        padding: 15px 0;
         border-top: 1px solid $grey_num_3;
-        height: 52px;
+        height: #{$mobile_navbar_height}px;
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100vw;
-        z-index: #{$navbar_zindex + 1};
+        z-index: #{$navbar_zindex + 5};
 
-        &.can-compose button {
-          width: 25%;
+        &.can-compose {
+          button {
+            width: 25%;
+          }
+
+          span.unread-notifications-dot {
+            right: 37vw;
+          }
         }
 
         button {
@@ -115,18 +121,17 @@ div.dashboard-layout {
           background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
           backgorund-size: 22px 18px;
           position: relative;
+        }
 
-          &.unread:after {
-            content: "";
-            width: 4px;
-            height: 4px;
-            position: absolute;
-            bottom: -8px;
-            background-color: #FF1E00;
-            border-radius: 50%;
-            left: 50%;
-            margin-left: -2px;
-          }
+        span.unread-notifications-dot {
+          display: block;
+          width: 4px;
+          height: 4px;
+          position: absolute;
+          bottom: 8px;
+          background-color: #FC5E49;
+          border-radius: 50%;
+          right: 16.1vw;
         }
 
         button.new-post-tab {
@@ -301,7 +306,7 @@ div.dashboard-layout {
         border-bottom: 1px solid $ultra_light_grey;
 
         @include mobile() {
-          height: 50px;
+          height: #{$mobile_navbar_height}px;
           border-bottom: none;
           padding: 0;
 
@@ -502,7 +507,7 @@ div.dashboard-layout {
 
           @include mobile() {
             width: 100%;
-            height: 50px;
+            height: #{$mobile_navbar_height}px;
             background-color: $grey_num_2;
             border-bottom: 1px solid $grey_num_3;
           }
@@ -540,7 +545,7 @@ div.dashboard-layout {
               top: 0;
               left: 50%;
               margin-left: -100px;
-              height: 50px;
+              height: #{$mobile_navbar_height}px;
               line-height: 50px;
               text-align: center;
               color: $ui_grey;

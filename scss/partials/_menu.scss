@@ -78,7 +78,7 @@ div.menu {
       margin-bottom: 24px;
 
       @include mobile() {
-        height: 50px;
+        height: #{$mobile_navbar_height}px;
         position: relative;
         border-bottom: 1px solid $ultra_light_grey;
         background-color: $grey_num_2;

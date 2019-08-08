@@ -15,6 +15,7 @@ div.cmail-outer {
     overflow-y: auto;
     background-color: $grey_num_2;
     margin-bottom: 0;
+    z-index: #{$navbar_zindex + 10};
   }
 
   &.quick-post-collapsed {
@@ -375,7 +376,7 @@ div.cmail-outer {
       @include mobile() {
         display: block;
         width: 100vw;
-        height: 50px;
+        height: #{$mobile_navbar_height}px;
         padding: 16px;
         position: fixed;
         top: 0;

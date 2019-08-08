@@ -31,7 +31,6 @@
             [oc.web.components.user-profile-modal :refer (user-profile-modal)]
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
-            [oc.web.components.user-notifications :refer (user-notifications)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
@@ -77,7 +76,7 @@
                            (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
-                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
+                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) (utils/page-scroll-top)))
                              (refresh-board-data s)
                              (init-whats-new)
                              s)
@@ -97,7 +96,6 @@
                 show-section-add-cb
                 activity-share-container
                 cmail-state
-                showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
                 panel-stack]} (drv/react s :org-dashboard-data)
@@ -225,11 +223,7 @@
           (wrt org-data)
           ;; Search results
           is-showing-mobile-search
-          (search-box)
-          ;; Mobile notifications
-          (and is-mobile?
-               showing-mobile-user-notifications)
-          (user-notifications))
+          (search-box))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -256,7 +250,6 @@
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (not show-mobile-cmail?)
                        (or (not open-panel)
                             (= open-panel :menu))))
           [:div.page

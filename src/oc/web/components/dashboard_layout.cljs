@@ -47,6 +47,7 @@
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
                               (drv/drv :user-notifications)
+                              (drv/drv :mobile-user-notifications)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -101,7 +102,8 @@
                                      (not (:read-only board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
-        user-notifications-data (drv/react s :user-notifications)]
+        user-notifications-data (drv/react s :user-notifications)
+        showing-mobile-user-notifications (drv/react s :mobile-user-notifications)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when current-activity-id "expanded-post-view")}
@@ -132,13 +134,19 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (user-actions/show-mobile-user-notifications))
-                 :class (when (user-notifications/has-new-content? user-notifications-data)
-                          "unread")}]
+                 :class (when showing-mobile-user-notifications "active")}]
+              (when (user-notifications/has-new-content? user-notifications-data)
+                [:span.unread-notifications-dot])
               (when can-compose?
                 [:button.mlb-reset.new-post-tab
                   {:on-click #(do
                                 (.stopPropagation %)
-                                (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}])])
+                                (ui-compose @(drv/get-ref s :show-add-post-tooltip))
+                                (user-actions/hide-mobile-user-notifications))}])])
+          ;; Mobile notifications
+          (when (and is-mobile?
+                     showing-mobile-user-notifications)
+            (user-notifications/user-notifications))
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group

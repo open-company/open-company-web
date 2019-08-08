@@ -50,6 +50,7 @@ nav.oc-navbar {
     @include mobile() {
       width: 100vw;
       height: #{$mobile_navbar_height}px;
+      padding: 14px 16px;
     }
 
     div.oc-navbar-header-container{
@@ -73,14 +74,14 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 12px;
+          top: 15px;
           left: 50%;
           width: 250px;
           height: 20px;
           margin: 0 0 0 -125px;
           text-align: center;
 
-          div.section-name {
+          div.navbar-mobile-title {
             @include OC_Body_Bold();
             font-size: 16px;
             color: $deep_navy;
@@ -108,8 +109,6 @@ nav.oc-navbar {
 
         @include mobile() {
           height: 24px;
-          margin-top: -2px;
-          margin-left: 1px;
         }
 
         button.mobile-ham-menu {
@@ -119,11 +118,13 @@ nav.oc-navbar {
             display: block;
             width: 24px;
             height: 24px;
-            float: left;
             background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
             background-size: 14px 10px;
             background-position: center;
             background-repeat: no-repeat;
+            position: absolute;
+            top: 15px;
+            left: 14px;
           }
         }
 
@@ -196,7 +197,7 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 12px;
+          top: 13px;
           right: 16px;
           width: 24px;
           height: 24px;

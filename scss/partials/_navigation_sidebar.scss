@@ -208,7 +208,7 @@ div.left-navigation-sidebar {
   }
 
   @include mobile() {
-    position: absolute;
+    position: fixed;
     margin-top: 0;
     top: 0;
     left: 0;

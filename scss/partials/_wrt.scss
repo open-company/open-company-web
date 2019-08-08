@@ -127,6 +127,8 @@ div.wrt-popup-container {
         position: fixed;
         border-bottom: 1px solid $ultra_light_grey;
         z-index: 2;
+        height: #{$mobile_navbar_height}px;
+        padding: 9px 16px;
       }
 
       div.wrt-popup-header-title {
@@ -171,11 +173,8 @@ div.wrt-popup-container {
       @include mobile() {
         overflow-x: hidden;
         overflow-y: auto;
-        height: calc(100% - 56px);
-      }
-
-      @include mobile() {
-        padding-top: 80px;
+        height: calc(100% - #{$mobile_navbar_height}px);
+        padding-top: #{$mobile_navbar_height + 24}px;
       }
 
       div.wrt-chart-container {

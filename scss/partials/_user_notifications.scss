@@ -2,14 +2,15 @@ div.user-notifications {
   position: relative;
 
   @include mobile() {
-    position: absolute;
+    position: fixed;
     top: 0;
-    left: 0px;
+    left: 0;
     width: 100%;
     height: 100vh;
     background-color: transparent;
     z-index: 21;
     overflow-y: auto;
+    margin-top: #{$mobile_navbar_height}px;
 
     button.notification-bell-bt {
       display: none;
@@ -68,7 +69,6 @@ div.user-notifications {
       border: none;
       height: 100%;
       background-color: white;
-      margin-top: 56px;
 
       &.hidden-tray {
         top: unset;
@@ -81,15 +81,7 @@ div.user-notifications {
       position: relative;
 
       @include mobile(){
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 56px;
-        background-color: white;
-        padding: 20px 16px;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-        z-index: 2;
+        display: none;
       }
 
       button.user-notifications-tray-mobile-close {

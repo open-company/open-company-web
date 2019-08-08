@@ -27,6 +27,7 @@
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
                     (drv/drv :show-add-post-tooltip)
+                    (drv/drv :mobile-user-notifications)
                     (ui-mixins/render-on-resize nil)
   [s]
   (let [{:keys [org-data
@@ -42,7 +43,10 @@
          is-mobile? (responsive/is-mobile-size?)
          current-panel (last panel-stack)
          expanded-user-menu (= current-panel :menu)
-         section-name (cond
+         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
+         mobile-title (cond
+                       showing-mobile-user-notifications
+                       "Notifications"
                        (= (router/current-board-slug) "all-posts")
                        "All Posts"
                        (= (router/current-board-slug) "must-see")
@@ -70,8 +74,8 @@
               (orgs-dropdown))]
           (if is-mobile?
             [:div.navbar-center
-              [:div.section-name
-                section-name]]
+              [:div.navbar-mobile-title
+                mobile-title]]
             [:div.navbar-center
               {:class (when search-active "search-active")}
               (search-box)])
