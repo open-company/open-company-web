@@ -19,8 +19,10 @@ $circular_book: "LL Circular Book Web";
 $circular_bold: "LL Circular Bold Web";
 
 .OC-Title {
-  font-family: "PT Serif", serif !important;
-  font-weight: 700;
+  // font-family: "PT Serif", serif !important;
+  // font-weight: 700;
+  font-family: $circular_bold, Muli, Arial, sans-serif;
+  font-weight: normal;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -88,8 +90,10 @@ $circular_bold: "LL Circular Bold Web";
   @include OCBodyFont($circular_bold, normal, italic);
 }
 
-@mixin OC_Title($weight: 700){
-  font-family: "PT Serif", serif !important;
+@mixin OC_Title($weight: normal){
+  // font-family: "PT Serif", serif !important;
+  // font-weight: $weight;
+  font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: $weight;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
