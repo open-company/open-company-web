@@ -41,7 +41,8 @@
       (let [old-queries (search-history)
             without-new-query (disj old-queries search-query)
             with-new-query (conj without-new-query search-query)]
-      (cook/set-cookie! search-history-cookie (.stringify js/JSON (clj->js with-new-query))))
+        (cook/set-cookie! search-history-cookie (.stringify js/JSON (clj->js with-new-query))
+         cook/default-cookie-expire))
       (active)
       (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
     (reset)))

@@ -51,6 +51,7 @@ $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
 $.datepicker = function(){};
+$.parseJSON = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
