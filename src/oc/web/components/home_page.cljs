@@ -10,24 +10,11 @@
             [oc.web.components.ui.shared-misc :as shared-misc]
             [oc.web.components.ui.site-header :refer (site-header)]
             [oc.web.components.ui.site-footer :refer (site-footer)]
-            [oc.web.components.ui.try-it-form :refer (try-it-form)]
             [oc.web.components.ui.site-mobile-menu :refer (site-mobile-menu)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
 
-(rum/defcs home-page < (rum/local false ::thanks-box-top)
-                       (rum/local false ::thanks-box-bottom)
-                       (rum/local false ::confirm)
-                       {:did-mount (fn [s]
-                                    (when (:tif (:query-params @router/path))
-                                      (utils/after 1500 #(.focus (sel1 [:input.try-it-form-central-input]))))
-                                    (when (exists? (.-OCWebSetupMarketingSiteJS js/window))
-                                      (js/OCWebSetupMarketingSiteJS))
-                                    s)
-                       :will-mount (fn [s]
-                                     (when (:confirm (:query-params @router/path))
-                                       (reset! (::confirm s) true))
-                                     s)}
-  [s]
+(rum/defc home-page
+  []
   [:div
     (site-header)
     (site-mobile-menu)

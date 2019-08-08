@@ -188,7 +188,7 @@
                          :data-placement "top"
                          :data-container "body"
                          :title (str (:name board-data) " settings")
-                         :on-click #(nav-actions/show-section-editor)}]])]
+                         :on-click #(nav-actions/show-section-editor (:slug board-data))}]])]
                 (when (not= (router/current-board-slug) utils/default-drafts-board-slug)
                   (let [default-sort (= board-sort dis/default-sort-type)]
                     [:div.board-sort.group
