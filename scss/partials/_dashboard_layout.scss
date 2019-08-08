@@ -74,7 +74,7 @@ div.dashboard-layout {
       @include mobile (){
         display: block;
         background-color: $grey_num_2;
-        padding: 15px 0;
+        padding: 20px 0;
         border-top: 1px solid $grey_num_3;
         height: #{$mobile_navbar_height}px;
         position: fixed;
@@ -85,7 +85,7 @@ div.dashboard-layout {
 
         &.ios-tabbar {
           height: #{$mobile_navbar_height + 31}px;
-          padding: 15px 0 47px;
+          padding: 20px 0 52px;
 
           span.unread-notifications-dot {
             bottom: 34px;
@@ -584,7 +584,7 @@ div.dashboard-layout {
 
               @include mobile() {
                 position: absolute;
-                top: 24px;
+                top: 28px;
                 left: 50%;
                 margin-left: 47px;
                 opacity: 0.6;

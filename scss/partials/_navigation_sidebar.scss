@@ -246,6 +246,7 @@ div.left-navigation-sidebar {
       min-height: 100%;
       margin-top: 64px;
       border-bottom: 1px solid $grey_num_3;
+      -webkit-overflow-scrolling: touch;
     }
 
     div.left-navigation-sidebar-mobile-header {

@@ -122,20 +122,23 @@
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % (oc-urls/all-posts)))
-                 :class (when (= (router/current-board-slug) "all-posts")
+                 :class (when (and (not showing-mobile-user-notifications)
+                                   (= (router/current-board-slug) "all-posts"))
                           "active")}]
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % (oc-urls/must-see)))
-                 :class (when (or (= (router/current-board-slug) "follow-ups")
-                                  (= (router/current-board-slug) "must-see"))
+                 :class (when (and (not showing-mobile-user-notifications)
+                                   (or (= (router/current-board-slug) "follow-ups")
+                                       (= (router/current-board-slug) "must-see")))
                           "active")}]
               [:button.mlb-reset.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (user-actions/show-mobile-user-notifications))
-                 :class (when showing-mobile-user-notifications "active")}]
+                 :class (when showing-mobile-user-notifications
+                          "active")}]
               (when (user-notifications/has-new-content? user-notifications-data)
                 [:span.unread-notifications-dot])
               (when can-compose?
@@ -236,7 +239,9 @@
                       {:ref :board-sort-menu}
                       (when is-mobile?
                         [:button.mlb-reset.mobile-search-bt
-                          {:on-click #(search-actions/active)}])
+                          {:on-click (fn [e]
+                                       (search-actions/active)
+                                       (utils/after 500 #(.focus (js/$ "input.search"))))}])
                       [:button.mlb-reset.board-sort-bt
                         {:on-click #(swap! (::sorting-menu-expanded s) not)}
                         (if default-sort "Recent activity" "Recently posted")]

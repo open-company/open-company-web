@@ -50,7 +50,7 @@ nav.oc-navbar {
     @include mobile() {
       width: 100vw;
       height: #{$mobile_navbar_height}px;
-      padding: 14px 16px;
+      padding: 19px 16px;
     }
 
     div.oc-navbar-header-container{
@@ -74,7 +74,7 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 15px;
+          top: 20px;
           left: 50%;
           width: 250px;
           height: 20px;
@@ -123,7 +123,7 @@ nav.oc-navbar {
             background-position: center;
             background-repeat: no-repeat;
             position: absolute;
-            top: 15px;
+            top: 20px;
             left: 14px;
           }
         }
@@ -197,7 +197,7 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 13px;
+          top: 18px;
           right: 16px;
           width: 24px;
           height: 24px;

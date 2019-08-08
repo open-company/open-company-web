@@ -50,7 +50,7 @@ div.menu {
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     @include mobile() {
       top: 0;
@@ -67,6 +67,7 @@ div.menu {
       display: none;
       opacity: 0;
       padding: 0 16px;
+      -webkit-overflow-scrolling: touch;
     }
 
     div.menu-header {

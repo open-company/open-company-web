@@ -172,6 +172,12 @@ div.user-notifications {
         position: relative;
         background-color: $oc_gray_8;
 
+        @include mobile() {
+          &:first-child {
+            border-top: none;
+          }
+        }
+
         &:hover {
           button.read-bt {
             display: block;
