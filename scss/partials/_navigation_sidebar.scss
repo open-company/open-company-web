@@ -217,8 +217,8 @@ div.left-navigation-sidebar {
     display: none;
     z-index: #{$navbar_zindex + 7};
     background-color: $carrot_modal_bg;
-    overflow-y: unset;
-    overflow-x: unset;
+    overflow-y: hidden;
+    overflow-x: hidden;
     padding-bottom: 0;
     max-height: initial;
 

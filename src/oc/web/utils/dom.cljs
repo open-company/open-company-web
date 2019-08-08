@@ -8,7 +8,8 @@
   []
   (when (and (responsive/is-mobile-size?)
              (nil? (:back-y @router/path)))
-    (swap! router/path assoc :back-y (.. js/document -scrollingElement -scrollTop)))
+    (swap! router/path assoc :back-y (.. js/document -scrollingElement -scrollTop))
+    (set! (.. js/document -scrollingElement -scrollTop) 0))
   (dommy/add-class! (sel1 [:body]) :no-scroll))
 
 (defn unlock-page-scroll
