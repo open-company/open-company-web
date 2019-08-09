@@ -500,7 +500,7 @@
         follow-up? (and ;; if there is at least a follow-up
                         (seq (:follow-ups cmail-data))
                         ;; That wasn't created by the owner
-                        (some? #(not= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
+                        (some #(not= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
         can-toggle-follow-ups? (every? #(and (not (:completed? %))
                                              (or (not (:author %))
                                                  (= (-> % :author :user-id) (jwt/user-id))))
