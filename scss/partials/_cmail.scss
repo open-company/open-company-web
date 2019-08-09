@@ -369,7 +369,7 @@ div.cmail-outer {
       width: 100vw;
       height: 100vh;
       background-color: $grey_num_2;
-      padding-top: 50px;
+      padding-top: #{mobile_navbar_height}px;
     }
 
     div.cmail-mobile-header {

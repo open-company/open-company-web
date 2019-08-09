@@ -621,8 +621,8 @@
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (if (js/isEdge)
-          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-          (js/window.scrollTo 0 (utils/page-scroll-top))))
+          (set! (.. js/document -scrollingElement -scrollTop) 0)
+          (js/window.scrollTo 0 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips
