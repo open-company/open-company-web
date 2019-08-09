@@ -528,7 +528,7 @@ div.dashboard-layout {
               display: block;
               position: absolute;
               left: 16px;
-              top: 0;
+              top: 4px;
               background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
               background-size: 16px 16px;
               background-position: center;
@@ -584,7 +584,7 @@ div.dashboard-layout {
 
               @include mobile() {
                 position: absolute;
-                top: 18px;
+                top: 15px;
                 left: 50%;
                 margin-left: 47px;
                 opacity: 0.6;
