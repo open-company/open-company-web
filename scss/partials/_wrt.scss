@@ -128,7 +128,7 @@ div.wrt-popup-container {
         border-bottom: 1px solid $ultra_light_grey;
         z-index: 2;
         height: #{$mobile_navbar_height}px;
-        padding: 14px 16px;
+        padding: 18px 16px;
       }
 
       div.wrt-popup-header-title {
@@ -141,6 +141,7 @@ div.wrt-popup-container {
         @include mobile() {
           text-align: center;
           float: unset;
+          line-height: 24px;
         }
       }
 
@@ -151,7 +152,7 @@ div.wrt-popup-container {
           display: block;
           position: absolute;
           left: 16px;
-          top: 21px;
+          top: 18px;
           width: 24px;
           height: 24px;
           padding: 0;

@@ -67,6 +67,7 @@
                                     (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
+                                (js/console.log "DBG dashboard-layout/did-mount reset scroll")
                                 (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
                                 s)
                                :did-remount (fn [_ s]

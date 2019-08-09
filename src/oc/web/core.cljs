@@ -620,6 +620,7 @@
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
+        (js/console.log "DBG core reset scroll")
         (if (js/isEdge)
           (set! (.. js/document -scrollingElement -scrollTop) 0)
           (js/window.scrollTo 0 0)))
