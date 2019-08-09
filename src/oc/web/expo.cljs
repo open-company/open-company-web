@@ -42,9 +42,14 @@
   contain the push token if the user granted permission (or had already granted permission). Response
   is `nil` if the user denied the permission (or previously denied the permission)."
   [json-str]
+  (bridge-log! (str "on-push-notification-permission: " json-str))
   (if-let [token (parse-bridge-data json-str)]
-    (user-actions/add-expo-push-token token)
-    (user-actions/deny-push-notification-permission)))
+    (do
+      (bridge-log! "Adding Expo push token")
+      (user-actions/add-expo-push-token token))
+    (do
+      (bridge-log! "Push notification permission denied by user")
+      (user-actions/deny-push-notification-permission))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Handling of user tapping on push notification
