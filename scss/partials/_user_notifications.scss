@@ -70,8 +70,6 @@ div.user-notifications {
       box-shadow: none;
       border: none;
       background-color: white;
-      overflow-y: auto;
-      overflow-x: hidden;
 
       &.hidden-tray {
         top: unset;
