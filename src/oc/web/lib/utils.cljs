@@ -733,5 +733,5 @@
     (if (and (not activity-id)
              (not= board-slug default-drafts-board-slug)
              is-mobile?)
-      60
+      32
       0)))
