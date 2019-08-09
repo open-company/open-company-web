@@ -3,6 +3,7 @@
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
@@ -120,7 +121,7 @@
                  :class (utils/class-set {:placeholder (empty? (:assignee reminder-data))
                                           :active @(::assignee-dropdown s)})}
                 (if (:assignee reminder-data)
-                  (str (utils/name-or-email (:assignee reminder-data)) (when self-assignee? " (you)"))
+                  (str (user-lib/name-for (:assignee reminder-data)) (when self-assignee? " (you)"))
                   "Pick a user")]
               (when (empty? users-list)
                 (small-loading))

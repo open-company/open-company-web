@@ -58,6 +58,8 @@
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :hide-left-navbar)
                                 (drv/drv :mobile-navigation-sidebar)
+                                (drv/drv :drafts-data)
+                                (drv/drv :follow-ups-data)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -104,11 +106,15 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         is-all-posts (= (router/current-board-slug) "all-posts")
+        is-follow-ups (= (router/current-board-slug) "follow-ups")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
-        show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
+        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "activity"))
+        show-follow-ups (and user-is-part-of-the-team?
+                             (utils/link-for (:links org-data) "follow-ups"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
@@ -118,7 +124,9 @@
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
         editable-boards (drv/react s :editable-boards)
-        can-compose (pos? (count editable-boards))]
+        can-compose (pos? (count editable-boards))
+        follow-ups-data (drv/react s :follow-ups-data)
+        drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
                                 :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
@@ -142,10 +150,19 @@
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
+        (when show-follow-ups
+          [:a.follow-ups.hover-item.group
+            {:class (utils/class-set {:item-selected is-follow-ups})
+             :href (oc-urls/follow-ups)
+             :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
+            [:div.follow-ups-icon]
+            [:div.follow-ups-label
+              "Follow-ups"]
+            (when (pos? (:follow-ups-count org-data))
+              [:span.count (:follow-ups-count org-data)])])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
-                draft-posts (dis/draft-posts-data)
-                draft-count (or (count draft-posts) (:count drafts-link))]
+                draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
                                  (= (router/current-board-slug) (:slug drafts-board)))

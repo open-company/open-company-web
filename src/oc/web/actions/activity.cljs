@@ -50,7 +50,55 @@
   (let [cleaned-ids (au/clean-who-reads-count-ids item-ids (dis/activity-read-data))]
     (when (seq cleaned-ids)
       (api/request-reads-count cleaned-ids))))
+
+;; Follow-ups stream
+
+(defn follow-ups-get-finish [sort-type {:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          posts-data-key (dis/posts-data-key org)
+          follow-ups-data (when success (json->cljs body))
+          fixed-follow-ups (au/fix-container (:collection follow-ups-data) (dis/change-data) org-data)]
+      (when (= (router/current-board-slug) "follow-ups")
+        (cook/set-cookie! (router/last-board-cookie org) "follow-ups" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-follow-ups)))
+        (watch-boards (:fixed-items fixed-follow-ups)))
+      (dis/dispatch! [:follow-ups-get/finish org sort-type fixed-follow-ups]))))
+
+(defn- follow-ups-real-get [follow-ups-link sort-type org-slug finish-cb]
+  (api/get-all-posts follow-ups-link
+   (fn [resp]
+     (follow-ups-get-finish sort-type resp)
+     (when (fn? finish-cb)
+       (finish-cb resp)))))
+
+(defn follow-ups-get [org-data & [finish-cb]]
+  (when-let [follow-ups-link (utils/link-for (:links org-data) "follow-ups")]
+    (follow-ups-real-get follow-ups-link :recently-posted (:slug org-data) finish-cb)))
+
+(defn recent-follow-ups-get [org-data & [finish-cb]]
+  (when-let [recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups")]
+    (follow-ups-real-get recent-follow-ups-link :recent-activity (:slug org-data) finish-cb)))
+
+(defn follow-ups-sort-get [org-data & [finish-cb]]
+  (let [sort-type (router/current-sort-type)
+        follow-ups-link-rel (if (= sort-type dis/default-sort-type) "follow-ups-activity" "follow-ups")
+        follow-ups-link (utils/link-for (:links org-data) follow-ups-link-rel)]
+    (when follow-ups-link
+      (follow-ups-real-get follow-ups-link sort-type (:slug org-data) finish-cb))))
+
+(defn follow-ups-more-finish [direction sort-type {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (json->cljs body)))))
+  (dis/dispatch! [:follow-ups-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
+
+(defn follow-ups-more [more-link direction]
+  (api/load-more-items more-link direction (partial follow-ups-more-finish direction (router/current-sort-type)))
+  (dis/dispatch! [:follow-ups-more (router/current-org-slug) (router/current-sort-type)]))
+
 ;; All Posts
+
 (defn all-posts-get-finish [sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
@@ -104,8 +152,8 @@
           must-see-data (when success (json->cljs body))
           must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data) org-data)]
       (when (= (router/current-board-slug) "must-see")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" cook/default-cookie-expire))
-      (watch-boards (:fixed-items must-see-posts))
+        (cook/set-cookie! (router/last-board-cookie org) "all-posts" cook/default-cookie-expire)
+        (watch-boards (:fixed-items must-see-posts)))
       (dis/dispatch! [:must-see-get/finish org sort-type must-see-posts]))))
 
 (defn must-see-get [org-data]
@@ -134,7 +182,7 @@
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
+        is-follow-ups (= (router/current-board-slug) "follow-ups")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         sort-type (router/current-sort-type)
         board-rel (if (= sort-type :recent-activity) "activity" "self")]
@@ -144,8 +192,8 @@
       (if (= sort-type :recent-activity)
         (recent-activity-get org-data)
         (activity-get org-data))
-      is-must-see
-      (must-see-get org-data)
+      is-follow-ups
+      (follow-ups-sort-get org-data)
       :else
       (sa/section-get sort-type (utils/link-for (:links board-data) board-rel "GET")))))
 
@@ -245,7 +293,8 @@
 (declare send-item-read)
 
 (defn entry-save-finish [board-slug activity-data initial-uuid edit-key]
-  (let [org-slug (router/current-org-slug)]
+  (let [org-slug (router/current-org-slug)
+        is-published? (= (:status activity-data) "published")]
     (when (and (router/current-activity-id)
                (not= board-slug (router/current-board-slug)))
       (router/nav! (oc-urls/entry org-slug board-slug (:uuid activity-data))))
@@ -258,8 +307,14 @@
     (swap! initial-revision dissoc (:uuid activity-data))
     (dis/dispatch! [:entry-save/finish (assoc activity-data :board-slug board-slug) edit-key])
     ;; Send item read
-    (when (= (:status activity-data) "published")
-      (send-item-read (:uuid activity-data)))))
+    (when is-published?
+      (send-item-read (:uuid activity-data))
+      (notification-actions/show-notification {:title "Changes have been saved"
+                                               :primary-bt-dismiss true
+                                               :primary-bt-title "OK"
+                                               :primary-bt-inline true
+                                               :expire 3
+                                               :id :entry-updated-notification}))))
 
 (defn create-update-entry-cb [entry-data edit-key {:keys [success body status]}]
   (if success
@@ -398,7 +453,28 @@
   ;; Send item read
   (send-item-read (:uuid activity-data))
   ;; Show the first post added tooltip if needed
-  (nux-actions/show-post-added-tooltip (:uuid activity-data)))
+  (nux-actions/show-post-added-tooltip (:uuid activity-data))
+  ;; Show follow-ups notifications if needed
+  (when (pos? (count (:follow-ups activity-data)))
+    (let [follow-ups (:follow-ups activity-data)
+          activity-follow-ups (cmail-actions/follow-ups-for-activity activity-data (dis/team-roster))
+          available-users-set (set (map #(-> % :assignee :user-id) activity-follow-ups))
+          actual-follow-ups-set (set (map #(-> % :assignee :user-id) follow-ups))
+          notification-message (if (or (= (count actual-follow-ups-set) (count available-users-set))
+                                       (and (= (dec (count actual-follow-ups-set)) (count available-users-set))
+                                            (not (utils/in? actual-follow-ups-set (jwt/user-id)))))
+                                (str "You requested a follow-up from everyone in " (:board-name activity-data) ".")
+                                (str "You've requested a follow-up from " (count actual-follow-ups-set)
+                                 (if (= (count actual-follow-ups-set) 1)
+                                  " person."
+                                  " people.")))]
+      (notification-actions/show-notification {:title "Follow-up requested"
+                                               :description notification-message
+                                               :primary-bt-dismiss true
+                                               :primary-bt-title "OK"
+                                               :primary-bt-inline true
+                                               :expire 3
+                                               :id :publish-follow-ups}))))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -600,6 +676,7 @@
             change-type (:change-type change-data)
             ;; In case another user is adding a new post mark it as unread
             ;; directly to avoid delays in the newly added post propagation
+            org-data (dis/org-data)
             dispatch-unread (when (and (= change-type :add)
                                        (not= (:user-id change-data) (jwt/user-id)))
                               (fn [{:keys [success]}]
@@ -611,9 +688,16 @@
         ;; Refresh the AP in case of items added or removed
         (when (or (= change-type :add)
                   (= change-type :delete))
-          (if (= (router/current-board-slug) "all-posts")
-            (all-posts-get (dis/org-data) dispatch-unread))
-            (sa/section-change section-uuid dispatch-unread))
+          ;; Refresh the count of drafts and follow-ups
+          (api/get-org (utils/link-for (:links org-data) "self") refresh-org-data-cb)
+          ;; Refresh specific containers/sections
+          (cond
+            (= (router/current-board-slug) "all-posts")
+            (all-posts-get org-data dispatch-unread)
+            (= (router/current-board-slug) "follow-ups")
+            (follow-ups-get org-data dispatch-unread)
+            :else
+            (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
         (when (= change-type :update)
           (activity-change section-uuid activity-uuid)))))
@@ -722,34 +806,6 @@
        (swap! wrt-timeouts-list dissoc activity-id)
        (send-item-read activity-id))))))
 
-(defn toggle-must-see [activity-data]
-  (let [must-see (:must-see activity-data)
-        must-see-toggled (update-in activity-data [:must-see] not)
-        org-data (dis/org-data)
-        must-see-count (:must-see-count dis/org-data)
-        new-must-see-count (if-not must-see
-                             (inc must-see-count)
-                             (dec must-see-count))
-        patch-entry-link (utils/link-for (:links activity-data) "partial-update")]
-    (dis/dispatch! [:org-loaded
-                    (assoc org-data :must-see-count new-must-see-count)
-                    false])
-    (dis/dispatch! [:must-see-toggle (router/current-org-slug) must-see-toggled])
-    (api/patch-entry patch-entry-link must-see-toggled :must-see
-                      (fn [entry-data edit-key {:keys [success body status]}]
-                        (if success
-                          (let [org-link (utils/link-for (:links org-data) ["item" "self"] "GET")]
-                            (api/get-org org-link
-                              (fn [{:keys [status body success]}]
-                                (let [api-org-data (json->cljs body)]
-                                  (dis/dispatch! [:org-loaded api-org-data false])
-                                  (must-see-get api-org-data)))))
-                          (dis/dispatch! [:activity-get/finish
-                                           status
-                                           (router/current-org-slug)
-                                           (json->cljs body)
-                                           nil]))))))
-
 ;; Video handling
 
 (defn uploading-video [video-id edit-key]
@@ -832,9 +888,9 @@
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
     (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
     (api/mark-unread mark-unread-link (:board-uuid activity-data)
-     (fn [{:keys [error success]}]
+     (fn [{:keys [success]}]
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
-                                               :description (when error "Please try again")
+                                               :description (when-not success "Please try again")
                                                :dismiss true
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
@@ -842,3 +898,38 @@
 (defn change-sort-type [type]
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))
+
+(defn complete-follow-up [entry-data assigned-follow-up]
+  (let [self-follow-up-index (utils/index-of (:follow-ups entry-data) #(= (-> % :assignee :user-id) (jwt/user-id)))
+        with-completed-follow-up (update-in entry-data [:follow-ups self-follow-up-index] merge
+                                  {:completed? true
+                                   :completed-at (utils/as-of-now)})
+        complete-follow-up-link (utils/link-for (:links assigned-follow-up) "mark-complete" "POST")]
+    (dis/dispatch! [:follow-up-complete (router/current-org-slug) with-completed-follow-up])
+    (api/complete-follow-up complete-follow-up-link
+     (fn [{:keys [success status body]}]
+       (when success
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+       (notification-actions/show-notification {:title (if success "Follow-up completed" "An error occurred")
+                                               :description (when-not success "Please try again")
+                                               :dismiss true
+                                               :expire 3
+                                               :id (if success :self-follow-up-completed
+                                                    :self-follow-up-completed-error)})))))
+
+(defn create-self-follow-up [entry-data create-follow-up-link]
+  (let [org-data (dis/org-data)]
+    (dis/dispatch! [:follow-up-create-self (:slug org-data) entry-data])
+    (when create-follow-up-link
+      (api/create-follow-ups create-follow-up-link {:self true}
+       (fn [{:keys [status body success]}]
+        (when success
+          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+        (notification-actions/show-notification {:title (if success "Follow-up created" "An error occurred")
+                                                 :description (when-not success "Please try again")
+                                                 :dismiss true
+                                                 :expire 3
+                                                 :id (if success :self-follow-up-created
+                                                      :self-follow-up-created-error)})
+        (follow-ups-get org-data)
+        (recent-follow-ups-get org-data))))))

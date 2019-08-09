@@ -1,6 +1,8 @@
 (ns oc.web.actions.cmail
-  (:require [oc.web.api :as api]
+  (:require [defun.core :refer (defun)]
+            [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -172,3 +174,37 @@
                          (fn [success status]
                            (when success
                              (cmail-show (dis/activity-data activity-uuid) cmail-state)))))))))))))))
+
+;; Follow-ups
+
+(defun author-for-user
+  ([user :guard map?]
+   (-> user
+    (select-keys [:user-id :avatar-url])
+    (assoc :name (user-lib/name-for user))))
+  ([users :guard sequential?]
+   (vec (map author-for-user users))))
+
+(defn- follow-up-from-user [user]
+  (hash-map :assignee (author-for-user user)
+            :completed? false))
+
+(defn follow-up-users [activity-data team-roster]
+  (let [all-team-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-roster))
+        board-data (dis/board-data (:board-slug activity-data))
+        private-board? (= (:access board-data) "private")
+        filtered-board-users (when private-board?
+                               (concat (:viewers board-data) (:authors board-data)))]
+    (if private-board?
+      (filterv #((set filtered-board-users) (:user-id %)) all-team-users)
+      all-team-users)))
+
+(defn follow-ups-for-activity [activity-data team-roster]
+  (let [follow-up-users (follow-up-users activity-data team-roster)]
+    (map follow-up-from-user (filterv #(not= (:user-id %) (jwt/user-id)) follow-up-users))))
+
+(defn cmail-toggle-follow-up [activity-data]
+  (let [follow-up (pos? (count (:follow-ups activity-data)))
+        turning-on? (not follow-up)
+        activity-follow-ups (follow-ups-for-activity activity-data (dis/team-roster))]
+    (dis/dispatch! [:follow-up-toggle (router/current-org-slug) activity-data (if turning-on? activity-follow-ups [])])))
