@@ -235,6 +235,10 @@ div.left-navigation-sidebar {
 
     &.can-compose {
       height: calc(100% - 72px);
+
+      @include mobile() {
+        height: 100%;
+      }
     }
 
     @include mobile() {
@@ -244,8 +248,7 @@ div.left-navigation-sidebar {
       height: auto;
       background-color: $grey_num_2;
       min-height: 100%;
-      margin-top: 64px;
-      border-bottom: 1px solid $grey_num_3;
+      padding-top: #{$mobile_navbar_height}px;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -254,18 +257,19 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         display: block;
-        height: 64px;
+        height: #{$mobile_navbar_height}px;
         position: fixed;
         top: 0;
         left: 0;
         width: 85vw;
         background-color: $grey_num_2;
-        padding: 16px;
+        padding: 18px 16px;
+        border-bottom: 1px solid $grey_num_3;
 
         button.mobile-close-bt {
           display: block;
           position: absolute;
-          right: 16px;
+          right: 18px;
           top: 20px;
           width: 24px;
           height: 24px;
