@@ -19,6 +19,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -199,16 +200,16 @@
 (defn- fix-abstract [cmail-data]
   (utils/trim (:abstract cmail-data)))
 
-(defn- is-publishable? [s cmail-data]
+(defn- is-publishable? [cmail-data]
   (and (seq (:board-slug cmail-data))
-       (not (zero? (count (fix-headline cmail-data))))))
+       (seq (fix-headline cmail-data))))
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         fixed-headline (fix-headline cmail-data)
         fixed-abstract (fix-abstract cmail-data)
         published? (= (:status cmail-data) "published")]
-      (if (is-publishable? s cmail-data)
+      (if (is-publishable? cmail-data)
         (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline :abstract fixed-abstract})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
@@ -275,6 +276,55 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- follow-ups-header [s cmail-data is-mobile? can-toggle-follow-ups?]
+  (let [published-entry? (= (:status cmail-data) "published")
+        completed-follow-ups (filterv :completed? (:follow-ups cmail-data))
+        remove-follow-ups-cb (fn [e]
+                               (utils/event-stop e)
+                               (when can-toggle-follow-ups?
+                                 (cmail-actions/cmail-toggle-follow-up cmail-data)))]
+    [:div.follow-ups-header
+      {:on-click (fn [_]
+                   (if @(::mobile-follow-ups-remove-menu s)
+                     (reset! (::mobile-follow-ups-remove-menu s) false)
+                     (nav-actions/show-follow-ups-picker nil
+                      (fn [users-list]
+                        (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
+                                                                         :follow-ups users-list})])))))
+       :ref :follow-ups-header}
+      (when-not is-mobile?
+        [:div.follow-up-tag.white-bg])
+      [:div.follow-ups-label
+        "Follow-ups "
+        (when-not published-entry?
+          "will be ")
+        "created for "
+        [:span.follow-ups-label-count
+          (count (:follow-ups cmail-data)) " "
+          (if (= (count (:follow-ups cmail-data)) 1)
+            "person"
+            "people")]
+        (when (and published-entry?
+                   (seq completed-follow-ups))
+          (str " (" (count completed-follow-ups) " completed)"))
+        " in the “"
+        (:board-name cmail-data)
+        "” section."]
+      (when can-toggle-follow-ups?
+        (if is-mobile?
+          [:div.mobile-follow-ups-remove-menu-container
+            [:button.mlb-reset.mobile-follow-ups-remove-menu
+              {:on-click (fn [e]
+                           (utils/event-stop e)
+                           (swap! (::mobile-follow-ups-remove-menu s) not))}]
+            (when @(::mobile-follow-ups-remove-menu s)
+              [:button.mlb-reset.mobile-follow-ups-remove
+                {:on-click remove-follow-ups-cb}
+                "Remove"])]
+          [:button.mlb-reset.remove-follow-up-button
+            {:on-click remove-follow-ups-cb}
+            "Remove"]))]))
+
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
@@ -302,10 +352,15 @@
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
                    (rum/local "" ::post-button-title)
+                   (rum/local false ::mobile-follow-ups-remove-menu)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    (mixins/autoresize-textarea "abstract")
                    mixins/refresh-tooltips-mixin
+                   (mixins/on-window-click-mixin (fn [s e]
+                    (when (and @(::mobile-follow-ups-remove-menu s)
+                               (not (utils/event-inside? e (rum/ref-node s :follow-ups-header))))
+                      (reset! (::mobile-follow-ups-remove-menu s) false))))
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -418,7 +473,7 @@
                       :height (utils/calc-video-height 548)})
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
-        show-post-bt-tooltip? (not (is-publishable? s cmail-data))
+        show-post-bt-tooltip? (not (is-publishable? cmail-data))
         post-button-title @(::post-button-title s)
         disabled? (or show-post-bt-tooltip?
                       @(::publishing s)
@@ -441,6 +496,15 @@
                            (:has-changes cmail-data))
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
+        current-user-id (jwt/user-id)
+        follow-up? (and ;; if there is at least a follow-up
+                        (seq (:follow-ups cmail-data))
+                        ;; That wasn't created by the owner
+                        (some #(not= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
+        can-toggle-follow-ups? (every? #(and (not (:completed? %))
+                                             (or (not (:author %))
+                                                 (= (-> % :author :user-id) (jwt/user-id))))
+                                (:follow-ups cmail-data))
         long-tooltip (not= (:status cmail-data) "published")]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
@@ -490,6 +554,9 @@
           [:div.cmail-mobile-header-bt-separator]
           [:button.mlb-reset.mobile-attachment-button
             {:on-click #(add-attachment s)}]]
+        (when (and follow-up?
+                   is-mobile?)
+          (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
         [:div.cmail-header.group
           [:div.close-bt-container
             {:class (when long-tooltip "long-tooltip")}
@@ -501,12 +568,13 @@
                         "Save & Close"
                         "Close")}]]
           [:div.cmail-header-vertical-separator]
-          [:div.cmail-header-board-must-see-container.group
-            {:class (when (:must-see cmail-data) "must-see-on")}
+          [:div.cmail-header-board-follow-ups-container.group
+            {:class (when follow-up? "follow-ups-on")}
             [:div.board-name.oc-input
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-               :class (when show-sections-picker "active")}
+               :class (utils/class-set {:active show-sections-picker
+                                        :has-follow-ups-button (not (seq (:follow-ups cmail-data)))})}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
@@ -526,20 +594,22 @@
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
-            [:div.must-see-toggle-container
-              {:class (when (:must-see cmail-data) "on")}
-              [:div.must-see-toggle
-                {:on-mouse-down #(cmail-actions/cmail-toggle-must-see)
-                 :data-toggle "tooltip"
-                 :data-placement "auto"
-                 :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                 :title "Must See"}
-                [:span.must-see-toggle-circle]]]
-            (when (:must-see cmail-data)
-              [:div.must-see-tag
-                {:class (when-not is-fullscreen? "white-bg")}])]
+            (when-not (seq (:follow-ups cmail-data))
+              [:button.mlb-reset.mobile-follow-up-button
+                {:on-click #(when can-toggle-follow-ups?
+                              (cmail-actions/cmail-toggle-follow-up cmail-data))
+                 :class (when-not can-toggle-follow-ups? "disabled")}])]
           (when is-fullscreen?
             [:div.cmail-header-right-buttons
+              (when-not (seq (:follow-ups cmail-data))
+                [:button.mlb-reset.follow-up-button
+                  {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
+                   :data-toggle "tooltip"
+                   :data-placement "bottom"
+                   :data-container "body"
+                   :on-click #(when can-toggle-follow-ups?
+                                (cmail-actions/cmail-toggle-follow-up cmail-data))
+                   :class (when-not can-toggle-follow-ups? "disabled")}])
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                              :width 24
                              :height 24
@@ -586,7 +656,12 @@
                         "Save & Close"
                         "Close")}]])
         [:div.cmail-content-outer
-          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
+          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
+                                    :has-follow-ups follow-up?})}
+          (when (and follow-up?
+                     (not is-mobile?)
+                     is-fullscreen?)
+            (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
           [:div.cmail-content
             ;; Video elements
             ; FIXME: disable video on mobile for now
@@ -677,6 +752,10 @@
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
+      (when (and follow-up?
+                 (not is-mobile?)
+                 (not is-fullscreen?))
+        (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
       (if is-fullscreen?
         [:div.cmail-footer
           (when (and (not= (:status cmail-data) "published")
@@ -692,6 +771,16 @@
               {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
+            (when (and (not (seq (:follow-ups cmail-data)))
+                       (not is-fullscreen?))
+              [:button.mlb-reset.follow-up-button
+                {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :on-click #(when can-toggle-follow-ups?
+                              (cmail-actions/cmail-toggle-follow-up cmail-data))
+                 :class (when-not can-toggle-follow-ups? "disabled")}])
             (when-not is-fullscreen?
               [:button.mlb-reset.post-button
                 {:ref "post-btn"
