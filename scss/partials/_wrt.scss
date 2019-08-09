@@ -175,7 +175,7 @@ div.wrt-popup-container {
       @include mobile() {
         overflow-x: hidden;
         overflow-y: auto;
-        height: calc(100% - #{$mobile_navbar_height}px);
+        height: 100%;
         padding-top: #{$mobile_navbar_height + 24}px;
       }
 
