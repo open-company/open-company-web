@@ -13,8 +13,10 @@ div.menu {
   z-index: #{$navbar_zindex + 156};
 
   @include mobile() {
-    position: absolute;
+    position: fixed;
+    width: 100vw;
     padding: 0;
+    overflow: initial;
   }
 
   &.dropdown-menu {
@@ -57,7 +59,7 @@ div.menu {
       left: unset;
       right: 0;
       width: 85vw;
-      height: 100vh;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
       border: none;
       box-shadow: none;
       transition: 230ms;
@@ -68,6 +70,7 @@ div.menu {
       opacity: 0;
       padding: 0 16px;
       -webkit-overflow-scrolling: touch;
+      padding-top: #{$mobile_navbar_height}px;
     }
 
     div.menu-header {
@@ -80,10 +83,15 @@ div.menu {
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
-        position: relative;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 85vw;
         border-bottom: 1px solid $ultra_light_grey;
         background-color: $grey_num_2;
         padding: 18px 16px 18px 24px;
+        margin: 0;
+        z-index: 2;
       }
 
       button.mobile-close-bt {
