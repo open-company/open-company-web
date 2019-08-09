@@ -647,6 +647,9 @@
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
 
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
+
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)

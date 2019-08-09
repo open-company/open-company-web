@@ -277,26 +277,20 @@
 
 ;; Expo push tokens
 
+(def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
+
 (defmethod dispatcher/action :expo-push-token
   [db [_ push-token]]
-  (cook/set-cookie! router/expo-push-token-cookie push-token)
-  (js/location.reload))
+  (if push-token
+    (do
+      (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
+      (assoc-in db dispatcher/expo-push-token-key push-token))
+    db))
 
 (defmethod dispatcher/action :deny-push-notification-permission
   [db [_]]
   ;; A blank Expo push token indicates that the user was prompted, but
   ;; denied the push notification permission.
-  (cook/set-cookie! router/expo-push-token-cookie "")
-  (js/location.reload))
-
-(defn get-expo-push-token
-  []
-  (if-let [token (cook/get-cookie router/expo-push-token-cookie)]
-    token
-    nil))
-
-(defn user-denied-push-notification-permission?
-  []
-  (if-let [token (get-expo-push-token)]
-    (empty? token)
-    false))
+  (let [push-token ""]
+    (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
+    (assoc-in db dispatcher/expo-push-token-key push-token)))

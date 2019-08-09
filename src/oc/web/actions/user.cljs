@@ -432,6 +432,10 @@
 
 ;; Mobile push notifications
 
+(defn recall-expo-push-token
+  []
+  (dis/dispatch! [:expo-push-token (cook/get-cookie router/expo-push-token-cookie)]))
+
 (defn add-expo-push-token [push-token]
   (let [user-data            (dis/current-user-data)
         add-token-link       (utils/link-for (:links user-data) "add-expo-push-token" "POST")

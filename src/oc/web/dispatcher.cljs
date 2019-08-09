@@ -102,6 +102,8 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
+(def expo-push-token-key [:expo-push-token])
+
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -350,6 +352,8 @@
                                     (when js/window.isDesktop
                                       (js/window.setBadgeCount ncount))
                                     ncount))]
+   :expo-push-token              [[:base] (fn [base] (get-in base expo-push-token-key))]
+   :user-denied-push-permission? [[:expo-push-token] (fn [push-token] (and push-token (empty? push-token)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]

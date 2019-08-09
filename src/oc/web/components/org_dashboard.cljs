@@ -75,6 +75,7 @@
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
+                           (drv/drv :user-denied-push-permission?)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
 
@@ -165,9 +166,8 @@
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
                                 is-mobile?)
-        show-push-notification-permissions-modal? (and is-mobile?
-                                                       (not (user-store/get-expo-push-token))
-                                                       (not (user-store/user-denied-push-notification-permission?)))]
+        user-denied-push-permission? (drv/react s :user-denied-push-permission?)
+        show-push-notification-permissions-modal? (and is-mobile? (not user-denied-push-permission?))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
