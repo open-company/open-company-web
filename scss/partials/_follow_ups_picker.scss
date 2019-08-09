@@ -1,0 +1,228 @@
+div.follow-ups-picker {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+
+    @include mobile() {
+      left: 12px;
+      right: unset;
+      top: 16px;
+      background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      display: block;
+      z-index: 3;
+    }
+  }
+
+  div.follow-ups-picker-container {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 0 16px;
+
+    @include mobile() {
+      width: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    div.follow-ups-picker-header {
+      width: 100%;
+      height: 56px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      @include mobile(){
+        height: #{mobile_navbar_height}px;
+        padding: 14px 16px;
+        border-bottom: 1px solid $grey_num_3;
+      }
+
+      div.follow-ups-picker-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+
+        @include mobile() {
+          margin-left: 24px;
+          width: 150px;
+          position: absolute;
+          left: 50%;
+          margin-left: -75px;
+        }
+      }
+      
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        background-color: $carrot_green;
+        border-radius: 4px;
+        color: white;
+        line-height: 18px;
+        float: right;
+
+        @include mobile() {
+          background-color: transparent;
+          padding: 0;
+          color: $carrot_green;
+        }
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        margin-right: 8px;
+        float: right;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+
+    div.follow-ups-picker-body {
+      padding: 0 24px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+
+      @include mobile() {
+        padding: 0 16px;
+      }
+
+      div.follow-ups-picker-body-head {
+        margin-top: 16px;
+        height: 22px;
+
+        div.follow-ups-users-count {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 22px;
+          color: $light_navy;
+          float: left;
+        }
+
+        div.follow-ups-users-bt {
+          float: right;
+
+          button.select-all, button.deselect-all {
+            color: $carrot_green;
+            font-size: 14px;
+            line-height: 22px;
+            height: 22px;
+            @include OC_Body_Book();
+            padding: 0;
+          }
+        }
+      }
+
+      div.follow-ups-users-search {
+        margin-top: 16px;
+        width: 100%;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+        padding: 5px 8px 7px 27px;
+        background-image: cdnUrl("/img/ML/wrt_search_lens.svg");
+        background-size: 11px 12px;
+        background-position: top 11px left 8px;
+        background-repeat: no-repeat;
+
+        input.follow-ups-query {
+          @include OC_Body_Book();
+          line-height: 18px;
+          font-size: 14px;
+          padding: 0;
+          outline: none;
+          border: none;
+          color: $deep_navy;
+          background-color: transparent;
+          width: 100%;
+          height: 18px;
+
+          @include placeholder() {
+            color: rgba($deep_navy, 0.5);
+          }
+        }
+      }
+
+      div.follow-ups-users-list {
+        margin-top: 16px;
+
+        div.follow-ups-user-item {
+          margin-top: 8px;
+          height: 24px;
+
+          div.follow-ups-user-left {
+            float: left;
+            width: calc(100% - 16px);
+
+            &.disabled {
+              opacity: 0.5;
+            }
+
+            @include user-profile(24);
+
+            div.user-avatar-img-container {
+              float: left;
+            }
+
+            div.user-name {
+              @include OC_Body_Book();
+              color: $light_navy;
+              font-size: 14px;
+              line-height: 24px;
+              overflow: hidden;
+              white-space: pre;
+              text-overflow: ellipsis;
+              max-width: calc(100% - 24px - 16px);
+              margin-left: 8px;
+              float: left;
+              height: 24px;
+            }
+          }
+
+          div.follow-ups-user-right {
+            float: right;
+            width: 16px;
+            text-align: right;
+
+            div.carrot-checkbox {
+              margin-top: 4px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@
                                         :collapsed true}}))
 
 (def default-sort-type :recent-activity)
+(def other-sort-type :recently-posted)
 
 ;; Data key paths
 
@@ -153,6 +154,11 @@
 (declare activity-read-data)
 (declare activity-data-get)
 
+;; Container helpers
+
+(defn- is-container? [container-slug]
+  (#{"all-posts" "must-see" "follow-ups"} container-slug))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -201,6 +207,12 @@
    :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
+   :drafts-data         [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (board-data-key org-slug :drafts other-sort-type)))]
+   :follow-ups-data     [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (container-key org-slug :follow-ups default-sort-type)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -213,6 +225,15 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
+   :follow-ups-picker-callback [[:base] (fn [base] (:follow-ups-picker-callback base))]
+   :follow-ups-activity-data [[:base :org-slug :current-panel]
+                              (fn [base org-slug current-panel]
+                                (when current-panel
+                                  (let [panel-name (name current-panel)
+                                        activity-uuid (subs panel-name (count "follow-ups-picker-") (count panel-name))]
+                                    (if (seq activity-uuid)
+                                      (get-in base (activity-key org-slug activity-uuid))
+                                      (get base :cmail-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
                           (fn [base team-data current-user-data team-roster invite-users]
@@ -230,9 +251,7 @@
    :container-data      [[:base :org-slug :board-slug :sort-type]
                          (fn [base org-slug board-slug sort-type]
                            (when (and org-slug board-slug)
-                             (let [is-container? (or (= board-slug "all-posts")
-                                                     (= board-slug "must-see"))
-                                   container-key (if is-container?
+                             (let [container-key (if (is-container? (router/current-board-slug))
                                                    (container-key org-slug board-slug sort-type)
                                                    (board-data-key org-slug board-slug sort-type))]
                                (get-in base container-key))))]
@@ -717,8 +736,7 @@
   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type))))
 
 (defn print-container-data []
-  (if (or (= (router/current-board-slug) "all-posts")
-          (= (router/current-board-slug) "must-see"))
+  (if (is-container? (router/current-board-slug))
     (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
     (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))))
 

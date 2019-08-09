@@ -75,6 +75,7 @@
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         is-all-posts (utils/in? (:route route) "all-posts")
+        is-follow-ups (utils/in? (:route route) "follow-ups")
         is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -92,6 +93,7 @@
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
+                                     (not is-follow-ups)
                                      (not is-must-see)
                                      (not (:read-only board-data)))
         cmail-state (drv/react s :cmail-state)
@@ -157,6 +159,9 @@
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
                                                    "All posts"
+
+                                                   is-follow-ups
+                                                   "Follow-ups"
 
                                                    is-must-see
                                                    "Must see"
@@ -224,5 +229,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
               )]]]))
