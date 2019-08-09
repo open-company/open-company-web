@@ -630,7 +630,6 @@
               [:textarea.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover
                 {:class utils/hide-class
                  :ref "abstract"
-                 :key (str "cmail-abstract-" (:key cmail-state))
                  :rows 1
                  :placeholder utils/default-abstract
                  :value (or (:abstract cmail-data) "")

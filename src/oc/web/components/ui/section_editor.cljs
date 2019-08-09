@@ -275,7 +275,7 @@
                               (dis/dispatch! [:update [:section-editing]
                                               #(merge % {:access "private"
                                                          :has-changes true
-                                                         :viewers (conj (set (:viewers section-editing)) current-user-id)
+                                                         :authors (conj (set (:authors section-editing)) current-user-id)
                                                          :slack-mirror (if show-slack-channels?
                                                                          nil
                                                                          (:slack-mirror section-editor))})]))}

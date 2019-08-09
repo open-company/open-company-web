@@ -82,10 +82,11 @@
   (when activity-data
     (let [comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))
           comments-link (utils/link-for (:links activity-data) "comments")]
-      (dis/dispatch! [:comments-get
-                      comments-key
-                      activity-data])
-      (api/get-comments comments-link #(get-comments-finished comments-key activity-data %)))))
+      (when comments-link
+        (dis/dispatch! [:comments-get
+                        comments-key
+                        activity-data])
+        (api/get-comments comments-link #(get-comments-finished comments-key activity-data %))))))
 
 (defn get-comments-if-needed [activity-data all-comments-data]
   (let [comments-link (utils/link-for (:links activity-data) "comments")
