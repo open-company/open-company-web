@@ -603,7 +603,7 @@
             [:div.cmail-header-right-buttons
               (when-not follow-up?
                 [:button.mlb-reset.follow-up-button
-                  {:title (if follow-up? "Remove follow-ups" "Create follow-ups")
+                  {:title "Create follow-ups"
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
@@ -771,10 +771,10 @@
               {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
-            (when (and follow-up?
+            (when (and (not follow-up?)
                        (not is-fullscreen?))
               [:button.mlb-reset.follow-up-button
-                {:title (if follow-up? "Remove follow-ups" "Create follow-ups")
+                {:title "Create follow-ups"
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
