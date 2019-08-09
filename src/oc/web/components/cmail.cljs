@@ -497,10 +497,10 @@
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
         current-user-id (jwt/user-id)
-        follow-up? (and ;; if ther is at least a follow-up
+        follow-up? (and ;; if there is at least a follow-up
                         (seq (:follow-ups cmail-data))
                         ;; That wasn't created by the owner
-                        (every? #(= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
+                        (some? #(not= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
         can-toggle-follow-ups? (every? #(and (not (:completed? %))
                                              (or (not (:author %))
                                                  (= (-> % :author :user-id) (jwt/user-id))))
