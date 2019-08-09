@@ -352,8 +352,8 @@
                                     (when js/window.isDesktop
                                       (js/window.setBadgeCount ncount))
                                     ncount))]
-   :expo-push-token              [[:base] (fn [base] (get-in base expo-push-token-key))]
-   :user-denied-push-permission? [[:expo-push-token] (fn [push-token] (and push-token (empty? push-token)))]
+   :user-responded-to-push-permission? [[:base] (fn [base]
+                                                  (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]
