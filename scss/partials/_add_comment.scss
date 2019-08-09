@@ -90,78 +90,128 @@ div.add-comment-box-container {
         @include activity-comment();
       }
     }
+  }
 
-    div.add-comment-footer {
+  div.add-comment-footer {
+    height: 32px;
+    width: 100%;
+    margin-top: 16px;
+
+
+    &.hide-footer * {
+      display: none;
+    }
+
+    button.close-reply-bt {
+      width: 22px;
       height: 32px;
-      width: 100%;
-      margin-top: 16px;
+      background-image: cdnUrl("/img/ML/cmail_delete.svg");
+      background-size: 14px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.4;
+      padding: 0;
+      float: right;
+      margin-left: 12px;
 
-      &.hide-footer * {
-        display: none;
+      &:hover {
+        opacity: 1;
       }
 
-      button.close-reply-bt {
-        width: 22px;
+      @include tablet() {
+        display: none;
+      }
+    }
+
+    div.emoji-picker {
+      float: right;
+
+      button.emoji-button {
+        width: 24px;
         height: 32px;
-        background-image: cdnUrl("/img/ML/cmail_delete.svg");
-        background-size: 14px 16px;
         background-position: center;
-        background-repeat: no-repeat;
-        opacity: 0.4;
-        padding: 0;
-        float: right;
-        margin-left: 12px;
+        background-size: 16px 16px;
+        padding: 0px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        cursor: pointer;
+      }
+
+      div.picker-container {
+        right: -16px;
+        left: unset;
+      }
+    }
+
+    button.send-btn {
+      float: right;
+      height: 32px;
+      padding: 7px 16px;
+      margin: 0 0 0 14px;
+      background-color: $carrot_green;
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 14px;
+      line-height: 18px;
+      border-radius: 4px;
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 1 !important;
+
+        @include big_web() {
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    div.buttons-separator {
+      width: 1px;
+      height: 16px;
+      float: right;
+      background-color: $ultra_light_grey;
+      margin: 7px 8px 0;
+    }
+
+    button.complete-follow-up {
+      float: right;
+      height: 24px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      line-height: 24px;
+      color: $deep_navy;
+      padding: 0 8px 0 24px;
+      position: relative;
+      margin-top: 5px;
+
+      div.carrot-checkbox {
+        position: absolute;
+        top: 4px;
+        left: 0px;
+      }
+
+      &.unselected {
+        opacity: 0.5;
 
         &:hover {
           opacity: 1;
         }
-
-        @include tablet() {
-          display: none;
-        }
       }
 
-      div.emoji-picker {
-        float: right;
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 1 !important;
 
-        button.emoji-button {
-          width: 24px;
-          height: 32px;
-          background-position: center;
-          background-size: 16px 16px;
-          padding: 0px;
-          position: absolute;
-          top: 0px;
-          left: 0px;
-          cursor: pointer;
+        @include mobile() {
+          opacity: 0.5;
         }
 
-        div.picker-container {
-          right: -16px;
-          left: unset;
-        }
-      }
-
-      button.send-btn {
-        float: right;
-        height: 32px;
-        padding: 7px 16px;
-        margin: 0 0 0 14px;
-        background-color: $carrot_green;
-        color: white;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        line-height: 18px;
-        border-radius: 4px;
-
-        &:disabled {
-          cursor: not-allowed;
-          opacity: 1 !important;
-
-          @include big_web() {
-            &:hover {
-              opacity: 1;
-            }
+        @include big_web() {
+          &:hover {
+            opacity: 1;
           }
         }
       }

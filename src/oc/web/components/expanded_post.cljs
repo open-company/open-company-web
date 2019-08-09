@@ -82,13 +82,19 @@
         route (drv/react s :route)
         back-to-slug (or (:back-to route) (:board route))
         is-all-posts? (= back-to-slug "all-posts")
+        is-follow-ups? (= back-to-slug "follow-ups")
         back-to-label (str "Back to "
-                           (if is-all-posts?
+                           (cond
+                             is-all-posts?
                              "All posts"
+                             is-follow-ups?
+                             "Follow-ups"
+                             :else
                              (:name (dis/board-data back-to-slug))))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        is-publisher? (= (:user-id publisher) (jwt/user-id))
+        current-user-id (jwt/user-id)
+        is-publisher? (= (:user-id publisher) current-user-id)
         video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
                      (if is-mobile?
@@ -100,7 +106,8 @@
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
-        expand-image-src (drv/react s :expand-image-src)]
+        expand-image-src (drv/react s :expand-image-src)
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
@@ -114,12 +121,13 @@
           [:div.back-to-board-inner
             back-to-label]]
         (more-menu activity-data dom-element-id
-         {:external-share true
+         {:external-share (not is-mobile?)
+          :external-follow-up true
           :show-edit? true
           :show-delete? true
           :show-move? (not is-mobile?)
           :tooltip-position "bottom"
-          :show-unread true})]
+          :assigned-follow-up-data assigned-follow-up-data})]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
@@ -150,8 +158,11 @@
                  " (public)")
                " on "
                (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
-          (when (:must-see activity-data)
-            [:div.must-see-tag])]]
+          (if (and assigned-follow-up-data
+                     (not (:completed? assigned-follow-up-data)))
+            [:div.follow-up-tag]
+            (when (:must-see activity-data)
+              [:div.must-see-tag]))]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract
           {:class utils/hide-class}

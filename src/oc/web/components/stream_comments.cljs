@@ -205,7 +205,6 @@
                                                      :edit-cb (partial start-editing s)
                                                      :show-delete? true
                                                      :delete-cb (partial delete-clicked s activity-data)
-                                                     :show-unread false
                                                      :can-comment-share? true
                                                      :comment-share-cb #(share-clicked comment-data)
                                                      :can-react? true

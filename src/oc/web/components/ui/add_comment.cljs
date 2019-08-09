@@ -19,10 +19,12 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]))
+            [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 ;; Add commnet handling
-
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
     (let [activity-data (first (:rum/args s))
@@ -69,11 +71,19 @@
                           :description "Please try again"
                           :dismiss true
                           :expire 3
-                          :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
+                          :id (if edit-comment-data :update-comment-error :add-comment-error)})))
+        complete? @(::complete-follow-up s)]
     (reset! (::add-button-disabled s) true)
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
-      (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))))
+      (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
+    (when complete?
+      (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+            show-follow-up-button? (and follow-up
+                                        (not (:completed? follow-up)))
+            complete-follow-up-link (when show-follow-up-button?
+                                      (utils/link-for (:links follow-up) "mark-complete" "POST"))]
+        (activity-actions/complete-follow-up activity-data follow-up)))))
 
 (def me-options
   {:media-config ["gif" "photo" "video"]
@@ -123,6 +133,7 @@
                          (rum/local "" ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
+                         (rum/local false ::complete-follow-up)
                          ;; Mixins
                          ;; Mixins
                          ui-mixins/first-render-mixin
@@ -151,6 +162,13 @@
                             (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
                           :did-mount (fn [s]
+                           (let [activity-data (first (:rum/args s))
+                                 follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))]
+                             ;; Default to complete follow-up on add comment if user has one
+                             (when (and follow-up
+                                        (not (:completed? follow-up)))
+                               (reset! (::complete-follow-up s) true)))
+
                            (me-media-utils/setup-editor s add-comment-did-change me-options)
                            (let [add-comment-node (rum/ref-node s "editor-node")]
                              (when (should-focus-field? s)
@@ -194,7 +212,14 @@
                                      ;; for the reply to comments
                                      (not parent-comment-uuid)
                                      (not @(::show-post-button s))
-                                     (not is-focused?))]
+                                     (not is-focused?))
+        follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+        complete-follow-up-link (when follow-up
+                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))
+        show-follow-up-button? (and follow-up
+                                    (not (:completed? follow-up))
+                                    complete-follow-up-link
+                                    (not parent-comment-uuid))]
     [:div.add-comment-box-container
       {:class container-class}
       [:div.add-comment-box
@@ -271,4 +296,18 @@
                          :height 24
                          :position "top"
                          :default-field-selector (str "div." add-comment-class)
-                         :container-selector (str "div." add-comment-class)})]]]))
+                         :container-selector (str "div." add-comment-class)})
+          (when show-follow-up-button?
+            [:div.buttons-separator])
+          (when show-follow-up-button?
+            [:button.mlb-reset.complete-follow-up
+              {:class (when-not @(::complete-follow-up s) "unselected")
+               :data-toggle "tooltip"
+               :data-placement "top"
+               :data-container "body"
+               :title "Complete follow-up when the comment is posted"
+               :on-click #(do
+                           (utils/event-stop %)
+                           (swap! (::complete-follow-up s) not))}
+              (carrot-checkbox {:selected @(::complete-follow-up s)})
+              "Complete follow-up"])]]]))
