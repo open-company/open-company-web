@@ -516,7 +516,7 @@ div.dashboard-layout {
 
           @include mobile() {
             width: 100%;
-            height: #{$mobile_navbar_height}px;
+            height: #{$mobile_navbar_height - 8}px;
             background-color: $grey_num_2;
             border-bottom: 1px solid $grey_num_3;
           }
@@ -528,7 +528,7 @@ div.dashboard-layout {
               display: block;
               position: absolute;
               left: 16px;
-              top: 14px;
+              top: 10px;
               background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
               background-size: 16px 16px;
               background-position: center;
@@ -555,8 +555,8 @@ div.dashboard-layout {
               top: 0;
               left: 50%;
               margin-left: -100px;
-              height: #{$mobile_navbar_height}px;
-              line-height: 50px;
+              height: #{$mobile_navbar_height - 8}px;
+              line-height: #{$mobile_navbar_height - 8}px;
               text-align: center;
               color: $ui_grey;
               opacity: 1;

@@ -11,6 +11,7 @@ div.user-notifications {
     z-index: 21;
     overflow-y: auto;
     margin-top: #{$mobile_navbar_height}px;
+    background-color: $grey_num_2;
 
     button.notification-bell-bt {
       display: none;
@@ -241,6 +242,10 @@ div.user-notifications {
 
           a {
             color: $carrot_green;
+          }
+
+          img {
+            display: none;
           }
         }
 
