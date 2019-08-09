@@ -192,4 +192,6 @@ window.isWin32 = {};
 window.isMac = {};
 window.showDesktopWindow = function() {};
 window.setBadgeCount = function() {};
+// Mobile app (Expo)
+window.ReactNativeWebView = {};
 // Fullstory
