@@ -574,7 +574,7 @@
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
                :class (utils/class-set {:active show-sections-picker
-                                        :has-follow-ups-button (not (seq (:follow-ups cmail-data)))})}
+                                        :has-follow-ups-button follow-up?})}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
@@ -594,16 +594,16 @@
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
-            (when-not (seq (:follow-ups cmail-data))
+            (when-not follow-up?
               [:button.mlb-reset.mobile-follow-up-button
                 {:on-click #(when can-toggle-follow-ups?
                               (cmail-actions/cmail-toggle-follow-up cmail-data))
                  :class (when-not can-toggle-follow-ups? "disabled")}])]
           (when is-fullscreen?
             [:div.cmail-header-right-buttons
-              (when-not (seq (:follow-ups cmail-data))
+              (when-not follow-up?
                 [:button.mlb-reset.follow-up-button
-                  {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
+                  {:title (if follow-up? "Remove follow-ups" "Create follow-ups")
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
@@ -771,10 +771,10 @@
               {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
-            (when (and (not (seq (:follow-ups cmail-data)))
+            (when (and follow-up?
                        (not is-fullscreen?))
               [:button.mlb-reset.follow-up-button
-                {:title (if (pos? (count (:follow-ups cmail-data))) "Remove follow-ups" "Create follow-ups")
+                {:title (if follow-up? "Remove follow-ups" "Create follow-ups")
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
