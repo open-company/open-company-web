@@ -426,7 +426,6 @@ function OCStaticTextareaRestoreSelection(range) {
 }
 
 function isiPhoneWithoutPhysicalHomeBt(){
-  try{
   // Really basic check for the ios platform
   // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
   var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -454,7 +453,4 @@ function isiPhoneWithoutPhysicalHomeBt(){
     return true;
   }
   return false;
-}catch(e){
-  alert(e.getMessage());
-}
 }

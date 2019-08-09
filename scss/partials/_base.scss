@@ -22,7 +22,6 @@ html {
 
   @include mobile() {
     height: 100%;
-    -webkit-overflow-scrolling: touch;
   }
 }
 
