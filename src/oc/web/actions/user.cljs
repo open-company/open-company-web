@@ -440,13 +440,17 @@
   (let [user-data            (dis/current-user-data)
         add-token-link       (utils/link-for (:links user-data) "add-expo-push-token" "POST")
         need-to-add?         (not (user-utils/user-has-push-token? user-data push-token))]
-    (when (and add-token-link push-token need-to-add?)
-      (api/add-expo-push-token
-       add-token-link
-       push-token
-       (fn [success]
-         (dis/dispatch! [:expo-push-token push-token])
-         (timbre/info "Successfully saved Expo push notification token"))))))
+    (if-not need-to-add?
+      ;; Push token already known, dispatch it to app-state immediately
+      (dis/dispatch! [:expo-push-token push-token])
+      ;; Novel push token, add it to the Auth service for storage
+      (when (and add-token-link push-token)
+        (api/add-expo-push-token
+         add-token-link
+         push-token
+         (fn [success]
+           (dis/dispatch! [:expo-push-token push-token])
+           (timbre/info "Successfully saved Expo push notification token")))))))
 
 (defn deny-push-notification-permission
   []
