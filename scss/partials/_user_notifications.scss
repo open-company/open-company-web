@@ -6,12 +6,13 @@ div.user-notifications {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - #{$mobile_navbar_height}px);
     background-color: transparent;
     z-index: 21;
     overflow-y: auto;
     margin-top: #{$mobile_navbar_height}px;
     background-color: $grey_num_2;
+    padding-bottom: #{$mobile_navbar_height}px;
 
     button.notification-bell-bt {
       display: none;
@@ -68,8 +69,9 @@ div.user-notifications {
       width: 100%;
       box-shadow: none;
       border: none;
-      height: 100%;
       background-color: white;
+      overflow-y: auto;
+      overflow-x: hidden;
 
       &.hidden-tray {
         top: unset;
@@ -153,6 +155,8 @@ div.user-notifications {
       @include mobile() {
         min-height: 100%;
         max-height: initial;
+        overflow-y: hidden;
+        overflow-x: hidden;
       }
 
       div.user-notifications-tray-empty {
