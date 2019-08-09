@@ -21,7 +21,7 @@
 
 ;; Post modal
 
-(defn open-post-modal [activity-data scroll-to-top]
+(defn open-post-modal [activity-data dont-scroll]
   (let [org (router/current-org-slug)
         old-board (router/current-board-slug)
         board (:board-slug activity-data)
@@ -41,7 +41,7 @@
                               :back-to back-to
                               :back-y scroll-y-position})
     (cmail-actions/cmail-hide)
-    (when-not scroll-to-top
+    (when-not dont-scroll
       (utils/scroll-to-y 0 0))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 

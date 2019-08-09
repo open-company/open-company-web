@@ -15,8 +15,10 @@
 (defn unlock-page-scroll
   "Remove no-scroll class from the page body tag to unlock the scroll"
   []
-  (dommy/remove-class! (sel1 [:body]) :no-scroll)
-  (when (responsive/is-mobile-size?)
-    (let [old-scroll-top (or (:back-y @router/path) 0)]
-      (swap! router/path dissoc :back-y)
-      (set! (.. js/document -scrollingElement -scrollTop) old-scroll-top))))
+  (let [body (sel1 [:body])]
+    (when (dommy/has-class? body :no-scroll)
+      (dommy/remove-class! (sel1 [:body]) :no-scroll)
+      (when (responsive/is-mobile-size?)
+        (let [old-scroll-top (or (:back-y @router/path) 0)]
+          (swap! router/path dissoc :back-y)
+          (set! (.. js/document -scrollingElement -scrollTop) old-scroll-top))))))
