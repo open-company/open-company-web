@@ -640,10 +640,10 @@
 (defn add-expo-push-token [add-token-link push-token callback]
   (when (and add-token-link push-token)
     (auth-http (method-for-link add-token-link) (relative-href add-token-link)
-      {:headers (headers-for-link add-token-link)
-      :body push-token}
-      (fn [{:keys [status success body]}]
-        (callback success)))))
+               {:headers (headers-for-link add-token-link)
+                :body push-token}
+               (fn [{:keys [status success body]}]
+                 (callback success)))))
 
 ;; Interactions
 
