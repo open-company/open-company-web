@@ -111,7 +111,10 @@ div.menu {
       }
 
       div.user-avatar-img-container {
-        float: left;
+        float: right;
+        @include mobile() {
+          float: left;
+        }
       }
 
       div.user-name {
