@@ -6,6 +6,7 @@ div.expanded-post {
   @include mobile() {
     width: 100%;
     padding: 16px;
+    margin-top: 56px;
   }
 
   div.activity-share-container {
@@ -18,6 +19,18 @@ div.expanded-post {
   div.expanded-post-header {
     height: 32px;
 
+    @include mobile() {
+      width: 100vw;
+      height: 56px;
+      padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      border-bottom: 1px solid $grey_num_3;
+      background-color: $grey_num_2;
+      z-index: 2;
+    }
+
     button.back-to-board {
       float: left;
       height: 32px;
@@ -28,6 +41,11 @@ div.expanded-post {
       align-items: center;
       position: relative;
       background-color: $ultra_light_grey;
+
+      @include mobile() {
+        background-color: transparent;
+        padding: 7px 0;
+      }
 
       div.back-to-board-inner {
         @include OC_Body_Book();
@@ -50,6 +68,10 @@ div.expanded-post {
 
     div.more-menu {
       float: right;
+
+      @include mobile() {
+        margin-top: 4px;
+      }
     }
   }
 
@@ -63,7 +85,7 @@ div.expanded-post {
       max-height: 478px;
     }
 
-    @include tablet(){
+    @include mobile(){
       width: 100vw;
       height: calc(100vw *  0.75);
     }
@@ -75,6 +97,7 @@ div.expanded-post {
 
     @include mobile() {
       @include activity-title(22px, 28px);
+      margin-top: 0;
     }
   }
 
@@ -96,11 +119,25 @@ div.expanded-post {
       @include OC_Body_Book();
       font-size: 12px;
       color: rgba($deep_navy, 0.5);
-      line-height: 24px;
+      line-height: 24px;      
 
       @include must-see-tag();
 
       div.must-see-tag {
+        display: inline-block;
+        margin-left: 8px;
+        margin-top: 2px;
+
+        @include mobile() {
+          display: block;
+          margin-left: 0;
+          margin-top: 8px;
+        }
+      }
+
+      @include follow-up-tag();
+
+      div.follow-up-tag {
         display: inline-block;
         margin-left: 8px;
         margin-top: 2px;

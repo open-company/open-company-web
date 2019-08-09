@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -216,7 +217,7 @@
                          :on-intermediate-change #(dis/dispatch! [:input [:invite-users]
                                                    (assoc invite-users i
                                                     (merge user-data {:user nil :error nil :temp-user %}))])
-                          :initial-value (utils/name-or-email (:user user-data))})
+                          :initial-value (user-lib/name-for (:user user-data))})
                         (str "slack-users-dropdown-" (count uninvited-users) "-row-" i))]
                     [:div.org-settings-field-container.group
                       {:class (utils/class-set {:focus (= @(::email-focused s) key-string)

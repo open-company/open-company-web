@@ -3,6 +3,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -30,7 +31,7 @@
 (defn- sort-users [user-id users]
   (let [{:keys [self-user other-users]}
          (group-by #(if (= (:user-id %) user-id) :self-user :other-users) users)
-        sorted-other-users (sort-by utils/name-or-email other-users)]
+        sorted-other-users (sort-by user-lib/name-for other-users)]
     (remove nil? (concat self-user sorted-other-users))))
 
 (defn dropdown-label [val total]
@@ -69,10 +70,10 @@
   (let [activity-data (drv/react s :wrt-activity-data)
         read-data (drv/react s :wrt-read-data)
         item-id (:uuid activity-data)
-        seen-users (vec (sort-by utils/name-or-email (:reads read-data)))
+        seen-users (vec (sort-by user-lib/name-for (:reads read-data)))
         seen-ids (set (map :user-id seen-users))
-        unseen-users (vec (sort-by utils/name-or-email (:unreads read-data)))
-        all-users (sort-by utils/name-or-email (concat seen-users unseen-users))
+        unseen-users (vec (sort-by user-lib/name-for (:unreads read-data)))
+        all-users (sort-by user-lib/name-for (concat seen-users unseen-users))
         read-count (:count read-data)
         query (::query s)
         lower-query (string/lower @query)
@@ -189,7 +190,11 @@
               (for [u sorted-filtered-users
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
                           is-self-user?       (= (:user-id current-user-data) (:user-id u))
-                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
+                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))
+                          follow-up           (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) (:follow-ups activity-data)))
+                          follow-up-string    (when (and follow-up
+                                                         (not (:completed? follow-up)))
+                                                ", marked for follow-up")]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                    :class (utils/class-set {:seen (:seen u)
@@ -198,18 +203,19 @@
                     {:class (when (:seen u) "seen")}
                     (user-avatar-image u)]
                   [:div.wrt-popup-list-row-name
-                    (utils/name-or-email u)
+                    (user-lib/name-for u)
                     (when is-self-user?
                       " (you)")]
                   [:div.wrt-popup-list-row-seen
                     (if (:seen u)
                       ;; Show time the read happened
-                      (str "Viewed " (string/lower (utils/time-since (:read-at u))))
+                      (str "Opened " (string/lower (utils/time-since (:read-at u))))
                       (if user-sending-notice
                         (if (= user-sending-notice :loading)
                           "Sending..."
                           user-sending-notice)
-                        "Unopened"))]
+                        "Unopened"))
+                    follow-up-string]
                   ;; Send reminder button
                   (when (and (not (:seen u))
                              (not is-self-user?)

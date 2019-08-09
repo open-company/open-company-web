@@ -3,6 +3,7 @@
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.stores.user :as user-store]
@@ -78,7 +79,7 @@
         splitted-users (group-by #(= (:user-id %) (:user-id cur-user-data)) filtered-users)
         self-user (-> splitted-users (get true) first)
         other-users (get splitted-users false)
-        other-sorted-users (reverse (sort-by utils/name-or-email other-users))
+        other-sorted-users (reverse (sort-by user-lib/name-for other-users))
         sorted-users (if self-user
                        (concat [self-user] other-sorted-users)
                        other-sorted-users)
@@ -117,7 +118,7 @@
                                       (or (contains? user :email)
                                           (contains? user :slack-id)))
                         current-user (= (:user-id user) (:user-id cur-user-data))
-                        display-name (utils/name-or-email user)
+                        display-name (user-lib/name-for user)
                         removing? (@(::removing s) (:user-id user))
                         remove-fn (fn []
                                     (let [alert-data {:icon "/img/ML/trash.svg"

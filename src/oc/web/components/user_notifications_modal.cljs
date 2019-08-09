@@ -112,7 +112,7 @@
             [:div.field-description
               "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Comments and mentions"]
+            [:div.field-label "Comments, mentions and follow-ups."]
             [:select.field-value.oc-input
               {:value (:notification-medium current-user-data)
                :on-change #(change! s :notification-medium (.. % -target -value))}

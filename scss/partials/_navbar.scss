@@ -164,6 +164,23 @@ nav.oc-navbar {
                   }
                 }
 
+                &.follow-ups {
+                  padding-left: 39px;
+                  &:before {
+                    content: " ";
+                    width: 16px;
+                    height: 16px;
+                    position: absolute;
+                    top: 9px;
+                    left: 16px;
+                    background-image: cdnUrl("/img/ML/follow_ups_icon_grey.svg");
+                    background-size: 12px 16px;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    opacity: 0.5;
+                  }
+                }
+
                 &.drafts {
                   padding-left: 39px;
                   &:before {
