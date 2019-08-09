@@ -28,14 +28,18 @@
 (def search-history-length 5)
 
 (defn search-history []
-  (let [res (cook/get-cookie search-history-cookie)]
-    (if (seq res)
-      (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
-      #{})))
+  (try
+    (let [res (cook/get-cookie search-history-cookie)]
+      (if (seq res)
+        (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
+        #{}))
+    (catch :default e
+     (js/alert (.getMessage e)))))
 
 (defn query
   "Use the search service to query for results."
   [search-query]
+  (try
   (if (seq search-query)
     (do
       (let [old-queries (search-history)
@@ -45,7 +49,9 @@
          cook/default-cookie-expire))
       (active)
       (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
-    (reset)))
+    (reset))
+  (catch :default e
+    (js/alert (.getMessage e)))))
 
 (defn result-clicked [entry-result url]
   (let [post-loaded? (dispatcher/activity-data (:uuid entry-result))
