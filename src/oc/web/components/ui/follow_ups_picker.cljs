@@ -162,7 +162,5 @@
                      (when (= (:user-id u) current-user-id)
                        (str " (you)")))]]
                 [:div.follow-ups-user-right.group
-                  (carrot-checkbox {:selected (if disabled?
-                                                (:completed? f)
-                                                f)
+                  (carrot-checkbox {:selected (or disabled? f)
                                     :disabled disabled?})]])]]]]))
