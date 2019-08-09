@@ -193,5 +193,6 @@ window.isMac = {};
 window.showDesktopWindow = function() {};
 window.setBadgeCount = function() {};
 // Mobile app (Expo)
-window.ReactNativeWebView = {};
+var ReactNativeWebView = {};
+ReactNativeWebView.postMessage = function() {};
 // Fullstory
