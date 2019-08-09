@@ -73,6 +73,7 @@
                               :opac opac
                               :light-theme light-theme
                               :mention-notification (and mention mention-author)
+                              :bottom-notch (js/isiPhoneWithoutPhysicalHomeBt)
                               :inline-bt (or primary-bt-inline
                                              (and id
                                                   ((keyword id) #{:slack-team-added :slack-bot-added
