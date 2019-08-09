@@ -32,6 +32,7 @@
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
+            [oc.web.components.ui.follow-ups-picker :refer (follow-ups-picker)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
@@ -51,6 +52,9 @@
 
         (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-get org-data)
+
+        (= (router/current-board-slug) "follow-ups")
+        (activity-actions/follow-ups-sort-get org-data)
 
         (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-get org-data)
@@ -115,11 +119,13 @@
                      ;; Board specified
                      (and (not= (router/current-board-slug) "all-posts")
                           (not= (router/current-board-slug) "must-see")
+                          (not= (router/current-board-slug) "follow-ups")
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
                      (and (or (= (router/current-board-slug) "all-posts")
-                              (= (router/current-board-slug) "must-see"))
+                              (= (router/current-board-slug) "must-see")
+                              (= (router/current-board-slug) "follow-ups"))
                           ;; But no all-posts data yet
                          (not container-data)))
         org-not-found (and (not (nil? orgs))
@@ -128,6 +134,7 @@
                                org-data
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")
+                               (not= (router/current-board-slug) "follow-ups")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
         entry-not-found (and (not section-not-found)
                              (and (router/current-activity-id)
@@ -160,6 +167,8 @@
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))
+        show-follow-ups-picker (and open-panel
+                                    (s/starts-with? (name open-panel) "follow-ups-picker-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
                                 is-mobile?)]
@@ -248,6 +257,8 @@
         ;; cmail editor
         (when show-mobile-cmail?
           (cmail))
+        (when show-follow-ups-picker
+          (follow-ups-picker))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
         (when-not is-mobile?
