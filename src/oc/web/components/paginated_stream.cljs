@@ -43,8 +43,6 @@
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= (router/current-board-slug) "must-see")
         (activity-actions/must-see-more @(::has-next s) :down)
-        (= (router/current-board-slug) "follow-ups")
-        (activity-actions/follow-ups-more @(::has-next s) :down)
         :else
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value
