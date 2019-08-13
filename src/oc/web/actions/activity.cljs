@@ -90,7 +90,7 @@
 
 (defn follow-ups-more-finish [direction sort-type {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (json->cljs body)))))
+    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
   (dis/dispatch! [:follow-ups-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
 
 (defn follow-ups-more [more-link direction]
@@ -136,7 +136,7 @@
 
 (defn all-posts-more-finish [direction sort-type {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (json->cljs body)))))
+    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
   (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
@@ -167,7 +167,7 @@
 
 (defn must-see-more-finish [direction sort-type {:keys [success body]}]
   (when success
-    (request-reads-count (map :uuid (:items (json->cljs body)))))
+    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
   (dis/dispatch! [:must-see-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
 
 (defn must-see-more [more-link direction]
