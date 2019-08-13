@@ -214,13 +214,15 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
-(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :follow-ups])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
+
+(def follow-up-assignee-keys [:user-id :name :avatar-url])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -850,6 +852,29 @@
      {:headers (headers-for-link roster-link)}
      callback)
     (handle-missing-link "get-reminders-roster" roster-link callback)))
+
+;; Follow-ups
+
+(defn complete-follow-up [complete-follow-up-link callback]
+  (if complete-follow-up-link
+    (storage-http (method-for-link complete-follow-up-link) (relative-href complete-follow-up-link)
+     {:headers (headers-for-link complete-follow-up-link)}
+     callback)
+    (handle-missing-link "complete-follow-up" complete-follow-up-link callback)))
+
+(defn create-follow-ups [create-follow-up-link follow-ups-map callback]
+  (if create-follow-up-link
+    (let [filtered-assignees (if (:assignees follow-ups-map)
+                               (map #(select-keys % follow-up-assignee-keys) (:assignees follow-ups-map))
+                               [])
+          final-data {:self (:self follow-ups-map)
+                      :assignees filtered-assignees}
+          json-data (cljs->json final-data)]
+      (storage-http (method-for-link create-follow-up-link) (relative-href create-follow-up-link)
+       {:headers (headers-for-link create-follow-up-link)
+        :json-params json-data}
+       callback))
+    (handle-missing-link "create-follow-ups" create-follow-up-link callback)))
 
 ;; WRT
 

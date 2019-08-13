@@ -144,6 +144,15 @@
 (defn hide-wrt []
   (pop-panel))
 
+;; Follow-ups users picker
+
+(defn show-follow-ups-picker [activity-uuid callback]
+  (dis/dispatch! [:input [:follow-ups-picker-callback] (fn [users-list]
+   (when (fn? callback)
+     (callback users-list))
+   (dis/dispatch! [:input [:follow-ups-picker-callback] nil]))])
+  (push-panel (keyword (str "follow-ups-picker-" (or activity-uuid "")))))
+
 ;; Integrations
 
 (defn open-integrations-panel [e]
