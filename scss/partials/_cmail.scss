@@ -331,6 +331,7 @@ div.cmail-outer {
           margin-top: 32px;
 
           div.rich-body-editor {
+            padding-bottom: 30vh;
             min-height: calc(100vh - 334px);
             @include activity-body(18, 26, $deep_navy);
 
@@ -1251,6 +1252,7 @@ div.cmail-outer {
             line-height: 24px;
             overflow-y: auto;
             overflow-x: visible;
+            padding-bottom: 30vh;
           }
 
           & > *:first-child {
