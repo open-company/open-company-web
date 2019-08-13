@@ -109,6 +109,13 @@
   ([org-slug]
     (str (org org-slug) "/all-posts")))
 
+(defn follow-ups
+  "Org follow-ups url"
+  ([]
+    (follow-ups (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/follow-ups")))
+
 (defn first-ever-all-posts
   "Org all posts url for the first ever land"
   ([]
