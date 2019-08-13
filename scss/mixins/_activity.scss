@@ -211,6 +211,69 @@ $h2_top_margin: 24;
   font-size: $font_size;
   color: $deep_navy;
   line-height: $line_height;
+
+  b, strong{
+    @include OC_Body_Bold();
+    font-weight: normal;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &.editing {
+    b, strong {
+      @include OC_Body_Book();
+      font-weight: 700;
+    }
+
+    i {
+      @include OC_Body_Book_Italic();
+    }
+
+    b i, b strong, i b, i strong {
+      @include OC_Body_Book_Italic();
+      font-weight: 700;
+    }
+  }
+
+  i {
+    @include OC_Body_Book_Italic();
+  }
+
+  i b, i strong, strong i, b i {
+    @include OC_Body_Bold_Italic(); 
+  }
+
+  a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
+    text-decoration: none;
+    color: $carrot_green;
+    background-color: transparent !important;
+  }
+
+  &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
+    @include OC_Body_Book();
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+    color: $grey_num_1;
+    opacity: 1;
+    font-style: none !important;
+  }
+
+  p, ul > li, i {
+    min-height: #{$line_height}px;
+  }
+
+  i:empty, li:empty, b:empty, strong:empty {
+    display: grid;
+    min-width: 1px;
+  }
 }
 
 @mixin activity-headline(){
@@ -294,8 +357,6 @@ $h2_top_margin: 24;
 
   b, strong{
     @include OC_Body_Bold();
-    color: $color;
-    letter-spacing: normal !important;
     font-weight: normal;
 
     a, span[data-auto-link] {
@@ -314,6 +375,23 @@ $h2_top_margin: 24;
       @include OC_Body_Book();
       font-weight: 700;
     }
+
+    i {
+      @include OC_Body_Book_Italic();
+    }
+
+    b i, b strong, i b, i strong {
+      @include OC_Body_Book_Italic();
+      font-weight: 700;
+    }
+  }
+
+  i {
+    @include OC_Body_Book_Italic();
+  }
+
+  i b, i strong, strong i, b i {
+    @include OC_Body_Bold_Italic(); 
   }
 
   *:first-child {
@@ -579,5 +657,44 @@ $h2_top_margin: 24;
 
   a:hover {
     text-decoration: underline;
+  }
+
+  b, strong{
+    @include OC_Body_Bold();
+    font-weight: normal;
+
+    a, span[data-auto-link] {
+      text-decoration: none;
+      color: $carrot_green;
+      background-color: transparent;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &.editing {
+    b, strong {
+      @include OC_Body_Book();
+      font-weight: 700;
+    }
+
+    i {
+      @include OC_Body_Book_Italic();
+    }
+
+    b i, b strong, i b, i strong {
+      @include OC_Body_Book_Italic();
+      font-weight: 700;
+    }
+  }
+
+  i {
+    @include OC_Body_Book_Italic();
+  }
+
+  i b, i strong, strong i, b i {
+    @include OC_Body_Bold_Italic(); 
   }
 }
