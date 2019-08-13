@@ -19,8 +19,6 @@ $circular_book: "LL Circular Book Web";
 $circular_bold: "LL Circular Bold Web";
 
 .OC-Title {
-  // font-family: "PT Serif", serif !important;
-  // font-weight: 700;
   font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: normal;
   font-style: normal;
@@ -91,8 +89,6 @@ $circular_bold: "LL Circular Bold Web";
 }
 
 @mixin OC_Title($weight: normal){
-  // font-family: "PT Serif", serif !important;
-  // font-weight: $weight;
   font-family: $circular_bold, Muli, Arial, sans-serif;
   font-weight: $weight;
   font-style: normal;
