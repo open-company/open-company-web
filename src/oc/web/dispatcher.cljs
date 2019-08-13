@@ -530,7 +530,7 @@
                             (some #(when (= (:rel %) "create") %) (:links board)))
                          (:boards org-data))]
     (zipmap
-     (map #(:slug %) filtered-boards)
+     (map :slug filtered-boards)
      filtered-boards))))
 
 (defn container-data
