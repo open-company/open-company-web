@@ -373,23 +373,6 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn name-or-email [user]
-  (let [user-name (:name user)
-        first-name (:first-name user)
-        last-name (:last-name user)]
-    (cond
-      (and (seq first-name)
-           (seq last-name))
-      (str first-name " " last-name)
-      (seq first-name)
-      first-name
-      (seq last-name)
-      last-name
-      (seq user-name)
-      user-name
-      :else
-      (:email user))))
-
 (defn slack-link-with-state [original-url user-id team-id redirect]
   (clojure.string/replace
    original-url
@@ -582,17 +565,15 @@
 
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        _ (.remove (js/$ ".oc-mention-popup" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))
         has-empty-ending-paragraph (when (seq last-p-html)
                                      (.match last-p-html reg-ex))
         _ (when has-empty-ending-paragraph
-            (.remove (js/$ "p:last-child" $container)))
-        cleaned-html (.html $container)
-        _ (.detach $container)]
-    cleaned-html))
+            (.remove (js/$ "p:last-child" $container)))]
+    (.html $container)))
 
 (defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]

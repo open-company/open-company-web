@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
@@ -46,7 +47,7 @@
                  :on-click #(when patch-link
                               (reminder-actions/edit-reminder (:uuid reminder)))}
                 [:div.reminder-assignee
-                  {:title (utils/name-or-email (:assignee reminder))
+                  {:title (user-lib/name-for (:assignee reminder))
                    :data-toggle (when-not is-tablet-or-mobile? "tooltip")
                    :data-placement "top"
                    :data-container "body"
@@ -57,7 +58,7 @@
                     (:headline reminder)]
                   [:div.reminder-description
                     (str
-                     (utils/name-or-email (:assignee reminder))
+                     (user-lib/name-for (:assignee reminder))
                      ", "
                      (utils/get-week-day (.getDay next-send-date) true)
                      " "
