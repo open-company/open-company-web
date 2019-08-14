@@ -10,7 +10,7 @@
      the user with constant notifications if they choose not to restart the app right away
 
   Upon restarting the app, the update will be installed."
-  (:require [taoensso.timbre :as timbre :refer [info]]
+  (:require [taoensso.timbre :as timbre]
             [oc.shared.interval :as interval]))
 
 ;; See https://www.electron.build/auto-update for details on the `electron-updater` API
@@ -21,25 +21,25 @@
 
 (defn- check-for-updates
   []
-  (info "Checking for Carrot desktop updates")
+  (timbre/info "Checking for Carrot desktop updates")
   (.checkForUpdatesAndNotify auto-updater))
 
 (defonce auto-updater-interval (interval/make-interval {:fn check-for-updates
                                                         :ms default-rate-ms}))
 
 (defn- on-update-available
-  [info]
-  (info "Carrot desktop update available" info)
+  [data]
+  (timbre/info "Carrot desktop update available" data)
   (interval/restart-interval! auto-updater-interval extended-rate-ms))
 
 (defn start-update-cycle!
   []
-  (info "Starting desktop auto updater")
+  (timbre/info "Starting desktop auto updater")
   (.addListener auto-updater "update-available" on-update-available)
   (interval/start-interval! auto-updater-interval))
 
 (defn stop-update-cycle!
   []
-  (info "Stopping desktop auto updater")
+  (timbre/info "Stopping desktop auto updater")
   (.removeListener auto-updater "update-available" on-update-available)
   (interval/stop-interval! auto-updater-interval))
