@@ -1,6 +1,7 @@
 (ns oc.web.utils.user
   (:require [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -17,6 +18,9 @@
 
 (defn notification-title [notification]
   (let [reminder? (:reminder? notification)
+        follow-up? (:follow-up? notification)
+        follow-up-data (when follow-up?
+                         (:follow-up notification))
         author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
         reminder (when reminder?
@@ -26,6 +30,11 @@
         reminder-assignee (when reminder?
                             (:assignee reminder))]
     (cond
+      (and follow-up?
+           follow-up-data
+           (not= (-> follow-up-data :author :user-id) (jwt/user-id))
+           (not (:completed? follow-up-data)))
+      (str (user-lib/name-for (:author follow-up-data)) " created a follow-up for you")
       (and reminder
            (= notification-type "reminder-notification"))
       (str first-name " created a new reminder for you")
@@ -60,6 +69,14 @@
       :else
       (:content notification))))
 
+(defn- load-item-if-needed [board-slug entry-uuid]
+  (when (and board-slug
+             entry-uuid)
+    #(if (seq (get (dis/posts-data) entry-uuid))
+       (router/nav! (oc-urls/entry board-slug entry-uuid))
+       (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+        (fn [s] (when s (router/nav! (oc-urls/entry board-slug entry-uuid))))))))
+
 (defn fix-notification [notification & [unread]]
   (let [board-data (activity-utils/board-by-uuid (:board-id notification))
         is-interaction (seq (:interaction-id notification))
@@ -67,7 +84,9 @@
         title (notification-title notification)
         reminder-data (:reminder notification)
         reminder? (:reminder? notification)
-        entry-uuid (:entry-id notification)]
+        entry-uuid (:entry-id notification)
+        follow-up? (:follow-up? notification)
+        follow-up-data (:follow-up notification)]
     (when (seq title)
       {:uuid entry-uuid
        :board-slug (:slug board-data)
@@ -77,22 +96,21 @@
        :mention? (:mention? notification)
        :reminder? reminder?
        :reminder reminder-data
+       :follow-up? follow-up?
+       :follow-up follow-up-data
        :created-at (:notify-at notification)
        :body (notification-content notification)
        :title title
        :author (:author notification)
-       :click (if reminder?
-                (when-not (responsive/is-mobile-size?)
-                  (if (and reminder-data
-                           (= (:notification-type reminder-data) "reminder-notification"))
-                    #(oc.web.actions.nav-sidebar/show-reminders)
-                    #(ui-compose)))
-                (when (and (:slug board-data)
-                           entry-uuid)
-                  #(if (seq (get (dis/posts-data) entry-uuid))
-                     (router/nav! (oc-urls/entry (:slug board-data) entry-uuid))
-                     (cmail-actions/get-entry-with-uuid (:slug board-data) entry-uuid
-                      (fn [s] (when s (router/nav! (oc-urls/entry (:slug board-data) entry-uuid))))))))})))
+       :click (if follow-up?
+                (load-item-if-needed (:slug board-data) entry-uuid)
+                (if reminder?
+                  (when-not (responsive/is-mobile-size?)
+                    (if (and reminder-data
+                             (= (:notification-type reminder-data) "reminder-notification"))
+                      #(oc.web.actions.nav-sidebar/show-reminders)
+                      #(ui-compose)))
+                  (load-item-if-needed (:slug board-data) entry-uuid)))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))

@@ -96,13 +96,19 @@
   (let [boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
+        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
+        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
         is-all-posts? (= (router/current-board-slug) "all-posts")
         activity-delay (if is-all-posts?
                          0
                          other-resources-delay)
         current-section-delay (if-not is-all-posts?
                                 0
-                                other-resources-delay)]
+                                other-resources-delay)
+        is-follow-ups? (= (router/current-board-slug) "follow-ups")
+        follow-ups-delay (if is-follow-ups?
+                           0
+                           other-resources-delay)]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
@@ -116,11 +122,16 @@
           (when activity-link
             (utils/maybe-after activity-delay #(aa/activity-get org-data)))
           (when recent-activity-link
-            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data))))))
+            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data)))
+          ;; Preload follow-ups data
+          (when follow-ups-link
+            (utils/maybe-after follow-ups-delay #(aa/follow-ups-get org-data)))
+          (when recent-follow-ups-link
+            (utils/maybe-after follow-ups-delay #(aa/recent-follow-ups-get org-data))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
-      (and (or (= (router/current-board-slug) "all-posts")
-               (= (router/current-board-slug) "must-see")))
+      (or (= (router/current-board-slug) "all-posts")
+          (= (router/current-board-slug) "follow-ups"))
       (when-not activity-link
         (check-org-404))
 
@@ -136,7 +147,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
-          (when (not (router/current-activity-id)) ;; user is not asking for a specific post
+          (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
