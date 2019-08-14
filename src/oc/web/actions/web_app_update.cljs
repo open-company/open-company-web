@@ -10,7 +10,7 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  (if js/window.isDesktop
+  (if js/window.OCCarrotDesktop
     "Update"
     "Refresh page"))
 
