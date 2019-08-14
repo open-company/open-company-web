@@ -134,5 +134,5 @@
 
 (defn user-has-push-token?
   [current-user-data push-token]
-  (let [current-push-tokens (into #{} (:expo-push-tokens current-user-data))]
+  (let [current-push-tokens (set (:expo-push-tokens current-user-data))]
     (current-push-tokens push-token)))
