@@ -145,7 +145,7 @@
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href (if js/window.isDesktop
+          [:a {:href (if js/window.OCCarrotDesktop
                        oc-urls/desktop-login
                        oc-urls/login)}
            "Sign in"]]]]))
