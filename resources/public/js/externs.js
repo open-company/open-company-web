@@ -193,6 +193,7 @@ var OCWebStaticOpenIntegrationsPanel = function() {};
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
-// Expo
-var OCCarrotMobile = function() {};
+// Mobile app (Expo)
+var ReactNativeWebView = {};
+ReactNativeWebView.postMessage = function() {};
 // Fullstory
