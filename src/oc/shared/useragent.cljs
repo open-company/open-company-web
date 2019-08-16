@@ -67,12 +67,12 @@ Not supported for Linux, where an empty string is returned."}
 (def ^{:doc "Whether we're running in the Carrot desktop application"}
   desktop-app?
   ;; injected by the Electron shell
-  (some? js/OCCarrotDesktop))
+  (some? js/window.OCCarrotDesktop))
 
 (def ^{:doc "Whether we're running in the Carrot mobile application"}
   mobile-app?
   ;; injected by the Expo shell
-  (some? js/ReactNativeWebView))
+  (some? js/window.ReactNativeWebView))
 
 (def ^{:doc "Whether we're running in a web-in-native wrapper (e.g. electron, expo, etc)"}
   pseudo-native?
