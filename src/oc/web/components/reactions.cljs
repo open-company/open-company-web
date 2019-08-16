@@ -4,6 +4,7 @@
   (:require [rum.core :as rum]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.utils.reaction :as reaction-utils]
@@ -84,9 +85,8 @@
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
                                (when (and (not (:reacted r))
-                                          (not (js/isSafari))
-                                          (not (js/isEdge))
-                                          (not (js/isIE)))
+                                          (not ua/safari?)
+                                          (not ua/ie-or-edge?))
                                  ;;TODO: animate reaction
                                  )
                                (if optional-activity-data

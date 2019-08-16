@@ -6,6 +6,7 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            [oc.shared.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
@@ -628,7 +629,7 @@
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (if (js/isEdge)
+        (if ua/edge?
           (set! (.. js/document -scrollingElement -scrollTop) 0)
           (js/window.scrollTo 0 0)))
       ;; dispatch on the token

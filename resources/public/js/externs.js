@@ -193,4 +193,6 @@ var OCWebStaticOpenIntegrationsPanel = function() {};
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
+// Expo
+var OCCarrotMobile = function() {};
 // Fullstory
