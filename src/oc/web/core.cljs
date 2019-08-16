@@ -108,11 +108,11 @@
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
-    (when js/window.OCCarrotDesktop
+    (when ua/desktop-app?
       (dommy/add-class! body :electron)
-      (when (js/window.isMac)
+      (when ua/mac?
         (dommy/add-class! body :mac-electron))
-      (when (js/window.isWindows)
+      (when ua/windows?
         (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
   (when (:log-level query-params)
@@ -547,7 +547,7 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if js/window.OCCarrotDesktop
+      (router/redirect! (if ua/desktop-app?
                           urls/desktop-login
                           urls/home)))
 

@@ -2,7 +2,8 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.shared.interval :as interval]))
+            [oc.shared.interval :as interval]
+            [oc.shared.useragent :as ua]))
 
 (declare web-app-update-interval)
 
@@ -10,7 +11,7 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  (if js/window.OCCarrotDesktop
+  (if ua/desktop-app?
     "Update"
     "Refresh page"))
 

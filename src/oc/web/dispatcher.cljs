@@ -6,7 +6,8 @@
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]))
 
 (defonce app-state (atom {:loading false
                           :show-login-overlay false
@@ -366,7 +367,7 @@
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
                                     (timbre/info "Unread notification count updated: " ncount)
-                                    (when js/window.OCCarrotDesktop
+                                    (when ua/desktop-app?
                                       (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
