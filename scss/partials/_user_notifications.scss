@@ -10,7 +10,7 @@ div.user-notifications {
     height: calc(100vh - #{$mobile_navbar_height * 2}px);
     margin-top: #{$mobile_navbar_height}px;
     margin-bottom: #{$mobile_navbar_height}px;
-    background-color: $grey_num_2;
+    background-color: white;
     z-index: 21;
     overflow-y: auto;
 
@@ -176,6 +176,8 @@ div.user-notifications {
         background-color: $oc_gray_8;
 
         @include mobile() {
+          background-color: white;
+
           &:first-child {
             border-top: none;
           }
@@ -194,6 +196,10 @@ div.user-notifications {
 
         &.unread {
           background-color: white;
+
+          @include mobile() {
+            background-color: $oc_gray_8;
+          }
         }
 
         @include user-profile(24);
