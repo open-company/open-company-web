@@ -43,6 +43,7 @@ div.paginated-stream {
 
         @include mobile() {
           width: 100%;
+          background-color: white;
         }
 
         div.oc-loading {

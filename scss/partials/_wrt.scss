@@ -115,7 +115,7 @@ div.wrt-popup-container {
       width: 100%;
       padding: 0;
       overflow-y: hidden;
-      background-color: $grey_num_2;
+      background-color: white;
     }
 
     div.wrt-popup-header {
@@ -130,6 +130,7 @@ div.wrt-popup-container {
         z-index: 2;
         height: #{$mobile_navbar_height}px;
         padding: 18px 16px;
+        background-color: white;
       }
 
       div.wrt-popup-header-title {
