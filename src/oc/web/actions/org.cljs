@@ -205,7 +205,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
+   #(router/nav! (oc-urls/all-posts (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -367,18 +367,5 @@
             (when (= (:item-id change-data) (:uuid current-board-data))
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
 
-(defn update-org-sections [org-slug all-sections]
-  (dis/dispatch! [:input [:ap-loading] true])
-  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
-        patch-payload {:boards (conj selected-sections "General")
-                       :samples true}
-        org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-      (api/patch-org-sections org-patch-link patch-payload
-       (fn [{:keys [success status body]}]
-         (when success
-           (org-loaded (json->cljs body) false))
-         (utils/after 2000
-          #(router/nav! (get-ap-url org-slug)))))))
-
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
+  (router/nav! (oc-urls/all-posts (:slug org-data))))

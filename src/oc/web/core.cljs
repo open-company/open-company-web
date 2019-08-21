@@ -411,18 +411,6 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
-    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
-      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
-    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
-      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
       ;; Check if the user already have filled the needed data or if it needs to
