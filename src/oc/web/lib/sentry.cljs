@@ -41,8 +41,8 @@
 (defn set-extra-context! [scope ctx & [prefix]]
   (doseq [k (keys ctx)]
     (if (map? (get ctx k))
-      (set-extra-context! scope (get ctx k) (str prefix (when prefix ":") (name k)))
-      (.setExtra scope (str prefix (name k)) (clj->js (get ctx k))))))
+      (set-extra-context! scope (get ctx k) (str prefix (when (seq prefix) "|") (name k)))
+      (.setExtra scope (str prefix (when (seq prefix) "|") (name k)) (get ctx k)))))
 
 (defn capture-message-with-extra-context! [ctx message]
   (.withScope js/Sentry (fn [scope]
