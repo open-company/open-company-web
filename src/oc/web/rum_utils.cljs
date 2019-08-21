@@ -1,8 +1,12 @@
 (ns oc.web.rum-utils
   (:require [org.martinklepsch.derivatives :as drv]
-            [rum.core :as rum]))
+            [rum.core :as rum]
+            [oc.web.lib.sentry :as sentry]))
 
-(rum/defc app < (drv/rum-derivatives* first)
+(rum/defcs app < (drv/rum-derivatives* first)
+                 {:did-catch (fn [s error error-info]
+                   (sentry/capture-error! error error-info)
+                   s)}
   [spec component]
   (component))
 
