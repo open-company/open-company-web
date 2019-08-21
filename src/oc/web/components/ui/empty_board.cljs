@@ -49,8 +49,9 @@
            :else (when is-author? (str "Looks like there aren’t any posts in " (:name board-data) ".")))]
         (when (and (not is-follow-ups?)
                    (or (and (or is-all-posts? is-must-see? is-drafts-board?)
-                       (pos? (count editable-boards)))
-                        (not (:read-only board-data))))
+                            (pos? (count editable-boards)))
+                       (and (not (or is-all-posts? is-must-see? is-drafts-board?))
+                            (not (:read-only board-data)))))
           [:button.mlb-reset.create-new-post-bt
             {:on-click #(activity-actions/activity-edit)}
             "Create a new post"])]]))
