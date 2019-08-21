@@ -206,7 +206,6 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :drafts-data         [[:base :org-slug]
