@@ -84,6 +84,7 @@ div.slack-users-dropdown {
         line-height: 24px;
         margin-left: 4px;
         float: left;
+        max-width: calc(100% - 40px);
 
         span.slack-org {
           @include OC_Body_Book();
