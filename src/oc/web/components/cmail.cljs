@@ -601,7 +601,7 @@
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
                :class (utils/class-set {:active show-sections-picker
-                                        :has-follow-ups-button follow-up?})}
+                                        :has-follow-ups-button (not follow-up?)})}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
@@ -687,7 +687,7 @@
                         "Close")}]])
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
-                                    :has-follow-ups (not follow-up?)})}
+                                    :has-follow-ups follow-up?})}
           (when (and follow-up?
                      (not is-mobile?)
                      is-fullscreen?)
