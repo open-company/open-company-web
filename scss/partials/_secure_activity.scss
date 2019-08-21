@@ -6,6 +6,10 @@ div.secure-activity-container {
   background-color: $grey_num_2;
   min-height: 100vh;
 
+  @include mobile() {
+    background-color: white;
+  }
+
   div.activity-header {
     height: 56px;
     position: fixed;
@@ -21,6 +25,7 @@ div.secure-activity-container {
       position: absolute;
       height: 72px;
       padding: 16px;
+      background-color: white;
     }
 
     div.org-avatar {

@@ -27,7 +27,7 @@ div.expanded-post {
       top: 0;
       left: 0;
       border-bottom: 1px solid $grey_num_3;
-      background-color: $grey_num_2;
+      background-color: white;
       z-index: 2;
     }
 
@@ -213,6 +213,11 @@ div.expanded-post {
         div.is-comments-author {
           background-color: $oc_gray_8;
           border: 2px solid $oc_gray_8;
+
+          @include mobile(){
+            background-color: white;
+            border: 2px solid white;
+          }
         }
       }
     }

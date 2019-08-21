@@ -21,7 +21,7 @@ div.search-box {
     left: 0px;
     width: 100vw;
     height: 100vh;
-    background-color: $grey_num_2;
+    background-color: white;
     border-radius: unset;
     z-index: #{$navbar_zindex + 16};
     padding: #{$mobile_navbar_height}px 16px 0px;
@@ -42,7 +42,7 @@ div.search-box {
     width: 430px;
 
     @include mobile() {
-      background-color: $grey_num_2;
+      background-color: white;
       border: 0px solid white;
       box-shadow: none;
       width: 100vw;
@@ -85,7 +85,6 @@ div.search-box {
       top: 0;
       left: 0;
       text-align: center;
-      background-color: $grey_num_2;
       border-bottom: 1px solid $grey_num_3;
       z-index: 2;
 

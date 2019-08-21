@@ -41,7 +41,7 @@ div.stream-item {
     border-radius: 0;
     border-top: none;
     border-bottom: 1px solid $grey_num_3;
-    background-color: $grey_num_2;
+    background-color: white;
     padding: 16px 16px 22px;
   }
 
@@ -492,6 +492,11 @@ div.stream-item {
             div.is-comments-author {
               background-color: $oc_gray_8;
               border: 2px solid $oc_gray_8;
+
+              @include mobile() {
+                background-color: white;
+                border: 2px solid white;
+              }
             }
           }
         }

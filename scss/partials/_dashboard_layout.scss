@@ -73,7 +73,7 @@ div.dashboard-layout {
 
       @include mobile (){
         display: block;
-        background-color: $grey_num_2;
+        background-color: white;
         padding: 20px 0;
         border-top: 1px solid $grey_num_3;
         height: #{$mobile_navbar_height}px;
@@ -159,7 +159,7 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: $grey_num_2;
+        background-color: white;
         padding: 0;
       }
 
@@ -517,7 +517,7 @@ div.dashboard-layout {
           @include mobile() {
             width: 100%;
             height: 32px;
-            background-color: $grey_num_2;
+            background-color: white;
             border-bottom: 1px solid $grey_num_3;
           }
 
