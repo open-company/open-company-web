@@ -29,8 +29,11 @@
     (catch :default e
       (.captureException js/Sentry e))))
 
-(defn capture-error! [e]
-  (.captureException js/Sentry e))
+(defn capture-error!
+  ([e]
+    (.captureException js/Sentry e))
+  ([e error-info]
+    (.captureException js/Sentry e #js {:extra error-info})))
 
 (defn capture-message! [msg]
   (.captureMessage js/Sentry msg "info"))
