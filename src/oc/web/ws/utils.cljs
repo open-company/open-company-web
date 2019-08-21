@@ -17,7 +17,7 @@
              :connection-status connection-status
              :send-fn ch-send-fn?
              :infos infos
-             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
+             :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}]
     (sentry/capture-message-with-extra-context! ctx message)
     (timbre/error message ctx)))
 
@@ -98,7 +98,7 @@
              :connection-status connection-status
              :timestamp (.getTime (new js/Date))
              :rep rep
-             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
+             :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}]
     (sentry/capture-message-with-extra-context! ctx (str service-name " WS: not valid JWT"))
     (timbre/error service-name "WS: not valid JWT" ctx)))
 
@@ -108,7 +108,7 @@
                             @@ch-state)
         ctx {:timestamp (.getTime (new js/Date))
              :connection-status connection-status
-             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
+             :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}]
     (sentry/capture-message-with-extra-context! ctx (str service-name " WS: handshake timeout"))
     (timbre/error service-name "WS: handshake timeout" ctx)))
 
