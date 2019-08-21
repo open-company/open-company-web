@@ -687,7 +687,7 @@
                         "Close")}]])
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
-                                    :has-follow-ups follow-up?})}
+                                    :has-follow-ups (not follow-up?)})}
           (when (and follow-up?
                      (not is-mobile?)
                      is-fullscreen?)
