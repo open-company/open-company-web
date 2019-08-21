@@ -258,30 +258,6 @@
       (dissoc s :on-resize-listener))
     s))})
 
-(defn autoresize-textarea
-  "Given a React reference to a component node, listens on all the events on that textarea element
-   and resize its frame to make sure it doesn't scroll and the no extra blank space."
-  [ref & [initially-focused]]
-  (letfn [(init-textarea [s el-ref]
-            (let [el (rum/ref-node s el-ref)
-                  observe (utils/observe)
-                  resize-fn (fn []
-                              (let [e (rum/ref-node s el-ref)]
-                                (set! (.-height (.-style e)) "auto")
-                                (set! (.-height (.-style e)) (str (.-scrollHeight e) "px"))))
-                  delayed-resize-fn (fn [] (utils/after 0 resize-fn))]
-            (observe el "change" resize-fn)
-            (observe el "cut" delayed-resize-fn)
-            (observe el "paste" delayed-resize-fn)
-            (observe el "drop" delayed-resize-fn)
-            (observe el "keydown" delayed-resize-fn)
-            (when initially-focused
-              (.focus el))
-            (resize-fn)))]
-    {:did-mount (fn [s]
-      (init-textarea s ref)
-      s)}))
-
 (defn make-images-interactive!
   "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
   [s el-selector]

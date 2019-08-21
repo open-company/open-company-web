@@ -127,6 +127,9 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
+var isMac = function(){};
+var isWindows = function(){};
+var isLinux = function(){};
 var isSafari = function(){};
 var isIE = function(){};
 var isEdge = function(){};
@@ -188,9 +191,7 @@ var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
 // Electron
-window.isDesktop = {};
-window.isWin32 = {};
-window.isMac = {};
-window.showDesktopWindow = function() {};
-window.setBadgeCount = function() {};
+var OCCarrotDesktop = function(){};
+OCCarrotDesktop.showDesktopWindow = function() {};
+OCCarrotDesktop.setBadgeCount = function() {};
 // Fullstory

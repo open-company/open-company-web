@@ -91,29 +91,31 @@
              attachment-dom-selector
              fullscreen
              cmail-key]}]
-  [:div.rich-body-editor-outer-container
-    {:key (str "rich-body-editor-" cmail-key)}
-    [:div.rich-body-editor-container
-      [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
-        {:ref "editor-node"
-         :content-editable (not nux)
-         :class (str classes
-                 (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
-                                   :uploading @(:me/upload-lock s)}))
-         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
-    (when @(:me/showing-media-video-modal s)
-      [:div.video-container
-        {:ref :video-container}
-        (media-video-modal {:fullscreen fullscreen
-                            :dismiss-cb #(do
-                                          (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)
-                                          (reset! (:me/showing-media-video-modal s) false))
-                            :offset-element-selector [:div.rich-body-editor-outer-container]
-                            :outer-container-selector [:div.cmail-content-outer]})])
-    (when @(:me/showing-gif-selector s)
-      (giphy-picker {:fullscreen fullscreen
-                     :pick-emoji-cb (fn [gif-obj]
-                                     (reset! (:me/showing-gif-selector s) false)
-                                     (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))
-                     :offset-element-selector [:div.rich-body-editor-outer-container]
-                     :outer-container-selector [:div.cmail-content-outer]}))])
+  (let [_team-roster (drv/react s :team-roster)
+        _media-input (drv/react s :media-input)]
+    [:div.rich-body-editor-outer-container
+      {:key (str "rich-body-editor-" cmail-key)}
+      [:div.rich-body-editor-container
+        [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
+          {:ref "editor-node"
+           :content-editable (not nux)
+           :class (str classes
+                   (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                                     :uploading @(:me/upload-lock s)}))
+           :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
+      (when @(:me/showing-media-video-modal s)
+        [:div.video-container
+          {:ref :video-container}
+          (media-video-modal {:fullscreen fullscreen
+                              :dismiss-cb #(do
+                                            (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil)
+                                            (reset! (:me/showing-media-video-modal s) false))
+                              :offset-element-selector [:div.rich-body-editor-outer-container]
+                              :outer-container-selector [:div.cmail-content-outer]})])
+      (when @(:me/showing-gif-selector s)
+        (giphy-picker {:fullscreen fullscreen
+                       :pick-emoji-cb (fn [gif-obj]
+                                       (reset! (:me/showing-gif-selector s) false)
+                                       (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))
+                       :offset-element-selector [:div.rich-body-editor-outer-container]
+                       :outer-container-selector [:div.cmail-content-outer]}))]))

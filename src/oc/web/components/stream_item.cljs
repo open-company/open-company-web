@@ -27,10 +27,10 @@
 
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
-    [:div.stream-item-body
-      {:data-itemuuid (:uuid activity-data)}
-      (:abstract activity-data)]
-    [:div.stream-item-body.no-abstract
+    [:div.stream-item-body.oc-mentions.oc-mentions-hover
+      {:data-itemuuid (:uuid activity-data)
+       :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
+    [:div.stream-item-body.no-abstract.oc-mentions.oc-mentions-hover
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 

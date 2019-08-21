@@ -164,9 +164,9 @@
             (when (:must-see activity-data)
               [:div.must-see-tag]))]]
       (when (seq (:abstract activity-data))
-        [:div.expanded-post-abstract
-          {:class utils/hide-class}
-          (:abstract activity-data)])
+        [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
+          {:class utils/hide-class
+           :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
          :class utils/hide-class
