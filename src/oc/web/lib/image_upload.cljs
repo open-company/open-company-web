@@ -2,7 +2,7 @@
   (:require [oc.web.local-settings :as ls]
             [cljsjs.filestack]
             [goog.object :as gobj]
-            [oc.web.lib.raven :as sentry]))
+            [oc.web.lib.sentry :as sentry]))
 
 (def _fs (atom nil))
 
@@ -72,7 +72,7 @@
             (when (fn? success-cb)
               (success-cb url))))))
     (catch :default e
-      (sentry/capture-error e)
+      (sentry/capture-error! e)
       (when (fn? error-cb)
         (error-cb e)))))
 
@@ -112,6 +112,6 @@
             (when (fn? success-cb)
               (success-cb url)))))
       (catch :default e
-        (sentry/capture-error e)
+        (sentry/capture-error! e)
         (when (fn? error-cb)
           (error-cb e))))))

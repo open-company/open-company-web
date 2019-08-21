@@ -47,20 +47,23 @@
               [:h3.tear-price
                 "$0"]
               [:div.tear-subtitle
-                "Free for small teams up to 10 users"]
+                "Perfect for any size team"]
               [:a.tear-start-bt
                 {:href "/sign-up"}
                 "Start for free"]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "1gb storage"]]
+                [:span "Unlimited users"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "Access 3 months recent history"]]]
-            ;; Team
+                [:span "Unlimited posts"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
+                [:span "2 GB storage"]]]
+            ;; Premium
             [:div.pricing-column.team-column.annual
               [:h2.tear-title
-                "Standard"]
+                "Premium"]
               [:div.pricing-toggle-line
                 [:span.pricing-toggle-annual
                   "Annual (20% off)"]
@@ -75,53 +78,62 @@
                   "$4"]]
               [:div.tear-subtitle
                 [:span.billed-annually
-                  "Per month, billed annually"]
+                  "Per user, per month, billed annually"]
                 [:span.billed-monthly
-                  "Per month, billed monthly"]]
+                  "Per user, per month"]]
               [:a.tear-start-bt
                 {:href "/sign-up"}
                 "Try free for 14 days"]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "Unlimited storage"]]
+                [:span
+                  "Everything in "
+                  [:span.heavy "Free"]
+                  ", plus:"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "Unlimited history"]]
+                [:span "Advanced permissions"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "Priority support"]]]
+                [:span "Follow-ups"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
+                [:span "Analytics"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
+                [:span "Post scheduling (soon)"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
+                [:span "Guest users (soon)"]]
+              [:div.tear-feature-separator]
+              [:div.tear-feature
+                [:span "Premium support"]]]
             ;; Enterprise
             [:div.pricing-column.enterprise-column
               [:h2.tear-title
                 "Enterprise"]
               [:div.tear-price]
               [:div.tear-subtitle
-                "A team of more than 250? Let's create a custom plan."]
+                "Tailored for larger organizations"]
               [:a.tear-start-bt
                 {:class "intercom-chat-link"
                  :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-                "Contact Us"]
+                "Chat with Us"]
               [:div.tear-feature-separator]
               [:div.tear-feature
                 [:span
-                  "Everything in the "
-                  [:span.heavy "Team plan"]
+                  "Everything in "
+                  [:span.heavy "Premium"]
                   ", plus:"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "Custom plans"]]
+                [:span "Ideal for teams of 250+"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "Carrot AI"]]
+                [:span "Custom pricing plans"]]
               [:div.tear-feature-separator]
               [:div.tear-feature
-                [:span "On premise option"]]
-              [:div.tear-feature-separator]
-              [:div.tear-feature
-                [:span "Uptime SLA"]]
-              [:div.tear-feature-separator]
-              [:div.tear-feature
-                [:span "Premium support"]]]]]
+                [:span "Enterprise support"]]]]]
 
       [:section.pricing-faq
         [:h2.faq-header
@@ -132,18 +144,9 @@
             "Can I use Carrot for free?"]
           [:div.faq-row-answer
             (str
-             "Absolutely! Carrot is free for teams of up to 10 people. The Free plan "
-             "has a storage limit, but includes all of the features of the Standard plan. "
+             "Absolutely! Carrot can be used for free. The Free plan "
+             "has a storage limit, and doesn't include all of the premium features. "
              "It’s fast to sign up, and no credit card is required.")]]
-
-        [:div.faq-row
-          [:div.faq-row-question
-            "How is the Standard plan different from the Free plan?"]
-          [:div.faq-row-answer
-            (str
-             "The Standard plan includes unlimited storage and history. "
-             "Choose the size of your team, and whether you’d like to pay "
-             "monthly or annually. Annual plans paid in advance provide a 20% discount.")]]
 
         [:div.faq-row
           [:div.faq-row-question
