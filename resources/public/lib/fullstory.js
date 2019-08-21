@@ -19,9 +19,9 @@ function init_fullstory() {
   window['_fs_ready'] = function() {
     // store client id
     FS.setUserVars({ 'clientId': CarrotGA.clientid });
-    Raven.setExtraContext({
-      'clientId': CarrotGA.clientid,
-      'FullStoryURL': FS.getCurrentSessionURL()
+    Sentry.withScope(function (scope){
+      scope.setExtra('clientId', CarrotGA.clientid);
+      scope.setExtra('FullStoryURL', FS.getCurrentSessionURL);
     });
   };
 }

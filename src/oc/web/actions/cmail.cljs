@@ -199,8 +199,11 @@
       all-team-users)))
 
 (defn follow-ups-for-activity [activity-data team-roster]
-  (let [follow-up-users (follow-up-users activity-data team-roster)]
-    (map follow-up-from-user (filterv #(not= (:user-id %) (jwt/user-id)) follow-up-users))))
+  (let [follow-up-users (follow-up-users activity-data team-roster)
+        filtered-follow-up-users (if (= (count follow-up-users) 1)
+                                   follow-up-users ; default to self-assignement if there's only 1 user
+                                   (filterv #(not= (:user-id %) (jwt/user-id)) follow-up-users))]
+      (map follow-up-from-user filtered-follow-up-users)))
 
 (defn cmail-toggle-follow-up [activity-data]
   (let [follow-up (pos? (count (:follow-ups activity-data)))

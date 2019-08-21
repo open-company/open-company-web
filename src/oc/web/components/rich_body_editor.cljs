@@ -5,7 +5,6 @@
             [oops.core :refer (oget oget+)]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
@@ -476,25 +475,27 @@
              attachment-dom-selector
              fullscreen
              cmail-key]}]
-  [:div.rich-body-editor-outer-container
-    {:key (str "rich-body-editor-" cmail-key)}
-    [:div.rich-body-editor-container
-      [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
-        {:ref "body"
-         :content-editable (not nux)
-         :class (str classes
-                 (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
-                                   :uploading @(::upload-lock s)}))
-         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
-    (when @(::showing-media-video-modal s)
-      [:div.video-container
-        {:ref :video-container}
-        (media-video-modal {:fullscreen fullscreen
-                            :dismiss-cb #(do
-                                          (media-video-add s @(::media-picker-ext s) nil)
-                                          (reset! (::showing-media-video-modal s) false))})])
-    (when @(::showing-gif-selector s)
-      (giphy-picker {:fullscreen fullscreen
-                     :pick-emoji-cb (fn [gif-obj]
-                                     (reset! (::showing-gif-selector s) false)
-                                     (media-gif-add s @(::media-picker-ext s) gif-obj))}))])
+  (let [_team-roster (drv/react s :team-roster)
+        _media-input (drv/react s :media-input)]
+    [:div.rich-body-editor-outer-container
+      {:key (str "rich-body-editor-" cmail-key)}
+      [:div.rich-body-editor-container
+        [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
+          {:ref "body"
+           :content-editable (not nux)
+           :class (str classes
+                   (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                                     :uploading @(::upload-lock s)}))
+           :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
+      (when @(::showing-media-video-modal s)
+        [:div.video-container
+          {:ref :video-container}
+          (media-video-modal {:fullscreen fullscreen
+                              :dismiss-cb #(do
+                                            (media-video-add s @(::media-picker-ext s) nil)
+                                            (reset! (::showing-media-video-modal s) false))})])
+      (when @(::showing-gif-selector s)
+        (giphy-picker {:fullscreen fullscreen
+                       :pick-emoji-cb (fn [gif-obj]
+                                       (reset! (::showing-gif-selector s) false)
+                                       (media-gif-add s @(::media-picker-ext s) gif-obj))}))]))
