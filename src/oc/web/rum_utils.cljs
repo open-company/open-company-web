@@ -7,7 +7,7 @@
                  {:did-catch (fn [s error error-info]
                    (sentry/capture-error! error error-info)
                    s)}
-  [spec component]
+  [state spec component]
   (component))
 
 (defn drv-root [{:keys [state drv-spec target component]}]
