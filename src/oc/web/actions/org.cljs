@@ -205,7 +205,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
+   #(router/nav! (oc-urls/org (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -381,4 +381,4 @@
           #(router/nav! (get-ap-url org-slug)))))))
 
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
+  (router/nav! (oc-urls/org (:slug org-data))))
