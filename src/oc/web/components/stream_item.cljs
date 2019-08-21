@@ -233,7 +233,7 @@
               {:ref "stream-item-reactions"}
               [:div.stream-item-comments-summary
                 ; {:on-click #(expand s true true)}
-                (comments-summary activity-data true has-new-comments?)]
+                (comments-summary activity-data has-new-comments?)]
               (when-not is-mobile?
                 (reactions activity-data))
               (when should-show-wrt

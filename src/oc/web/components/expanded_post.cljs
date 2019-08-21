@@ -190,7 +190,7 @@
         [:div.expanded-post-mobile-reactions
           (reactions activity-data)])
       [:div.expanded-post-footer.group
-        (comments-summary activity-data true)
+        (comments-summary activity-data)
         (when-not is-mobile?
           (reactions activity-data))
         (when user-is-part-of-the-team
