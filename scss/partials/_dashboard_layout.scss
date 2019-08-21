@@ -161,6 +161,7 @@ div.dashboard-layout {
         width: 100%;
         background-color: white;
         padding: 0;
+        min-height: calc(100vh - 101px);
       }
 
       @include mobile() {
