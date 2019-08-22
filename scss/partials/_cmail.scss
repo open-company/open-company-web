@@ -395,12 +395,14 @@ div.cmail-outer {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          width: 24px;
-          height: 24px;
+          width: 32px;
+          height: 32px;
           padding: 0;
           position: absolute;
-          top: 18px;
-          left: 10px;
+          top: 11px;
+          left: 16px;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
         }
 
         div.cmail-mobile-header-title {
@@ -546,13 +548,13 @@ div.cmail-outer {
 
           @include mobile() {
             width: calc(100% - 16px - 32px);
+            margin-right: 16px;
             background-image: cdnUrl("/img/ML/select_arrows.svg");
             background-color: $ultra_light_grey;
             color: $deep_navy;
-            width: 100%;
 
             &.has-follow-ups-button {
-              width: calc(100% - 4px - 32px);
+              width: calc(100% - 16px - 32px - 8px - 32px);
             }
 
             &:hover, &.open {
@@ -570,21 +572,42 @@ div.cmail-outer {
           overflow: auto;
 
           @include mobile() {
-            width: calc(100% - 4px - 32px);
+            width: calc(100% - 16px - 32px);
+          }
+        }
+
+        button.mobile-attachment-button {
+          display: none;
+
+          @include mobile() {
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
+            opacity: 1;
+            padding: 0;
+            display: block;
+            float: left;
           }
         }
 
         button.mobile-follow-up-button {
           display: none;
 
-          @include tablet() {
-            width: 24px;
+          @include mobile() {
+            width: 32px;
             height: 32px;
-            background-image: cdnUrl("/img/ML/follow_up_add.svg");
-            background-size: 16px 16px;
-            background-position: top 50% right 0;
+            background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+            background-size: 13px 16px;
+            background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.5;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
+            opacity: 1;
             padding: 0;
             margin-left: 8px;
             display: block;

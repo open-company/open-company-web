@@ -582,10 +582,7 @@
                   abstract-max-length-exceeded-tooltip)])
             (if (= (:status cmail-data) "published")
               "Save"
-              "Post")]
-          [:div.cmail-mobile-header-bt-separator]
-          [:button.mlb-reset.mobile-attachment-button
-            {:on-click #(add-attachment s)}]]
+              "Post")]]
         (when (and follow-up?
                    is-mobile?)
           (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
@@ -626,6 +623,8 @@
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
+            [:button.mlb-reset.mobile-attachment-button
+              {:on-click #(add-attachment s)}]
             (when-not follow-up?
               [:button.mlb-reset.mobile-follow-up-button
                 {:on-click #(when can-toggle-follow-ups?

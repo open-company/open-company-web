@@ -4,6 +4,7 @@
   padding-top: 6px;
 
   @include mobile() {
+    margin: 2px 0;
     padding: 8px 16px;
   }
 
@@ -277,21 +278,24 @@ div.left-navigation-sidebar {
         left: 0;
         width: 85vw;
         background-color: white;
-        padding: 18px 16px;
+        padding: 11px 16px;
         border-bottom: 1px solid $grey_num_3;
 
         button.mobile-close-bt {
           display: block;
           position: absolute;
-          right: 18px;
-          top: 20px;
-          width: 24px;
-          height: 24px;
+          right: 16px;
+          top: 11px;
+          width: 32px;
+          height: 32px;
           padding: 0;
           background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat; 
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          
         }
 
         div.orgs-dropdown  {

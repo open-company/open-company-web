@@ -50,14 +50,14 @@ nav.oc-navbar {
     @include mobile() {
       width: 100vw;
       height: #{$mobile_navbar_height}px;
-      padding: 19px 16px;
+      padding: 16px;
     }
 
     div.oc-navbar-header-container{
       height: 32px;
 
       @include mobile(){
-        height: 20px;
+        height: 24px;
       }
 
       div.navbar-center {
@@ -74,18 +74,18 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 22px;
+          top: 18px;
           left: 50%;
           width: 250px;
-          height: 20px;
+          height: 23px;
           margin: 0 0 0 -125px;
           text-align: center;
 
           div.navbar-mobile-title {
             @include OC_Body_Bold();
-            font-size: 16px;
+            font-size: 18px;
             color: $deep_navy;
-            line-height: 20px;
+            line-height: 23px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -116,15 +116,18 @@ nav.oc-navbar {
 
           @include mobile() {
             display: block;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
-            background-size: 14px 10px;
+            background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
             position: absolute;
-            top: 22px;
-            left: 14px;
+            padding: 0;
+            top: 11px;
+            left: 16px;
           }
         }
 
@@ -197,11 +200,10 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 20px;
+          top: 11px;
           right: 16px;
-          width: 24px;
-          height: 24px;
-          margin-top: -2px;
+          width: 32px;
+          height: 32px;
         }
 
         div.user-notifications {
@@ -218,11 +220,6 @@ nav.oc-navbar {
           height: 32px;
           float: right;
           position: relative;
-
-          @include mobile() {
-            width: 24px;
-            height: 24px;
-          }
 
           div.user-menu-button {
             position: relative;

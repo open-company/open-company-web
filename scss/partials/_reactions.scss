@@ -4,6 +4,7 @@ div.reactions {
 
   @include mobile() {
     float: unset;
+    height: 32px;
   }
 
   div.reactions-list {

@@ -88,7 +88,7 @@ div.menu {
         width: 85vw;
         border-bottom: 1px solid $ultra_light_grey;
         background-color: white;
-        padding: 18px 16px 18px 24px;
+        padding: 15px 16px 15px 24px;
         margin: 0;
         z-index: 2;
       }
@@ -99,15 +99,17 @@ div.menu {
         @include mobile() {
           display: block;
           position: absolute;
-          right: 10px;
-          top: 18px;
-          width: 24px;
-          height: 24px;
+          right: 16px;
+          top: 11px;
+          width: 32px;
+          height: 32px;
           padding: 0;
           background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
         }
       }
 
