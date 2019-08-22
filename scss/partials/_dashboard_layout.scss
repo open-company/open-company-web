@@ -85,10 +85,10 @@ div.dashboard-layout {
 
         &.ios-tabbar {
           height: #{$mobile_navbar_height + 24}px;
-          padding: 15px 0 40px;
+          padding: 11px 0 44px;
 
           span.unread-notifications-dot {
-            bottom: 28px;
+            bottom: 32px;
           }
         }
 
@@ -185,13 +185,12 @@ div.dashboard-layout {
         width: 100%;
         background-color: white;
         padding: 0;
-        min-height: calc(100vh - 101px);
-      }
+        min-height: calc(100vh - 76px);
+        margin: 0;
 
-      @include mobile() {
-        width: 100%;
-        margin: 0px;
-        left: unset;
+        &.ios-with-notch {
+          min-height: calc(100vh - 101px);
+        }
       }
 
       div.add-post-tooltip-container {

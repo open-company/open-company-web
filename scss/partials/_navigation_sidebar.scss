@@ -565,10 +565,6 @@ div.left-navigation-sidebar {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-
-        @include mobile() {
-          height: 18px;
-        }
       }
 
       div.private {
@@ -580,10 +576,6 @@ div.left-navigation-sidebar {
         background-size: 10px 12px;
         background-position: center;
         background-repeat: no-repeat;
-
-        @include mobile() {
-          height: 18px;
-        }
       }
 
       div.board-name {

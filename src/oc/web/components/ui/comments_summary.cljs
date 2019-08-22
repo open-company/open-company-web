@@ -78,8 +78,8 @@
                                     :add-a-comment (not (pos? comments-count))})}
           (if (pos? comments-count)
             [:div.group
-              comments-count
-              (str " comment" (when (not= comments-count 1) "s"))
+              (str comments-count
+               " comment" (when (not= comments-count 1) "s"))
               (when should-show-new-tag?
                 [:div.new-comments-tag
                   "(NEW)"])]

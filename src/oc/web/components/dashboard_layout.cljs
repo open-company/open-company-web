@@ -105,7 +105,8 @@
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
-        showing-mobile-user-notifications (drv/react s :mobile-user-notifications)]
+        showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
+        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when current-activity-id "expanded-post-view")}
@@ -119,7 +120,7 @@
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
-                                        :ios-tabbar (js/isiPhoneWithoutPhysicalHomeBt)})}
+                                        :ios-tabbar no-phisical-home-button})}
               [:button.mlb-reset.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -156,6 +157,7 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
+            {:class (when no-phisical-home-button "ios-with-notch")}
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
