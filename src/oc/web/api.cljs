@@ -292,15 +292,6 @@
         callback))
     (handle-missing-link "patch-org" org-patch-link callback {:data data})))
 
-(defn patch-org-sections [org-patch-link data callback]
-  (if (and org-patch-link data)
-    (let [json-data (cljs->json data)]
-      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
-        {:json-params json-data
-         :headers (headers-for-link org-patch-link)}
-        callback))
-    (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
-
 (defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)
     (let [email-domain-payload {:email-domain domain}
