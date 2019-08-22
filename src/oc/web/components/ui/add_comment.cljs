@@ -87,7 +87,7 @@
 
 (def me-options
   {:media-config ["gif" "photo" "video"]
-   :placeholder "Leave a new comment…"
+   :placeholder "Add a comment…"
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 
