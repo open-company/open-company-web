@@ -7,6 +7,7 @@
             [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
@@ -65,12 +66,12 @@
 
 (defn- detect-desktop-app
   []
-  (when-not js/window.OCCarrotDesktop
+  (when-not ua/desktop-app?
     (cond
-      (js/window.isMac) {:title "Mac app"
-                         :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
-      (js/window.isWindows) {:title "Windows app"
-                             :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+      ua/mac? {:title "Mac app"
+               :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
+      ua/windows? {:title "Windows app"
+                   :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
 (rum/defcs menu < rum/reactive

@@ -126,12 +126,6 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
-var isMac = function(){};
-var isWindows = function(){};
-var isLinux = function(){};
-var isSafari = function(){};
-var isIE = function(){};
-var isEdge = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -193,4 +187,7 @@ var OCWebStaticOpenIntegrationsPanel = function() {};
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
+// Mobile app (Expo)
+var ReactNativeWebView = {};
+ReactNativeWebView.postMessage = function() {};
 // Fullstory

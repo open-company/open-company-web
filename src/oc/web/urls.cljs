@@ -32,7 +32,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
-(def desktop-login "/login/desktop")
+(def native-login "/login/desktop")
 (def sign-up "/sign-up")
 (def sign-up-slack "/sign-up/slack")
 (def sign-up-profile "/sign-up/profile")
