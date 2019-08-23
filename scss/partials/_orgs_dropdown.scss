@@ -33,11 +33,6 @@ div.orgs-dropdown {
           position: absolute;
           top: 0;
           right: 0;
-
-          @include mobile() {
-            opacity: 0;
-            margin-left: 0px;
-          }
         }
       }
 
