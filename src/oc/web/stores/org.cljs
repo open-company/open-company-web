@@ -43,7 +43,6 @@
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing next-org-editing)
       (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
-      (assoc :sections-setup sections)
       (assoc-in boards-key next-boards))))
 
 (defmethod dispatcher/action :org-avatar-update/failed
