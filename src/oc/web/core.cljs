@@ -535,7 +535,7 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if ua/desktop-app?
+      (router/redirect! (if ua/pseudo-native?
                           urls/desktop-login
                           urls/home)))
 
