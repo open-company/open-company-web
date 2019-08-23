@@ -179,11 +179,9 @@ div.expanded-post {
   }
 
   div.expanded-post-abstract {
+    @include activity-abstract(18px, 24px);
     margin: 16px 0 24px;
     @include OC_Body_Bold();
-    font-size: 18px;
-    color: $deep_navy;
-    line-height: 24px;
     white-space: pre-wrap;
     word-break: break-word;
 
