@@ -44,7 +44,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
@@ -74,7 +74,7 @@
                   :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+(defonce sentry (sentry/sentry-setup))
 
 ;; Avoid warnings
 
@@ -412,18 +412,6 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
-    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
-      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
-    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
-      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
       ;; Check if the user already have filled the needed data or if it needs to
@@ -638,7 +626,7 @@
       (utils/after 100 #(utils/remove-tooltips))))
   (do
     (timbre/error "Error: div#app is not defined!")
-    (sentry/capture-message "Error: div#app is not defined!")))
+    (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn init []
   ;; Setup timbre log level

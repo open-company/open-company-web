@@ -601,7 +601,7 @@
               {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
                             (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
                :class (utils/class-set {:active show-sections-picker
-                                        :has-follow-ups-button follow-up?})}
+                                        :has-follow-ups-button (not follow-up?)})}
               [:div.board-name-inner
                 (:board-name cmail-data)]]
             (when show-sections-picker
