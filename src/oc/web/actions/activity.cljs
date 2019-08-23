@@ -622,14 +622,14 @@
   (let [secure-activity-data (if success (json->cljs body) {})
         org-data (org-data-from-secure-activity secure-activity-data)]
     (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
-    (dis/dispatch! [:org-loaded org-data false])))
+    (dis/dispatch! [:org-loaded org-data])))
 
 (defn get-org [org-data cb]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
     (api/get-org org-link (fn [{:keys [status body success]}]
       (let [org-data (json->cljs body)]
-        (dis/dispatch! [:org-loaded org-data false nil])
+        (dis/dispatch! [:org-loaded org-data])
         (cb success))))))
 
 (defn connect-change-service []

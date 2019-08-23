@@ -87,7 +87,12 @@
 
 (def other-resources-delay 2500)
 
-(defn org-loaded [org-data saved? & [email-domain complete-refresh?]]
+(defn org-loaded
+  "Dispatch the org data into the app-state to be used by all the components.
+   Do all the needed loading when the org data are loaded if complete-refresh? is true.
+   The saved? flag is used as a strict boolean, if it's nil it means no org data PATCH happened, false
+   means that the save went wrong, true went well."
+  [org-data & [saved? email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
@@ -187,7 +192,7 @@
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data false nil (not prevent-complete-refresh?))))
+    (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
 (defn get-org [& [org-data prevent-complete-refresh?]]
   (let [fixed-org-data (or org-data (dis/org-data))
@@ -264,7 +269,7 @@
       ;; rewrite history so when user come back here we load org data and patch them
       ;; instead of creating them
       (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data nil email-domain)
       (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
@@ -272,7 +277,7 @@
 (defn org-update-cb [email-domain {:keys [success status body]}]
   (if success
     (when-let [org-data (when success (json->cljs body))]
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data success email-domain)
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
 
@@ -305,7 +310,7 @@
   (dis/dispatch! [:org-edit-setup org-data]))
 
 (defn org-edit-save-cb [{:keys [success body status]}]
-  (org-loaded (json->cljs body) true))
+  (org-loaded (json->cljs body) success))
 
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
@@ -325,7 +330,7 @@
          :description "Your image was succesfully updated."
          :expire 3
          :dismiss true})
-      (org-loaded (json->cljs body) false))
+      (org-loaded (json->cljs body)))
     (do
       (dis/dispatch! [:org-avatar-update/failed])
       (notification-actions/show-notification
