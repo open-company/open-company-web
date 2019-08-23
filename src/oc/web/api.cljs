@@ -11,7 +11,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
@@ -177,9 +177,7 @@
                         :params params
                         :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
-            (sentry/set-extra-context! report)
-            (sentry/capture-error-with-message (str "xhr response error:" status))
-            (sentry/clear-extra-context!)))
+            (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
         (on-complete response)))))
 
 (def ^:private web-http (partial req web-endpoint))
@@ -202,12 +200,12 @@
 
 (defn- handle-missing-link [callee-name link callback & [parameters]]
   (timbre/error "Handling missing link:" callee-name ":" link)
-  (sentry/set-extra-context! (merge {:callee callee-name
-                                     :link link
-                                     :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
-                                    parameters))
-  (sentry/capture-error-with-message (str "Client API error on: " callee-name))
-  (sentry/clear-extra-context!)
+  (sentry/capture-message-with-extra-context!
+    (merge {:callee callee-name
+            :link link
+            :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
+     parameters)
+    (str "Client API error on: " callee-name))
   (notification-actions/show-notification (assoc utils/internal-error :expire 3))
   (when (fn? callback)
     (callback {:success false :status 0})))
@@ -293,15 +291,6 @@
          :headers (headers-for-link org-patch-link)}
         callback))
     (handle-missing-link "patch-org" org-patch-link callback {:data data})))
-
-(defn patch-org-sections [org-patch-link data callback]
-  (if (and org-patch-link data)
-    (let [json-data (cljs->json data)]
-      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
-        {:json-params json-data
-         :headers (headers-for-link org-patch-link)}
-        callback))
-    (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
 
 (defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)

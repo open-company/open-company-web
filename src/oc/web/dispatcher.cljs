@@ -206,7 +206,6 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :drafts-data         [[:base :org-slug]
@@ -368,8 +367,8 @@
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
                                     (timbre/info "Unread notification count updated: " ncount)
-                                    (when js/window.isDesktop
-                                      (js/window.setBadgeCount ncount))
+                                    (when js/window.OCCarrotDesktop
+                                      (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
    :user-responded-to-push-permission? [[:base] (fn [base]
                                                   (boolean (get-in base expo-push-token-key)))]

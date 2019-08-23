@@ -15,7 +15,7 @@
 
 (defn logout
   ([]
-   (logout (if js/window.isDesktop
+   (logout (if js/window.OCCarrotDesktop
              oc-urls/desktop-login
              oc-urls/home)))
   ([location]

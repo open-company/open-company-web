@@ -145,7 +145,7 @@
             "Sign up"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href (if js/window.isDesktop
+          [:a {:href (if js/window.OCCarrotDesktop
                        oc-urls/desktop-login
                        oc-urls/login)}
            "Sign in"]]]]))
@@ -294,10 +294,7 @@
             :aria-label "Continue"}
             "Continue"]]
         [:div.title.about-yourself
-          "Tell us about you"]
-        (when-not has-org?
-          [:div.steps
-            "Step 1 of 2"])]
+          "Tell us about you"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -555,52 +552,6 @@
              :on-touch-start identity
              :on-click continue-fn}
             "Continue"]]]]))
-
-(rum/defcs lander-sections < rum/reactive
-                             (drv/drv :org-data)
-                             (drv/drv :sections-setup)
-                             (rum/local false ::patching-sections)
-  [s]
-  (let [sections-list (drv/react s :sections-setup)
-        org-data (drv/react s :org-data)
-        disabled @(::patching-sections s)
-        continue-fn (fn []
-                      (reset! (::patching-sections s) true)
-                      ;; refresh user api data after org creation
-                      (user-actions/entry-point-get (:slug org-data))
-                      (org-actions/update-org-sections (:slug org-data) sections-list))]
-    [:div.onboard-lander.lander-sections
-      [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]
-          [:button.mlb-reset.top-continue
-            {:on-touch-start identity
-             :on-click continue-fn
-             :disabled disabled
-             :aria-label "Start using Carrot"}
-           "Start"]]
-        [:div.title
-          "Pick a few topics to start"]
-        [:div.steps
-          "Step 2 of 2"]]
-      [:div.onboard-form
-        [:div.sections-list
-          (if (seq sections-list)
-            (for [idx (range (count sections-list))
-                  :let [section (get sections-list idx)]]
-              [:div.section
-                {:key (str "sections-list-" (:name section))
-                 :class (when (:selected section) "selected")
-                 :on-click #(dis/dispatch! [:update [:sections-setup idx :selected] not])}
-                (:name section)])
-            (small-loading))]
-        [:div.field-description
-          "Don't worry, you'll be able to change these later."]
-        [:button.continue.start-using-carrot
-          {:on-touch-start identity
-           :on-click continue-fn
-           :disabled disabled}
-          "Start using Carrot"]]]))
 
 (def default-invite-row
   {:user ""
@@ -1004,7 +955,6 @@
     :lander (lander)
     :lander-profile (lander-profile)
     :lander-team (lander-team)
-    :lander-sections (lander-sections)
     :lander-invite (lander-invite)
     :invitee-lander (invitee-lander)
     :invitee-lander-password (invitee-lander-password)

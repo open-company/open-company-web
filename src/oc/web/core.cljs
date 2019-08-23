@@ -45,7 +45,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
@@ -75,7 +75,7 @@
                   :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+(defonce sentry (sentry/sentry-setup))
 
 ;; Avoid warnings
 
@@ -109,12 +109,12 @@
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
-    (when js/window.isDesktop
-      (dommy/add-class! body :electron))
-    (when js/window.isMac
-      (dommy/add-class! body :mac-electron))
-    (when js/window.isWin32
-      (dommy/add-class! body :win-electron)))
+    (when js/window.OCCarrotDesktop
+      (dommy/add-class! body :electron)
+      (when (js/window.isMac)
+        (dommy/add-class! body :mac-electron))
+      (when (js/window.isWindows)
+        (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
   (when (:log-level query-params)
     (logging/config-log-level! (:log-level query-params)))
@@ -413,18 +413,6 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
-    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
-      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
-    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
-      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
       ;; Check if the user already have filled the needed data or if it needs to
@@ -548,7 +536,7 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if js/window.isDesktop
+      (router/redirect! (if js/window.OCCarrotDesktop
                           urls/desktop-login
                           urls/home)))
 
@@ -639,7 +627,7 @@
       (utils/after 100 #(utils/remove-tooltips))))
   (do
     (timbre/error "Error: div#app is not defined!")
-    (sentry/capture-message "Error: div#app is not defined!")))
+    (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn init []
   ;; Setup timbre log level

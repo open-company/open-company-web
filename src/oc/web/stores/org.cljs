@@ -38,7 +38,6 @@
                               (assoc :email-domain email-domain)
                               (dissoc :has-changes)))
       (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
-      (assoc :sections-setup sections)
       (assoc-in boards-key next-boards))))
 
 (defmethod dispatcher/action :org-avatar-update/failed

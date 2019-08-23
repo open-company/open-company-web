@@ -126,6 +126,9 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
+var isMac = function(){};
+var isWindows = function(){};
+var isLinux = function(){};
 var isSafari = function(){};
 var isIE = function(){};
 var isEdge = function(){};
@@ -186,13 +189,14 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
-// Electron
+// Platform and product detection
 window.isDesktop = {};
 window.isWin32 = {};
 window.isMac = {};
-window.showDesktopWindow = function() {};
-window.setBadgeCount = function() {};
 // Mobile app (Expo)
 var ReactNativeWebView = {};
 ReactNativeWebView.postMessage = function() {};
-// Fullstory
+// Desktop app (Electron)
+var OCCarrotDesktop = function(){};
+OCCarrotDesktop.showDesktopWindow = function() {};
+OCCarrotDesktop.setBadgeCount = function() {};
