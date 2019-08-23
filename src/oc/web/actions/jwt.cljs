@@ -17,7 +17,7 @@
 (defn logout
   ([]
    (logout (if ua/pseudo-native?
-             oc-urls/desktop-login
+             oc-urls/native-login
              oc-urls/home)))
   ([location]
    (cook/remove-cookie! :jwt)

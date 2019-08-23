@@ -509,8 +509,8 @@
         (router/redirect-404!))
       (simple-handler login-wall "login-wall" target params true))
 
-    (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-route" urls/desktop-login)
+    (defroute native-login-route urls/native-login {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-route" urls/native-login)
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -518,8 +518,8 @@
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
-    (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
+    (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -536,7 +536,7 @@
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
       (router/redirect! (if ua/pseudo-native?
-                          urls/desktop-login
+                          urls/native-login
                           urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}

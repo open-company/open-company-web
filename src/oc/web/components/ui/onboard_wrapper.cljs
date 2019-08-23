@@ -147,7 +147,7 @@
         [:div.footer-link
           "Already have an account?"
           [:a {:href (if ua/pseudo-native?
-                       oc-urls/desktop-login
+                       oc-urls/native-login
                        oc-urls/login)}
            "Sign in"]]]]))
 
