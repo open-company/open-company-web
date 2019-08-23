@@ -531,8 +531,7 @@
 
 (defn copy-to-clipboard [el]
   (try
-    (when (and (responsive/is-tablet-or-mobile?)
-               (js/isSafari))
+    (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
