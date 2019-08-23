@@ -90,7 +90,8 @@
   (let [comments-data (second (:rum/args s))]
     (when (and (seq comments-data)
                (router/current-comment-id)
-               (not @(::initial-comment-scroll s)))
+               (not @(::initial-comment-scroll s))
+               (rum/ref-node s (str "stream-comment-" (router/current-comment-id))))
       (reset! (::initial-comment-scroll s) true)
       (highlight-comment s (router/current-comment-id) true))))
 
