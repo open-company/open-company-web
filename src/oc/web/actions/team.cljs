@@ -322,7 +322,7 @@
     (teams-get))
   (dis/dispatch! [:email-domain-team-add/finish (= status 204)]))
 
-(defn email-domain-team-add [domain]
+(defn email-domain-team-add [domain cb]
   (when (utils/valid-domain? domain)
     (let [team-data (dis/team-data)
           add-email-domain-link (utils/link-for
@@ -331,7 +331,12 @@
                                    "POST"
                                    {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
           fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
-      (api/add-email-domain add-email-domain-link fixed-domain email-domain-team-add-cb team-data))
+      (api/add-email-domain add-email-domain-link fixed-domain
+       (fn [{:keys [success] :as resp}]
+        (email-domain-team-add-cb resp)
+        (when (fn? cb)
+         (cb success)))
+       team-data))
     (dis/dispatch! [:email-domain-team-add])))
 
 ;; Slack team add

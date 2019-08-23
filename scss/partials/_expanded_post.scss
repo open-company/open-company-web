@@ -185,6 +185,13 @@ div.expanded-post {
     white-space: pre-wrap;
     word-break: break-word;
 
+    // Abstract is bold only in expanded post view
+    // we need to make sure italic doesn't override
+    // the font weight only here
+    i, i strong, i b, b i, strong i {
+      @include OC_Body_Bold_Italic();
+    }
+
     @include mobile() {
       margin: 8px 0 16px;
     }
