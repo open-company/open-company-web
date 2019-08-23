@@ -81,10 +81,6 @@ div.expanded-post {
 
     div.more-menu {
       float: right;
-
-      @include mobile() {
-        margin-top: 4px;
-      }
     }
   }
 

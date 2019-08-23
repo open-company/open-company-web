@@ -31,6 +31,7 @@ div.more-menu {
 
     @include mobile() {
       width: 32px;
+      height: 32px;
       background-color: $ultra_light_grey;
       border-radius: 4px;
       opacity: 1;
@@ -82,6 +83,7 @@ div.more-menu {
 
     @include mobile() {
       width: 32px;
+      height: 32px;
       background-color: $ultra_light_grey;
       border-radius: 4px;
       background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
@@ -113,6 +115,7 @@ div.more-menu {
 
     @include mobile() {
       width: 32px;
+      height: 32px;
       background-color: $ultra_light_grey;
       border-radius: 4px;
       background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
