@@ -1,5 +1,8 @@
 (ns oc.web.expo
-  "TODO: Write a couple notes here briefly explaining the bridge."
+  "Cljs side of the communication bridge between this web app and the Expo mobile
+  app container (a ReactNativeWebView component).
+  See https://github.com/open-company/open-company-mobile/blob/master/src/nativeWebBridge.js
+  for the native side of the bridge."
   (:require [oc.web.actions.user :as user-actions]
             [oc.web.utils.user :as user-utils]))
 
