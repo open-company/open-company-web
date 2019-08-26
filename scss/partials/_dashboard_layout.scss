@@ -187,10 +187,6 @@ div.dashboard-layout {
         padding: 0;
         min-height: calc(100vh - 76px);
         margin: 0;
-
-        &.ios-with-notch {
-          min-height: calc(100vh - 101px);
-        }
       }
 
       div.add-post-tooltip-container {

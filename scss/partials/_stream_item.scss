@@ -493,8 +493,8 @@ div.stream-item {
               border: 2px solid $oc_gray_8;
 
               @include mobile() {
-                background-color: white;
-                border: 2px solid white;
+                background-color: $grey_num_4;
+                border: 2px solid $grey_num_4;
               }
             }
           }

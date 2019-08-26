@@ -23,7 +23,7 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
     padding-bottom: 1px;
-    border-bottom: 1px solid $more_ultra_light_grey;
+    border-bottom: 1px solid $divider_line_grey;
     background-color: white;
     overflow: visible;
 
@@ -73,10 +73,10 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 18px;
+          top: 15px;
           left: 50%;
           width: 250px;
-          height: 23px;
+          height: 24px;
           margin: 0 0 0 -125px;
           text-align: center;
 
@@ -84,7 +84,7 @@ nav.oc-navbar {
             @include OC_Body_Bold();
             font-size: 18px;
             color: $deep_navy;
-            line-height: 23px;
+            line-height: 24px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

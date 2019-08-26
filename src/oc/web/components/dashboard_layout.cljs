@@ -157,7 +157,6 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
-            {:class (when no-phisical-home-button "ios-with-notch")}
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
