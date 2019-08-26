@@ -1,10 +1,11 @@
 (ns oc.web.components.push-notifications-permission-modal
   (:require [rum.core :as rum]
             [oc.web.actions.user :as user-actions]
+            [oc.web.mixins.ui :refer (no-scroll-mixin)]
             [oc.web.expo :as expo]))
 
-(rum/defc push-notifications-permission-modal
-  [{:keys [org-data] :as props}]
+(rum/defcs push-notifications-permission-modal < no-scroll-mixin
+  [s {:keys [org-data] :as props}]
   [:div.push-notifications-permission-modal
    [:div.modal-header
     [:button.modal-close-bt

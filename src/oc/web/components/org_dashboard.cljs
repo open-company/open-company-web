@@ -12,7 +12,6 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
-            [oc.web.stores.user :as user-store]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -180,112 +179,113 @@
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
+      [:div
+       {:class (utils/class-set {:org-dashboard true
+                                 :mobile-or-tablet is-mobile?
+                                 :login-wall show-login-wall
+                                 :activity-removed show-activity-removed
+                                 :expanded-activity (router/current-activity-id)
+                                 :show-menu (= open-panel :menu)})}
+       ;; Use cond for the next components to exclud each other and avoid rendering all of them
+       (login-overlays-handler)
+       (cond
+         ;; User menu
+         (and is-mobile?
+              (= open-panel :menu))
+         (menu)
+         ;; Activity removed
+         show-activity-removed
+         (activity-removed)
+         ;; Activity not found
+         show-login-wall
+         (login-wall)
+         ;; Org settings
+         (= open-panel :org)
+         (org-settings-modal)
+         ;; Integrations settings
+         (= open-panel :integrations)
+         (integrations-settings-modal)
+         ;; Invite settings
+         (= open-panel :invite)
+         (invite-settings-modal)
+         ;; Team management
+         (= open-panel :team)
+         (team-management-modal)
+         ;; User settings
+         (= open-panel :profile)
+         (user-profile-modal)
+         ;; User notifications
+         (= open-panel :notifications)
+         (user-notifications-modal)
+         ;; Reminders list
+         show-reminders?
+         (recurring-updates-modal)
+         ;; Edit a reminder
+         show-reminder-edit?
+         (edit-recurring-update-modal)
+         ;; Mobile create a new section
+         show-section-editor
+         (section-editor initial-section-editing
+                         (fn [sec-data note dismiss-action]
+                           (if sec-data
+                             (section-actions/section-save sec-data note dismiss-action)
+                             (dismiss-action))))
+         ;; Mobile edit current section data
+         show-section-add
+         (section-editor nil show-section-add-cb)
+         ;; Activity share for mobile
+         (and is-mobile?
+              is-sharing-activity)
+         (activity-share)
+         ;; WRT
+         show-wrt-view?
+         (wrt org-data)
+         ;; Search results
+         is-showing-mobile-search
+         (search-box)
+         ;; Mobile notifications
+         (and is-mobile?
+              showing-mobile-user-notifications)
+         (user-notifications))
+       ;; Activity share modal for no mobile
+       (when (and (not is-mobile?)
+                  is-sharing-activity)
+         ;; If we have an element id find the share container inside that element
+         ;; and portal the component to that element
+         (let [portal-element (when activity-share-container
+                                (.get (.find (js/$ (str "#" activity-share-container))
+                                       ".activity-share-container") 0))]
+          (if portal-element
+            (rum/portal (activity-share) portal-element)
+            (activity-share))))
+      ;; cmail editor
+      (when show-mobile-cmail?
+        (cmail))
+      (when show-follow-ups-picker
+        (follow-ups-picker))
+      ;; Menu always rendered if not on mobile since we need the
+      ;; selector for whats-new widget to be present
+      (when-not is-mobile?
+        (menu))
       ;; Mobile push notifications permission
-      (if show-push-notification-permissions-modal?
-        (push-notifications-permission-modal {:org-data org-data})
-        [:div
-         {:class (utils/class-set {:org-dashboard true
-                                   :mobile-or-tablet is-mobile?
-                                   :login-wall show-login-wall
-                                   :activity-removed show-activity-removed
-                                   :expanded-activity (router/current-activity-id)
-                                   :show-menu (= open-panel :menu)})}
-         ;; Use cond for the next components to exclud each other and avoid rendering all of them
-         (login-overlays-handler)
-         (cond
-           ;; User menu
-           (and is-mobile?
-                (= open-panel :menu))
-           (menu)
-           ;; Activity removed
-           show-activity-removed
-           (activity-removed)
-           ;; Activity not found
-           show-login-wall
-           (login-wall)
-           ;; Org settings
-           (= open-panel :org)
-           (org-settings-modal)
-           ;; Integrations settings
-           (= open-panel :integrations)
-           (integrations-settings-modal)
-           ;; Invite settings
-           (= open-panel :invite)
-           (invite-settings-modal)
-           ;; Team management
-           (= open-panel :team)
-           (team-management-modal)
-           ;; User settings
-           (= open-panel :profile)
-           (user-profile-modal)
-           ;; User notifications
-           (= open-panel :notifications)
-           (user-notifications-modal)
-           ;; Reminders list
-           show-reminders?
-           (recurring-updates-modal)
-           ;; Edit a reminder
-           show-reminder-edit?
-           (edit-recurring-update-modal)
-           ;; Mobile create a new section
-           show-section-editor
-           (section-editor initial-section-editing
-                           (fn [sec-data note dismiss-action]
-                             (if sec-data
-                               (section-actions/section-save sec-data note dismiss-action)
-                               (dismiss-action))))
-           ;; Mobile edit current section data
-           show-section-add
-           (section-editor nil show-section-add-cb)
-           ;; Activity share for mobile
-           (and is-mobile?
-                is-sharing-activity)
-           (activity-share)
-           ;; WRT
-           show-wrt-view?
-           (wrt org-data)
-           ;; Search results
-           is-showing-mobile-search
-           (search-box)
-           ;; Mobile notifications
-           (and is-mobile?
-                showing-mobile-user-notifications)
-           (user-notifications))
-         ;; Activity share modal for no mobile
-         (when (and (not is-mobile?)
-                    is-sharing-activity)
-           ;; If we have an element id find the share container inside that element
-           ;; and portal the component to that element
-           (let [portal-element (when activity-share-container
-                                  (.get (.find (js/$ (str "#" activity-share-container))
-                                         ".activity-share-container") 0))]
-            (if portal-element
-              (rum/portal (activity-share) portal-element)
-              (activity-share))))
-        ;; cmail editor
-        (when show-mobile-cmail?
-          (cmail))
-        (when show-follow-ups-picker
-          (follow-ups-picker))
-        ;; Menu always rendered if not on mobile since we need the
-        ;; selector for whats-new widget to be present
-        (when-not is-mobile?
-          (menu))
-        ;; Alert modal
-        (when is-showing-alert
-          (alert-modal))
-        ;; On mobile don't show the dashboard/stream when showing another panel
-        (when (or (not is-mobile?)
-                  (and (not is-sharing-activity)
-                       (not show-mobile-cmail?)
-                       (not open-panel)))
-          [:div.page
-            (navbar)
-            [:div.org-dashboard-container
-             [:div.org-dashboard-inner
-              (when (or (not is-mobile?)
-                        (and (or (not search-active?) (not search-results?))
-                             (not open-panel)
-                             (not is-showing-mobile-search)
-                             (not showing-mobile-user-notifications)))
-                (dashboard-layout))]]])]))))
+      (when show-push-notification-permissions-modal?
+        (push-notifications-permission-modal {:org-data org-data}))
+      ;; Alert modal
+      (when is-showing-alert
+        (alert-modal))
+      ;; On mobile don't show the dashboard/stream when showing another panel
+      (when (or (not is-mobile?)
+                (and (not is-sharing-activity)
+                     (not show-mobile-cmail?)
+                     (not open-panel)
+                     (not show-push-notification-permissions-modal?)))
+        [:div.page
+          (navbar)
+          [:div.org-dashboard-container
+           [:div.org-dashboard-inner
+            (when (or (not is-mobile?)
+                      (and (or (not search-active?) (not search-results?))
+                           (not open-panel)
+                           (not is-showing-mobile-search)
+                           (not showing-mobile-user-notifications)))
+              (dashboard-layout))]]])])))
