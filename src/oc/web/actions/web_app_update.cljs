@@ -39,6 +39,7 @@
                                                   :secondary-bt-style :green
                                                   :secondary-bt-class :update-app-bt
                                                   :secondary-bt-cb #(js/window.location.reload)
+                                                  :click #(js/window.location.reload)
                                                   :expire 0}))
        (interval/restart-interval! web-app-update-interval default-update-interval-ms)))))
 
