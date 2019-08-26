@@ -131,7 +131,7 @@
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % (oc-urls/must-see)))
+                              (nav-actions/nav-to-url! % (oc-urls/follow-ups)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (or (= (router/current-board-slug) "follow-ups")
                                        (= (router/current-board-slug) "must-see")))
