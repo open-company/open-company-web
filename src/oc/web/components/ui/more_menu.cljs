@@ -176,34 +176,34 @@
                                   (when (fn? will-close)
                                     (will-close))
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Create follow-up"]))
-              (when can-react?
-                [:li.react
-                  {:on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (when (fn? comment-share-cb)
-                                  (react-cb)))}
-                  "React"])
-              (when can-reply?
-                [:li.reply
-                  {:on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (when (fn? comment-share-cb)
-                                  (reply-cb)))}
-                  "Reply"])
-              (when can-comment-share?
-                [:li.comment-share
-                  {:on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (when (fn? comment-share-cb)
-                                  (comment-share-cb)))}
-                  "Share"]))])
+                    "Create follow-up"])))
+            (when can-react?
+              [:li.react
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (react-cb)))}
+                "React"])
+            (when can-reply?
+              [:li.reply
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (reply-cb)))}
+                "Reply"])
+            (when can-comment-share?
+              [:li.comment-share
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (comment-share-cb)))}
+                "Share"])])
         (when (and external-share
                    share-link)
           [:button.mlb-reset.more-menu-share-bt
