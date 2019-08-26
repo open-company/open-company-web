@@ -183,10 +183,6 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
-// Platform and product detection
-window.isDesktop = {};
-window.isWin32 = {};
-window.isMac = {};
 // Mobile app (Expo)
 var ReactNativeWebView = {};
 ReactNativeWebView.postMessage = function() {};
@@ -194,6 +190,3 @@ ReactNativeWebView.postMessage = function() {};
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
-// Mobile app (Expo)
-var ReactNativeWebView = {};
-ReactNativeWebView.postMessage = function() {};
