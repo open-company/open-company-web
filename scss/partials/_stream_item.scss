@@ -431,26 +431,29 @@ div.stream-item {
       }
     }
 
-    div.stream-item-mobile-reactions {
-      display: none;
-
-      @include mobile() {
-        display: block;
-        height: 48px;
-        margin: 16px 0 0;
-        padding-bottom: 16px;
-      }
-    }
-
     div.stream-item-footer {
       min-height: 26px;
       margin-top: 16px;
 
       @include mobile() {
-        height: 16px;
+        height: auto;
         overflow: hidden;
         margin-top: 10px;
-        min-height: 20px;
+        min-height: 32px;
+      }
+
+      div.reactions {
+        @include mobile() {
+          display: inline-block;
+        }
+      }
+
+      div.stream-item-footer-mobile-group {
+        @include mobile() {
+          display: inline-block;
+          height: 32px;
+          padding-top: 8px;
+        }
       }
 
       div.stream-body-draft-edit {
@@ -479,12 +482,6 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
-
-        @include mobile() {
-          max-width: calc(50% - 16px);
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
 
         div.is-comments {
           div.is-comments-authors.show-border {
