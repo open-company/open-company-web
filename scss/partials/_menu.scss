@@ -182,6 +182,11 @@ div.menu {
       @include OC_Body_Book();
       font-size: 14px;
 
+      @include mobile() {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
       &.whats-new {
         #HW_badge_cont {
           display: inline;
