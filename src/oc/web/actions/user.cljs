@@ -438,10 +438,11 @@
   "Save the expo push token in a cookie (or re-save to extend the cookie expire time)
    and dispatch the value into the app-state."
   [push-token]
-  ;; A blank push-token indicates that the user was prompted, but
-  ;; denied the push notification permission.
-  (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
-  (dis/dispatch! [:expo-push-token push-token]))
+  (when push-token
+    ;; A blank push-token indicates that the user was prompted, but
+    ;; denied the push notification permission.
+    (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
+    (dis/dispatch! [:expo-push-token push-token])))
 
 (defn recall-expo-push-token
   []
