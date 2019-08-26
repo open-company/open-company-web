@@ -432,9 +432,20 @@
 
 ;; Mobile push notifications
 
+(def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
+
+(defn dispatch-expo-push-token
+  "Save the expo push token in a cookie (or re-save to extend the cookie expire time)
+   and dispatch the value into the app-state."
+  [push-token]
+  ;; A blank push-token indicates that the user was prompted, but
+  ;; denied the push notification permission.
+  (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
+  (dis/dispatch! [:expo-push-token push-token]))
+
 (defn recall-expo-push-token
   []
-  (dis/dispatch! [:expo-push-token (cook/get-cookie router/expo-push-token-cookie)]))
+  (dispatch-expo-push-token (cook/get-cookie router/expo-push-token-cookie)))
 
 (defn add-expo-push-token [push-token]
   (let [user-data            (dis/current-user-data)
@@ -442,19 +453,20 @@
         need-to-add?         (not (user-utils/user-has-push-token? user-data push-token))]
     (if-not need-to-add?
       ;; Push token already known, dispatch it to app-state immediately
-      (dis/dispatch! [:expo-push-token push-token])
+      (dispatch-expo-push-token push-token)
       ;; Novel push token, add it to the Auth service for storage
       (when (and add-token-link push-token)
         (api/add-expo-push-token
          add-token-link
          push-token
          (fn [success]
-           (dis/dispatch! [:expo-push-token push-token])
+           (dispatch-expo-push-token push-token)
            (timbre/info "Successfully saved Expo push notification token")))))))
 
 (defn deny-push-notification-permission
+  "Push notification permission was denied."
   []
-  (dis/dispatch! [:deny-push-notification-permission]))
+  (dispatch-expo-push-token ""))
 
 ;; Initial loading
 

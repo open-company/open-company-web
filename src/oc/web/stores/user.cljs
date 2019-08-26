@@ -4,8 +4,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.user :as user-utils]
-            [oc.web.router :as router]))
+            [oc.web.utils.user :as user-utils]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
@@ -277,20 +276,8 @@
 
 ;; Expo push tokens
 
-(def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
-
 (defmethod dispatcher/action :expo-push-token
   [db [_ push-token]]
   (if push-token
-    (do
-      (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
-      (assoc-in db dispatcher/expo-push-token-key push-token))
+    (assoc-in db dispatcher/expo-push-token-key push-token)
     db))
-
-(defmethod dispatcher/action :deny-push-notification-permission
-  [db [_]]
-  ;; A blank Expo push token indicates that the user was prompted, but
-  ;; denied the push notification permission.
-  (let [push-token ""]
-    (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
-    (assoc-in db dispatcher/expo-push-token-key push-token)))
