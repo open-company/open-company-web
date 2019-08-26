@@ -73,6 +73,8 @@ div.expanded-post {
         background-position: center;
 
         @include mobile() {
+          width: 12px;
+          height: 12px;
           background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
         }
