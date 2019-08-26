@@ -80,6 +80,9 @@
     (when (or edit-link
               share-link
               delete-link
+              can-comment-share?
+              can-react?
+              can-reply?
               create-follow-up-link
               complete-follow-up-link)
       [:div.more-menu
