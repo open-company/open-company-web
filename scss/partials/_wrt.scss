@@ -130,7 +130,7 @@ div.wrt-popup-container {
 
       @include mobile() {
         position: fixed;
-        border-bottom: 1px solid $ultra_light_grey;
+        border-bottom: 1px solid $divider_line_grey;
         z-index: 2;
         height: #{$mobile_navbar_height}px;
         padding: 15px 16px;

@@ -177,6 +177,7 @@ div.user-notifications {
 
         @include mobile() {
           background-color: white;
+          border-top: 1px solid $divider_line_grey;
 
           &:first-child {
             border-top: none;

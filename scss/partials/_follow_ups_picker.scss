@@ -59,7 +59,7 @@ div.follow-ups-picker {
       @include mobile(){
         height: #{mobile_navbar_height}px;
         padding: 14px 16px;
-        border-bottom: 1px solid $grey_num_3;
+        border-bottom: 1px solid $divider_line_grey;
         background-color: white;
       }
 

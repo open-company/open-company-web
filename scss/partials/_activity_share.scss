@@ -28,7 +28,7 @@ div.activity-share-modal-container {
     border: none;
     box-shadow: none;
     padding: 0px;
-    border-bottom: 1px solid $ultra_light_grey;
+    border-bottom: 1px solid $divider_line_grey;
     background-color: white;
   }
 
@@ -64,7 +64,7 @@ div.activity-share-modal-container {
         position: relative;
         width: 100%;
         height: #{$mobile_navbar_height}px;
-        border-bottom: 1px solid $ultra_light_grey;
+        border-bottom: 1px solid $divider_line_grey;
         padding: 11px 16px;
         text-align: center;
         line-height: 32px;
