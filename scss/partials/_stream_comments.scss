@@ -80,6 +80,48 @@ div.stream-comments {
           @include mobile() {
             display: block;
 
+            div.emoji-picker-container {
+              width: 100vw;
+              position: fixed;
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              height: 100vh;
+              background-color: white;
+              z-index: 4;
+              padding-top: 29px;
+
+              button.close-bt {
+                color: $deep_navy;
+                padding: 0;
+                margin: 0;
+                @include OC_Body_Bold();
+                font-size: 14px;
+                position: absolute;
+                top: 8px;
+                right: 8px;
+              }
+
+              div.emoji-mart {
+                position: relative;
+                width: 100% !important;
+                height: calc(100vh - 29px);
+                bottom: unset;
+                box-shadow: none;
+                border-radius: none;
+                border: none;
+
+                div.emoji-mart-scroll {
+                  height: calc(100vh - 29px - 46px - 29px);
+                }
+
+                div.emoji-mart-bar:last-child {
+                  display: none;
+                }
+              }
+            }
+
             div.more-menu {
               button.more-menu-bt {
                 margin-top: -12px;

@@ -21,7 +21,6 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
-            [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn stop-editing [s comment-data]
@@ -101,6 +100,29 @@
                                            :dismiss true
                                            :id (keyword (str "comment-url-copied-"
                                             (:uuid comment-data)))}))
+
+(rum/defc emoji-picker < ui-mixins/no-scroll-mixin
+  [{:keys [add-emoji-cb dismiss-cb]}]
+  [:div.emoji-picker-container
+    [:button.mlb-reset.close-bt
+      {:on-click dismiss-cb}
+      "Cancel"]
+    (react-utils/build (.-Picker js/EmojiMart)
+      {:native true
+       :onClick (fn [emoji event]
+                  (add-emoji-cb emoji))})])
+
+(defn- emoji-picker-container [s comment-data]
+  (let [activity-data (first (:rum/args s))
+        showing-picker? (and (seq @(::show-picker s))
+                             (= @(::show-picker s) (:uuid comment-data)))]
+    (when showing-picker?
+      (emoji-picker {:dismiss-cb (fn [_] (reset! (::show-picker s) nil))
+                     :add-emoji-cb (fn [emoji]
+       (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+         (comment-actions/react-from-picker activity-data comment-data
+          (gobj/get emoji "native")))
+       (reset! (::show-picker s) nil))}))))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
@@ -196,6 +218,7 @@
                                           :showing-picker showing-picker?
                                           :indented-comment is-indented-comment?})
                  :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
+                (js/console.log "DBG showing-picker:" @(::show-picker s) showing-picker?)
                 [:div.stream-comment-inner
                   (when-not is-editing?
                     (if (responsive/is-tablet-or-mobile?)
@@ -209,9 +232,11 @@
                                                      :can-comment-share? true
                                                      :comment-share-cb #(share-clicked comment-data)
                                                      :can-react? true
-                                                     :react-cb #(reset! (::show-picker s) (:uuid comment-data))
+                                                     :react-cb #(do (js/console.log "DBG show-picker" (:uuid comment-data)) (reset! (::show-picker s) (:uuid comment-data)))
                                                      :can-reply? true
-                                                     :reply-cb #(reply-to s (:reply-parent comment-data))})]
+                                                     :reply-cb #(reply-to s (:reply-parent comment-data))})
+                        (when showing-picker?
+                          (emoji-picker-container s comment-data))]
                       [:div.stream-comment-floating-buttons
                         {:key (str "stream-comment-floating-buttons"
                                (when can-show-edit-bt?
@@ -266,15 +291,9 @@
                               {:data-toggle "tooltip"
                                :data-placement "top"
                                :title "Add reaction"
-                               :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
+                               :on-click #(do (js/console.log "DBG show-picker" (:uuid comment-data)) (reset! (::show-picker s) (:uuid comment-data)))}]
                             (when showing-picker?
-                              (react-utils/build (.-Picker js/EmojiMart)
-                               {:native true
-                                :onClick (fn [emoji event]
-                                           (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
-                                             (comment-actions/react-from-picker activity-data comment-data
-                                              (gobj/get emoji "native")))
-                                           (reset! (::show-picker s) nil))}))]]]))
+                              (emoji-picker-container s comment-data))]]]))
                   [:div.stream-comment-author-avatar
                     (user-avatar-image (:author comment-data))]
 
@@ -297,7 +316,7 @@
                     (when (and (not is-editing?)
                                (seq (:reactions comment-data)))
                      [:div.stream-comment-reactions-footer.group
-                        (reactions comment-data true activity-data)])]]]
+                        (reactions comment-data (zero? (count (:reactions comment-data))) activity-data)])]]]
             (when should-show-add-comment?
               [:div.stream-comment
                 {:class (utils/class-set {:indented-comment true})}
