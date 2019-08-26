@@ -3,6 +3,7 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
@@ -190,7 +191,7 @@
 
 (defn scroll-to-y [scroll-y & [duration]]
   (if (and duration (zero? duration))
-    (if (js/isEdge)
+    (if ua/edge?
       (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
       (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
     (.play
@@ -530,8 +531,7 @@
 
 (defn copy-to-clipboard [el]
   (try
-    (when (and (responsive/is-tablet-or-mobile?)
-               (js/isSafari))
+    (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e

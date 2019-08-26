@@ -2,7 +2,8 @@
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.shared.interval :as interval]))
+            [oc.shared.interval :as interval]
+            [oc.shared.useragent :as ua]))
 
 (declare web-app-update-interval)
 
@@ -10,7 +11,7 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  (if js/window.OCCarrotDesktop
+  (if ua/pseudo-native?
     "Update"
     "Refresh page"))
 
@@ -38,6 +39,7 @@
                                                   :secondary-bt-style :green
                                                   :secondary-bt-class :update-app-bt
                                                   :secondary-bt-cb #(js/window.location.reload)
+                                                  :click #(js/window.location.reload)
                                                   :expire 0}))
        (interval/restart-interval! web-app-update-interval default-update-interval-ms)))))
 

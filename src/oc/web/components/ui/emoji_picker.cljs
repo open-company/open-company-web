@@ -4,6 +4,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.shared.useragent :as ua]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
@@ -87,12 +88,12 @@
                                  js/document
                                  EventType/FOCUSOUT
                                  (partial check-focus s))
-                       ff-click (when js/isFireFox
+                       ff-click (when ua/firefox?
                                   (events/listen
                                    js/window
                                    EventType/CLICK
                                    (partial check-focus s)))
-                       ff-keypress (when js/isFireFox
+                       ff-keypress (when ua/firefox?
                                      (events/listen
                                       js/window
                                       EventType/KEYPRESS

@@ -6,6 +6,7 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            [oc.shared.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
@@ -107,11 +108,11 @@
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
-    (when js/window.OCCarrotDesktop
+    (when ua/desktop-app?
       (dommy/add-class! body :electron)
-      (when (js/window.isMac)
+      (when ua/mac?
         (dommy/add-class! body :mac-electron))
-      (when (js/window.isWindows)
+      (when ua/windows?
         (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
   (when (:log-level query-params)
@@ -508,8 +509,8 @@
         (router/redirect-404!))
       (simple-handler login-wall "login-wall" target params true))
 
-    (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-route" urls/desktop-login)
+    (defroute native-login-route urls/native-login {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-route" urls/native-login)
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -517,8 +518,8 @@
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
-    (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
+    (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -534,8 +535,8 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if js/window.OCCarrotDesktop
-                          urls/desktop-login
+      (router/redirect! (if ua/pseudo-native?
+                          urls/native-login
                           urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
@@ -616,7 +617,7 @@
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (if (js/isEdge)
+        (if ua/edge?
           (set! (.. js/document -scrollingElement -scrollTop) 0)
           (js/window.scrollTo 0 0)))
       ;; dispatch on the token
