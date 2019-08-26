@@ -238,65 +238,6 @@ function OCStaticGetParameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function isMac() {
-  var platform = window.navigator.platform;
-  var macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
-  return (macosPlatforms.indexOf(platform) !== -1);
-}
-
-function isWindows() {
-  var platform = window.navigator.platform;
-  var windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
-  return (windowsPlatforms.indexOf(platform) !== -1);
-}
-
-function isLinux() {
-  var platform = window.navigator.platform;
-  return /Linux/.test(platform);
-}
-
-function isSafari(){
-  var ua = navigator.userAgent.toLowerCase(); 
-  if (ua.indexOf('safari') > -1) { 
-    if (ua.indexOf('chrome') > -1) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isFireFox(){
-  var ua = navigator.userAgent.toLowerCase();
-  if (ua.match(/Firefox/) && !ua.match(/Seamonkey/)) {
-      return true;
-  } else {
-      return false;
-  }
-}
-
-function isEdge(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
-}
-
-function isIE(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) ||
-         navigator.userAgent.match(/rv:11/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
-}
-
 function OCStaticSiteMobileMenuToggle(){
   var menuClass = "mobile-menu-expanded";
   var body = document.body;

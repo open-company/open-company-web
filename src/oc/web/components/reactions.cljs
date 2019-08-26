@@ -83,12 +83,6 @@
                  :data-toggle (when-not is-mobile? "tooltip")
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
-                               (when (and (not (:reacted r))
-                                          (not (js/isSafari))
-                                          (not (js/isEdge))
-                                          (not (js/isIE)))
-                                 ;;TODO: animate reaction
-                                 )
                                (if optional-activity-data
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}

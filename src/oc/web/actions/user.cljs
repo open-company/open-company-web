@@ -108,7 +108,7 @@
   (let [url-pathname (.. js/window -location -pathname)
         is-login-route? (or (= url-pathname oc-urls/login-wall)
                             (= url-pathname oc-urls/login)
-                            (= url-pathname oc-urls/desktop-login))]
+                            (= url-pathname oc-urls/native-login))]
     (cond
       (and is-login-route?
            (:login-redirect (:query-params @dis/app-state)))
