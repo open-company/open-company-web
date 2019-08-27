@@ -5,6 +5,7 @@
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.shared.useragent :as ua]
+            [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
@@ -30,6 +31,8 @@
       (let [will-close-picker (:will-close-picker (first (:rum/args s)))]
         (when (fn? will-close-picker)
           (will-close-picker))))
+    (when ua/mobile?
+      (dom-utils/unlock-page-scroll))
     (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
@@ -144,10 +147,16 @@
                                               @caret-pos)
                                           (not @visible))]
                              (if vis
-                               (when (fn? will-open-picker)
-                                 (will-open-picker vis))
-                               (when (fn? will-close-picker)
-                                 (will-close-picker vis)))
+                               (do
+                                (when ua/mobile?
+                                  (dom-utils/lock-page-scroll))
+                                (when (fn? will-open-picker)
+                                  (will-open-picker vis)))
+                               (do
+                                 (when (fn? will-close-picker)
+                                   (will-close-picker vis))
+                                 (when ua/mobile?
+                                   (dom-utils/unlock-page-scroll))))
                              (reset! visible vis)))}]
      (when @visible
        [:div.picker-container
