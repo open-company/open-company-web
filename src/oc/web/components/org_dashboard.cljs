@@ -227,9 +227,9 @@
           show-section-editor
           (section-editor initial-section-editing
            (fn [sec-data note dismiss-action]
-             (if sec-data
-               (section-actions/section-save sec-data note dismiss-action)
-               (dismiss-action))))
+            (if sec-data
+              (section-actions/section-save sec-data note dismiss-action)
+              (dismiss-action))))
           ;; Mobile edit current section data
           show-section-add
           (section-editor nil show-section-add-cb)
