@@ -606,7 +606,7 @@
 
 (def default-headline "Title")
 
-(def default-abstract "Quick summary: let everyone know what your post is about...")
+(def default-abstract "What would you like to share?")
 
 (def max-abstract-length 280)
 
