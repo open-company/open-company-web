@@ -141,6 +141,12 @@ div.add-comment-box-container {
       div.picker-container {
         right: -16px;
         left: unset;
+
+        @include mobile() {
+          left: 0;
+          right: 0;
+          top: 0 !important;
+        }
       }
     }
 

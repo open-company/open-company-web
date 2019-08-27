@@ -136,7 +136,9 @@ div.reactions {
         position: absolute;
         top: 8px;
         right: 8px;
-        color: black;
+        color: $deep_navy;
+        @include OC_Body_Bold();
+        font-size: 16px;
       }
     }
 
