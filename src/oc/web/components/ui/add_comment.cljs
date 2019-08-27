@@ -85,9 +85,9 @@
                                       (utils/link-for (:links follow-up) "mark-complete" "POST"))]
         (activity-actions/complete-follow-up activity-data follow-up)))))
 
-(def me-options
+(defn me-options [reply-comment?]
   {:media-config ["gif" "photo" "video"]
-   :placeholder "Add a comment…"
+   :placeholder (if reply-comment? "Reply…" "Add a comment…")
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 
@@ -169,7 +169,7 @@
                                         (not (:completed? follow-up)))
                                (reset! (::complete-follow-up s) true)))
 
-                           (me-media-utils/setup-editor s add-comment-did-change me-options)
+                           (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
                            (let [add-comment-node (rum/ref-node s "editor-node")]
                              (when (should-focus-field? s)
                                (.focus add-comment-node)
@@ -178,7 +178,7 @@
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
                           :did-remount (fn [_ s]
-                           (me-media-utils/setup-editor s add-comment-did-change me-options)
+                           (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
                            s)
                           :will-update (fn [s]
                            (let [data @(drv/get-ref s :media-input)
