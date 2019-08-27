@@ -306,6 +306,7 @@ div.left-navigation-sidebar {
       background-color: white;
       min-height: 100%;
       padding-top: #{$mobile_navbar_height}px;
+      -webkit-overflow-scrolling: touch;
     }
 
     div.left-navigation-sidebar-mobile-header {

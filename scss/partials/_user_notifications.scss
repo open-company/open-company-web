@@ -13,6 +13,7 @@ div.user-notifications {
     background-color: white;
     z-index: 21;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 
     button.notification-bell-bt {
       display: none;
