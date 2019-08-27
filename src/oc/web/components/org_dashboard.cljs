@@ -253,39 +253,39 @@
           ;; If we have an element id find the share container inside that element
           ;; and portal the component to that element
           (let [portal-element (when activity-share-container
-                                 (.get (.find (js/$ (str "#" activity-share-container))
-                                        ".activity-share-container") 0))]
-           (if portal-element
-             (rum/portal (activity-share) portal-element)
-             (activity-share))))
-       ;; cmail editor
-       (when show-mobile-cmail?
-         (cmail))
-       (when show-follow-ups-picker
-         (follow-ups-picker))
-       ;; Menu always rendered if not on mobile since we need the
-       ;; selector for whats-new widget to be present
-       (when-not is-mobile?
-         (menu))
-       ;; Mobile push notifications permission
-       (when show-push-notification-permissions-modal?
-         (push-notifications-permission-modal {:org-data org-data}))
-       ;; Alert modal
-       (when is-showing-alert
-         (alert-modal))
-       ;; On mobile don't show the dashboard/stream when showing another panel
-       (when (or (not is-mobile?)
-                 (and (not is-sharing-activity)
-                      (not show-mobile-cmail?)
-                      (not open-panel)
-                      (not show-push-notification-permissions-modal?)))
-         [:div.page
-           (navbar)
-           [:div.org-dashboard-container
-            [:div.org-dashboard-inner
-             (when (or (not is-mobile?)
-                       (and (or (not search-active?) (not search-results?))
-                            (not open-panel)
-                            (not is-showing-mobile-search)
-                            (not showing-mobile-user-notifications)))
-               (dashboard-layout))]]])])))
+                                  (.get (.find (js/$ (str "#" activity-share-container))
+                                         ".activity-share-container") 0))]
+            (if portal-element
+              (rum/portal (activity-share) portal-element)
+              (activity-share))))
+        ;; cmail editor
+        (when show-mobile-cmail?
+          (cmail))
+        (when show-follow-ups-picker
+          (follow-ups-picker))
+        ;; Menu always rendered if not on mobile since we need the
+        ;; selector for whats-new widget to be present
+        (when-not is-mobile?
+          (menu))
+        ;; Mobile push notifications permission
+        (when show-push-notification-permissions-modal?
+          (push-notifications-permission-modal {:org-data org-data}))
+        ;; Alert modal
+        (when is-showing-alert
+          (alert-modal))
+        ;; On mobile don't show the dashboard/stream when showing another panel
+        (when (or (not is-mobile?)
+                  (and (not is-sharing-activity)
+                       (not show-mobile-cmail?)
+                       (not open-panel)
+                       (not show-push-notification-permissions-modal?)))
+          [:div.page
+            (navbar)
+            [:div.org-dashboard-container
+             [:div.org-dashboard-inner
+              (when (or (not is-mobile?)
+                        (and (or (not search-active?) (not search-results?))
+                             (not open-panel)
+                             (not is-showing-mobile-search)
+                             (not showing-mobile-user-notifications)))
+                (dashboard-layout))]]])])))
