@@ -77,6 +77,12 @@ div.stream-comments {
         div.stream-comment-mobile-menu {
           display: none;
 
+          div.emoji-picker-container {
+            button.close-bt {
+              display: none;
+            }
+          }
+
           @include mobile() {
             display: block;
 
@@ -101,6 +107,7 @@ div.stream-comments {
                 position: absolute;
                 top: 8px;
                 right: 8px;
+                display: block;
               }
 
               div.emoji-mart {
