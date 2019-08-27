@@ -181,7 +181,7 @@
           [:div.oc-menu-separator])
         [:a.whats-new-link
           (if is-mobile?
-            {:href "https://whats-new.carrot.io/"
+            {:href "https://the.carrot.news/"
              :target "_blank"}
             {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
