@@ -606,7 +606,7 @@
 
 (def default-headline "Title")
 
-(def default-abstract "What would you like to share?")
+(def default-abstract "Quick summary")
 
 (def max-abstract-length 280)
 
