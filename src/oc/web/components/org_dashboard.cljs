@@ -40,7 +40,8 @@
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
-            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
+            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
+            [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
 (defn refresh-board-data [s]
   (when (and (not (router/current-activity-id))
@@ -77,6 +78,7 @@
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
+                           (drv/drv :user-responded-to-push-permission?)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
 
@@ -171,7 +173,11 @@
                                     (s/starts-with? (name open-panel) "follow-ups-picker-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
-                                is-mobile?)]
+                                is-mobile?)
+        user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
+        show-push-notification-permissions-modal? (and is-mobile?
+                                                       (jwt/jwt)
+                                                       (not user-responded-to-push-permission?))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -263,6 +269,9 @@
         ;; selector for whats-new widget to be present
         (when-not is-mobile?
           (menu))
+        ;; Mobile push notifications permission
+        (when show-push-notification-permissions-modal?
+          (push-notifications-permission-modal {:org-data org-data}))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
@@ -270,7 +279,8 @@
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
                        (not show-mobile-cmail?)
-                       (not open-panel)))
+                       (not open-panel)
+                       (not show-push-notification-permissions-modal?)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

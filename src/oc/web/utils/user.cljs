@@ -95,7 +95,8 @@
           (fn [s] (when s (router/nav! url))))))))
 
 (defn fix-notification [notification & [unread]]
-  (let [board-data (activity-utils/board-by-uuid (:board-id notification))
+  (let [board-id (:board-id notification)
+        board-data (activity-utils/board-by-uuid board-id)
         is-interaction (seq (:interaction-id notification))
         created-at (:notify-at notification)
         title (notification-title notification)
@@ -121,14 +122,14 @@
        :title title
        :author (:author notification)
        :click (if follow-up?
-                (load-item-if-needed (:slug board-data) entry-uuid interaction-uuid)
+                (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)
                 (if reminder?
                   (when-not (responsive/is-mobile-size?)
                     (if (and reminder-data
                              (= (:notification-type reminder-data) "reminder-notification"))
                       #(oc.web.actions.nav-sidebar/show-reminders)
                       #(ui-compose)))
-                  (load-item-if-needed (:slug board-data) entry-uuid interaction-uuid)))})))
+                  (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))
@@ -149,3 +150,8 @@
   (let [slack-orgs-with-bot (map :slack-org-id bots-data)
         slack-users (:slack-users (first (filter #(= (:user-id %) (:user-id current-user-data)) (:users team-roster))))]
     (some #(contains? slack-users (keyword %)) slack-orgs-with-bot)))
+
+(defn user-has-push-token?
+  [current-user-data push-token]
+  (let [current-push-tokens (set (:expo-push-tokens current-user-data))]
+    (current-push-tokens push-token)))
