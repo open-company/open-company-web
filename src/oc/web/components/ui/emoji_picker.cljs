@@ -3,7 +3,7 @@
             [dommy.core :refer-macros (sel1)]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as react-utils]
-            [oc.web.mixins.ui :refer (on-window-click-mixin no-scroll-mixin)]
+            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.shared.useragent :as ua]
             [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
@@ -81,8 +81,6 @@
   (rum/local false ::last-active-element)
   (rum/local false ::disabled)
   (on-window-click-mixin on-click-out)
-  (when ua/mobile?
-    no-scroll-mixin)
   {:init (fn [s p] (js/rangy.init) s)
    :will-mount (fn [s]
                  (check-focus s nil)
