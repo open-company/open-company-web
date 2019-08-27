@@ -6,6 +6,8 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            ;; Pull in functions for interfacing with Expo mobile app
+            [oc.web.expo :as expo]
             [oc.shared.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
@@ -641,6 +643,9 @@
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
+
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)

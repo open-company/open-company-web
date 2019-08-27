@@ -183,11 +183,10 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
-// Electron
-var OCCarrotDesktop = function(){};
-OCCarrotDesktop.showDesktopWindow = function() {};
-OCCarrotDesktop.setBadgeCount = function() {};
 // Mobile app (Expo)
 var ReactNativeWebView = {};
 ReactNativeWebView.postMessage = function() {};
-// Fullstory
+// Desktop app (Electron)
+var OCCarrotDesktop = function(){};
+OCCarrotDesktop.showDesktopWindow = function() {};
+OCCarrotDesktop.setBadgeCount = function() {};

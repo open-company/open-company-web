@@ -104,6 +104,8 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
+(def expo-push-token-key [:expo-push-token])
+
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -369,6 +371,8 @@
                                     (when ua/desktop-app?
                                       (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
+   :user-responded-to-push-permission? [[:base] (fn [base]
+                                                  (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]

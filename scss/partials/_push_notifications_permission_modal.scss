@@ -1,0 +1,97 @@
+div.push-notifications-permission-modal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: #{$navbar_zindex + 180};
+  background-color: $oc_gray_8;
+
+  .modal-header {
+    display: flex;
+    width: 100%;
+    height: 7%;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2%;
+
+    .modal-close-bt {
+      position: absolute;
+      left: 5%;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_close_x.svg");
+      background-size: 16px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: none;
+    }
+
+    .modal-title {
+      flex: 99;
+      text-align: center;
+    }
+  }
+
+  .modal-body {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .carrot-icon {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border: 1px solid $oc_gray_1;
+      border-radius: 26px;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.24);
+      background-image: cdnUrl("/img/ML/carrot_logo.svg");
+      background-size: 80% 80%;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      .notification-bubble {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        color: #fff;
+        background-color: #ff4c34;
+        height: 32px;
+        width: 32px;
+        border-radius: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+
+    .modal-body-text {
+      text-align: center;
+      font-size: 1.3em;
+      margin-top: 25px;
+    }
+
+    .enable-notifications-bt {
+      color: #fff;
+      background-color: $carrot_green_2;
+      border-radius: 4px;
+      height: 48px;
+      width: 85%;
+      margin: 15px 0;
+      font-size: 1.1em;
+    }
+
+    .no-thanks-btn {
+      color: $carrot_green_2;
+      height: 48px;
+      width: 85%;
+      font-size: 1.1em;
+    }
+  }
+}
