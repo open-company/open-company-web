@@ -288,4 +288,4 @@
                               (not open-panel)
                               (not is-showing-mobile-search)
                               (not showing-mobile-user-notifications)))
-                (dashboard-layout))]]])])))
+                 (dashboard-layout))]]])])))
