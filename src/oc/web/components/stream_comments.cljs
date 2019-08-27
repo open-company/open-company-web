@@ -218,7 +218,6 @@
                                           :showing-picker showing-picker?
                                           :indented-comment is-indented-comment?})
                  :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
-                (js/console.log "DBG showing-picker:" @(::show-picker s) showing-picker?)
                 [:div.stream-comment-inner
                   (when-not is-editing?
                     (if (responsive/is-tablet-or-mobile?)
@@ -232,7 +231,7 @@
                                                      :can-comment-share? true
                                                      :comment-share-cb #(share-clicked comment-data)
                                                      :can-react? true
-                                                     :react-cb #(do (js/console.log "DBG show-picker" (:uuid comment-data)) (reset! (::show-picker s) (:uuid comment-data)))
+                                                     :react-cb #(reset! (::show-picker s) (:uuid comment-data))
                                                      :can-reply? true
                                                      :reply-cb #(reply-to s (:reply-parent comment-data))})
                         (when showing-picker?
@@ -291,7 +290,7 @@
                               {:data-toggle "tooltip"
                                :data-placement "top"
                                :title "Add reaction"
-                               :on-click #(do (js/console.log "DBG show-picker" (:uuid comment-data)) (reset! (::show-picker s) (:uuid comment-data)))}]
+                               :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
                             (when showing-picker?
                               (emoji-picker-container s comment-data))]]]))
                   [:div.stream-comment-author-avatar
