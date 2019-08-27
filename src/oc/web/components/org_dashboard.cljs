@@ -175,7 +175,9 @@
                                 (not (:collapsed cmail-state))
                                 is-mobile?)
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
-        show-push-notification-permissions-modal? (and is-mobile? (not user-responded-to-push-permission?))]
+        show-push-notification-permissions-modal? (and is-mobile?
+                                                       (jwt/jwt)
+                                                       (not user-responded-to-push-permission?))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
