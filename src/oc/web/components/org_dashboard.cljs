@@ -283,9 +283,9 @@
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
-                (when (or (not is-mobile?)
-                          (and (or (not search-active?) (not search-results?))
-                               (not open-panel)
-                               (not is-showing-mobile-search)
-                               (not showing-mobile-user-notifications)))
-                  (dashboard-layout))]]])])))
+               (when (or (not is-mobile?)
+                         (and (or (not search-active?) (not search-results?))
+                              (not open-panel)
+                              (not is-showing-mobile-search)
+                              (not showing-mobile-user-notifications)))
+                (dashboard-layout))]]])])))
