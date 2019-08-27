@@ -180,8 +180,8 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          {:href "https://whats-new.carrot.io/"
-           :target "_blank"}
+          {:href "https://the.carrot.news/"
+             :target "_blank"}
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a
