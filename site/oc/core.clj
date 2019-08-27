@@ -168,7 +168,7 @@
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href "https://whats-new.carrot.io/" :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href "https://the.carrot.news/" :target "_blank"} "What’s new"]]
           [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]]
 
         [:div.column.column-resources
