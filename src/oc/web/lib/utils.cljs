@@ -712,6 +712,7 @@
         board-slug (router/current-board-slug)
         activity-id (router/current-activity-id)]
     (if (and (not activity-id)
+             (seq board-slug)
              (not= board-slug default-drafts-board-slug)
              is-mobile?)
       50
