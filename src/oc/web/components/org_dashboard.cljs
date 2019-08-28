@@ -116,19 +116,7 @@
                      ;; No board specified
                      (and (not (router/current-board-slug))
                           ;; but there are some
-                          (pos? (count (:boards org-data))))
-                     ;; Board specified
-                     (and (not= (router/current-board-slug) "all-posts")
-                          (not= (router/current-board-slug) "must-see")
-                          (not= (router/current-board-slug) "follow-ups")
-                          ;; But no board data yet
-                          (not board-data))
-                     ;; Another container
-                     (and (or (= (router/current-board-slug) "all-posts")
-                              (= (router/current-board-slug) "must-see")
-                              (= (router/current-board-slug) "follow-ups"))
-                          ;; But no all-posts data yet
-                         (not container-data)))
+                          (pos? (count (:boards org-data)))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
@@ -137,13 +125,19 @@
                                (not= (router/current-board-slug) "must-see")
                                (not= (router/current-board-slug) "follow-ups")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
-        entry-not-found (and (not section-not-found)
-                             (and (router/current-activity-id)
-                                  board-data)
+        entry-not-found (and ;; org is present
+                             (not org-not-found)
+                             ;; section is present
+                             (not section-not-found)
+                             ;; a post id is specified
+                             (router/current-activity-id)
+                             ;; posts data are present
                              (not (nil? posts-data))
-                             (or (and (router/current-activity-id)
-                                      (not ((set (keys posts-data)) (router/current-activity-id)))
-                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))))
+                             ;; and
+                             (or ;; the post is not present int he posts list
+                                 (not ((set (keys posts-data)) (router/current-activity-id)))
+                                 ;; the board of the post is wrong
+                                 (not= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug)))))
         show-login-wall (and (not jwt)
                              (or force-login-wall
                                  (and (router/current-activity-id)
