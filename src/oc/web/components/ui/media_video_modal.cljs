@@ -118,27 +118,28 @@
                                ;; Mixins
                                first-render-mixin
                                {:will-mount (fn [s]
-                                 (when-let [picker-el (sel1 [:div.medium-editor-media-picker])]
-                                   (reset! (::offset-top s) (.-offsetTop picker-el)))
+                                 (let [outer-container-selector (:outer-container-selector (first (:rum/args s)))]
+                                   (when-let [picker-el (sel1 (concat outer-container-selector [:div.medium-editor-media-picker]))]
+                                     (reset! (::offset-top s) (.-offsetTop picker-el))))
                                  s)
                                 :did-mount (fn [s]
                                  (when-let [video-field (rum/ref-node s "video-input")]
                                   (.focus video-field))
                                 s)}
-  [s {:keys [fullscreen dismiss-cb]}]
+  [s {:keys [fullscreen dismiss-cb outer-container-selector offset-element-selector]}]
   (let [current-user-data (drv/react s :current-user-data)
         valid-url (valid-video-url? @(::video-url s))
-        scrolling-element (if fullscreen (sel1 [:div.cmail-content-outer]) (.-scrollingElement js/document))
+        scrolling-element (if fullscreen (sel1 outer-container-selector) (.-scrollingElement js/document))
         win-height (or (.-clientHeight (.-documentElement js/document))
                        (.-innerHeight js/window))
-        top-offset-limit (.-offsetTop (sel1 [:div.rich-body-editor-outer-container]))
+        top-offset-limit (.-offsetTop (sel1 offset-element-selector))
         scroll-top (.-scrollTop scrolling-element)
         top-position (max 0 @(::offset-top s))
         relative-position (+ top-position
                              top-offset-limit
                              (* scroll-top -1)
                              media-video-modal-height)
-        adjusted-position (if (> relative-position win-height) ;; 286 is the top offset of the body
+        adjusted-position (if (> relative-position win-height)
                             (max 0 (- top-position (- relative-position win-height) 16))
                             top-position)]
     [:div.media-video-modal-container
