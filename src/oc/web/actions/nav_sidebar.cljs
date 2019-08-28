@@ -34,15 +34,16 @@
     (.preventDefault e))
   (when ua/mobile?
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
-  (utils/after 0 (fn []
-   (cmail-actions/cmail-hide)
-   (user-actions/hide-mobile-user-notifications)
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
+  (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
      (if (= current-path url)
        (do
+         (js/console.log "DBG refresh current")
          (routing-actions/routing @router/path)
          (user-actions/initial-loading true))
-       (router/nav! url))))))
+       (router/nav! url)))
+  (utils/after 0 (fn []
+   (cmail-actions/cmail-hide)
+   (user-actions/hide-mobile-user-notifications))))
 
 ;; Push panel
 
