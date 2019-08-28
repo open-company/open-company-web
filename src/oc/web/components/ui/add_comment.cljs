@@ -270,7 +270,7 @@
              :disabled @(::add-button-disabled s)}
             (if edit-comment-data
               "Save"
-              "Post")]
+              "Comment")]
           (when (and parent-comment-uuid
                      (fn? dismiss-reply-cb))
             [:button.mlb-reset.close-reply-bt
