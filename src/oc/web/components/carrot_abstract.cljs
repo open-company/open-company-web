@@ -35,11 +35,11 @@
                                  :cleanPastedHTML true
                                  :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
                                  :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
-                                                 "textarea" "style" "javascript"]
+                                                 "textarea" "style" "javascript" "br"]
                                  :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1" "h2" "h3" "h4" "h5"
                                                        "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                                        "details" "summary" "nav" "abbr" "ol" "ul" "li"
-                                                       "table" "thead" "tbody" "tr" "th" "td"]))}
+                                                       "table" "thead" "tbody" "tr" "th" "td" "p" "div"]))}
                      :placeholder #js {:text utils/default-abstract
                                        :hideOnClick false
                                        :hide-on-click false}
