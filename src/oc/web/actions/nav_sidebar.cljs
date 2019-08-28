@@ -34,13 +34,13 @@
     (.preventDefault e))
   (when ua/mobile?
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
-  (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
+  (utils/after 0 (fn []
+   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
      (if (= current-path url)
        (do
          (routing-actions/routing @router/path)
          (user-actions/initial-loading true))
        (router/nav! url)))
-  (utils/after 0 (fn []
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
 
