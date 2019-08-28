@@ -2,6 +2,8 @@
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -30,18 +32,17 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
-  (cmail-actions/cmail-hide)
-  (nux-actions/dismiss-post-added-tooltip)
-  (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
-  (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-  (user-actions/hide-mobile-user-notifications)
-  (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
-    (if (= current-path url)
-      (do
-        (routing-actions/routing @router/path)
-        (user-actions/initial-loading true))
-      (router/nav! url))))
-
+  (when ua/mobile?
+    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+  (utils/after 0 (fn []
+   (cmail-actions/cmail-hide)
+   (user-actions/hide-mobile-user-notifications)
+   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
+     (if (= current-path url)
+       (do
+         (routing-actions/routing @router/path)
+         (user-actions/initial-loading true))
+       (router/nav! url))))))
 
 ;; Push panel
 
