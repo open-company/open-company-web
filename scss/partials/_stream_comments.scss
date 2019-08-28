@@ -23,206 +23,326 @@ div.stream-comments {
 
   div.stream-comments-list {
 
-    div.stream-comment {
-      padding: 8px 16px;
-      position: relative;
+    div.stream-comment-outer {
+      background-color: #FFF7DD;
+      padding: 0 16px;
 
-      @include big_web() {
-        &:not(.editing-other-comment):hover {
-          background-color: #F5F5F5;
-
-          div.stream-comment-floating-buttons {
-            display: block;
-          }
-        }
+      &.closing-thread {
+        padding-bottom: 16px;
       }
 
-      div.stream-comment-mobile-menu {
-        display: none;
+      div.stream-comment:not(.indented-comment) {
+        border-top: 1px solid $ultra_light_grey;
+        padding-top: 16px;
+      }
+
+      div.stream-comment.indented-comment div.stream-comment-inner {
+        margin-left: 40px;
+        width: calc(100% - 40px);
 
         @include mobile() {
-          display: block;
+          margin-left: 32px;
+          width: calc(100% - 32px);
+        }
 
-          div.more-menu {
-            button.more-menu-bt {
-              background-position: 0px left 4px top;
-              margin-top: -4px;
+        div.stream-comment-floating-buttons {
+          top: 8px;
+        }
+      }
+
+      &.not-highlighted {
+        background-color: transparent;
+        transition: background-color 3s ease-in;
+      }
+
+      div.stream-comment {
+        position: relative;
+
+        div.stream-comment-inner {
+          padding: 8px 0;
+
+          @include mobile() {
+
+          }
+        }
+
+        @include big_web() {
+          &:not(.editing-other-comment):hover {
+            div.stream-comment-floating-buttons {
+              display: block;
+            }
+          }
+        }
+
+        div.stream-comment-mobile-menu {
+          display: none;
+
+          div.emoji-picker-container {
+            button.close-bt {
+              display: none;
+            }
+          }
+
+          @include mobile() {
+            display: block;
+
+            div.emoji-picker-container {
+              width: 100vw;
+              position: fixed;
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              height: 100vh;
+              background-color: white;
+              z-index: 4;
+              padding-top: 29px;
+
+              button.close-bt {
+                color: $deep_navy;
+                padding: 0;
+                margin: 0;
+                @include OC_Body_Bold();
+                font-size: 16px;
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                display: block;
+              }
+
+              div.emoji-mart {
+                position: relative;
+                width: 100% !important;
+                height: calc(100vh - 29px);
+                bottom: unset;
+                box-shadow: none;
+                border-radius: none;
+                border: none;
+
+                div.emoji-mart-scroll {
+                  height: calc(100vh - 29px - 46px - 29px);
+                }
+
+                div.emoji-mart-bar:last-child {
+                  display: none;
+                }
+              }
             }
 
-            ul.more-menu-list {
-              width: 78px;
-              top: 20px;
-              right: 13px;
+            div.more-menu {
+              button.more-menu-bt {
+                margin-top: -12px;
+                margin-left: 7px;
+                background-color: transparent;
+              }
+
+              ul.more-menu-list {
+                width: 78px;
+                top: 20px;
+                right: 0;
+                left: unset;
+              }
+            }
+          }
+        }
+
+        &.showing-picker {
+          div.stream-comment-floating-buttons {
+            background-color: rgba($ultra_light_grey, 0.3);
+            display: block;
+          }
+        }
+
+        &.editing {
+          @include big_web() {
+            &:not(.highlighted):hover div.stream-comment-inner {
+              background-color: initial;
+            }
+          }
+
+          div.stream-comment-header {
+            display: none;
+          }
+
+          div.stream-comment-content {
+            div.stream-comment-body, div.stream-comment-body.medium-editor-element {
+              // editing comment
+              display: block;
+              margin-top: 0;
+              border-radius: 4px;
+              border: 1px solid $mid_light_grey;
+              background-color: white;
+              outline: none;
+              padding: 4px;
+              box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+              padding: 8px 16px;
+
+              &:focus, &:active {
+                outline: none;
+              }
+            }
+          }
+        }
+
+        div.stream-comment-floating-buttons {
+          position: absolute;
+          right: 16px;
+          top: 16px;
+          height: 26px;
+          width: 104px;
+          display: none;
+          z-index: 2;
+
+          div.stream-comment-floating-buttons-inner {
+            position: relative;
+            height: 26px;
+            width: 104px;
+
+            div.stream-comment-floating-buttons-more-menu {
+              Width: 86px;
+              position: absolute;
+              top: 28px;
+              left: -24px;
+              background-color: transparent;
+              padding: 8px 0;
+              border: 1px solid $mid_light_grey;
+              box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+              border-radius: 4px;
+              background-color: white;
+              z-index: 2;
+
+              button {
+                width: 84px;
+                height: 34px;
+                padding: 8px 16px;
+                background-color: white;
+                margin: 0;
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: $light_navy;
+                text-align: left;
+
+                &:hover, &.active {
+                  background-color: #ebf8f1;
+                  color: $carrot_green;
+                }
+              }
+            }
+          }
+
+          div.react-bt-container {
+            width: 34px;
+            height: 26px;
+            position: absolute;
+            left: 68px;
+            top: 0;
+
+            div.emoji-mart {
+              position: absolute;
+              top: 28px;
+              right: 0;
+              bottom: unset;
               left: unset;
             }
-          }
-        }
-      }
-
-      &.showing-picker {
-        div.stream-comment-floating-buttons {
-          background-color: rgba($ultra_light_grey, 0.3);
-          display: block;
-        }
-      }
-
-      &.editing {
-        @include big_web() {
-          &:hover {
-            background-color: initial;
-          }
-        }
-        div.stream-comment-floating-buttons div.stream-comment-floating-buttons-inner:hover {
-          display: none;
-        }
-
-        div.stream-comment-header {
-          display: none;
-        }
-
-        div.stream-comment-content {
-          div.stream-comment-body, div.stream-comment-body.medium-editor-element {
-            // editing comment
-            display: block;
-            margin-top: 0;
-            border-radius: 4px;
-            border: 1px solid $mid_light_grey;
-            background-color: white;
-            outline: none;
-            padding: 4px;
-            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-            padding: 8px 16px;
-
-            &:focus, &:active {
-              outline: none;
-            }
-          }
-        }
-      }
-
-      div.stream-comment-floating-buttons {
-        position: absolute;
-        right: 16px;
-        top: -13px;
-        height: 26px;
-        width: 34px; // FIXME With share change to 69px;
-        display: none;
-
-        &.can-edit, &.can-delete {
-          width: 69px; // FIXME With share change to 104px;
-        }
-
-        &.can-edit.can-delete {
-          width: 104px; // FIXME With share change to 139px;
-        }
-
-        div.emoji-mart {
-          right: 0;
-          left: unset;
-          position: absolute;
-          top: 34px;
-        }
-
-        .tooltip {
-          z-index: 1500;
-
-          &:last-child {
-            width: 86px;
-          }
-
-          &.in {
-            opacity: 1;
           }
 
           // Change Bootstrap tooltip style
           .tooltip-arrow {
             display: block;
+            border-top-color: $deep_navy;
           }
 
-          .tooltip-inner {
-            background-color: $deep_navy;
-            white-space:pre-wrap;
-            max-width: none;
-            text-align: left;
-            opacity: 1;
-            @include OC_Body_Book();
-            font-size: 12px;
-            color: white;
-            line-height: 18px;
-            padding: 5px 8px;
-            border-radius: 4px;
-            box-shadow: none;
-            border: none;
-          }
-        }
-        & > button {
-          background-color: #3FBD7C;
-          width: 35px;
-          height: 26px;
-          background-position: center;
-          background-repeat: no-repeat;
-          border-right: 1px solid #61C98F;
-          margin: 0;
-          padding: 0;
-
-          &:last-of-type {
-            width: 34px;
-            border-right: none;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
+          div.react-bt-container .tooltip {
+            width: 86px;
           }
 
-          &:first-of-type {
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
-          }
+          .tooltip {
+            z-index: 1500;
 
-          @include big_web() {
-            &:hover {
-              background-color: #3CA473;
+            &.in {
+              opacity: 1;
+            }
+
+            // Change Bootstrap tooltip style
+            .tooltip-arrow {
+              display: block;
+            }
+
+            .tooltip-inner {
+              background-color: $deep_navy;
+              white-space:pre-wrap;
+              max-width: none;
+              text-align: left;
+              opacity: 1;
+              @include OC_Body_Book();
+              font-size: 12px;
+              color: white;
+              line-height: 18px;
+              padding: 5px 8px;
+              border-radius: 4px;
+              box-shadow: none;
+              border: none;
             }
           }
 
-          &.edit-bt {
-            background-image: cdnUrl("/img/ML/comment_edit_pen.svg");
-            background-size: 12px 12px;
-          }
+          div.stream-comment-floating-buttons-inner button.floating-bt {
+            padding: 0;
+            margin: 0;
+            width: 34px;
+            height: 26px;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
 
-          &.delete-bt {
-            background-image: cdnUrl("/img/ML/comment_delete_can.svg");
-            background-size: 12px 14px;
-          }
+            @include big_web() {
+              opacity: 0.5;
+              &:hover {
+                opacity: 1;
+              }
+            }
 
-          &.share-bt {
-            background-image: cdnUrl("/img/ML/comment_share.svg");
-            background-size: 14px 12px;
-          }
+            &.share-bt {
+              background-image: cdnUrl("/img/ML/comment_share.svg");
+              background-size: 14px 12px;
+              left: 0;
+            }
 
-          &.react-bt {
-            background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
-            background-size: 14px 14px;
+            &.reply-bt {
+              background-image: cdnUrl("/img/ML/comment_reply.svg");
+              background-size: 12px 12px;
+              left: 34px;
+            }
+
+            &.more-menu-bt {
+              background-image: cdnUrl("/img/ML/comment_more_menu.svg");
+              background-size: 18px 4px;
+              left: 0;
+            }
+
+            &.react-bt {
+              background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
+              background-size: 21px 14px;
+              width: 34px;
+              border-right: none;
+
+              div.emoji-mart {
+                right: 0;
+                left: unset;
+                position: absolute;
+                top: 34px;
+              }
+            }
           }
         }
-      }
-
-      div.stream-comment-author-avatar {
-        float: left;
-        width: 24px;
-        height: 24px;
-
-        @include user-profile(24);
-      }
-
-      div.stream-comment-right {
-        margin-left: 40px;
-      }
-
-      div.stream-comment-header {
-        height: 16px;
 
         div.stream-comment-author-right  {
           float: left;
           max-width: 80%;
+
+          @include preload_image(cdnUrl("/img/ML/comment_delete_can.svg"));
 
           div.stream-comment-author-name {
             @include OC_Body_Bold();
@@ -230,67 +350,162 @@ div.stream-comments {
             color: $deep_navy;
             line-height: 15px;
             float: left;
+            @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
+          }
+        }
+
+        div.stream-comment-author-avatar {
+          float: left;
+          width: 24px;
+          height: 24px;
+
+          @include user-profile(24);
+        }
+
+        div.stream-comment-right {
+          margin-left: 40px;
+
+          @include mobile() {
+            margin-left: 32px;
           }
 
-          div.stream-comment-author-timestamp {
-            @include OC_Body_Book();
-            font-size: 12px;
-            color: rgba($deep_navy, 0.5);
+          @include preload_image(cdnUrl("/img/ML/comment_react_emoji.svg"));
+        }
+
+        div.stream-comment-header {
+          height: 16px;
+
+          div.stream-comment-author-right  {
             float: left;
-            margin-left: 8px;
-            line-height: 14px;
+            max-width: 80%;
+
+            div.stream-comment-author-name {
+              @include OC_Body_Bold();
+              font-size: 12px;
+              color: $deep_navy;
+              line-height: 15px;
+              float: left;
+            }
+
+            div.stream-comment-author-timestamp {
+              @include OC_Body_Book();
+              font-size: 12px;
+              color: rgba($deep_navy, 0.5);
+              float: left;
+              margin-left: 8px;
+              line-height: 14px;
+            }
           }
         }
-      }
 
-      div.stream-comment-content {
-        text-align: left;
-        position: relative;
-        margin-top: 2px;
+        div.stream-comment-content {
+          text-align: left;
+          position: relative;
+          margin-top: 2px;
 
-        div.stream-comment-body {
-          display: inline;
-          @include activity-comment();
+          div.stream-comment-body {
+            display: inline;
+            @include activity-comment();
+
+            .interactive-image {
+              cursor: zoom-in;
+
+              &:hover {
+                opacity: 0.7;
+              }
+            }
+          }
         }
-      }
 
-      div.stream-comment-reactions-footer {
-        height: 24px;
-        margin-top: 8px;
-      }
-
-      div.stream-comment-footer {
-        height: 24px;
-        margin-top: 2px;
-
-        @include mobile() {
+        div.stream-comment-reactions-footer {
+          height: 24px;
           margin-top: 8px;
         }
-      }
 
-      div.save-cancel-edit-buttons {
-        float: right;
-        padding-top: 16px;
+        div.stream-comment-footer {
+          height: 24px;
+          margin-top: 2px;
 
-        @include mobile() {
-          padding-top: 0;
+          @include mobile() {
+            margin-top: 8px;
+          }
         }
 
-        button {
+        div.save-cancel-edit-buttons {
           float: right;
-          @include OC_Body_Book();
-          font-size: 14px;
-          padding: 0;
-          height: 18px;
-          line-height: 18px;
+          padding-top: 16px;
 
-          &.cancel-bt {
-            color: rgba($deep_navy, 0.5);
-            margin-right: 16px;
+          @include mobile() {
+            padding-top: 0;
           }
 
-          &.save-bt {
-            color: $carrot_green;
+          button {
+            float: right;
+            @include OC_Body_Book();
+            font-size: 14px;
+            padding: 0;
+            height: 18px;
+            line-height: 18px;
+
+            &.cancel-bt {
+              color: rgba($deep_navy, 0.5);
+              margin-right: 16px;
+            }
+
+            &.save-bt {
+              color: $carrot_green;
+            }
+          }
+        }
+      }
+
+      div.stream-comment div.add-comment-box-container {
+        margin-top: 8px;
+        margin-bottom: 8px;
+
+        div.add-comment-box div.add-comment-internal div.add-comment {
+          min-height: 92px;
+
+          @include mobile() {
+            min-height: 48px;
+          }
+
+          div.add-comment-footer.hide-footer {
+            display: none;
+          }
+        }
+      }
+
+      div.stream-comment.indented-comment {
+        div.add-comment-box-container {
+          margin-left: 40px;
+          margin-top: 8px;
+          margin-bottom: 8px;
+
+          @include mobile() {
+            margin-left: 32px;
+          }
+
+          div.add-comment-box {
+            width: calc(100% - 40px);
+
+            @include mobile() {
+              width: calc(100% - 32px);
+            }
+
+            div.add-comment-internal {
+              div.add-comment {
+                min-height: 92px;
+
+                @include mobile() {
+                  min-height: 48px;
+                }
+              }
+            }
+
+            div.add-comment-footer.hide-footer {
+              display: none;
+            }
           }
         }
       }

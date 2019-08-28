@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]))
@@ -256,3 +257,19 @@
       (events/unlistenByKey (:on-resize-listener s))
       (dissoc s :on-resize-listener))
     s))})
+
+(defn make-images-interactive!
+  "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
+  [s el-selector]
+  (let [dom-node (rum/dom-node s)
+        imgs (dommy/sel dom-node (str el-selector " img"))]
+    (doseq [img  imgs
+            :let [href (.-src img)]]
+      (dommy/add-class! img :interactive-image)
+      (dommy/listen! img :click #(dis/dispatch! [:input [:expand-image-src] href])))
+    s))
+
+(defn interactive-images-mixin [el-sel]
+  {:did-mount (fn [s] (make-images-interactive! s el-sel))
+   :did-remount (fn [_ new-state]
+                  (make-images-interactive! new-state el-sel))})

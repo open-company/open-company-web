@@ -41,22 +41,6 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn make-images-interactive!
-  "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
-  [s]
-  (let [body (rum/ref s "post-body")
-        imgs (dom/sel body "img")]
-    (doseq [img  imgs
-            :let [href (.-src img)]]
-      (dom/add-class! img :interactive-image)
-      (dom/listen! img :click #(reset! (::image-modal-src s) href)))
-    s))
-
-(def interactive-images-mixin
-  {:did-mount make-images-interactive!
-   :did-remount (fn [_ new-state]
-                  (make-images-interactive! new-state))})
-
 (defn- load-comments [s]
   (let [activity-data @(drv/get-ref s :activity-data)]
     (comment-actions/get-comments activity-data)))
@@ -69,14 +53,15 @@
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
+  (drv/drv :add-comment-highlight)
+  (drv/drv :expand-image-src)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
-  (rum/local nil ::image-modal-src)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
-  interactive-images-mixin
+  (mixins/interactive-images-mixin "div.expanded-post-body")
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
@@ -120,13 +105,14 @@
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
+        add-comment-highlight (drv/react s :add-comment-highlight)
+        expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
     [:div.expanded-post
       {:class dom-node-class
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
-      (image-modal/image-modal {:src @(::image-modal-src s)
-                                :on-close #(reset! (::image-modal-src s) nil)})
+      (image-modal/image-modal {:src expand-image-src})
       [:div.activity-share-container]
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
@@ -197,6 +183,6 @@
           [:div.expanded-post-wrt-container
             (wrt-count activity-data reads-data)])]
       [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data)
+        (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
           (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))

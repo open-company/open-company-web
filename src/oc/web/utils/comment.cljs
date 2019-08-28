@@ -30,7 +30,7 @@
                             :unwrapTags #js ["div" "label" "font" "h1" "h2" "h3" "h4" "h5" "div" "p" "ul" "ol" "li"
                                              "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                              "details" "summary" "nav" "abbr" "a"]}
-                :placeholder #js {:text "Leave a new comment…"
+                :placeholder #js {:text "Add a comment…"
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
                                   #js {
@@ -56,15 +56,11 @@
                                   }]}}]
     (new js/MediumEditor comment-node (clj->js config))))
 
-(defn add-comment-content [add-comment-div]
-  (let [inner-html (.-innerHTML add-comment-div)
-        replace-br (.replace inner-html (js/RegExp. "<br[ ]{0,}/?>" "ig") "\n")
-        cleaned-text (.replace replace-br (js/RegExp. "<div?[^>]+(>|$)" "ig") "")
-        cleaned-text-1 (.replace cleaned-text (js/RegExp. "</div?[^>]+(>|$)" "ig") "\n")
-        final-node (.html (js/$ "<div/>") cleaned-text-1)
-        final-text (.trim (.text final-node))]
-    (when (pos? (count final-text))
-      (string/trim (.html final-node)))))
+(defn add-comment-content [comment-node & [print?]]
+  (let [comment-html (.-innerHTML comment-node)
+        $comment-node (.html (js/$ "<div/>") comment-html)
+        _remove-mentions-popup (.remove $comment-node ".oc-mention-popup")]
+    (.html $comment-node)))
 
 (defn- is-own-comment?
   [comment-data]
@@ -110,4 +106,12 @@
   ([comments :guard map?]
    (sort-comments (vals comments)))
   ([comments :guard sequential?]
-   (vec (sort-by :created-at comments))))
+   (let [root-comments (filterv :thread-root comments)
+         sorted-roots (sort-comments root-comments nil)]
+     (vec (apply concat (mapv #(concat [%] (sort-comments comments (:uuid %))) sorted-roots)))))
+  ([comments :guard sequential? parent-uuid]
+   (let [filtered-comments (filterv #(if parent-uuid
+                                       (= (:parent-uuid %) parent-uuid)
+                                       (empty? (:parent-uuid %)))
+                            comments)]
+     (vec (sort-by :created-at filtered-comments)))))

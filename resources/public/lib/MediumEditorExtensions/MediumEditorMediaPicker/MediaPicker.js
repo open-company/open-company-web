@@ -656,7 +656,9 @@ function PlaceCaretAtEnd(el) {
       this.delegate("willExpand");
       if (this.hidePlaceholderOnExpand) {
         this.getEditorElements().forEach(function(element){
-          element.classList.add("medium-editor-placeholder-hidden");
+          if (element && element.classList) {
+            element.classList.add("medium-editor-placeholder-hidden");
+          }
         });
       }
       // Hide the placeholder
@@ -681,7 +683,9 @@ function PlaceCaretAtEnd(el) {
         return;
       }
       this.delegate("willCollapse");
-      this.mediaButtonsContainer.classList.remove(this.expandedClass);
+      if (this.mediaButtonsContainer) {
+        this.mediaButtonsContainer.classList.remove(this.expandedClass);
+      }
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.mainButton.classList.remove(this.expandedClass);
 

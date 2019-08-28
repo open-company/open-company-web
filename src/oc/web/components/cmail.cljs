@@ -750,6 +750,7 @@
             ;         "OK, got it"]]])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
+                               :media-picker-initially-visible true
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
@@ -760,7 +761,8 @@
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)
-                               :cmail-key (:key cmail-state)})
+                               :cmail-key (:key cmail-state)
+                               :attachments-enabled true})
             ; Attachments
             (stream-attachments (:attachments cmail-data) nil
              #(activity-actions/remove-attachment :cmail-data %))]]
