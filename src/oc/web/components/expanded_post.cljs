@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
@@ -122,7 +123,8 @@
         reads-data (get activities-read (:uuid activity-data))
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
     [:div.expanded-post
-      {:class dom-node-class
+      {:class (utils/class-set {dom-node-class true
+                                :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
       (image-modal/image-modal {:src @(::image-modal-src s)
