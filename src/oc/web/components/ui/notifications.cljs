@@ -10,10 +10,10 @@
 (defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]
   (let [has-html (string? bt-title)
         button-base-map {:on-click (fn [e]
-                                     (when bt-dismiss
-                                       (notification-actions/remove-notification (first (:rum/args s))))
                                      (when (fn? bt-cb)
-                                       (bt-cb e)))
+                                       (bt-cb e))
+                                     (when bt-dismiss
+                                       (utils/after 0 #(notification-actions/remove-notification (first (:rum/args s))))))
                          :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
                                                   :default-link (= bt-style :default-link)})}
