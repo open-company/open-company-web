@@ -91,10 +91,11 @@
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
+        current-board-data (or board-data org-board-data)
         board-container-data (if (or is-all-posts is-follow-ups) container-data board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
+        is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -175,9 +176,9 @@
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access board-data) "private")
+                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board))
-                                                  :public (= (:access board-data) "public")})
+                                                  :public (= (:access current-board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
                                                    "All posts"
@@ -189,9 +190,8 @@
                                                    ;; Fallback to the org board data
                                                    ;; to avoid showing an empty name while loading
                                                    ;; the board data
-                                                   (or (:name board-data)
-                                                       (:name org-board-data))))}]])
-                  (when (and (= (:access board-data) "private")
+                                                   (:name current-board-data)))}]])
+                  (when (and (= (:access current-board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -201,7 +201,7 @@
                        :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}])
-                  (when (= (:access board-data) "public")
+                  (when (= (:access current-board-data) "public")
                     [:div.public-board
                       {:data-toggle "tooltip"
                        :data-placement "top"
@@ -215,8 +215,8 @@
                         {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
-                         :title (str (:name board-data) " settings")
-                         :on-click #(nav-actions/show-section-editor (:slug board-data))}]])]
+                         :title (str (:name current-board-data) " settings")
+                         :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
                 (when-not is-drafts-board
                   (let [default-sort (= board-sort dis/default-sort-type)]
                     [:div.board-sort.group
@@ -287,5 +287,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" :else (:slug board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" :else (:slug current-board-data)) "-" board-sort))
               )]]]))
