@@ -51,6 +51,7 @@ $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
 $.datepicker = function(){};
+$.parseJSON = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -126,6 +127,7 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
+var isiPhoneWithoutPhysicalHomeBt = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};

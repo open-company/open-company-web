@@ -180,10 +180,8 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          (if is-mobile?
-            {:href "https://the.carrot.news/"
+          {:href "https://the.carrot.news/"
              :target "_blank"}
-            {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a

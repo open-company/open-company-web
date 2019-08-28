@@ -606,7 +606,7 @@
 
 (def default-headline "Title")
 
-(def default-abstract "Quick summary: let everyone know what your post is about...")
+(def default-abstract "Quick summary")
 
 (def max-abstract-length 280)
 
@@ -706,3 +706,14 @@
   (if (.-attachEvent js/window)
     (fn [el e handler] (.attachEvent el (str "on" e) handler))
     (fn [el e handler] (.addEventListener el e handler))))
+
+(defn page-scroll-top []
+  (let [is-mobile? (responsive/is-mobile-size?)
+        board-slug (router/current-board-slug)
+        activity-id (router/current-activity-id)]
+    (if (and (not activity-id)
+             (seq board-slug)
+             (not= board-slug default-drafts-board-slug)
+             is-mobile?)
+      50
+      0)))

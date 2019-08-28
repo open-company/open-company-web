@@ -24,6 +24,10 @@ div.notifications {
     @include mobile() {
       width: 100%;
       border-radius: 0px;
+
+      &.bottom-notch {
+        padding-bottom: 35px;
+      }
     }
 
     &.server-error {

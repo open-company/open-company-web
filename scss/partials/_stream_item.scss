@@ -40,9 +40,9 @@ div.stream-item {
     margin: 0;
     border-radius: 0;
     border-top: none;
-    border-bottom: 1px solid $grey_num_3;
-    background-color: $grey_num_2;
-    padding: 24px 16px 22px;
+    border-bottom: 1px solid $divider_line_grey;
+    background-color: $grey_num_4;
+    padding: 16px 16px 22px;
   }
 
   &.draft {
@@ -431,27 +431,29 @@ div.stream-item {
       }
     }
 
-    div.stream-item-mobile-reactions {
-      display: none;
-
-      @include mobile() {
-        display: block;
-        height: 48px;
-        margin: 16px 0 0;
-        padding-bottom: 16px;
-        border-bottom: 1px solid $ultra_light_grey;
-      }
-    }
-
     div.stream-item-footer {
       min-height: 26px;
       margin-top: 16px;
 
       @include mobile() {
-        height: 16px;
+        height: auto;
         overflow: hidden;
         margin-top: 10px;
-        min-height: 20px;
+        min-height: 32px;
+      }
+
+      div.reactions {
+        @include mobile() {
+          display: inline-block;
+        }
+      }
+
+      div.stream-item-footer-mobile-group {
+        @include mobile() {
+          display: inline-block;
+          height: 32px;
+          padding-top: 8px;
+        }
       }
 
       div.stream-body-draft-edit {
@@ -481,17 +483,16 @@ div.stream-item {
         margin-right: 16px;
         float: left;
 
-        @include mobile() {
-          max-width: calc(50% - 16px);
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
         div.is-comments {
           div.is-comments-authors.show-border {
             div.is-comments-author {
               background-color: $oc_gray_8;
               border: 2px solid $oc_gray_8;
+
+              @include mobile() {
+                background-color: $grey_num_4;
+                border: 2px solid $grey_num_4;
+              }
             }
           }
         }

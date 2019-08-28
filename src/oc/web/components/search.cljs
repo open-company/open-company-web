@@ -5,6 +5,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.urls :as oc-urls]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.search :as search]
@@ -74,7 +75,17 @@
                        store/search-limit
                        (:count search-results))
         is-mobile? (responsive/is-mobile-size?)]
-    (when-not (nil? search-results)
+    (if (empty? search-results)
+      [:div.search-history
+        (let [history (search/search-history)]
+          (for [idx (range (count history))
+                :let [q (get (vec (reverse history)) idx)]]
+            [:div.search-history-row
+              {:key (str "search-history-" idx)
+               :on-click #(do
+                            (.val (js/$ "input.search.oc-input") q)
+                            (search/query q))}
+              q]))]
       [:div.search-results {:ref "results"
                             :class (when-not search-active? "inactive")}
         (when-not is-mobile?
@@ -131,12 +142,18 @@
                               (.focus search-input)))
                             s)
                          :will-mount (fn [s]
-                          (when-not (responsive/is-tablet-or-mobile?)
+                          (if (responsive/is-mobile-size?)
+                            (dom-utils/lock-page-scroll)
                             (search/inactive))
+                          s)
+                         :will-unmount (fn [s]
+                          (when (responsive/is-mobile-size?)
+                            (dom-utils/unlock-page-scroll))
                           s)}
   [s]
   (when (store/should-display)
-    (let [search-active? (drv/react s store/search-active?)]
+    (let [search-active? (drv/react s store/search-active?)
+          is-mobile? (responsive/is-mobile-size?)]
       [:div.search-box
         {:class (when @(::search-clicked? s) "active")
          :on-click (fn [e]
@@ -147,6 +164,7 @@
           [:button.mlb-reset.search-close-bt
             {:on-click #(do
                          (utils/event-stop %)
+                         (search-reset s)
                          (search-inactive s))}]
           [:div.mobile-header-title
             "Search"]]
@@ -158,26 +176,31 @@
         [:input.search.oc-input
           {:class (when-not @(::search-clicked? s) "inactive")
            :ref "search-input"
-           :placeholder "Search"
-           :on-blur #(do
-                       (when (responsive/is-mobile-size?)
-                         (set! (.-placehoder (.-target %)) ""))
-                       (let [search-input (.-target %)
-                             search-query (.-value search-input)]
-                         (when-not (seq (utils/trim search-query))
-                           (search-inactive s))))
-           :on-focus #(let [search-input (.-target %)
-                            search-query (.-value search-input)]
-                        (reset! (::search-clicked? s) true)
-                        (search/active)
-                        (search/focus)
-                        (search/query search-query))
+           :type "search"
+           :placeholder (if is-mobile? "Search posts..." "Search")
+           :on-blur #(when-not is-mobile?
+                      (let [search-input (.-target %)
+                           search-query (.-value search-input)]
+                       (when-not (seq (utils/trim search-query))
+                         (search-inactive s))))
+           :on-focus #(when-not is-mobile?
+                        (let [search-input (.-target %)
+                              search-query (.-value search-input)]
+                          (reset! (::search-clicked? s) true)
+                          (search/active)
+                          (search/focus)
+                          (search/query search-query)))
+           :on-key-press (fn [e]
+                           (when (and is-mobile?
+                                      (or (= (.-key e) "Enter")
+                                          (= (.-keyCode e) 13)))
+                             (search/query (.-value (.-target e)))))
            :on-change (fn [e]
-                        (let [v (.-value (.-target e))]
-                          (when @(::search-timeout s)
-                            (.clearTimeout js/window @(::search-timeout s)))
-                          (reset! (::search-timeout s)
-                           (utils/after 500
-                            #(search/query v)))))}]
-
+                        (when-not is-mobile?
+                          (let [v (.-value (.-target e))]
+                            (when @(::search-timeout s)
+                              (.clearTimeout js/window @(::search-timeout s)))
+                            (reset! (::search-timeout s)
+                             (utils/after 500
+                              #(search/query v))))))}]
        (search-results-view)])))

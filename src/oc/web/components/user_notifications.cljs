@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.activity :as am]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
@@ -13,7 +14,7 @@
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
-(defn- has-new-content? [notifications-data]
+(defn has-new-content? [notifications-data]
   (some :unread notifications-data))
 
 (defn- close-tray [s]
@@ -30,6 +31,14 @@
                                 (ui-mixins/on-window-click-mixin (fn [s e]
                                  (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
                                    (close-tray s))))
+                                {:will-mount (fn [s]
+                                  (when (responsive/is-mobile-size?)
+                                    (dom-utils/lock-page-scroll))
+                                 s)
+                                 :will-unmount (fn [s]
+                                  (when (responsive/is-mobile-size?)
+                                    (dom-utils/unlock-page-scroll))
+                                  s)}
   [s]
   (let [user-notifications-data (drv/react s :user-notifications)
         has-new-content (has-new-content? user-notifications-data)

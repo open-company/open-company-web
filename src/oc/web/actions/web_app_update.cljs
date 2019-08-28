@@ -11,9 +11,14 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  (if ua/pseudo-native?
-    "Update"
-    "Refresh page"))
+  (cond
+   (or ua/mobile?
+       ua/mobile-app?)
+   "Get the new release of Carrot"
+   ua/pseudo-native?
+   "Update"
+   :else
+   "Refresh page"))
 
 (defn- on-notification-dismissed
   []

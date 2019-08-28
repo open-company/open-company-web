@@ -21,21 +21,18 @@ div.add-comment-box-container {
 
     @include user-profile(24);
 
+    @include mobile() {
+      @include user-profile(32);      
+    }
+
     div.user-avatar-img-container {
       position: absolute;
       top: 8px;
       left: 0;
 
       @include mobile() {
-        display: none;
+        top: 0;
       }
-    }
-
-    @include mobile() {
-      background-color: white;
-      border: 1px solid $mid_light_grey;
-      border-radius: 4px;
-      padding: 9px 14px;
     }
 
     div.add-comment-internal{
@@ -49,15 +46,6 @@ div.add-comment-box-container {
       border: 1px solid $mid_light_grey;
       overflow-x: hidden;
       overflow-y: auto;
-
-      @include mobile() {
-        width: 100%;
-        left: unset;
-        position: relative;
-        bottom: unset;
-        max-height: unset;
-        border: none;
-      }
 
       div.add-comment {
         resize: none;
@@ -73,25 +61,12 @@ div.add-comment-box-container {
         outline: none;
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
-        @include mobile() {
-          padding: 0;
-          border: none;
-          border-radius: 0;
-          box-shadow: none;
-          min-height: unset;
-        }
 
         &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
           @include OC_Body_Book();
           font-size: 16px;
           color: rgba($deep_navy, 0.5);
           font-style: normal;
-        }
-
-        @include tablet() {
-          width: calc(100% - 48px);
-          resize: vertical;
-          padding-right: 0px;
         }
 
         .emojione {
@@ -129,13 +104,12 @@ div.add-comment-box-container {
     button.send-btn {
       float: right;
       height: 24px;
-      padding: 0;
       margin: 0;
       text-align: right;
       color: $carrot_green;
       @include OC_Body_Bold();
       font-size: 16px;
-      padding: 0 0 0 8px;
+      padding: 0;
 
       @include mobile() {
         right: 10px;

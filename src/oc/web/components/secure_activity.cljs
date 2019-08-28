@@ -126,7 +126,7 @@
                  :class utils/hide-class}])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (comments-summary activity-data true)
+              (comments-summary activity-data)
               (reactions activity-data)]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
