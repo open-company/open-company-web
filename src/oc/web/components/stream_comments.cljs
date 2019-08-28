@@ -160,8 +160,10 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)
-                             :did-remount (fn [o s]
+                             :did-update (fn [s]
                               (maybe-highlight-comment s)
+                              s)
+                             :did-remount (fn [o s]
                               (when (not= (count (second (:rum/args o))) (count (second (:rum/args s))))
                                  (reset! (::replying-to s) #{}))
                               (let [new-added-comment (nth (:rum/args s) 2)]
