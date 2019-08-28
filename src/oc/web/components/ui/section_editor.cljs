@@ -4,6 +4,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -32,8 +33,8 @@
         (>= (.search lower-email lower-query) 0))))
 
 (defn compare-users [user-1 user-2]
-  (compare (string/lower (utils/name-or-email user-1))
-           (string/lower (utils/name-or-email user-2))))
+  (compare (string/lower (user-lib/name-for user-1))
+           (string/lower (user-lib/name-for user-2))))
 
 (defn filter-users
   "Given a list of users and a query string, return those that match the given query."
@@ -151,6 +152,7 @@
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when @(::editing-existing-section s) (:channel-name (:slack-mirror section-data)))
         roster (drv/react s :team-roster)
+        all-users-data (if team-data (:users team-data) (:users roster))
         slack-orgs (:slack-orgs team-data)
         cur-user-data (drv/react s :current-user-data)
         slack-users (:slack-users cur-user-data)
@@ -274,6 +276,7 @@
                               (dis/dispatch! [:update [:section-editing]
                                               #(merge % {:access "private"
                                                          :has-changes true
+                                                         :authors (conj (set (:authors section-editing)) current-user-id)
                                                          :slack-mirror (if show-slack-channels?
                                                                          nil
                                                                          (:slack-mirror section-editor))})]))}
@@ -363,7 +366,7 @@
                              :ref (str "add-user-" (:user-id user))}
                             (user-avatar-image user)
                             [:div.name
-                              (utils/name-or-email user)]])
+                              (user-lib/name-for user)]])
                         [:div.section-editor-private-users-result.no-more-invites
                           [:div.name
                             (str
@@ -390,7 +393,7 @@
                     user-type (if (utils/in? (:viewers section-editing) user-id)
                                 :viewer
                                 :author)
-                    team-user (some #(when (= (:user-id %) user-id) %) (:users team-data))]
+                    team-user (some #(when (= (:user-id %) user-id) %) all-users-data)]
                 [:div.section-editor-add-private-users-dropdown-container
                   {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
                            :display (if @(::show-edit-user-dropdown s) "block" "none")}}
@@ -411,16 +414,18 @@
                  :ref "edit-users-scroll"}
                 (let [author-ids (set (:authors section-editing))
                       viewer-ids (set (:viewers section-editing))
-                      authors (filter (comp author-ids :user-id) (:users team-data))
-                      viewers (filter (comp viewer-ids :user-id) (:users team-data))
+                      authors (filter (comp author-ids :user-id) all-users-data)
+                      viewers (filter (comp viewer-ids :user-id) all-users-data)
                       complete-authors (map
-                                        #(merge % {:type :author :display-name (utils/name-or-email %)})
+                                        #(merge % {:type :author :display-name (user-lib/name-for %)})
                                         authors)
                       complete-viewers (map
-                                        #(merge % {:type :viewer :display-name (utils/name-or-email %)})
+                                        #(merge % {:type :viewer :display-name (user-lib/name-for %)})
                                         viewers)
                       all-users (concat complete-authors complete-viewers)
-                      sorted-users (sort compare-users all-users)]
+                      self-user (first (filter #(= (:user-id %) current-user-id) all-users))
+                      rest-users (filter #(not= (:user-id %) current-user-id) all-users)
+                      sorted-users (concat [self-user] (sort compare-users rest-users))]
                   (for [user sorted-users
                         :let [user-type (:type user)
                               self (= (:user-id user) current-user-id)
@@ -438,7 +443,9 @@
                                       (reset! (::show-edit-user-dropdown s) next-user-id)))}
                       (user-avatar-image user)
                       [:div.name
-                        (utils/name-or-email user)]
+                        (user-lib/name-for user)
+                        (when (= (:user-id user) current-user-id)
+                          " (you)")]
                       (if self
                         (if (and (seq (:slug section-editing))
                                  (> (count (:authors section-data)) 1))

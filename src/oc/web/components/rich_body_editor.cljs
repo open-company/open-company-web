@@ -5,7 +5,6 @@
             [oops.core :refer (oget oget+)]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
@@ -312,7 +311,8 @@
             media-picker-opts {:buttons (clj->js media-config)
                                :hidePlaceholderOnExpand false
                                :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
-                                                             :alwaysExpanded (:use-inline-media-picker options)}
+                                                             :alwaysExpanded (:use-inline-media-picker options)
+                                                             :initiallyVisible (:use-inline-media-picker options)}
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
@@ -436,8 +436,16 @@
                                    (when-not (:nux props)
                                      (utils/after 300 #(setup-editor s))))
                                  s)
-                                :did-remount (fn [_ s]
+                                :did-remount (fn [o s]
                                  (setup-editor s)
+                                 (when (not= (:cmail-key (first (:rum/args o))) (:cmail-key (first (:rum/args s))))
+                                   (when @(::editor s)
+                                     (.destroy @(::editor s)))
+                                   (reset! (::editor s) nil)
+                                   (reset! (::media-picker-ext s) nil)
+                                   (reset! (::did-change s) false)
+                                   (reset! (::initializing-editor s) false)
+                                   (utils/after 10 #(setup-editor s)))
                                  s)
                                 :will-update (fn [s]
                                  (let [data @(drv/get-ref s :media-input)
@@ -448,7 +456,7 @@
                                       (when (or (= video-data :dismiss)
                                                 (map? video-data))
                                         (reset! (::media-video s) false)
-                                        (dis/dispatch! [:input [:media-input :media-video] nil]))
+                                        (dis/dispatch! [:update [:media-input] #(dissoc % :media-video)]))
                                       (if (map? video-data)
                                         (media-video-add s @(::media-picker-ext s) video-data)
                                         (media-video-add s @(::media-picker-ext s) nil))))
@@ -465,26 +473,29 @@
              upload-progress-cb
              dispatch-input-key
              attachment-dom-selector
-             start-video-recording-cb
-             fullscreen]}]
-  [:div.rich-body-editor-outer-container
-    [:div.rich-body-editor-container
-      [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
-        {:ref "body"
-         :content-editable (not nux)
-         :class (str classes
-                 (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
-                                   :uploading @(::upload-lock s)}))
-         :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
-    (when @(::showing-media-video-modal s)
-      [:div.video-container
-        {:ref :video-container}
-        (media-video-modal {:fullscreen fullscreen
-                            :dismiss-cb #(do
-                                          (media-video-add s @(::media-picker-ext s) nil)
-                                          (reset! (::showing-media-video-modal s) false))})])
-    (when @(::showing-gif-selector s)
-      (giphy-picker {:fullscreen fullscreen
-                     :pick-emoji-cb (fn [gif-obj]
-                                     (reset! (::showing-gif-selector s) false)
-                                     (media-gif-add s @(::media-picker-ext s) gif-obj))}))])
+             fullscreen
+             cmail-key]}]
+  (let [_team-roster (drv/react s :team-roster)
+        _media-input (drv/react s :media-input)]
+    [:div.rich-body-editor-outer-container
+      {:key (str "rich-body-editor-" cmail-key)}
+      [:div.rich-body-editor-container
+        [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
+          {:ref "body"
+           :content-editable (not nux)
+           :class (str classes
+                   (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                                     :uploading @(::upload-lock s)}))
+           :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
+      (when @(::showing-media-video-modal s)
+        [:div.video-container
+          {:ref :video-container}
+          (media-video-modal {:fullscreen fullscreen
+                              :dismiss-cb #(do
+                                            (media-video-add s @(::media-picker-ext s) nil)
+                                            (reset! (::showing-media-video-modal s) false))})])
+      (when @(::showing-gif-selector s)
+        (giphy-picker {:fullscreen fullscreen
+                       :pick-emoji-cb (fn [gif-obj]
+                                       (reset! (::showing-gif-selector s) false)
+                                       (media-gif-add s @(::media-picker-ext s) gif-obj))}))]))

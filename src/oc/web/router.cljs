@@ -5,7 +5,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
-            [oc.web.lib.raven :as raven]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.jwt :as jwt]))
 
 (def path (atom {}))
@@ -19,7 +19,7 @@
 (defn get-token []
   (when (or (not js/window.location.pathname)
             (not js/window.location.search))
-    (raven/capture-message (str "Window.location problem:"
+    (sentry/capture-message! (str "Window.location problem:"
                                 " windown.location.pathname:" js/window.location.pathname
                                 " window.location.search:" js/window.location.search
                                 " return:" (str js/window.location.pathname js/window.location.search))))
@@ -166,6 +166,8 @@
   (str "invite-people-tooltip-" (jwt/user-id)))
 
 (def login-redirect-cookie "login-redirect")
+
+(def expo-push-token-cookie "expo-push-token")
 
 ;; Debug
 

@@ -3,6 +3,7 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
@@ -190,7 +191,7 @@
 
 (defn scroll-to-y [scroll-y & [duration]]
   (if (and duration (zero? duration))
-    (if (js/isEdge)
+    (if ua/edge?
       (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
       (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
     (.play
@@ -373,23 +374,6 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn name-or-email [user]
-  (let [user-name (:name user)
-        first-name (:first-name user)
-        last-name (:last-name user)]
-    (cond
-      (and (seq first-name)
-           (seq last-name))
-      (str first-name " " last-name)
-      (seq first-name)
-      first-name
-      (seq last-name)
-      last-name
-      (seq user-name)
-      user-name
-      :else
-      (:email user))))
-
 (defn slack-link-with-state [original-url user-id team-id redirect]
   (clojure.string/replace
    original-url
@@ -405,21 +389,6 @@
   :server-error true
   :id :generic-network-error
   :dismiss true})
-
-(def update-verbage
-  (if js/window.isDesktop
-    "Update"
-    "Reload"))
-
-(def app-update-error
-  {:title "There's a new version of Carrot!"
-   :app-update true
-   :id :app-update-error
-   :expire 0
-   :dismiss false
-   :primary-bt-title update-verbage
-   :primary-bt-inline true
-   :primary-bt-cb #(js/window.location.reload)})
 
 (def internal-error
   {:title "Internal error occurred"
@@ -562,8 +531,7 @@
 
 (defn copy-to-clipboard [el]
   (try
-    (when (and (responsive/is-tablet-or-mobile?)
-               (js/isSafari))
+    (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
@@ -597,17 +565,15 @@
 
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        _ (.remove (js/$ ".oc-mention-popup" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))
         has-empty-ending-paragraph (when (seq last-p-html)
                                      (.match last-p-html reg-ex))
         _ (when has-empty-ending-paragraph
-            (.remove (js/$ "p:last-child" $container)))
-        cleaned-html (.html $container)
-        _ (.detach $container)]
-    cleaned-html))
+            (.remove (js/$ "p:last-child" $container)))]
+    (.html $container)))
 
 (defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]

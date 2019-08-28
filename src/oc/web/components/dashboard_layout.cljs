@@ -14,6 +14,8 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.components.cmail :refer (cmail)]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
@@ -33,13 +35,14 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
-                              (drv/drv :ap-initial-at)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
                               (drv/drv :hide-left-navbar)
                               (drv/drv :sort-type)
+                              (drv/drv :cmail-state)
+                              (drv/drv :cmail-data)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -56,7 +59,7 @@
                                 ;; Reopen cmail if it was open
                                 (when-let [org-data @(drv/get-ref s :org-data)]
                                   (when (utils/is-admin-or-author? org-data)
-                                    (activity-actions/cmail-reopen?)))
+                                    (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
                                 s)
@@ -72,6 +75,7 @@
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         is-all-posts (utils/in? (:route route) "all-posts")
+        is-follow-ups (utils/in? (:route route) "follow-ups")
         is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
@@ -79,7 +83,7 @@
         empty-board? (zero? (count posts-data))
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
-        can-compose (pos? (count all-boards))
+        can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
@@ -89,13 +93,17 @@
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
+                                     (not is-follow-ups)
                                      (not is-must-see)
-                                     (not (:read-only board-data)))]
+                                     (not (:read-only board-data)))
+        cmail-state (drv/react s :cmail-state)
+        _cmail-data (drv/react s :cmail-data)]
       ;; Entries list
       [:div.dashboard-layout.group
+        {:class (when current-activity-id "expanded-post-view")}
         (when (and is-mobile?
                    (not current-activity-id)
-                   can-compose)
+                   can-compose?)
           [:button.mlb-reset.mobile-floating-compose-bt
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}])
         [:div.dashboard-layout-container.group
@@ -129,11 +137,14 @@
             ;           (when (and is-admin-or-author
             ;                      (not is-second-user))
             ;             [:button.mlb-reset.add-post-bt
-            ;               {:on-click #(when can-compose (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+            ;               {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
             ;               [:span.add-post-bt-pen]
             ;               "New post"])
             ;         [:div.add-post-tooltip-box.big-web-only
             ;           {:class (when is-second-user "second-user")}]]]))
+            (when (and (not is-mobile?)
+                       can-compose?)
+               (cmail))
             (when-not current-activity-id
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
@@ -148,6 +159,9 @@
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
                                                    "All posts"
+
+                                                   is-follow-ups
+                                                   "Follow-ups"
 
                                                    is-must-see
                                                    "Must see"
@@ -179,7 +193,7 @@
                          :data-placement "top"
                          :data-container "body"
                          :title (str (:name board-data) " settings")
-                         :on-click #(nav-actions/show-section-editor)}]])]
+                         :on-click #(nav-actions/show-section-editor (:slug board-data))}]])]
                 (when (not= (router/current-board-slug) utils/default-drafts-board-slug)
                   (let [default-sort (= board-sort dis/default-sort-type)]
                     [:div.board-sort.group
@@ -215,5 +229,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-all-posts "AP" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
               )]]]))

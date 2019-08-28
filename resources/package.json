@@ -1,7 +1,7 @@
 {
   "name": "Carrot",
   "author": "Open Company",
-  "version": "1.1.0",
+  "version": "1.1.6",
   "main": "index.js",
   "license": "CC-BY-NC-SA-4.0",
   "repository": {
@@ -16,9 +16,13 @@
   "build": {
     "appId": "io.carrot.desktop",
     "productName": "Carrot",
+    "artifactName": "${productName}.${ext}",
     "copyright": "Copyright © 2019 Open Company LLC",
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "electron/entitlements.mac.plist",
@@ -28,7 +32,9 @@
       "sign": false
     },
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "carrot.iconset/icon.ico"
     },
     "nsis": {
@@ -37,15 +43,18 @@
     },
     "afterSign": "electron/notarize.js",
     "icon": "carrot.iconset/icon.icns",
-    "publish": ["github"]
+    "publish": [
+      "github"
+    ]
   },
   "devDependencies": {
+    "dotenv": "^8.0.0",
     "electron": "^5.0.2",
     "electron-builder": "^20.44.4",
-    "dotenv": "^8.0.0",
     "electron-notarize": "^0.1.1"
   },
   "dependencies": {
+    "@sentry/electron": "0.17.1",
     "electron-updater": "^4.0.6"
   }
 }

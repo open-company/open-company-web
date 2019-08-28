@@ -6,12 +6,16 @@
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false}))
+                          :show-login-overlay false
+                          :cmail-state {:key (utils/activity-uuid)
+                                        :collapsed true}}))
 
 (def default-sort-type :recent-activity)
+(def other-sort-type :recently-posted)
 
 ;; Data key paths
 
@@ -100,6 +104,8 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
+(def expo-push-token-key [:expo-push-token])
+
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -151,6 +157,11 @@
 (declare activity-read-data)
 (declare activity-data-get)
 
+;; Container helpers
+
+(defn- is-container? [container-slug]
+  (#{"all-posts" "must-see" "follow-ups"} container-slug))
+
 ;; Derived Data ================================================================
 
 (defn drv-spec [db route-db]
@@ -169,7 +180,6 @@
    :auth-settings       [[:base] (fn [base] (get-in base auth-settings-key))]
    :entry-save-on-exit  [[:base] (fn [base] (:entry-save-on-exit base))]
    :orgs-dropdown-visible [[:base] (fn [base] (:orgs-dropdown-visible base))]
-   :ap-initial-at       [[:base] (fn [base] (:ap-initial-at base))]
    :add-comment-focus   [[:base] (fn [base] (:add-comment-focus base))]
    :nux                 [[:base] (fn [base] (:nux base))]
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
@@ -197,9 +207,14 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
+   :drafts-data         [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (board-data-key org-slug :drafts other-sort-type)))]
+   :follow-ups-data     [[:base :org-slug]
+                          (fn [base org-slug]
+                            (get-in base (container-key org-slug :follow-ups default-sort-type)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -212,6 +227,15 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
+   :follow-ups-picker-callback [[:base] (fn [base] (:follow-ups-picker-callback base))]
+   :follow-ups-activity-data [[:base :org-slug :current-panel]
+                              (fn [base org-slug current-panel]
+                                (when current-panel
+                                  (let [panel-name (name current-panel)
+                                        activity-uuid (subs panel-name (count "follow-ups-picker-") (count panel-name))]
+                                    (if (seq activity-uuid)
+                                      (get-in base (activity-key org-slug activity-uuid))
+                                      (get base :cmail-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
                           (fn [base team-data current-user-data team-roster invite-users]
@@ -229,9 +253,7 @@
    :container-data      [[:base :org-slug :board-slug :sort-type]
                          (fn [base org-slug board-slug sort-type]
                            (when (and org-slug board-slug)
-                             (let [is-container? (or (= board-slug "all-posts")
-                                                     (= board-slug "must-see"))
-                                   container-key (if is-container?
+                             (let [container-key (if (is-container? (router/current-board-slug))
                                                    (container-key org-slug board-slug sort-type)
                                                    (board-data-key org-slug board-slug sort-type))]
                                (get-in base container-key))))]
@@ -346,9 +368,11 @@
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
                                     (timbre/info "Unread notification count updated: " ncount)
-                                    (when js/window.isDesktop
-                                      (js/window.setBadgeCount ncount))
+                                    (when ua/desktop-app?
+                                      (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
+   :user-responded-to-push-permission? [[:base] (fn [base]
+                                                  (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]
@@ -366,26 +390,26 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :ap-initial-at :show-sections-picker :entry-editing :jwt :wrt-show]
+                            :show-sections-picker :entry-editing :jwt :wrt-show]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 ap-initial-at show-sections-picker entry-editing jwt wrt-show]
+                                 show-sections-picker entry-editing jwt wrt-show]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
                                :container-data container-data
                                :board-data board-data
+                               :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
                                :is-sharing-activity (boolean (:activity-share base))
                                :is-showing-alert (boolean (:alert-modal base))
                                :entry-edit-dissmissing (:entry-edit-dissmissing base)
                                :media-input (:media-input base)
-                               :ap-initial-at ap-initial-at
                                :show-section-add-cb (:show-section-add-cb base)
                                :show-sections-picker show-sections-picker
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
-                               :show-cmail (boolean (:cmail-state base))
+                               :cmail-state (:cmail-state base)
                                :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
@@ -425,11 +449,6 @@
   (flux/dispatch actions payload))
 
 ;; Data
-
-(defn ap-initial-at
-  "Get ap-initial-at."
-  ([] (ap-initial-at @app-state))
-  ([data] (:ap-initial-at data)))
 
 (defn bot-access
   ""
@@ -507,16 +526,14 @@
   ([] (editable-boards-data @app-state (router/current-org-slug)))
   ([org-slug] (editable-boards-data @app-state org-slug))
   ([data org-slug]
-  (let [boards-key (boards-key org-slug)
-        boards (get-in data boards-key)
+  (let [org-data (org-data data org-slug)
         filtered-boards (filterv
                          (fn [board]
-                            (let [links (-> board :board-data :links)]
-                              (some #(when (= (:rel %) "create") %) links)))
-                         (vals boards))]
+                            (some #(when (= (:rel %) "create") %) (:links board)))
+                         (:boards org-data))]
     (zipmap
-     (map #(-> % :board-data :slug) filtered-boards)
-     (map :board-data filtered-boards)))))
+     (map :slug filtered-boards)
+     filtered-boards))))
 
 (defn container-data
   "Get container data."
@@ -564,7 +581,7 @@
   ([org-slug]
     (draft-posts-data @app-state org-slug))
   ([data org-slug]
-    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug :recently-posted)))
 
 (defn activity-data
   "Get activity data."
@@ -723,8 +740,7 @@
   (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type))))
 
 (defn print-container-data []
-  (if (or (= (router/current-board-slug) "all-posts")
-          (= (router/current-board-slug) "must-see"))
+  (if (is-container? (router/current-board-slug))
     (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
     (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))))
 

@@ -126,9 +126,6 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
-var isSafari = function(){};
-var isIE = function(){};
-var isEdge = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -180,16 +177,16 @@ Headway.show = function(){};
 // Intercom (Chat support)
 var Intercom = function(){};
 // Homepage animation
-var OCWebSetupMarketingSiteJS = function(){};
+var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
-// Electron
-window.isDesktop = {};
-window.isWin32 = {};
-window.isMac = {};
-window.showDesktopWindow = function() {};
-window.setBadgeCount = function() {};
-// Fullstory
+// Mobile app (Expo)
+var ReactNativeWebView = {};
+ReactNativeWebView.postMessage = function() {};
+// Desktop app (Electron)
+var OCCarrotDesktop = function(){};
+OCCarrotDesktop.showDesktopWindow = function() {};
+OCCarrotDesktop.setBadgeCount = function() {};

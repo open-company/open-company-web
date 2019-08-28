@@ -63,7 +63,7 @@ div.org-settings-modal {
         @include OC_Body_Bold();
         font-size: 14px;
         background-color: $carrot_green;
-        border-radius: 6px;
+        border-radius: 4px;
         color: white;
         line-height: 18px;
         float: right;
@@ -205,13 +205,13 @@ div.org-settings-modal {
         outline: none;
         border: 1px solid $ultra_light_grey;
 
-        @include placeholder(){
-          opacity: 0.6;
+        &:focus, &:active, &.active {
+          border: 1px solid $ultra_light_grey;
+          outline: none;
         }
 
-        &:active, &:focus {
-          border: none;
-          outline: none;
+        @include placeholder(){
+          opacity: 0.6;
         }
 
         &.error {

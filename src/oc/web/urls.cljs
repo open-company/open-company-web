@@ -24,7 +24,7 @@
 
 (def help "http://help.carrot.io/")
 
-(def what-s-new "https://whats-new.carrot.io/")
+(def what-s-new "https://the.carrot.news/")
 
 (def home-try-it-focus (str home "?tif"))
 
@@ -32,7 +32,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
-(def desktop-login "/login/desktop")
+(def native-login "/login/desktop")
 (def sign-up "/sign-up")
 (def sign-up-slack "/sign-up/slack")
 (def sign-up-profile "/sign-up/profile")
@@ -49,12 +49,6 @@
     (sign-up-invite (router/current-org-slug)))
   ([org-slug]
     (str sign-up "/" (name org-slug) "/invite")))
-
-(defn sign-up-setup-sections
-  ([]
-    (sign-up-setup-sections (router/current-org-slug)))
-  ([org-slug]
-    (str sign-up "/" (name org-slug) "/sections")))
 
 (def slack-lander-check "/slack-lander/check")
 
@@ -108,6 +102,13 @@
     (all-posts (router/current-org-slug)))
   ([org-slug]
     (str (org org-slug) "/all-posts")))
+
+(defn follow-ups
+  "Org follow-ups url"
+  ([]
+    (follow-ups (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/follow-ups")))
 
 (defn first-ever-all-posts
   "Org all posts url for the first ever land"

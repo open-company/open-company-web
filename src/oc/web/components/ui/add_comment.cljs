@@ -3,6 +3,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -10,7 +11,9 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.mixins.ui :refer (first-render-mixin)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
+            [oc.web.actions.activity :as activity-actions]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "add-comment")]
@@ -34,9 +37,17 @@
 (defn- send-clicked [s]
   (let [add-comment-div (rum/ref-node s "add-comment")
         comment-body (cu/add-comment-content add-comment-div)
-        activity-data (first (:rum/args s))]
+        activity-data (first (:rum/args s))
+        complete? @(::complete-follow-up s)]
     (set! (.-innerHTML add-comment-div) "")
-    (comment-actions/add-comment activity-data comment-body)))
+    (comment-actions/add-comment activity-data comment-body)
+    (when complete?
+      (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+            show-follow-up-button? (and follow-up
+                                        (not (:completed? follow-up)))
+            complete-follow-up-link (when show-follow-up-button?
+                                      (utils/link-for (:links follow-up) "mark-complete" "POST"))]
+        (activity-actions/complete-follow-up activity-data follow-up)))))
 
 (defn setup-medium-editor-when-needed [s]
   (when-not @(::medium-editor s)
@@ -47,7 +58,8 @@
           (reset! (::medium-editor s) medium-editor)
           (.subscribe medium-editor
             "editableInput"
-            #(enable-add-comment? s)))))))
+            #(enable-add-comment? s))
+          (utils/after 100 #(enable-add-comment? s)))))))
 
 (rum/defcs add-comment < rum/reactive
                          rum/static
@@ -66,6 +78,7 @@
                          (rum/local nil ::focus-listener)
                          (rum/local nil ::blur-listener)
                          (rum/local "" ::initial-add-comment)
+                         (rum/local false ::complete-follow-up)
                          {:will-mount (fn [s]
                           (let [activity-data (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
@@ -77,8 +90,8 @@
                            (let [add-comment-node (rum/ref-node s "add-comment")
                                  activity-data (first (:rum/args s))
                                  add-comment-focus @(drv/get-ref s :add-comment-focus)
-                                 should-focus-field? (= (:uuid activity-data) add-comment-focus)]
-
+                                 should-focus-field? (= (:uuid activity-data) add-comment-focus)
+                                 follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))]
                              (setup-medium-editor-when-needed s)
                              (reset! (::focus-listener s)
                               (events/listen add-comment-node EventType/FOCUS
@@ -101,9 +114,13 @@
                              (when should-focus-field?
                                (.focus add-comment-node)
                                (utils/after 0
-                                #(utils/to-end-of-content-editable add-comment-node))))
+                                #(utils/to-end-of-content-editable add-comment-node)))
+                             ;; Default to complete follow-up on add comment if user has one
+                             (when (and follow-up
+                                        (not (:completed? follow-up)))
+                               (reset! (::complete-follow-up s) true)))
                            s)
-                          :did-remount (fn [_ s]
+                          :will-update (fn [s]
                            (setup-medium-editor-when-needed s)
                            s)
                           :will-unmount (fn [s]
@@ -126,7 +143,16 @@
                            s)}
   [s activity-data]
   (let [_ (drv/react s :add-comment-data)
-        current-user-data (drv/react s :current-user-data)]
+        _ (drv/react s :add-comment-focus)
+        _ (drv/react s :team-roster)
+        current-user-data (drv/react s :current-user-data)
+        follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+        complete-follow-up-link (when follow-up
+                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))
+        show-follow-up-button? (and follow-up
+                                    (not (:completed? follow-up))
+                                    complete-follow-up-link
+                                    (not (responsive/is-mobile-size?)))]
     [:div.add-comment-box-container
       [:div.add-comment-box
         (user-avatar-image current-user-data)
@@ -135,8 +161,23 @@
            {:ref "add-comment"
             :content-editable true
             :class utils/hide-class
-            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]
+            :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]]]
+      [:div.add-comment-footer
         [:button.mlb-reset.send-btn
           {:on-click #(send-clicked s)
            :disabled @(::add-button-disabled s)}
-          "Send"]]]))
+          "Send"]
+        (when show-follow-up-button?
+          [:div.buttons-separator])
+        (when show-follow-up-button?
+          [:button.mlb-reset.complete-follow-up
+            {:class (when-not @(::complete-follow-up s) "unselected")
+             :data-toggle "tooltip"
+             :data-placement "top"
+             :data-container "body"
+             :title "Complete follow-up when the comment is posted"
+             :on-click #(do
+                         (utils/event-stop %)
+                         (swap! (::complete-follow-up s) not))}
+            (carrot-checkbox {:selected @(::complete-follow-up s)})
+            "Complete follow-up"])]]))

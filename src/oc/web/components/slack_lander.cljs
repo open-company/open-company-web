@@ -30,7 +30,6 @@
 
             [:div.subheadline
               "Carrot makes it simple for Slack teams to stay aligned around what matters most."]
-            ; (try-it-form "try-it-form-central" "try-it-combo-field-top")
             [:a.continue-with-slack-bt
               {:on-click #(user-actions/login-with-slack slack-auth-link)}]
 

@@ -2,11 +2,7 @@ div.stream-item {
   width: #{$board_container_width}px;
   margin: 0;
   border-bottom: 1px solid $ultra_light_grey;
-
-  div.stream-item-inner {
-    border-left: 4px solid transparent;
-    padding: 24px 40px;
-  }
+  padding: 24px 40px;
 
   &.expandable {
     cursor: pointer;
@@ -14,10 +10,6 @@ div.stream-item {
     @include big_web() {
       &:hover {
         background-color: #F5F5F5;
-
-        div.stream-item-inner {
-          border-left: 4px solid #F5F5F5;
-        }
 
         div.stream-item-header {
           div.more-menu button {
@@ -50,10 +42,7 @@ div.stream-item {
     border-top: none;
     border-bottom: 1px solid $grey_num_3;
     background-color: $grey_num_2;
-
-    div.stream-item-inner {
-      padding: 24px 16px 22px;
-    }
+    padding: 24px 16px 22px;
   }
 
   &.draft {
@@ -65,10 +54,6 @@ div.stream-item {
     z-index: 1;
     position: relative;
 
-    div.stream-item-inner {
-      border-left: 4px solid white;
-    }
-
     &.showing-share {
       z-index: 3;
     }
@@ -77,11 +62,8 @@ div.stream-item {
       &:hover {
         background-color: white;
         z-index: 2;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
 
-        div.stream-item-inner{
-          border-left: 4px solid white;
-          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-        }
         div.stream-item-body-ext {
           div.stream-item-footer {
             div.stream-item-comments-summary {
@@ -113,36 +95,21 @@ div.stream-item {
         }
       }
     }
+  }
 
-    &.must-see-item {
-      div.stream-item-inner {
-        border-left: 4px solid $sea_blue;
-      }
+  &:not(.follow-up-item).must-see-item {
 
-      @include big_web(){
-        &:hover {
-          div.stream-item-inner {
-            border-left: 4px solid $sea_blue;
-          }
-        }
-      }
+    div.must-see-tag {
+      display: inline-block;
     }
   }
 
-  &.must-see-item {
-    div.stream-item-inner {
-      border-left: 4px solid transparent;
-    }
-
-    @include big_web(){
-      &:hover {
-        div.stream-item-inner {
-          border-left: 4px solid transparent;
-        }
-      }
-    }
-
+  &.follow-up-item, &.follow-up-item.must-see-item {
     div.must-see-tag {
+      display: none;
+    }
+
+    div.follow-up-tag {
       display: inline-block;
     }
   }
@@ -221,7 +188,7 @@ div.stream-item {
         }
       }
 
-      div.must-see-tag {
+      div.follow-up-tag, div.must-see-tag {
         margin-top: 2px;
       }
     }
@@ -240,7 +207,7 @@ div.stream-item {
 
         ul.more-menu-list {
           left: unset;
-          right: 16px;
+          right: 0;
         }
       }
     }
@@ -252,7 +219,9 @@ div.stream-item {
 
   @include must-see-tag();
 
-  div.must-see-tag {
+  @include follow-up-tag();
+
+  div.follow-up-tag, div.must-see-tag {
     display: none;
 
     @include mobile() {
@@ -260,7 +229,7 @@ div.stream-item {
     }
   }
 
-  & > div.new-tag, & > div.must-see-tag {
+  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
     margin-top: 16px;
   }
 
@@ -660,6 +629,49 @@ div.stream-item {
         @include mobile() {
           margin-left: 2px;
           margin-top: 0;
+        }
+
+        div.post-added-tooltip-container {
+          position: absolute;
+          bottom: 30px;
+          left: 0;
+          width: 320px;
+          padding: 16px;
+          border-radius: 4px;
+          background-color: $deep_navy;
+
+          &:after {
+            content: " ";
+            position: absolute;
+            left: 24px;
+            bottom: -3px;
+            width: 6px;
+            height: 6px;
+            transform: rotate(-45deg);
+            background-color: $deep_navy;
+          }
+
+          div.post-added-tooltip-title {
+            color: white;
+            @include OC_Body_Bold();
+            font-size: 16px;
+          }
+
+          div.post-added-tooltip {
+            margin-top: 8px;
+            color: white;
+            @include OC_Body_Book();
+            font-size: 14px;
+          }
+
+          button.post-added-tooltip-bt {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            color: $carrot_green;
+            margin-top: 8px;
+            padding: 0;
+            display: block;
+          }
         }
       }
 

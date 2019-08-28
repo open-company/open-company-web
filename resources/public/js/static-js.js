@@ -93,7 +93,7 @@ if (jwt) {
   }
 }
 
-function OCWebSetupMarketingSiteJS(){
+function OCWebSetupStaticPagesJS(){
   var switchFn = function() {
     $("button.keep-aligned-section-next-bt").toggleClass("active");
     var $switchContainer = $("div.slack-email-switch-container");
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
-  OCWebSetupMarketingSiteJS();
+  OCWebSetupStaticPagesJS();
 
   $(window).on("click", function(e){
     $target = $(e.target);
@@ -236,48 +236,6 @@ function OCStaticGetParameterByName(name, url) {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-function isSafari(){
-  var ua = navigator.userAgent.toLowerCase(); 
-  if (ua.indexOf('safari') > -1) { 
-    if (ua.indexOf('chrome') > -1) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isFireFox(){
-  var ua = navigator.userAgent.toLowerCase();
-  if (ua.match(/Firefox/) && !ua.match(/Seamonkey/)) {
-      return true;
-  } else {
-      return false;
-  }
-}
-
-function isEdge(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
-}
-
-function isIE(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) ||
-         navigator.userAgent.match(/rv:11/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
 }
 
 function OCStaticSiteMobileMenuToggle(){

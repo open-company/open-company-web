@@ -15,6 +15,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -86,37 +87,56 @@
 
 (def other-resources-delay 2500)
 
-(defn org-loaded [org-data saved? & [email-domain complete-refresh?]]
+(defn org-loaded
+  "Dispatch the org data into the app-state to be used by all the components.
+   Do all the needed loading when the org data are loaded if complete-refresh? is true.
+   The saved? flag is used as a strict boolean, if it's nil it means no org data PATCH happened, false
+   means that the save went wrong, true went well."
+  [org-data & [saved? email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
-  (let [ap-initial-at (:ap-initial-at @dis/app-state)
-        boards (:boards org-data)
+  (let [boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
+        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
+        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
         is-all-posts? (= (router/current-board-slug) "all-posts")
         activity-delay (if is-all-posts?
                          0
                          other-resources-delay)
         current-section-delay (if-not is-all-posts?
                                 0
-                                other-resources-delay)]
+                                other-resources-delay)
+        is-follow-ups? (= (router/current-board-slug) "follow-ups")
+        follow-ups-delay (if is-follow-ups?
+                           0
+                           other-resources-delay)]
     (when complete-refresh?
-      (when (router/current-activity-id)
-        (aa/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
-      (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
-      ;; Preload all posts data
-      (when activity-link
-        (utils/maybe-after activity-delay #(aa/activity-get org-data ap-initial-at)))
-      (when recent-activity-link
-        (utils/maybe-after activity-delay #(aa/recent-activity-get org-data ap-initial-at))))
+      ;; Load secure activity
+      (if (router/current-secure-activity-id)
+        (aa/secure-activity-get)
+        (do
+          ;; Load the current activity
+          (when (router/current-activity-id)
+            (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
+          (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
+          ;; Preload all posts data
+          (when activity-link
+            (utils/maybe-after activity-delay #(aa/activity-get org-data)))
+          (when recent-activity-link
+            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data)))
+          ;; Preload follow-ups data
+          (when follow-ups-link
+            (utils/maybe-after follow-ups-delay #(aa/follow-ups-get org-data)))
+          (when recent-follow-ups-link
+            (utils/maybe-after follow-ups-delay #(aa/recent-follow-ups-get org-data))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
-      (and (not ap-initial-at)
-           (or (= (router/current-board-slug) "all-posts")
-               (= (router/current-board-slug) "must-see")))
+      (or (= (router/current-board-slug) "all-posts")
+          (= (router/current-board-slug) "follow-ups"))
       (when-not activity-link
         (check-org-404))
 
@@ -132,8 +152,7 @@
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
-          (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
-                     (not ap-initial-at)) ;; neither for a briefing link
+          (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -173,7 +192,7 @@
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data false nil (not prevent-complete-refresh?))))
+    (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
 (defn get-org [& [org-data prevent-complete-refresh?]]
   (let [fixed-org-data (or org-data (dis/org-data))
@@ -191,7 +210,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
+   #(router/nav! (oc-urls/all-posts (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -250,7 +269,7 @@
       ;; rewrite history so when user come back here we load org data and patch them
       ;; instead of creating them
       (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data nil email-domain)
       (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
@@ -258,7 +277,7 @@
 (defn org-update-cb [email-domain {:keys [success status body]}]
   (if success
     (when-let [org-data (when success (json->cljs body))]
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data success email-domain)
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
 
@@ -291,7 +310,7 @@
   (dis/dispatch! [:org-edit-setup org-data]))
 
 (defn org-edit-save-cb [{:keys [success body status]}]
-  (org-loaded (json->cljs body) true))
+  (org-loaded (json->cljs body) success))
 
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
@@ -311,7 +330,7 @@
          :description "Your image was succesfully updated."
          :expire 3
          :dismiss true})
-      (org-loaded (json->cljs body) false))
+      (org-loaded (json->cljs body)))
     (do
       (dis/dispatch! [:org-avatar-update/failed])
       (notification-actions/show-notification
@@ -353,18 +372,5 @@
             (when (= (:item-id change-data) (:uuid current-board-data))
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
 
-(defn update-org-sections [org-slug all-sections]
-  (dis/dispatch! [:input [:ap-loading] true])
-  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
-        patch-payload {:boards (conj selected-sections "General")
-                       :samples true}
-        org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-      (api/patch-org-sections org-patch-link patch-payload
-       (fn [{:keys [success status body]}]
-         (when success
-           (org-loaded (json->cljs body) false))
-         (utils/after 2000
-          #(router/nav! (get-ap-url org-slug)))))))
-
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
+  (router/nav! (oc-urls/all-posts (:slug org-data))))

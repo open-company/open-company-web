@@ -4,36 +4,40 @@
 (def local-dsn "https://747713ae92c246d1a64bbce9aab3da34@app.getsentry.com/73174") ; insert your Sentry public dsn here
 (def local-whitelist-array ["localhost" "127.0.0.1"])
 
-;; Storage location
-(def web-server-domain "http://localhost:3559")
+;; Change this with your machine ip address to test
+;; from a device on the same network
+(def local-ip "localhost")
 
 ;; Storage location
-(def storage-server-domain "http://localhost:3001")
+(def web-server-domain (str "http://" local-ip ":3559"))
+
+;; Storage location
+(def storage-server-domain (str "http://" local-ip ":3001"))
 
 ;; Auth location
-(def auth-server-domain "http://localhost:3003")
+(def auth-server-domain (str "http://" local-ip ":3003"))
 
 ;; Pay location
-(def pay-server-domain "http://localhost:3004")
+(def pay-server-domain (str "http://" local-ip ":3004"))
 
 ;; Interaction location
-(def interaction-server-domain "http://localhost:3002")
+(def interaction-server-domain (str "http://" local-ip ":3002"))
 
 ;; Change location
-(def change-server-domain "http://localhost:3006")
+(def change-server-domain (str "http://" local-ip ":3006"))
 
 ;; Search location
-(def search-server-domain "http://localhost:3007")
+(def search-server-domain (str "http://" local-ip ":3007"))
 (def search-enabled? true)
 
 ;; Reminder location
-(def reminder-server-domain "http://localhost:3011")
+(def reminder-server-domain (str "http://" local-ip ":3011"))
 
 ;; Web location
-(def web-server "localhost:3559")
+(def web-server (str local-ip ":3559"))
 
 ;; JWT
-(def jwt-cookie-domain "localhost")
+(def jwt-cookie-domain local-ip)
 (def jwt-cookie-secure false)
 
 ;; Deploy key (cache buster)
@@ -43,7 +47,7 @@
 (def filestack-key "Aoay0qXUSOyVIcDvls4Egz")
 
 ;; Cookie prefix
-(def cookie-name-prefix "localhost-")
+(def cookie-name-prefix (str local-ip "-"))
 
 ;; Log level
 (def log-level "debug")
@@ -53,9 +57,6 @@
 
 ;; Attachments bucket
 (def attachments-bucket "open-company-attachments-non-prod")
-
-;; Mailchimp api endpoing
-(def mailchimp-api-endpoint "https://onhq6jg245.execute-api.us-east-1.amazonaws.com/dev/subscribe")
 
 ;; AP seen TTL in days
 (def oc-seen-ttl 30)

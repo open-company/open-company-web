@@ -6,6 +6,9 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            ;; Pull in functions for interfacing with Expo mobile app
+            [oc.web.expo :as expo]
+            [oc.shared.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
@@ -32,6 +35,7 @@
             [oc.web.actions.nux :as na]
             [oc.web.actions.jwt :as ja]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.web-app-update :as web-app-update-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.api :as api]
@@ -42,7 +46,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
@@ -72,7 +76,7 @@
                   :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+(defonce sentry (sentry/sentry-setup))
 
 ;; Avoid warnings
 
@@ -106,12 +110,12 @@
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
-    (when js/window.isDesktop
-      (dommy/add-class! body :electron))
-    (when js/window.isMac
-      (dommy/add-class! body :mac-electron))
-    (when js/window.isWin32
-      (dommy/add-class! body :win-electron)))
+    (when ua/desktop-app?
+      (dommy/add-class! body :electron)
+      (when ua/mac?
+        (dommy/add-class! body :mac-electron))
+      (when ua/windows?
+        (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
   (when (:log-level query-params)
     (logging/config-log-level! (:log-level query-params)))
@@ -178,7 +182,6 @@
         bot-access (when (contains? query-params :access)
                       (:access query-params))
         next-app-state {:loading loading
-                        :ap-initial-at (when has-at-param (:at query-params))
                         :panel-stack panel-stack
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
@@ -262,11 +265,12 @@
     (drv-root component target)))
 
 ;; Component specific to a secure activity
-(defn secure-activity-handler [component route target params]
+(defn secure-activity-handler [component route target params pre-routing?]
   (let [org (:org params)
         secure-id (:secure-id params)
         query-params (:query-params params)]
-    (pre-routing query-params true)
+    (when pre-routing?
+      (pre-routing query-params true))
     ;; save the route
     (router/set-route!
      (vec
@@ -275,7 +279,7 @@
        [org route secure-id]))
      {:org org
       :activity (:entry params)
-      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
+      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
@@ -285,15 +289,15 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
-    (aa/secure-activity-chain)
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
 (defn entry-handler [target params]
+  (pre-routing (:query-params params) true)
   (if (and (not (jwt/jwt))
-           (:secure-uuid (jwt/get-id-token-contents
-                          (:id (:query-params params)))))
-    (secure-activity-handler secure-activity "secure-activity" target params)
+           (:secure-uuid (jwt/get-id-token-contents)))
+    (secure-activity-handler secure-activity "secure-activity" target params false)
     (board-handler "activity" target org-dashboard params)))
 
 (defn slack-lander-check [params]
@@ -410,18 +414,6 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
-    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
-      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
-    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
-      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
       ;; Check if the user already have filled the needed data or if it needs to
@@ -519,8 +511,8 @@
         (router/redirect-404!))
       (simple-handler login-wall "login-wall" target params true))
 
-    (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-route" urls/desktop-login)
+    (defroute native-login-route urls/native-login {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-route" urls/native-login)
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -528,8 +520,8 @@
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
-    (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
+    (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -545,8 +537,8 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if js/window.isDesktop
-                          urls/desktop-login
+      (router/redirect! (if ua/pseudo-native?
+                          urls/native-login
                           urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
@@ -573,6 +565,14 @@
       (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
       (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
+    (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
+      (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
+      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+
+    (defroute follow-ups-slash-route (str (urls/follow-ups ":org") "/") {:as params}
+      (timbre/info "Routing follow-ups-slash-route" (str (urls/follow-ups ":org") "/"))
+      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
@@ -583,11 +583,11 @@
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
-      (secure-activity-handler secure-activity "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params true))
 
     (defroute secure-activity-slash-route (str (urls/secure-activity ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
-      (secure-activity-handler secure-activity "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params true))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
@@ -619,7 +619,7 @@
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (if (js/isEdge)
+        (if ua/edge?
           (set! (.. js/document -scrollingElement -scrollTop) 0)
           (js/window.scrollTo 0 0)))
       ;; dispatch on the token
@@ -628,7 +628,7 @@
       (utils/after 100 #(utils/remove-tooltips))))
   (do
     (timbre/error "Error: div#app is not defined!")
-    (sentry/capture-message "Error: div#app is not defined!")))
+    (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn init []
   ;; Setup timbre log level
@@ -644,6 +644,9 @@
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
 
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
+
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
@@ -652,6 +655,9 @@
   (ra/subscribe)
   (ca/subscribe)
   (user-actions/subscribe)
+
+  ;; Start the app update check cicle
+  (web-app-update-actions/start-web-app-update-check!)
 
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))

@@ -88,8 +88,10 @@
         (utils/maybe-after load-delay #(team-get team-link))
         (when channels-link
           (utils/maybe-after load-delay #(enumerate-channels team))))
+      ;; Do not delay the roster load since it's needed for the mentions extention
+      ;; that needs to be initialized with the rich-body-editor or the add-comment components
       (when roster-link
-        (utils/maybe-after load-delay #(roster-get roster-link))))))
+        (roster-get roster-link)))))
 
 (defn teams-get-cb [{:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))]
@@ -320,7 +322,7 @@
     (teams-get))
   (dis/dispatch! [:email-domain-team-add/finish (= status 204)]))
 
-(defn email-domain-team-add [domain]
+(defn email-domain-team-add [domain cb]
   (when (utils/valid-domain? domain)
     (let [team-data (dis/team-data)
           add-email-domain-link (utils/link-for
@@ -329,7 +331,12 @@
                                    "POST"
                                    {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
           fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
-      (api/add-email-domain add-email-domain-link fixed-domain email-domain-team-add-cb team-data))
+      (api/add-email-domain add-email-domain-link fixed-domain
+       (fn [{:keys [success] :as resp}]
+        (email-domain-team-add-cb resp)
+        (when (fn? cb)
+         (cb success)))
+       team-data))
     (dis/dispatch! [:email-domain-team-add])))
 
 ;; Slack team add

@@ -11,7 +11,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
@@ -177,9 +177,7 @@
                         :params params
                         :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
-            (sentry/set-extra-context! report)
-            (sentry/capture-error-with-message (str "xhr response error:" status))
-            (sentry/clear-extra-context!)))
+            (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
         (on-complete response)))))
 
 (def ^:private web-http (partial req web-endpoint))
@@ -202,12 +200,12 @@
 
 (defn- handle-missing-link [callee-name link callback & [parameters]]
   (timbre/error "Handling missing link:" callee-name ":" link)
-  (sentry/set-extra-context! (merge {:callee callee-name
-                                     :link link
-                                     :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
-                                    parameters))
-  (sentry/capture-error-with-message (str "Client API error on: " callee-name))
-  (sentry/clear-extra-context!)
+  (sentry/capture-message-with-extra-context!
+    (merge {:callee callee-name
+            :link link
+            :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
+     parameters)
+    (str "Client API error on: " callee-name))
   (notification-actions/show-notification (assoc utils/internal-error :expire 3))
   (when (fn? callback)
     (callback {:success false :status 0})))
@@ -216,13 +214,15 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
-(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :follow-ups])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
+
+(def follow-up-assignee-keys [:user-id :name :avatar-url])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -291,15 +291,6 @@
          :headers (headers-for-link org-patch-link)}
         callback))
     (handle-missing-link "patch-org" org-patch-link callback {:data data})))
-
-(defn patch-org-sections [org-patch-link data callback]
-  (if (and org-patch-link data)
-    (let [json-data (cljs->json data)]
-      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
-        {:json-params json-data
-         :headers (headers-for-link org-patch-link)}
-        callback))
-    (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
 
 (defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)
@@ -400,17 +391,13 @@
 
 ;; All Posts
 
-(defn get-all-posts [activity-link from callback]
+(defn get-all-posts [activity-link callback]
   (if activity-link
-    (let [href (relative-href activity-link)
-          final-href (if from
-                       (str href "?start=" from "&direction=around")
-                       href)]
-      (storage-http (method-for-link activity-link) final-href
+    (let [href (relative-href activity-link)]
+      (storage-http (method-for-link activity-link) href
         {:headers (headers-for-link activity-link)}
         callback))
-    (handle-missing-link "get-all-posts" activity-link callback
-     {:from from})))
+    (handle-missing-link "get-all-posts" activity-link callback)))
 
 (defn load-more-items [more-link direction callback]
   (if (and more-link direction)
@@ -641,6 +628,16 @@
      (fn [{:keys [status success body]}]
       (callback success)))))
 
+(defn add-expo-push-token [add-token-link push-token callback]
+  (if (and add-token-link push-token)
+    (auth-http (method-for-link add-token-link) (relative-href add-token-link)
+               {:headers (headers-for-link add-token-link)
+                :body push-token}
+               (fn [{:keys [status success body]}]
+                 (callback success)))
+    (handle-missing-link "add-expo-push-token" add-token-link callback
+                         {:push-token push-token})))
+
 ;; Interactions
 
 (defn get-comments [comments-link callback]
@@ -856,6 +853,29 @@
      {:headers (headers-for-link roster-link)}
      callback)
     (handle-missing-link "get-reminders-roster" roster-link callback)))
+
+;; Follow-ups
+
+(defn complete-follow-up [complete-follow-up-link callback]
+  (if complete-follow-up-link
+    (storage-http (method-for-link complete-follow-up-link) (relative-href complete-follow-up-link)
+     {:headers (headers-for-link complete-follow-up-link)}
+     callback)
+    (handle-missing-link "complete-follow-up" complete-follow-up-link callback)))
+
+(defn create-follow-ups [create-follow-up-link follow-ups-map callback]
+  (if create-follow-up-link
+    (let [filtered-assignees (if (:assignees follow-ups-map)
+                               (map #(select-keys % follow-up-assignee-keys) (:assignees follow-ups-map))
+                               [])
+          final-data {:self (:self follow-ups-map)
+                      :assignees filtered-assignees}
+          json-data (cljs->json final-data)]
+      (storage-http (method-for-link create-follow-up-link) (relative-href create-follow-up-link)
+       {:headers (headers-for-link create-follow-up-link)
+        :json-params json-data}
+       callback))
+    (handle-missing-link "create-follow-ups" create-follow-up-link callback)))
 
 ;; WRT
 
