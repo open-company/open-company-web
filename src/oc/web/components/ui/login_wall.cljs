@@ -6,7 +6,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user-actions]
-            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]))
+            [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
+            [oc.shared.useragent :as ua]))
 
 (def default-title "Please log in to continue")
 (def default-desc "You need to be logged in to view a post.")
@@ -52,18 +53,19 @@
                 [:div.slack-icon
                   {:aria-label "slack"}]
                 "Continue with Slack"]]
-           [:button.mlb-reset.signup-with-google
-             {:on-touch-start identity
-              :on-click #(do
-                           (.preventDefault %)
-                           (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                                {:auth-source "google"})]
+           (when-not ua/mobile-app?
+             [:button.mlb-reset.signup-with-google
+               {:on-touch-start identity
+                :on-click #(do
+                             (.preventDefault %)
+                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                  {:auth-source "google"})]
                              (user-actions/maybe-save-login-redirect)
                              (user-actions/login-with-google auth-link)))}
-              [:div.signup-with-google-content
-                [:div.google-icon
-                  {:aria-label "google"}]
-                "Continue with Google "]]
+             [:div.signup-with-google-content
+               [:div.google-icon
+                {:aria-label "google"}]
+                "Continue with Google "]])
             [:div.or-login
               "Or, sign in with email"]
             ;; Email fields
