@@ -10,6 +10,8 @@ div.dashboard-layout {
   }
 
   @include mobile() {
+    background-color: $grey_num_4;
+
     &.sticky-board-name {
       padding-top: 48px;
       div.dashboard-layout-container {
@@ -183,7 +185,6 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: white;
         padding: 0;
         min-height: calc(100vh - 76px);
         margin: 0;
