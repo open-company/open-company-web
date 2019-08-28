@@ -17,7 +17,7 @@
             [goog.events.EventType :as EventType]))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
-(def scroll-card-threshold 5)
+(def scroll-card-threshold 2)
 (def card-avg-height 372)
 
 (defn did-scroll
