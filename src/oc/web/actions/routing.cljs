@@ -4,6 +4,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.actions.cmail :as cmail-actions]))
 
 (defn routing [route-path]
@@ -42,7 +43,9 @@
                               :back-y scroll-y-position})
     (cmail-actions/cmail-hide)
     (when-not dont-scroll
-      (utils/scroll-to-y 0 0))
+      (if ua/mobile?
+        (utils/after 10 #(utils/scroll-to-y 0 0))
+        (utils/scroll-to-y 0 0)))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 (defn dismiss-post-modal []
