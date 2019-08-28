@@ -1,6 +1,7 @@
 (ns oc.web.actions.web-app-update
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
+            [oc.web.lib.utils :as utils]
             [oc.web.actions.notifications :as notification-actions]
             [oc.shared.interval :as interval]
             [oc.shared.useragent :as ua]))
@@ -43,8 +44,14 @@
                                                   :secondary-bt-title update-verbage
                                                   :secondary-bt-style :green
                                                   :secondary-bt-class :update-app-bt
-                                                  :secondary-bt-cb #(js/window.location.reload)
-                                                  :click #(js/window.location.reload)
+                                                  :secondary-bt-cb (fn [e]
+                                                                      (when e
+                                                                        (utils/event-stop e))
+                                                                      (.. js/window -location reload))
+                                                  :click (fn [e]
+                                                           (when e
+                                                             (utils/event-stop e))
+                                                           (.. js/window -location reload))
                                                   :expire 0}))
        (interval/restart-interval! web-app-update-interval default-update-interval-ms)))))
 
