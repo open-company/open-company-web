@@ -37,7 +37,6 @@
   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
      (if (= current-path url)
        (do
-         (js/console.log "DBG refresh current")
          (routing-actions/routing @router/path)
          (user-actions/initial-loading true))
        (router/nav! url)))
