@@ -68,21 +68,12 @@
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
 
-;; 404
-
-(defn maybe-404 []
-  (if (jwt/jwt)
-    (router/redirect-404!)
-    (dis/dispatch! [:show-login-wall])))
-
 ;; Entry
 
 (defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
   (api/get-current-entry (router/current-org-slug) board-slug activity-uuid
    (fn [{:keys [status success body]}]
-    (if (and (= status 404)
-             (= activity-uuid (router/current-activity-id)))
-      (maybe-404)
+    (when-not (= status 404)
       (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (when success (json->cljs body)) nil]))
     (when (fn? loaded-cb)
       (utils/after 100 #(loaded-cb success status))))))
