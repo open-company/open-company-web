@@ -13,7 +13,7 @@
                                      (when (fn? bt-cb)
                                        (bt-cb e))
                                      (when bt-dismiss
-                                       (utils/after 0 #(notification-actions/remove-notification (first (:rum/args s))))))
+                                       (notification-actions/remove-notification (first (:rum/args s)))))
                          :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
                                                   :default-link (= bt-style :default-link)})}
@@ -90,16 +90,17 @@
                            (not (utils/event-inside? % (rum/ref-node s :dismiss-bt)))
                            (not (utils/event-inside? % (rum/ref-node s :first-bt)))
                            (not (utils/event-inside? % (rum/ref-node s :second-bt))))
-                  (click %))
+                  (click %)
+                  (clear-timeout s)
+                  (notification-actions/remove-notification notification-data))
      :data-notificationid id}
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
         {:on-click #(do
-                      (reset! (::timeout s) nil)
-                      (js/clearTimeout @(::timeout s))
-                      (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
-                        (dismiss %)))
+                        (dismiss %))
+                      (clear-timeout s)
+                      (notification-actions/remove-notification notification-data))
          :class (when dismiss-x "dismiss-x")
          :ref :dismiss-bt}
         (when-not dismiss-x
