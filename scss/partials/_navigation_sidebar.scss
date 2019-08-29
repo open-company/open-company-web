@@ -305,7 +305,7 @@ div.left-navigation-sidebar {
       height: auto;
       background-color: white;
       min-height: 100%;
-      padding-top: #{$mobile_navbar_height}px;
+      padding-top: #{$mobile_navbar_height + 16}px;
       -webkit-overflow-scrolling: touch;
     }
 
