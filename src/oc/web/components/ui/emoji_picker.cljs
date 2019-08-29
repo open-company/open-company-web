@@ -9,6 +9,7 @@
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
+            [oc.shared.useragent :as ua]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]))
@@ -161,6 +162,13 @@
      (when @visible
        [:div.picker-container
          {:class (utils/class-set {position true})}
+         [:button.mlb-reset.mobile-cancel-bt
+          {:on-click #(do
+                        (remove-markers s)
+                        (when (fn? will-close-picker)
+                          (will-close-picker))
+                        (reset! visible false))}
+          "Cancel"]
          (when-not (utils/is-test-env?)
            (react-utils/build (.-Picker js/EmojiMart)
              {:native true

@@ -30,6 +30,10 @@ div.notifications {
       }
     }
 
+    &.clickable {
+      cursor: pointer;
+    }
+
     &.server-error {
       background-color: $carrot_orange;
 
@@ -97,7 +101,11 @@ div.notifications {
 
     &.dismiss-button {
       div.notification-title {
-        width: calc(100% - 20px);
+        width: calc(100% - 26px);
+        float: left;
+      }
+
+      div.notification-description {
         float: left;
       }
     }
@@ -211,9 +219,31 @@ div.notifications {
     div.notification-description {
       @include OC_Body_Book();
       font-size: 14px;
+      font-weight: normal;
       color: white;
-      margin-top: 4px;
+      margin-top: 8px;
       overflow-wrap: break-word;
+
+      blockquote {
+        padding: 1px 0 1px 8px;
+        border-left: 2px solid rgba(255, 255, 255, 0.5);
+        @include OC_Body_Book();
+        font-weight: normal;
+        font-size: 14px;
+        color: white;
+        text-decoration: none;
+        font-style: normal;
+      }
+
+      ul {
+        @include OC_Body_Book();
+        font-size: 14px;
+        font-weight: normal;
+        color: white;
+        text-decoration: none;
+        font-style: normal;
+        padding-left: 20px;
+      }
 
       &.oc-mentions span.oc-mention[data-found="true"] {
         background-color: transparent !important;
@@ -223,6 +253,13 @@ div.notifications {
 
       a {
         color: $carrot_green;
+        text-decoration: none;
+
+        @include big_web() {
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
     }
 

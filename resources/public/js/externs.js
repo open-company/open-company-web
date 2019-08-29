@@ -67,6 +67,7 @@ var recursiveAttachPasteListener = function(){};
 var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
+var AutoQuote = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};

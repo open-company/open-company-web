@@ -310,8 +310,6 @@ div.expanded-post {
   div.expanded-post-comments {
     padding-bottom: 0;
     margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid $ultra_light_grey;
 
     @include mobile() {
       margin-top: 16px;
