@@ -239,52 +239,50 @@
 (declare entry-save)
 
 (defn entry-save-on-exit
-  [edit-key activity-data entry-body section-editing]
-  (let [entry-map (assoc activity-data :body entry-body)
-        cache-key (cmail-actions/get-entry-cache-key (:uuid activity-data))]
+  [edit-key entry-map section-editing]
+  (let [cache-key (cmail-actions/get-entry-cache-key (:uuid entry-map))]
     ;; Save the entry in the local cache without auto-saving or
     ;; we it will be picked up it won't be autosaved
     (uc/set-item cache-key (dissoc entry-map :auto-saving)
      (fn [err]
-       (when-not err
-         ;; auto save on drafts that have changes
-         (when (and (not= "published" (:status entry-map))
-                    (:has-changes entry-map)
-                    (not (:auto-saving entry-map)))
-           ;; dispatch that you are auto saving
-           (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :has-changes false :body (:body entry-map)})])
-           (entry-save edit-key entry-map section-editing
-             (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
-               (if-not success
-                 ;; If save fails let's make sure save will be retried on next call
-                 (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving false :has-changes true})])
-                 (let [json-body (json->cljs body)
-                       board-data (if (:entries json-body)
-                                    (au/fix-board json-body)
-                                    false)
-                       fixed-items (:fixed-items board-data)
-                       entry-saved (if fixed-items
-                                     ;; board creation
-                                     (first (vals fixed-items))
-                                     json-body)]
-                   (cook/set-cookie! (cmail-actions/edit-open-cookie) (str (:board-slug entry-saved) "/" (:uuid entry-saved)) (* 60 60 24 365))
-                   ;; remove the initial document cache now that we have a uuid
-                   ;; uuid didn't exist before
-                   (when (and (nil? (:uuid entry-map))
-                              (:uuid entry-saved))
-                     (cmail-actions/remove-cached-item (:uuid entry-map)))
-                   ;; set the initial version number after the first auto save
-                   ;; this is used to revert if user decides to lose the changes
-                   (when (nil? (get @initial-revision (:uuid entry-saved)))
-                     (swap! initial-revision assoc (:uuid entry-saved)
-                            (or (:revision-id entry-map) -1)))
-                   (when board-data
-                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug)
-                      (router/current-sort-type) board-data]))
-                   ;; add or update the entry in the app-state list of posts
-                   ;; also move the updated data to the entry editing
-                   (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
-           (dis/dispatch! [:entry-toggle-save-on-exit false])))))))
+       ;; auto save on drafts that have changes
+       (when (and (not= "published" (:status entry-map))
+                  (:has-changes entry-map)
+                  (not (:auto-saving entry-map)))
+         ;; dispatch that you are auto saving
+         (dis/dispatch! [:update [edit-key] #(merge % {:auto-saving true :has-changes false :body (:body entry-map)})])
+         (entry-save edit-key entry-map section-editing
+           (fn [entry-data-saved edit-key-saved {:keys [success body status]}]
+             (if-not success
+               ;; If save fails let's make sure save will be retried on next call
+               (dis/dispatch! [:update [edit-key ] #(merge % {:auto-saving false :has-changes true})])
+               (let [json-body (json->cljs body)
+                     board-data (if (:entries json-body)
+                                  (au/fix-board json-body)
+                                  false)
+                     fixed-items (:fixed-items board-data)
+                     entry-saved (if fixed-items
+                                   ;; board creation
+                                   (first (vals fixed-items))
+                                   json-body)]
+                 (cook/set-cookie! (cmail-actions/edit-open-cookie) (str (:board-slug entry-saved) "/" (:uuid entry-saved)) (* 60 60 24 365))
+                 ;; remove the initial document cache now that we have a uuid
+                 ;; uuid didn't exist before
+                 (when (and (nil? (:uuid entry-map))
+                            (:uuid entry-saved))
+                   (cmail-actions/remove-cached-item (:uuid entry-map)))
+                 ;; set the initial version number after the first auto save
+                 ;; this is used to revert if user decides to lose the changes
+                 (when (nil? (get @initial-revision (:uuid entry-saved)))
+                   (swap! initial-revision assoc (:uuid entry-saved)
+                          (or (:revision-id entry-map) -1)))
+                 (when board-data
+                   (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug)
+                    (router/current-sort-type) board-data]))
+                 ;; add or update the entry in the app-state list of posts
+                 ;; also move the updated data to the entry editing
+                 (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
+         (dis/dispatch! [:entry-toggle-save-on-exit false]))))))
 
 (defn entry-toggle-save-on-exit
   [enable?]
