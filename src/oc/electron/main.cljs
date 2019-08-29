@@ -1,6 +1,6 @@
 (ns oc.electron.main
   (:require [oc.electron.auto-update :as auto-update]
-            [taoensso.timbre :as timbre :refer [info]]))
+            [taoensso.timbre :as timbre]))
 
 (goog-define dev? true)
 (goog-define web-origin "http://localhost:3559")
@@ -41,7 +41,7 @@
 
 (defn- load-page
   [window]
-  (info "Loading " init-url)
+  (timbre/info "Loading " init-url)
   (.loadURL window init-url))
 
 (defn- mk-window
@@ -106,17 +106,17 @@
               (fn [event navigation-url]
                 (let [parsed-url    (URL. navigation-url)
                       target-origin (.-origin parsed-url)]
-                  (info "Attempting to navigate to origin: " target-origin)
+                  (timbre/info "Attempting to navigate to origin: " target-origin)
                   (when (not (allowed-origin? target-origin))
-                    (info "Navigation prevented")
+                    (timbre/info "Navigation prevented")
                     (.preventDefault event)))))
          (.on contents "new-window"
               (fn [event navigation-url]
                 (let [parsed-url    (URL. navigation-url)
                       target-origin (.-origin parsed-url)]
-                  (info "Attempting to open new window at: " target-origin)
+                  (timbre/info "Attempting to open new window at: " target-origin)
                   (when (not (allowed-origin? target-origin))
-                    (info "New window not whitelisted, opening in external browser")
+                    (timbre/info "New window not whitelisted, opening in external browser")
                     (.preventDefault event)
                     (.openExternal shell navigation-url))))))))
 
