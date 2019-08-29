@@ -239,8 +239,9 @@
 (declare entry-save)
 
 (defn entry-save-on-exit
-  [edit-key entry-map section-editing]
-  (let [cache-key (cmail-actions/get-entry-cache-key (:uuid entry-map))]
+  [edit-key activity-data entry-body section-editing]
+  (let [entry-map (assoc activity-data :body entry-body)
+        cache-key (cmail-actions/get-entry-cache-key (:uuid entry-map))]
     ;; Save the entry in the local cache without auto-saving or
     ;; we it will be picked up it won't be autosaved
     (uc/set-item cache-key (dissoc entry-map :auto-saving)
