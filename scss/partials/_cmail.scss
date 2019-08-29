@@ -573,7 +573,7 @@ div.cmail-outer {
           overflow: auto;
 
           @include mobile() {
-            width: calc(100% - 16px - 32px);
+            width: 100%;
           }
         }
 
