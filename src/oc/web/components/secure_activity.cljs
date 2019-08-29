@@ -118,8 +118,8 @@
                               :video-processed (:video-processed activity-data)}))
             (when (:abstract activity-data)
               [:div.activity-abstract
-                {:class utils/hide-class}
-                (:abstract activity-data)])
+                {:class utils/hide-class
+                 :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
             (when (:body activity-data)
               [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
