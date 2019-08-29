@@ -190,6 +190,7 @@
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
+   :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -426,7 +427,8 @@
    :reminders-roster      [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
-                                    (get-in base (reminder-edit-key org-slug)))]})
+                                    (get-in base (reminder-edit-key org-slug)))]
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
 
 ;; Action Loop =================================================================
 

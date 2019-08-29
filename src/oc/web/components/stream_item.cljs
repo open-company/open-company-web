@@ -170,9 +170,8 @@
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
-              ; [:div.mobile-time-since
-              ;   (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]
-                ]
+              [:div.mobile-time-since
+                (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
             [:div.must-see-tag.big-web-tablet-only]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
