@@ -11,9 +11,7 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  (if ua/pseudo-native?
-    "Update"
-    "Refresh page"))
+  "Get the latest")
 
 (defn- on-notification-dismissed
   []

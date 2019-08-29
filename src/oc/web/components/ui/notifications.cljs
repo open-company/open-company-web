@@ -73,6 +73,7 @@
                               :opac opac
                               :light-theme light-theme
                               :mention-notification (and mention mention-author)
+                              :bottom-notch (js/isiPhoneWithoutPhysicalHomeBt)
                               :dismiss dismiss
                               :clickable (fn? click)
                               :inline-bt (or primary-bt-inline

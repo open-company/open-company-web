@@ -80,7 +80,6 @@ div.is-comments {
     }
 
     @include mobile() {
-      max-width: 68vw;
       margin-top: 0;
       line-height: 20px;
     }

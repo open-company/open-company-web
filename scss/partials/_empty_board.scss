@@ -61,20 +61,5 @@ div.empty-board {
       line-height: 18px;
       margin: 6px auto 0;
     }
-
-    button.create-new-post-bt {
-      width: 160px;
-      height: 40px;
-      background-color: $carrot_green;
-      color: white;
-      @include OC_Body_Bold();
-      font-size: 16px;
-      border-radius: 6px;
-      margin: 21px auto 0;
-
-      @include mobile() {
-        display: none;
-      }
-    }
   }
 }

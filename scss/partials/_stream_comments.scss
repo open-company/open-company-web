@@ -41,8 +41,24 @@ div.stream-comments {
         width: calc(100% - 40px);
 
         @include mobile() {
+          display: block;
           margin-left: 32px;
           width: calc(100% - 32px);
+
+          div.more-menu {
+            button.more-menu-bt {
+              background-position: 0px left 4px top;
+              margin-top: -4px;
+              background-color: transparent;
+            }
+
+            ul.more-menu-list {
+              width: 78px;
+              top: 20px;
+              right: 13px;
+              left: unset;
+            }
+          }
         }
 
         div.stream-comment-floating-buttons {
@@ -420,6 +436,10 @@ div.stream-comments {
         div.stream-comment-reactions-footer {
           height: 24px;
           margin-top: 8px;
+
+          @include mobile() {
+            margin-bottom: 8px;
+          }
         }
 
         div.stream-comment-footer {

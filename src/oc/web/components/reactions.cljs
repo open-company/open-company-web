@@ -38,7 +38,7 @@
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)
               should-show-picker?)
-      [:div.reactions
+      [:div.reactions.group
         [:div.reactions-list
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))

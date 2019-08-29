@@ -23,7 +23,7 @@ div.follow-ups-picker {
       left: 12px;
       right: unset;
       top: 16px;
-      background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
       background-size: 12px 12px;
       background-position: center;
       background-repeat: no-repeat;
@@ -59,7 +59,8 @@ div.follow-ups-picker {
       @include mobile(){
         height: #{mobile_navbar_height}px;
         padding: 14px 16px;
-        border-bottom: 1px solid $grey_num_3;
+        border-bottom: 1px solid $divider_line_grey;
+        background-color: white;
       }
 
       div.follow-ups-picker-header-title {

@@ -4,24 +4,9 @@
   padding-top: 6px;
 
   @include mobile() {
-    height: 72px;
-    padding: 24px 16px;
-    position: relative;
-
-    &:before {
-      content: "";
-      position: absolute;
-      top: 0px;
-      left: 46px;
-      height: 1px;
-      width: calc(100% - 65px);
-      background-color: $ultra_light_grey;
-    }
-
-    &:first-child:before {
-      width: 100%;
-      left: 0px;
-    }
+    height: 40px;
+    margin: 2px 0;
+    padding: 7px 16px;
   }
 
   .internal {
@@ -32,6 +17,11 @@
 
     &.new {
       @include OC_Body_Bold();
+    }
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
     }
   }
 
@@ -49,6 +39,12 @@
     border-radius: 4px;
     margin-top: 4px;
     margin-right: 16px;
+
+    @include mobile() {
+      float: left;
+      margin-top: 5px;
+      margin-left: 8px;
+    }
   }
 
   div.drafts-label {
@@ -56,6 +52,11 @@
     font-size: 14px;
     color: $deep_navy;
     text-decoration: none;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
   }
 
   &:active, &:focus {
@@ -74,6 +75,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
 
     &:active, &:focus {
       text-decoration: none;
@@ -94,6 +100,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
     &:active, &:focus {
       text-decoration: none;
     }
@@ -112,6 +123,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
     &:active, &:focus {
       text-decoration: none;
     }
@@ -127,7 +143,7 @@
   outline: none;
 
   @include mobile() {
-    background-color: transparent;
+    background-color: $carrot_green;
   }
 
   .internal, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
@@ -136,14 +152,35 @@
     font-size: 14px;
     text-decoration: none;
 
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
     span.count {
       color: $carrot_green;
+    }
+
+    @include mobile() {
+      color: white;
+    }
+  }
+
+  @include mobile() {
+    span.count {
+      background-color: rgba(white, 0.1);
+      color: white;
     }
   }
 
   div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     font-size: 14px;
     text-decoration: none;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
   }
 
   &:active, &:focus {
@@ -179,6 +216,11 @@
     font-size: 14px;
     color: $deep_navy;
     text-decoration: none;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
 
     &.new {
       @include OC_Body_Bold();
@@ -218,23 +260,26 @@ div.left-navigation-sidebar {
     left: -216px;
   }
 
-  @include mobile() {
-    position: absolute;
-    margin-top: 0;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    min-height: 100vh;
-    display: none;
-    z-index: 10000;
-    background-color: transparent;
-    max-height: unset;
-    height: unset;
-    overflow-y: unset;
-    overflow-x: unset;
-    padding-bottom: 0;
+  @media screen and (max-width: 975px) {
+    position: absolute; 
+  }
 
-    &.show-mobile-boards-menu {
+  @include mobile() {
+    position: fixed;
+    margin-top: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: none;
+    z-index: #{$navbar_zindex + 7};
+    background-color: $carrot_modal_bg;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    padding-bottom: 0;
+    max-height: initial;
+
+    &.mobile-show-side-panel {
       display: block;
     }
   }
@@ -247,13 +292,62 @@ div.left-navigation-sidebar {
 
     &.can-compose {
       height: calc(100% - 72px);
+
+      @include mobile() {
+        height: 100%;
+      }
     }
 
     @include mobile() {
       position: relative;
-      padding-bottom: 0px;
-      width: 100%;
+      padding-bottom: 40px;
+      width: 85%;
       height: auto;
+      background-color: white;
+      min-height: 100%;
+      padding-top: #{$mobile_navbar_height + 16}px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    div.left-navigation-sidebar-mobile-header {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 85vw;
+        background-color: white;
+        padding: 11px 16px;
+        border-bottom: 1px solid $divider_line_grey;
+
+        button.mobile-close-bt {
+          display: block;
+          position: absolute;
+          right: 16px;
+          top: 11px;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat; 
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          
+        }
+
+        div.orgs-dropdown  {
+          width: calc(100% - 40px);
+
+          div.orgs-dropdown-container {
+            z-index: 2;
+          }
+        }
+      }
     }
   }
 
@@ -286,6 +380,27 @@ div.left-navigation-sidebar {
       }
     }
 
+    @include mobile() {
+      &.item-selected {
+
+        div.all-posts-icon {
+          background-image: cdnUrl("/img/ML/digest_icon_white.svg");
+        }
+
+        div.must-see-icon {
+          background-image: cdnUrl("/img/ML/must_see_bolt_white.svg");
+        }
+
+        div.follow-ups-icon {
+          background-image: cdnUrl("/img/ML/must_see_bolt_white.svg");
+        }
+
+        div.drafts-icon {
+          background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
+        }
+      }
+    }
+
     div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
       padding: 2px 0px 0px 0;
       float: left;
@@ -294,14 +409,17 @@ div.left-navigation-sidebar {
       text-decoration: none;
 
       @include mobile() {
-        margin-left: 32px;
-        width: auto;
         padding: 0px;
+        line-height: 18px;
       }
     }
 
     div.must-see-label {
       padding: 2px 0px 0px 14px;
+
+      @include mobile() {
+        padding: 0;
+      }
     }
 
     div.all-posts-icon {
@@ -314,10 +432,8 @@ div.left-navigation-sidebar {
       float: left;
 
       @include mobile() {
-        margin-left: 0px;
-        margin-top: 0px;
-        background-position: center 4px;
         opacity: 1;
+        height: 24px;
       }
     }
 
@@ -346,6 +462,11 @@ div.left-navigation-sidebar {
       width: 18px;
       height: 23px;
       float: left;
+
+      @include mobile() {
+        opacity: 1;
+        height: 24px;
+      }
     }
 
     div.drafts-icon {
@@ -358,10 +479,9 @@ div.left-navigation-sidebar {
       float: left;
 
       @include mobile() {
-        margin-left: 0px;
-        margin-top: 0px;
-        background-position: center 4px;
+        background-position: center;
         opacity: 1;
+        height: 24px;
       }
     }
   }

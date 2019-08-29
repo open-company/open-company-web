@@ -15,6 +15,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -406,6 +407,8 @@
                           :else nil))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state)))
+                    (when (responsive/is-mobile-size?)
+                      (dom-utils/lock-page-scroll))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
@@ -493,6 +496,8 @@
                       (events/unlistenByKey @(::abstract-input-listener s))
                       (reset! (::abstract-input-listener s) nil))
                     (remove-autosave s)
+                    (when (responsive/is-mobile-size?)
+                      (dom-utils/unlock-page-scroll))
                     s)}
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
@@ -577,10 +582,7 @@
                   abstract-max-length-exceeded-tooltip)])
             (if (= (:status cmail-data) "published")
               "Save"
-              "Post")]
-          [:div.cmail-mobile-header-bt-separator]
-          [:button.mlb-reset.mobile-attachment-button
-            {:on-click #(add-attachment s)}]]
+              "Post")]]
         (when (and follow-up?
                    is-mobile?)
           (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
@@ -621,6 +623,8 @@
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
+            [:button.mlb-reset.mobile-attachment-button
+              {:on-click #(add-attachment s)}]
             (when-not follow-up?
               [:button.mlb-reset.mobile-follow-up-button
                 {:on-click #(when can-toggle-follow-ups?
