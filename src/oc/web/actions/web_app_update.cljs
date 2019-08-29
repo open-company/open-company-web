@@ -12,7 +12,7 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  "Get the new release of Carrot")
+  "Get the latest")
 
 (defn- on-notification-dismissed
   []
