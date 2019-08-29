@@ -105,13 +105,16 @@
                 cmail-state
                 wrt-read-data
                 force-login-wall
-                panel-stack]} (drv/react s :org-dashboard-data)
+                panel-stack
+                app-loading]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
                           (:results (drv/react s search/search-key))))
-        loading? (or ;; the org data are not loaded yet
+        loading? (or ;; force loading screen
+                     app-loading
+                     ;; the org data are not loaded yet
                      (not org-data)
                      ;; No board specified
                      (and (not (router/current-board-slug))
@@ -265,8 +268,6 @@
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
-                       (or (not open-panel)
-                           (= open-panel :menu))
                        (not show-mobile-cmail?)
                        (not show-push-notification-permissions-modal?)))
           [:div.page
