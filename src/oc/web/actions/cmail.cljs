@@ -95,6 +95,7 @@
                                            (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
+    (dis/dispatch! [:input [:cmail-state] fixed-cmail-state])
     (if (:fullscreen cmail-default-state)
       (dom-utils/lock-page-scroll)
       (when-not (:collapsed cmail-state)
@@ -102,8 +103,7 @@
     (when (and (not (:auto cmail-state))
                (not (:collapsed cmail-state)))
       (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 60 24 365)))
-    (load-cached-item initial-entry-data :cmail-data
-     #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
+    (load-cached-item initial-entry-data :cmail-data)))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
