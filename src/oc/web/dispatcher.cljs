@@ -69,6 +69,11 @@
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
+(defn add-comment-string-key [activity-uuid parent-comment-uuid comment-uuid]
+  (str activity-uuid "-" parent-comment-uuid "-" comment-uuid))
+
+(def add-comment-force-update-key :add-comment-force-update)
+
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
 
@@ -191,6 +196,7 @@
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
+   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]

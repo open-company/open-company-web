@@ -100,10 +100,11 @@
       (dom-utils/lock-page-scroll)
       (when-not (:collapsed cmail-state)
         (cook/remove-cookie! (cmail-fullscreen-cookie))))
-    (when (and (not (:auto cmail-state))
-               (not (:collapsed cmail-state)))
-      (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 60 24 365)))
-    (load-cached-item initial-entry-data :cmail-data)))
+    (utils/after 0 #(do
+     (when (and (not (:auto cmail-state))
+                (not (:collapsed cmail-state)))
+       (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 60 24 365)))
+     (load-cached-item initial-entry-data :cmail-data)))))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))

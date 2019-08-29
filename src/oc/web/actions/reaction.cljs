@@ -12,7 +12,8 @@
 
 (defn react-from-picker [activity-data emoji]
   (dis/dispatch! [:handle-reaction-to-entry activity-data
-   {:reaction emoji :count 1 :reacted true :links [] :authors []}])
+   {:reaction emoji :count 1 :reacted true :links [] :authors []}
+   (dis/activity-key (router/current-org-slug) (:uuid activity-data))])
   ;; Some times emoji.native coming from EmojiMart is null
   ;; so we need to avoid posting empty emojis
   (when (and emoji
@@ -20,15 +21,8 @@
     (let [react-link (utils/link-for (:links activity-data) "react")]
       (api/react-from-picker react-link emoji
         (fn [{:keys [status success body]}]
-          ;; Refresh the full entry after the reaction finished
-          ;; in the meantime update the local state with the result.
-          (activity-actions/get-entry activity-data)
-          (dis/dispatch!
-           [:react-from-picker/finish
-            {:status status
-             :activity-data activity-data
-             :activity-key (dis/activity-key (router/current-org-slug) (:uuid activity-data))
-             :reaction-data (if success (json->cljs body) {})}]))))))
+          ;; Refresh the full entry to make sure it's up to date
+          (activity-actions/get-entry activity-data))))))
 
 (defn reaction-toggle
   [activity-data reaction-data reacting?]
@@ -38,13 +32,8 @@
     (dis/dispatch! [:handle-reaction-to-entry activity-data reaction-data activity-key])
     (api/toggle-reaction reaction-link
       (fn [{:keys [status success body]}]
-        (activity-actions/get-entry activity-data)
-        (dis/dispatch!
-         [:activity-reaction-toggle/finish
-          activity-data
-          (:reaction reaction-data)
-          (when success (json->cljs body))
-          activity-key])))))
+        ;; Refresh the full entry to make sure it's up to date
+        (activity-actions/get-entry activity-data)))))
 
 (defn is-activity-reaction? [org-slug board-slug interaction-data]
   (let [activity-uuid (router/current-activity-id)
