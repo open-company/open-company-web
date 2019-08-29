@@ -112,8 +112,15 @@
 
 (defn autosave [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
-        section-editing @(drv/get-ref s :section-editing)]
-    (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
+        section-editing @(drv/get-ref s :section-editing)
+        headline (rum/ref-node s "headline")
+        headline-text (.-innerText headline)
+        $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
+        abstract-html (.html $abstract)
+        next-cmail-data (merge cmail-data {:headline headline-text
+                                           :abstract abstract-html
+                                           :body (cleaned-body)})]
+    (activity-actions/entry-save-on-exit :cmail-data next-cmail-data section-editing)))
 
 ;; Close dismiss handling
 
@@ -167,17 +174,12 @@
     (reset! (::post-button-title s) post-button-title)))
 
 (defn- headline-on-change [state]
-  (when-let [headline (rum/ref-node state "headline")]
-    (let [emojied-headline (.-innerText headline)]
-      (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
-                                                       :has-changes true})])
-      (check-limits state))))
+  (dis/dispatch! [:input [:cmail-data :has-changes] true])
+  (utils/after 0 #(check-limits state)))
 
 (defn- abstract-on-change [state]
-  (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
-    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.html $abstract)
-                                                     :has-changes true})])
-    (check-limits state)))
+  (dis/dispatch! [:input [:cmail-data :has-changes] true])
+  (utils/after 0 #(check-limits state)))
 
 ;; Headline setup and paste handler
 
