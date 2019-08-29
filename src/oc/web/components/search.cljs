@@ -178,29 +178,21 @@
            :ref "search-input"
            :type "search"
            :placeholder (if is-mobile? "Search posts..." "Search")
-           :on-blur #(when-not is-mobile?
-                      (let [search-input (.-target %)
+           :on-blur #(let [search-input (.-target %)
                            search-query (.-value search-input)]
                        (when-not (seq (utils/trim search-query))
-                         (search-inactive s))))
-           :on-focus #(when-not is-mobile?
-                        (let [search-input (.-target %)
-                              search-query (.-value search-input)]
-                          (reset! (::search-clicked? s) true)
-                          (search/active)
-                          (search/focus)
-                          (search/query search-query)))
-           :on-key-press (fn [e]
-                           (when (and is-mobile?
-                                      (or (= (.-key e) "Enter")
-                                          (= (.-keyCode e) 13)))
-                             (search/query (.-value (.-target e)))))
+                         (search-inactive s)))
+           :on-focus #(let [search-input (.-target %)
+                            search-query (.-value search-input)]
+                        (reset! (::search-clicked? s) true)
+                        (search/active)
+                        (search/focus)
+                        (search/query search-query))
            :on-change (fn [e]
-                        (when-not is-mobile?
-                          (let [v (.-value (.-target e))]
-                            (when @(::search-timeout s)
-                              (.clearTimeout js/window @(::search-timeout s)))
-                            (reset! (::search-timeout s)
-                             (utils/after 500
-                              #(search/query v))))))}]
+                        (let [v (.-value (.-target e))]
+                          (when @(::search-timeout s)
+                            (.clearTimeout js/window @(::search-timeout s)))
+                          (reset! (::search-timeout s)
+                           (utils/after 500
+                            #(search/query v)))))}]
        (search-results-view)])))
