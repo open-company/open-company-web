@@ -54,6 +54,8 @@
                       win-frame-settings
                       {:width w
                        :height h
+                       :minWidth 1280
+                       :minHeight 720
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
