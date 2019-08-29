@@ -160,4 +160,7 @@
   (.on ipc-main "set-badge-count" (fn [event arg] (.setBadgeCount app arg)))
   (.on ipc-main "show-desktop-window" (fn [event arg] (when @main-window
                                                         (.show @main-window))))
+  (.on ipc-main "window-has-focus?" (fn [event]
+                                      (let [ret-value (boolean (.getFocusedWindow BrowserWindow))]
+                                        (set! (.-returnValue event) ret-value))))
   )

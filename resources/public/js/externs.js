@@ -193,3 +193,4 @@ ReactNativeWebView.postMessage = function() {};
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
+OCCarrotDesktop.windowHasFocus = function() {};
