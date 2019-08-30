@@ -97,16 +97,18 @@
 
 (defmethod dispatcher/action :comments-get/finish
   [db [_ {:keys [success error comments-key body secure-activity-uuid activity-uuid]}]]
-  (let [org-data (dispatcher/org-data db)
-        activity-data (if secure-activity-uuid
-                        (dispatcher/secure-activity-data (:slug org-data) secure-activity-uuid db)
-                        (dispatcher/activity-data (:slug org-data) activity-uuid db))
-        cleaned-comments (map #(parse-comment org-data activity-data %) (:items (:collection body)))
-        sorted-comments (comment-utils/sort-comments cleaned-comments)
-        pre-comments-key (vec (butlast comments-key))]
-    (-> db
-      (assoc-in comments-key sorted-comments)
-      (assoc-in (vec (conj pre-comments-key :loading)) false))))
+  (let [pre-comments-key (vec (butlast comments-key))]
+    (if success
+      (let [org-data (dispatcher/org-data db)
+            activity-data (if secure-activity-uuid
+                            (dispatcher/secure-activity-data (:slug org-data) secure-activity-uuid db)
+                            (dispatcher/activity-data (:slug org-data) activity-uuid db))
+            cleaned-comments (map #(parse-comment org-data activity-data %) (:items (:collection body)))
+            sorted-comments (comment-utils/sort-comments cleaned-comments)]
+        (-> db
+          (assoc-in comments-key sorted-comments)
+          (assoc-in (vec (conj pre-comments-key :loading)) false)))
+      (assoc-in db (vec (conj pre-comments-key :loading)) false))))
 
 (defmethod dispatcher/action :comment-delete
   [db [_ activity-uuid comment-data comments-key]]
