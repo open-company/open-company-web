@@ -178,4 +178,4 @@
         combined-state   (merge decoded-state state)
         new-state-string (encode-state-string combined-state)]
     (.. parsed-url -searchParams (set "state" new-state-string))
-    (.toString parsed-url)))
+    (str parsed-url)))
