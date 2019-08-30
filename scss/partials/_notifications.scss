@@ -261,6 +261,10 @@ div.notifications {
           }
         }
       }
+
+      img, iframe {
+        display: none;
+      }
     }
 
     button.notification-button {
