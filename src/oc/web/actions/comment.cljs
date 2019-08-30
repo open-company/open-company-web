@@ -56,8 +56,8 @@
                                                    :dismiss true
                                                    :expire 3
                                                    :id :first-comment-follow-post}))
-        (let [comments-link (utils/link-for (:links activity-data) "comments")]
-          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
+        (utils/after 100 (fn [](let [comments-link (utils/link-for (:links activity-data) "comments")]
+          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))))
         ;; In case save didn't go well let's re-set the comment body in the add comment field
         (when-not success
           (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))))
