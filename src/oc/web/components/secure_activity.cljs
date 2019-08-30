@@ -29,6 +29,11 @@
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
 
+(defn- maybe-load-comments [s]
+  (let [activity-data @(drv/get-ref s :secure-activity-data)
+        comments-data @(drv/get-ref s :comments-data)]
+    (comment-utils/get-comments-if-needed activity-data comments-data)))
+
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
@@ -40,9 +45,10 @@
                              (mention-mixins/oc-mentions-hover)
                              ui-mixins/refresh-tooltips-mixin
                              {:did-mount (fn [s]
-                               (let [activity-data @(drv/get-ref s :secure-activity-data)
-                                     comments-data @(drv/get-ref s :comments-data)]
-                                (comment-utils/get-comments-if-needed activity-data comments-data))
+                               (maybe-load-comments s)
+                               s)
+                              :will-update (fn [s]
+                               (maybe-load-comments s)
                                s)
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
@@ -132,7 +138,7 @@
                       (:can-comment activity-data))
               [:div.comments-separator])
             (when comments-data
-              (stream-comments activity-data comments-data true))
+              (stream-comments activity-data comments-data))
             (when (:can-comment activity-data)
               (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
             [:div.secure-activity-footer
