@@ -42,9 +42,12 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn- load-comments [s]
+(defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
-    (comment-actions/get-comments activity-data)))
+    (if force?
+      (comment-actions/get-comments activity-data)
+      (let [comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+        (comment-actions/get-comments-if-needed activity-data comments-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -66,10 +69,10 @@
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
-    (load-comments s)
+    (load-comments s true)
     s)
    :did-remount (fn [_ s]
-    (load-comments s)
+    (load-comments s false)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
