@@ -93,7 +93,7 @@ if (jwt) {
   }
 }
 
-function OCWebSetupMarketingSiteJS(){
+function OCWebSetupStaticPagesJS(){
   var switchFn = function() {
     $("button.keep-aligned-section-next-bt").toggleClass("active");
     var $switchContainer = $("div.slack-email-switch-container");
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
-  OCWebSetupMarketingSiteJS();
+  OCWebSetupStaticPagesJS();
 
   $(window).on("click", function(e){
     $target = $(e.target);
@@ -236,48 +236,6 @@ function OCStaticGetParameterByName(name, url) {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-
-function isSafari(){
-  var ua = navigator.userAgent.toLowerCase(); 
-  if (ua.indexOf('safari') > -1) { 
-    if (ua.indexOf('chrome') > -1) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isFireFox(){
-  var ua = navigator.userAgent.toLowerCase();
-  if (ua.match(/Firefox/) && !ua.match(/Seamonkey/)) {
-      return true;
-  } else {
-      return false;
-  }
-}
-
-function isEdge(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
-}
-
-function isIE(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) ||
-         navigator.userAgent.match(/rv:11/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
 }
 
 function OCStaticSiteMobileMenuToggle(){
@@ -423,4 +381,34 @@ function OCStaticTextareaRestoreSelection(range) {
             range.select();
         }
     }
+}
+
+function isiPhoneWithoutPhysicalHomeBt(){
+  // Really basic check for the ios platform
+  // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+  var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  // Get the device pixel ratio
+  var ratio = window.devicePixelRatio || 1;
+
+  // Define the users device screen dimensions
+  var screen = {
+    width : window.screen.width * ratio,
+    height : window.screen.height * ratio
+  };
+
+  // iPhone X and Xs Detection
+  if (iOS && screen.width === 1125 && screen.height === 2436) {
+    return true;
+  }
+  // iPhone Xr Detection
+  if (iOS && screen.width === 828 && screen.height === 1792) {
+    return true;
+  }
+
+  // iPhone Xs Max Detection
+  if (iOS && screen.width === 1242 && screen.height === 2688) {
+    return true;
+  }
+  return false;
 }

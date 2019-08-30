@@ -6,6 +6,10 @@ div.secure-activity-container {
   background-color: $grey_num_2;
   min-height: 100vh;
 
+  @include mobile() {
+    background-color: white;
+  }
+
   div.activity-header {
     height: 56px;
     position: fixed;
@@ -21,6 +25,8 @@ div.secure-activity-container {
       position: absolute;
       height: 72px;
       padding: 16px;
+      background-color: white;
+      border-bottom: 1px solid $divider_line_grey;
     }
 
     div.org-avatar {
@@ -140,7 +146,7 @@ div.secure-activity-container {
       }
 
       div.activity-title {
-        @include activity-title(36px, 47px);
+        @include activity-title(36px, 40px);
         color: $deep_navy;
 
         .emojione {
@@ -255,10 +261,6 @@ div.secure-activity-container {
                 border-radius: 0;
               }
             }
-          }
-
-          button.send-btn {
-            margin-bottom: 8px;
           }
         }
       }

@@ -4,9 +4,12 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.shared.useragent :as ua]
+            [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
+            [oc.shared.useragent :as ua]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]))
@@ -29,6 +32,8 @@
       (let [will-close-picker (:will-close-picker (first (:rum/args s)))]
         (when (fn? will-close-picker)
           (will-close-picker))))
+    (when ua/mobile?
+      (dom-utils/unlock-page-scroll))
     (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
@@ -87,12 +92,12 @@
                                  js/document
                                  EventType/FOCUSOUT
                                  (partial check-focus s))
-                       ff-click (when js/isFireFox
+                       ff-click (when ua/firefox?
                                   (events/listen
                                    js/window
                                    EventType/CLICK
                                    (partial check-focus s)))
-                       ff-keypress (when js/isFireFox
+                       ff-keypress (when ua/firefox?
                                      (events/listen
                                       js/window
                                       EventType/KEYPRESS
@@ -143,14 +148,27 @@
                                               @caret-pos)
                                           (not @visible))]
                              (if vis
-                               (when (fn? will-open-picker)
-                                 (will-open-picker vis))
-                               (when (fn? will-close-picker)
-                                 (will-close-picker vis)))
+                               (do
+                                (when ua/mobile?
+                                  (dom-utils/lock-page-scroll))
+                                (when (fn? will-open-picker)
+                                  (will-open-picker vis)))
+                               (do
+                                 (when (fn? will-close-picker)
+                                   (will-close-picker vis))
+                                 (when ua/mobile?
+                                   (dom-utils/unlock-page-scroll))))
                              (reset! visible vis)))}]
      (when @visible
        [:div.picker-container
          {:class (utils/class-set {position true})}
+         [:button.mlb-reset.mobile-cancel-bt
+          {:on-click #(do
+                        (remove-markers s)
+                        (when (fn? will-close-picker)
+                          (will-close-picker))
+                        (reset! visible false))}
+          "Cancel"]
          (when-not (utils/is-test-env?)
            (react-utils/build (.-Picker js/EmojiMart)
              {:native true

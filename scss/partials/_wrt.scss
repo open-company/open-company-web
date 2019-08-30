@@ -46,6 +46,15 @@ div.wrt-count-container {
     position: relative;
     opacity: 0.5;
 
+    @include mobile() {
+      padding-left: 0;
+      line-height: 20px;
+
+      &:before {
+        display: none;
+      }
+    }
+
     &:before {
       content: "";
       width: 10px;
@@ -86,6 +95,10 @@ div.wrt-popup-container {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.wrt-popup {
@@ -95,28 +108,33 @@ div.wrt-popup-container {
     top: 0;
     height: 100vh;
     right: 0;
-    padding: 0 24px 16px;
-    transition: right 180ms ease-in;
+    padding: 0;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     @include mobile() {
       position: relative;
       top: unset;
       right: unset;
       width: 100%;
+      padding: 0;
+      overflow-y: hidden;
+      background-color: white;
     }
 
     div.wrt-popup-header {
-      width: calc(100% + 48px);
+      width: 100%;
       height: 56px;
-      margin-left: -24px;
       background-color: $grey_num_2;
       padding: 12px 16px;
 
       @include mobile() {
-        position: relative;
-        border-bottom: 1px solid $ultra_light_grey;
+        position: fixed;
+        border-bottom: 1px solid $divider_line_grey;
+        z-index: 2;
+        height: #{$mobile_navbar_height}px;
+        padding: 15px 16px;
+        background-color: white;
       }
 
       div.wrt-popup-header-title {
@@ -129,6 +147,8 @@ div.wrt-popup-container {
         @include mobile() {
           text-align: center;
           float: unset;
+          line-height: 24px;
+          font-size: 18px;
         }
       }
 
@@ -139,11 +159,11 @@ div.wrt-popup-container {
           display: block;
           position: absolute;
           left: 16px;
-          top: 16px;
-          width: 24px;
-          height: 24px;
+          top: 15px;
+          width: 32px;
+          height: 32px;
           padding: 0;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
@@ -156,7 +176,14 @@ div.wrt-popup-container {
     }
 
     div.wrt-popup-inner {
-      padding: 24px 0;
+      padding: 24px;
+
+      @include mobile() {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 100%;
+        padding-top: #{$mobile_navbar_height + 24}px;
+      }
 
       div.wrt-chart-container {
         margin-bottom: 24px;
@@ -297,12 +324,16 @@ div.wrt-popup-container {
           }
 
           &.seen {
+            opacity: 0.5;
+          }
+
+          &.seen, &.sent {
             div.wrt-popup-list-row-name, div.wrt-popup-list-row-seen {
               width: calc(100% - 24px - 8px);
             }
           }
 
-          &:not(.seen) {
+          &:not(.seen), &:not(.sent) {
             @include big_web() {
               &:hover {
                 button.send-reminder-bt {
@@ -342,7 +373,7 @@ div.wrt-popup-container {
             margin-left: 8px;
             @include OC_Body_Book();
             font-size: 12px;
-            color: rgba($deep_navy, 0.5);
+            color: $light_navy;
             line-height: 18px;
             overflow: hidden;
             text-overflow: ellipsis;

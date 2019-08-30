@@ -3,8 +3,16 @@ div.is-comments {
   text-align: right;
   height: 26px;
 
+  @include mobile() {
+    height: 20px;
+  }
+
   div.is-comments-authors {
     float: left;
+
+    @media screen and (max-width: 374px) {
+      display: none;
+    }
 
     &:not(:empty){
       margin-right: 8px;
@@ -28,6 +36,16 @@ div.is-comments {
 
       @include user-profile(24);
 
+      @include mobile(){
+        width: 20px;
+        height: 20px;
+        border: 1px solid transparent;
+        margin-left: -8px;
+        margin-top: 0;
+
+        @include user-profile(16);
+      }
+
       &:first-child {
         margin-left: 0px;
       }
@@ -37,30 +55,45 @@ div.is-comments {
   div.is-comments-summary {
     float: left;
     font-size: 12px;
-    color: $deep_navy;
+    color: rgba($deep_navy, 0.5);
     @include OC_Body_Book();
     margin-top: 4px;
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    opacity: 0.5;
 
     @include big_web() {
       cursor: pointer;
 
       &:hover {
-        opacity: 1;
+        color: $deep_navy;
+
+        span.add-a-comment {
+          color: $deep_navy;
+
+          &:before {
+            opacity: 1;
+          }
+        }
       }
     }
 
     @include mobile() {
-      max-width: 68vw;
+      margin-top: 0;
+      line-height: 20px;
+    }
+
+    @include new-comments-tag();
+
+    div.new-comments-tag {
+      margin-left: 8px;
+      display: inline-block;
     }
 
     span.add-a-comment {
       padding-left: 6px;
-      color: $deep_navy;
+      color: rgba($deep_navy, 0.5);
 
       &:before {
         content: "";
@@ -72,7 +105,7 @@ div.is-comments {
         height: 15px;
         float: left;
         display: block;
-
+        opacity: 0.5;
       }
     }
   }

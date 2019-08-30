@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.notifications :as notification-actions]))
@@ -46,6 +47,7 @@
                           (rum/local false ::timeout)
 
                           (rum/local 0 ::old-expire)
+                          (am/truncate-element-mixin "div.notification-description" (* 20 3))
                           {:did-mount (fn [s]
                            (setup-timeout s)
                            s)
@@ -58,19 +60,22 @@
                                 ;; remove notification from list
                                 (notification-actions/remove-notification (first (:rum/args s)))))
                             s)}
-  [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
+  [s {:keys [id title description slack-icon opac server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
-             secondary-bt-dismiss app-update slack-bot mention mention-author
-             click] :as notification-data}
+             secondary-bt-dismiss web-app-update slack-bot mention mention-author
+             click dismiss-x] :as notification-data}
       light-theme]
   [:div.notification.group
     {:class (utils/class-set {:server-error server-error
-                              :app-update app-update
+                              :app-update web-app-update
                               :slack-bot slack-bot
                               :opac opac
                               :light-theme light-theme
                               :mention-notification (and mention mention-author)
+                              :bottom-notch (js/isiPhoneWithoutPhysicalHomeBt)
+                              :dismiss dismiss
+                              :clickable (fn? click)
                               :inline-bt (or primary-bt-inline
                                              (and id
                                                   ((keyword id) #{:slack-team-added :slack-bot-added
@@ -78,7 +83,7 @@
                                                                   :cancel-invitation :member-removed-from-team
                                                                   :reminder-created :reminder-updated
                                                                   :reminder-deleted :resend-verification-ok})))
-                              :dismiss-button dismiss-bt})
+                              :dismiss-button dismiss})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)
      :on-click #(when (and (fn? click)
@@ -95,8 +100,10 @@
                       (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
                         (dismiss %)))
+         :class (when dismiss-x "dismiss-x")
          :ref :dismiss-bt}
-        "OK"])
+        (when-not dismiss-x
+          "OK")])
     [:div.notification-title.group
       {:class (when-not (seq description) "no-description")}
       (when slack-icon

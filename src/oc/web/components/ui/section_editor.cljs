@@ -4,6 +4,7 @@
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -32,8 +33,8 @@
         (>= (.search lower-email lower-query) 0))))
 
 (defn compare-users [user-1 user-2]
-  (compare (string/lower (utils/name-or-email user-1))
-           (string/lower (utils/name-or-email user-2))))
+  (compare (string/lower (user-lib/name-for user-1))
+           (string/lower (user-lib/name-for user-2))))
 
 (defn filter-users
   "Given a list of users and a query string, return those that match the given query."
@@ -118,7 +119,8 @@
                             utils/default-section
                             (section-for-editing initial-section-data))]
      (when (string? (:name fixed-section-data))
-       (reset! (::section-name s) (clojure.string/trim (:name fixed-section-data))))
+       (reset! (::section-name s) (clojure.string/trim
+        (.text (js/$ (str "<div>" (:name fixed-section-data) "</div>"))))))
      (reset! (::editing-existing-section s) (not new-section))
      (when-not (empty? (:name fixed-section-data))
        (reset! (::initial-section-name s) (:name fixed-section-data)))
@@ -150,6 +152,7 @@
         show-slack-channels? (pos? (apply + (map #(-> % :channels count) slack-teams)))
         channel-name (when @(::editing-existing-section s) (:channel-name (:slack-mirror section-data)))
         roster (drv/react s :team-roster)
+        all-users-data (if team-data (:users team-data) (:users roster))
         slack-orgs (:slack-orgs team-data)
         cur-user-data (drv/react s :current-user-data)
         slack-users (:slack-users cur-user-data)
@@ -208,7 +211,7 @@
                           (when (and (not disable-bt)
                                      (compare-and-set! (::saving s) false true))
                             (let [section-node (rum/ref-node s "section-name")
-                                  section-name (.-innerText section-node)
+                                  section-name (clojure.string/trim (.-value section-node))
                                   personal-note-node (rum/ref-node s "personal-note")
                                   personal-note (when personal-note-node (.-innerText personal-note-node))
                                   success-cb #(when (fn? on-change)
@@ -222,28 +225,22 @@
         [:div.section-editor-add
           [:div.section-editor-add-label
             [:span.section-name "Section name"]]
-          [:div.section-editor-add-name.oc-input
-            {:content-editable true
+          [:input.section-editor-add-name.oc-input
+            {:value @(::section-name s)
              :placeholder "Section name"
              :ref "section-name"
              :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
                                        :preflight-error (:section-name-error section-editing)})
-             :on-paste #(js/OnPaste_StripFormatting (rum/ref-node s "section-name") %)
-             :on-key-up (fn [e]
-                          (let [next-section-name (clojure.string/trim (.. e -target -innerText))]
+             :max-length 50
+             :on-change (fn [e]
+                          (let [next-section-name (.. e -target -value)]
                             (when (not= @(::section-name s) next-section-name)
+                              (reset! (::section-name s) next-section-name)
                               (when @(::section-name-check-timeout s)
                                 (.clearTimeout js/window @(::section-name-check-timeout s)))
                               (reset! (::section-name-check-timeout s)
                                (utils/after 500
-                                (fn []
-                                  (reset! (::section-name s) next-section-name)
-                                  (check-section-name-error s)))))))
-             :on-key-press (fn [e]
-                             (when (or (>= (count (.. e -target -innerText)) 50)
-                                      (= (.-key e) "Enter"))
-                              (utils/event-stop e)))
-             :dangerouslySetInnerHTML (utils/emojify @(::initial-section-name s))}]
+                                #(check-section-name-error s))))))}]
           (when (or (:section-name-error section-editing)
                     (:section-error section-editing))
             [:div.section-editor-error-label
@@ -279,6 +276,7 @@
                               (dis/dispatch! [:update [:section-editing]
                                               #(merge % {:access "private"
                                                          :has-changes true
+                                                         :authors (conj (set (:authors section-editing)) current-user-id)
                                                          :slack-mirror (if show-slack-channels?
                                                                          nil
                                                                          (:slack-mirror section-editor))})]))}
@@ -368,7 +366,7 @@
                              :ref (str "add-user-" (:user-id user))}
                             (user-avatar-image user)
                             [:div.name
-                              (utils/name-or-email user)]])
+                              (user-lib/name-for user)]])
                         [:div.section-editor-private-users-result.no-more-invites
                           [:div.name
                             (str
@@ -395,7 +393,7 @@
                     user-type (if (utils/in? (:viewers section-editing) user-id)
                                 :viewer
                                 :author)
-                    team-user (some #(when (= (:user-id %) user-id) %) (:users team-data))]
+                    team-user (some #(when (= (:user-id %) user-id) %) all-users-data)]
                 [:div.section-editor-add-private-users-dropdown-container
                   {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
                            :display (if @(::show-edit-user-dropdown s) "block" "none")}}
@@ -416,16 +414,18 @@
                  :ref "edit-users-scroll"}
                 (let [author-ids (set (:authors section-editing))
                       viewer-ids (set (:viewers section-editing))
-                      authors (filter (comp author-ids :user-id) (:users team-data))
-                      viewers (filter (comp viewer-ids :user-id) (:users team-data))
+                      authors (filter (comp author-ids :user-id) all-users-data)
+                      viewers (filter (comp viewer-ids :user-id) all-users-data)
                       complete-authors (map
-                                        #(merge % {:type :author :display-name (utils/name-or-email %)})
+                                        #(merge % {:type :author :display-name (user-lib/name-for %)})
                                         authors)
                       complete-viewers (map
-                                        #(merge % {:type :viewer :display-name (utils/name-or-email %)})
+                                        #(merge % {:type :viewer :display-name (user-lib/name-for %)})
                                         viewers)
                       all-users (concat complete-authors complete-viewers)
-                      sorted-users (sort compare-users all-users)]
+                      self-user (first (filter #(= (:user-id %) current-user-id) all-users))
+                      rest-users (filter #(not= (:user-id %) current-user-id) all-users)
+                      sorted-users (concat [self-user] (sort compare-users rest-users))]
                   (for [user sorted-users
                         :let [user-type (:type user)
                               self (= (:user-id user) current-user-id)
@@ -443,7 +443,9 @@
                                       (reset! (::show-edit-user-dropdown s) next-user-id)))}
                       (user-avatar-image user)
                       [:div.name
-                        (utils/name-or-email user)]
+                        (user-lib/name-for user)
+                        (when (= (:user-id user) current-user-id)
+                          " (you)")]
                       (if self
                         (if (and (seq (:slug section-editing))
                                  (> (count (:authors section-data)) 1))

@@ -274,3 +274,11 @@
         old-notifications (get-in db user-notifications-key)
         read-notifications (map #(if (= (:created-at %) (:created-at notification)) (assoc % :unread false) %) old-notifications)]
     (assoc-in db user-notifications-key read-notifications)))
+
+;; Expo push tokens
+
+(defmethod dispatcher/action :expo-push-token
+  [db [_ push-token]]
+  (if push-token
+    (assoc-in db dispatcher/expo-push-token-key push-token)
+    db))

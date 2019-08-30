@@ -7,6 +7,9 @@ nav.oc-navbar {
   transition: height 230ms;
   border-bottom: 1px solid $ultra_light_grey;
 
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+
   &.showing-orgs-dropdown {
     overflow: visible;
   }
@@ -20,9 +23,8 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
     padding-bottom: 1px;
-    border-bottom: none;
-    border-bottom: 1px solid $grey_num_3;
-    background-color: $grey_num_2;
+    border-bottom: 1px solid $divider_line_grey;
+    background-color: white;
     overflow: visible;
 
     &.show-login-overlay {
@@ -31,10 +33,6 @@ nav.oc-navbar {
 
     &.showing-orgs-dropdown {
       overflow: visible;
-    }
-
-    &.expanded-user-menu {
-      height: 100vh;
     }
   }
 
@@ -50,15 +48,15 @@ nav.oc-navbar {
 
     @include mobile() {
       width: 100vw;
-      padding: 16px;
       height: #{$mobile_navbar_height}px;
+      padding: 16px;
     }
 
     div.oc-navbar-header-container{
       height: 32px;
 
       @include mobile(){
-        height: 40px;
+        height: 24px;
       }
 
       div.navbar-center {
@@ -75,184 +73,27 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 16px;
-          left: 72px;
-          width: calc(100vw - 64px - 80px);
-          height: 40px;
-          margin: 0;
-        }
+          top: 15px;
+          left: 50%;
+          width: 250px;
+          height: 24px;
+          margin: 0 0 0 -125px;
+          text-align: center;
 
-        div.mobile-sections-list {
-          display: none;
-
-          @include mobile() {
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: transparent;
-            display: block;
-            z-index: #{$navbar_zindex + 10};
-
-            div.mobile-sections-list-inner {
-              display: block;
-              width: calc(100vw - 64px - 80px);
-              max-height: 60vh;
-              position: absolute;
-              top: 64px;
-              left: 72px;
-              border-radius: 4px;
-              background-color: white;
-              padding: 8px 0 0;
-              overflow-x: hidden;
-              overflow-y: auto;
-              border: 1px solid $mid_light_grey;
-              box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-
-              button.mobile-section-item {
-                display: block;
-                width: 100%;
-                height: 34px;
-                padding: 8px 16px;
-                @include OC_Body_Book();
-                color: rgba($light_navy, 0.5);
-                font-size: 14px;
-                line-height: 18px;
-                text-align: left;
-                max-width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                position: relative;
-
-                &.compose {
-                  padding-left: 39px;
-                  &:before {
-                    content: " ";
-                    width: 12px;
-                    height: 12px;
-                    position: absolute;
-                    top: 11px;
-                    left: 18px;
-                    background-image: cdnUrl("/img/ML/compose_icon_grey.svg");
-                    background-size: 12px 12px;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    opacity: 0.5;
-                  }
-                }
-
-                &.all-posts {
-                  padding-left: 39px;
-                  &:before {
-                    content: " ";
-                    width: 16px;
-                    height: 16px;
-                    position: absolute;
-                    top: 9px;
-                    left: 16px;
-                    background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
-                    background-size: 16px 16px;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    opacity: 0.5;
-                  }
-                }
-
-                &.drafts {
-                  padding-left: 39px;
-                  &:before {
-                    content: " ";
-                    width: 12px;
-                    height: 16px;
-                    position: absolute;
-                    top: 9px;
-                    left: 18px;
-                    background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
-                    background-size: 12px 16px;
-                    background-repeat: no-repeat;
-                    background-position: center;
-                    opacity: 0.5;
-                  }
-                }
-
-                &.active, &:focus, &:active {
-                  background-color: $ultra_light_grey;
-                  color: $light_navy;
-                  -webkit-tap-highlight-color: $ultra_light_grey;
-
-                  &.all-posts:before, &.drafts:before {
-                    opacity: 1;
-                  }
-                }
-              }
-
-              button.mobile-section-item-compose {
-                border-radius: 6px;
-                background-color: $carrot_green;
-                margin: 8px;
-                text-align: center;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 40px;
-                width: calc(100% - 16px);
-                opacity: 1;
-
-                span.compose-green-icon {
-                  width: 12px;
-                  height: 22px;
-                  background-image: cdnUrl("/img/ML/white_pen.svg");
-                  background-size: 12px 12px;
-                  background-position: center;
-                  background-repeat: no-repeat;
-                }
-
-                span.compose-green-label {
-                  @include OC_Body_Bold();
-                  font-size: 16px;
-                  line-height: 22px;
-                  color: white;
-                  margin-left: 8px;
-                  margin-top: 1px;
-                }
-              }
-            }
+          div.navbar-mobile-title {
+            @include OC_Body_Bold();
+            font-size: 18px;
+            color: $deep_navy;
+            line-height: 24px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
           }
         }
 
         &.search-active {
           width: 430px;
           margin-left: -215px;
-        }
-
-        button.mobile-board-button {
-          display: none;
-
-          @include mobile() {
-            display: block;
-            width: calc(100vw - 64px - 80px);
-            margin: 0;
-            height: 40px;
-            background-color: $ultra_light_grey;
-            border-radius: 4px;
-            border: none;
-            padding: 10px 20px 10px 14px;
-            @include OC_Body_Book();
-            font-size: 16px;
-            color: $deep_navy;
-            text-align: left;
-            background-image: cdnUrl("/img/ML/select_arrows.svg");
-            background-size: 8px 10px;
-            background-position: top 15px right 8px;
-            background-repeat: no-repeat;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            white-space: nowrap;
-          }
         }
 
         button.orgs-dropdown div.org-avatar {
@@ -264,6 +105,30 @@ nav.oc-navbar {
       div.navbar-left {
         float: left;
         height: 32px;
+
+        @include mobile() {
+          height: 24px;
+        }
+
+        button.mobile-ham-menu {
+          display: none;
+
+          @include mobile() {
+            display: block;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/mobile_navbar_ham.svg");
+            background-size: 16px 12px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
+            position: absolute;
+            padding: 0;
+            top: 11px;
+            left: 16px;
+          }
+        }
 
         div.orgs-dropdown {
           float: left;
@@ -334,10 +199,10 @@ nav.oc-navbar {
 
         @include mobile() {
           position: absolute;
-          top: 16px;
+          top: 11px;
           right: 16px;
-          width: 40px;
-          height: 40px;
+          width: 32px;
+          height: 32px;
         }
 
         div.user-notifications {
@@ -355,15 +220,10 @@ nav.oc-navbar {
           float: right;
           position: relative;
 
-          @include mobile() {
-            float: unset;
-            width: 40px;
-            height: 40px;
-          }
-
-          div.user-menu-button.green-dot {
+          div.user-menu-button {
             position: relative;
-            &:after {
+
+            &.green-dot:after {
               content: "";
               width: 12px;
               height: 12px;

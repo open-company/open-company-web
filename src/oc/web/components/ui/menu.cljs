@@ -7,6 +7,7 @@
             [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
@@ -63,6 +64,16 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
+(defn- detect-desktop-app
+  []
+  (when-not ua/desktop-app?
+    (cond
+      ua/mac? {:title "Mac app"
+               :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
+      ua/windows? {:title "Windows app"
+                   :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+      :default nil)))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
@@ -84,7 +95,8 @@
         org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
-                                 is-admin-or-author?)]
+                                 is-admin-or-author?)
+        desktop-app-data (detect-desktop-app)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -126,9 +138,7 @@
              :on-click #(reminders-click s %)}
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        (when (and (not is-mobile?)
-                   (or (= user-role :admin)
-                       show-invite-people?))
+        (when-not is-mobile?
           [:div.oc-menu-separator])
         (when (and (not is-mobile?)
                    (= user-role :admin)
@@ -146,13 +156,14 @@
             [:div.oc-menu-item.invite-team
               "Invite people"]])
         (when (and (not is-mobile?)
-                   org-slug
-                   (= user-role :admin))
+                   org-slug)
           [:a
             {:href "#"
              :on-click #(manage-team-click s %)}
             [:div.oc-menu-item.manage-team
-              "Manage team"]])
+              (if (= user-role :admin)
+                "Manage team"
+                "View team")]])
         (when (and (not is-mobile?)
                    org-slug
                    (= user-role :admin))
@@ -169,16 +180,21 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          (if is-mobile?
-            {:href "https://whats-new.carrot.io/"
+          {:href "https://the.carrot.news/"
              :target "_blank"}
-            {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a
-          {:on-click #(chat/chat-click 42861)}
+          {:class "intercom-chat-link"
+           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
           [:div.oc-menu-item.support
             "Get support"]]
+        (when desktop-app-data
+          [:a
+            {:href (:href desktop-app-data)
+             :target "_blank"}
+            [:div.oc-menu-item.native-app
+              (:title desktop-app-data)]])
         [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out

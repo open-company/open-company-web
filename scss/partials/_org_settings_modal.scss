@@ -63,7 +63,7 @@ div.org-settings-modal {
         @include OC_Body_Bold();
         font-size: 14px;
         background-color: $carrot_green;
-        border-radius: 6px;
+        border-radius: 4px;
         color: white;
         line-height: 18px;
         float: right;
@@ -150,6 +150,46 @@ div.org-settings-modal {
         }
       }
 
+      div.org-settings-field-container {
+        margin-top: 8px;
+        height: 32px;
+        padding: 0 8px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+        border: 1px solid $ultra_light_grey;
+        border: none;
+        outline: none;
+        width: 100%;
+
+        &.error {
+          border: 1px solid $carrot_orange;
+        }
+
+        input.org-settings-field {
+          padding: 7px 0;
+          height: 32px;
+          float: left;
+          width: calc(100% - 32px);
+          margin-top: 0;
+        }
+
+        button.add-email-domain-bt {
+          float: right;
+          width: auto;
+          padding: 0;
+          @include OC_Body_Bold();
+          color: $carrot_green;
+          font-size: 13px;
+          height: 18px;
+          margin-top: 7px;
+
+          &:disabled, &.disabled {
+            color:rgba($deep_navy, 0.5);
+            opacity: 1;
+          }
+        }
+      }
+
       input.org-settings-field {
         margin-top: 8px;
         height: 32px;
@@ -158,19 +198,20 @@ div.org-settings-modal {
         @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
+        line-height: 18px;
         padding: 7px 8px;
         width: 100%;
         border: none;
         outline: none;
         border: 1px solid $ultra_light_grey;
 
-        @include placeholder(){
-          opacity: 0.6;
+        &:focus, &:active, &.active {
+          border: 1px solid $ultra_light_grey;
+          outline: none;
         }
 
-        &:active, &:focus {
-          border: none;
-          outline: none;
+        @include placeholder(){
+          opacity: 0.6;
         }
 
         &.error {
@@ -206,12 +247,16 @@ div.org-settings-modal {
           height: 18px;
 
           button.remove-email-bt {
-            padding: 0 12px 0 0;
+            padding: 0;
             float: right;
             @include OC_Body_Book();
             font-size: 12px;
-            color: $ui_grey;
+            color: $deep_navy;
             opacity: 0.5;
+
+            &:hover {
+              opacity: 1;
+            }
           }
         }
       }

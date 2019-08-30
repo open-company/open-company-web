@@ -2,12 +2,14 @@
   (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.stores.user :as store]
             [oc.web.lib.utils :as utils]
+            [oc.web.stores.user :as store]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]))
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
+                               ui-mixins/refresh-tooltips-mixin
   [s user-data tooltip?]
   (let [use-default @(::use-default s)
         default-avatar (store/user-icon (:user-id user-data))

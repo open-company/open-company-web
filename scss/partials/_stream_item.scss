@@ -2,11 +2,7 @@ div.stream-item {
   width: #{$board_container_width}px;
   margin: 0;
   border-bottom: 1px solid $ultra_light_grey;
-
-  div.stream-item-inner {
-    border-left: 4px solid transparent;
-    padding: 24px 40px;
-  }
+  padding: 24px 40px;
 
   &.expandable {
     cursor: pointer;
@@ -15,13 +11,9 @@ div.stream-item {
       &:hover {
         background-color: #F5F5F5;
 
-        div.stream-item-inner {
-          border-left: 4px solid #F5F5F5;
-        }
-
         div.stream-item-header {
-          div.more-menu {
-            display: block;
+          div.more-menu button {
+            display: initial;
           }
         }
 
@@ -48,12 +40,9 @@ div.stream-item {
     margin: 0;
     border-radius: 0;
     border-top: none;
-    border-bottom: 1px solid $grey_num_3;
-    background-color: $grey_num_2;
-
-    div.stream-item-inner {
-      padding: 24px 16px;
-    }
+    border-bottom: 1px solid $divider_line_grey;
+    background-color: $grey_num_4;
+    padding: 16px 16px 22px;
   }
 
   &.draft {
@@ -65,10 +54,6 @@ div.stream-item {
     z-index: 1;
     position: relative;
 
-    div.stream-item-inner {
-      border-left: 4px solid white;
-    }
-
     &.showing-share {
       z-index: 3;
     }
@@ -77,11 +62,8 @@ div.stream-item {
       &:hover {
         background-color: white;
         z-index: 2;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
 
-        div.stream-item-inner{
-          border-left: 4px solid white;
-          box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-        }
         div.stream-item-body-ext {
           div.stream-item-footer {
             div.stream-item-comments-summary {
@@ -113,36 +95,21 @@ div.stream-item {
         }
       }
     }
+  }
 
-    &.must-see-item {
-      div.stream-item-inner {
-        border-left: 4px solid $sea_blue;
-      }
+  &:not(.follow-up-item).must-see-item {
 
-      @include big_web(){
-        &:hover {
-          div.stream-item-inner {
-            border-left: 4px solid $sea_blue;
-          }
-        }
-      }
+    div.must-see-tag {
+      display: inline-block;
     }
   }
 
-  &.must-see-item {
-    div.stream-item-inner {
-      border-left: 4px solid transparent;
-    }
-
-    @include big_web(){
-      &:hover {
-        div.stream-item-inner {
-          border-left: 4px solid transparent;
-        }
-      }
-    }
-
+  &.follow-up-item, &.follow-up-item.must-see-item {
     div.must-see-tag {
+      display: none;
+    }
+
+    div.follow-up-tag {
       display: inline-block;
     }
   }
@@ -171,6 +138,7 @@ div.stream-item {
       }
 
       @include mobile() {
+        @include activity-author(32);
         width: calc(100% - 46px);
       }
 
@@ -181,19 +149,46 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: auto;
+          height: 32px;
+          width: calc(100% - 48px);
+          max-width: unset;
         }
 
-        div.name-inner {
+        div.mobile-name {
           display: inline-block;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          line-height: 24px;
-          margin-right: 8px;
+
+          @include mobile() {
+            display: flex;
+            align-items: center;
+          }
+
+          div.name-inner {
+            display: inline-block;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 24px;
+            margin-right: 8px;
+
+            @include mobile() {
+              flex: 1;
+              min-width: 0;
+              display: block;
+              line-height: 32px;
+            }
+          }
+
+          div.mobile-time-since {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              white-space: nowrap;
+            }
+          }
         }
       }
 
-      div.must-see-tag {
+      div.follow-up-tag, div.must-see-tag {
         margin-top: 2px;
       }
     }
@@ -202,13 +197,17 @@ div.stream-item {
       height: 24px;
 
       @include big_web() {
-        display: none;
+        &:not(.menu-expanded) button {
+          display: none;
+        }
       }
 
       @include mobile() {
+        height: 32px;
+
         ul.more-menu-list {
           left: unset;
-          right: 16px;
+          right: 0;
         }
       }
     }
@@ -220,7 +219,9 @@ div.stream-item {
 
   @include must-see-tag();
 
-  div.must-see-tag {
+  @include follow-up-tag();
+
+  div.follow-up-tag, div.must-see-tag {
     display: none;
 
     @include mobile() {
@@ -228,7 +229,7 @@ div.stream-item {
     }
   }
 
-  & > div.new-tag, & > div.must-see-tag {
+  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
     margin-top: 16px;
   }
 
@@ -384,11 +385,13 @@ div.stream-item {
       }
 
       div.stream-item-headline {
-        @include activity-title();
+        @include activity-title(24px, 28px);
         color: $deep_navy;
         display: inline;
+
         @include mobile() {
           margin-top: 16px;
+          @include activity-title(24px, 28px);
         }
       }
 
@@ -398,10 +401,13 @@ div.stream-item {
         color: $deep_navy;
         @include OC_Body_Book();
         line-height: 24px;
-        max-height: 72px;
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
+
+        &.no-abstract {
+          max-height: #{24 * 3}px;
+        }
 
         @include mobile() {
           margin-top: 4px;
@@ -428,6 +434,27 @@ div.stream-item {
     div.stream-item-footer {
       min-height: 26px;
       margin-top: 16px;
+
+      @include mobile() {
+        height: auto;
+        overflow: hidden;
+        margin-top: 10px;
+        min-height: 32px;
+      }
+
+      div.reactions {
+        @include mobile() {
+          display: inline-block;
+        }
+      }
+
+      div.stream-item-footer-mobile-group {
+        @include mobile() {
+          display: inline-block;
+          height: 32px;
+          padding-top: 8px;
+        }
+      }
 
       div.stream-body-draft-edit {
         float: left;
@@ -456,17 +483,16 @@ div.stream-item {
         margin-right: 16px;
         float: left;
 
-        @include mobile() {
-          max-width: calc(50% - 16px);
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
         div.is-comments {
           div.is-comments-authors.show-border {
             div.is-comments-author {
               background-color: $oc_gray_8;
               border: 2px solid $oc_gray_8;
+
+              @include mobile() {
+                background-color: $grey_num_4;
+                border: 2px solid $grey_num_4;
+              }
             }
           }
         }
@@ -498,6 +524,10 @@ div.stream-item {
         height: 26px;
         position: relative;
 
+        @include mobile() {
+          height: 20px;
+        }
+
         &:hover {
           div.stream-item-attachments-count {
             opacity: 1;
@@ -516,6 +546,16 @@ div.stream-item {
           color: $deep_navy;
           opacity: 0.5;
           margin-top: 4px;
+
+          @include mobile() {
+            margin-top: 0;
+            padding-left: 0;
+            line-height: 20px;
+
+            &:before {
+              display: none;
+            }
+          }
 
           &:before {
             content: " ";
@@ -589,6 +629,50 @@ div.stream-item {
 
         @include mobile() {
           margin-left: 2px;
+          margin-top: 0;
+        }
+
+        div.post-added-tooltip-container {
+          position: absolute;
+          bottom: 30px;
+          left: 0;
+          width: 320px;
+          padding: 16px;
+          border-radius: 4px;
+          background-color: $deep_navy;
+
+          &:after {
+            content: " ";
+            position: absolute;
+            left: 24px;
+            bottom: -3px;
+            width: 6px;
+            height: 6px;
+            transform: rotate(-45deg);
+            background-color: $deep_navy;
+          }
+
+          div.post-added-tooltip-title {
+            color: white;
+            @include OC_Body_Bold();
+            font-size: 16px;
+          }
+
+          div.post-added-tooltip {
+            margin-top: 8px;
+            color: white;
+            @include OC_Body_Book();
+            font-size: 14px;
+          }
+
+          button.post-added-tooltip-bt {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            color: $carrot_green;
+            margin-top: 8px;
+            padding: 0;
+            display: block;
+          }
         }
       }
 

@@ -6,6 +6,9 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            ;; Pull in functions for interfacing with Expo mobile app
+            [oc.web.expo :as expo]
+            [oc.shared.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
@@ -32,6 +35,7 @@
             [oc.web.actions.nux :as na]
             [oc.web.actions.jwt :as ja]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.web-app-update :as web-app-update-actions]
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.api :as api]
@@ -39,16 +43,14 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.ziggeo :as ziggeo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.logging :as logging]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
-            [oc.web.components.user-profile :refer (user-profile)]
             [oc.web.components.about :refer (about)]
             [oc.web.components.home-page :refer (home-page)]
             [oc.web.components.pricing :refer (pricing)]
@@ -58,7 +60,7 @@
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
             [oc.web.components.ui.notifications :refer (notifications)]
-            [oc.web.components.ui.activity-not-found :refer (activity-not-found)]))
+            [oc.web.components.ui.login-wall :refer (login-wall)]))
 
 (enable-console-print!)
 
@@ -74,7 +76,7 @@
                   :target notifications-mount-point})))
 
 ;; setup Sentry error reporting
-(defonce raven (sentry/raven-setup))
+(defonce sentry (sentry/sentry-setup))
 
 ;; Avoid warnings
 
@@ -106,6 +108,14 @@
       (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
 
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
+  ;; Add Electron classes if needed
+  (let [body (sel1 [:body])]
+    (when ua/desktop-app?
+      (dommy/add-class! body :electron)
+      (when ua/mac?
+        (dommy/add-class! body :mac-electron))
+      (when ua/windows?
+        (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
   (when (:log-level query-params)
     (logging/config-log-level! (:log-level query-params)))
@@ -172,15 +182,25 @@
         bot-access (when (contains? query-params :access)
                       (:access query-params))
         next-app-state {:loading loading
-                        :ap-initial-at (when has-at-param (:at query-params))
                         :panel-stack panel-stack
                         :bot-access bot-access}]
     (swap! dis/app-state merge next-app-state)))
+
+(defn- read-sort-type-from-cookie
+  "Read the sort order from the cookie, fallback to the default,
+   if it's on drafts board force the recently posted sort since that has only that"
+  [params]
+  (let [last-sort-cookie (cook/get-cookie (router/last-sort-cookie (:org params)))]
+    (if (or (= last-sort-cookie "recently-posted")
+            (= (:board params) utils/default-drafts-board-slug))
+      :recently-posted
+      dis/default-sort-type)))
 
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
         board (:board params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
         first-ever-cookie-name (when (= route "all-posts")
@@ -198,7 +218,7 @@
       (do
         (pre-routing query-params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -224,6 +244,8 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
+        comment (:comment params)
+        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
     (pre-routing query-params true {:query-params query-params :keep-params [:at]})
@@ -232,10 +254,12 @@
      (vec
       (remove
        nil?
-       [org board (when entry entry) route]))
+       [org board (when entry entry) (when comment comment) route]))
      {:org org
       :board board
       :activity entry
+      :comment comment
+      :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
     (post-routing)
@@ -243,11 +267,12 @@
     (drv-root component target)))
 
 ;; Component specific to a secure activity
-(defn secure-activity-handler [component route target params]
+(defn secure-activity-handler [component route target params pre-routing?]
   (let [org (:org params)
         secure-id (:secure-id params)
         query-params (:query-params params)]
-    (pre-routing query-params true)
+    (when pre-routing?
+      (pre-routing query-params true))
     ;; save the route
     (router/set-route!
      (vec
@@ -256,7 +281,7 @@
        [org route secure-id]))
      {:org org
       :activity (:entry params)
-      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents (:id query-params))))
+      :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
@@ -266,15 +291,15 @@
               ;; a subset of the company data loaded with a SU
               (not (dis/secure-activity-data)))
       (swap! dis/app-state merge {:loading true}))
-    (aa/secure-activity-chain)
+    (post-routing)
     ;; render component
     (drv-root component target)))
 
 (defn entry-handler [target params]
+  (pre-routing (:query-params params) true)
   (if (and (not (jwt/jwt))
-           (:secure-uuid (jwt/get-id-token-contents
-                          (:id (:query-params params)))))
-    (secure-activity-handler secure-activity "secure-activity" target params)
+           (:secure-uuid (jwt/get-id-token-contents)))
+    (secure-activity-handler secure-activity "secure-activity" target params false)
     (board-handler "activity" target org-dashboard params)))
 
 (defn slack-lander-check [params]
@@ -391,18 +416,6 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
-    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
-      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
-    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
-      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
       ;; Check if the user already have filled the needed data or if it needs to
@@ -484,7 +497,7 @@
     (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
       (when (jwt/jwt)
-        (router/redirect! urls/home))
+        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
     (defroute login-wall-route urls/login-wall {:keys [query-params] :as params}
@@ -492,13 +505,31 @@
       ; Email wall is shown only to not logged in users
       (when (jwt/jwt)
         (router/redirect-404!))
-      (simple-handler activity-not-found "login-wall" target params true))
+      (simple-handler login-wall "login-wall" target params true))
 
     (defroute login-wall-slash-route (str urls/login-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing login-wall-slash-route" (str urls/login-wall "/"))
       (when (jwt/jwt)
         (router/redirect-404!))
-      (simple-handler activity-not-found "login-wall" target params true))
+      (simple-handler login-wall "login-wall" target params true))
+
+    (defroute native-login-route urls/native-login {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-route" urls/native-login)
+      (if (jwt/jwt)
+        (router/redirect!
+         (if (seq (cook/get-cookie (router/last-org-cookie)))
+           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           urls/login))
+        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
+
+    (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
+      (if (jwt/jwt)
+        (router/redirect!
+         (if (seq (cook/get-cookie (router/last-org-cookie)))
+           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           urls/login))
+        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
     (defroute home-page-route urls/home {:as params}
       (timbre/info "Routing home-page-route" urls/home)
@@ -508,7 +539,9 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! urls/home))
+      (router/redirect! (if ua/pseudo-native?
+                          urls/native-login
+                          urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
@@ -534,6 +567,14 @@
       (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
       (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
 
+    (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
+      (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
+      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+
+    (defroute follow-ups-slash-route (str (urls/follow-ups ":org") "/") {:as params}
+      (timbre/info "Routing follow-ups-slash-route" (str (urls/follow-ups ":org") "/"))
+      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))
       (board-handler "dashboard" target org-dashboard (assoc params :board "drafts")))
@@ -544,11 +585,11 @@
 
     (defroute secure-activity-route (urls/secure-activity ":org" ":secure-id") {:as params}
       (timbre/info "Routing secure-activity-route" (urls/secure-activity ":org" ":secure-id"))
-      (secure-activity-handler secure-activity "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params true))
 
     (defroute secure-activity-slash-route (str (urls/secure-activity ":org" ":secure-id") "/") {:as params}
       (timbre/info "Routing secure-activity-slash-route" (str (urls/secure-activity ":org" ":secure-id") "/"))
-      (secure-activity-handler secure-activity "secure-activity" target params))
+      (secure-activity-handler secure-activity "secure-activity" target params true))
 
     (defroute board-route (urls/board ":org" ":board") {:as params}
       (timbre/info "Routing board-route" (urls/board ":org" ":board"))
@@ -566,6 +607,14 @@
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
       (entry-handler target params))
 
+    (defroute comment-route (urls/comment-url ":org" ":board" ":entry" ":comment") {:as params}
+      (timbre/info "Routing comment-route" (urls/comment-url ":org" ":board" ":entry" ":comment"))
+      (entry-handler target params))
+
+    (defroute comment-slash-route (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/") {:as params}
+      (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/"))
+      (entry-handler target params))
+
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
       ;; render component
@@ -575,19 +624,21 @@
 
     (defn handle-url-change [e]
       ;; we are checking if this event is due to user action,
-      ;; such as click a link, a back button, etc.
+      ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (js/window.scrollTo 0 0))
+        (if ua/edge?
+          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+          (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips
       (utils/after 100 #(utils/remove-tooltips))))
   (do
     (timbre/error "Error: div#app is not defined!")
-    (sentry/capture-message "Error: div#app is not defined!")))
+    (sentry/capture-message! "Error: div#app is not defined!")))
 
 (defn init []
   ;; Setup timbre log level
@@ -603,6 +654,9 @@
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
 
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
+
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
@@ -612,13 +666,15 @@
   (ca/subscribe)
   (user-actions/subscribe)
 
+  ;; Start the app update check cicle
+  (web-app-update-actions/start-web-app-update-check!)
+
   ;; on any click remove all the shown tooltips to make sure they don't get stuck
   (.click (js/$ js/window) #(utils/remove-tooltips))
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when handle-url-change
-    (router/setup-navigation! handle-url-change))
-  (ziggeo/init-ziggeo true))
+    (router/setup-navigation! handle-url-change)))
 
 (defn on-js-reload []
   (.clear js/console)

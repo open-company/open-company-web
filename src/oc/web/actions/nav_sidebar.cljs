@@ -3,10 +3,13 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.user :as user-actions]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
-            [oc.web.actions.section :as section-actions]))
+            [oc.web.actions.section :as section-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
 ;; :menu
@@ -27,7 +30,11 @@
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
+  (cmail-actions/cmail-hide)
+  (nux-actions/dismiss-post-added-tooltip)
   (dis/dispatch! [:reset-ap-initial-at (router/current-org-slug)])
+  (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+  (user-actions/hide-mobile-user-notifications)
   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
     (if (= current-path url)
       (do
@@ -67,7 +74,8 @@
 
 ;; Section settings
 
-(defn show-section-editor []
+(defn show-section-editor [section-slug]
+  (section-actions/setup-section-editing section-slug)
   (push-panel :section-edit))
 
 (defn hide-section-editor []
@@ -138,12 +146,28 @@
 (defn hide-wrt []
   (pop-panel))
 
+;; Follow-ups users picker
+
+(defn show-follow-ups-picker [activity-uuid callback]
+  (dis/dispatch! [:input [:follow-ups-picker-callback] (fn [users-list]
+   (when (fn? callback)
+     (callback users-list))
+   (dis/dispatch! [:input [:follow-ups-picker-callback] nil]))])
+  (push-panel (keyword (str "follow-ups-picker-" (or activity-uuid "")))))
+
 ;; Integrations
 
 (defn open-integrations-panel [e]
   (when e
     (.preventDefault e)
     (.stopPropagation e))
-  (show-org-settings :integrations))
+  (if (responsive/is-mobile-size?)
+    (let [alert-data {:action "mobile-integrations-link"
+                      :message "Carrot integrations need to be configured in a desktop browser."
+                      :solid-button-style :green
+                      :solid-button-title "OK, got it"
+                      :solid-button-cb #(alert-modal/hide-alert)}]
+      (alert-modal/show-alert alert-data))
+    (show-org-settings :integrations)))
 
 (set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)

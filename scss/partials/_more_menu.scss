@@ -8,44 +8,55 @@ div.more-menu {
 
   div.activity-move {
     position: absolute;
-    top: 24px;
+    top: 26px;
     left: unset;
     right: -9px;
 
     @include mobile() {
-      top: 40px;
+      top: 32px;
+      height: 32px;
       bottom: unset;
     }
   }
 
   button.more-menu-bt {
     height: 26px;
+    width: 24px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
     background-size: 18px 4px;
-    background-position: left center;
-    padding: 0 0 0 24px;
+    background-position: center;
+    padding: 0;
     background-repeat: no-repeat;
     opacity: 0.5;
 
     @include mobile() {
       width: 32px;
+      height: 32px;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
+      opacity: 1;
     }
 
     &:hover, &:active, &:focus {
       opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
     }
   }
 
   button.more-menu-share-bt {
-    height: 24px;
+    height: 26px;
+    width: 24px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_share_arrow.svg");
     background-size: 16px 14px;
-    background-position: left center;
-    padding: 0 0 0 24px;
+    background-position: center;
+    padding: 0;
     background-repeat: no-repeat;
-    margin-left: 16px;
+    margin-left: 10px;
     display: inline-block;
     opacity: 0.5;
 
@@ -58,9 +69,73 @@ div.more-menu {
     }
   }
 
+  button.more-menu-complete-follow-up-bt {
+    height: 26px;
+    width: 24px;
+    display: inline;
+    background-image: cdnUrl("/img/ML/follow_up_complete.svg");
+    background-size: 14px 14px;
+    background-position: center;
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    margin-left: 8px;
+    display: inline-block;
+
+    @include mobile() {
+      width: 32px;
+      height: 32px;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
+      background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
+      background-size: 14px 10px;
+      opacity: 1;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-create-follow-up-bt {
+    height: 26px;
+    width: 24px;
+    display: inline;
+    background-image: cdnUrl("/img/ML/follow_up_add.svg");
+    background-size: 16px 16px;
+    background-position: center;
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    margin-left: 8px;
+    display: inline-block;
+
+    @include mobile() {
+      width: 32px;
+      height: 32px;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
+      background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+      background-size: 13px 16px;
+      opacity: 1;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
   ul.more-menu-list {
     position: absolute;
-    top: 24px;
+    top: 26px;
     left: calc(100% - 108px);
     width: 74px;
     outline: none;
@@ -73,9 +148,24 @@ div.more-menu {
     padding: 8px 0;
     list-style-type: none;
 
-    &.has-read-unread {
-      left: calc(100% - 166px);
-      width: 120px;
+    &.has-create-follow-up {
+      left: calc(100% - 146px);
+      width: 144px;
+
+      @include mobile() {
+        left: calc(100% - 108px);
+        width: 74px;
+      }
+    }
+
+    &.has-complete-follow-up {
+      left: calc(100% - 126px);
+      width: 162px;
+
+      @include mobile() {
+        left: calc(100% - 108px);
+        width: 74px;
+      }
     }
 
     @include mobile() {

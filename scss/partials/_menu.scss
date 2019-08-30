@@ -13,9 +13,10 @@ div.menu {
   z-index: #{$navbar_zindex + 156};
 
   @include mobile() {
-    position: absolute;
+    position: fixed;
+    width: 100vw;
     padding: 0;
-    background-color: $grey_num_2;
+    overflow: initial;
   }
 
   &.dropdown-menu {
@@ -26,6 +27,10 @@ div.menu {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   &.expanded-user-menu {
@@ -47,15 +52,14 @@ div.menu {
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     @include mobile() {
-      position: relative;
-      top: unset;
+      top: 0;
       left: unset;
-      right: unset;
-      width: 100%;
-      height: 100vh;
+      right: 0;
+      width: 85vw;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
       border: none;
       box-shadow: none;
       transition: 230ms;
@@ -65,6 +69,7 @@ div.menu {
       display: none;
       opacity: 0;
       padding: 0 16px;
+      padding-top: #{$mobile_navbar_height}px;
     }
 
     div.menu-header {
@@ -76,12 +81,16 @@ div.menu {
       margin-bottom: 24px;
 
       @include mobile() {
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        border-bottom: 1px solid $ultra_light_grey;
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 85vw;
+        border-bottom: 1px solid $divider_line_grey;
+        background-color: white;
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
       }
 
       button.mobile-close-bt {
@@ -90,15 +99,17 @@ div.menu {
         @include mobile() {
           display: block;
           position: absolute;
-          left: 16px;
-          top: 13px;
-          width: 24px;
-          height: 24px;
+          right: 16px;
+          top: 11px;
+          width: 32px;
+          height: 32px;
           padding: 0;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
         }
       }
 
@@ -110,6 +121,9 @@ div.menu {
 
       div.user-avatar-img-container {
         float: right;
+        @include mobile() {
+          float: left;
+        }
       }
 
       div.user-name {
@@ -121,6 +135,8 @@ div.menu {
 
         @include mobile() {
           margin-left: 8px;
+          font-size: 16px;
+          line-height: 24px;
         }
       }
     }
@@ -166,6 +182,11 @@ div.menu {
       @include OC_Body_Book();
       font-size: 14px;
 
+      @include mobile() {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
       &.whats-new {
         #HW_badge_cont {
           display: inline;
@@ -177,6 +198,18 @@ div.menu {
           background-color: $carrot_green;
           border-radius: 4px;
         }
+      }
+
+      &.native-app::after {
+        @include OC_Body_Bold();
+        content: "BETA";
+        margin-left: 0.5em;
+        padding: 0.3em 0.5em;
+        color: $light_navy;
+        background-color: $oc_gray_6;
+        border-radius: 4px;
+        opacity: 0.5;
+        font-size: 0.8em;
       }
     }
   }

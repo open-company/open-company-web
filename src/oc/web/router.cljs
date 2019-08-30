@@ -5,7 +5,7 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
-            [oc.web.lib.raven :as raven]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.lib.jwt :as jwt]))
 
 (def path (atom {}))
@@ -19,7 +19,7 @@
 (defn get-token []
   (when (or (not js/window.location.pathname)
             (not js/window.location.search))
-    (raven/capture-message (str "Window.location problem:"
+    (sentry/capture-message! (str "Window.location problem:"
                                 " windown.location.pathname:" js/window.location.pathname
                                 " window.location.search:" js/window.location.search
                                 " return:" (str js/window.location.pathname js/window.location.search))))
@@ -105,11 +105,17 @@
 (defn current-posts-filter []
   (:board @path))
 
+(defn current-sort-type []
+  (or (:sort-type @path) :recent-activity))
+
 (defn current-activity-id []
   (:activity @path))
 
 (defn current-secure-activity-id []
   (:secure-id @path))
+
+(defn current-comment-id []
+  (:comment @path))
 
 (defn query-params []
   (:query-params @path))
@@ -137,6 +143,11 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
+(defn last-sort-cookie
+  "Cookie to save the last sort selected"
+  [org-slug]
+  (str "last-sort-" (jwt/user-id) "-" (name org-slug)))
+
 (defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
@@ -158,6 +169,8 @@
   (str "invite-people-tooltip-" (jwt/user-id)))
 
 (def login-redirect-cookie "login-redirect")
+
+(def expo-push-token-cookie "expo-push-token")
 
 ;; Debug
 

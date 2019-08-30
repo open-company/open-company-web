@@ -9,7 +9,7 @@
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.reaction :as reaction-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.mixins.ui :as ui-mixins]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]
@@ -17,22 +17,11 @@
 
 (def default-reaction-number 5)
 
-(defn- setup-tooltips [s]
-  (when-not (responsive/is-tablet-or-mobile?)
-    (doto (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
-      (.tooltip "fixTitle")
-      (.tooltip "hide"))))
-
 (rum/defcs reactions < (rum/local false ::show-picker)
-                       (on-window-click-mixin (fn [s e]
+                       ui-mixins/refresh-tooltips-mixin
+                       (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
-                       {:did-mount (fn [s]
-                         (setup-tooltips s)
-                         s)
-                        :did-remount (fn [_ s]
-                         (setup-tooltips s)
-                         s)}
   [s entity-data hide-last-reaction? optional-activity-data]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
@@ -49,7 +38,7 @@
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)
               should-show-picker?)
-      [:div.reactions
+      [:div.reactions.group
         [:div.reactions-list
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))
@@ -94,12 +83,6 @@
                  :data-toggle (when-not is-mobile? "tooltip")
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
-                               (when (and (not (:reacted r))
-                                          (not (js/isSafari))
-                                          (not (js/isEdge))
-                                          (not (js/isIE)))
-                                 ;;TODO: animate reaction
-                                 )
                                (if optional-activity-data
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}

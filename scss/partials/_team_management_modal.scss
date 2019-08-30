@@ -54,7 +54,6 @@ div.team-management-modal {
         font-size: 14px;
         color: $ui_grey;
         float: right;
-        margin-right: 8px;
       }
 
       button.save-bt {
@@ -66,7 +65,8 @@ div.team-management-modal {
         color: white;
         line-height: 18px;
         float: right;
-        border-radius: 6px; 
+        border-radius: 4px;
+        margin-left: 8px;
       }
     }
 

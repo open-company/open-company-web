@@ -24,7 +24,17 @@ div.sections-picker {
       }
 
       @include mobile() {
+        height: 34px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        padding: 8px 16px;
+        cursor: pointer;
+
         &.active {
+          background-color: $feint_emerald;
+          color: $carrot_green;
+          -webkit-tap-highlight-color: $feint_emerald;
+
           div.sections-picker-section-name {
             opacity: 1;
           }
@@ -48,6 +58,11 @@ div.sections-picker {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
+
+        @include mobile() {
+          @include OC_Body_Book();
+          font-size: 14px;
+        }
       }
     }
   }

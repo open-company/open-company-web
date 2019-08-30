@@ -51,6 +51,7 @@ $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
 $.datepicker = function(){};
+$.parseJSON = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -66,6 +67,7 @@ var recursiveAttachPasteListener = function(){};
 var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
+var AutoQuote = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};
@@ -126,8 +128,7 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
-var isSafari = function(){};
-var isIE = function(){};
+var isiPhoneWithoutPhysicalHomeBt = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -150,6 +151,7 @@ var init_fullstory = function(){};
 var FS = function(){};
 FS.setUserVars = function(){};
 FS.getCurrentSessionURL = function(){};
+FS.identify = function(){};
 // TCMention
 var CustomizedTagComponent = function(){};
 var TCMention = function(){};
@@ -175,16 +177,19 @@ ZiggeoApi.V2.Player.get = function(){};
 var Headway = function(){};
 Headway.init = function(){};
 Headway.show = function(){};
-// Drift
-var drift = function(){};
-drift.api = {};
-drift.api.startInteraction = function(){};
-drift.identify = function(){};
-drift.track = function(){};
+// Intercom (Chat support)
+var Intercom = function(){};
 // Homepage animation
-var OCWebSetupMarketingSiteJS = function(){};
+var OCWebSetupStaticPagesJS = function(){};
 var OCStaticShowAnimationLightbox = function(){};
 var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// Mobile app (Expo)
+var ReactNativeWebView = {};
+ReactNativeWebView.postMessage = function() {};
+// Desktop app (Electron)
+var OCCarrotDesktop = function(){};
+OCCarrotDesktop.showDesktopWindow = function() {};
+OCCarrotDesktop.setBadgeCount = function() {};

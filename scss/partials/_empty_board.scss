@@ -35,17 +35,15 @@ div.empty-board {
       margin: 0 auto;
       background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
 
-      // &.ap-section {
-      //   background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
-      // }
+      &.drafts {
+        background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+        background-size: 56px 56px;
+      }
 
-      // &.must-see {
-      //   background-image: cdnUrl("/img/ML/empty_state_ms.svg");
-      // }
-
-      // &.drafts {
-      //   background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-      // }
+      &.follow-ups {
+        background-image: cdnUrl("/img/ML/empty_state_follow_ups_section.svg");
+        background-size: 18px 24px;
+      }
     }
 
     div.empty-board-title {
@@ -62,21 +60,6 @@ div.empty-board {
       color: $ui_grey;
       line-height: 18px;
       margin: 6px auto 0;
-    }
-
-    button.create-new-post-bt {
-      width: 160px;
-      height: 40px;
-      background-color: $carrot_green;
-      color: white;
-      @include OC_Body_Bold();
-      font-size: 16px;
-      border-radius: 6px;
-      margin: 21px auto 0;
-
-      @include mobile() {
-        display: none;
-      }
     }
   }
 }

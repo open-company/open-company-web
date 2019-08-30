@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
@@ -16,6 +17,7 @@
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -40,24 +42,6 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn wrap-img-tags-in-anchors!
-  "Wraps all `img` tags within the post's body in anchor tags to allow for opening in a new tab."
-  [s]
-  (let [body (rum/ref s "post-body")
-        imgs (dom/sel body "img")]
-    (doseq [img  imgs
-            :let [anchor (dom/create-element "a")
-                  href   (.-src img)]]
-      (dom/set-attr! anchor :href href :target "_blank")
-      (dom/add-class! anchor :interactable-image)
-      (dom/insert-before! anchor img)
-      (dom/remove! img)
-      (dom/replace-contents! anchor img))
-    s))
-
-(def interactable-images-mixin
-  {:did-mount wrap-img-tags-in-anchors!})
-
 (defn- load-comments [s]
   (let [activity-data @(drv/get-ref s :activity-data)]
     (comment-actions/get-comments activity-data)))
@@ -70,14 +54,15 @@
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
-  (drv/drv :show-post-added-tooltip)
+  (drv/drv :add-comment-highlight)
+  (drv/drv :expand-image-src)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
-  interactable-images-mixin
+  (mixins/interactive-images-mixin "div.expanded-post-body")
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
@@ -85,9 +70,6 @@
     s)
    :did-remount (fn [_ s]
     (load-comments s)
-    s)
-   :will-unmount (fn [s]
-    (nux-actions/dismiss-post-added-tooltip)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -101,13 +83,19 @@
         route (drv/react s :route)
         back-to-slug (or (:back-to route) (:board route))
         is-all-posts? (= back-to-slug "all-posts")
+        is-follow-ups? (= back-to-slug "follow-ups")
         back-to-label (str "Back to "
-                           (if is-all-posts?
+                           (cond
+                             is-all-posts?
                              "All posts"
+                             is-follow-ups?
+                             "Follow-ups"
+                             :else
                              (:name (dis/board-data back-to-slug))))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
-        is-publisher? (= (:user-id publisher) (jwt/user-id))
+        current-user-id (jwt/user-id)
+        is-publisher? (= (:user-id publisher) current-user-id)
         video-player-show (and is-publisher? uploading-video)
         video-size (when has-video
                      (if is-mobile?
@@ -118,13 +106,15 @@
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
-        post-add-tooltip (drv/react s :show-post-added-tooltip)
-        should-show-post-added-tooltip? (and post-add-tooltip
-                                             (= post-add-tooltip (router/current-activity-id)))]
+        add-comment-highlight (drv/react s :add-comment-highlight)
+        expand-image-src (drv/react s :expand-image-src)
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
     [:div.expanded-post
-      {:class dom-node-class
+      {:class (utils/class-set {dom-node-class true
+                                :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
+      (image-modal/image-modal {:src expand-image-src})
       [:div.activity-share-container]
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
@@ -133,12 +123,13 @@
           [:div.back-to-board-inner
             back-to-label]]
         (more-menu activity-data dom-element-id
-         {:external-share true
+         {:external-share (not is-mobile?)
+          :external-follow-up true
           :show-edit? true
           :show-delete? true
           :show-move? (not is-mobile?)
           :tooltip-position "bottom"
-          :show-unread true})]
+          :assigned-follow-up-data assigned-follow-up-data})]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
@@ -161,43 +152,43 @@
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
            :data-title (utils/activity-date-tooltip activity-data)
            :class utils/hide-class}
-          (str (:name publisher) " in "
-               (:board-name activity-data)
-               (when (= (:board-access activity-data) "private")
-                 " (private)")
-               (when (= (:board-access activity-data) "public")
-                 " (public)")
-               " on "
-               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
-          (when (:must-see activity-data)
-            [:div.must-see-tag])]]
+          [:span.expanded-post-author-inner-label
+            (str (:name publisher) " in "
+                 (:board-name activity-data)
+                 (when (= (:board-access activity-data) "private")
+                   " (private)")
+                 (when (= (:board-access activity-data) "public")
+                   " (public)")
+                 " on "
+                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]
+          (if (and assigned-follow-up-data
+                   (not (:completed? assigned-follow-up-data)))
+            [:div.follow-up-tag]
+            (when (:must-see activity-data)
+              [:div.must-see-tag]))]]
       (when (seq (:abstract activity-data))
-        [:div.expanded-post-abstract
-          {:class utils/hide-class}
-          (:abstract activity-data)])
+        [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
+          {:class utils/hide-class
+           :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
          :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
+      ; (when is-mobile?
+      ;   [:div.expanded-post-mobile-reactions
+      ;     (reactions activity-data)])
       [:div.expanded-post-footer.group
-        (comments-summary activity-data true)
-        (reactions activity-data)
-        (when user-is-part-of-the-team
-          [:div.expanded-post-wrt-container
-            (when should-show-post-added-tooltip?
-              [:div.post-added-tooltip-container
-                {:ref :post-added-tooltip}
-                [:div.post-added-tooltip-title
-                  "Post analytics"]
-                [:div.post-added-tooltip
-                  (str "Invite your team to Carrot so you can know who read your "
-                   "post and when. Click here to access your post analytics anytime.")]
-                [:button.mlb-reset.post-added-tooltip-bt
-                  {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                  "OK, got it"]])
-            (wrt-count activity-data reads-data)])]
+        (when is-mobile?
+          (reactions activity-data))
+        [:div.expanded-post-footer-mobile-group
+          (comments-summary activity-data)
+          (when-not is-mobile?
+            (reactions activity-data))
+          (when user-is-part-of-the-team
+            [:div.expanded-post-wrt-container
+              (wrt-count activity-data reads-data)])]]
       [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data)
+        (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
           (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))

@@ -3,11 +3,23 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]))
 
 (def -no-scroll-mixin-class :no-scroll)
+
+(def refresh-tooltips-mixin
+  {:did-mount (fn [s]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+   s)
+   :did-remount (fn [_ s]
+    (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+      #(doto (js/$ %2)
+         (.tooltip "fixTitle")
+         (.tooltip "hide")))
+   s)})
 
 (def no-scroll-mixin
   "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
@@ -246,25 +258,18 @@
       (dissoc s :on-resize-listener))
     s))})
 
-(defn autoresize-textarea
-  "Given a React reference to a component node, listens on all the events on that textarea element
-   and resize its frame to make sure it doesn't scroll and the no extra blank space."
-  [ref & [initially-focused]]
-  (letfn [(init-textarea [el]
-            (let [observe (utils/observe)
-                  resize-fn (fn []
-                              (set! (.-height (.-style el)) "auto")
-                              (set! (.-height (.-style el)) (str (.-scrollHeight el) "px")))
-                  delayed-resize-fn (fn [] (utils/after 0 resize-fn))]
-            (observe el "change" resize-fn)
-            (observe el "cut" delayed-resize-fn)
-            (observe el "paste" delayed-resize-fn)
-            (observe el "drop" delayed-resize-fn)
-            (observe el "keydown" delayed-resize-fn)
-            (when initially-focused
-              (.focus el))
-            (resize-fn)))]
-    {:did-mount (fn [s]
-      (when-let [el (rum/ref-node s ref)]
-        (init-textarea el))
-      s)}))
+(defn make-images-interactive!
+  "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
+  [s el-selector]
+  (let [dom-node (rum/dom-node s)
+        imgs (dommy/sel dom-node (str el-selector " img"))]
+    (doseq [img  imgs
+            :let [href (.-src img)]]
+      (dommy/add-class! img :interactive-image)
+      (dommy/listen! img :click #(dis/dispatch! [:input [:expand-image-src] href])))
+    s))
+
+(defn interactive-images-mixin [el-sel]
+  {:did-mount (fn [s] (make-images-interactive! s el-sel))
+   :did-remount (fn [_ new-state]
+                  (make-images-interactive! new-state el-sel))})

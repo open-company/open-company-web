@@ -3,6 +3,7 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
@@ -190,7 +191,9 @@
 
 (defn scroll-to-y [scroll-y & [duration]]
   (if (and duration (zero? duration))
-    (.scrollTo (.-scrollingElement js/document) 0 scroll-y)
+    (if ua/edge?
+      (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
+      (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
     (.play
       (new Scroll
            (.-scrollingElement js/document)
@@ -216,6 +219,11 @@
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
+
+(defn maybe-after [ms fn]
+  (if (zero? ms)
+   (fn)
+   (js/setTimeout fn ms)))
 
 (defn every [ms fn]
   (js/setInterval fn ms))
@@ -366,22 +374,14 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn name-or-email [user]
-  (let [user-name (:name user)
-        first-name (:first-name user)
-        last-name (:last-name user)]
-    (cond
-      (and (seq first-name)
-           (seq last-name))
-      (str first-name " " last-name)
-      (seq first-name)
-      first-name
-      (seq last-name)
-      last-name
-      (seq user-name)
-      user-name
-      :else
-      (:email user))))
+(defn slack-link-with-state [original-url user-id team-id redirect]
+  (clojure.string/replace
+   original-url
+   team-id
+   (str
+    (when (seq team-id) (str team-id ":"))
+    (when (seq user-id) (str user-id ":"))
+    redirect)))
 
 (def network-error
  {:title "Network error"
@@ -389,13 +389,6 @@
   :server-error true
   :id :generic-network-error
   :dismiss true})
-
-(def app-update-error
-  {:title "App has been updated"
-   :description "You’re using an out of date version of Carrot. Please refresh your browser."
-   :app-update true
-   :id :app-update-error
-   :dismiss true})
 
 (def internal-error
   {:title "Internal error occurred"
@@ -538,8 +531,7 @@
 
 (defn copy-to-clipboard [el]
   (try
-    (when (and (responsive/is-tablet-or-mobile?)
-               (js/isSafari))
+    (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
@@ -571,38 +563,17 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
-;; Get the board to show counting the last accessed and the last created
-
-(def default-board "all-posts")
-
-(defn get-default-board [org-data]
-  (let [last-board-slug default-board]
-    ; Replace default-board with the following to go back to the last visited board
-    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (and (= last-board-slug "all-posts")
-             (link-for (:links org-data) "activity"))
-      {:slug "all-posts"}
-      (let [boards (:boards org-data)
-            board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (or
-          ; Get the last accessed board from the saved cookie
-          board
-          (let [sorted-boards (vec (sort-by :name boards))]
-            (first sorted-boards)))))))
-
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        _ (.remove (js/$ ".oc-mention-popup" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))
         has-empty-ending-paragraph (when (seq last-p-html)
                                      (.match last-p-html reg-ex))
         _ (when has-empty-ending-paragraph
-            (.remove (js/$ "p:last-child" $container)))
-        cleaned-html (.html $container)
-        _ (.detach $container)]
-    cleaned-html))
+            (.remove (js/$ "p:last-child" $container)))]
+    (.html $container)))
 
 (defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
@@ -633,9 +604,9 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-headline "Untitled post")
+(def default-headline "Title")
 
-(def default-abstract "Quick summary: let everyone know what your post is about...")
+(def default-abstract "Quick summary")
 
 (def max-abstract-length 280)
 
@@ -735,3 +706,14 @@
   (if (.-attachEvent js/window)
     (fn [el e handler] (.attachEvent el (str "on" e) handler))
     (fn [el e handler] (.addEventListener el e handler))))
+
+(defn page-scroll-top []
+  (let [is-mobile? (responsive/is-mobile-size?)
+        board-slug (router/current-board-slug)
+        activity-id (router/current-activity-id)]
+    (if (and (not activity-id)
+             (seq board-slug)
+             (not= board-slug default-drafts-board-slug)
+             is-mobile?)
+      50
+      0)))

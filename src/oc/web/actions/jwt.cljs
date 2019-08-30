@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.fullstory :as fullstory]))
@@ -15,11 +16,13 @@
 
 (defn logout
   ([]
-     (logout oc-urls/home))
+   (logout (if ua/pseudo-native?
+             oc-urls/native-login
+             oc-urls/home)))
   ([location]
-     (cook/remove-cookie! :jwt)
-     (router/redirect! location)
-     (dis/dispatch! [:logout])))
+   (cook/remove-cookie! :jwt)
+   (router/redirect! location)
+   (dis/dispatch! [:logout])))
 
 ;; ID Token
 

@@ -30,9 +30,12 @@ html, body {
   font-size: 16px;
   width: 100%;
   color: $oc_gray_5;
+  background-color: $grey_num_2;
 
   @include mobile(){
     overflow-x: hidden;
+    background-color: white;
+    overflow-y: scroll;
   }
 }
 

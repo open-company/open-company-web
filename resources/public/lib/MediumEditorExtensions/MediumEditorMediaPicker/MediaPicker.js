@@ -49,12 +49,16 @@ function PlaceCaretAtEnd(el) {
     pickerButtons: [],
     /* Use inline plus button */
     inlinePlusButtonOptions: {inlineButtons: true,
-                              alwaysExpanded: false},
+                              alwaysExpanded: false,
+                              initiallyVisible: false},
+    initialButtonsShown: false,
     /* Selector to identify the click that needs save the caret position */
     saveSelectionClickElementId: undefined,
     /* Contains the picker buttons */
     options: {buttons: ['entry', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
               delegateMethods: {}},
+    /* Force placeholder hide of MediumEditor when the button expands*/
+    hidePlaceholderOnExpand: false,
     /* Internal private properties */
     _lastSelection: undefined,
     _waitingCB: false,
@@ -64,7 +68,6 @@ function PlaceCaretAtEnd(el) {
         this.options = options;
       }
       MediumEditor.Extension.call(this, this.options);
-      log("contructor", options);
     },
 
     init: function(){
@@ -89,6 +92,11 @@ function PlaceCaretAtEnd(el) {
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
       $('[data-toggle=\"tooltip\"]').tooltip();
+
+      if (this.inlinePlusButtonOptions.initiallyVisible) {
+        // Force show the media picker buttons
+        this.togglePicker();
+      }
     },
 
     delegate: function(event, arg) {
@@ -112,13 +120,8 @@ function PlaceCaretAtEnd(el) {
       if (this._waitingCB) {
         return;
       }
-      log("windowClick", event.target);
       // If the inline plus button is enabled
-      if (this.inlinePlusButtonOptions.inlineButtons) {
-        log("   isEditorDescendant:", 
-            MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true),
-            "isPickerDescendant:",
-            MediumEditor.util.isDescendant(this.pickerElement, event.target, true))
+      if (this.inlinePlusButtonOptions.inlineButtons && !this.inlinePlusButtonOptions.alwaysExpanded) {
         // If the user clicked inside the editor or on the picker
         if(!MediumEditor.util.isDescendant(this.getEditorElements()[0], event.target, true) &&
            !MediumEditor.util.isDescendant(this.pickerElement, event.target, true)) {
@@ -129,14 +132,10 @@ function PlaceCaretAtEnd(el) {
       }
       // If we have a selector for an external picker
       if (this.saveSelectionClickElementId !== undefined) {
-        log(this.saveSelectionClickElementId);
         var target = event.target,
             el = document.getElementById(this.saveSelectionClickElementId);
-        log("   target", target);
-        log("   el", el);
         // And the target of the click is the same of the given selector
         if (target === el) {
-          log("   SAVING SELECTION!");
           // Save the current selection
           this.saveSelection();
           // TODO: if the currently focused element is not a MediumEditor element
@@ -260,7 +259,6 @@ function PlaceCaretAtEnd(el) {
       if (photoUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
         if (!this.base.getFocusedElement()) {
-          log("MediumEditor not focused, give focus to the first!");
           PlaceCaretAtEnd(this.getEditorElements()[0]);
         }
         var sel = this.window.getSelection(),
@@ -330,7 +328,6 @@ function PlaceCaretAtEnd(el) {
       if (videoUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
         if (!this.base.getFocusedElement()) {
-          log("MediumEditor not focused, give focus to the first!");
           PlaceCaretAtEnd(this.getEditorElements()[0]);
         }
         var sel = this.window.getSelection(),
@@ -392,7 +389,6 @@ function PlaceCaretAtEnd(el) {
       if (chartUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
         if (!this.base.getFocusedElement()) {
-          log("MediumEditor not focused, give focus to the first!");
           PlaceCaretAtEnd(this.getEditorElements()[0]);
         }
         var sel = this.window.getSelection(),
@@ -453,7 +449,6 @@ function PlaceCaretAtEnd(el) {
       if (attachmentUrl) {
         // 2 cases: it's directly the div.medium-editor or it's a p already
         if (!this.base.getFocusedElement()) {
-          log("MediumEditor not focused, give focus to the first!");
           PlaceCaretAtEnd(this.getEditorElements()[0]);
         }
         var sel = this.window.getSelection(),
@@ -538,7 +533,6 @@ function PlaceCaretAtEnd(el) {
       }
       // 2 cases: it's directly the div.medium-editor or it's a p already
       if (!this.base.getFocusedElement()) {
-        log("MediumEditor not focused, give focus to the first!");
         PlaceCaretAtEnd(this.getEditorElements()[0]);
       }
       var sel = this.window.getSelection(),
@@ -580,7 +574,6 @@ function PlaceCaretAtEnd(el) {
         var button = this.document.createElement('button');
         button.className = 'media';
         container.appendChild(button);
-        log("createPickerMediaButtons", opt, idx);
 
         if (opt === 'entry') {
           button.classList.add('media-entry');
@@ -633,7 +626,6 @@ function PlaceCaretAtEnd(el) {
     },
 
     saveSelection: function() {
-      log("SaveSelection");
       // Remove the previous selection to avoid leaving
       // markers in the body that are not needed
       this.internalRemoveSelection();
@@ -654,7 +646,6 @@ function PlaceCaretAtEnd(el) {
     },
 
     removeSelection: function() {
-      log("RemoveSelection");
       this.internalRemoveSelection();
     },
 
@@ -663,9 +654,13 @@ function PlaceCaretAtEnd(el) {
         return;
       }
       this.delegate("willExpand");
-      this.getEditorElements().forEach(function(element){
-        element.classList.add("medium-editor-placeholder-hidden");
-      });
+      if (this.hidePlaceholderOnExpand) {
+        this.getEditorElements().forEach(function(element){
+          if (element && element.classList) {
+            element.classList.add("medium-editor-placeholder-hidden");
+          }
+        });
+      }
       // Hide the placeholder
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.hidePlaceholder();
@@ -688,7 +683,9 @@ function PlaceCaretAtEnd(el) {
         return;
       }
       this.delegate("willCollapse");
-      this.mediaButtonsContainer.classList.remove(this.expandedClass);
+      if (this.mediaButtonsContainer) {
+        this.mediaButtonsContainer.classList.remove(this.expandedClass);
+      }
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.mainButton.classList.remove(this.expandedClass);
 
@@ -696,7 +693,6 @@ function PlaceCaretAtEnd(el) {
         $(this.mainButton).tooltip("fixTitle");
         $(this.mainButton).tooltip("hide");
       }
-      log("collapse", this.inlinePlusButtonOptions);
       this.delegate("didCollapse");
     },
 
@@ -726,7 +722,6 @@ function PlaceCaretAtEnd(el) {
       if (this._waitingCB) {
         return;
       }
-      log("show");
       this.delegate("willShow");
       this.pickerElement.style.display = 'block';
       this.delegate("didShow");
@@ -742,7 +737,6 @@ function PlaceCaretAtEnd(el) {
       if(this.inlinePlusButtonOptions.alwaysExpanded) {
         this.collapse();
       }
-      log("hide", this);
       this.delegate("willHide");
       this.collapse();
       this.pickerElement.style.display = 'none';
@@ -784,21 +778,18 @@ function PlaceCaretAtEnd(el) {
         if (this._waitingCB) {
           return;
         }
-        if (event) {
-          log("togglePicker 1", event, event.type);
-        } else {
-          log("togglePicker 2", "no event");
-        }
         var sel = this.window.getSelection(),
             element;
-        log("   ", sel, sel.rangeCount, sel.rangeCount.length);
-        if (sel.rangeCount > 0) {
-          element = sel.getRangeAt(0).commonAncestorContainer;
-          log("   sel.rangeCount > 0", element);
+        if (sel.rangeCount > 0 || (this.inlinePlusButtonOptions.initiallyVisible && !this.initialButtonsShown)) {
+          if (this.inlinePlusButtonOptions.initiallyVisible && !this.initialButtonsShown) {
+            element = this.getEditorElements()[0];
+          }else {
+            element = sel.getRangeAt(0).commonAncestorContainer;  
+          }
+          this.initialButtonsShown = true;
           if (sel !== undefined || element !== undefined) {
             if (this.paragraphIsEmpty(element)){
               var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
-              log("   top:", $(element).offset().top, $(this.pickerElement.parentNode).offset().top, top + "px");
               this.pickerElement.style.top = top + "px";
               this.show();
               return;
