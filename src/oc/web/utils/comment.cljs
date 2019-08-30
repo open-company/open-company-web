@@ -66,13 +66,15 @@
   [comment-data]
   (= (jwt/user-id) (:user-id (:author comment-data))))
 
-(defn get-comments-finished [comments-key activity-data {:keys [status success body]}]
-  (dis/dispatch! [:comments-get/finish {:success success
-                                        :error (when-not success body)
-                                        :comments-key comments-key
-                                        :body (when (seq body) (json->cljs body))
-                                        :activity-uuid (:uuid activity-data)
-                                        :secure-activity-uuid (router/current-secure-activity-id)}]))
+(defn get-comments-finished
+  [comments-key activity-data {:keys [status success body]}]
+  (when success
+    (dis/dispatch! [:comments-get/finish {:success success
+                                          :error (when-not success body)
+                                          :comments-key comments-key
+                                          :body (when (seq body) (json->cljs body))
+                                          :activity-uuid (:uuid activity-data)
+                                          :secure-activity-uuid (router/current-secure-activity-id)}])))
 
 (defn get-comments [activity-data]
   (when activity-data
