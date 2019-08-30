@@ -166,7 +166,8 @@
                              :did-remount (fn [o s]
                               (when (not= (count (second (:rum/args o))) (count (second (:rum/args s))))
                                  (reset! (::replying-to s) #{}))
-                              (let [new-added-comment (nth (:rum/args s) 2)]
+                              (let [args (vec (:rum/args s))
+                                    new-added-comment (get args 2)]
                                 (when new-added-comment
                                   (utils/after 180 #(highlight-comment s new-added-comment false))
                                   (comment-actions/add-comment-highlight-reset)))

@@ -241,28 +241,6 @@ div.secure-activity-container {
 
       div.add-comment-box-container {
         margin-top: 24px;
-
-        div.add-comment-box {
-          div.user-avatar-img-container {
-            bottom: unset;
-            top: 8px;
-          }
-
-          div.add-comment-internal {
-            div.add-comment {
-              background-color: white;
-              border-radius: 4px;
-              border: 1px solid $mid_light_grey;
-              padding: 6px 14px;
-
-              @include tablet() {
-                border: none;
-                padding: 0;
-                border-radius: 0;
-              }
-            }
-          }
-        }
       }
     }
 
