@@ -154,7 +154,7 @@
         (notification-actions/show-notification {:title (if (:saved org-editing) "Settings saved" "Error saving, please retry")
                                                  :primary-bt-title "OK"
                                                  :primary-bt-dismiss true
-                                                 :expire 10
+                                                 :expire 3
                                                  :id :org-settings-saved})))
     s)}
   [s]

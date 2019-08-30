@@ -47,14 +47,14 @@
       (notification-actions/show-notification {:title "Carrot Bot enabled"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
+                                                      :expire 5
                                                       :id :slack-bot-added}))
     (when (and (= bot-access "team")
                (not= (:new (router/query-params)) "true"))
       (notification-actions/show-notification {:title "Integration added"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
+                                                      :expire 5
                                                       :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
