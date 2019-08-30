@@ -656,6 +656,9 @@
 
   ;; Recall Expo push token into app state (push notification permission)
   (user-actions/recall-expo-push-token)
+  ;; Get the mobile app deep link origin if we're on mobile
+  (when ua/mobile-app?
+    (expo/bridge-get-deep-link-origin))
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)

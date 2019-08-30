@@ -165,10 +165,10 @@
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
-(defn login-with-google [auth-url]
+(defn login-with-google [auth-url & [state-map]]
   (let [auth-url-with-redirect (user-utils/auth-link-with-state
                                 (:href auth-url)
-                                {})]
+                                (or state-map {}))]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-google])))
 
