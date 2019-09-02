@@ -49,7 +49,7 @@
                 {:aria-label "Login"
                  :class (when-not login-enabled "disabled")
                  :on-click login-action}]]
-            (when-not (empty? (or desc default-desc))
+            (when (seq (or desc default-desc))
               [:div.login-description (or desc default-desc)])
             [:button.mlb-reset.signup-with-slack
               {:on-touch-start identity
