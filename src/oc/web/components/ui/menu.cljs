@@ -68,9 +68,9 @@
   []
   (when-not ua/desktop-app?
     (cond
-      ua/mac? {:title "Mac app"
+      ua/mac? {:title "Download Mac app"
                :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
-      ua/windows? {:title "Windows app"
+      ua/windows? {:title "Download Windows app"
                    :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
