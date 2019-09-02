@@ -69,7 +69,12 @@
         follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)
         filtered-users-list (filter-users s)
         current-user-id (jwt/user-id)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        all-users-set (set (map :user-id users-list))
+        current-assignees (set (map (comp :user-id :assignee) follow-ups))
+        users-diff (clojure.set/difference all-users-set current-assignees)
+        show-select-all? (and (not-empty users-diff)
+                              (not= users-diff #{current-user-id}))]
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -98,8 +103,7 @@
                 (str (count follow-ups) " people selected"))]
             [:div.follow-ups-users-bt
               (when-not (seq @(::query s))
-                (cond
-                  (< (count follow-ups) (count users-list))
+                (if show-select-all?
                   [:button.mlb-reset.select-all
                     {:on-click (fn [_]
                                 (reset! (::follow-ups s) (map (fn [user]
@@ -109,7 +113,6 @@
                                                                                 :completed? false))))
                                                           users-list)))}
                     "Select all"]
-                  :else
                   [:button.mlb-reset.deselect-all
                     {:on-click (fn [_]
                                 (reset! (::follow-ups s)
