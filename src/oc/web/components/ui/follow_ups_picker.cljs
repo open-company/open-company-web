@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.cmail :as cmail-actions]
@@ -54,6 +55,9 @@
                                (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
+
+                               ui-mixins/refresh-tooltips-mixin
+
                                {:will-mount (fn [s]
                                  (set-users-list s true)
                                  (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -138,7 +142,19 @@
                   :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
                         disabled? (or (:completed? f)
                                       (and (map? (:author f))
-                                           (= (-> f :author :user-id) (-> f :assignee :user-id))))]]
+                                           (= (-> f :author :user-id) (-> f :assignee :user-id))))
+                        roster-user (first (filterv #(= (:user-id %) (:user-id u)) (:users team-roster)))
+                        ;; Retrieve the Slack display name for pending and active users
+                        slack-display-name (if (or (= (:status u) "uninvited")
+                                                   (= (:status u) "pending"))
+                                            (:slack-display-name roster-user)
+                                            (some #(when (seq (:display-name %)) (:display-name %)) (vals (:slack-users roster-user))))
+                        ;; Add @ in front of the slack display name if it's not there already
+                        fixed-display-name (if (and (seq slack-display-name)
+                                                    (not= slack-display-name "-")
+                                                    (not (clojure.string/starts-with? slack-display-name "@")))
+                                             (str "@" slack-display-name)
+                                             slack-display-name)]]
               [:div.follow-ups-user-item.group
                 {:key (str "follow-ups-user-" (:user-id u))
                  :title (when disabled?
@@ -160,6 +176,13 @@
                   {:class (when disabled? "disabled")}
                   (user-avatar-image u)
                   [:div.user-name
+                    {:title (str "<span>" (:email u)
+                              (when (seq fixed-display-name)
+                                (str " | <i class=\"mdi mdi-slack\"></i>" (when-not (= fixed-display-name "-") (str " " fixed-display-name))))
+                              "</span>")
+                     :data-toggle "tooltip"
+                     :data-html "true"
+                     :data-placement "top"}
                     (str
                      (user-lib/name-for u)
                      (when (= (:user-id u) current-user-id)
