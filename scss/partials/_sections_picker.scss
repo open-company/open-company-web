@@ -14,6 +14,11 @@ div.sections-picker {
     div.sections-picker-section {
       padding: 8px 16px;
       cursor: pointer;
+      height: 34px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      padding: 8px 16px;
+      cursor: pointer;
 
       @include big_web() {
         &.active, &:hover {
@@ -23,27 +28,31 @@ div.sections-picker {
         }
       }
 
-      @include mobile() {
-        height: 34px;
-        @include OC_Body_Book();
-        font-size: 14px;
-        padding: 8px 16px;
-        cursor: pointer;
+      &.active, &:hover {
+        background-color: $feint_emerald;
+        color: $carrot_green;
 
-        &.active {
-          background-color: $feint_emerald;
-          color: $carrot_green;
+        @include mobile() {
           -webkit-tap-highlight-color: $feint_emerald;
+        }
 
-          div.sections-picker-section-name {
-            opacity: 1;
-          }
+        div.sections-picker-section-name {
+          opacity: 1;
+          color: $carrot_green;
+        }
+
+        div.public-icon {
+          background-image: cdnUrl("/img/ML/board_public_green.svg");
+        }
+
+        div.private-icon {
+          background-image: cdnUrl("/img/ML/board_private_green.svg");
         }
       }
 
-      &.active {
+      &.has-access-icon {
         div.sections-picker-section-name {
-          opacity: 1;
+          max-width: calc(100% - 12px - 8px);
         }
       }
 
@@ -58,11 +67,27 @@ div.sections-picker {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
+        float: left;
+      }
 
-        @include mobile() {
-          @include OC_Body_Book();
-          font-size: 14px;
-        }
+      div.private-icon {
+        float: right;
+        width: 12px;
+        height: 18px;
+        background-image: cdnUrl("/img/ML/board_private.svg");
+        background-size: 10px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      div.public-icon {
+        float: right;
+        width: 12px;
+        height: 18px;
+        background-image: cdnUrl("/img/ML/board_public.svg");
+        background-size: 12px 12px;
+        background-position: center;
+        background-repeat: no-repeat;
       }
     }
   }
