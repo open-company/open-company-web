@@ -160,7 +160,7 @@
                  (when (= (:board-access activity-data) "public")
                    " (public)")
                  " on "
-                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]
+                 (utils/tooltip-date (:published-at activity-data)))]
           (if (and assigned-follow-up-data
                    (not (:completed? assigned-follow-up-data)))
             [:div.follow-up-tag]
