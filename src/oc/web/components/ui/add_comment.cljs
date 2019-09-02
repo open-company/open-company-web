@@ -246,7 +246,7 @@
                                     (not parent-comment-uuid))]
     [:div.add-comment-box-container
       {:class container-class}
-      [:div.add-comment-box
+      [:div.add-comment-box.group
         (user-avatar-image current-user-data)
         [:div.add-comment-internal
           {:class (when-not should-hide-post-button "active")}
