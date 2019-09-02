@@ -8,6 +8,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
+            [oc.web.stores.comment :as comment-store]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -48,21 +49,25 @@
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
-        (save-done-cb success)
-        ;; If the user is not the publisher of the post and is leaving his first comment on it
-        ;; let's inform them that they are now following the post
-        (when (and success
-                   first-comment-from-user?)
-          (notification-actions/show-notification {:title "You are now following this post."
-                                                   :dismiss true
-                                                   :expire 3
-                                                   :id :first-comment-follow-post}))
-        (utils/after 100 (fn [](let [comments-link (utils/link-for (:links activity-data) "comments")]
-          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))))
-        ;; In case save didn't go well let's re-set the comment body in the add comment field
-        (when-not success
-          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true])
-          (dis/dispatch! [:comment-add/failed comments-key new-comment-temp-uuid]))))))
+        (let [added-comment-map (comment-store/parse-comment (dis/org-data) activity-data (json->cljs body))]
+          (save-done-cb success)
+          ;; If the user is not the publisher of the post and is leaving his first comment on it
+          ;; let's inform them that they are now following the post
+          (when (and success
+                     first-comment-from-user?)
+            (notification-actions/show-notification {:title "You are now following this post."
+                                                     :dismiss true
+                                                     :expire 3
+                                                     :id :first-comment-follow-post}))
+          (utils/after 100 (fn [](let [comments-link (utils/link-for (:links activity-data) "comments")]
+           (api/get-comments comments-link
+            #(do
+              (comment-utils/get-comments-finished comments-key activity-data %)
+              (dis/dispatch! [:input [:add-comment-highlight] (:uuid added-comment-map)]))))))
+          ;; In case save didn't go well let's re-set the comment body in the add comment field
+          (when-not success
+            (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true])
+            (dis/dispatch! [:comment-add/failed comments-key new-comment-temp-uuid])))))))
 
 (defn get-comments [activity-data]
   (comment-utils/get-comments activity-data))
@@ -147,8 +152,7 @@
     (dis/dispatch! [:ws-interaction/comment-add
                     org-slug
                     entry-data
-                    interaction-data])
-    (dis/dispatch! [:input [:add-comment-highlight] (:uuid (:interaction interaction-data))])))
+                    interaction-data])))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add
