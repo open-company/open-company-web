@@ -47,7 +47,7 @@
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
     (enable-add-comment? s)
-    (when (not (seq (.-innerHTML add-comment-node)))
+    (when-not (seq (.-innerHTML add-comment-node))
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
