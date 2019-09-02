@@ -62,7 +62,7 @@
   (assoc db :add-comment-focus focus-uuid))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ activity-data comment-body parent-comment-uuid comments-key]]
+  [db [_ activity-data comment-body parent-comment-uuid comments-key new-comment-temp-uuid]]
   (let [comments-data (vec (get-in db comments-key))
         user-data (if (jwt/jwt)
                     (jwt/get-contents)
@@ -72,7 +72,7 @@
                                         {:body comment-body
                                          :created-at (utils/as-of-now)
                                          :parent-uuid parent-comment-uuid
-                                         :uuid (utils/activity-uuid)
+                                         :uuid new-comment-temp-uuid
                                          :author {:name (:name user-data)
                                                   :avatar-url (:avatar-url user-data)
                                                   :user-id (:user-id user-data)}})
@@ -80,11 +80,12 @@
         sorted-all-comments (comment-utils/sort-comments all-comments)]
     (assoc-in db comments-key sorted-all-comments)))
 
-(defmethod dispatcher/action :comment-add/finish
-  [db [_ {:keys [activity-data body]}]]
-  (-> db
-    (assoc :comment-add-finish true)
-    (assoc :add-comment-highlight (:uuid body))))
+(defmethod dispatcher/action :comment-add/failed
+  [db [_ comments-key new-comment-temp-uuid]]
+  (let [comments-data (vec (get-in db comments-key))
+        all-comments (filterv #(not= (:uuid %) new-comment-temp-uuid) comments-data)
+        sorted-all-comments (comment-utils/sort-comments all-comments)]
+    (assoc-in db comments-key sorted-all-comments)))
 
 (defmethod dispatcher/action :add-comment-highlight-reset
   [db [_]]
