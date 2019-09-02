@@ -164,54 +164,5 @@ div.add-comment-box-container {
         }
       }
     }
-
-    div.buttons-separator {
-      width: 1px;
-      height: 16px;
-      float: right;
-      background-color: $ultra_light_grey;
-      margin: 7px 8px 0;
-    }
-
-    button.complete-follow-up {
-      float: right;
-      height: 24px;
-      @include OC_Body_Book();
-      font-size: 14px;
-      line-height: 24px;
-      color: $deep_navy;
-      padding: 0 8px 0 24px;
-      position: relative;
-      margin-top: 5px;
-
-      div.carrot-checkbox {
-        position: absolute;
-        top: 4px;
-        left: 0px;
-      }
-
-      &.unselected {
-        opacity: 0.5;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 1 !important;
-
-        @include mobile() {
-          opacity: 0.5;
-        }
-
-        @include big_web() {
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-    }
   }
 }
