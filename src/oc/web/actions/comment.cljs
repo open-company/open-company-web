@@ -39,12 +39,10 @@
         is-publisher? (= (-> activity-data :publisher :user-id) current-user-id)
         first-comment-from-user? (when-not is-publisher?
                                    (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))]
+    ;; Remove the cached comment, will be re-added if api call fails
+    (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil])
     ;; Add the comment to the app-state to show it immediately
-    (dis/dispatch! [:comment-add
-                    activity-data
-                    comment-body
-                    parent-comment-uuid
-                    comments-key])
+    (dis/dispatch! [:comment-add activity-data comment-body parent-comment-uuid comments-key])
     (api/add-comment add-comment-link comment-body parent-comment-uuid
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
@@ -58,15 +56,11 @@
                                                    :dismiss true
                                                    :expire 3
                                                    :id :first-comment-follow-post}))
-        (let [comments-link (utils/link-for (:links activity-data) "comments")]
-          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
-        (when success
-          (dis/dispatch! [:comment-add/finish {:success success
-                                               :error (when-not success body)
-                                               :body (when (seq body) (json->cljs body))
-                                               :activity-data activity-data}])
-          ;; If comment was succesfully added delete the cached comment
-          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil]))))))
+        (utils/after 100 (fn [](let [comments-link (utils/link-for (:links activity-data) "comments")]
+          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))))
+        ;; In case save didn't go well let's re-set the comment body in the add comment field
+        (when-not success
+          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))))
 
 (defn get-comments [activity-data]
   (comment-utils/get-comments activity-data))

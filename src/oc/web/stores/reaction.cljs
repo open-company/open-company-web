@@ -57,7 +57,7 @@
 
 (defmethod dispatcher/action :handle-reaction-to-entry
   [db [_ activity-data reaction-data activity-key]]
-  (handle-reaction-to-entry db activity-data reaction-data activity-key))
+  (handle-reaction-to-entry-finish db activity-data (:reaction reaction-data) {(keyword (:reaction reaction-data)) reaction-data} activity-key))
 
 (defmethod dispatcher/action :react-from-picker/finish
   [db [_ {:keys [status activity-data reaction reaction-data activity-key]}]]

@@ -66,13 +66,15 @@
   [comment-data]
   (= (jwt/user-id) (:user-id (:author comment-data))))
 
-(defn get-comments-finished [comments-key activity-data {:keys [status success body]}]
-  (dis/dispatch! [:comments-get/finish {:success success
-                                        :error (when-not success body)
-                                        :comments-key comments-key
-                                        :body (when (seq body) (json->cljs body))
-                                        :activity-uuid (:uuid activity-data)
-                                        :secure-activity-uuid (router/current-secure-activity-id)}]))
+(defn get-comments-finished
+  [comments-key activity-data {:keys [status success body]}]
+  (when success
+    (dis/dispatch! [:comments-get/finish {:success success
+                                          :error (when-not success body)
+                                          :comments-key comments-key
+                                          :body (when (seq body) (json->cljs body))
+                                          :activity-uuid (:uuid activity-data)
+                                          :secure-activity-uuid (router/current-secure-activity-id)}])))
 
 (defn get-comments [activity-data]
   (when activity-data
@@ -106,12 +108,11 @@
   ([comments :guard map?]
    (sort-comments (vals comments)))
   ([comments :guard sequential?]
-   (let [root-comments (filterv :thread-root comments)
-         sorted-roots (sort-comments root-comments nil)]
-     (vec (apply concat (mapv #(concat [%] (sort-comments comments (:uuid %))) sorted-roots)))))
+   (let [root-comments (filterv (comp empty? :parent-uuid) comments)
+         sorted-roots (sort-comments root-comments nil)
+         all-comments-seqs (mapv #(vec (concat [%] (sort-comments comments (:uuid %)))) sorted-roots)]
+     (vec (apply concat all-comments-seqs))))
   ([comments :guard sequential? parent-uuid]
-   (let [filtered-comments (filterv #(if parent-uuid
-                                       (= (:parent-uuid %) parent-uuid)
-                                       (empty? (:parent-uuid %)))
-                            comments)]
+   (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
+         filtered-comments (filterv check-fn comments)]
      (vec (sort-by :created-at filtered-comments)))))

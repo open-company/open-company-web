@@ -69,6 +69,11 @@
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
+(defn add-comment-string-key [activity-uuid parent-comment-uuid comment-uuid]
+  (str activity-uuid "-" parent-comment-uuid "-" comment-uuid))
+
+(def add-comment-force-update-key :add-comment-force-update)
+
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
 
@@ -191,6 +196,7 @@
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
+   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -393,9 +399,9 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show]
+                                 show-sections-picker entry-editing jwt wrt-show loading]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -413,7 +419,8 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
                                :cmail-state (:cmail-state base)
-                               :force-login-wall (:force-login-wall base)})]
+                               :force-login-wall (:force-login-wall base)
+                               :app-loading loading})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
