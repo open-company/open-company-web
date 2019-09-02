@@ -51,6 +51,7 @@
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
+  (reset! (::add-button-disabled s) true)
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
         args (vec (:rum/args s))
@@ -59,7 +60,6 @@
         dismiss-reply-cb (get args 2)
         edit-comment-data (get args 3 nil)
         save-done-cb (fn [success]
-                      (reset! (::add-button-disabled s) false)
                       (if success
                         (do
                           (when add-comment-div
@@ -73,7 +73,6 @@
                           :expire 3
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))
         complete? @(::complete-follow-up s)]
-    (reset! (::add-button-disabled s) true)
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
@@ -213,8 +212,10 @@
                              (when-not (= @(::add-comment-force-update s) force-update)
                                (reset! (::add-comment-force-update s) force-update)
                                (let [add-comment-data @(drv/get-ref s :add-comment-data)
-                                     activity-add-comment-data (get add-comment-data add-comment-key)]
-                                 (reset! (::initial-add-comment s) (or activity-add-comment-data "")))))
+                                     activity-add-comment-data (get add-comment-data add-comment-key)
+                                     add-comment-text (or activity-add-comment-data "")]
+                                 (reset! (::add-button-disabled s) (clojure.string/blank? add-comment-text))
+                                 (reset! (::initial-add-comment s) add-comment-text))))
                            s)
                           :will-unmount (fn [s]
                            (when @(:me/editor s)
@@ -289,7 +290,8 @@
         [:div.add-comment-footer
           {:class (when should-hide-post-button "hide-footer")}
           [:button.mlb-reset.send-btn
-            {:on-click #(send-clicked % s)
+            {:on-click #(when-not @(::add-button-disabled s)
+                          (send-clicked % s))
              :disabled @(::add-button-disabled s)}
             (if edit-comment-data
               "Save"
