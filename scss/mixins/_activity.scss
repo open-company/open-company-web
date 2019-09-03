@@ -195,8 +195,12 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-title($font_size: 26px, $line_height: 30px){
-  @include OC_Title();
+@mixin activity-title($font_size: 26px, $line_height: 30px, $unread: false){
+  @if $unread {
+    @include OC_Body_Bold();
+  } @else {
+    @include OC_Body_Book();
+  }
   font-size: $font_size;
   color: $deep_navy;
   line-height: $line_height;
