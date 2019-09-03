@@ -69,7 +69,7 @@
         (.subscribe body-editor
                     "editableInput"
                     (fn [event editable]
-                      (abstract-on-change s)))
+                      (abstract-on-change s event)))
         (.subscribe body-editor
                     "editableKeydown"
                     (fn [e editable]

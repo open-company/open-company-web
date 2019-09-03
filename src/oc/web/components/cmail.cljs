@@ -154,8 +154,8 @@
 
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
-        $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
-        abstract-text (s/trim (.text $abstract))
+        abstract (.querySelector js/document "div.cmail-content-abstract")
+        abstract-text (s/trim (.-innerText abstract))
         exceeds-limit (> (count abstract-text) utils/max-abstract-length)
         clean-headline (s/trim (s/replace (.-innerText headline) #"\n" ""))
         post-button-title (cond
@@ -166,16 +166,19 @@
     (reset! (::abstract-length s) (count abstract-text))
     (reset! (::post-button-title s) post-button-title)))
 
-(defn- headline-on-change [state]
-  (when-let [headline (rum/ref-node state "headline")]
+(defn- headline-on-change [state & [event]]
+  (when-let [headline (if event (.-target event) (rum/ref-node state "headline"))]
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
       (check-limits state))))
 
-(defn- abstract-on-change [state]
-  (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
-    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.html $abstract)
+(defn- abstract-on-change [state & [inner-state event]]
+  (when-let [abstract (cond
+                       event (.-target event)
+                       inner-state (rum/ref-node inner-state "abstract")
+                       :else (.querySelector js/document "div.cmail-content-abstract"))]
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.-innerHTML abstract)
                                                      :has-changes true})])
     (check-limits state)))
 
@@ -413,7 +416,7 @@
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
-                    (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                    (reset! (::autosave-timer s) (utils/every 10000 #(autosave s)))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -714,11 +717,11 @@
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
-               :on-click    #(headline-on-change s)
-               :on-focus #(headline-on-change s)
-               :on-blur #(headline-on-change s)
+               :on-click    #(headline-on-change s %)
+               :on-focus #(headline-on-change s %)
+               :on-blur #(headline-on-change s %)
                :on-key-down (fn [e]
-                              (utils/after 10 #(headline-on-change s))
+                              (utils/after 10 #(headline-on-change s %))
                               (cond
                                 (and (.-metaKey e)
                                      (= "Enter" (.-key e)))
@@ -736,7 +739,7 @@
                                 :value (:abstract cmail-data)
                                 :exceeds-limit @(::abstract-exceeds-limit s)
                                 :abstract-length @(::abstract-length s)
-                                :on-change-cb #(abstract-on-change s)
+                                :on-change-cb (partial abstract-on-change s)
                                 :post-clicked #(post-clicked s)
                                 :cmail-key (:key cmail-state)}))
             (when (and show-edit-tooltip
