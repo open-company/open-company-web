@@ -293,6 +293,7 @@
                               {:data-toggle "tooltip"
                                :data-placement "top"
                                :title "Add reaction"
+                               :class (when (or can-show-edit-bt? can-show-delete-bt?) "has-more-menu")
                                :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
                             (when showing-picker?
                               (emoji-picker-container s comment-data))]]]))

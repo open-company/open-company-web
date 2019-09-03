@@ -247,11 +247,15 @@ div.stream-comments {
           }
 
           div.react-bt-container {
-            width: 34px;
+            width: 37px;
             height: 26px;
             position: absolute;
-            left: 68px;
+            left: 62px;
             top: 0;
+
+            &.has-more-menu {
+              left: 58px;
+            }
 
             div.emoji-mart {
               position: absolute;
@@ -304,7 +308,7 @@ div.stream-comments {
           div.stream-comment-floating-buttons-inner button.floating-bt {
             padding: 0;
             margin: 0;
-            width: 34px;
+            width: 30px;
             height: 26px;
             background-position: center;
             background-repeat: no-repeat;
@@ -322,26 +326,28 @@ div.stream-comments {
 
             &.share-bt {
               background-image: cdnUrl("/img/ML/comment_share.svg");
-              background-size: 14px 12px;
+              background-size: 14px 14px;
               left: 0;
             }
 
             &.reply-bt {
+              width: 32px;
               background-image: cdnUrl("/img/ML/comment_reply.svg");
               background-size: 12px 12px;
-              left: 34px;
+              left: 30px;
             }
 
             &.more-menu-bt {
+              width: 26px;
               background-image: cdnUrl("/img/ML/comment_more_menu.svg");
               background-size: 18px 4px;
               left: 0;
             }
 
             &.react-bt {
+              width: 37px;
               background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
               background-size: 21px 14px;
-              width: 34px;
               border-right: none;
 
               div.emoji-mart {
