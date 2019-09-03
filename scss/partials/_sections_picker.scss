@@ -20,14 +20,6 @@ div.sections-picker {
       padding: 8px 16px;
       cursor: pointer;
 
-      @include big_web() {
-        &.active, &:hover {
-          div.sections-picker-section-name {
-            opacity: 1;
-          }
-        }
-      }
-
       &.active, &:hover {
         background-color: $feint_emerald;
         color: $carrot_green;
@@ -37,7 +29,6 @@ div.sections-picker {
         }
 
         div.sections-picker-section-name {
-          opacity: 1;
           color: $carrot_green;
         }
 
@@ -60,7 +51,6 @@ div.sections-picker {
         @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
-        opacity: 0.5;
         height: 18px;
         line-height: 18px;
         white-space: nowrap;
