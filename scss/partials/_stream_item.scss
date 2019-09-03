@@ -60,6 +60,10 @@ div.stream-item {
 
     div.stream-item-body-ext div.stream-body-left div.stream-item-headline {
       @include activity-title(24px, 28px, true);
+
+      @include mobile() {
+        @include activity-title(24px, 28px, true);
+      }
     }
 
     @include big_web(){
@@ -394,7 +398,7 @@ div.stream-item {
 
         @include mobile() {
           margin-top: 16px;
-          @include activity-title(24px, 28px);
+          @include activity-title(24px, 28px, false);
         }
       }
 
