@@ -261,6 +261,7 @@
   (if (< (oget file :size) (* 5 1000 1000))
     (if (.match (.-type file) "image")
       (do
+        (.hide @(:me/media-picker-ext s))
         (dis/dispatch! [:input [:attachment-uploading]
          {:progress "0"
           :comment-parent-uuid (:comment-parent-uuid options)}])
@@ -268,10 +269,12 @@
           (fn [url]
             (.insertImageFile editor-ext file url nil)
             (utils/after 500
-             #(do
+             (fn []
+               (dis/dispatch! [:input [:attachment-uploading] nil])
                (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
-               (dis/dispatch! [:input [:attachment-uploading] nil]))))
-          nil
+               (utils/after 500 #(.togglePicker @(:me/media-picker-ext s))))))
+          (fn []
+           (dis/dispatch! [:input [:attachment-uploading] nil]))
           (fn [progress-percentage]
            (dis/dispatch! [:input [:attachment-uploading]
             {:progress progress-percentage
@@ -297,7 +300,8 @@
                     dispatch-input-key (:dispatch-input-key options)]
                 (activity-actions/add-attachment dispatch-input-key attachment-data)
                 (dis/dispatch! [:input [:attachment-uploading] nil])))
-            nil
+            (fn []
+             (dis/dispatch! [:input [:attachment-uploading] nil]))
             (fn [progress-percentage]
              (dis/dispatch! [:input [:attachment-uploading]
               {:progress progress-percentage
