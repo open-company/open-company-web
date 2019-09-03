@@ -717,3 +717,13 @@
              is-mobile?)
       50
       0)))
+
+(defn back-to [org-data]
+  (cond
+    ;; the board specified in the router if there is one
+    (:back-to @router/path) (:back-to @router/path)
+    ;; if the user is part of the team we can go back to all posts
+    (jwt/user-is-part-of-the-team (:team-id org-data)) "all-posts"
+    ;; else go back to the current post board since it's probably the
+    ;; only one the user can see
+    :else (router/current-board-slug)))
