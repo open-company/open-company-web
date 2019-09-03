@@ -260,26 +260,48 @@
 (defn file-dnd-handler [s options editor-ext file]
   (if (< (oget file :size) (* 5 1000 1000))
     (if (.match (.-type file) "image")
-      (iu/upload-file! file
-        (fn [url]
-          (.insertImageFile editor-ext file url nil)
-          (utils/after 500 #(utils/to-end-of-content-editable (rum/ref-node s "editor-node")))))
-      (when (:attachments-enabled options)
+      (do
+        (dis/dispatch! [:input [:attachment-uploading]
+         {:progress "0"
+          :comment-parent-uuid (:comment-parent-uuid options)}])
         (iu/upload-file! file
           (fn [url]
-            (let [size (oget file :size)
-                  mimetype (oget file :type)
-                  filename (oget file :name)
-                  createdat (utils/js-date)
-                  prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
-                  subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-                  icon (au/icon-for-mimetype mimetype)
-                  attachment-data {:file-name filename
-                                   :file-type mimetype
-                                   :file-size size
-                                   :file-url url}
-                  dispatch-input-key (:dispatch-input-key options)]
-              (activity-actions/add-attachment dispatch-input-key attachment-data))))))
+            (.insertImageFile editor-ext file url nil)
+            (utils/after 500
+             #(do
+               (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
+               (dis/dispatch! [:input [:attachment-uploading] nil]))))
+          nil
+          (fn [progress-percentage]
+           (dis/dispatch! [:input [:attachment-uploading]
+            {:progress progress-percentage
+             :comment-parent-uuid (:comment-parent-uuid options)}]))))
+      (when (:attachments-enabled options)
+        (do
+          (dis/dispatch! [:input [:attachment-uploading]
+           {:progress "0"
+            :comment-parent-uuid (:comment-parent-uuid options)}])
+          (iu/upload-file! file
+            (fn [url]
+              (let [size (oget file :size)
+                    mimetype (oget file :type)
+                    filename (oget file :name)
+                    createdat (utils/js-date)
+                    prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+                    subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+                    icon (au/icon-for-mimetype mimetype)
+                    attachment-data {:file-name filename
+                                     :file-type mimetype
+                                     :file-size size
+                                     :file-url url}
+                    dispatch-input-key (:dispatch-input-key options)]
+                (activity-actions/add-attachment dispatch-input-key attachment-data)
+                (dis/dispatch! [:input [:attachment-uploading] nil])))
+            nil
+            (fn [progress-percentage]
+             (dis/dispatch! [:input [:attachment-uploading]
+              {:progress progress-percentage
+               :comment-parent-uuid (:comment-parent-uuid options)}]))))))
     (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "dnd-file-too-big"
                     :title "Sorry!"
