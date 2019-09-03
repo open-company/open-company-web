@@ -202,17 +202,17 @@ div.stream-comments {
 
         div.stream-comment-floating-buttons {
           position: absolute;
-          right: 16px;
+          right: 0;
           top: 16px;
           height: 26px;
-          width: 104px;
+          width: 84px;
           display: none;
           z-index: 2;
 
           div.stream-comment-floating-buttons-inner {
             position: relative;
             height: 26px;
-            width: 104px;
+            width: 84px;
 
             div.stream-comment-floating-buttons-more-menu {
               Width: 86px;
@@ -247,10 +247,10 @@ div.stream-comments {
           }
 
           div.react-bt-container {
-            width: 37px;
+            width: 30px;
             height: 26px;
             position: absolute;
-            left: 62px;
+            left: 60px;
             top: 0;
 
             &.has-more-menu {
@@ -331,9 +331,9 @@ div.stream-comments {
             }
 
             &.reply-bt {
-              width: 32px;
+              width: 30px;
               background-image: cdnUrl("/img/ML/comment_reply.svg");
-              background-size: 12px 12px;
+              background-size: 14px 14px;
               left: 30px;
             }
 
@@ -345,9 +345,9 @@ div.stream-comments {
             }
 
             &.react-bt {
-              width: 37px;
+              width: 30px;
               background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
-              background-size: 21px 14px;
+              background-size: 14px 14px;
               border-right: none;
 
               div.emoji-mart {
