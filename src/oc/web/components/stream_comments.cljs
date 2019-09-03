@@ -109,6 +109,7 @@
       "Cancel"]
     (react-utils/build (.-Picker js/EmojiMart)
       {:native true
+       :autoFocus true
        :onClick (fn [emoji event]
                   (add-emoji-cb emoji))})])
 
