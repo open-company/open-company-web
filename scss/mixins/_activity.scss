@@ -195,7 +195,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-title($font_size: 26px, $line_height: 30px, $unread: false){
+@mixin activity-title($font_size: 26px, $line_height: 30px, $unread: true){
   @if $unread {
     @include OC_Body_Bold();
   } @else {
