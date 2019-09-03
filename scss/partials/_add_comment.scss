@@ -14,12 +14,16 @@ div.add-comment-box-container {
 
     @include user-profile(24);
 
+    @include mobile() {
+      @include user-profile(32);      
+    }
+
     div.user-avatar-img-container {
       float: left;
       margin-top: 10px;
 
       @include mobile() {
-        display: none;
+        top: 0;
       }
     }
 
@@ -65,22 +69,9 @@ div.add-comment-box-container {
         min-height: 24px;
         outline: none;
 
-        @include mobile() {
-          padding: 0;
-          border: none;
-          border-radius: 0;
-          box-shadow: none;
-          min-height: unset;
-        }
 
         &.medium-editor-placeholder-hidden:after {
           display: none !important;
-        }
-
-        @include tablet() {
-          width: calc(100% - 48px);
-          resize: vertical;
-          padding-right: 0px;
         }
 
         .emojione {

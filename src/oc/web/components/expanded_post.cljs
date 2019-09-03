@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
@@ -109,7 +110,8 @@
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
     [:div.expanded-post
-      {:class dom-node-class
+      {:class (utils/class-set {dom-node-class true
+                                :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
       (image-modal/image-modal {:src expand-image-src})
@@ -150,16 +152,17 @@
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
            :data-title (utils/activity-date-tooltip activity-data)
            :class utils/hide-class}
-          (str (:name publisher) " in "
-               (:board-name activity-data)
-               (when (= (:board-access activity-data) "private")
-                 " (private)")
-               (when (= (:board-access activity-data) "public")
-                 " (public)")
-               " on "
-               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
+          [:span.expanded-post-author-inner-label
+            (str (:name publisher) " in "
+                 (:board-name activity-data)
+                 (when (= (:board-access activity-data) "private")
+                   " (private)")
+                 (when (= (:board-access activity-data) "public")
+                   " (public)")
+                 " on "
+                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]
           (if (and assigned-follow-up-data
-                     (not (:completed? assigned-follow-up-data)))
+                   (not (:completed? assigned-follow-up-data)))
             [:div.follow-up-tag]
             (when (:must-see activity-data)
               [:div.must-see-tag]))]]
@@ -172,16 +175,19 @@
          :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
-      (when is-mobile?
-        [:div.expanded-post-mobile-reactions
-          (reactions activity-data)])
+      ; (when is-mobile?
+      ;   [:div.expanded-post-mobile-reactions
+      ;     (reactions activity-data)])
       [:div.expanded-post-footer.group
-        (comments-summary activity-data true)
-        (when-not is-mobile?
+        (when is-mobile?
           (reactions activity-data))
-        (when user-is-part-of-the-team
-          [:div.expanded-post-wrt-container
-            (wrt-count activity-data reads-data)])]
+        [:div.expanded-post-footer-mobile-group
+          (comments-summary activity-data)
+          (when-not is-mobile?
+            (reactions activity-data))
+          (when user-is-part-of-the-team
+            [:div.expanded-post-wrt-container
+              (wrt-count activity-data reads-data)])]]
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)

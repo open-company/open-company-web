@@ -47,7 +47,7 @@
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
     (enable-add-comment? s)
-    (when (not (seq (.-innerHTML add-comment-node)))
+    (when-not (seq (.-innerHTML add-comment-node))
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
@@ -168,7 +168,6 @@
                              (when (and follow-up
                                         (not (:completed? follow-up)))
                                (reset! (::complete-follow-up s) true)))
-
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
                            (let [add-comment-node (rum/ref-node s "editor-node")]
                              (when (should-focus-field? s)
@@ -177,10 +176,8 @@
                                 #(utils/to-end-of-content-editable add-comment-node))))
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
-                          :did-remount (fn [_ s]
-                           (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
-                           s)
                           :will-update (fn [s]
+                           (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
                            (let [data @(drv/get-ref s :media-input)
                                  video-data (:media-video data)]
                               (when (and @(:me/media-video s)

@@ -325,7 +325,7 @@
             with-file-dragging (if enable-file-dragging?
                                  (assoc clj-extentions "carrotFileDragging" file-dragging-ext)
                                  clj-extentions)
-            extensions (clj->js clj-extentions)
+            extensions (clj->js with-file-dragging)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                      :buttonLabels "fontawesome"
                      :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})

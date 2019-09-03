@@ -29,12 +29,6 @@
   img.org-avatar-img {
     display: none;
   }
-
-  @include mobile() {
-    span.org-name {
-      display: none !important;
-    }
-  }
 }
 
 @mixin org-avatar($max_logo_height: 42, $show_border: true){
@@ -52,7 +46,7 @@
       }
     }
 
-    img.org-avatar-img{
+    img.org-avatar-img {
       @if $show_border == true {
         border: 1px solid $ultra_light_grey;
         padding: #{$max_logo_height / 10}px; // Let's use a padding of 1/10
@@ -81,6 +75,10 @@
       display: block;
       margin-left: 8px;
       float: left;
+
+      @include mobile() {
+        max-width: unset;
+      }
     }
   }
 }

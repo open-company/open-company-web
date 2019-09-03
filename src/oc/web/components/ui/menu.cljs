@@ -68,9 +68,9 @@
   []
   (when-not ua/desktop-app?
     (cond
-      ua/mac? {:title "Mac app"
+      ua/mac? {:title "Download Mac app"
                :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
-      ua/windows? {:title "Windows app"
+      ua/windows? {:title "Download Windows app"
                    :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
@@ -180,10 +180,8 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          (if is-mobile?
-            {:href "https://the.carrot.news/"
+          {:href "https://the.carrot.news/"
              :target "_blank"}
-            {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a

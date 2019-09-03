@@ -673,7 +673,7 @@ $h2_top_margin: 24;
   a, span[data-auto-link] {
     text-decoration: none;
     color: $carrot_green;
-    background-color: transparent;
+    background-color: transparent !important;
   }
 
   a:hover {
@@ -748,5 +748,9 @@ $h2_top_margin: 24;
 
   i b, i strong, strong i, b i {
     @include OC_Body_Bold_Italic(); 
+  }
+
+  p, ul > li, i {
+    min-height: 24px;
   }
 }

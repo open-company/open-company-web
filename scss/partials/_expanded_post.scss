@@ -7,6 +7,15 @@ div.expanded-post {
     width: 100%;
     padding: 16px;
     margin-top: 56px;
+    background-color: white;
+
+    // Add some extra padding on android at the bottom
+    // to make sure the add comment field is not hidden
+    // behind the keyboard, Safari resize the viewport when
+    // the keyboard pops out so it's not a problem
+    &.android {
+      padding-bottom: 25vh;
+    }
   }
 
   div.activity-share-container {
@@ -21,13 +30,13 @@ div.expanded-post {
 
     @include mobile() {
       width: 100vw;
-      height: 56px;
-      padding: 12px 16px;
+      height: #{$mobile_navbar_height}px;
+      padding: 11px 16px;
       position: fixed;
       top: 0;
       left: 0;
-      border-bottom: 1px solid $grey_num_3;
-      background-color: $grey_num_2;
+      border-bottom: 1px solid $divider_line_grey;
+      background-color: white;
       z-index: 2;
     }
 
@@ -45,6 +54,10 @@ div.expanded-post {
       @include mobile() {
         background-color: transparent;
         padding: 7px 0;
+        width: 32px;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
       }
 
       div.back-to-board-inner {
@@ -53,6 +66,10 @@ div.expanded-post {
         color: $light_navy;
         line-height: 18px;
         margin-left: 8px;
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       div.back-arrow {
@@ -63,15 +80,18 @@ div.expanded-post {
         background-repeat: no-repeat;
         background-size: 16px 10px;
         background-position: center;
+
+        @include mobile() {
+          width: 12px;
+          height: 12px;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+        }
       }
     }
 
     div.more-menu {
       float: right;
-
-      @include mobile() {
-        margin-top: 4px;
-      }
     }
   }
 
@@ -119,7 +139,15 @@ div.expanded-post {
       @include OC_Body_Book();
       font-size: 12px;
       color: rgba($deep_navy, 0.5);
-      line-height: 24px;      
+      line-height: 24px;
+
+      span.expanded-post-author-inner-label {
+        @include mobile() {
+          margin-right: 8px;
+          margin-bottom: 8px;
+          display: inline-block;
+        }
+      }
 
       @include must-see-tag();
 
@@ -129,9 +157,14 @@ div.expanded-post {
         margin-top: 2px;
 
         @include mobile() {
-          display: block;
           margin-left: 0;
-          margin-top: 8px;
+          margin-top: 3px;
+          margin-bottom: 8px;
+          overflow: hidden;
+          max-width: 100%;
+          text-overflow: ellipsis;
+          white-space: pre-wrap;
+          word-break: break-word;
         }
       }
 
@@ -143,9 +176,14 @@ div.expanded-post {
         margin-top: 2px;
 
         @include mobile() {
-          display: block;
           margin-left: 0;
-          margin-top: 8px;
+          margin-top: 3px;
+          margin-bottom: 8px;
+          overflow: hidden;
+          max-width: 100%;
+          text-overflow: ellipsis;
+          white-space: pre-wrap;
+          word-break: break-word;
         }
       }
     }
@@ -166,7 +204,7 @@ div.expanded-post {
     }
 
     @include mobile() {
-      margin: 16px 0;
+      margin: 8px 0 16px;
     }
   }
 
@@ -174,26 +212,30 @@ div.expanded-post {
     @include activity-body(18, 24, $deep_navy);
     margin-top: 16px;
 
+    @include mobile() {
+      margin-top: 8px;
+    }
+
     .interactive-image {
       cursor: zoom-in;
 
       &:hover {
-          opacity: 0.7;
+        opacity: 0.7;
       }
     }
   }
 
-  div.expanded-post-mobile-reactions {
-    display: none;
+  // div.expanded-post-mobile-reactions {
+  //   display: none;
 
-    @include mobile() {
-      display: block;
-      height: 48px;
-      margin: 24px 0 0;
-      padding-bottom: 16px;
-      border-bottom: 1px solid $ultra_light_grey;
-    }
-  }
+  //   @include mobile() {
+  //     display: block;
+  //     height: 48px;
+  //     margin: 24px 0 0;
+  //     padding-bottom: 16px;
+  //     border-bottom: 1px solid $ultra_light_grey;
+  //   }
+  // }
 
   div.expanded-post-footer {
     margin-top: 24px;
@@ -201,8 +243,16 @@ div.expanded-post {
     position: relative;
 
     @include mobile() {
-      margin-top: 10px;
-      min-height: 20px;
+      margin-top: 3px;
+      min-height: 32px;
+    }
+
+    div.expanded-post-footer-mobile-group {
+      @include mobile() {
+        float: left;
+        height: 20px;
+        margin-top: 20px;
+      }
     }
 
     div.is-comments {
@@ -213,6 +263,11 @@ div.expanded-post {
         div.is-comments-author {
           background-color: $oc_gray_8;
           border: 2px solid $oc_gray_8;
+
+          @include mobile(){
+            background-color: white;
+            border: 2px solid white;
+          }
         }
       }
     }
@@ -220,6 +275,10 @@ div.expanded-post {
     div.reactions {
       float: left;
       margin-right: 16px;
+
+      @include mobile() {
+        margin-top: 13px;
+      }
 
       div.reactions-picker-container {
         div.emoji-mart {
@@ -253,10 +312,9 @@ div.expanded-post {
     margin-top: 24px;
 
     @include mobile() {
-      margin-top: 14px;
-      width: calc(100% + 32px);
-      margin-left: -16px;
-      padding: 16px;
+      margin-top: 16px;
+      width: 100%;
+      padding: 16px 0;
     }
 
     div.stream-comments {
@@ -267,6 +325,11 @@ div.expanded-post {
     & > div.add-comment-box-container {
       border-top: 1px solid $ultra_light_grey;
       padding-top: 24px;
+
+      @include mobile() {
+        margin-top: 8px;
+        padding-top: 16px;
+      }
     }
   }
 }

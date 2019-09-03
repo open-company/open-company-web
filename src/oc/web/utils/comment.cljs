@@ -30,7 +30,7 @@
                             :unwrapTags #js ["div" "label" "font" "h1" "h2" "h3" "h4" "h5" "div" "p" "ul" "ol" "li"
                                              "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                              "details" "summary" "nav" "abbr" "a"]}
-                :placeholder #js {:text "Add a comment…"
+                :placeholder #js {:text "Add a reply…"
                                   :hideOnClick true}
                :keyboardCommands #js {:commands #js [
                                   #js {
@@ -66,13 +66,13 @@
   [comment-data]
   (= (jwt/user-id) (:user-id (:author comment-data))))
 
-(defn get-comments-finished
-  [comments-key activity-data {:keys [status success body]}]
+(defn get-comments-finished [comments-key activity-data {:keys [status success body]}]
   (dis/dispatch! [:comments-get/finish {:success success
                                         :error (when-not success body)
                                         :comments-key comments-key
                                         :body (when (seq body) (json->cljs body))
-                                        :activity-uuid (:uuid activity-data)}]))
+                                        :activity-uuid (:uuid activity-data)
+                                        :secure-activity-uuid (router/current-secure-activity-id)}]))
 
 (defn get-comments [activity-data]
   (when activity-data

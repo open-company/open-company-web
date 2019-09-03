@@ -10,6 +10,8 @@ div.dashboard-layout {
   }
 
   @include mobile() {
+    background-color: $grey_num_4;
+
     &.sticky-board-name {
       padding-top: 48px;
       div.dashboard-layout-container {
@@ -65,6 +67,113 @@ div.dashboard-layout {
       width: 100%;
       max-width: initial;
       min-width: initial;
+      padding-bottom: 52px;
+    }
+
+    div.dashboard-layout-mobile-tabbar {
+      display: none;
+
+      @include mobile (){
+        display: block;
+        background-color: white;
+        padding: 15px 0;
+        border-top: 1px solid $divider_line_grey;
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        z-index: #{$navbar_zindex + 5};
+
+        &.ios-tabbar {
+          height: #{$mobile_navbar_height + 24}px;
+          padding: 7px 0 48px;
+
+          span.unread-notifications-dot {
+            bottom: 32px;
+          }
+        }
+
+        &.can-compose {
+          button {
+            width: 25%;
+          }
+
+          span.unread-notifications-dot {
+            right: 37vw;
+          }
+        }
+
+        button {
+          width: 33.3%;
+          height: 24px;
+          margin: 0;
+          padding: 0;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.5;
+
+          &.active {
+            opacity: 1;
+          }
+        }
+
+        button.all-posts-tab {
+          background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
+          backgorund-size: 22px 18px;
+
+          @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+          }
+        }
+
+        button.follow-ups-tab {
+          background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
+          backgorund-size: 18px 20px;
+
+          @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
+          }
+        }
+
+        button.notifications-tab {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+          backgorund-size: 18px 20px;
+          position: relative;
+
+          @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+          }
+        }
+
+        span.unread-notifications-dot {
+          display: block;
+          width: 4px;
+          height: 4px;
+          position: absolute;
+          bottom: 4px;
+          background-color: $carrot_green;
+          border-radius: 50%;
+          right: 16.1vw;
+        }
+
+        button.new-post-tab {
+          background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
+          backgorund-size: 20px 20px;
+
+          @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+          }
+        }
+      }
     }
 
     div.board-container {
@@ -76,14 +185,9 @@ div.dashboard-layout {
 
       @include mobile() {
         width: 100%;
-        background-color: $grey_num_2;
         padding: 0;
-      }
-
-      @include mobile() {
-        width: 100%;
-        margin: 0px;
-        left: unset;
+        min-height: calc(100vh - 76px);
+        margin: 0;
       }
 
       div.add-post-tooltip-container {
@@ -232,9 +336,13 @@ div.dashboard-layout {
         border-bottom: 1px solid $ultra_light_grey;
 
         @include mobile() {
-          height: 35px;
+          height: 50px;
           border-bottom: none;
           padding: 0;
+
+          &.drafts-board {
+            height: 0;
+          }
         }
           
         div.board-name {
@@ -429,9 +537,26 @@ div.dashboard-layout {
 
           @include mobile() {
             width: 100%;
-            height: 35px;
-            background-color: $grey_num_2;
-            border-bottom: 1px solid $grey_num_3;
+            height: 50px;
+            background-color: $grey_num_4;
+            border-bottom: 1px solid $more_ultra_light_grey;
+          }
+
+          button.mobile-search-bt {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              position: absolute;
+              left: 16px;
+              top: 13px;
+              background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              width: 24px;
+              height: 24px;
+            }
           }
 
           button.board-sort-bt {
@@ -445,13 +570,15 @@ div.dashboard-layout {
             position: relative;
 
             @include mobile(){
-              width: 100%;
-              height: 35px;
-              line-height: 35px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              color: $ui_grey;
+              width: 200px;
+              position: absolute;
+              top: 0;
+              left: 50%;
+              margin-left: -100px;
+              height: 50px;
+              line-height: 50px;
+              text-align: center;
+              color: $deep_navy;
               opacity: 1;
             }
 
@@ -476,11 +603,10 @@ div.dashboard-layout {
               background-position: center;
 
               @include mobile() {
-                position: relative;
-                top: unset;
-                right: unset;
-                margin-left: 6px;
-                opacity: 0.6;
+                position: absolute;
+                top: 24px;
+                left: 50%;
+                margin-left: 47px;
               }
             }
           }

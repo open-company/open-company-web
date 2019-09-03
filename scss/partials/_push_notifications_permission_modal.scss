@@ -18,16 +18,19 @@ div.push-notifications-permission-modal {
     margin-top: 2%;
 
     .modal-close-bt {
-      position: absolute;
-      left: 5%;
-      width: 16px;
-      height: 16px;
+      width: 32px;
+      height: 32px;
       padding: 0;
-      background-image: cdnUrl("/img/ML/mobile_close_x.svg");
-      background-size: 16px 16px;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
       background-position: center;
       background-repeat: no-repeat;
+      background-size: 12px 12px;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
       border: none;
+      position: absolute;
+      left: 16px;
+      top: 11px;
     }
 
     .modal-title {

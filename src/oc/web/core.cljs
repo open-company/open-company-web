@@ -624,14 +624,14 @@
 
     (defn handle-url-change [e]
       ;; we are checking if this event is due to user action,
-      ;; such as click a link, a back button, etc.
+      ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
         (if ua/edge?
-          (set! (.. js/document -scrollingElement -scrollTop) 0)
-          (js/window.scrollTo 0 0)))
+          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+          (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips

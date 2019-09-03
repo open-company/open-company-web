@@ -28,7 +28,8 @@ div.activity-share-modal-container {
     border: none;
     box-shadow: none;
     padding: 0px;
-    border-bottom: 1px solid $ultra_light_grey;
+    border-bottom: 1px solid $divider_line_grey;
+    background-color: white;
   }
 
   &.will-appear {
@@ -62,11 +63,13 @@ div.activity-share-modal-container {
       @include mobile() {
         position: relative;
         width: 100%;
-        height: 56px;
-        box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.1);
-        padding: 16px 0;
+        height: #{$mobile_navbar_height}px;
+        border-bottom: 1px solid $divider_line_grey;
+        padding: 11px 16px;
         text-align: center;
-        line-height: 24px;
+        line-height: 32px;
+        @include OC_Body_Bold();
+        font-size: 18px;
       }
 
       button.mobile-modal-close-bt {
@@ -81,7 +84,8 @@ div.activity-share-modal-container {
           background-repeat: no-repeat;
           background-size: 14px 14px;
           position: absolute;
-          top: 16px;
+          padding: 0;
+          top: 15px;
           left: 16px;
         }
       }
