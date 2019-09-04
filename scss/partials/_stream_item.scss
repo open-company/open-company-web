@@ -139,7 +139,6 @@ div.stream-item {
 
       @include mobile() {
         @include activity-author(32);
-        width: calc(100% - 46px);
       }
 
       div.name {

@@ -768,8 +768,9 @@
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
             ; Attachments
-            (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))]]
+            (when-not (:collapsed cmail-state)
+              (stream-attachments (:attachments cmail-data) nil
+               #(activity-actions/remove-attachment :cmail-data %)))]]
       (when (and follow-up?
                  (not is-mobile?)
                  (not is-fullscreen?))

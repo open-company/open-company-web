@@ -8,6 +8,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
@@ -174,7 +175,7 @@
                                 (not (:collapsed cmail-state))
                                 is-mobile?)
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
-        show-push-notification-permissions-modal? (and is-mobile?
+        show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        (jwt/jwt)
                                                        (not user-responded-to-push-permission?))]
     (if is-loading
