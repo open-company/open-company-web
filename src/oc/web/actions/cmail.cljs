@@ -8,42 +8,9 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
-            [oc.web.lib.user-cache :as uc]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.json :refer (json->cljs)]))
-
-;; Cached items
-
-(defn get-entry-cache-key
-  [entry-uuid]
-  (str (or
-        entry-uuid
-        (router/current-org-slug))
-   "-entry-edit"))
-
-(defn remove-cached-item
-  [item-uuid]
-  (uc/remove-item (get-entry-cache-key item-uuid)))
-
-(defn load-cached-item
-  [entry-data edit-key & [completed-cb]]
-  (let [cache-key (get-entry-cache-key (:uuid entry-data))]
-    (uc/get-item cache-key
-     (fn [item err]
-       (if (and (not err)
-                (map? item)
-                (= (:updated-at entry-data) (:updated-at item)))
-         (let [entry-to-save (merge item (select-keys entry-data [:links :board-slug :board-name]))]
-           (dis/dispatch! [:input [edit-key] entry-to-save]))
-         (do
-           ;; If we got an item remove it since it won't be used
-           ;; since we have an updated version of it already
-           (when item
-             (remove-cached-item (:uuid entry-data)))
-           (dis/dispatch! [:input [edit-key] entry-data])))
-       (when (fn? completed-cb)
-         (completed-cb))))))
 
 ;; Last used and default section for editing
 
@@ -102,8 +69,8 @@
     (when (and (not (:auto cmail-state))
                (not (:collapsed cmail-state)))
       (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 60 24 365)))
-    (load-cached-item initial-entry-data :cmail-data
-     #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
+    (dis/dispatch! [:input [:cmail-data] initial-entry-data])
+    (dis/dispatch! [:input [:cmail-state] fixed-cmail-state])))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))
