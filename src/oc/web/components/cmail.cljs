@@ -517,7 +517,7 @@
                         (some #(not= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
         can-toggle-follow-ups? (every? #(and (not (:completed? %))
                                              (or (not (:author %))
-                                                 (= (-> % :author :user-id) (jwt/user-id))))
+                                                 (= (-> % :author :user-id) current-user-id)))
                                 (:follow-ups cmail-data))
         long-tooltip (not= (:status cmail-data) "published")]
     [:div.cmail-outer
