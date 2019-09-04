@@ -11,7 +11,7 @@
                 (.dotdotdot $dom-node
                  #js {:height height
                       :wrap "word"
-                      :watch true
+                      :watch false
                       :ellipsis "..."}))))]
     {:did-mount (fn [s]
       (truncate-fn s)
