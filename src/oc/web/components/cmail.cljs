@@ -152,26 +152,10 @@
 (defn body-on-change [state]
   (dis/dispatch! [:input [:cmail-data :has-changes] true]))
 
-(defn- check-limits [s]
-  (let [headline (rum/ref-node s "headline")
-        abstract (.querySelector js/document "div.cmail-content-abstract")
-        abstract-text (s/trim (.-innerText abstract))
-        exceeds-limit (> (count abstract-text) utils/max-abstract-length)
-        clean-headline (s/trim (s/replace (.-innerText headline) #"\n" ""))
-        post-button-title (cond
-                           (not (seq clean-headline)) :title
-                           exceeds-limit :abstract
-                           :else nil)]
-    (reset! (::abstract-exceeds-limit s) exceeds-limit)
-    (reset! (::abstract-length s) (count abstract-text))
-    (reset! (::post-button-title s) post-button-title)))
-
 (defn- headline-on-change [state & [event]]
   (when-let [headline (if event (.-target event) (rum/ref-node state "headline"))]
-    (let [emojied-headline (.-innerText headline)]
-      (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
-                                                       :has-changes true})])
-      (check-limits state))))
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:headline (.-innerText headline)
+                                                     :has-changes true})])))
 
 (defn- abstract-on-change [state & [inner-state event]]
   (when-let [abstract (cond
@@ -179,8 +163,8 @@
                        inner-state (rum/ref-node inner-state "abstract")
                        :else (.querySelector js/document "div.cmail-content-abstract"))]
     (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.-innerHTML abstract)
-                                                     :has-changes true})])
-    (check-limits state)))
+                                                     :abstract-text (.-innerText abstract)
+                                                     :has-changes true})])))
 
 ;; Headline setup and paste handler
 
@@ -223,7 +207,7 @@
 (defn- is-publishable? [s cmail-data]
   (and (seq (:board-slug cmail-data))
        (seq (fix-headline cmail-data))
-       (not @(::abstract-exceeds-limit s))))
+       (<= (count (:abstract-text cmail-data)) utils/max-abstract-length)))
 
 (defn real-post-action [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -366,9 +350,6 @@
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
-                   (rum/local "" ::post-button-title)
-                   (rum/local false ::abstract-exceeds-limit)
-                   (rum/local 0 ::abstract-length)
                    (rum/local false ::show-post-tooltip)
                    (rum/local false ::mobile-follow-ups-remove-menu)
                    ;; Mixins
@@ -397,17 +378,11 @@
                       (when (and (not (seq (:uuid cmail-data)))
                                  (not (:collapsed cmail-state)))
                         (nux-actions/dismiss-add-post-tooltip))
+                      (dis/dispatch! [:input [:cmail-data :abstract-text] abstract-text])
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
                       (reset! (::initial-abstract s) initial-abstract)
                       (reset! (::initial-uuid s) (:uuid cmail-data))
-                      (reset! (::abstract-length s) (count abstract-text))
-                      (reset! (::abstract-exceeds-limit s) abstract-exceeds)
-                      (reset! (::post-button-title s)
-                        (cond
-                          abstract-exceeds :abstract
-                          (not (seq (:headline cmail-data))) :title
-                          :else nil))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state)))
                     (when (responsive/is-mobile-size?)
@@ -443,13 +418,6 @@
                             (reset! (::initial-headline s) initial-headline)
                             (reset! (::initial-abstract s) initial-abstract)
                             (reset! (::initial-uuid s) (:uuid cmail-data))
-                            (reset! (::abstract-length s) (count abstract-text))
-                            (reset! (::abstract-exceeds-limit s) abstract-exceeds)
-                            (reset! (::post-button-title s)
-                             (cond
-                              abstract-exceeds :abstract
-                              (not (seq (:headline cmail-data))) :title
-                              :else nil))
                             (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
@@ -516,7 +484,11 @@
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
-        post-button-title @(::post-button-title s)
+        abstract-exceeds (> (count (:abstract-text cmail-data)) utils/max-abstract-length)
+        post-button-title (cond
+                            abstract-exceeds :abstract
+                            (not (seq (:headline cmail-data))) :title
+                            :else nil)
         disabled? (or show-post-bt-tooltip?
                       @(::publishing s)
                       @(::disable-post s))
@@ -737,8 +709,8 @@
                       is-fullscreen?)
               (carrot-abstract {:initial-value @(::initial-abstract s)
                                 :value (:abstract cmail-data)
-                                :exceeds-limit @(::abstract-exceeds-limit s)
-                                :abstract-length @(::abstract-length s)
+                                :exceeds-limit abstract-exceeds
+                                :abstract-length (count (:abstract-text cmail-data))
                                 :on-change-cb (partial abstract-on-change s)
                                 :post-clicked #(post-clicked s)
                                 :cmail-key (:key cmail-state)}))
