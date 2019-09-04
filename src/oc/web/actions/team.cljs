@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -351,11 +352,11 @@
                         (if (> (.indexOf redirect "?") -1)
                           (str redirect "&add=team")
                           (str redirect "?add=team")))
-        fixed-add-slack-team-link (utils/slack-link-with-state
+        fixed-add-slack-team-link (uu/auth-link-with-state
                                    (:href add-slack-team-link)
-                                   (:user-id current-user-data)
-                                   team-id
-                                   with-add-team)]
+                                   {:user-id (:user-id current-user-data)
+                                    :team-id team-id
+                                    :redirect with-add-team})]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 
