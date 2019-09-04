@@ -374,15 +374,6 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace
-   original-url
-   team-id
-   (str
-    (when (seq team-id) (str team-id ":"))
-    (when (seq user-id) (str user-id ":"))
-    redirect)))
-
 (def network-error
  {:title "Network error"
   :description "Shoot, looks like there might be a connection issue. Please try again."
