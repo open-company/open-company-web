@@ -14,6 +14,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.utils.mention :as mention-utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
@@ -259,26 +260,59 @@
 
 (defn file-dnd-handler [s options editor-ext file]
   (if (< (oget file :size) (* 5 1000 1000))
-    (if (.match (.-type file) "image")
-      (iu/upload-file! file
-        (fn [url]
-          (.insertImageFile editor-ext file url nil)
-          (utils/after 500 #(utils/to-end-of-content-editable (rum/ref-node s "editor-node")))))
-      (iu/upload-file! file
-        (fn [url]
-          (let [size (oget file :size)
-                mimetype (oget file :type)
-                filename (oget file :name)
-                createdat (utils/js-date)
-                prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
-                subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-                icon (au/icon-for-mimetype mimetype)
-                attachment-data {:file-name filename
-                                 :file-type mimetype
-                                 :file-size size
-                                 :file-url url}
-                dispatch-input-key (:dispatch-input-key options)]
-            (activity-actions/add-attachment dispatch-input-key attachment-data)))))
+    (let [cmail-state (:cmail-state @dis/app-state)]
+      ;; If Quick Post is still collapsed expand it
+      (when (:collapsed cmail-state)
+        (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
+                                                                      :fullscreen false
+                                                                      :key (:key cmail-state)}))
+      (if (.match (.-type file) "image")
+        (do
+          (.hide @(:me/media-picker-ext s))
+          (dis/dispatch! [:input [:attachment-uploading]
+           {:progress "0"
+            :comment-parent-uuid (:comment-parent-uuid options)}])
+          (iu/upload-file! file
+            (fn [url]
+              (.insertImageFile editor-ext file url nil)
+              (utils/after 500
+               (fn []
+                 (dis/dispatch! [:input [:attachment-uploading] nil])
+                 (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
+                 (utils/after 500 #(.togglePicker @(:me/media-picker-ext s))))))
+            (fn []
+             (dis/dispatch! [:input [:attachment-uploading] nil]))
+            (fn [progress-percentage]
+             (dis/dispatch! [:input [:attachment-uploading]
+              {:progress progress-percentage
+               :comment-parent-uuid (:comment-parent-uuid options)}]))))
+        (when (:attachments-enabled options)
+          (do
+            (dis/dispatch! [:input [:attachment-uploading]
+             {:progress "0"
+              :comment-parent-uuid (:comment-parent-uuid options)}])
+            (iu/upload-file! file
+              (fn [url]
+                (let [size (oget file :size)
+                      mimetype (oget file :type)
+                      filename (oget file :name)
+                      createdat (utils/js-date)
+                      prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+                      subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+                      icon (au/icon-for-mimetype mimetype)
+                      attachment-data {:file-name filename
+                                       :file-type mimetype
+                                       :file-size size
+                                       :file-url url}
+                      dispatch-input-key (:dispatch-input-key options)]
+                  (activity-actions/add-attachment dispatch-input-key attachment-data)
+                  (dis/dispatch! [:input [:attachment-uploading] nil])))
+              (fn []
+               (dis/dispatch! [:input [:attachment-uploading] nil]))
+              (fn [progress-percentage]
+               (dis/dispatch! [:input [:attachment-uploading]
+                {:progress progress-percentage
+                 :comment-parent-uuid (:comment-parent-uuid options)}])))))))
     (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "dnd-file-too-big"
                     :title "Sorry!"
@@ -306,26 +340,17 @@
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
-            enable-file-dragging? (and (not mobile-editor)
-                                       (:attachments-enabled options))
-            file-dragging-ext (when enable-file-dragging?
+            file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
-            buttons (if show-subtitle
-                      ["bold" "italic" "unorderedlist" "anchor" "quote" "h2"]
-                      ["bold" "italic" "unorderedlist" "anchor" "quote"])
-            clj-extentions (if mobile-editor
-                             {"autolist" (js/AutoList.)
-                              "mention" (mention-utils/mention-ext users-list)
-                              "fileDragging" false}
-                             {"autolist" (js/AutoList.)
-                              "mention" (mention-utils/mention-ext users-list)
-                              "media-picker" media-picker-ext
-                              "fileDragging" false
-                              "autoquote" (js/AutoQuote.)})
-            with-file-dragging (if enable-file-dragging?
-                                 (assoc clj-extentions "carrotFileDragging" file-dragging-ext)
-                                 clj-extentions)
-            extensions (clj->js with-file-dragging)
+            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote"]
+                      show-subtitle (conj "h2"))
+            extensions (cond-> {"autolist" (js/AutoList.)
+                                "mention" (mention-utils/mention-ext users-list)
+                                "fileDragging" false}
+                         (not mobile-editor) (assoc "media-picker" media-picker-ext
+                                                    "autoquote" (js/AutoQuote.)
+                                                    "carrotFileDragging" file-dragging-ext)
+                         true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
                      :buttonLabels "fontawesome"
                      :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})

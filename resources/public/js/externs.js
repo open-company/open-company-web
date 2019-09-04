@@ -78,6 +78,8 @@ MediaPicker.addChart = function(){};
 MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
+MediaPicker.togglePicker = function(){};
+MediaPicker.hide = function(){};
 // MediumEditorFileDragging
 var CarrotFileDragging = function(){};
 CarrotFileDragging.insertImageFile = function(){};
