@@ -12,6 +12,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
@@ -259,7 +260,7 @@
 ;; DND
 
 (defn file-dnd-handler [s options editor-ext file]
-  (if (< (oget file :size) (* 20 1024 1024))
+  (if (< (oget file :size) ls/file-upload-size)
     (let [cmail-state (:cmail-state @dis/app-state)]
       ;; If Quick Post is still collapsed expand it
       (when (:collapsed cmail-state)
