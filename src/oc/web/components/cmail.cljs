@@ -168,14 +168,14 @@
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
       (check-limits state)
-      (.call (::debounced-autosave state)))))
+      (.call @(::debounced-autosave state)))))
 
 (defn- abstract-on-change [state]
   (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
     (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.html $abstract)
                                                      :has-changes true})])
     (check-limits state)
-    (.call (::debounced-autosave state))))
+    (.call @(::debounced-autosave state))))
 
 ;; Headline setup and paste handler
 
