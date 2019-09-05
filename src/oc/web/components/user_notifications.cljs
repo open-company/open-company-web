@@ -21,6 +21,44 @@
   (reset! (::tray-open s) false)
   (user-actions/read-notifications))
 
+(rum/defc user-notification-item < rum/static
+  [{entry-uuid        :uuid
+    board-slug        :board-slug
+    reminder?         :reminder?
+    reminder          :reminder
+    notification-type :notification-type
+    created-at        :created-at
+    :as n}]
+  (let [children-key-base (str "user-notification-" created-at "-")
+        children-key (str children-key-base
+                          (if (seq entry-uuid)
+                            entry-uuid
+                            (if (and reminder? (seq (:uuid reminder)))
+                              (:uuid reminder)
+                              (rand 1000))))]
+    [:div.user-notification.group
+     {:class    (utils/class-set {:unread (:unread n)})
+      :on-click (fn [e]
+                  (when (fn? (:click n))
+                    ((:click n)))
+                  (user-actions/hide-mobile-user-notifications))
+      :key      children-key}
+     (user-avatar-image (:author n))
+     [:div.user-notification-title
+      (:title n)]
+     [:div.user-notification-time-since
+      [:time
+       {:date-time      (:created-at n)
+        :data-toggle    "tooltip"
+        :data-placement "top"
+        :data-delay     "{\"show\":\"1000\", \"hide\":\"0\"}"
+        :data-container "body"
+        :data-title     (utils/tooltip-date (:created-at n))}
+       (utils/time-since (:created-at n) [:short])]]
+     [:div.user-notification-body.oc-mentions.oc-mentions-hover
+      {:dangerouslySetInnerHTML (utils/emojify (:body n))}]])
+  )
+
 (rum/defcs user-notifications < rum/static
                                 rum/reactive
                                 (drv/drv :user-notifications)
@@ -95,24 +133,4 @@
                                                  (seq (:uuid reminder)))
                                           (:uuid reminder)
                                           (rand 1000))))]]
-              [:div.user-notification.group
-                {:class (utils/class-set {:unread (:unread n)})
-                 :on-click (fn [e]
-                             (when (fn? (:click n))
-                               ((:click n)))
-                             (user-actions/hide-mobile-user-notifications))
-                 :key children-key}
-                (user-avatar-image (:author n))
-                [:div.user-notification-title
-                  (:title n)]
-                [:div.user-notification-time-since
-                  [:time
-                    {:date-time (:created-at n)
-                     :data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-container "body"
-                     :data-title (utils/tooltip-date (:created-at n))}
-                    (utils/time-since (:created-at n) [:short])]]
-                [:div.user-notification-body.oc-mentions.oc-mentions-hover
-                  {:dangerouslySetInnerHTML (utils/emojify (:body n))}]]))]]]))
+              (user-notification-item n)))]]]))
