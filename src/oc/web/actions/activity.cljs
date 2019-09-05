@@ -653,8 +653,13 @@
 (defn activity-change [section-uuid activity-uuid]
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
-        activity-data (dis/activity-data (:slug org-data) activity-uuid)]
-    (when activity-data
+        activity-data (dis/activity-data (:slug org-data) activity-uuid)
+        editing-activity-data (:cmail-data @dis/app-state)]
+    (when (and ;; if we have the activity in the app-state
+               activity-data
+               ;; and we are not currently editing it (if we are editing
+               ;; we don't need to refresh it on each change)
+               (not= (:uuid activity-data) (:uuid editing-activity-data)))
       (get-entry activity-data))))
 
 ;; Change service actions
