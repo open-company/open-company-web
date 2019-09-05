@@ -259,7 +259,7 @@
 ;; DND
 
 (defn file-dnd-handler [s options editor-ext file]
-  (if (< (oget file :size) (* 5 1000 1000))
+  (if (< (oget file :size) (* 20 1024 1024))
     (let [cmail-state (:cmail-state @dis/app-state)]
       ;; If Quick Post is still collapsed expand it
       (when (:collapsed cmail-state)
