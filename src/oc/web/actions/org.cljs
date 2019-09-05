@@ -122,7 +122,7 @@
           ;; Load the current activity
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
-          (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
+          (sa/load-other-sections (:boards org-data) 1000)
           ;; Preload all posts data
           (when activity-link
             (utils/maybe-after activity-delay #(aa/activity-get org-data)))

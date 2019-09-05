@@ -58,20 +58,24 @@
     (dispatcher/dispatch! [:section sort-type (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
-  [sections]
-  (doseq [section sections
-          :when (not (is-currently-shown? section))
-          :let [board-link (utils/link-for (:links section) ["item" "self"] "GET")
-                recent-board-link (utils/link-for (:links section) "activity" "GET")]]
-    (api/get-board board-link
-      (fn [{:keys [status body success]}]
-        (when success
-          (section-get-finish :recently-posted (json->cljs body)))))
-    (when recent-board-link
-      (api/get-board recent-board-link
-        (fn [{:keys [status body success]}]
-          (when success
-            (section-get-finish :recent-activity (json->cljs body))))))))
+  [sections load-delay]
+  (when (seq sections)
+    (if (is-currently-shown? (first sections))
+      (load-other-sections (rest sections) load-delay)
+      (utils/maybe-after load-delay
+       #(let [section (first sections)
+              board-link (utils/link-for (:links section) ["item" "self"] "GET")
+              recent-board-link (utils/link-for (:links section) "activity" "GET")]
+          (api/get-board board-link
+            (fn [{:keys [status body success]}]
+              (when success
+                (section-get-finish :recently-posted (json->cljs body)))))
+          (when recent-board-link
+            (api/get-board recent-board-link
+              (fn [{:keys [status body success]}]
+                (when success
+                  (section-get-finish :recent-activity (json->cljs body))))))
+          (load-other-sections (rest sections) load-delay))))))
 
 (declare refresh-org-data)
 
@@ -93,8 +97,8 @@
                            (finish-cb resp))))
         ;; Reload a secondary board data
         (let [sections (:boards (dispatcher/org-data))
-              filtered-sections (filter #(= (:uuid %) section-uuid) sections)]
-          (load-other-sections filtered-sections))))))
+              filtered-sections (filterv #(= (:uuid %) section-uuid) sections)]
+          (load-other-sections filtered-sections 0))))))
   ;; Update change-data state that the board has a change
   (dispatcher/dispatch! [:section-change section-uuid]))
 
