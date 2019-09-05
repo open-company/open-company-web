@@ -33,6 +33,7 @@
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
+            [goog.functions :as gfn]
             [clojure.contrib.humanize :refer (filesize)]))
 
 (def missing-title-tooltip "Please add a title")
@@ -105,11 +106,6 @@
 
 ;; Local cache for outstanding edits
 
-(defn remove-autosave [s]
-  (when @(::autosave-timer s)
-    (.clearInterval js/window @(::autosave-timer s))
-    (reset! (::autosave-timer s) nil)))
-
 (defn autosave [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         section-editing @(drv/get-ref s :section-editing)]
@@ -120,7 +116,6 @@
 (defn cancel-clicked [s]
   (let [cmail-data @(drv/get-ref s :cmail-data)
         clean-fn (fn [dismiss-modal?]
-                    (remove-autosave s)
                     (activity-actions/entry-clear-local-cache (:uuid cmail-data) :cmail-data cmail-data)
                     (when dismiss-modal?
                       (alert-modal/hide-alert))
@@ -150,7 +145,8 @@
 ;; Data change handling
 
 (defn body-on-change [state]
-  (dis/dispatch! [:input [:cmail-data :has-changes] true]))
+  (dis/dispatch! [:input [:cmail-data :has-changes] true])
+  (.call @(::debounced-autosave state)))
 
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
@@ -171,13 +167,15 @@
     (let [emojied-headline (.-innerText headline)]
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
-      (check-limits state))))
+      (check-limits state)
+      (.call (::debounced-autosave state)))))
 
 (defn- abstract-on-change [state]
   (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
     (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (.html $abstract)
                                                      :has-changes true})])
-    (check-limits state)))
+    (check-limits state)
+    (.call (::debounced-autosave state))))
 
 ;; Headline setup and paste handler
 
@@ -231,7 +229,6 @@
         (let [_ (dis/dispatch! [:update [:cmail-data] #(merge % {:headline fixed-headline :abstract fixed-abstract})])
               updated-cmail-data @(drv/get-ref s :cmail-data)
               section-editing @(drv/get-ref s :section-editing)]
-          (remove-autosave s)
           (if published?
             (do
               (reset! (::saving s) true)
@@ -357,7 +354,7 @@
                    (rum/local false ::publishing)
                    (rum/local false ::disable-post)
                    (rum/local false ::publish-after-autosave)
-                   (rum/local nil ::autosave-timer)
+                   (rum/local nil ::debounced-autosave)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
                    (rum/local false ::media-attachment-did-success)
@@ -413,7 +410,7 @@
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
-                    (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                    (reset! (::debounced-autosave s) (gfn/debounce (partial autosave s) 2000))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -495,7 +492,6 @@
                     (when @(::abstract-input-listener s)
                       (events/unlistenByKey @(::abstract-input-listener s))
                       (reset! (::abstract-input-listener s) nil))
-                    (remove-autosave s)
                     (when (responsive/is-mobile-size?)
                       (dom-utils/unlock-page-scroll))
                     s)}
@@ -527,7 +523,6 @@
                   (if (au/has-content? (assoc cmail-data
                                          :body
                                          (cleaned-body)))
-                    (autosave s)
                     (do
                       (reset! (::deleting s) true)
                       (activity-actions/activity-delete cmail-data)))
@@ -714,9 +709,6 @@
                :ref "headline"
                :placeholder utils/default-headline
                :on-paste    #(headline-on-paste s %)
-               :on-click    #(headline-on-change s)
-               :on-focus #(headline-on-change s)
-               :on-blur #(headline-on-change s)
                :on-key-down (fn [e]
                               (utils/after 10 #(headline-on-change s))
                               (cond
@@ -778,8 +770,7 @@
         [:div.cmail-footer
           (when (and (not= (:status cmail-data) "published")
                      (not is-mobile?))
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
+            (if (:auto-saving cmail-data)
               [:div.saving-saved "Saving..."]
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))]
