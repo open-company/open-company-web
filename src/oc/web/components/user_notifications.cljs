@@ -29,20 +29,14 @@
     notification-type :notification-type
     created-at        :created-at
     :as n}]
-  (let [children-key-base (str "user-notification-" created-at "-")
-        children-key (str children-key-base
-                          (if (seq entry-uuid)
-                            entry-uuid
-                            (if (and reminder? (seq (:uuid reminder)))
-                              (:uuid reminder)
-                              (rand 1000))))]
+  (let [react-key (str "user-notification-" created-at)]
     [:div.user-notification.group
      {:class    (utils/class-set {:unread (:unread n)})
       :on-click (fn [e]
                   (when (fn? (:click n))
                     ((:click n)))
                   (user-actions/hide-mobile-user-notifications))
-      :key      children-key}
+      :key      react-key}
      (user-avatar-image (:author n))
      [:div.user-notification-title
       (:title n)]
