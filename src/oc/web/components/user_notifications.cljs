@@ -30,7 +30,8 @@
                                 ui-mixins/refresh-tooltips-mixin
                                 (am/truncate-element-mixin "div.user-notification-body" (* 18 3))
                                 (ui-mixins/on-window-click-mixin (fn [s e]
-                                 (when-not (utils/event-inside? e (rum/ref-node s :read-bt))
+                                 (when (and @(::tray-open s)
+                                            (not (utils/event-inside? e (rum/ref-node s :read-bt))))
                                    (close-tray s))))
                                 {:will-mount (fn [s]
                                   (when (responsive/is-mobile-size?)
