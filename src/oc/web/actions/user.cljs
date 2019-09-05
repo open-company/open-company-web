@@ -158,16 +158,19 @@
     (dis/dispatch! [:login-with-email])))
 
 (defn login-with-slack [auth-url]
-  (let [auth-url-with-redirect (utils/slack-link-with-state
+  (let [auth-url-with-redirect (user-utils/auth-link-with-state
                                  (:href auth-url)
-                                 nil
-                                 "open-company-auth" oc-urls/slack-lander-check)]
+                                 {:team-id "open-company-auth"
+                                  :redirect oc-urls/slack-lander-check})]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
 (defn login-with-google [auth-url]
-  (router/redirect! (:href auth-url))
-  (dis/dispatch! [:login-with-google]))
+  (let [auth-url-with-redirect (user-utils/auth-link-with-state
+                                (:href auth-url)
+                                {})]
+    (router/redirect! auth-url-with-redirect)
+    (dis/dispatch! [:login-with-google])))
 
 (defn refresh-slack-user []
   (let [refresh-link (utils/link-for (:links (dis/auth-settings)) "refresh")]
