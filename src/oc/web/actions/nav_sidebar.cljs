@@ -1,4 +1,5 @@
 (ns oc.web.actions.nav-sidebar
+  (:require-macros [if-let.core :refer (when-let*)])
   (:require [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -11,6 +12,7 @@
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
@@ -28,7 +30,30 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 
-(defn nav-to-url! [e url]
+(defn- refresh-board-data [board-slug]
+  (when (and (not (router/current-activity-id))
+             board-slug)
+    (let [org-data (dis/org-data)
+          board-data (if (#{"all-posts" "follow-ups"} board-slug)
+                       (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
+                       (dis/board-data board-slug))]
+       (cond
+
+        (= board-slug "all-posts")
+        (activity-actions/all-posts-get org-data)
+
+        (= board-slug "follow-ups")
+        (activity-actions/follow-ups-sort-get org-data)
+
+        :default
+        (let [sort-type (router/current-sort-type)
+              board-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
+          (when-let* [fixed-board-data (or board-data
+                       (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+            (section-actions/section-get sort-type board-link)))))))
+
+(defn nav-to-url! [e board-slug url]
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
@@ -40,7 +65,16 @@
        (do
          (routing-actions/routing @router/path)
          (user-actions/initial-loading true))
-       (router/nav! url)))
+       ; (router/nav! url)
+       (let [org (router/current-org-slug)]
+         (refresh-board-data board-slug)
+         (router/set-route! [org board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
+          {:org (router/current-org-slug)
+           :board board-slug
+           :sort-type (router/current-sort-type)
+           :query-params (router/query-params)})
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+         (.pushState (.-history js/window) #js {} (.-title js/document) url))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
 

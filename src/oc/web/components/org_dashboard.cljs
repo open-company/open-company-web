@@ -1,5 +1,4 @@
 (ns oc.web.components.org-dashboard
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [clojure.string :as s]
@@ -44,31 +43,6 @@
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
             [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
-(defn refresh-board-data [s]
-  (when (and (not (router/current-activity-id))
-             (router/current-board-slug))
-    (utils/after 100 (fn []
-     (let [{:keys [org-data
-                   board-data]} @(drv/get-ref s :org-dashboard-data)]
-       (cond
-
-        (= (router/current-board-slug) "all-posts")
-        (activity-actions/all-posts-get org-data)
-
-        (= (router/current-board-slug) "follow-ups")
-        (activity-actions/follow-ups-sort-get org-data)
-
-        (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-get org-data)
-
-        :default
-        (let [sort-type (router/current-sort-type)
-              board-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
-          (when-let* [fixed-board-data (or board-data
-                       (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
-                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
-            (section-actions/section-get sort-type board-link)))))))))
-
 (defn- init-whats-new []
   (when-not (responsive/is-tablet-or-mobile?)
     (whats-new/init)))
@@ -80,12 +54,12 @@
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
+                           (drv/drv :route)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-body js/document)) (utils/page-scroll-top)))
-                             (refresh-board-data s)
                              (init-whats-new)
                              s)
                             :did-remount (fn [_ s]
