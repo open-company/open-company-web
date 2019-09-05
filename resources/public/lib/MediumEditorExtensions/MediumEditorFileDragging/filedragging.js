@@ -106,7 +106,6 @@ var CarrotFileDragging = MediumEditor.Extension.extend({
     },
 
     insertNewParagraph: function() {
-        console.log("DBG insertNewParagraph");
         this.base.execAction('insertparagraph');
     }
 });
