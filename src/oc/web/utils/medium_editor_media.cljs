@@ -316,7 +316,7 @@
     (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "dnd-file-too-big"
                     :title "Sorry!"
-                    :message "Error, please use files smaller than 5MB."
+                    :message "Error, please use files smaller than 20MB."
                     :solid-button-title "OK"
                     :solid-button-cb #(alert-modal/hide-alert)}]
       (alert-modal/show-alert alert-data))))
