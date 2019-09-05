@@ -29,29 +29,26 @@
     notification-type :notification-type
     created-at        :created-at
     :as n}]
-  (let [react-key (str "user-notification-" created-at)]
-    [:div.user-notification.group
-     {:class    (utils/class-set {:unread (:unread n)})
-      :on-click (fn [e]
-                  (when (fn? (:click n))
-                    ((:click n)))
-                  (user-actions/hide-mobile-user-notifications))
-      :key      react-key}
-     (user-avatar-image (:author n))
-     [:div.user-notification-title
+  [:div.user-notification.group
+    {:class    (utils/class-set {:unread (:unread n)})
+     :on-click (fn [e]
+                 (when (fn? (:click n))
+                   ((:click n)))
+                 (user-actions/hide-mobile-user-notifications))}
+    (user-avatar-image (:author n))
+    [:div.user-notification-title
       (:title n)]
-     [:div.user-notification-time-since
+    [:div.user-notification-time-since
       [:time
-       {:date-time      (:created-at n)
-        :data-toggle    "tooltip"
-        :data-placement "top"
-        :data-delay     "{\"show\":\"1000\", \"hide\":\"0\"}"
-        :data-container "body"
-        :data-title     (utils/tooltip-date (:created-at n))}
-       (utils/time-since (:created-at n) [:short])]]
-     [:div.user-notification-body.oc-mentions.oc-mentions-hover
+        {:date-time      (:created-at n)
+         :data-toggle    "tooltip"
+         :data-placement "top"
+         :data-delay     "{\"show\":\"1000\", \"hide\":\"0\"}"
+         :data-container "body"
+         :data-title     (utils/tooltip-date (:created-at n))}
+        (utils/time-since (:created-at n) [:short])]]
+    [:div.user-notification-body.oc-mentions.oc-mentions-hover
       {:dangerouslySetInnerHTML (utils/emojify (:body n))}]])
-  )
 
 (rum/defcs user-notifications < rum/static
                                 rum/reactive
@@ -128,4 +125,4 @@
                                                  (seq (:uuid reminder)))
                                           (:uuid reminder)
                                           (rand 1000))))]]
-              (user-notification-item n)))]]]))
+              (rum/with-key (user-notification-item n) (str "user-notification-" (:created-at n)))))]]]))
