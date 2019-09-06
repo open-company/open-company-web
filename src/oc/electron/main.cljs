@@ -31,6 +31,9 @@
 
 (def init-url (str web-origin init-path))
 
+(def min-win-dims [980 720])
+(def init-win-dims min-win-dims)
+
 (defn mac?
   []
   (= (.-platform js/process) "darwin"))
@@ -54,8 +57,8 @@
                       win-frame-settings
                       {:width w
                        :height h
-                       :minWidth 1280
-                       :minHeight 720
+                       :minWidth (first min-win-dims)
+                       :minHeight (second min-win-dims)
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
@@ -126,7 +129,7 @@
     (.show @main-window)
     (do (set-csp)
         (prevent-navigation-external-to-carrot)
-        (reset! main-window (mk-window 1280 720 true))
+        (reset! main-window (mk-window (first init-win-dims) (second init-win-dims) true))
         (when (win32?)
           (.setMenuBarVisibility @main-window false))
         (load-page @main-window)
