@@ -7,7 +7,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.shared.useragent :as ua]))
+            [oc.shared.useragent :as ua]
+            [oc.web.expo :as expo]))
 
 (def default-title "Please log in to continue")
 (def default-desc "You need to be logged in to view a post.")
@@ -53,19 +54,20 @@
                 [:div.slack-icon
                   {:aria-label "slack"}]
                 "Continue with Slack"]]
-           (when-not ua/mobile-app?
-             [:button.mlb-reset.signup-with-google
-               {:on-touch-start identity
-                :on-click #(do
-                             (.preventDefault %)
-                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                                  {:auth-source "google"})]
+            [:button.mlb-reset.signup-with-google
+              {:on-touch-start identity
+               :on-click #(do
+                           (.preventDefault %)
+                           (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                {:auth-source "google"})]
                              (user-actions/maybe-save-login-redirect)
-                             (user-actions/login-with-google auth-link)))}
+                             (user-actions/login-with-google auth-link
+                                                             (when ua/mobile-app?
+                                                               {:redirect-origin (expo/get-deep-link-origin)}))))}
              [:div.signup-with-google-content
                [:div.google-icon
                 {:aria-label "google"}]
-                "Continue with Google "]])
+                "Continue with Google "]]
             [:div.or-login
               "Or, sign in with email"]
             ;; Email fields
