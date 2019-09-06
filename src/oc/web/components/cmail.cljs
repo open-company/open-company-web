@@ -523,6 +523,7 @@
                   (if (au/has-content? (assoc cmail-data
                                          :body
                                          (cleaned-body)))
+                    (autosave s)
                     (do
                       (reset! (::deleting s) true)
                       (activity-actions/activity-delete cmail-data)))
