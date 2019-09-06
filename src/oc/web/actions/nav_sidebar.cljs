@@ -73,8 +73,8 @@
            :board board-slug
            :sort-type (router/current-sort-type)
            :query-params (router/query-params)})
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (.pushState (.-history js/window) #js {} (.-title js/document) url))))
+         (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top)))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
 
