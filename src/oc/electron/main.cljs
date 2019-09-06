@@ -32,7 +32,7 @@
 (def init-url (str web-origin init-path))
 
 (def min-win-dims [980 720])
-(def init-win-dims min-win-dims)
+(def init-win-dims [1280 720])
 
 (defn mac?
   []
