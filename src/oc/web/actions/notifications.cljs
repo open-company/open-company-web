@@ -8,7 +8,8 @@
 
 (defn- potentially-show-desktop-notification!
   [{:keys [title click] :as notification-data}]
-  (when ua/desktop-app?
+  (when (and ua/desktop-app?
+             (not (js/window.OCCarrotDesktop.windowHasFocus)))
     (let [notif (js/Notification. title)]
       (set! (.-onclick notif) #(do (js/window.OCCarrotDesktop.showDesktopWindow)
                                    (click))))))

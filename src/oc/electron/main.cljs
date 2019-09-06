@@ -1,6 +1,6 @@
 (ns oc.electron.main
   (:require [oc.electron.auto-update :as auto-update]
-            [taoensso.timbre :as timbre :refer [info]]))
+            [taoensso.timbre :as timbre]))
 
 (goog-define dev? true)
 (goog-define web-origin "http://localhost:3559")
@@ -31,6 +31,9 @@
 
 (def init-url (str web-origin init-path))
 
+(def min-win-dims [980 720])
+(def init-win-dims [1280 720])
+
 (defn mac?
   []
   (= (.-platform js/process) "darwin"))
@@ -41,7 +44,7 @@
 
 (defn- load-page
   [window]
-  (info "Loading " init-url)
+  (timbre/info "Loading " init-url)
   (.loadURL window init-url))
 
 (defn- mk-window
@@ -54,6 +57,8 @@
                       win-frame-settings
                       {:width w
                        :height h
+                       :minWidth (first min-win-dims)
+                       :minHeight (second min-win-dims)
                        :show show?
                        ;; Icon of Ubuntu/Linux. Other platforms are configured in package.json
                        :icon (.join path (.getAppPath app) "carrot.iconset/icon_512x512.png")
@@ -104,17 +109,17 @@
               (fn [event navigation-url]
                 (let [parsed-url    (URL. navigation-url)
                       target-origin (.-origin parsed-url)]
-                  (info "Attempting to navigate to origin: " target-origin)
+                  (timbre/info "Attempting to navigate to origin: " target-origin)
                   (when (not (allowed-origin? target-origin))
-                    (info "Navigation prevented")
+                    (timbre/info "Navigation prevented")
                     (.preventDefault event)))))
          (.on contents "new-window"
               (fn [event navigation-url]
                 (let [parsed-url    (URL. navigation-url)
                       target-origin (.-origin parsed-url)]
-                  (info "Attempting to open new window at: " target-origin)
+                  (timbre/info "Attempting to open new window at: " target-origin)
                   (when (not (allowed-origin? target-origin))
-                    (info "New window not whitelisted, opening in external browser")
+                    (timbre/info "New window not whitelisted, opening in external browser")
                     (.preventDefault event)
                     (.openExternal shell navigation-url))))))))
 
@@ -124,7 +129,7 @@
     (.show @main-window)
     (do (set-csp)
         (prevent-navigation-external-to-carrot)
-        (reset! main-window (mk-window 1280 720 true))
+        (reset! main-window (mk-window (first init-win-dims) (second init-win-dims) true))
         (when (win32?)
           (.setMenuBarVisibility @main-window false))
         (load-page @main-window)
@@ -158,4 +163,7 @@
   (.on ipc-main "set-badge-count" (fn [event arg] (.setBadgeCount app arg)))
   (.on ipc-main "show-desktop-window" (fn [event arg] (when @main-window
                                                         (.show @main-window))))
+  (.on ipc-main "window-has-focus?" (fn [event]
+                                      (let [ret-value (boolean (.getFocusedWindow BrowserWindow))]
+                                        (set! (.-returnValue event) ret-value))))
   )
