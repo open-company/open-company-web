@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
+            [oc.web.lib.cookies :as cook]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -30,7 +31,7 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 
-(defn- refresh-board-data [board-slug]
+(defn- refresh-board-data [board-slug sort-type]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
@@ -46,8 +47,9 @@
         (activity-actions/follow-ups-sort-get org-data)
 
         :default
-        (let [sort-type (router/current-sort-type)
-              board-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
+        (let [board-rel (if (= sort-type dis/other-sort-type)
+                          ["item" "self"]
+                          "activity")]
           (when-let* [fixed-board-data (or board-data
                        (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
                       board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
@@ -60,18 +62,23 @@
   (when ua/mobile?
     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
   (utils/after 0 (fn []
-   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
+   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+         is-drafts-board? (= board-slug utils/default-drafts-board-slug)
+         org-slug (router/current-org-slug)
+         sort-type (if is-drafts-board?
+                     dis/other-sort-type
+                     (activity-actions/saved-sort-type org-slug))]
      (if (= current-path url)
        (do
          (routing-actions/routing @router/path)
          (user-actions/initial-loading true))
        ; (router/nav! url)
-       (let [org (router/current-org-slug)]
-         (refresh-board-data board-slug)
-         (router/set-route! [org board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
-          {:org (router/current-org-slug)
+       (do
+         (refresh-board-data board-slug sort-type)
+         (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
+          {:org org-slug
            :board board-slug
-           :sort-type (router/current-sort-type)
+           :sort-type sort-type
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top)))))

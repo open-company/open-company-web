@@ -900,6 +900,11 @@
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
 
+(defn saved-sort-type [org-slug]
+  (if-let [sort-type-cookie (cook/get-cookie (router/last-sort-cookie org-slug))]
+    (keyword sort-type-cookie)
+    dis/default-sort-type))
+
 (defn change-sort-type [type]
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))
