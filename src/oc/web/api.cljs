@@ -206,7 +206,7 @@
             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
      parameters)
     (str "Client API error on: " callee-name))
-  (notification-actions/show-notification (assoc utils/internal-error :expire 3))
+  (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
     (callback {:success false :status 0})))
 

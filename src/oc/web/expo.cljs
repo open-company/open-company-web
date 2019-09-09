@@ -65,3 +65,24 @@
     (let [fixed-notif (user-utils/fix-notification notification)
           click-handler (:click fixed-notif)]
       (click-handler))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Grabbing the deep link origin for creating mobile URLs
+
+(def ^:private deep-link-origin (atom nil))
+
+(defn get-deep-link-origin
+  []
+  @deep-link-origin)
+
+(defn bridge-get-deep-link-origin
+  ""
+  []
+  (bridge-call! "get-deep-link-origin" nil))
+
+(defn- ^:export on-deep-link-origin
+  ""
+  [json-str]
+  (when-let [origin (parse-bridge-data json-str)]
+    (bridge-log! origin)
+    (reset! deep-link-origin origin)))
