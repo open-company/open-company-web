@@ -13,32 +13,23 @@
   :ratio (/ 250 211)})
 
 (rum/defcs empty-board < rum/reactive
-                         (drv/drv :org-data)
-                         (drv/drv :board-data)
-                         (drv/drv :editable-boards)
                          section-mixins/container-nav-in
   [s]
-  (let [org-data (drv/react s :org-data)
-        board-data (drv/react s :board-data)
-        editable-boards (drv/react s :editable-boards)
-        is-all-posts? (= (router/current-board-slug) "all-posts")
+  (let [is-all-posts? (= (router/current-board-slug) "all-posts")
         is-follow-ups? (= (router/current-board-slug) "follow-ups")
-        is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)
-        is-author? (utils/is-admin-or-author? org-data board-data)]
+        is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
     [:div.empty-board.group
       [:div.empty-board-grey-box
         [:div.empty-board-illustration
-          {:class (utils/class-set {:drafts is-drafts-board?
-                                    :follow-ups is-follow-ups?})}]
+          {:class (utils/class-set {:all-posts is-all-posts?
+                                    :drafts is-drafts-board?
+                                    :follow-ups is-follow-ups?
+                                    :section (and (not is-all-posts?)
+                                                  (not is-drafts-board?)
+                                                  (not is-follow-ups?))})}]
         [:div.empty-board-title
           (cond
-           ; is-all-posts? "Stay up to date"
+           is-all-posts? "Stay up to date"
            is-drafts-board? "Nothing in drafts"
            is-follow-ups? "You’re all caught up!"
-           :else (if-not (:read-only board-data) "Create a post to get started" "There's nothing to see here"))]
-        (when (and (not is-drafts-board?)
-                   (not is-follow-ups?))
-          [:div.empty-board-subtitle
-            (cond
-             is-all-posts? "All posts is a stream of what’s new in Carrot."
-             :else (when is-author? (str "Looks like there aren’t any posts in " (:name board-data) ".")))])]]))
+           :else "This section is empty")]]]))
