@@ -485,8 +485,8 @@ div.stream-item {
         div.is-comments {
           div.is-comments-authors.show-border {
             div.is-comments-author {
-              background-color: $oc_gray_8;
-              border: 2px solid $oc_gray_8;
+              background-color: $grey_num_2;
+              border: 2px solid $grey_num_2;
 
               @include mobile() {
                 background-color: $grey_num_4;
