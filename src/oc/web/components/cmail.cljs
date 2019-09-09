@@ -33,8 +33,8 @@
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
-            [goog.functions :as gfn]
-            [clojure.contrib.humanize :refer (filesize)]))
+            [clojure.contrib.humanize :refer (filesize)])
+  (:import [goog.async Debouncer]))
 
 (def missing-title-tooltip "Please add a title")
 (def abstract-max-length-exceeded-tooltip "Abstract too long")
@@ -111,6 +111,14 @@
         section-editing @(drv/get-ref s :section-editing)]
     (activity-actions/entry-save-on-exit :cmail-data cmail-data (cleaned-body) section-editing)))
 
+(defn debounced-autosave!
+  [s]
+  (.fire @(::debounced-autosave s)))
+
+(defn cancel-autosave!
+  [s]
+  (.stop @(::debounced-autosave s)))
+
 ;; Close dismiss handling
 
 (defn cancel-clicked [s]
@@ -146,7 +154,7 @@
 
 (defn body-on-change [state]
   (dis/dispatch! [:input [:cmail-data :has-changes] true])
-  (.call @(::debounced-autosave state)))
+  (debounced-autosave! state))
 
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
@@ -168,14 +176,14 @@
       (dis/dispatch! [:update [:cmail-data] #(merge % {:headline emojied-headline
                                                        :has-changes true})])
       (check-limits state)
-      (.call @(::debounced-autosave state)))))
+      (debounced-autosave! state))))
 
 (defn- abstract-on-change [state]
   (let [$abstract (js/$ "div.cmail-content-abstract" (rum/dom-node state))]
     (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract (utils/clean-body-html (.html $abstract))
                                                      :has-changes true})])
     (check-limits state)
-    (.call @(::debounced-autosave state))))
+    (debounced-autosave! state)))
 
 ;; Headline setup and paste handler
 
@@ -244,10 +252,8 @@
 (defn post-clicked [s]
   (clean-body s)
   (reset! (::disable-post s) true)
-  (let [cmail-data @(drv/get-ref s :cmail-data)]
-    (if (:auto-saving cmail-data)
-      (reset! (::publish-after-autosave s) true)
-      (real-post-action s))))
+  (cancel-autosave! s)
+  (real-post-action s))
 
 (defn fix-tooltips
   "Fix the tooltips"
@@ -300,7 +306,7 @@
                       (fn [users-list]
                         (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
                                                                          :follow-ups users-list})])
-                        (.call @(::debounced-autosave s))))))
+                        (debounced-autosave! s)))))
        :ref :follow-ups-header}
       (when-not is-mobile?
         [:div.follow-up-tag.white-bg])
@@ -354,7 +360,6 @@
                    (rum/local false ::saving)
                    (rum/local false ::publishing)
                    (rum/local false ::disable-post)
-                   (rum/local false ::publish-after-autosave)
                    (rum/local nil ::debounced-autosave)
                    (rum/local 0 ::mobile-video-height)
                    (rum/local false ::deleting)
@@ -411,7 +416,7 @@
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
-                    (reset! (::debounced-autosave s) (gfn/debounce (partial autosave s) 2000))
+                    (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -456,12 +461,6 @@
                                  (:delete cmail-data))
                         (reset! (::deleting s) false)
                         (real-close))
-                      ;; Entry is saving
-                      ;: and save request finished
-                      (when (and @(::publish-after-autosave s)
-                                 (not (:auto-saving cmail-data)))
-                        (reset! (::publish-after-autosave s) false)
-                        (real-post-action s))
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
                         (reset! (::saving s) false)
@@ -495,6 +494,8 @@
                       (reset! (::abstract-input-listener s) nil))
                     (when (responsive/is-mobile-size?)
                       (dom-utils/unlock-page-scroll))
+                    (when-let [debounced-autosave @(::debounced-autosave s)]
+                      (.dispose debounced-autosave))
                     s)}
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
@@ -620,7 +621,7 @@
                                           :has-changes has-changes
                                           :invite-note note})])
                       (when has-changes
-                        (.call @(::debounced-autosave s))))
+                        (debounced-autosave! s)))
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:button.mlb-reset.mobile-attachment-button
@@ -836,7 +837,7 @@
                                           :has-changes has-changes
                                           :invite-note note})])
                       (when has-changes
-                        (.call @(::debounced-autosave s))))
+                        (debounced-autosave! s)))
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:div.delete-button-container
