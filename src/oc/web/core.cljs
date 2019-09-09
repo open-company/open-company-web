@@ -648,7 +648,7 @@
    #(ja/update-jwt %) ;; success jwt refresh after expire
    #(ja/logout) ;; failed to refresh jwt
    ;; network error
-   #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
+   #(notification-actions/show-notification (assoc utils/network-error :expire 5)))
 
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
@@ -656,6 +656,9 @@
 
   ;; Recall Expo push token into app state (push notification permission)
   (user-actions/recall-expo-push-token)
+  ;; Get the mobile app deep link origin if we're on mobile
+  (when ua/mobile-app?
+    (expo/bridge-get-deep-link-origin))
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)

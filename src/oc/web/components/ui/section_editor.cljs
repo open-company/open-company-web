@@ -122,7 +122,7 @@
        (reset! (::section-name s) (clojure.string/trim
         (.text (js/$ (str "<div>" (:name fixed-section-data) "</div>"))))))
      (reset! (::editing-existing-section s) (not new-section))
-     (when-not (empty? (:name fixed-section-data))
+     (when (seq (:name fixed-section-data))
        (reset! (::initial-section-name s) (:name fixed-section-data)))
      (dis/dispatch! [:input [:section-editing] fixed-section-data])
      (reset! (::slack-enabled s)

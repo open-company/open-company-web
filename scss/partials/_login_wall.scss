@@ -69,19 +69,13 @@ div.login-wall-container {
 
       div.login-wall-right-content {
         margin: 64px auto;
-        width: 440px;
+        width: 340px;
         text-align: center;
 
         @include mobile() {
           width: 100%;
-          padding: 0px 24px;
-          margin: 40px auto;
-        }
-
-        div.login-title {
-          @include OC_Title();
-          font-size: 32px;
-          color: $deep_navy;
+          padding: 0px 32px;
+          margin: 0 auto;
         }
 
         div.login-description {
@@ -91,12 +85,87 @@ div.login-wall-container {
           margin-top: 16px;
         }
 
-        button.signup-with-slack {
-          margin-top: 40px;
+        div.login-overlay-cta {
+          text-align: center;
 
           @include mobile() {
-            margin-top: 26px;
+            width: 100vw;
+            margin-left: -32px;
+            height: 64px;
+            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
           }
+
+          div.login-title {
+            @include OC_Body_Bold();
+            font-size: 32px;
+            color: $deep_navy;
+            text-transform: none;
+
+            @include mobile() {
+              font-size: 18px;
+              padding-top: 24px;
+            }
+
+            @include mobile() {
+              font-size: 18px;
+              padding-top: 24px;
+            }
+          }
+
+          button.top-back-button {
+            display: none;
+
+            @include tablet(){
+              display: block;
+              float: left;
+              height: 40px;
+              width: 40px;
+              background-color: white;
+              background-image: cdnUrl("/img/ML/gray_back_x.svg");
+              background-size: 14px 14px;
+              background-position: center;
+              background-repeat: no-repeat;
+              padding: 0px;
+              position: absolute;
+              margin-top: 0px;
+              top: 12px;
+              left: 24px;
+            }
+          }
+
+          button.top-continue {
+            display: none;
+
+            @include tablet(){
+              display: block;
+              float: right;
+              @include OC_Body_Bold();
+              font-size: 15px;
+              height: 40px;
+              width: 40px;
+              border-radius: 20px;
+              background-color: $sea_blue;
+              background-image: cdnUrl("/img/ML/white_continue_arrow.svg");
+              background-size: 14px 19px;
+              background-position: center;
+              background-repeat: no-repeat;
+              outline: none;
+              border: none;
+              padding: 0px;
+              position: absolute;
+              top: 12px;
+              right: 24px;
+
+              &.disabled {
+                background-color: $light_ui_grey;
+                opacity: 1;
+              }
+            }
+          }
+        }
+
+        button.signup-with-slack {
+          margin-top: 32px;
         }
 
         button.signup-with-google {
@@ -106,38 +175,47 @@ div.login-wall-container {
         button.signup-with-slack, button.signup-with-google {
           width: 340px;
           height: 40px;
-          border: 1px solid $medium_light_grey;
-          color: $light_ui_grey;
-          border-radius: 100px;
+          border: 1px solid rgba($light_navy, 0.5);
+          color: $light_navy;
+          border-radius: 6px;
           text-align: center;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 18px;
+          position: relative;
+          opacity: 1;
 
-          div.signup-with-slack-content, div.signup-with-google-content {
-            @include OC_Body_Bold();
-            font-size: 14px;
-            color: $deep_navy;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            div.slack-icon {
-              width: 21px;
-              height: 21px;
-              background-image: cdnUrl("/img/ML/slack_normal.svg");
-              background-repeat: no-repeat;
-              background-size: 21px 21px;
-              float: left;
-              margin-right: 16px;
+          @include big_web() {
+            &:hover {
+              opacity: 0.9;
             }
+          }
 
-            div.google-icon {
-              width: 21px;
-              height: 21px;
-              background-image: cdnUrl("/img/ML/google_signin.svg");
-              background-repeat: no-repeat;
-              float: left;
-              margin-right: 16px;
-            }
+          div.slack-icon {
+            position: absolute;
+            top: 10px;
+            left: 16px;
+            width: 20px;
+            height: 20px;
+            background-image: cdnUrl("/img/ML/slack_normal.svg");
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            float: left;
+            margin-right: 16px;
+          }
+
+          div.google-icon {
+            position: absolute;
+            top: 10px;
+            left: 16px;
+            width: 20px;
+            height: 20px;
+            background-image: cdnUrl("/img/ML/google_signin.svg");
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            float: left;
+            margin-right: 16px;
           }
 
           @include mobile() {
@@ -146,10 +224,18 @@ div.login-wall-container {
         }
 
         div.or-login {
-          @include OC_Body_Bold();
-          font-size: 14px;
-          color: $deep_navy;
-          margin: 24px auto 0;
+          width: 100%;
+          height: 19px;
+          margin-top: 24px;
+          position: relative;
+
+          div.or-login-copy {
+            text-align: center;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: rgba($light_navy, 0.5);
+            margin: 0 auto;
+          }
         }
 
         div.fields-container {
@@ -162,46 +248,79 @@ div.login-wall-container {
           }
 
           div.field-label {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $light_navy;
             margin-top: 16px;
-            @include OC_Body_Bold();
-            font-size: 12px;
-            color: $deep_navy;
-            margin-top: 16px;
+            margin-bottom: 0;
           }
 
           input.field-content {
             width: 100%;
-            height: 40px;
+            height: 32px;
             border-radius: 4px;
-            border: 1px solid rgba(#B1B8C0, 0.5);
-            margin-top: 16px;
-            padding: 6px 12px;
+            background-color: $ultra_light_grey;
+            border: none;
+            outline: none;
+            padding: 7px 8px;
+            position: relative;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $deep_navy;
+            line-height: 18px;
+            letter-spacing: 0.2px;
+            margin-top: 8px;
+
+            @include placeholder() {
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: rgba($deep_navy, 0.5);
+            }
+
+            &.error {
+              border: 1px solid rgba($carrot_orange, 0.5);
+            }
+
+            &.half {
+              width: 49%;
+            }
 
             -webkit-app-region: no-drag;
           }
 
-          a.forgot-password {
-            display: block;
-            text-align: center;
-            margin: 16px auto 0;
-            color: $carrot_green;
-            @include OC_Body_Bold();
-            font-size: 13px;
+          div.forgot-password {
+            margin-top: 4px;
+            float: right;
+
+            a {
+              @include OC_Body_Book();
+              font-size: 12px;
+              line-height: 1.5;
+              color: $light_ui_grey;
+              text-decoration: underline;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
           }
         }
 
         button.continue-btn {
-          width: 340px;
+          margin-top: 32px;
+          outline: none;
+          border: none;
+          width: 100%;
           height: 48px;
-          margin: 40px auto 20px;
-          background-color: $sea_blue;
+          background-color: $carrot_orange;
           color: white;
-          border-radius: 100px;
           @include OC_Body_Bold();
-          font-size: 16px;
+          font-size: 18px;
+          line-height: 23px;
+          border-radius: 6px;
 
-          @include mobile() {
-            width: 100%;
+          &.disabled {
+            background-color: $light_ui_grey;
           }
         }
 
