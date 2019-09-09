@@ -77,8 +77,10 @@
         all-users-set (set (map :user-id users-list))
         current-assignees (set (map (comp :user-id :assignee) follow-ups))
         users-diff (clojure.set/difference all-users-set current-assignees)
-        show-select-all? (and (not-empty users-diff)
-                              (not= users-diff #{current-user-id}))]
+        show-select-all? (if (= all-users-set  #{current-user-id})
+                             (empty? current-assignees)
+                             (and (not-empty users-diff)
+                                  (not= users-diff #{current-user-id})))]
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
