@@ -138,7 +138,6 @@
                          (rum/local false ::show-post-button)
                          (rum/local false ::complete-follow-up)
                          ;; Mixins
-                         ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
 
@@ -165,12 +164,6 @@
                             (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
                           :did-mount (fn [s]
-                           (let [activity-data (first (:rum/args s))
-                                 follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))]
-                             ;; Default to complete follow-up on add comment if user has one
-                             (when (and follow-up
-                                        (not (:completed? follow-up)))
-                               (reset! (::complete-follow-up s) true)))
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
                            (let [add-comment-node (rum/ref-node s "editor-node")]
                              (when (should-focus-field? s)
@@ -218,8 +211,7 @@
                                   (utils/link-for (:links follow-up) "mark-complete" "POST"))
         show-follow-up-button? (and follow-up
                                     (not (:completed? follow-up))
-                                    complete-follow-up-link
-                                    (not parent-comment-uuid))
+                                    complete-follow-up-link)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))]
@@ -311,6 +303,7 @@
                :title "Complete follow-up when the comment is posted"
                :on-click #(do
                            (utils/event-stop %)
+                           (reset! (::show-post-button s) true)
                            (swap! (::complete-follow-up s) not))}
               (carrot-checkbox {:selected @(::complete-follow-up s)})
               "Complete follow-up"])
