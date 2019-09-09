@@ -282,7 +282,7 @@
                                                                                      :expire 3
                                                                                      :id (keyword (str "comment-url-copied-"
                                                                                       (:uuid comment-data)))}))
-                               :title "Copy url"}])
+                               :title "Copy link"}])
                           ;; Reply to comment
                           (when (:reply-parent comment-data)
                             [:button.mlb-reset.floating-bt.reply-bt
