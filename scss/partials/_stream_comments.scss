@@ -260,6 +260,12 @@ div.stream-comments {
               bottom: unset;
               left: unset;
             }
+
+            div.emoji-picker-container {
+              button.close-bt {
+                display: none;
+              }
+            }
           }
 
           // Change Bootstrap tooltip style

@@ -197,6 +197,7 @@
    :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
+   :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]

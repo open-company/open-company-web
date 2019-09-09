@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
@@ -25,6 +26,7 @@
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
+            [oc.shared.useragent :as ua]
             [goog.dom :as gdom]
             [goog.object :as gobj]))
 
@@ -79,7 +81,9 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                                             {:auth-source "google"})]
-                         (user-actions/login-with-google auth-link)))}
+                         (user-actions/login-with-google auth-link
+                                                         (when ua/mobile-app?
+                                                           {:redirect-origin (expo/get-deep-link-origin)}))))}
           "Continue with Google"
           [:div.google-icon
             {:aria-label "google"}]]

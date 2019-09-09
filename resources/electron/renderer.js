@@ -23,3 +23,8 @@ window.OCCarrotDesktop.setBadgeCount = function(count) {
   console.log("Sending set-badge-count IPC: " + count);
   ipcRenderer.send('set-badge-count', count);
 };
+
+window.OCCarrotDesktop.windowHasFocus = function() {
+  console.log("Determining focus state of desktop window");
+  return ipcRenderer.sendSync('window-has-focus?');
+};

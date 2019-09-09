@@ -87,9 +87,25 @@ div.add-comment-box-container {
     width: 100%;
     margin-top: 16px;
 
-
     &.hide-footer * {
       display: none;
+    }
+
+    div.upload-progress {
+      float: right;
+      margin-right: 16px;
+      margin-top: 6px;
+
+      div.small-loading {
+        float: left;
+      }
+
+      span.attachment-uploading {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        float: left;
+      }
     }
 
     button.close-reply-bt {

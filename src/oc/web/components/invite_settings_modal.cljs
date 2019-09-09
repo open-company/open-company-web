@@ -140,7 +140,7 @@
                                                                                    " sent.")
                                                                            :primary-bt-title "OK"
                                                                            :primary-bt-dismiss true
-                                                                           :expire 10
+                                                                           :expire 3
                                                                            :primary-bt-inline true
                                                                            :id :invites-sent}))
                                 (reset! (::send-bt-cta s) "Send"))))))))

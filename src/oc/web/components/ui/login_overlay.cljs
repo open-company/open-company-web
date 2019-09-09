@@ -150,7 +150,7 @@
           [:form.sign-in-form {:class utils/hide-class}
             ;; Email label
             [:div.sign-in-label-container
-              [:label.sign-in-label "Enter Email"]]
+              [:label.sign-in-label "Work Email"]]
             ;; Email field
             [:div.sign-in-field-container
               [:input.sign-in-field.email.oc-input

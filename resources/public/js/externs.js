@@ -78,6 +78,8 @@ MediaPicker.addChart = function(){};
 MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
+MediaPicker.togglePicker = function(){};
+MediaPicker.hide = function(){};
 // MediumEditorFileDragging
 var CarrotFileDragging = function(){};
 CarrotFileDragging.insertImageFile = function(){};
@@ -193,3 +195,4 @@ ReactNativeWebView.postMessage = function() {};
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
+OCCarrotDesktop.windowHasFocus = function() {};
