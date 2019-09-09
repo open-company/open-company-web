@@ -552,6 +552,7 @@
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
       [:div.cmail-container
+        {:class (when follow-up? "has-follow-ups")}
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]

@@ -135,6 +135,6 @@
           (notification-actions/show-notification {:title "Reminder deleted"
                                                    :primary-bt-title "OK"
                                                    :primary-bt-dismiss true
-                                                   :expire 10
+                                                   :expire 3
                                                    :id :reminder-deleted}))
         (api/get-reminders reminders-link reminders-loaded)))))
