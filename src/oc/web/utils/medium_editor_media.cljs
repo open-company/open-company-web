@@ -261,59 +261,81 @@
 
 (defn file-dnd-handler [s options editor-ext file]
   (if (< (oget file :size) ls/file-upload-size)
-    (let [cmail-state (:cmail-state @dis/app-state)]
-      ;; If Quick Post is still collapsed expand it
-      (when (:collapsed cmail-state)
-        (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
-                                                                      :fullscreen false
-                                                                      :key (:key cmail-state)}))
-      (if (.match (.-type file) "image")
-        (do
-          (.hide @(:me/media-picker-ext s))
-          (dis/dispatch! [:input [:attachment-uploading]
-           {:progress "0"
-            :comment-parent-uuid (:comment-parent-uuid options)}])
-          (iu/upload-file! file
-            (fn [url]
-              (.insertImageFile editor-ext file url nil)
-              (utils/after 500
-               (fn []
-                 (dis/dispatch! [:input [:attachment-uploading] nil])
-                 (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
-                 (utils/after 500 #(.togglePicker @(:me/media-picker-ext s))))))
-            (fn []
-             (dis/dispatch! [:input [:attachment-uploading] nil]))
-            (fn [progress-percentage]
-             (dis/dispatch! [:input [:attachment-uploading]
-              {:progress progress-percentage
-               :comment-parent-uuid (:comment-parent-uuid options)}]))))
-        (when (:attachments-enabled options)
+    (if (:attachment-uploading @dis/app-state)
+      (let [alert-data {:icon "/img/ML/error_icon.png"
+                      :action "dnd-already-running"
+                      :title "Sorry!"
+                      :message "You are already uploading a file, wait until it finishes to add another."
+                      :solid-button-title "OK"
+                      :solid-button-cb #(alert-modal/hide-alert)}]
+                  (alert-modal/show-alert alert-data))
+      (let [cmail-state (:cmail-state @dis/app-state)]
+        ;; If Quick Post is still collapsed expand it
+        (when (:collapsed cmail-state)
+          (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
+                                                                        :fullscreen false
+                                                                        :key (:key cmail-state)}))
+        (if (.match (.-type file) "image")
           (do
+            (.hide @(:me/media-picker-ext s))
             (dis/dispatch! [:input [:attachment-uploading]
              {:progress "0"
               :comment-parent-uuid (:comment-parent-uuid options)}])
             (iu/upload-file! file
               (fn [url]
-                (let [size (oget file :size)
-                      mimetype (oget file :type)
-                      filename (oget file :name)
-                      createdat (utils/js-date)
-                      prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
-                      subtitle (str prefix (filesize size :binary false :format "%.2f" ))
-                      icon (au/icon-for-mimetype mimetype)
-                      attachment-data {:file-name filename
-                                       :file-type mimetype
-                                       :file-size size
-                                       :file-url url}
-                      dispatch-input-key (:dispatch-input-key options)]
-                  (activity-actions/add-attachment dispatch-input-key attachment-data)
-                  (dis/dispatch! [:input [:attachment-uploading] nil])))
+                (.insertImageFile editor-ext file url nil)
+                (utils/after 500
+                 (fn []
+                   (dis/dispatch! [:input [:attachment-uploading] nil])
+                   (utils/to-end-of-content-editable (rum/ref-node s "editor-node"))
+                   (utils/after 500 #(.togglePicker @(:me/media-picker-ext s))))))
               (fn []
-               (dis/dispatch! [:input [:attachment-uploading] nil]))
+               (dis/dispatch! [:input [:attachment-uploading] nil])
+               (let [alert-data {:icon "/img/ML/error_icon.png"
+                      :action "dnd-image-upload-error"
+                      :title "Sorry!"
+                      :message "An error occurred while uploading your file."
+                      :solid-button-title "OK"
+                      :solid-button-cb #(alert-modal/hide-alert)}]
+                  (alert-modal/show-alert alert-data)))
               (fn [progress-percentage]
                (dis/dispatch! [:input [:attachment-uploading]
                 {:progress progress-percentage
-                 :comment-parent-uuid (:comment-parent-uuid options)}])))))))
+                 :comment-parent-uuid (:comment-parent-uuid options)}]))))
+          (when (:attachments-enabled options)
+            (do
+              (dis/dispatch! [:input [:attachment-uploading]
+               {:progress "0"
+                :comment-parent-uuid (:comment-parent-uuid options)}])
+              (iu/upload-file! file
+                (fn [url]
+                  (let [size (oget file :size)
+                        mimetype (oget file :type)
+                        filename (oget file :name)
+                        createdat (utils/js-date)
+                        prefix (str "Uploaded by " (jwt/get-key :name) " on " (utils/date-string createdat [:year]) " - ")
+                        subtitle (str prefix (filesize size :binary false :format "%.2f" ))
+                        icon (au/icon-for-mimetype mimetype)
+                        attachment-data {:file-name filename
+                                         :file-type mimetype
+                                         :file-size size
+                                         :file-url url}
+                        dispatch-input-key (:dispatch-input-key options)]
+                    (activity-actions/add-attachment dispatch-input-key attachment-data)
+                    (dis/dispatch! [:input [:attachment-uploading] nil])))
+                (fn []
+                 (dis/dispatch! [:input [:attachment-uploading] nil])
+                 (let [alert-data {:icon "/img/ML/error_icon.png"
+                      :action "dnd-attachment-upload-error"
+                      :title "Sorry!"
+                      :message "An error occurred while uploading your file."
+                      :solid-button-title "OK"
+                      :solid-button-cb #(alert-modal/hide-alert)}]
+                  (alert-modal/show-alert alert-data)))
+                (fn [progress-percentage]
+                 (dis/dispatch! [:input [:attachment-uploading]
+                  {:progress progress-percentage
+                   :comment-parent-uuid (:comment-parent-uuid options)}]))))))))
     (let [alert-data {:icon "/img/ML/error_icon.png"
                     :action "dnd-file-too-big"
                     :title "Sorry!"
