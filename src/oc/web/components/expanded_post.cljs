@@ -81,7 +81,8 @@
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         route (drv/react s :route)
-        back-to-slug (or (:back-to route) (:board route))
+        org-data (dis/org-data)
+        back-to-slug (utils/back-to org-data)
         is-all-posts? (= back-to-slug "all-posts")
         is-follow-ups? (= back-to-slug "follow-ups")
         back-to-label (str "Back to "
@@ -103,7 +104,7 @@
                         :height @(::mobile-video-height s)}
                        {:width 638
                         :height (utils/calc-video-height 638)}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
