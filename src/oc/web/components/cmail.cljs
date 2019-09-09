@@ -299,7 +299,8 @@
                      (nav-actions/show-follow-ups-picker nil
                       (fn [users-list]
                         (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
-                                                                         :follow-ups users-list})])))))
+                                                                         :follow-ups users-list})])
+                        (.call @(::debounced-autosave s))))))
        :ref :follow-ups-header}
       (when-not is-mobile?
         [:div.follow-up-tag.white-bg])
@@ -610,13 +611,16 @@
                    (dis/dispatch! [:input [:show-sections-picker] false])
                    (when (and board-data
                               (seq (:name board-data)))
-                    (dis/dispatch! [:input [:cmail-data]
-                     (merge cmail-data {:board-slug (:slug board-data)
-                                        :board-name (:name board-data)
-                                        :has-changes (or (:has-changes cmail-data)
-                                                         (seq (:uuid cmail-data))
-                                                         (:auto-saving cmail-data))
-                                        :invite-note note})])
+                    (let [has-changes (or (:has-changes cmail-data)
+                                          (seq (:uuid cmail-data))
+                                          (:auto-saving cmail-data))]
+                      (dis/dispatch! [:input [:cmail-data]
+                       (merge cmail-data {:board-slug (:slug board-data)
+                                          :board-name (:name board-data)
+                                          :has-changes has-changes
+                                          :invite-note note})])
+                      (when has-changes
+                        (.call @(::debounced-autosave s))))
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:button.mlb-reset.mobile-attachment-button
@@ -823,13 +827,16 @@
                    (dis/dispatch! [:input [:show-sections-picker] false])
                    (when (and board-data
                               (seq (:name board-data)))
-                    (dis/dispatch! [:input [:cmail-data]
-                     (merge cmail-data {:board-slug (:slug board-data)
-                                        :board-name (:name board-data)
-                                        :has-changes (or (:has-changes cmail-data)
-                                                         (seq (:uuid cmail-data))
-                                                         (:auto-saving cmail-data))
-                                        :invite-note note})])
+                    (let [has-changes (or (:has-changes cmail-data)
+                                          (seq (:uuid cmail-data))
+                                          (:auto-saving cmail-data))]
+                      (dis/dispatch! [:input [:cmail-data]
+                       (merge cmail-data {:board-slug (:slug board-data)
+                                          :board-name (:name board-data)
+                                          :has-changes has-changes
+                                          :invite-note note})])
+                      (when has-changes
+                        (.call @(::debounced-autosave s))))
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
             [:div.delete-button-container
