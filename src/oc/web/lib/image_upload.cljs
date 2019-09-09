@@ -62,11 +62,11 @@
           (when (= (count files-uploaded)1)
             (success-cb (get files-uploaded 0))))))))
 
-(defn upload-file! [file success-cb & [error-cb]]
+(defn upload-file! [file success-cb & [error-cb progress-cb]]
   (try
     (let [fs-client (init-filestack)]
       (.then
-        (.upload fs-client file #js {})
+        (.upload fs-client file #js {:onProgress #(when (fn? progress-cb) (progress-cb (.-totalPercent %)))})
         (fn [res]
           (let [url (gobj/get res "url")]
             (when (fn? success-cb)

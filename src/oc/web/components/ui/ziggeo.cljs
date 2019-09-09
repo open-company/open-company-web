@@ -152,7 +152,7 @@
                                      (na/show-notification {:title "Error processing your video."
                                                             :description "An error occurred while processing your video, please try again."
                                                             :id :ziggeo-video-error
-                                                            :expire 10})
+                                                            :expire 3})
                                      (when (fn? cancel-cb)
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "pick_cover_start"

@@ -18,6 +18,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.actions.activity :as activity-actions]
@@ -47,7 +48,7 @@
 (defn disable-add-comment-if-needed [s]
   (when-let [add-comment-node (rum/ref-node s "editor-node")]
     (enable-add-comment? s)
-    (when (not (seq (.-innerHTML add-comment-node)))
+    (when-not (seq (.-innerHTML add-comment-node))
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
@@ -85,9 +86,10 @@
                                       (utils/link-for (:links follow-up) "mark-complete" "POST"))]
         (activity-actions/complete-follow-up activity-data follow-up)))))
 
-(defn me-options [reply-comment?]
+(defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
-   :placeholder (if reply-comment? "Reply…" "Add a comment…")
+   :comment-parent-uuid parent-uuid
+   :placeholder (if parent-uuid "Reply…" "Add a comment…")
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 
@@ -128,6 +130,7 @@
                          (drv/drv :add-comment-data)
                          (drv/drv :team-roster)
                          (drv/drv :current-user-data)
+                         (drv/drv :attachment-uploading)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
                          (rum/local "" ::initial-add-comment)
@@ -208,7 +211,10 @@
                                   (utils/link-for (:links follow-up) "mark-complete" "POST"))
         show-follow-up-button? (and follow-up
                                     (not (:completed? follow-up))
-                                    complete-follow-up-link)]
+                                    complete-follow-up-link)
+        attachment-uploading (drv/react s :attachment-uploading)
+        uploading? (and attachment-uploading
+                        (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))]
     [:div.add-comment-box-container
       {:class container-class}
       [:div.add-comment-box
@@ -300,4 +306,9 @@
                            (reset! (::show-post-button s) true)
                            (swap! (::complete-follow-up s) not))}
               (carrot-checkbox {:selected @(::complete-follow-up s)})
-              "Complete follow-up"])]]]))
+              "Complete follow-up"])
+          (when uploading?
+            [:div.upload-progress
+              (small-loading)
+              [:span.attachment-uploading
+                (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])]]]))

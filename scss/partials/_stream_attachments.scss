@@ -30,6 +30,17 @@ div.stream-attachments {
     div.stream-attachments-item {
       max-width: 100%;
 
+      div.small-loading {
+        float: left;
+      }
+
+      span.attachment-uploading {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        float: left;
+      }
+
       div.attachment-info {
         margin-top: 8px;
 
