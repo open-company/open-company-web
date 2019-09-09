@@ -158,16 +158,19 @@
     (dis/dispatch! [:login-with-email])))
 
 (defn login-with-slack [auth-url]
-  (let [auth-url-with-redirect (utils/slack-link-with-state
+  (let [auth-url-with-redirect (user-utils/auth-link-with-state
                                  (:href auth-url)
-                                 nil
-                                 "open-company-auth" oc-urls/slack-lander-check)]
+                                 {:team-id "open-company-auth"
+                                  :redirect oc-urls/slack-lander-check})]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
-(defn login-with-google [auth-url]
-  (router/redirect! (:href auth-url))
-  (dis/dispatch! [:login-with-google]))
+(defn login-with-google [auth-url & [state-map]]
+  (let [auth-url-with-redirect (user-utils/auth-link-with-state
+                                (:href auth-url)
+                                (or state-map {}))]
+    (router/redirect! auth-url-with-redirect)
+    (dis/dispatch! [:login-with-google])))
 
 (defn refresh-slack-user []
   (let [refresh-link (utils/link-for (:links (dis/auth-settings)) "refresh")]
@@ -521,7 +524,7 @@
           :mention-author (:author fixed-notification)
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
-          :expire 3})))))
+          :expire 5})))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))

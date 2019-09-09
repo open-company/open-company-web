@@ -98,6 +98,7 @@
   (copy-comment-url (:url comment-data))
   (notification-actions/show-notification {:title "Share link copied to clipboard"
                                            :dismiss true
+                                           :expire 3
                                            :id (keyword (str "comment-url-copied-"
                                             (:uuid comment-data)))}))
 
@@ -277,6 +278,7 @@
                                             (copy-comment-url (:url comment-data))
                                             (notification-actions/show-notification {:title "Share link copied to clipboard"
                                                                                      :dismiss true
+                                                                                     :expire 3
                                                                                      :id (keyword (str "comment-url-copied-"
                                                                                       (:uuid comment-data)))}))
                                :title "Share"}])

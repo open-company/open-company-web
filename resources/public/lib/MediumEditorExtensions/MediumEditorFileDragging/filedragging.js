@@ -100,8 +100,13 @@ var CarrotFileDragging = MediumEditor.Extension.extend({
                 addImageElement.dataset.thumbnail = photoThumbnail;
             }
             MediumEditor.util.insertHTMLCommand(that.document, addImageElement.outerHTML);
+            that.insertNewParagraph();
         };
         addImageElement.src = imageURL;
+    },
+
+    insertNewParagraph: function() {
+        this.base.execAction('insertparagraph');
     }
 });
 

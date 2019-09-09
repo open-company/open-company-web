@@ -61,8 +61,13 @@
                 :let [active (= (:slug b) active-slug)]]
             [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
-               :class (when active "active")
+               :class (utils/class-set {:active active
+                                        :has-access-icon (#{"public" "private"} (:access b))})
                :on-click #(when (fn? on-change)
                             (on-change b))}
               [:div.sections-picker-section-name
-                (:name b)]]))]]))
+                (:name b)]
+              (case (:access b)
+                "private" [:div.private-icon]
+                "public" [:div.public-icon]
+                nil)]))]]))

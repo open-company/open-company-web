@@ -554,6 +554,7 @@
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
       [:div.cmail-container
+        {:class (when follow-up? "has-follow-ups")}
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
@@ -768,8 +769,9 @@
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
             ; Attachments
-            (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))]]
+            (when-not (:collapsed cmail-state)
+              (stream-attachments (:attachments cmail-data) nil
+               #(activity-actions/remove-attachment :cmail-data %)))]]
       (when (and follow-up?
                  (not is-mobile?)
                  (not is-fullscreen?))

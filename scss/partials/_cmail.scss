@@ -44,6 +44,7 @@ div.cmail-outer {
 
               div.rich-body-editor {
                 margin-top: 0;
+                min-height: 24px;
               }
             }
           }
@@ -291,6 +292,16 @@ div.cmail-outer {
         border: none;
         box-shadow: none;
         background-color: transparent;
+
+        &.has-follow-ups {
+          padding: 96px 0 0;
+        }
+
+        div.follow-ups-header {
+          position: fixed;
+          top: 56px;
+          z-index: 2;
+        }
       }
 
       div.cmail-content {
@@ -367,6 +378,12 @@ div.cmail-outer {
     width: 100%;
     height: 100%;
     position: relative;
+
+    &.has-follow-ups {
+      @include mobile() {
+        padding-top: #{$mobile_navbar_height + $mobile_navbar_height}px;
+      }
+    }
 
     @include mobile() {
       width: 100vw;
@@ -700,7 +717,7 @@ div.cmail-outer {
         padding: 4px 19px 4px 0px;
         border-right: 1px solid $ultra_light_grey;
 
-        @include tablet() {
+        @include mobile() {
           display: none;
         }
 
@@ -723,7 +740,7 @@ div.cmail-outer {
             cursor: not-allowed;
           }
 
-          @include tablet() {
+          @include mobile() {
             display: none;
           }
         }
@@ -786,7 +803,7 @@ div.cmail-outer {
             cursor: pointer;
           }
 
-          @include tablet() {
+          @include mobile() {
             display: none;
           }
 
@@ -960,7 +977,7 @@ div.cmail-outer {
         border-bottom-right-radius: 6px;
         margin-top: -1px;
 
-        @include tablet() {
+        @include mobile() {
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
           margin-top: 0;
@@ -981,11 +998,14 @@ div.cmail-outer {
 
       @include follow-up-tag();
 
-      @include tablet() {
+      @include mobile() {
         text-align: center;
         width: 100%;
-        height: auto;
+        height: #{$mobile_navbar_height}px;
         padding: 8px 48px;
+        position: fixed;
+        top: #{$mobile_navbar_height}px;
+        z-index: 2;
 
         div.follow-up-tag {
           display: none;
@@ -1025,7 +1045,7 @@ div.cmail-outer {
       div.mobile-follow-ups-remove-menu-container {
         display: none;
 
-        @include tablet() {
+        @include mobile() {
           display: block;
           position: absolute;
           right: 16px;
@@ -1112,7 +1132,7 @@ div.cmail-outer {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
 
-        @include tablet() {
+        @include mobile() {
           border-radius: 0;
         }
       }
@@ -1373,7 +1393,7 @@ div.cmail-outer {
             cursor: not-allowed;
           }
 
-          @include tablet() {
+          @include mobile() {
             display: none;
           }
         }
@@ -1524,7 +1544,7 @@ div.cmail-outer {
         div.sections-picker-container {
           position: absolute;
           top: 40px;
-          left: 102px;
+          left: 134px;
           z-index: #{$navbar_zindex + 156};
           max-height: 370px;
 
