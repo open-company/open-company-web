@@ -6,7 +6,8 @@
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]))
 
 (defonce app-state (atom {:loading false
                           :show-login-overlay false
@@ -103,6 +104,8 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
+(def expo-push-token-key [:expo-push-token])
+
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -185,6 +188,10 @@
    :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
+   :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
+   :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
+   :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
+   :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -204,7 +211,6 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :drafts-data         [[:base :org-slug]
@@ -366,9 +372,11 @@
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
                                     (timbre/info "Unread notification count updated: " ncount)
-                                    (when js/window.OCCarrotDesktop
+                                    (when ua/desktop-app?
                                       (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
+   :user-responded-to-push-permission? [[:base] (fn [base]
+                                                  (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]
@@ -406,7 +414,6 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
                                :cmail-state (:cmail-state base)
-                               :showing-mobile-user-notifications (:mobile-user-notifications base)
                                :force-login-wall (:force-login-wall base)})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
@@ -421,7 +428,8 @@
    :reminders-roster      [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
-                                    (get-in base (reminder-edit-key org-slug)))]})
+                                    (get-in base (reminder-edit-key org-slug)))]
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
 
 ;; Action Loop =================================================================
 

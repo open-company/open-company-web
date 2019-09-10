@@ -1,13 +1,15 @@
 (ns oc.web.actions.notifications
   (:require [taoensso.timbre :as timbre]
-            [oc.web.dispatcher :as dis]))
+            [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]))
 
 ;; Default time to disappeara notification
 (def default-expiration-time 3)
 
 (defn- potentially-show-desktop-notification!
   [{:keys [title click] :as notification-data}]
-  (when js/window.OCCarrotDesktop
+  (when (and ua/desktop-app?
+             (not (js/window.OCCarrotDesktop.windowHasFocus)))
     (let [notif (js/Notification. title)]
       (set! (.-onclick notif) #(do (js/window.OCCarrotDesktop.showDesktopWindow)
                                    (click))))))

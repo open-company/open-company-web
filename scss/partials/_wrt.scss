@@ -42,30 +42,12 @@ div.wrt-count-container {
     font-size: 12px;
     color: $deep_navy;
     cursor: pointer;
-    padding-left: 16px;
     position: relative;
     opacity: 0.5;
 
     @include mobile() {
       padding-left: 0;
       line-height: 20px;
-
-      &:before {
-        display: none;
-      }
-    }
-
-    &:before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      position: absolute;
-      top: 4px;
-      left: 0;
-      background-image: cdnUrl("/img/ML/viewers_icon.svg");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 10px 10px;
     }
   }
 }
@@ -95,6 +77,10 @@ div.wrt-popup-container {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      display: none;
+    }
   }
 
   div.wrt-popup {
@@ -115,6 +101,7 @@ div.wrt-popup-container {
       width: 100%;
       padding: 0;
       overflow-y: hidden;
+      background-color: white;
     }
 
     div.wrt-popup-header {
@@ -125,8 +112,11 @@ div.wrt-popup-container {
 
       @include mobile() {
         position: fixed;
-        border-bottom: 1px solid $ultra_light_grey;
+        border-bottom: 1px solid $divider_line_grey;
         z-index: 2;
+        height: #{$mobile_navbar_height}px;
+        padding: 15px 16px;
+        background-color: white;
       }
 
       div.wrt-popup-header-title {
@@ -139,6 +129,8 @@ div.wrt-popup-container {
         @include mobile() {
           text-align: center;
           float: unset;
+          line-height: 24px;
+          font-size: 18px;
         }
       }
 
@@ -149,11 +141,11 @@ div.wrt-popup-container {
           display: block;
           position: absolute;
           left: 16px;
-          top: 16px;
-          width: 24px;
-          height: 24px;
+          top: 15px;
+          width: 32px;
+          height: 32px;
           padding: 0;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
@@ -171,11 +163,8 @@ div.wrt-popup-container {
       @include mobile() {
         overflow-x: hidden;
         overflow-y: auto;
-        height: calc(100% - 56px);
-      }
-
-      @include mobile() {
-        padding-top: 80px;
+        height: 100%;
+        padding-top: #{$mobile_navbar_height + 24}px;
       }
 
       div.wrt-chart-container {

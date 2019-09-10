@@ -13,11 +13,13 @@
   [current-slug org is-mobile?]
   [:li
     {:class (when (= (:slug org) current-slug) "active")
-     :on-click #(do
-                 (utils/event-stop %)
-                 (dis/dispatch! [:input [:orgs-dropdown-visible] false])
-                 (router/nav! (oc-urls/org (:slug org))))}
-    (org-avatar org false :always)])
+     :on-click (fn [e]
+                 (.stopPropagation e)
+                 (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                 (dis/dispatch! [:input [:orgs-dropdown-visible] false]))}
+    [:a
+      {:href (oc-urls/all-posts (:slug org))}
+      (org-avatar org false :always)]])
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive

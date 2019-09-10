@@ -60,7 +60,7 @@
                                 ;; remove notification from list
                                 (notification-actions/remove-notification (first (:rum/args s)))))
                             s)}
-  [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
+  [s {:keys [id title description slack-icon opac server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss web-app-update slack-bot mention mention-author
@@ -73,6 +73,9 @@
                               :opac opac
                               :light-theme light-theme
                               :mention-notification (and mention mention-author)
+                              :bottom-notch (js/isiPhoneWithoutPhysicalHomeBt)
+                              :dismiss dismiss
+                              :clickable (fn? click)
                               :inline-bt (or primary-bt-inline
                                              (and id
                                                   ((keyword id) #{:slack-team-added :slack-bot-added
@@ -80,7 +83,7 @@
                                                                   :cancel-invitation :member-removed-from-team
                                                                   :reminder-created :reminder-updated
                                                                   :reminder-deleted :resend-verification-ok})))
-                              :dismiss-button dismiss-bt})
+                              :dismiss-button dismiss})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)
      :on-click #(when (and (fn? click)

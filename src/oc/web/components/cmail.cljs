@@ -15,6 +15,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
             [oc.web.local-settings :as ls]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -406,11 +407,16 @@
                           :else nil))
                       (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
                       (reset! (::latest-key s) (:key cmail-state)))
+                    (when (responsive/is-mobile-size?)
+                      (dom-utils/lock-page-scroll))
                     s)
                    :did-mount (fn [s]
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::autosave-timer s) (utils/every 5000 #(autosave s)))
+                    (let [cmail-state @(drv/get-ref s :cmail-state)]
+                      (when-not (:collapsed cmail-state)
+                        (utils/after 1000 #(.focus (body-element)))))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -418,6 +424,7 @@
                       (when (not= @(::latest-key s) (:key cmail-state))
                         (when @(::latest-key s)
                           (let [cmail-data @(drv/get-ref s :cmail-data)
+                                cmail-state @(drv/get-ref s :cmail-state)
                                 initial-body (if (seq (:body cmail-data))
                                                (:body cmail-data)
                                                "")
@@ -444,7 +451,9 @@
                               abstract-exceeds :abstract
                               (not (seq (:headline cmail-data))) :title
                               :else nil))
-                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
+                            (when-not (:collapsed cmail-state)
+                              (utils/after 1000 #(.focus (body-element))))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
@@ -493,6 +502,8 @@
                       (events/unlistenByKey @(::abstract-input-listener s))
                       (reset! (::abstract-input-listener s) nil))
                     (remove-autosave s)
+                    (when (responsive/is-mobile-size?)
+                      (dom-utils/unlock-page-scroll))
                     s)}
   [s]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
@@ -549,6 +560,7 @@
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
       [:div.cmail-container
+        {:class (when follow-up? "has-follow-ups")}
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
@@ -577,10 +589,7 @@
                   abstract-max-length-exceeded-tooltip)])
             (if (= (:status cmail-data) "published")
               "Save"
-              "Post")]
-          [:div.cmail-mobile-header-bt-separator]
-          [:button.mlb-reset.mobile-attachment-button
-            {:on-click #(add-attachment s)}]]
+              "Post")]]
         (when (and follow-up?
                    is-mobile?)
           (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
@@ -621,6 +630,8 @@
                                         :invite-note note})])
                     (when (fn? dismiss-action)
                       (dismiss-action)))))])
+            [:button.mlb-reset.mobile-attachment-button
+              {:on-click #(add-attachment s)}]
             (when-not follow-up?
               [:button.mlb-reset.mobile-follow-up-button
                 {:on-click #(when can-toggle-follow-ups?
@@ -750,6 +761,7 @@
                     "OK, got it"]]])
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
+                               :media-picker-initially-visible true
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
@@ -760,10 +772,12 @@
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
                                :classes (str "emoji-autocomplete emojiable " utils/hide-class)
-                               :cmail-key (:key cmail-state)})
+                               :cmail-key (:key cmail-state)
+                               :attachments-enabled true})
             ; Attachments
-            (stream-attachments (:attachments cmail-data) nil
-             #(activity-actions/remove-attachment :cmail-data %))]]
+            (when-not (:collapsed cmail-state)
+              (stream-attachments (:attachments cmail-data) nil
+               #(activity-actions/remove-attachment :cmail-data %)))]]
       (when (and follow-up?
                  (not is-mobile?)
                  (not is-fullscreen?))

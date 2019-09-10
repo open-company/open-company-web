@@ -114,6 +114,9 @@
 (defn current-secure-activity-id []
   (:secure-id @path))
 
+(defn current-comment-id []
+  (:comment @path))
+
 (defn query-params []
   (:query-params @path))
 
@@ -166,6 +169,8 @@
   (str "invite-people-tooltip-" (jwt/user-id)))
 
 (def login-redirect-cookie "login-redirect")
+
+(def expo-push-token-cookie "expo-push-token")
 
 ;; Debug
 

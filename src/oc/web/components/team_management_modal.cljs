@@ -30,7 +30,7 @@
   (notification-actions/show-notification {:title "Invitation resent"
                                            :primary-bt-title "OK"
                                            :primary-bt-dismiss true
-                                           :expire 10
+                                           :expire 3
                                            :id :invitation-resent}))
 
 (defn user-match [query user]
@@ -153,7 +153,7 @@
                                                                          "Member removed from team")
                                                                 :primary-bt-title "OK"
                                                                 :primary-bt-dismiss true
-                                                                :expire 10
+                                                                :expire 3
                                                                 :id (if pending?
                                                                      :cancel-invitation
                                                                      :member-removed-from-team)}))))

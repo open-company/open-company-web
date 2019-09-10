@@ -108,7 +108,7 @@
   (let [url-pathname (.. js/window -location -pathname)
         is-login-route? (or (= url-pathname oc-urls/login-wall)
                             (= url-pathname oc-urls/login)
-                            (= url-pathname oc-urls/desktop-login))]
+                            (= url-pathname oc-urls/native-login))]
     (cond
       (and is-login-route?
            (:login-redirect (:query-params @dis/app-state)))
@@ -158,16 +158,19 @@
     (dis/dispatch! [:login-with-email])))
 
 (defn login-with-slack [auth-url]
-  (let [auth-url-with-redirect (utils/slack-link-with-state
+  (let [auth-url-with-redirect (user-utils/auth-link-with-state
                                  (:href auth-url)
-                                 nil
-                                 "open-company-auth" oc-urls/slack-lander-check)]
+                                 {:team-id "open-company-auth"
+                                  :redirect oc-urls/slack-lander-check})]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
-(defn login-with-google [auth-url]
-  (router/redirect! (:href auth-url))
-  (dis/dispatch! [:login-with-google]))
+(defn login-with-google [auth-url & [state-map]]
+  (let [auth-url-with-redirect (user-utils/auth-link-with-state
+                                (:href auth-url)
+                                (or state-map {}))]
+    (router/redirect! auth-url-with-redirect)
+    (dis/dispatch! [:login-with-google])))
 
 (defn refresh-slack-user []
   (let [refresh-link (utils/link-for (:links (dis/auth-settings)) "refresh")]
@@ -430,6 +433,45 @@
            :primary-bt-dismiss true
            :id (keyword (str "resend-verification-" (if success "ok" "failed")))}))))))
 
+;; Mobile push notifications
+
+(def ^:private expo-push-token-expiry (* 60 60 24 352 10)) ;; 10 years (infinite)
+
+(defn dispatch-expo-push-token
+  "Save the expo push token in a cookie (or re-save to extend the cookie expire time)
+   and dispatch the value into the app-state."
+  [push-token]
+  (when push-token
+    ;; A blank push-token indicates that the user was prompted, but
+    ;; denied the push notification permission.
+    (cook/set-cookie! router/expo-push-token-cookie push-token expo-push-token-expiry)
+    (dis/dispatch! [:expo-push-token push-token])))
+
+(defn recall-expo-push-token
+  []
+  (dispatch-expo-push-token (cook/get-cookie router/expo-push-token-cookie)))
+
+(defn add-expo-push-token [push-token]
+  (let [user-data            (dis/current-user-data)
+        add-token-link       (utils/link-for (:links user-data) "add-expo-push-token" "POST")
+        need-to-add?         (not (user-utils/user-has-push-token? user-data push-token))]
+    (if-not need-to-add?
+      ;; Push token already known, dispatch it to app-state immediately
+      (dispatch-expo-push-token push-token)
+      ;; Novel push token, add it to the Auth service for storage
+      (when (and add-token-link push-token)
+        (api/add-expo-push-token
+         add-token-link
+         push-token
+         (fn [success]
+           (dispatch-expo-push-token push-token)
+           (timbre/info "Successfully saved Expo push notification token")))))))
+
+(defn deny-push-notification-permission
+  "Push notification permission was denied."
+  []
+  (dispatch-expo-push-token ""))
+
 ;; Initial loading
 
 (defn initial-loading [& [force-refresh]]
@@ -482,7 +524,7 @@
           :mention-author (:author fixed-notification)
           :description (:body fixed-notification)
           :id (str "notif-" (:created-at fixed-notification))
-          :expire 3})))))
+          :expire 5})))))
 
 (defn read-notification [notification]
   (dis/dispatch! [:user-notification/read (router/current-org-slug) notification]))

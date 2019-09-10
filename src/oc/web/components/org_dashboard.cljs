@@ -8,6 +8,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
@@ -40,7 +41,8 @@
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
-            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
+            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
+            [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
 (defn refresh-board-data [s]
   (when (and (not (router/current-activity-id))
@@ -77,11 +79,12 @@
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
+                           (drv/drv :user-responded-to-push-permission?)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
-                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
+                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) (utils/page-scroll-top)))
                              (refresh-board-data s)
                              (init-whats-new)
                              s)
@@ -101,7 +104,6 @@
                 show-section-add-cb
                 activity-share-container
                 cmail-state
-                showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
                 panel-stack]} (drv/react s :org-dashboard-data)
@@ -171,7 +173,11 @@
                                     (s/starts-with? (name open-panel) "follow-ups-picker-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
-                                is-mobile?)]
+                                is-mobile?)
+        user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
+        show-push-notification-permissions-modal? (and ua/mobile-app?
+                                                       (jwt/jwt)
+                                                       (not user-responded-to-push-permission?))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -185,10 +191,6 @@
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
-          ;; User menu
-          (and is-mobile?
-               (= open-panel :menu))
-          (menu)
           ;; Activity removed
           show-activity-removed
           (activity-removed)
@@ -238,11 +240,7 @@
           (wrt org-data)
           ;; Search results
           is-showing-mobile-search
-          (search-box)
-          ;; Mobile notifications
-          (and is-mobile?
-               showing-mobile-user-notifications)
-          (user-notifications))
+          (search-box))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -261,23 +259,29 @@
           (follow-ups-picker))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
-        (when-not is-mobile?
+        (when (or (not is-mobile?)
+                  (and is-mobile?
+                       (= open-panel :menu)))
           (menu))
+        ;; Mobile push notifications permission
+        (when show-push-notification-permissions-modal?
+          (push-notifications-permission-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
         ;; On mobile don't show the dashboard/stream when showing another panel
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
+                       (or (not open-panel)
+                           (= open-panel :menu))
                        (not show-mobile-cmail?)
-                       (not open-panel)))
+                       (not show-push-notification-permissions-modal?)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
-                              (not open-panel)
-                              (not is-showing-mobile-search)
-                              (not showing-mobile-user-notifications)))
+                              (or (not open-panel)
+                                  (= open-panel :menu))))
                  (dashboard-layout))]]])])))

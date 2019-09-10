@@ -4,6 +4,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.actions.cmail :as cmail-actions]))
 
 (defn routing [route-path]
@@ -21,7 +22,7 @@
 
 ;; Post modal
 
-(defn open-post-modal [activity-data scroll-to-top]
+(defn open-post-modal [activity-data dont-scroll]
   (let [org (router/current-org-slug)
         old-board (router/current-board-slug)
         board (:board-slug activity-data)
@@ -41,17 +42,21 @@
                               :back-to back-to
                               :back-y scroll-y-position})
     (cmail-actions/cmail-hide)
-    (when-not scroll-to-top
-      (utils/scroll-to-y 0 0))
+    (when-not dont-scroll
+      (if ua/mobile?
+        (utils/after 10 #(utils/scroll-to-y 0 0))
+        (utils/scroll-to-y 0 0)))
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 (defn dismiss-post-modal []
-  (let [org (router/current-org-slug)
-        board (or (:back-to @router/path) (router/current-board-slug))
+  (let [org-data (dis/org-data)
+        org (router/current-org-slug)
+        ;; Go back to
+        board (utils/back-to org-data)
         to-url (oc-urls/board board)
         query-params (router/query-params)
         route [org board "dashboard"]
-        back-y (or (:back-y @router/path) 0)]
+        back-y (or (:back-y @router/path) (utils/page-scroll-top))]
     (router/set-route! route {:org org
                               :board board
                               :sort-type (router/current-sort-type)

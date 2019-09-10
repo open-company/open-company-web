@@ -40,9 +40,9 @@ div.stream-item {
     margin: 0;
     border-radius: 0;
     border-top: none;
-    border-bottom: 1px solid $grey_num_3;
-    background-color: $grey_num_2;
-    padding: 24px 16px 22px;
+    border-bottom: 1px solid $divider_line_grey;
+    background-color: $grey_num_4;
+    padding: 16px 16px 22px;
   }
 
   &.draft {
@@ -139,7 +139,6 @@ div.stream-item {
 
       @include mobile() {
         @include activity-author(32);
-        width: calc(100% - 46px);
       }
 
       div.name {
@@ -391,7 +390,7 @@ div.stream-item {
 
         @include mobile() {
           margin-top: 16px;
-          @include activity-title(24px, 28px);
+          @include activity-title(22px, 28px);
         }
       }
 
@@ -431,27 +430,29 @@ div.stream-item {
       }
     }
 
-    div.stream-item-mobile-reactions {
-      display: none;
-
-      @include mobile() {
-        display: block;
-        height: 48px;
-        margin: 16px 0 0;
-        padding-bottom: 16px;
-        border-bottom: 1px solid $ultra_light_grey;
-      }
-    }
-
     div.stream-item-footer {
       min-height: 26px;
       margin-top: 16px;
 
       @include mobile() {
-        height: 16px;
+        height: auto;
         overflow: hidden;
         margin-top: 10px;
-        min-height: 20px;
+        min-height: 32px;
+      }
+
+      div.reactions {
+        @include mobile() {
+          display: inline-block;
+        }
+      }
+
+      div.stream-item-footer-mobile-group {
+        @include mobile() {
+          display: inline-block;
+          height: 32px;
+          padding-top: 8px;
+        }
       }
 
       div.stream-body-draft-edit {
@@ -481,17 +482,16 @@ div.stream-item {
         margin-right: 16px;
         float: left;
 
-        @include mobile() {
-          max-width: calc(50% - 16px);
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
         div.is-comments {
           div.is-comments-authors.show-border {
             div.is-comments-author {
-              background-color: $oc_gray_8;
-              border: 2px solid $oc_gray_8;
+              background-color: $grey_num_2;
+              border: 2px solid $grey_num_2;
+
+              @include mobile() {
+                background-color: $grey_num_4;
+                border: 2px solid $grey_num_4;
+              }
             }
           }
         }
@@ -539,7 +539,6 @@ div.stream-item {
 
         div.stream-item-attachments-count {
           position: relative;
-          padding-left: 22px;
           @include OC_Body_Book();
           font-size: 12px;
           color: $deep_navy;
@@ -550,21 +549,6 @@ div.stream-item {
             margin-top: 0;
             padding-left: 0;
             line-height: 20px;
-
-            &:before {
-              display: none;
-            }
-          }
-
-          &:before {
-            content: " ";
-            width: 14px;
-            height: 16px;
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 14px 16px;
-            position: absolute;
-            top: 0;
-            left: 0;
           }
         }
 

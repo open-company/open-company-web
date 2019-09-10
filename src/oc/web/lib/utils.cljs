@@ -3,6 +3,7 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
@@ -190,7 +191,7 @@
 
 (defn scroll-to-y [scroll-y & [duration]]
   (if (and duration (zero? duration))
-    (if (js/isEdge)
+    (if ua/edge?
       (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
       (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
     (.play
@@ -373,15 +374,6 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace
-   original-url
-   team-id
-   (str
-    (when (seq team-id) (str team-id ":"))
-    (when (seq user-id) (str user-id ":"))
-    redirect)))
-
 (def network-error
  {:title "Network error"
   :description "Shoot, looks like there might be a connection issue. Please try again."
@@ -530,8 +522,7 @@
 
 (defn copy-to-clipboard [el]
   (try
-    (when (and (responsive/is-tablet-or-mobile?)
-               (js/isSafari))
+    (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
@@ -606,7 +597,7 @@
 
 (def default-headline "Title")
 
-(def default-abstract "Quick summary: let everyone know what your post is about...")
+(def default-abstract "Quick summary")
 
 (def max-abstract-length 280)
 
@@ -706,3 +697,24 @@
   (if (.-attachEvent js/window)
     (fn [el e handler] (.attachEvent el (str "on" e) handler))
     (fn [el e handler] (.addEventListener el e handler))))
+
+(defn page-scroll-top []
+  (let [is-mobile? (responsive/is-mobile-size?)
+        board-slug (router/current-board-slug)
+        activity-id (router/current-activity-id)]
+    (if (and (not activity-id)
+             (seq board-slug)
+             (not= board-slug default-drafts-board-slug)
+             is-mobile?)
+      50
+      0)))
+
+(defn back-to [org-data]
+  (cond
+    ;; the board specified in the router if there is one
+    (:back-to @router/path) (:back-to @router/path)
+    ;; if the user is part of the team we can go back to all posts
+    (jwt/user-is-part-of-the-team (:team-id org-data)) "all-posts"
+    ;; else go back to the current post board since it's probably the
+    ;; only one the user can see
+    :else (router/current-board-slug)))

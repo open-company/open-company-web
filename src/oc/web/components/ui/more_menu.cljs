@@ -65,7 +65,8 @@
                        (drv/drv :editable-boards)
   [s entity-data share-container-id
    {:keys [will-open will-close external-share tooltip-position
-           show-edit? show-delete? edit-cb delete-cb show-move?
+           show-edit? show-delete? edit-cb delete-cb show-move? can-comment-share?
+           comment-share-cb can-react? react-cb can-reply? reply-cb
            assigned-follow-up-data external-follow-up]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
@@ -79,6 +80,9 @@
     (when (or edit-link
               share-link
               delete-link
+              can-comment-share?
+              can-react?
+              can-reply?
               create-follow-up-link
               complete-follow-up-link)
       [:div.more-menu
@@ -88,6 +92,9 @@
                   "menu-expanded")}
         (when (or edit-link
                   delete-link
+                  can-comment-share?
+                  can-react?
+                  can-reply?
                   (and (not external-share)
                        share-link))
           [:button.mlb-reset.more-menu-bt
@@ -169,7 +176,34 @@
                                   (when (fn? will-close)
                                     (will-close))
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Create follow-up"])))])
+                    "Create follow-up"])))
+            (when can-react?
+              [:li.react
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (react-cb)))}
+                "React"])
+            (when can-reply?
+              [:li.reply
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (reply-cb)))}
+                "Reply"])
+            (when can-comment-share?
+              [:li.comment-share
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (comment-share-cb)))}
+                "Copy link"])])
         (when (and external-share
                    share-link)
           [:button.mlb-reset.more-menu-share-bt

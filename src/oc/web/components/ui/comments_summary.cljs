@@ -35,7 +35,7 @@
 (rum/defcs comments-summary < rum/static
                               rum/reactive
                               (drv/drv :comments-data)
-  [s entry-data show-zero-comments? should-show-new-tag?]
+  [s entry-data should-show-new-tag?]
   (let [all-comments-data (drv/react s :comments-data)
         _comments-data (get all-comments-data (:uuid entry-data))
         comments-data (:sorted-comments _comments-data)
@@ -53,17 +53,13 @@
                          (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))
         is-mobile? (responsive/is-mobile-size?)
-        short-label? (and is-mobile?
-                          (> (count (:reactions entry-data)) 1))
         faces-to-render (take max-face-pile comments-authors)
         face-pile-width (if (pos? face-pile-count)
                           (if is-mobile?
                             (+ 8 (* 12 face-pile-count))
                             (+ 10 (* 18 face-pile-count)))
                             0)]
-    (when (and comments-count
-               (or show-zero-comments?
-                   (not (zero? comments-count))))
+    (when comments-count
       [:div.is-comments
         {:on-click (fn [e]
                      (routing-actions/open-post-modal entry-data true)
@@ -82,13 +78,9 @@
                                     :add-a-comment (not (pos? comments-count))})}
           (if (pos? comments-count)
             [:div.group
-              comments-count
-              (when-not short-label?
-                (str " comment" (when (not= comments-count 1) "s")))
+              (str comments-count " comment" (when (not= comments-count 1) "s"))
               (when should-show-new-tag?
                 [:div.new-comments-tag
                   "(NEW)"])]
             [:span.add-a-comment
-              (if short-label?
-                "Comment"
-                "Add a comment")])]])))
+              "Add a comment"])]])))

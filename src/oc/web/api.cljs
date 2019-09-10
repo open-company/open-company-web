@@ -206,7 +206,7 @@
             :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}
      parameters)
     (str "Client API error on: " callee-name))
-  (notification-actions/show-notification (assoc utils/internal-error :expire 3))
+  (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
     (callback {:success false :status 0})))
 
@@ -291,15 +291,6 @@
          :headers (headers-for-link org-patch-link)}
         callback))
     (handle-missing-link "patch-org" org-patch-link callback {:data data})))
-
-(defn patch-org-sections [org-patch-link data callback]
-  (if (and org-patch-link data)
-    (let [json-data (cljs->json data)]
-      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
-        {:json-params json-data
-         :headers (headers-for-link org-patch-link)}
-        callback))
-    (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
 
 (defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)
@@ -637,6 +628,16 @@
      (fn [{:keys [status success body]}]
       (callback success)))))
 
+(defn add-expo-push-token [add-token-link push-token callback]
+  (if (and add-token-link push-token)
+    (auth-http (method-for-link add-token-link) (relative-href add-token-link)
+               {:headers (headers-for-link add-token-link)
+                :body push-token}
+               (fn [{:keys [status success body]}]
+                 (callback success)))
+    (handle-missing-link "add-expo-push-token" add-token-link callback
+                         {:push-token push-token})))
+
 ;; Interactions
 
 (defn get-comments [comments-link callback]
@@ -646,9 +647,10 @@
       callback)
     (handle-missing-link "get-comments" comments-link callback)))
 
-(defn add-comment [add-comment-link comment-body callback]
+(defn add-comment [add-comment-link comment-body parent-comment-uuid callback]
   (if (and add-comment-link comment-body)
-    (let [json-data (cljs->json {:body comment-body})]
+    (let [json-data (cljs->json {:body comment-body
+                                 :parent-uuid parent-comment-uuid})]
       (interaction-http (method-for-link add-comment-link) (relative-href add-comment-link)
         {:headers (headers-for-link add-comment-link)
          :json-params json-data}
@@ -665,15 +667,15 @@
     (handle-missing-link "delete-comment" delete-comment-link callback)))
 
 (defn patch-comment
-  [patch-comment-link new-data callback]
-  (if (and patch-comment-link new-data)
-    (let [json-data (cljs->json {:body new-data})]
+  [patch-comment-link new-comment-body callback]
+  (if (and patch-comment-link new-comment-body)
+    (let [json-data (cljs->json {:body new-comment-body})]
       (interaction-http (method-for-link patch-comment-link) (relative-href patch-comment-link)
         {:headers (headers-for-link patch-comment-link)
          :json-params json-data}
         callback))
     (handle-missing-link "patch-comment" patch-comment-link callback
-     {:new-data new-data})))
+     {:new-comment-body new-comment-body})))
 
 (defn toggle-reaction
   [reaction-link callback]

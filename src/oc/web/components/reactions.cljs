@@ -38,7 +38,7 @@
     ;; If there are reactions to render or there is at least the link to add a reaction from the picker
     (when (or (seq reactions-data)
               should-show-picker?)
-      [:div.reactions
+      [:div.reactions.group
         [:div.reactions-list
           (when (seq reactions-data)
             (for [idx (range (count reactions-data))
@@ -83,12 +83,6 @@
                  :data-toggle (when-not is-mobile? "tooltip")
                  :on-click (fn [e]
                              (when (and (not is-loading) (not read-only-reaction))
-                               (when (and (not (:reacted r))
-                                          (not (js/isSafari))
-                                          (not (js/isEdge))
-                                          (not (js/isIE)))
-                                 ;;TODO: animate reaction
-                                 )
                                (if optional-activity-data
                                 (comment-actions/comment-reaction-toggle optional-activity-data entity-data r (not reacted))
                                 (reaction-actions/reaction-toggle entity-data r (not reacted)))))}
@@ -111,6 +105,7 @@
            (when-not (utils/is-test-env?)
              (react-utils/build (.-Picker js/EmojiMart)
                {:native true
+                :autoFocus true
                 :onClick (fn [emoji event]
                            (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") reactions-data)
                              (if optional-activity-data

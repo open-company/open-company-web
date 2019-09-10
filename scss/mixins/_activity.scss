@@ -327,7 +327,13 @@ $h2_top_margin: 24;
     min-height: #{$line_height}px;
   }
 
-  i:empty {
+  blockquote {
+    padding: 10px 20px;
+    min-height: #{$line_height + 20}px;
+    border-left: 4px solid $ultra_light_grey;
+  }
+
+  i:empty, b:empty, strong:empty, li:empty {
     display: grid;
     min-width: 1px;
   }
@@ -349,6 +355,17 @@ $h2_top_margin: 24;
   & > *:last-child:not(:first-child) {
     margin: #{$line_height}px 0px 0px;
     padding-bottom: 0px;
+  }
+
+  & > blockquote:not(:last-child) {
+    margin: #{$line_height}px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  & > blockquote:last-child:not(:first-child) {
+    margin: #{$line_height}px 0px 0px;
+    padding-bottom: 10px;
   }
 
   & > img, img {
@@ -452,12 +469,12 @@ $h2_top_margin: 24;
   }
 
   img, a > img {
-      display: block;
-      margin: 0 auto;
-      width: auto;
-      height: auto;
-      max-width: 100%;
-      max-height: 400px;
+    display: block;
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 400px;
   }
 
   iframe {
@@ -607,17 +624,22 @@ $h2_top_margin: 24;
   word-wrap: break-word;
   line-height: 24px;
 
-  & > *:last-child {
-    display: inline;
-  }
-
-  & > *:not(:last-child) {
-    display: block;
+  &.uploading[contenteditable=true]{
+    .rangySelectionBoundary {
+      display: inline-block !important;
+      width: 32px;
+      height: 32px;
+      background-image: cdnUrl("/img/small_loading.gif");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 32px 32px;
+      top: -16px;
+      position: relative;
+    }
   }
 
   &.editing {
     display: block;
-    margin-top: 6px;
   }
 
   &:hover {
@@ -632,14 +654,13 @@ $h2_top_margin: 24;
     color: $deep_navy;
   }
 
-  * {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
   margin-bottom: 0px;
 
   &>*:last-child {
+    margin-bottom: 0px;
+  }
+
+  & > blockquote:last-child {
     margin-bottom: 0px;
   }
 
@@ -652,11 +673,42 @@ $h2_top_margin: 24;
   a, span[data-auto-link] {
     text-decoration: none;
     color: $carrot_green;
-    background-color: transparent;
+    background-color: transparent !important;
   }
 
   a:hover {
     text-decoration: underline;
+  }
+
+  &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
+    color: rgba($deep_navy, 0.5);
+    font-style: normal;
+  }
+
+  img, a > img {
+    display: block;
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 400px;
+  }
+
+  iframe {
+    margin: 0 auto;
+    display: block;
+    width: 100% !important;
+  }
+
+  i:empty, b:empty, strong:empty, li:empty {
+    display: grid;
+    min-width: 1px;
+  }
+
+  blockquote {
+    padding: 10px 20px;
+    min-height: 44px;
+    border-left: 4px solid $ultra_light_grey;
   }
 
   b, strong{
@@ -696,5 +748,9 @@ $h2_top_margin: 24;
 
   i b, i strong, strong i, b i {
     @include OC_Body_Bold_Italic(); 
+  }
+
+  p, ul > li, i {
+    min-height: 24px;
   }
 }

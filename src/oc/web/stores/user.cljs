@@ -4,7 +4,8 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.cookies :as cook]
             [oc.web.lib.utils :as utils]
-            [oc.web.utils.user :as user-utils]))
+            [oc.web.utils.user :as user-utils]
+            [cljsjs.moment-timezone]))
 
 (def default-user-image "/img/ML/happy_face_red.svg")
 (def other-user-images
@@ -273,3 +274,11 @@
         old-notifications (get-in db user-notifications-key)
         read-notifications (map #(if (= (:created-at %) (:created-at notification)) (assoc % :unread false) %) old-notifications)]
     (assoc-in db user-notifications-key read-notifications)))
+
+;; Expo push tokens
+
+(defmethod dispatcher/action :expo-push-token
+  [db [_ push-token]]
+  (if push-token
+    (assoc-in db dispatcher/expo-push-token-key push-token)
+    db))

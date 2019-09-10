@@ -51,6 +51,7 @@ $.closest = function(){};
 $.scrollLeft = function(){};
 $.scrollTop = function(){};
 $.datepicker = function(){};
+$.parseJSON = function(){};
 // WURFL
 var WURFL = {};
 WURFL.complete_device_name = {};
@@ -66,6 +67,7 @@ var recursiveAttachPasteListener = function(){};
 var replaceSelectedText = function(){};
 // MediumEditorAutolist
 var AutoList = function(){};
+var AutoQuote = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};
@@ -76,6 +78,8 @@ MediaPicker.addChart = function(){};
 MediaPicker.addAttachment = function(){};
 MediaPicker.saveSelection = function(){};
 MediaPicker.removeSelection = function(){};
+MediaPicker.togglePicker = function(){};
+MediaPicker.hide = function(){};
 // MediumEditorFileDragging
 var CarrotFileDragging = function(){};
 CarrotFileDragging.insertImageFile = function(){};
@@ -126,12 +130,7 @@ var OCStaticMailchimpApiSubmit = function(){};
 var OCStaticStartFixFixedPositioning = function(){};
 
 var OnPaste_StripFormatting = function(){};
-var isMac = function(){};
-var isWindows = function(){};
-var isLinux = function(){};
-var isSafari = function(){};
-var isIE = function(){};
-var isEdge = function(){};
+var isiPhoneWithoutPhysicalHomeBt = function(){};
 // Rangy
 var rangy = function(){};
 rangy.createClassApplier = function(){};
@@ -189,8 +188,11 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
-// Electron
+// Mobile app (Expo)
+var ReactNativeWebView = {};
+ReactNativeWebView.postMessage = function() {};
+// Desktop app (Electron)
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
-// Fullstory
+OCCarrotDesktop.windowHasFocus = function() {};

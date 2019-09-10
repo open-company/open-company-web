@@ -183,7 +183,7 @@ div.onboard-lander {
         height: 54px;
         text-align: center;
         width: 100%;
-        border-bottom: 1px solid $ultra_light_grey;
+        border-bottom: 1px solid $divider_line_grey;
         position: fixed;
         background-color: white;
         left: 0px;
@@ -886,93 +886,6 @@ div.onboard-lander {
     div.onboard-form {
       div.field-label:first-child {
         margin-top: 40px;
-      }
-    }
-  }
-
-  &.lander-sections {
-
-    div.subtitle {
-      max-width: 500px;
-      text-align: center;
-      margin: 16px auto 0;
-
-      @include mobile() {
-        max-width: 280px;
-      }
-    }
-
-    div.main-cta {
-      div.mobile-header {
-        button.top-continue {
-          color: $carrot_orange;
-        }
-      }
-    }
-
-    div.onboard-form {
-      width: 456px;
-      text-align: center;
-
-      @include mobile() {
-        width: 100%;
-      }
-
-      div.sections-list {
-        margin: 32px auto 0;
-        width: 456px;
-        text-align: center;
-        min-height: 276px;
-
-        @include mobile() {
-          margin: 32px auto 0;
-          width: 100%;
-        }
-
-        div.small-loading {
-          margin-top: 50px;
-        }
-
-        div.section {
-          margin-left: 8px;
-          margin-top: 8px;
-          display: inline-block;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          background-color: #F8FCFA;
-          color: $carrot_green;
-          border: 1px dashed #9FDEBE;
-          padding: 8px 16px;
-          border-radius: 6px;
-          cursor: pointer;
-          opacity: 0.9;
-
-          &:hover {
-            opacity: 1;
-          }
-
-          &.selected {
-            color: white;
-            background-color: $carrot_green;
-            border: 1px solid $carrot_green;
-          }
-        }
-      }
-
-      div.field-description {
-        font-size: 16px;
-        color: $deep_navy;
-        margin-top: 32px;
-        width: 100%;
-      }
-
-      button.continue {
-        width: 340px;
-        margin-top: 32px;
-
-        @include mobile() {
-          width: 100%;
-        }
       }
     }
   }

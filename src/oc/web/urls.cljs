@@ -24,7 +24,7 @@
 
 (def help "http://help.carrot.io/")
 
-(def what-s-new "https://whats-new.carrot.io/")
+(def what-s-new "https://the.carrot.news/")
 
 (def home-try-it-focus (str home "?tif"))
 
@@ -32,7 +32,7 @@
 (def contact-mail-to (str "mailto:" contact-email))
 
 (def login "/login")
-(def desktop-login "/login/desktop")
+(def native-login "/login/desktop")
 (def sign-up "/sign-up")
 (def sign-up-slack "/sign-up/slack")
 (def sign-up-profile "/sign-up/profile")
@@ -49,12 +49,6 @@
     (sign-up-invite (router/current-org-slug)))
   ([org-slug]
     (str sign-up "/" (name org-slug) "/invite")))
-
-(defn sign-up-setup-sections
-  ([]
-    (sign-up-setup-sections (router/current-org-slug)))
-  ([org-slug]
-    (str sign-up "/" (name org-slug) "/sections")))
 
 (def slack-lander-check "/slack-lander/check")
 
@@ -154,9 +148,18 @@
 (defn entry
   "Entry url"
   ([] (entry (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
-  ([entry-uuid] ( (router/current-org-slug) (router/current-board-slug) entry-uuid))
+  ([entry-uuid] (entry (router/current-org-slug) (router/current-board-slug) entry-uuid))
   ([board-slug entry-uuid] (entry (router/current-org-slug) board-slug entry-uuid))
   ([org-slug board-slug entry-uuid] (str (board org-slug board-slug) "/post/" (name entry-uuid))))
+
+;; Commennts
+
+(defn comment-url
+  "Comment url"
+  ([comment-uuid] (comment-url (router/current-org-slug) (router/current-board-slug) (router/current-activity-id)))
+  ([entry-uuid comment-uuid] (comment-url (router/current-org-slug) (router/current-board-slug) entry-uuid comment-uuid))
+  ([board-slug entry-uuid comment-uuid] (comment-url (router/current-org-slug) board-slug entry-uuid comment-uuid))
+  ([org-slug board-slug entry-uuid comment-uuid] (str (entry org-slug board-slug entry-uuid) "/comment/" comment-uuid)))
 
 ;; Secure activities
 

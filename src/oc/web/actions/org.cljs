@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -35,8 +36,10 @@
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
-                        redirect)]
+        fixed-auth-url (uu/auth-link-with-state (:href auth-link)
+                                                {:user-id (:user-id user-data)
+                                                 :team-id (:team-id team-data)
+                                                 :redirect redirect})]
     (router/redirect! fixed-auth-url)))
 
 (defn maybe-show-integration-added-notification? []
@@ -47,14 +50,14 @@
       (notification-actions/show-notification {:title "Carrot Bot enabled"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
+                                                      :expire 5
                                                       :id :slack-bot-added}))
     (when (and (= bot-access "team")
                (not= (:new (router/query-params)) "true"))
       (notification-actions/show-notification {:title "Integration added"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
+                                                      :expire 5
                                                       :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
@@ -87,7 +90,12 @@
 
 (def other-resources-delay 2500)
 
-(defn org-loaded [org-data saved? & [email-domain complete-refresh?]]
+(defn org-loaded
+  "Dispatch the org data into the app-state to be used by all the components.
+   Do all the needed loading when the org data are loaded if complete-refresh? is true.
+   The saved? flag is used as a strict boolean, if it's nil it means no org data PATCH happened, false
+   means that the save went wrong, true went well."
+  [org-data & [saved? email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
@@ -187,7 +195,7 @@
 
 (defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data false nil (not prevent-complete-refresh?))))
+    (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
 (defn get-org [& [org-data prevent-complete-refresh?]]
   (let [fixed-org-data (or org-data (dis/org-data))
@@ -205,7 +213,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
+   #(router/nav! (oc-urls/all-posts (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -264,7 +272,7 @@
       ;; rewrite history so when user come back here we load org data and patch them
       ;; instead of creating them
       (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data nil email-domain)
       (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
@@ -272,7 +280,7 @@
 (defn org-update-cb [email-domain {:keys [success status body]}]
   (if success
     (when-let [org-data (when success (json->cljs body))]
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data success email-domain)
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
 
@@ -305,7 +313,7 @@
   (dis/dispatch! [:org-edit-setup org-data]))
 
 (defn org-edit-save-cb [{:keys [success body status]}]
-  (org-loaded (json->cljs body) true))
+  (org-loaded (json->cljs body) success))
 
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
@@ -325,7 +333,7 @@
          :description "Your image was succesfully updated."
          :expire 3
          :dismiss true})
-      (org-loaded (json->cljs body) false))
+      (org-loaded (json->cljs body)))
     (do
       (dis/dispatch! [:org-avatar-update/failed])
       (notification-actions/show-notification
@@ -367,18 +375,5 @@
             (when (= (:item-id change-data) (:uuid current-board-data))
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
 
-(defn update-org-sections [org-slug all-sections]
-  (dis/dispatch! [:input [:ap-loading] true])
-  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
-        patch-payload {:boards (conj selected-sections "General")
-                       :samples true}
-        org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-      (api/patch-org-sections org-patch-link patch-payload
-       (fn [{:keys [success status body]}]
-         (when success
-           (org-loaded (json->cljs body) false))
-         (utils/after 2000
-          #(router/nav! (get-ap-url org-slug)))))))
-
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
+  (router/nav! (oc-urls/all-posts (:slug org-data))))

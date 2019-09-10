@@ -7,6 +7,7 @@
             [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
@@ -65,12 +66,12 @@
 
 (defn- detect-desktop-app
   []
-  (when-not js/window.OCCarrotDesktop
+  (when-not ua/desktop-app?
     (cond
-      (js/window.isMac) {:title "Mac app"
-                         :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
-      (js/window.isWindows) {:title "Windows app"
-                             :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+      ua/mac? {:title "Download Mac app"
+               :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
+      ua/windows? {:title "Download Windows app"
+                   :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
 (rum/defcs menu < rum/reactive
@@ -179,10 +180,8 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          (if is-mobile?
-            {:href "https://whats-new.carrot.io/"
+          {:href "https://the.carrot.news/"
              :target "_blank"}
-            {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a

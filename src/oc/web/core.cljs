@@ -6,6 +6,9 @@
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
             [oc.web.rum-utils :as ru]
+            ;; Pull in functions for interfacing with Expo mobile app
+            [oc.web.expo :as expo]
+            [oc.shared.useragent :as ua]
             ;; Pull in all the stores to register the events
             [oc.web.actions]
             [oc.web.stores.routing]
@@ -107,11 +110,11 @@
 (defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
-    (when js/window.OCCarrotDesktop
+    (when ua/desktop-app?
       (dommy/add-class! body :electron)
-      (when (js/window.isMac)
+      (when ua/mac?
         (dommy/add-class! body :mac-electron))
-      (when (js/window.isWindows)
+      (when ua/windows?
         (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
   (when (:log-level query-params)
@@ -241,6 +244,7 @@
   (let [org (:org params)
         board (:board params)
         entry (:entry params)
+        comment (:comment params)
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
@@ -250,10 +254,11 @@
      (vec
       (remove
        nil?
-       [org board (when entry entry) route]))
+       [org board (when entry entry) (when comment comment) route]))
      {:org org
       :board board
       :activity entry
+      :comment comment
       :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
@@ -411,18 +416,6 @@
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-invite) "sign-up" target params))
 
-    (defroute signup-setup-sections-route (urls/sign-up-setup-sections ":org") {:as params}
-      (timbre/info "Routing signup-setup-sections-route" (urls/sign-up-setup-sections ":org"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
-    (defroute signup-setup-sections-slash-route (str (urls/sign-up-setup-sections ":org") "/") {:as params}
-      (timbre/info "Routing signup-setup-sections-slash-route" (str (urls/sign-up-setup-sections ":org") "/"))
-      (when-not (jwt/jwt)
-        (router/redirect! urls/sign-up))
-      (simple-handler #(onboard-wrapper :lander-sections) "sign-up" target params))
-
     (defroute slack-lander-check-route urls/slack-lander-check {:as params}
       (timbre/info "Routing slack-lander-check-route" urls/slack-lander-check)
       ;; Check if the user already have filled the needed data or if it needs to
@@ -520,8 +513,8 @@
         (router/redirect-404!))
       (simple-handler login-wall "login-wall" target params true))
 
-    (defroute desktop-login-route urls/desktop-login {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-route" urls/desktop-login)
+    (defroute native-login-route urls/native-login {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-route" urls/native-login)
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -529,8 +522,8 @@
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
-    (defroute desktop-login-slash-route (str urls/desktop-login "/") {:keys [query-params] :as params}
-      (timbre/info "Routing desktop-login-slash-route" (str urls/desktop-login "/"))
+    (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
+      (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
@@ -546,8 +539,8 @@
       (timbre/info "Routing logout-route" urls/logout)
       (cook/remove-cookie! :jwt)
       (cook/remove-cookie! :show-login-overlay)
-      (router/redirect! (if js/window.OCCarrotDesktop
-                          urls/desktop-login
+      (router/redirect! (if ua/pseudo-native?
+                          urls/native-login
                           urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
@@ -614,6 +607,14 @@
       (timbre/info "Routing entry-route" (str (urls/entry ":org" ":board" ":entry") "/"))
       (entry-handler target params))
 
+    (defroute comment-route (urls/comment-url ":org" ":board" ":entry" ":comment") {:as params}
+      (timbre/info "Routing comment-route" (urls/comment-url ":org" ":board" ":entry" ":comment"))
+      (entry-handler target params))
+
+    (defroute comment-slash-route (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/") {:as params}
+      (timbre/info "Routing comment-slash-route" (str (urls/comment-url ":org" ":board" ":entry" ":comment") "/"))
+      (entry-handler target params))
+
     (defroute not-found-route "*" []
       (timbre/info "Routing not-found-route" "*")
       ;; render component
@@ -623,14 +624,14 @@
 
     (defn handle-url-change [e]
       ;; we are checking if this event is due to user action,
-      ;; such as click a link, a back button, etc.
+      ;; such as initial page load, click a link, a back button, etc.
       ;; as opposed to programmatically setting the URL with the API
       (when-not (.-isNavigation e)
         ;; in this case, we're setting it so
         ;; let's scroll to the top to simulate a navigation
-        (if (js/isEdge)
-          (set! (.. js/document -scrollingElement -scrollTop) 0)
-          (js/window.scrollTo 0 0)))
+        (if ua/edge?
+          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+          (js/window.scrollTo (utils/page-scroll-top) 0)))
       ;; dispatch on the token
       (secretary/dispatch! (router/get-token))
       ; remove all the tooltips
@@ -647,11 +648,17 @@
    #(ja/update-jwt %) ;; success jwt refresh after expire
    #(ja/logout) ;; failed to refresh jwt
    ;; network error
-   #(notification-actions/show-notification (assoc utils/network-error :expire 10)))
+   #(notification-actions/show-notification (assoc utils/network-error :expire 5)))
 
   ;; Persist JWT in App State
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
+
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
+  ;; Get the mobile app deep link origin if we're on mobile
+  (when ua/mobile-app?
+    (expo/bridge-get-deep-link-origin))
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
