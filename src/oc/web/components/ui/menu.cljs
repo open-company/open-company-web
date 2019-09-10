@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel sel1)]
+            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.chat :as chat]
@@ -96,7 +97,12 @@
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
-        desktop-app-data (detect-desktop-app)]
+        desktop-app-data (detect-desktop-app)
+        build-version (if (seq ls/deploy-key) ls/deploy-key "local")
+        app-version (cond
+                      ua/mobile-app? [:span "Version " (expo/get-app-version) " Build " [:i build-version]]
+                      ua/desktop-app? [:span "Version " (.getElectronAppVersion js/OCCarrotDesktop) " Build " [:i build-version]]
+                      :else [:span "Version " [:i build-version]])]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -203,4 +209,7 @@
               "Sign out"]]
           [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
             [:div.oc-menu-item
-              "Sign in / Sign up"]])]]))
+              "Sign in / Sign up"]])
+        [:div.oc-menu-separator]
+        [:div.oc-menu-item.app-version
+           app-version]]]))
