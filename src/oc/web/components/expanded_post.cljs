@@ -42,9 +42,11 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn- load-comments [s]
+(defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
-    (comment-actions/get-comments activity-data)))
+    (if force?
+      (comment-actions/get-comments activity-data)
+      (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -56,6 +58,7 @@
   (drv/drv :activities-read)
   (drv/drv :add-comment-highlight)
   (drv/drv :expand-image-src)
+  (drv/drv :add-comment-force-update)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -66,10 +69,10 @@
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
-    (load-comments s)
+    (load-comments s true)
     s)
    :did-remount (fn [_ s]
-    (load-comments s)
+    (load-comments s false)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -109,7 +112,8 @@
         reads-data (get activities-read (:uuid activity-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
+        add-comment-force-update (drv/react s :add-comment-force-update)]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -192,4 +196,4 @@
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))
+          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]]))

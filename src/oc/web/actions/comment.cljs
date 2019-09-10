@@ -29,22 +29,31 @@
 
 (defn add-comment [activity-data comment-body parent-comment-uuid save-done-cb]
   (add-comment-blur)
-  ;; Send WRT read on comment add
-  (activity-actions/send-item-read (:uuid activity-data))
   (let [org-slug (router/current-org-slug)
         comments-key (dis/activity-comments-key org-slug (:uuid activity-data))
         comments-data (get-in @dis/app-state comments-key)
         add-comment-link (utils/link-for (:links activity-data) "create" "POST")
         current-user-id (jwt/user-id)
         is-publisher? (= (-> activity-data :publisher :user-id) current-user-id)
+        new-comment-uuid (utils/activity-uuid)
+        user-data (if (jwt/jwt)
+                    (jwt/get-contents)
+                    (jwt/get-id-token-contents))
+        new-comment-map {:body comment-body
+                         :created-at (utils/as-of-now)
+                         :parent-uuid parent-comment-uuid
+                         :uuid new-comment-uuid
+                         :author {:name (:name user-data)
+                                  :avatar-url (:avatar-url user-data)
+                                  :user-id (:user-id user-data)}}
         first-comment-from-user? (when-not is-publisher?
                                    (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))]
+    ;; Reset the add comment field
+    (dis/dispatch! [:add-comment-reset (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil])
     ;; Add the comment to the app-state to show it immediately
-    (dis/dispatch! [:comment-add
-                    activity-data
-                    comment-body
-                    parent-comment-uuid
-                    comments-key])
+    (dis/dispatch! [:comment-add activity-data new-comment-map parent-comment-uuid comments-key new-comment-uuid])
+    ;; Send WRT read on comment add
+    (activity-actions/send-item-read (:uuid activity-data))
     (api/add-comment add-comment-link comment-body parent-comment-uuid
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
@@ -52,21 +61,23 @@
         (save-done-cb success)
         ;; If the user is not the publisher of the post and is leaving his first comment on it
         ;; let's inform them that they are now following the post
-        (when (and success
-                   first-comment-from-user?)
-          (notification-actions/show-notification {:title "You are now following this post."
-                                                   :dismiss true
-                                                   :expire 3
-                                                   :id :first-comment-follow-post}))
+        (when success
+          (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
+          (when first-comment-from-user?
+            (notification-actions/show-notification {:title "You are now following this post."
+                                                     :dismiss true
+                                                     :expire 3
+                                                     :id :first-comment-follow-post})))
+        ; (utils/after 100 (fn [](let [comments-link (utils/link-for (:links activity-data) "comments")]
+        ;   (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))))
         (let [comments-link (utils/link-for (:links activity-data) "comments")]
           (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
-        (when success
-          (dis/dispatch! [:comment-add/finish {:success success
-                                               :error (when-not success body)
-                                               :body (when (seq body) (json->cljs body))
-                                               :activity-data activity-data}])
-          ;; If comment was succesfully added delete the cached comment
-          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil]))))))
+        ;; In case save didn't go well let's re-set the comment body in the add comment field
+        (when-not success
+          ;; Remove the newly added comment if still in the list
+          (dis/dispatch! [:comment-add/failed activity-data new-comment-map comments-key])
+          ;; Move the comment back in the body field
+          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil comment-body true]))))))
 
 (defn get-comments [activity-data]
   (comment-utils/get-comments activity-data))
@@ -108,10 +119,15 @@
         (get-comments activity-data)))))
 
 (defn react-from-picker [activity-data comment-data emoji]
-  (let [react-link (utils/link-for (:links comment-data) "react" "POST")]
+  (let [react-link (utils/link-for (:links comment-data) "react" "POST")
+        comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))]
+    (dis/dispatch! [:comment-react-from-picker comments-key activity-data comment-data emoji])
     (api/react-from-picker react-link emoji
       (fn [{:keys [status succes body]}]
         (get-comments activity-data)))))
+
+(defn- inc-time [t]
+  (.getTime (js/Date. (inc (.getTime (js/Date. t))))))
 
 (defn save-comment [activity-data comment-data new-body save-done-cb]
   ;; Send WRT on comment update
@@ -119,15 +135,23 @@
   (let [comments-key (dis/activity-comments-key
                       (router/current-org-slug)
                       (:uuid activity-data))
-        patch-comment-link (utils/link-for (:links comment-data) "partial-update")]
+        patch-comment-link (utils/link-for (:links comment-data) "partial-update")
+        updated-comment-map (merge comment-data {:body new-body
+                                                 :updated-at (inc-time (:updated-at comment-data))})]
+    ;; Add the new comment to the list of comments
+    (dis/dispatch! [:comment-save (router/current-org-slug) comments-key updated-comment-map])
+    ;; Reset the add comment field
+    (dis/dispatch! [:add-comment-reset (router/current-org-slug) (:uuid activity-data) (:reply-parent comment-data) (:uuid comment-data)])
     (api/patch-comment patch-comment-link new-body
       (fn [{:keys [success]}]
         (save-done-cb success)
-        (when success
-          (dis/dispatch! [:comment-save comments-key (:uuid activity-data) comment-data new-body])
-          (dis/dispatch! [:add-comment-remove (router/current-org-slug) (:uuid activity-data) (:reply-parent comment-data) (:uuid comment-data)])
-          (let [comments-link (utils/link-for (:links activity-data) "comments")]
-            (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %))))))))
+        (let [comments-link (utils/link-for (:links activity-data) "comments")]
+          (api/get-comments comments-link #(comment-utils/get-comments-finished comments-key activity-data %)))
+        (when-not success
+          ;; Remove the newly added comment if still in the list
+          (dis/dispatch! [:comment-save/failed activity-data comment-data comments-key])
+          ;; Move the comment back in the body field
+          (dis/dispatch! [:add-comment-change (router/current-org-slug) (:uuid activity-data) (:parent-uuid comment-data) (:uuid comment-data) new-body true]))))))
 
 (defn ws-comment-update
   [interaction-data]
@@ -144,19 +168,23 @@
 (defn ws-comment-add [interaction-data]
   (let [org-slug   (router/current-org-slug)
         activity-uuid (:resource-uuid interaction-data)
-        entry-data (dis/activity-data org-slug activity-uuid)]
-    (when entry-data
+        entry-data (dis/activity-data org-slug activity-uuid)
+        new-comment-uuid (:uuid (:interaction interaction-data))
+        comments-data (get-in @dis/app-state (dis/activity-comments-key org-slug activity-uuid))
+        comment-exists? (seq (filterv #(= (:uuid %) new-comment-uuid) comments-data))]
+    (when (and entry-data
+               (not comment-exists?))
       ;; Refresh the entry data to get the new links to interact with
-      (activity-actions/get-entry entry-data))
-    (dis/dispatch! [:ws-interaction/comment-add
-                    org-slug
-                    entry-data
-                    interaction-data])
-    (dis/dispatch! [:input [:add-comment-highlight] (:uuid (:interaction interaction-data))])))
+      (activity-actions/get-entry entry-data)
+      (dis/dispatch! [:ws-interaction/comment-add
+                      org-slug
+                      entry-data
+                      interaction-data]))
+    (dis/dispatch! [:input [:add-comment-highlight] new-comment-uuid])))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add
-                   #(ws-comment-add (:data %)))
+                   #(utils/after 0 (fn [] (ws-comment-add (:data %)))))
   (ws-ic/subscribe :interaction-comment/update
                    #(ws-comment-update (:data %)))
   (ws-ic/subscribe :interaction-comment/delete

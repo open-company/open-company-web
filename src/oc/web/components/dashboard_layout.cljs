@@ -38,6 +38,7 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
+                              (drv/drv :container-data)
                               (drv/drv :filtered-posts)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
@@ -48,6 +49,7 @@
                               (drv/drv :cmail-data)
                               (drv/drv :user-notifications)
                               (drv/drv :mobile-user-notifications)
+                              (drv/drv :activity-data)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -77,17 +79,23 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
+        container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
+        ;; Board data used as fallback until the board is completely loaded
+        org-board-data (first (filter #(= (:slug %) (router/current-board-slug)) (:boards org-data)))
         route (drv/react s :route)
         team-data (drv/react s :team-data)
+        activity-data (drv/react s :activity-data)
         is-all-posts (utils/in? (:route route) "all-posts")
         is-follow-ups (utils/in? (:route route) "follow-ups")
-        is-must-see (utils/in? (:route route) "must-see")
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
-        empty-board? (zero? (count posts-data))
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
+        current-board-data (or board-data org-board-data)
+        board-container-data (if (or is-all-posts is-follow-ups) container-data board-data)
+        empty-board? (and (map? board-container-data)
+                          (zero? (count (:posts-list board-container-data))))
+        is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -100,7 +108,6 @@
         should-show-settings-bt (and (router/current-board-slug)
                                      (not is-all-posts)
                                      (not is-follow-ups)
-                                     (not is-must-see)
                                      (not (:read-only board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
@@ -169,9 +176,9 @@
                   (when (router/current-board-slug)
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access board-data) "private")
+                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board))
-                                                  :public (= (:access board-data) "public")})
+                                                  :public (= (:access current-board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-all-posts
                                                    "All posts"
@@ -179,12 +186,12 @@
                                                    is-follow-ups
                                                    "Follow-ups"
 
-                                                   is-must-see
-                                                   "Must see"
-
                                                    :default
-                                                   (:name board-data)))}]])
-                  (when (and (= (:access board-data) "private")
+                                                   ;; Fallback to the org board data
+                                                   ;; to avoid showing an empty name while loading
+                                                   ;; the board data
+                                                   (:name current-board-data)))}]])
+                  (when (and (= (:access current-board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board
                       {:data-toggle "tooltip"
@@ -194,7 +201,7 @@
                        :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}])
-                  (when (= (:access board-data) "public")
+                  (when (= (:access current-board-data) "public")
                     [:div.public-board
                       {:data-toggle "tooltip"
                        :data-placement "top"
@@ -208,8 +215,8 @@
                         {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
                          :data-placement "top"
                          :data-container "body"
-                         :title (str (:name board-data) " settings")
-                         :on-click #(nav-actions/show-section-editor (:slug board-data))}]])]
+                         :title (str (:name current-board-data) " settings")
+                         :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
                 (when-not is-drafts-board
                   (let [default-sort (= board-sort dis/default-sort-type)]
                     [:div.board-sort.group
@@ -271,7 +278,8 @@
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; Expanded post
-              current-activity-id
+              (and current-activity-id
+                   activity-data)
               (expanded-post)
               ;; Empty board
               empty-board?
@@ -279,5 +287,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" is-must-see "MS" :else (:slug board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" :else (:slug current-board-data)) "-" board-sort))
               )]]]))
