@@ -654,12 +654,6 @@
   (ja/dispatch-jwt)
   (ja/dispatch-id-token)
 
-  ;; Recall Expo push token into app state (push notification permission)
-  (user-actions/recall-expo-push-token)
-  ;; Get the mobile app deep link origin if we're on mobile
-  (when ua/mobile-app?
-    (expo/bridge-get-deep-link-origin))
-
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
@@ -668,6 +662,14 @@
   (ra/subscribe)
   (ca/subscribe)
   (user-actions/subscribe)
+
+  ;; Recall Expo push token into app state (push notification permission)
+  (user-actions/recall-expo-push-token)
+  (when ua/mobile-app?
+    ;; Get the mobile app deep link origin if we're on mobile
+    (expo/bridge-get-deep-link-origin)
+    ;; Handle pending push notification taps now that the app is loaded
+    (expo/handle-pending-notification-tap))
 
   ;; Start the app update check cicle
   (web-app-update-actions/start-web-app-update-check!)

@@ -191,6 +191,8 @@ var OCWebStaticOpenIntegrationsPanel = function() {};
 // Mobile app (Expo)
 var ReactNativeWebView = {};
 ReactNativeWebView.postMessage = function() {};
+var OCCarrotMobile = {};
+OCCarrotMobile.pendingNotificationTap = {};
 // Desktop app (Electron)
 var OCCarrotDesktop = function(){};
 OCCarrotDesktop.showDesktopWindow = function() {};

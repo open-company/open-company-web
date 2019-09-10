@@ -66,6 +66,11 @@
           click-handler (:click fixed-notif)]
       (click-handler))))
 
+(defn handle-pending-notification-tap
+  []
+  (when-let [pending-notif-json-str js/window.OCCarrotMobile.pendingNotificationTap]
+    (on-push-notification-tapped pending-notif-json-str)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
 
