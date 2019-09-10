@@ -666,10 +666,6 @@
   ;; Recall Expo push token into app state (push notification permission)
   (user-actions/recall-expo-push-token)
 
-  ;; Initialize the mobile/web bridge
-  (when ua/mobile-app?
-    (expo/init-bridge!))
-
   ;; Start the app update check cicle
   (web-app-update-actions/start-web-app-update-check!)
 
@@ -678,7 +674,12 @@
   ;; setup the router navigation only when handle-url-change and route-disaptch!
   ;; are defined, this is used to avoid crash on tests
   (when handle-url-change
-    (router/setup-navigation! handle-url-change)))
+    (router/setup-navigation! handle-url-change))
+
+  ;; Initialize the mobile/web bridge
+  ;; Must be done AFTER navigation has been set up
+  (when ua/mobile-app?
+    (expo/init-bridge!)))
 
 (defn on-js-reload []
   (.clear js/console)
