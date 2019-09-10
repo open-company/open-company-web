@@ -120,7 +120,9 @@
         (get-comments activity-data)))))
 
 (defn react-from-picker [activity-data comment-data emoji]
-  (let [react-link (utils/link-for (:links comment-data) "react" "POST")]
+  (let [react-link (utils/link-for (:links comment-data) "react" "POST")
+        comments-key (dis/activity-comments-key (router/current-org-slug) (:uuid activity-data))]
+    (dis/dispatch! [:comment-react-from-picker comments-key activity-data comment-data emoji])
     (api/react-from-picker react-link emoji
       (fn [{:keys [status succes body]}]
         (get-comments activity-data)))))

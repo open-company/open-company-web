@@ -161,6 +161,40 @@
         (assoc-in db comments-key new-comments-data))
       db)))
 
+(defmethod dispatcher/action :comment-react-from-picker
+  [db [_ comments-key activity-data comment-data reaction]]
+  (let [comments-data (get-in db comments-key)
+        comment-idx (utils/index-of comments-data #(= (:uuid comment-data) (:uuid %)))]
+    ;; the comment has yet to be stored locally in app state so ignore and
+    ;; wait for server side reaction
+    (if comment-idx
+      (let [old-comment-data (nth comments-data comment-idx)
+            reactions-data (:reactions old-comment-data)
+            reaction-idx (utils/index-of reactions-data #(= (:reaction %) reaction))
+            reaction-data (when reaction-idx
+                            (get reactions-data reaction-idx))
+            reacted? (if reaction-data
+                       (not (:reacted reaction-data))
+                       true)
+            old-link (when reaction-data
+                       (first (:links reaction-data)))
+            new-link (when old-link
+                       (assoc old-link :method (if reacted? "DELETE" "PUT")))
+            new-count (if reacted?
+                        (inc (:count reaction-data))
+                        (dec (:count reaction-data)))
+            new-reaction-data {:links [new-link]
+                               :reacted reacted?
+                               :reaction reaction
+                               :count new-count}
+            new-reactions-data (if reaction-idx
+                                 (assoc reactions-data reaction-idx new-reaction-data)
+                                 (conj reactions-data new-reaction-data))
+            new-comment-data (assoc comment-data :reactions new-reactions-data)
+            new-comments-data (assoc comments-data comment-idx new-comment-data)]
+        (assoc-in db comments-key new-comments-data))
+      db)))
+
 (defmethod dispatcher/action :comment-save
   [db [_ org-slug comments-key updated-comment-map]]
   (let [all-comments (get-in db comments-key)
