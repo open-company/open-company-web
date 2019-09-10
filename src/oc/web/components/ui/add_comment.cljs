@@ -74,6 +74,8 @@
                           :expire 3
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))
         complete? @(::complete-follow-up s)]
+    (reset! (::add-button-disabled s) true)
+    (set! (.-innerHTML add-comment-div) "")
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
@@ -136,15 +138,6 @@
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
                          (rum/local false ::complete-follow-up)
-                         ;; Force update key, we have 2 versions: one in the app-state
-                         ;; one local. They are set up equally when the component is mounted
-                         ;; When it changes in the app-state we can compare
-                         ;; and force the add comment field to change it's body
-                         ;; with the new one
-                         ;; Used to force clean the field or to re-add the body
-                         ;; when a comment POST fails
-                         (drv/drv :add-comment-force-update)
-                         (rum/local nil ::add-comment-force-update)
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -168,12 +161,9 @@
                                 edit-comment-data (get (vec (:rum/args s)) 3 nil)
                                 add-comment-key (str (:uuid activity-data) "-" parent-comment-uuid "-" (:uuid edit-comment-data))
                                 activity-add-comment-data (get add-comment-data add-comment-key)
-                                add-comment-activity-data (get add-comment-data (:uuid activity-data))
-                                force-update-uuid (utils/activity-uuid)]
+                                add-comment-activity-data (get add-comment-data (:uuid activity-data))]
                             (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
-                            (reset! (::show-post-button s) (should-focus-field? s))
-                            (reset! (::add-comment-force-update s) force-update-uuid)
-                            (dis/dispatch! [:input [:add-comment-force-update add-comment-key] force-update-uuid]))
+                            (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
                           :did-mount (fn [s]
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
@@ -198,21 +188,6 @@
                                 (if (map? video-data)
                                   (me-media-utils/media-video-add s @(:me/media-picker-ext s) video-data)
                                   (me-media-utils/media-video-add s @(:me/media-picker-ext s) nil))))
-                           ;; Handle force updates of the add comment body
-                           (let [args (vec (:rum/args s))
-                                 activity-data (first args)
-                                 parent-comment-uuid (second args)
-                                 edit-comment-data (get (vec (:rum/args s)) 3 nil)
-                                 add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
-                                 add-comment-force-update @(drv/get-ref s :add-comment-force-update)
-                                 force-update (get add-comment-force-update add-comment-key)]
-                             (when-not (= @(::add-comment-force-update s) force-update)
-                               (reset! (::add-comment-force-update s) force-update)
-                               (let [add-comment-data @(drv/get-ref s :add-comment-data)
-                                     activity-add-comment-data (get add-comment-data add-comment-key)
-                                     add-comment-text (or activity-add-comment-data "")]
-                                 (reset! (::add-button-disabled s) (clojure.string/blank? add-comment-text))
-                                 (reset! (::initial-add-comment s) add-comment-text))))
                            s)
                           :will-unmount (fn [s]
                            (when @(:me/editor s)
@@ -223,7 +198,6 @@
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _team-roster (drv/react s :team-roster)
-        _add-comment-force-update (drv/react s :add-comment-force-update)
         add-comment-focus (drv/react s :add-comment-focus)
         current-user-data (drv/react s :current-user-data)
         add-comment-class (str "add-comment-" @(::add-comment-id s))

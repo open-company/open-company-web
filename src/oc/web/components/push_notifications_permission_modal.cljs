@@ -5,7 +5,7 @@
             [oc.web.expo :as expo]))
 
 (rum/defcs push-notifications-permission-modal < no-scroll-mixin
-  [s {:keys [org-data] :as props}]
+  [s]
   [:div.push-notifications-permission-modal
    [:div.modal-header
     [:button.modal-close-bt
@@ -15,12 +15,10 @@
     [:div.carrot-icon
      [:div.notification-bubble "3"]]
     [:p.modal-body-text
-     (str "Ensure you never miss out on important communications from "
-          (:name org-data)
-          ".")]
+     "Get notified when your team shares on Carrot"]
     [:button.mlb-reset.enable-notifications-bt
      {:on-click #(expo/bridge-request-push-notification-permission!)}
      "Enable notifications"]
     [:button.mlb-reset.no-thanks-btn
      {:on-click #(user-actions/deny-push-notification-permission)}
-     "No thanks"]]])
+     "No thanks, skip for now"]]])

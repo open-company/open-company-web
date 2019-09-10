@@ -71,3 +71,6 @@
 
 ;; Giphy
 (def giphy-api-key "M2FfNXledXWbpa7FZkg2vvUD8kHMTQVF")
+
+;; Image upload limit
+(def file-upload-size (* 20 1024 1024))
