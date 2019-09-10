@@ -86,3 +86,25 @@
   (when-let [origin (parse-bridge-data json-str)]
     (bridge-log! origin)
     (reset! deep-link-origin origin)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Grabbing the app version from the expo wrapper
+
+(def ^:private app-version (atom nil))
+
+(defn get-app-version
+  []
+  @app-version)
+
+(defn bridge-get-app-version
+  ""
+  []
+  (bridge-call! "get-app-version" nil))
+
+(defn- ^:export on-app-version
+  ""
+  [av]
+  (when av
+    (bridge-log! (str "on-app-version " av))
+    (reset! app-version av)))
