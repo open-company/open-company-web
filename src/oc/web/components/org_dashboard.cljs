@@ -236,7 +236,7 @@
           (menu))
         ;; Mobile push notifications permission
         (when show-push-notification-permissions-modal?
-          (push-notifications-permission-modal {:org-data org-data}))
+          (push-notifications-permission-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))

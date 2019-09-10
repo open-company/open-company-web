@@ -53,13 +53,5 @@ div.empty-board {
       line-height: 20px;
       margin: 16px auto 0;
     }
-
-    div.empty-board-subtitle {
-      @include OC_Body_Book();
-      font-size: 14px;
-      color: $ui_grey;
-      line-height: 18px;
-      margin: 6px auto 0;
-    }
   }
 }

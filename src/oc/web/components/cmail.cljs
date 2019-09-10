@@ -417,6 +417,9 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
+                    (let [cmail-state @(drv/get-ref s :cmail-state)]
+                      (when-not (:collapsed cmail-state)
+                        (utils/after 1000 #(.focus (body-element)))))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -424,6 +427,7 @@
                       (when (not= @(::latest-key s) (:key cmail-state))
                         (when @(::latest-key s)
                           (let [cmail-data @(drv/get-ref s :cmail-data)
+                                cmail-state @(drv/get-ref s :cmail-state)
                                 initial-body (if (seq (:body cmail-data))
                                                (:body cmail-data)
                                                "")
@@ -450,7 +454,9 @@
                               abstract-exceeds :abstract
                               (not (seq (:headline cmail-data))) :title
                               :else nil))
-                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
+                            (when-not (:collapsed cmail-state)
+                              (utils/after 1000 #(.focus (body-element))))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
