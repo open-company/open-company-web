@@ -62,11 +62,8 @@
         save-done-cb (fn [success]
                       (reset! (::add-button-disabled s) false)
                       (if success
-                        (do
-                          (when add-comment-div
-                            (set! (.-innerHTML add-comment-div) ""))
-                          (when (fn? dismiss-reply-cb)
-                            (dismiss-reply-cb false)))
+                        (when add-comment-div
+                          (set! (.-innerHTML add-comment-div) ""))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
@@ -79,6 +76,8 @@
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
+    (when (fn? dismiss-reply-cb)
+      (dismiss-reply-cb false))
     (when complete?
       (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
             show-follow-up-button? (and follow-up
