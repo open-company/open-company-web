@@ -197,7 +197,7 @@
                                                 ", marked for follow-up")]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
-                   :class (utils/class-set {:seen (:seen u)
+                   :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
                                             :sent user-sending-notice})}
                   [:div.wrt-popup-list-row-avatar
                     {:class (when (:seen u) "seen")}

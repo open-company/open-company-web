@@ -38,7 +38,7 @@ div.paginated-stream {
         height: calc(100vh - 50px);
         width: #{$board_container_width}px;
         margin-left: -244px;
-        background-color: $oc_gray_8;
+        background-color: $grey_num_2;
         text-align: center;
 
         @include mobile() {

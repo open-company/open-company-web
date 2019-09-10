@@ -46,8 +46,7 @@
   (let [activity-data @(drv/get-ref s :activity-data)]
     (if force?
       (comment-actions/get-comments activity-data)
-      (let [comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
-        (comment-actions/get-comments-if-needed activity-data comments-data)))))
+      (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -59,6 +58,7 @@
   (drv/drv :activities-read)
   (drv/drv :add-comment-highlight)
   (drv/drv :expand-image-src)
+  (drv/drv :add-comment-force-update)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -84,7 +84,8 @@
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         route (drv/react s :route)
-        back-to-slug (or (:back-to route) (:board route))
+        org-data (dis/org-data)
+        back-to-slug (utils/back-to org-data)
         is-all-posts? (= back-to-slug "all-posts")
         is-follow-ups? (= back-to-slug "follow-ups")
         back-to-label (str "Back to "
@@ -106,12 +107,13 @@
                         :height @(::mobile-video-height s)}
                        {:width 638
                         :height (utils/calc-video-height 638)}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
+        add-comment-force-update (drv/react s :add-comment-force-update)]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -163,7 +165,7 @@
                  (when (= (:board-access activity-data) "public")
                    " (public)")
                  " on "
-                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]
+                 (utils/tooltip-date (:published-at activity-data)))]
           (if (and assigned-follow-up-data
                    (not (:completed? assigned-follow-up-data)))
             [:div.follow-up-tag]
@@ -194,4 +196,4 @@
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))
+          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]]))

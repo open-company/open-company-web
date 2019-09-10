@@ -203,7 +203,7 @@
                                 (will-close))
                               (when (fn? comment-share-cb)
                                 (comment-share-cb)))}
-                "Share"])])
+                "Copy link"])])
         (when (and external-share
                    share-link)
           [:button.mlb-reset.more-menu-share-bt
