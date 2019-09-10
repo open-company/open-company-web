@@ -66,12 +66,6 @@
           click-handler (:click fixed-notif)]
       (click-handler))))
 
-(defn handle-pending-notification-tap
-  []
-  (when-let [pending-notif-json-str (and js/window.OCCarrotMobile
-                                         js/window.OCCarrotMobile.pendingNotificationTap)]
-    (on-push-notification-tapped pending-notif-json-str)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
 
@@ -92,3 +86,15 @@
   (when-let [origin (parse-bridge-data json-str)]
     (bridge-log! origin)
     (reset! deep-link-origin origin)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Initialization
+
+(defn- bridge-ready!
+  []
+  (bridge-call! "ready" nil))
+
+(defn init-bridge!
+  []
+  (bridge-get-deep-link-origin)
+  (bridge-ready!))

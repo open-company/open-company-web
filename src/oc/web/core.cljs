@@ -665,11 +665,10 @@
 
   ;; Recall Expo push token into app state (push notification permission)
   (user-actions/recall-expo-push-token)
+
+  ;; Initialize the mobile/web bridge
   (when ua/mobile-app?
-    ;; Get the mobile app deep link origin if we're on mobile
-    (expo/bridge-get-deep-link-origin)
-    ;; Handle pending push notification taps now that the app is loaded
-    (expo/handle-pending-notification-tap))
+    (expo/init-bridge!))
 
   ;; Start the app update check cicle
   (web-app-update-actions/start-web-app-update-check!)
