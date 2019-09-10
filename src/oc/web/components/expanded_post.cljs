@@ -46,8 +46,7 @@
   (let [activity-data @(drv/get-ref s :activity-data)]
     (if force?
       (comment-actions/get-comments activity-data)
-      (let [comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
-        (comment-actions/get-comments-if-needed activity-data comments-data)))))
+      (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
