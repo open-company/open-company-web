@@ -68,7 +68,8 @@
 
 (defn handle-pending-notification-tap
   []
-  (when-let [pending-notif-json-str js/window.OCCarrotMobile.pendingNotificationTap]
+  (when-let [pending-notif-json-str (and js/window.OCCarrotMobile
+                                         js/window.OCCarrotMobile.pendingNotificationTap)]
     (on-push-notification-tapped pending-notif-json-str)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
