@@ -58,6 +58,7 @@
   (drv/drv :activities-read)
   (drv/drv :add-comment-highlight)
   (drv/drv :expand-image-src)
+  (drv/drv :add-comment-force-update)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -110,7 +111,8 @@
         reads-data (get activities-read (:uuid activity-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
+        add-comment-force-update (drv/react s :add-comment-force-update)]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -193,4 +195,4 @@
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))
+          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]]))
