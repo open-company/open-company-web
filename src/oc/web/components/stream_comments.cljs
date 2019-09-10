@@ -110,6 +110,7 @@
       "Cancel"]
     (react-utils/build (.-Picker js/EmojiMart)
       {:native true
+       :autoFocus true
        :onClick (fn [emoji event]
                   (add-emoji-cb emoji))})])
 
@@ -266,7 +267,7 @@
                                     "Delete"])
                                 [:button.mlb-reset.share-bt
                                   {:on-click #(share-clicked comment-data)}
-                                  "Share"]])
+                                  "Copy link"]])
                             ;; More menu button or share button (depends if user is author of the comment)
                             (if (or can-show-edit-bt?
                                     can-show-delete-bt?)
@@ -285,7 +286,7 @@
                                                                                        :expire 3
                                                                                        :id (keyword (str "comment-url-copied-"
                                                                                         (:uuid comment-data)))}))
-                                 :title "Share"}])
+                                 :title "Copy link"}])
                             ;; Reply to comment
                             (when (:reply-parent comment-data)
                               [:button.mlb-reset.floating-bt.reply-bt
@@ -299,6 +300,7 @@
                                 {:data-toggle "tooltip"
                                  :data-placement "top"
                                  :title "Add reaction"
+                                 :class (when (or can-show-edit-bt? can-show-delete-bt?) "has-more-menu")
                                  :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
                               (when showing-picker?
                                 (emoji-picker-container s comment-data))]]]))
