@@ -260,7 +260,7 @@
         [:div.testimonial-copy-footer
           "— Sara Vienna, Head of Design at "
           [:a.testimonial-copy-link
-            {:href "https://blend.com"
+            {:href "https://bl3ndlabs.com/"
              :target "_blank"}
             "Bl3NDlabs"]]]]
     dashed-string
