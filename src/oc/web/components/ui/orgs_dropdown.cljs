@@ -27,7 +27,8 @@
                            (drv/drv :org-data)
                            (drv/drv :orgs-dropdown-visible)
                            (on-window-click-mixin (fn [s e]
-                            (when-not (utils/event-inside? e (rum/dom-node s))
+                            (when (and @(drv/get-ref s :orgs-dropdown-visible)
+                                        (not (utils/event-inside? e (rum/dom-node s))))
                               (dis/dispatch! [:input [:orgs-dropdown-visible] false]))))
   [s]
   (let [orgs (drv/react s :orgs)
