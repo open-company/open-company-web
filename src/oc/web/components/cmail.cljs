@@ -784,7 +784,8 @@
         [:div.cmail-footer
           (when (and (not= (:status cmail-data) "published")
                      (not is-mobile?))
-            (if (:auto-saving cmail-data)
+            (if (or (:has-changes cmail-data)
+                    (:auto-saving cmail-data))
               [:div.saving-saved "Saving..."]
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))]
