@@ -197,7 +197,7 @@
     [:div.keep-aligned-title
       "It’s never been easier to keep everyone on the same page"]
     [:button.mlb-reset.get-started-button.get-started-action
-      "Create your team - It's free"]])
+      "Create your team. It’s free!"]])
 
 (def keep-aligned-bottom
   [:section.keep-aligned
@@ -217,7 +217,7 @@
         {:src (utils/cdn "/img/ML/homepage_bottom_section_decisions.png")
          :srcSet (str (utils/cdn "/img/ML/homepage_bottom_section_decisions@2x.png") " 2x")}]]
     [:button.mlb-reset.get-started-button.get-started-action
-      "Create your team - It's free"]])
+      "Create your team. It’s free!"]])
 
 (defn slack-email-switch [slack?]
   [:div.slack-email-container.group.big-web-only
@@ -329,7 +329,7 @@
                "in the noise.")]
             [:div.keep-aligned-section-footer
               [:button.mlb-reset.create-team-bt.get-started-action
-                "Create your team - it’s free"]]]
+                "Create your team. It’s free!"]]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-3.big-web-tablet-only
               {:src (utils/cdn (str "/img/ML/homepage_screenshots_third_row" (if slack? "_slack" "") ".png"))
@@ -350,7 +350,7 @@
                "to get caught up fast - perfect for remote teams.")]
             [:div.keep-aligned-section-footer
               [:button.mlb-reset.create-team-bt.get-started-action
-                "Create your team - it’s free"]]
+                "Create your team. It’s free!"]]
             (slack-email-switch slack?)]
           [:div.keep-aligned-section-row-left
             [:div.keep-aligned-section-carion-container
@@ -380,7 +380,7 @@
                "through.")]
             [:div.keep-aligned-section-footer
               [:button.mlb-reset.create-team-bt.get-started-action
-                "Create your team - it’s free"]]]
+                "Create your team. It’s free!"]]]
           [:div.keep-aligned-section-row-right
             [:img.keep-aligned-section-screenshot.screenshot-2.big-web-tablet-only
               {:src (utils/cdn "/img/ML/homepage_screenshots_second_row.png")

@@ -38,138 +38,26 @@ span.go-to-digest {
 }
 
 nav.site-navbar {
-  height: 64px;
+  height: 60px;
   position: fixed;
   width: 100%;
   z-index: 100;
   background-color: transparent;
   border-bottom: 1px solid transparent;
-  transform: background-color 180ms, border-bottom 180ms;
+  background-color: $ultra_light_gold;
 
   @include tablet() {
     height: 72px;
   }
 
   &.sticky {
-    background-color: white;
-    border-bottom: 1px solid rgba($ui_grey, 0.2);
-    height: 56px;
-
-    div.site-navbar-container {
-      padding: 12px 16px;
-      height: 56px;
-
-      @include tablet() {
-        padding: 14px 24px;
-        width: 100%;
-      }
-
-      div.mobile-ham-menu {
-        display: none;
-
-        @include tablet() {
-          display: block;
-          position: absolute;
-          height: 24px;
-          top: 16px;
-        }
-      }
-
-      a.navbar-brand-left {
-        display: block;
-        margin: 4px 0px 0px;
-        width: 99px;
-        height: 24px;
-        background-size: 99px 24px;
-        display: block;
-
-        @include tablet() {
-          margin: 2px 0px 0px -50px;
-        }
-      }
-
-      div.navbar-brand-center {
-        margin: 2px auto 0px;
-      }
-
-      &.is-slack-header {
-        div.navbar-brand-center {
-          display: none;
-        }
-
-        div.site-navbar-right {
-          margin-top: -4px;
-        }
-
-      }
-
-      div.site-navbar-right {
-        height: 40px;
-        margin-top: -34px;
-
-        @include tablet() {
-          margin-top: -6px;
-        }
-
-        @include mobile() {
-          margin-top: 0;
-          height: 30px;
-
-          a.your-digest {
-            margin-top: 0;
-            height: 30px;
-          }
-        }
-
-        a.login {
-          height: 40px;
-          padding: 10px 24px;
-
-          @include mobile() {
-            height: 30px;
-            padding: 5px 12px;
-          }
-        }
-
-        a.start {
-          border-radius: 8px;
-          background-color: #FB5E48;
-          color: white;
-          height: 40px;
-          padding: 10px 24px;
-
-          @include mobile() {
-            height: 30px;
-            padding: 2px 12px;
-          }
-
-          span.slack-orange-icon {
-            @include image-2x("/img/ML/slack_white_icon");
-          }
-
-          span.start-copy {
-            position: relative;
-            top: 0px;
-          }
-
-          &:not(.your-digest).slack-get-started {
-            height: 40px;
-            background-color: #FB5E48;
-            color: white;
-
-            @include mobile() {
-              height: 30px;
-              padding: 2px 12px;
-            }
-          }
-        }
-      }
-    }
+    border-bottom: 1px solid rgba($carrot_dark_brown_1, 0.1);
+    height: 60px;
   }
 
   div.site-navbar-container {
-    height: 64px;
-    padding: 24px 16px 0px;
+    height: 60px;
+    padding: 16px;
     position: relative;
     max-width: 1209px;
     margin: 0 auto;
@@ -239,13 +127,10 @@ nav.site-navbar {
     }
 
     div.site-navbar-right {
-      float: right;
-      margin-top: -34px;
-      height: 40px;
-
-      @include tablet() {
-        margin-top: -6px;
-      }
+      position: absolute;
+      height: 28px;
+      right: 16px;
+      top: 16px;
 
       @include mobile() {
         height: 30px;
@@ -256,23 +141,22 @@ nav.site-navbar {
         }
       }
 
-      a {
-        margin: 0px 0px 0px 8px;
-        text-transform: uppercase;
+      span.login-signup-or {
+        color: $deep_navy;
+        @include OC_Body_Book();
+        font-size: 18px;
+        margin: 0 6px;
       }
 
-      a.login {
-        min-width: 96px;
-        height: 40px;
-        color: $ui_grey;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        padding: 10px 24px;
+      a.login, a.signup {
+        height: 28px;
+        color: $carrot_green;
+        @include OC_Body_Book();
+        font-size: 18px;
+        padding: 0;
+        margin: 0;
         text-align: center;
         margin-top: 0;
-        border-radius: 8px;
-        opacity: 0.8;
-        float: left;
 
         @include mobile() {
           height: 30px;
@@ -295,102 +179,102 @@ nav.site-navbar {
         }
       }
 
-      a.start {
-        min-width: 84px;
-        height: 40px;
-        border-radius: 8px;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        color: #FB5E48;
-        background-color: $coral;
-        padding: 10px 24px;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 0;
-        opacity: 0.8;
+      // a.start {
+      //   min-width: 84px;
+      //   height: 40px;
+      //   border-radius: 8px;
+      //   @include OC_Body_Bold();
+      //   font-size: 14px;
+      //   color: #FB5E48;
+      //   background-color: $coral;
+      //   padding: 10px 24px;
+      //   text-align: center;
+      //   display: flex;
+      //   justify-content: center;
+      //   align-items: center;
+      //   margin-top: 0;
+      //   opacity: 0.8;
 
-        &:active, &:focus {
-          text-decoration: none;
-        }
+      //   &:active, &:focus {
+      //     text-decoration: none;
+      //   }
 
-        @include mobile() {
-          height: 30px;
-          width: auto;
-          text-align: center;
-          padding: 4px 12px;
-          font-size: 13px;
-          letter-spacing: 0.46px;
-          min-width: 64px;
+      //   @include mobile() {
+      //     height: 30px;
+      //     width: auto;
+      //     text-align: center;
+      //     padding: 4px 12px;
+      //     font-size: 13px;
+      //     letter-spacing: 0.46px;
+      //     min-width: 64px;
 
-          span.slack-copy {
-            top: 2px;
-            position: relative;
-          }
+      //     span.slack-copy {
+      //       top: 2px;
+      //       position: relative;
+      //     }
 
-          span.copy {
-            top: 2px;
-            position: relative; 
-          }
-        }
+      //     span.copy {
+      //       top: 2px;
+      //       position: relative; 
+      //     }
+      //   }
 
-        span.slack-orange-icon {
-          width: 16px;
-          height: 16px;
-          background-image: cdnUrl("/img/ML/slack_orange_icon_1.svg");
-          background-repeat: no-repeat;
-          background-size: 16px 16px;
-          margin-right: 6px;
-          position: relative;
-          margin-top: -3px;
+      //   span.slack-orange-icon {
+      //     width: 16px;
+      //     height: 16px;
+      //     background-image: cdnUrl("/img/ML/slack_orange_icon_1.svg");
+      //     background-repeat: no-repeat;
+      //     background-size: 16px 16px;
+      //     margin-right: 6px;
+      //     position: relative;
+      //     margin-top: -3px;
 
-          @include tablet() {
-            display: none;
-          }
-        }
+      //     @include tablet() {
+      //       display: none;
+      //     }
+      //   }
 
-        &:not(.your-digest).slack-get-started {
-          height: 40px;
-          background-color: $coral;
-          font-size: 16px;
-          color: #FB5E48;
-          text-align: left;
-          padding: 2px 24px 0;
+      //   &:not(.your-digest).slack-get-started {
+      //     height: 40px;
+      //     background-color: $coral;
+      //     font-size: 16px;
+      //     color: #FB5E48;
+      //     text-align: left;
+      //     padding: 2px 24px 0;
 
-          &.slack {
-            padding: 5px 24px 0;
-          }
+      //     &.slack {
+      //       padding: 5px 24px 0;
+      //     }
 
-          @media screen and (max-width: 320px) {
-            display: none;
-          }
-        }
+      //     @media screen and (max-width: 320px) {
+      //       display: none;
+      //     }
+      //   }
 
-        &.your-digest {
-          height: unset;
-          border: none;
-          border-radius: 8px;
-          background-color: $carrot_green;
-          padding: 0px;
-          margin-top: 0;
-          opacity: 1;
-        }
+      //   &.your-digest {
+      //     height: unset;
+      //     border: none;
+      //     border-radius: 8px;
+      //     background-color: $carrot_green;
+      //     padding: 0px;
+      //     margin-top: 0;
+      //     opacity: 1;
+      //   }
 
-        &:hover {
-          text-decoration: none;
-          opacity: 1;
-        }
-      }
+      //   &:hover {
+      //     text-decoration: none;
+      //     opacity: 1;
+      //   }
+      // }
     }
 
     a.navbar-brand-left {
       float: left;
       margin: 0;
-      width: 164px;
-      height: 40px;
+      width: 118px;
+      height: 28px;
       background-image: cdnUrl("/img/ML/carrot_wordmark.svg");
-      background-size: 164px 40px;
+      background-size: 118px 28px;
       background-repeat: no-repeat;
       padding: 0;
 
@@ -421,7 +305,7 @@ nav.site-navbar {
     div.navbar-brand-center {
       width: 327px;
       height: 28px;
-      margin: 6px auto 0px;
+      margin: 0 auto;
       text-align: center;
 
       @include tablet() {
@@ -434,13 +318,13 @@ nav.site-navbar {
         display: inline-block;
         font-size: 18px;
         line-height: 28px;
-        color: $ui_grey;
+        color: $carrot_dark_brown_1;
         margin: 0px;
         height: 28px;
 
         &.active {
           @include OC_Body_Bold();
-          color: $deep_navy;
+          color: rgba($carrot_dark_brown_1, 0.5);
         }
       }
     }

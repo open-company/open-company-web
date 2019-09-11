@@ -37,7 +37,7 @@
           [:div.get-started-button-container.group
             [:button.mlb-reset.get-started-button
               {:id "get-started-centred-bt"}
-              "Create your team - It's free"]]
+              "Create your team. It’s free!"]]
 
           [:div.main-animation-container
             [:img.main-animation

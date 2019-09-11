@@ -1,5 +1,6 @@
 (ns oc.core
   (:require [oc.pages :as pages]
+            [oc.pages.shared :as shared]
             [boot.util :as util]
             [hiccup.page :as hp]
             [environ.core :refer (env)]))
@@ -23,9 +24,9 @@
     pages/google-fonts
     pages/bootstrap-css
     ;; Local css
-    [:link {:href (pages/cdn "/css/app.main.css"), :rel "stylesheet"}]
+    [:link {:href (shared/cdn "/css/app.main.css"), :rel "stylesheet"}]
     ;; Fallback for the CDN compacted css
-    [:link {:href (pages/cdn "/main.css") :rel "stylesheet"}]
+    [:link {:href (shared/cdn "/main.css") :rel "stylesheet"}]
     ;; HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
     ;; WARNING: Respond.js doesn't work if you view the page via file://
     "<!--[if lt IE 9]>
@@ -34,14 +35,14 @@
     <![endif]-->"
     pages/font-awesome
     ;; Favicon
-    [:link {:rel "icon" :type "image/png" :href (pages/cdn "/img/carrot_logo.png") :sizes "64x64"}]
+    [:link {:rel "icon" :type "image/png" :href (shared/cdn "/img/carrot_logo.png") :sizes "64x64"}]
     ;; jQuery needed by Bootstrap JavaScript
     pages/jquery
     pages/ie-jquery-fix
     ;; Static js files
-    [:script {:src (pages/cdn "/js/static-js.js")}]
+    [:script {:src (shared/cdn "/js/static-js.js")}]
     ;; Intercom (Support chat)
-    [:script {:src (pages/cdn "/js/intercom.js")}]
+    [:script {:src (shared/cdn "/js/intercom.js")}]
     ;; Google Analytics
     [:script {:type "text/javascript" :src "https://www.google-analytics.com/analytics.js"}]
     [:script {:type "text/javascript" :src "/lib/autotrack/autotrack.js"}]
@@ -104,7 +105,7 @@
           [:a
             {:href "/about"
              :class (when (= active-page "about") "active")}
-            "About"]
+            "Apps"]
           [:a
             {:href "/pricing"
              :class (when (= active-page "pricing") "active")}
@@ -114,42 +115,26 @@
             {:id "site-header-login-item"
              :href "/login"}
               "Login"]
-          [:a.start
+          [:span.login-signup-or "or"]
+          [:a.signup
             {:id "site-header-signup-item"
-             :href (if use-slack-url?
-                      (env :slack-signup-url)
-                      "/sign-up")
-             :class (when use-slack-url?
-                      "slack-get-started")}
-            (when use-slack-url?
-              [:span.slack-orange-icon])
-            [:span.start-copy
-              (if is-slack-lander?
-                "Continue with Slack"
-                (if (= active-page "slack")
-                  "Add to Slack"
-                  "Get Started"))]]]
+             :href "/sign-up"}
+            "Sign up"]]
         [:div.site-navbar-right.tablet-only
           [:a.login
             {:id "site-header-tablet-login-item"
              :href "/login"}
               "Login"]
-          [:a.start
+          [:span.login-signup-or "or"]
+          [:a.signup
             {:id "site-header-tablet-signup-item"
-             :href (if use-slack-url?
-                      (env :slack-signup-url)
-                      "/sign-up")}
-            [:span.start-copy
-              "Start Free"]]]
+             :href "/sign-up"}
+            "Sign up"]]
         [:div.site-navbar-right.mobile-only
-          [:a.start
+          [:a.login
             {:id "site-header-mobile-signup-item"
-             :class (when (= active-page "slack") "slack")
-             :href (if (= active-page "slack")
-                     (env :slack-signup-url)
-                     "/sign-up")}
-              [:span.copy
-                "START"]]]
+             :href "/login"}
+            "Login"]]
         [:div.mobile-ham-menu
           {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
 
@@ -192,7 +177,7 @@
           ]]
       [:div.left-column.group
         [:img.logo
-          {:src (pages/cdn "/img/ML/carrot_wordmark.svg")}]
+          {:src (shared/cdn "/img/ML/carrot_wordmark.svg")}]
         [:div.footer-communication-copy
           "Leadership communication for fast-growing and remote teams."]
         [:div.footer-small-links.static

@@ -6,7 +6,7 @@ div.main-animation-container {
     margin: 80px 0px 0px;
   }
 
-  img.main-animation {
+  .main-animation {
     max-width: 1208px;
     width: calc(100% - 48px);
     margin: 120px auto 0px;
@@ -29,7 +29,7 @@ div.main-animation-container {
 div.homepage-testimonials-container {
   margin: 0 auto;
   width: 100%;
-  max-width: 1261px;
+  max-width: 784px;
   text-align: center;
   z-index: 3;
   position: relative;
@@ -57,294 +57,59 @@ div.homepage-testimonials-container {
 
   div.homepage-testimonials-copy {
     text-align: center;
-    @include OC_Body_Bold();
-    font-size: 14px;
-    color: rgba($deep_navy, 0.5);
-    line-height: 19px;
-    margin-top: 32px;
+    @include OC_Body_Book();
+    font-size: 24px;
+    color: $deep_navy;
+    line-height: 32px;
+    margin-top: 40px;
     margin-bottom: 24px;
   }
 
   div.homepage-testimonials-logo {
-    width: 208px;
+    width: 112px;
     height: 66px;
     display: inline-block;
     background-position: center;
     background-repeat: no-repeat;
 
-    @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px){
-      width: 178px;
-    }
-
     @include mobile() {
-      width: 138px;
       // Temp hide the logos on mobile since they don't look good
       display: none;
     }
 
-    &.logo-novo {
-      background-image: cdnUrl("/img/ML/logo_line_novo.svg");
-      background-size: 65px 32px;
+    &.logo-ifttt {
+      @include image-2x("/img/ML/logo_ifttt");
+      background-size: 78px 21px;
     }
 
-    &.logo-ph {
-      background-image: cdnUrl("/img/ML/logo_line_ph.svg");
-      background-size: 38px 38px;
+    &.logo-hopper {
+      @include image-2x("/img/ML/logo_hopper");
+      background-size: 74px 66px;
     }
 
-    &.logo-wsu {
-      background-image: cdnUrl("/img/ML/logo_line_wsu.svg");
-      background-size: 126px 30px;
+    &.logo-hinge {
+      @include image-2x("/img/ML/logo_hinge");
+      background-size: 78px 30px;
     }
 
-    &.logo-om {
-      background-image: cdnUrl("/img/ML/logo_line_om.svg");
+    &.logo-resy {
+      @include image-2x("/img/ML/logo_resy");
+      background-size: 78px 34px;
+    }
+
+    &.logo-flyt {
+      @include image-2x("/img/ML/logo_flyt");
+      background-size: 80px 37px;
+    }
+
+    &.logo-oval {
+      @include image-2x("/img/ML/logo_oval");
       background-size: 78px 32px;
     }
 
-    &.logo-mio {
-      background-image: cdnUrl("/img/ML/logo_line_mio.svg");
-      background-size: 67px 30px;
-    }
-
-    &.logo-sd {
-      background-image: cdnUrl("/img/ML/logo_line_sd.svg");
-      background-size: 96px 26px;
-    }
-  }
-}
-
-section.testimonials-section {
-  text-align: center;
-  padding: 120px 0px !important;
-  position: relative;
-
-  @include tablet() {
-    width: 100%;
-    padding: 56px 24px !important;
-    padding-top: 56px !important;
-    padding-bottom: 56px !important;
-    text-align: center;
-  }
-
-  &:before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: $another_ui_grey;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    @include big_web_no_tablet(){
-      border-top-right-radius: 200px;
-    }
-  }
-
-  div.testimonials-section-title {
-    @include OC_Title()
-    color: $deep_navy;
-    font-size: 40px;
-    line-height: 38px;
-    position: relative;
-
-    @include tablet(){
-      font-size: 40px;
-      line-height: initial;
-    }
-
-    @include mobile() {
-      font-size: 36px;
-    }
-  }
-
-  div.testimonials-section-subtitle {
-    @include OC_Body_Book();
-    font-size: 24px;
-    line-height: 32px;
-    color: $deep_navy;
-    margin-top: 16px;
-    position: relative;
-
-    @include tablet(){
-      font-size: 24px;
-      line-height: 26px;
-    }
-
-    @include mobile() {
-      font-size: 20px;
-      line-height: initial;
-    }
-  }
-
-  div.testimonials-cards-container {
-    $testimonials_num: 4;
-    $testimonials_breakpoint: ((278 + 16) * $testimonials_num);
-    margin: 55px auto 0px;
-    position: relative;
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    @include tablet() {
-      width: calc(100% + 48px);
-      margin-left: -24px;
-    }
-
-    div.testimonials-cards-inner {
-      width: #{($testimonials_breakpoint + 1)}px;
-      margin: 0 auto;
-
-      @media screen and (max-width: #{$testimonials_breakpoint + 48}px){
-        width: #{$testimonials_breakpoint + 48}px;
-        padding: 0 24px;
-      }
-    }
-
-    div.testimonals-cards-column {
-      width: 278px;
-      margin: 0 8px;
-      float: left;
-
-      div.testimonial-card {
-        &:not(:first-child) {
-          margin-top: 16px;
-        }
-      }
-    }
-
-    div.testimonial-card {
-      float: left;
-      width: 278px;
-      padding: 24px;
-      text-align: left;
-      position: relative;
-      border-radius: 8px;
-      background-color: white;
-      border: 1px solid $deep_tan;
-
-      &.oval-money {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_oval_money");
-          }
-        }
-      }
-
-      &.helloticket {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_helloticket");
-          }
-        }
-      }
-
-      &.skylight-digital {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_skylight_digital");
-          }
-        }
-      }
-
-      &.wayne-state-univerity {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_wayne_state_university");
-          }
-        }
-      }
-
-      &.partner-hero {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_partner_hero");
-          }
-        }
-      }
-
-      &.blend-labs {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_blend_labs");
-          }
-        }
-      }
-
-      &.m-io {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_m_io");
-          }
-        }
-      }
-
-      &.peak-support {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_peak_support");
-          }
-        }
-      }
-
-      &.novo {
-        div.testimonial-footer {
-          div.testimonial-image {
-            @include image-2x("/img/ML/testimonial_novo");
-          } 
-        }
-      }
-
-      div.testimonial-quote {
-        @include OC_Body_Book();
-        font-size: 18px;
-        color: $deep_navy;
-        line-height: 22px;
-        text-align: center;
-      }
-
-      div.testimonial-footer {
-        margin-top: 16px;
-
-        div.testimonial-image {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background-position: center;
-          background-size: 40px 40px;
-          background-repeat: no-repeat;
-          margin-right: 16px;
-          margin: 0 auto;
-        }
-
-        div.testimonial-name {
-          @include OC_Title()
-          font-size: 18px;
-          color: $deep_navy;
-          line-height: 20px;
-          margin-top: 12px;
-          text-align: center;
-        }
-
-        div.testimonial-role {
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: rgba($deep_navy, 0.6);
-          line-height: 19px;
-          text-align: center;
-
-          a {
-            color: rgba($deep_navy, 0.6);
-            text-decoration: none;
-
-            &:hover {
-              text-decoration: underline;
-            }
-          }
-        }
-      }
+    &.logo-novo {
+      @include image-2x("/img/ML/logo_novo");
+      background-size: 78px 39px;
     }
   }
 }
@@ -405,19 +170,19 @@ section.keep-aligned {
 
 button.get-started-button {
   width: 320px;
-  height: 64px;
-  border-radius: 8px;
+  height: 56px;
+  border-radius: 6px;
   background-color: $carrot_orange;
   color: white;
   @include OC_Body_Bold();
   font-size: 20px;
-  line-height: 27px;
+  line-height: 25px;
   margin: 48px auto 0;
   position: relative;
   text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
   padding: 2px 0 0;
 
   @include mobile(){
@@ -427,6 +192,16 @@ button.get-started-button {
     font-size: 18px;
     line-height: 25px;
   }
+}
+
+span.get-started-subtitle {
+  margin: 16px auto 0;
+  @include OC_Body_Book();
+  font-size: 16px;
+  line-height: 20px;
+  color: rgba($deep_navy, 0.5);
+  text-align: center;
+  display: inline-block;
 }
 
 section.home-keep-aligned {
@@ -1331,3 +1106,103 @@ button.show-animation-bt {
     line-height: 25px;
   }
 }
+
+div.dashed-string {
+  margin: 40px auto;
+  width: 80px;
+  height: 280px;
+  background-image: cdnUrl("/img/ML/dashed_string.svg");
+  background-size: 80px 280px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+section.testimonials {
+  text-align: center;
+  position: relative;
+
+  @include tablet() {
+    width: 100%;
+    padding: 56px 24px !important;
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+    text-align: center;
+  }
+
+  div.testimonials-block {
+    width: 100%;
+    max-width: 894px;
+    margin: 0 auto;
+    position: relative;
+
+    &.ifttt {
+      div.testimonial-author-pic {
+        @include image-2x("/img/ML/testimonial_author_ifttt");
+      }
+    }
+
+    &.blend-labs {
+      div.testimonial-author-pic {
+        @include image-2x("/img/ML/testimonial_author_blend_labs");
+      }
+    }
+
+    &.novo {
+      div.testimonial-author-pic {
+        @include image-2x("/img/ML/testimonial_author_novo");
+      }
+    }
+
+    div.testimonial-author-pic {
+      width: 78px;
+      height: 78px;
+      float: left;
+      margin-top: 38px;
+      background-size: 78px 78px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    div.testimonial-copy-bubble {
+      float: right;
+      background-color: $grey_num_5;
+      border-radius: 16px;
+      width: calc(100% - 78px - 24px);
+      height: 100%;
+      padding: 38px 40px;
+
+      &:before {
+        content: "";
+        width: 20px;
+        height: 20px;
+        transform: rotate(45deg);
+        position: absolute;
+        top: 40px;
+        left: 92px;
+        background-color: $grey_num_5;
+        display: block;
+      }
+
+      div.testimonial-copy {
+        @include OC_Body_Book();
+        font-size: 22px;
+        line-height: 28px;
+        color: $deep_navy;
+        text-align: left;
+      }
+
+      div.testimonial-copy-footer {
+        margin-top: 24px;
+        @include OC_Body_Bold();
+        font-size: 18px;
+        color: $deep_navy;
+        text-align: left;
+
+        a {
+          color: $carrot_green;
+        }
+      }    
+    }
+  }
+}
+
