@@ -641,7 +641,7 @@
             [:div.cmail-header-right-buttons
               (when-not follow-up?
                 [:button.mlb-reset.follow-up-button
-                  {:title "Create follow-ups"
+                  {:title "Request follow up"
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
@@ -800,7 +800,7 @@
             (when (and (not follow-up?)
                        (not is-fullscreen?))
               [:button.mlb-reset.follow-up-button
-                {:title "Create follow-ups"
+                {:title "Request follow up"
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"

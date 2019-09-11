@@ -176,7 +176,7 @@
                                   (when (fn? will-close)
                                     (will-close))
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Create follow-up"])))
+                    "Follow up later"])))
             (when can-react?
               [:li.react
                 {:on-click #(do
