@@ -454,6 +454,11 @@
   (send-item-read (:uuid activity-data))
   ;; Show the first post added tooltip if needed
   (nux-actions/show-post-added-tooltip (:uuid activity-data))
+  ;; Refresh the drafts board on publish
+  (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
+        drafts-link (utils/link-for (:links drafts-board) "self")]
+    (when drafts-link
+      (sa/section-get dis/other-sort-type drafts-link)))
   ;; Show follow-ups notifications if needed
   (when (pos? (count (:follow-ups activity-data)))
     (let [follow-ups (:follow-ups activity-data)
