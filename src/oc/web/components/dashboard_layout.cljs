@@ -32,7 +32,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(rum/defcs dashboard-layout < rum/reactive
+(rum/defcs dashboard-layout < rum/static
+                              rum/reactive
                               ;; Derivative
                               (drv/drv :route)
                               (drv/drv :org-data)
