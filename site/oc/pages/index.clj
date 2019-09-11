@@ -42,7 +42,5 @@
 
       shared/carrot-in-action
 
-      shared/testimonials-section
-
       shared/keep-aligned-bottom
       ]])
