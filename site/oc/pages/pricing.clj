@@ -10,6 +10,12 @@
 
       shared/pricing-table-section
 
+      shared/dashed-string
+
+      (shared/testimonial-block :ifttt)
+
+      shared/dashed-string
+
       [:section.pricing-faq
         [:h2.faq-header
           "Frequently asked questions."]
@@ -74,8 +80,10 @@
                :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
               "Get in touch with us"]]]]
 
-      shared/testimonials-section
+      shared/dashed-string
 
-      shared/keep-aligned-bottom
+      (shared/testimonial-block :blend-labs)
+
+      shared/dashed-string
 
     ]])

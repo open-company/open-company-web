@@ -231,7 +231,7 @@
 (def dashed-string
   [:div.dashed-string])
 
-(defn- testimonial-block [slug]
+(defn testimonial-block [slug]
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
