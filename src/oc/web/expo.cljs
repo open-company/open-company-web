@@ -86,12 +86,6 @@
   []
   @deep-link-origin)
 
-;; TODO remove this function, bridge will call it on init
-(defn bridge-get-deep-link-origin
-  ""
-  []
-  (bridge-call! "get-deep-link-origin" nil))
-
 (defn- ^:export on-deep-link-origin
   ""
   [json-str]
@@ -104,7 +98,6 @@
 
 (defn init-bridge!
   []
-  (bridge-get-deep-link-origin)
   (bridge-call! "init" nil))
 
 (defn org-loaded!
