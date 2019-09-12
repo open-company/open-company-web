@@ -148,6 +148,10 @@ div.home-wrap {
       div.pricing-three-columns {
         div.pricing-column {
           background-color: $grey_num_5;
+
+          &.free-column {
+            background-color: white;
+          }
         }
       }
     }
