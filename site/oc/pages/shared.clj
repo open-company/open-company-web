@@ -391,3 +391,106 @@
     dashed-string
     (testimonial-block :hello-tickets)
     dashed-string])
+
+(def pricing-table-section
+  [:section.pricing-header
+
+    [:h1.pricing-headline
+      "Free for unlimited users"]
+
+    [:div.pricing-subheadline
+      "Carrot is open source and always free to use. Questions? "
+      [:a.chat-with-us
+        {:class "intercom-chat-link"
+         :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+        "Chat with us!"]]
+
+    [:div.pricing-three-columns.group
+      ;; Free
+      [:div.pricing-column.free-column
+        [:h2.tear-title
+          "Free"]
+        [:div.tear-subtitle
+          "Perfect for any size team"]
+        [:h3.tear-price
+          "$0"]
+        [:div.tear-price-billing
+          "FREE for unlimited users"]
+        [:a.tear-start-bt
+          {:href "/sign-up"}
+          "Create your team"]
+        [:div.tear-feature
+          [:span "Unlimited users"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          [:span "Unlimited posts"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          [:span "2 GB storage"]]]
+      ;; Premium
+      [:div.pricing-column.team-column
+        [:h2.tear-title
+          "Premium"]
+        [:div.tear-subtitle
+          "Advanced permissions and analytics to boost engagement"]
+        [:h3.tear-price
+          "$4"]
+        [:div.tear-price-billing
+          "Per user, per month, billed annually"]
+        [:a.tear-start-bt
+          {:href "/sign-up"}
+          "Create your team"]
+        [:div.tear-feature-summary
+          "Everything in FREE plus:"]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          {:data-toggle "tooltip"
+           :data-placement "top"
+           :title "Advanced permissions"}
+          [:span "Advanced permissions"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          {:data-toggle "tooltip"
+           :data-placement "top"
+           :title "Follow-ups"}
+          [:span "Follow-ups"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          {:data-toggle "tooltip"
+           :data-placement "top"
+           :title "Analytics"}
+          [:span "Analytics"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          [:span "Scheduling"]
+          [:span.soon "SOON"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          [:span "Free fuest users"]
+          [:span.soon "SOON"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          [:span "Unlimited storage"]]
+        [:div.tear-feature-separator]
+        [:div.tear-feature
+          [:span "Premium support"]]]
+      ;; Enterprise
+      [:div.pricing-column.enterprise-column
+        [:h2.tear-title
+          "Enterprise"]
+        [:div.tear-subtitle
+          "Tailored for corporate comms and HR departments"]
+        [:div.tear-price]
+        [:div.tear-price-billing
+          "Ideal for teams 250+"]
+        [:a.chat-with-us
+          {:class "intercom-chat-link"
+           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+          "Chat with us"]]]
+    [:div.pricing-header-footer
+      [:div.pricing-header-footer-headline
+        "Non-profits and educational institutions save 50% on premium plans."]
+      [:div.pricing-header-footer-subheadline
+        (str
+         "Prices shown are for annual billing. When billed month-to-month, "
+         "the Premium plan is $5 per user per month.")]]])

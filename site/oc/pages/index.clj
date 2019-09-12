@@ -38,6 +38,8 @@
 
       ; (shared/keep-aligned-section false)
 
+      shared/pricing-table-section
+
       shared/carrot-in-action
 
       shared/keep-aligned-bottom

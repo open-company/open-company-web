@@ -143,5 +143,14 @@ div.home-wrap {
         }
       }
     }
+
+    section.pricing-header {
+      div.pricing-three-columns {
+        div.pricing-column {
+          background-color: $grey_num_5;
+        }
+      }
+    }
+
   }
 }

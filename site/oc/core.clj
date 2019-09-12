@@ -170,7 +170,7 @@
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href "http://help.carrot.io/" :target "_blank"} "Help center"]]
+          [:div.column-item [:a {:href "https://intercom.help/carrot-c8000b30b176/en" :target "_blank"} "Help center"]]
           ;[:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
           ;[:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
           ;[:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]

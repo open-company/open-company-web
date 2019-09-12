@@ -1445,3 +1445,281 @@ section.testimonials {
     }
   }
 }
+
+section.pricing-header {
+  padding: 80px 0;
+  text-align: center;
+  position: relative;
+
+  &:after {
+    content: "";
+    display: block;
+    background-color: $another_ui_grey;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 20px 20px 200px 20px;
+    max-width: 1200px;
+  }
+
+  @include tablet() {
+    overflow: visible;
+    padding: 131px 0 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  & > * {
+    z-index: 2;
+    position: relative;
+  }
+
+  h1.pricing-headline {
+    font-size: 60px;
+    line-height: 78px;
+    @include OC_Title()
+    color: $deep_navy;
+    min-width: 300px;
+    margin: 0 auto;
+
+    @include mobile() {
+      margin: 0 auto;
+      font-size: 36px;
+      line-height: initial;
+      max-width: initial;
+      padding: 0 24px;
+    }
+  }
+
+  div.pricing-subheadline {
+    color: $deep_navy;
+    font-size: 30px;
+    line-height: 38px;
+    @include OC_Body_Book();
+    margin: 24px auto 0px;
+    z-index: 2;
+    position: relative;
+    max-width: 630px;
+
+    @include mobile(){
+      margin-top: 16px;
+      font-size: 20px;
+      line-height: 26px;
+      padding: 0px;
+      color: $deep_navy;
+      max-width: initial;
+    }
+
+    a.chat-with-us {
+      color: $carrot_green;
+    }
+  }
+
+  div.pricing-three-columns {
+    margin: 80px auto 40px;
+    width: 100%;
+    max-width: 1044px;
+    padding: 0 24px;
+
+    @include pricing-tablet() {
+      width: 100%;
+    }
+
+    @include mobile() {
+      padding: 0;
+    }
+
+    div.pricing-column {
+      width: calc(33% - 21px - 21px);
+      width: 336px;
+      background-color: $another_ui_grey;
+      float: left;
+      padding: 40px 38px;
+      text-align: center;
+      border-radius: 16px;
+
+      &:not(:first-child) {
+        margin-left: 21px;
+      }
+
+      @include pricing-tablet() {
+        float: unset;
+        padding: 40px 32px;
+        margin: 32px auto 0;
+      }
+
+      @include mobile() {
+        width: 100%;
+      }
+
+      h2.tear-title {
+        @include OC_Body_Bold()
+        font-size: 30px;
+        color: $deep_navy;
+        line-height: 38px;
+      }
+
+      div.tear-subtitle {
+        @include OC_Body_Book();
+        font-size: 16px;
+        color: $deep_navy;
+        line-height: 20px;
+        height: 40px;
+        margin: 32px auto 0;
+      }
+
+      h3.tear-price {
+        @include OC_Body_Bold();
+        font-size: 70px;
+        line-height: 90px;
+        color: $deep_navy;
+        margin-top: 16px;
+      }
+
+      a.tear-start-bt {
+        display: block;
+        margin: 32px auto 24px;
+        width: 260px;
+        height: 56px;
+        background-color: $carrot_orange;
+        border-radius: 8px;
+        color: white;
+        @include OC_Body_Bold();
+        font-size: 18px;
+        line-height: 24px;
+        padding: 16px 24px;
+      }
+
+      a.chat-with-us {
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        color: $carrot_green;
+        margin-top: 7px;
+        @include OC_Body_Bold();
+        font-size: 16px;
+        line-height: 20px;
+      }
+
+      div.tear-price-billing {
+        @include OC_Body_Book();
+        font-size: 20px;
+        line-height: 24px;
+        max-width: 184px;
+        margin: 30px auto 0;
+      }
+
+      div.tear-feature-separator {
+        height: 1px;
+        width: 100%;
+        background-color: $more_ultra_light_grey;
+        margin-top: 16px;
+      }
+
+      div.tear-feature-summary {
+        max-width: 200px;
+        @include OC_Body_Bold();
+        font-size: 16px;
+        color: $deep_navy;
+        line-height: 20px;
+        text-align: center;
+        margin: 32px auto 0;
+      }
+
+      div.tear-feature {
+        max-width: 200px;
+        @include OC_Body_Book();
+        font-size: 16px;
+        color: $deep_navy;
+        text-align: center;
+        margin: 16px auto 0;
+        cursor: pointer;
+
+        &[data-toggle="tooltip"] {
+          span{
+            border-bottom: 1px dotted $deep_navy;
+          }
+        }
+
+        @include big_web() {
+          &[data-toggle="tooltip"] {
+            &:hover {
+              color: $deep_navy;
+            }
+          }
+        }
+
+        @include pricing-tablet() {
+          max-width: initial;
+        }
+
+        span.soon {
+          margin-left: 8px;
+          height: 18px;
+          background-color: $carrot_green;
+          border-radius: 4px;
+          padding: 2px 5px;
+          @include OC_Body_Bold();
+          font-size: 11px;
+          color: white;
+          line-height: 14px;
+        }
+      }
+
+      &.free-column {
+        margin-left: 0;
+        box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
+        background-color: white;
+
+        @include pricing-tablet() {
+          margin: 32px auto 0;
+        }
+
+        div.tear-price-billing {
+          max-width: 138px;
+        }
+      }
+
+      &.enterprise-column {
+        border-bottom-right-radius: 40px;
+        width: 282px;
+
+        div.tear-price {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background-color: $deep_navy;
+          background-image: cdnUrl("/img/ML/carrot_logo_white.svg");
+          background-size: 23px 40px;
+          background-position: center;
+          background-repeat: no-repeat;
+          margin: 24px auto 0;
+        }
+      }
+    }
+  }
+
+  div.pricing-header-footer {
+    margin: 40px auto 0;
+    max-width: 720px;
+    text-align: center;
+
+    div.pricing-header-footer-headline {
+      @include OC_Body_Book();
+      font-size: 20px;
+      line-height: 25px;
+      color: $deep_navy;
+    }
+
+    div.pricing-header-footer-subheadline {
+      margin-top: 24px;
+      @include OC_Body_Book();
+      font-size: 20px;
+      line-height: 25px;
+      color: rgba($deep_navy, 0.5);
+    }
+  }
+}
