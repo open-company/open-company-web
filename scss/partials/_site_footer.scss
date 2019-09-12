@@ -200,8 +200,7 @@
             line-height: 32px;
 
             &:hover {
-              color: $carrot_green;
-              text-decoration: none;
+              text-decoration: underline;
               opacity: 1;
             }
           }
