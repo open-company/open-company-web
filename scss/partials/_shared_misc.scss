@@ -2,6 +2,8 @@ $carousel_timing: 7s;
 
 div.main-animation-container {
   position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
 
   @include tablet() {
     width: 100%;
@@ -9,9 +11,9 @@ div.main-animation-container {
   }
 
   .main-animation {
-    max-width: 1208px;
-    width: calc(100% - 48px);
-    margin: 120px auto 0px;
+    width: 83%;
+    height: auto;
+    margin: 0 auto;
     padding: 0;
     z-index: 10;
     position: relative;
@@ -1124,6 +1126,8 @@ div.dashed-string {
 section.testimonials {
   text-align: center;
   position: relative;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
 
   @include tablet() {
     width: 100%;

@@ -107,12 +107,6 @@
 (defn press-kit [options]
   (press-kit/press-kit options))
 
-(def desktop-video
-  [:div.main-animation-container
-    [:img.main-animation
-      {:src (shared/cdn "/img/ML/homepage_screenshot.png")
-       :srcSet (str (shared/cdn "/img/ML/homepage_screenshot@2x.png") " 2x")}]])
-
 (defn not-found [{contact-mail-to :contact-mail-to contact-email :contact-email}]
   [:div.not-found
     [:div

@@ -24,13 +24,12 @@
             "Carrot is open source and free for all teams."]]
 
         [:div.main-animation-container
-          [:picture.main-animation
-            [:source {:srcSet (shared/cdn "/img/ML/homepage_screenshot.png")}]
-            [:img {:src (shared/cdn "/img/ML/homepage_screenshot.png")
-                   :alt "Carrot"
-                   :srcSet (str (shared/cdn "/img/ML/homepage_screenshot@2x.png") " 2x, "
-                            (shared/cdn "/img/ML/homepage_screenshot@3x.png") " 3x, "
-                            (shared/cdn "/img/ML/homepage_screenshot@4x.png") " 4x")}]]]
+          [:img.main-animation
+            {:src (shared/cdn "/img/ML/homepage_screenshot.png")
+             :alt "Carrot"
+             :srcSet (str (shared/cdn "/img/ML/homepage_screenshot@2x.png") " 2x, "
+                      (shared/cdn "/img/ML/homepage_screenshot@3x.png") " 3x, "
+                      (shared/cdn "/img/ML/homepage_screenshot@4x.png") " 4x")}]]
 
         shared/testimonials-logos-line]
 
