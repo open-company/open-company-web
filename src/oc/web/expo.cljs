@@ -4,7 +4,8 @@
   See https://github.com/open-company/open-company-mobile/blob/master/src/nativeWebBridge.js
   for the native side of the bridge."
   (:require [oc.web.actions.user :as user-actions]
-            [oc.web.utils.user :as user-utils]))
+            [oc.web.utils.user :as user-utils]
+            [oc.web.dispatcher :as dis]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Native/web bridge primitives
@@ -57,14 +58,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Handling of user tapping on push notification
 
+(defn- bridge-pend-push-notification!
+  "Signals to the Expo app that web is not yet ready to handle a push
+  notification tap event. Mobile should raise the tap event again once
+  web is ready."
+  [json-str]
+  (when-let [notif (parse-bridge-data json-str)]
+    (bridge-call! "pend-push-notification" notif)))
+
 (defn- ^:export on-push-notification-tapped
   "Callback for responding to the user tapping on a native push notification. Response contains
   a push notification payload, which is literally a Carrot notification map."
   [json-str]
-  (when-let [notification (parse-bridge-data json-str)]
-    (let [fixed-notif (user-utils/fix-notification notification)
-          click-handler (:click fixed-notif)]
-      (click-handler))))
+  (if-not (dis/org-data)
+    (bridge-pend-push-notification! json-str)
+    (when-let [notification (parse-bridge-data json-str)]
+      (let [fixed-notif (user-utils/fix-notification notification)
+            click-handler (:click fixed-notif)]
+        (click-handler)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
