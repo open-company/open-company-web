@@ -1,5 +1,7 @@
 (ns oc.web.stores.org
-  (:require [oc.web.lib.utils :as utils]
+  (:require [oc.web.expo :as expo]
+            [oc.shared.useragent :as ua]
+            [oc.web.lib.utils :as utils]
             [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]))
 
@@ -23,7 +25,7 @@
         ;; we are only excluding keys that already exists in the app-state
         board-slugs (set (mapcat #(vec [(keyword (str (:slug %) "-recent-activity"))
                                         (keyword (str (:slug %) "-recently-posted"))])
-                          (:boards org-data)))
+                                 (:boards org-data)))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))
@@ -37,13 +39,17 @@
                       ;; If save actually happened let's update the saved value
                       (assoc org-data :saved saved?))
         next-org-editing (-> with-saved?
-                          (assoc :email-domain email-domain)
-                          (dissoc :has-changes))]
-    (-> db
-      (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
-      (assoc :org-editing next-org-editing)
-      (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
-      (assoc-in boards-key next-boards))))
+                             (assoc :email-domain email-domain)
+                             (dissoc :has-changes))
+        new-db (-> db
+                   (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
+                   (assoc :org-editing next-org-editing)
+                   (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
+                   (assoc-in boards-key next-boards))]
+    (when ua/mobile-app?
+      (expo/org-loaded! fixed-org-data))
+    new-db
+    ))
 
 (defmethod dispatcher/action :org-avatar-update/failed
   [db [_]]

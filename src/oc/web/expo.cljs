@@ -75,6 +75,7 @@
   []
   @deep-link-origin)
 
+;; TODO remove this function, bridge will call it on init
 (defn bridge-get-deep-link-origin
   ""
   []
@@ -88,13 +89,13 @@
     (reset! deep-link-origin origin)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Initialization
-
-(defn- bridge-ready!
-  []
-  (bridge-call! "ready" nil))
+;; Initialization and Readiness
 
 (defn init-bridge!
   []
   (bridge-get-deep-link-origin)
-  (bridge-ready!))
+  (bridge-call! "init" nil))
+
+(defn org-loaded!
+  [org-data]
+  (bridge-call! "org-loaded" org-data))
