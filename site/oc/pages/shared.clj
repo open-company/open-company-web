@@ -344,10 +344,10 @@
            :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1@2x.png")) " 2x")}]
         [:img.testimonial-carousel-image.image-2
           {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png"))
-           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png")) " 2x")}]
+           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2@2x.png")) " 2x")}]
         [:img.testimonial-carousel-image.image-3
           {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png"))
-           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png")) " 2x")}]]
+           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3@2x.png")) " 2x")}]]
       [:div.testimonial-carousel-footers.group
         [:div.testimonial-carousel-footer.footer-1
           {:class (name slug)
