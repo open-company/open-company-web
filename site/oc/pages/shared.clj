@@ -228,8 +228,9 @@
     [:button.mlb-reset.get-started-button.get-started-action
       "Create your team. It’s free!"]])
 
-(def dashed-string
-  [:div.dashed-string])
+(defn dashed-string [num]
+  [:div.dashed-string
+    {:class (str "dashed-string-" num)}])
 
 (defn testimonial-block [slug]
   (let [testimonial-copy (cond
@@ -380,21 +381,21 @@
 
 (def testimonials-section
   [:section.testimonials
-    dashed-string
+    (dashed-string 1)
     (testimonial-block :ifttt)
-    dashed-string
+    (dashed-string 2)
     (testimonial-carousel :orange)
-    dashed-string
+    (dashed-string 3)
     (testimonial-block :blend-labs)
-    dashed-string
+    (dashed-string 4)
     (testimonial-carousel :blue)
-    dashed-string
+    (dashed-string 5)
     (testimonial-block :novo)
-    dashed-string
+    (dashed-string 6)
     (testimonial-carousel :purple)
-    dashed-string
+    (dashed-string 7)
     (testimonial-block :hello-tickets)
-    dashed-string])
+    (dashed-string 8)])
 
 (def pricing-table-section
   [:section.pricing-header
