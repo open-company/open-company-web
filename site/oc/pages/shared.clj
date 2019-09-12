@@ -231,50 +231,163 @@
 (def dashed-string
   [:div.dashed-string])
 
+(defn- testimonial-block [slug]
+  (let [testimonial-copy (cond
+                         (= slug :ifttt)
+                         (str
+                          "Carrot helps us communicate more efficiently across multiple "
+                          "time zones and working hours. It minimizes the FOMO that can "
+                          "result from missed Slack conversations, and cuts out the ‘Did "
+                          "you see my message?’ nagging.")
+                         (= slug :blend-labs)
+                         (str
+                          "Carrot is a perfect compliment for Slack. We use it for "
+                          "longer-form weekly updates no one should miss.")
+                         (= slug :novo)
+                         (str
+                          "Carrot keeps everyone across our global offices up to date. "
+                          "It helps us share big wins, and key information across our growing family.")
+                         (= slug :hello-tickets)
+                         "Love being able to quickly see who read my post and when.")
+        footer-copy (cond
+                      (= slug :ifttt)
+                      "— Kevin Ebaugh, Senior Platform Community Manager at "
+                      (= slug :blend-labs)
+                      "— Sara Vienna, Head of Design at "
+                      (= slug :novo)
+                      "— Tyler McIntyre, CEO at "
+                      (= slug :hello-tickets)
+                      "— Alberto Martinez, CEO at ")
+        testimonial-website (cond
+                             (= slug :ifttt)
+                             "https://ifttt.com/"
+                             (= slug :blend-labs)
+                             "https://bl3ndlabs.com/"
+                             (= slug :novo)
+                             "https://banknovo.com/"
+                             (= slug :hello-tickets)
+                             "https://hellotickets.com/")
+        testimonial-company (cond
+                             (= slug :ifttt)
+                             "IFTTT"
+                             (= slug :blend-labs)
+                             "Bl3NDlabs"
+                             (= slug :novo)
+                             "Novobank"
+                             (= slug :hello-tickets)
+                             "Hello Tickets")]
+    [:div.testimonials-block.group
+      {:class (name slug)}
+      [:div.testimonial-author-pic]
+      [:div.testimonial-copy-bubble
+        [:div.testimonial-copy
+          testimonial-copy]
+        [:div.testimonial-copy-footer
+          footer-copy
+          [:a.testimonial-copy-link
+            {:href testimonial-website
+             :target "_blank"}
+            testimonial-company]]]]))
+
+(defn- testimonial-carousel [slug]
+  (let [images-prefix (cond
+                        (= slug :orange)
+                        "1"
+                        (= slug :blue)
+                        "2"
+                        (= slug :purple)
+                        "3")
+        headline (cond
+                  (= slug :orange)
+                  "Share what matters"
+                  (= slug :blue)
+                  "Organized, topic-based discussions"
+                  (= slug :purple)
+                  "Close communication gaps")
+        subheadline (cond
+                     (= slug :orange)
+                     "Thoughtful communication should never be lost in the noise."
+                     (= slug :blue)
+                     "Bring your team closer together despite location and timezone differences."
+                     (= slug :purple)
+                     "Make sure your team knows what matters most.")
+        footer-copy-1 (cond
+                       (= slug :orange)
+                       "Longer-form posts"
+                       (= slug :blue)
+                       "Reply later"
+                       (= slug :purple)
+                       "Analytics")
+        footer-copy-2 (cond
+                       (= slug :orange)
+                       "At-a-glance summary"
+                       (= slug :blue)
+                       "Threads"
+                       (= slug :purple)
+                       "Daily digest")
+        footer-copy-3 (cond
+                       (= slug :orange)
+                       "Follow-ups"
+                       (= slug :blue)
+                       "Stay current"
+                       (= slug :purple)
+                       "Integrations")]
+    [:div.testimonial-carousel-block
+      {:class (str (name slug) " step-3")}
+      [:div.testimonial-carousel-headline
+        headline]
+      [:div.testimonial-carousel-subheadline
+        subheadline]
+      [:div.testimonial-carousel-images
+        [:img.testimonial-carousel-image.image-1
+          {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1.png"))
+           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1@2x.png")) " 2x")}]
+        [:img.testimonial-carousel-image.image-2
+          {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png"))
+           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png")) " 2x")}]
+        [:img.testimonial-carousel-image.image-3
+          {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png"))
+           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png")) " 2x")}]]
+      [:div.testimonial-carousel-footers.group
+        [:div.testimonial-carousel-footer.footer-1
+          {:class (name slug)
+           :onClick (str "OCCarouselStopInterval(\"" (name slug) "\"); OCCarouselStopInterval(\"" (name slug) "\"); OCStaticSwitchTestimonialImage(\"" (name slug) "\", \"1\");")}
+          [:div.testimonial-carousel-footer-progress]
+          [:div.testimonial-carousel-footer-block
+            [:div.testimonial-carousel-footer-icon]
+            [:div.testimonial-carousel-footer-copy
+              footer-copy-1]]]
+        [:div.testimonial-carousel-footer.footer-2
+          {:class (name slug)
+           :onClick (str "OCStaticSwitchTestimonialImage(\"" (name slug) "\", \"2\");")}
+          [:div.testimonial-carousel-footer-progress]
+          [:div.testimonial-carousel-footer-block
+            [:div.testimonial-carousel-footer-icon]
+            [:div.testimonial-carousel-footer-copy
+              footer-copy-2]]]
+        [:div.testimonial-carousel-footer.footer-3
+          {:class (name slug)
+           :onClick (str "OCCarouselStopInterval(\"" (name slug) "\"); OCStaticSwitchTestimonialImage(\"" (name slug) "\", \"3\");")}
+          [:div.testimonial-carousel-footer-progress]
+          [:div.testimonial-carousel-footer-block
+            [:div.testimonial-carousel-footer-icon]
+            [:div.testimonial-carousel-footer-copy
+              footer-copy-3]]]]]))
+
 (def testimonials-section
   [:section.testimonials
     dashed-string
-    [:div.testimonials-block.group.ifttt
-      [:div.testimonial-author-pic]
-      [:div.testimonial-copy-bubble
-        [:div.testimonial-copy
-          (str
-           "Carrot helps us communicate more efficiently across multiple "
-           "time zones and working hours. It minimizes the FOMO that can "
-           "result from missed Slack conversations, and cuts out the ‘Did "
-           "you see my message?’ nagging.")]
-        [:div.testimonial-copy-footer
-          "— Kevin Ebaugh, Senior Platform Community Manager at "
-          [:a.testimonial-copy-link
-            {:href "https://ifttt.com/"
-             :target "_blank"}
-            "IFTTT"]]]]
+    (testimonial-block :ifttt)
     dashed-string
-    [:div.testimonials-block.group.blend-labs
-      [:div.testimonial-author-pic]
-      [:div.testimonial-copy-bubble
-        [:div.testimonial-copy
-          (str
-           "Carrot is a perfect compliment for Slack. We use it for "
-           "longer-form weekly updates no one should miss.")]
-        [:div.testimonial-copy-footer
-          "— Sara Vienna, Head of Design at "
-          [:a.testimonial-copy-link
-            {:href "https://bl3ndlabs.com/"
-             :target "_blank"}
-            "Bl3NDlabs"]]]]
+    (testimonial-carousel :orange)
     dashed-string
-    [:div.testimonials-block.group.novo 
-      [:div.testimonial-author-pic]
-      [:div.testimonial-copy-bubble
-        [:div.testimonial-copy
-          (str
-           "Carrot keeps everyone across our global offices up to date. "
-           "It helps us share big wins, and key information across our growing family.")]
-        [:div.testimonial-copy-footer
-          "— Tyler McIntyre, CEO at "
-          [:a.testimonial-copy-link
-            {:href "https://banknovo.com/"
-             :target "_blank"}
-            "Novobank"]]]]
+    (testimonial-block :blend-labs)
+    dashed-string
+    (testimonial-carousel :blue)
+    dashed-string
+    (testimonial-block :novo)
+    dashed-string
+    (testimonial-carousel :purple)
+    dashed-string
+    (testimonial-block :hello-tickets)
     dashed-string])

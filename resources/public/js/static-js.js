@@ -412,3 +412,60 @@ function isiPhoneWithoutPhysicalHomeBt(){
   }
   return false;
 }
+
+function OCStaticSwitchTestimonialImage(testimonialSection, step) {
+  var $carousel = $("div.testimonial-carousel-block." + testimonialSection);
+  $carousel.removeClass("step-1");
+  $carousel.removeClass("step-2");
+  $carousel.removeClass("step-3");
+
+  if (step === "1") {
+    $carousel.addClass("step-1");
+  }
+  if (step === "2") {
+    $carousel.addClass("step-2");
+  }
+  if (step === "3") {
+    $carousel.addClass("step-3");
+  }
+}
+
+function OCCarouselGetNextStep($carousel) {
+  if ($carousel.hasClass("step-1")) {
+    return "2";
+  } else if ($carousel.hasClass("step-2")) {
+    return "3";
+  } else {
+    return "1";
+  }
+}
+
+function OCCarouselDoStep(carouselSection) {
+  var $carousel = $("div.testimonial-carousel-block." + carouselSection);
+  var nextStep = OCCarouselGetNextStep($carousel);
+  OCStaticSwitchTestimonialImage(carouselSection, nextStep);
+  return true;
+}
+
+function OCCarouselStopInterval(carouselSection) {
+  if (carouselSection === "orange" && OCCarouselIntervals[0]) {
+    clearInterval(OCCarouselIntervals[0]);
+    OCCarouselIntervals[0] = undefined;
+  } else if (carouselSection === "blue" && OCCarouselIntervals[1]) {
+    clearInterval(OCCarouselIntervals[1]);
+    OCCarouselIntervals[1] = undefined;
+  } else if (carouselSection === "purple" && OCCarouselIntervals[2]){
+    clearInterval(OCCarouselIntervals[2]);
+    OCCarouselIntervals[2] = undefined;
+  }
+}
+
+var OCCarouselIntervals = {};
+
+$(document).ready(function(){
+  if ($("div.testimonial-carousel-block").length > 0) {
+    OCCarouselIntervals[0] = setInterval(function() {OCCarouselDoStep("orange")}, 3000);
+    OCCarouselIntervals[1] = setInterval(function() {OCCarouselDoStep("blue")}, 3000);
+    OCCarouselIntervals[2] = setInterval(function() {OCCarouselDoStep("purple")}, 3000);
+  }
+});
