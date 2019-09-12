@@ -146,9 +146,12 @@
 
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
-      (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
+      (if-let [board-data (first (filter #(or (= (:slug %) (router/current-board-slug))
+                                              (= (:uuid %) (router/current-board-slug))) boards))]
         ; Load the board data since there is a link to the board in the org data
         (do
+          (when (= (:uuid board-data) (router/current-board-slug))
+            (router/rewrite-board-uuid-as-slug (router/current-board-slug) (:slug board-data)))
           (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
             (utils/maybe-after section-delay #(sa/section-get :recently-posted board-link)))
           (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
