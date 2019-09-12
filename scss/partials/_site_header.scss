@@ -336,7 +336,6 @@ nav.site-navbar {
         height: 28px;
 
         &.active {
-          @include OC_Body_Bold();
           color: rgba($carrot_dark_brown_1, 0.5);
         }
       }
