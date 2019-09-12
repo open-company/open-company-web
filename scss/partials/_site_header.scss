@@ -38,14 +38,14 @@ span.go-to-digest {
 }
 
 nav.site-navbar {
-  height: 60px;
+  height: 83px;
   position: fixed;
   width: 100%;
   z-index: 100;
   background-color: transparent;
   border-bottom: 1px solid transparent;
   background-color: $ultra_light_gold;
-  transition: background-color 180ms;
+  transition: background-color 180ms, height 180ms;
 
   @include tablet() {
     height: 72px;
@@ -56,14 +56,23 @@ nav.site-navbar {
     height: 60px;
     box-shadow: 0px 2px 16px 0px rgba(0, 0, 0, 0.16);
     background-color: white;
+
+    div.site-navbar-container {
+      padding: 16px;
+
+      div.site-navbar-right {
+        top: 16px;
+      }
+    }
   }
 
   div.site-navbar-container {
     height: 60px;
-    padding: 16px;
+    padding: 39px 16px 16px;
     position: relative;
     max-width: 1209px;
     margin: 0 auto;
+    transition: padding 180ms;
 
     @include tablet() {
       width: 100%;
@@ -133,7 +142,8 @@ nav.site-navbar {
       position: absolute;
       height: 28px;
       right: 16px;
-      top: 16px;
+      top: 39px;
+      transform: top 180ms;
 
       @include mobile() {
         height: 30px;

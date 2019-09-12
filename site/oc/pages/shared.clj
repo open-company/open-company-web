@@ -333,25 +333,27 @@
                        (= slug :purple)
                        "Integrations")]
     [:div.testimonial-carousel-block
-      {:class (str (name slug) " step-3")}
+      {:class (name slug)}
       [:div.testimonial-carousel-headline
         headline]
       [:div.testimonial-carousel-subheadline
         subheadline]
       [:div.testimonial-carousel-images
-        [:img.testimonial-carousel-image.image-1
-          {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1.png"))
-           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1@2x.png")) " 2x")}]
-        [:img.testimonial-carousel-image.image-2
-          {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png"))
-           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2@2x.png")) " 2x")}]
-        [:img.testimonial-carousel-image.image-3
-          {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png"))
-           :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3@2x.png")) " 2x")}]]
+        [:div.testimonial-carousel-images-inner
+          [:img.testimonial-carousel-image.image-1
+            {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1.png"))
+             :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1@2x.png")) " 2x")}]
+          [:img.testimonial-carousel-image.image-2
+            {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png"))
+             :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2@2x.png")) " 2x")}]
+          [:img.testimonial-carousel-image.image-3
+            {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png"))
+             :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3@2x.png")) " 2x")}]]]
       [:div.testimonial-carousel-footers.group
         [:div.testimonial-carousel-footer.footer-1
           {:class (name slug)
-           :onClick (str "OCCarouselStopInterval(\"" (name slug) "\"); OCCarouselStopInterval(\"" (name slug) "\"); OCStaticSwitchTestimonialImage(\"" (name slug) "\", \"1\");")}
+           :onClick (str "OCCarousel.carouselClicked(\"" (name slug) "\", \"1\");")
+           :onMouseLeave (str "OCCarousel.maybeRestartTimeout(\"" (name slug) "\", \"1\");")}
           [:div.testimonial-carousel-footer-progress]
           [:div.testimonial-carousel-footer-block
             [:div.testimonial-carousel-footer-icon]
@@ -359,7 +361,8 @@
               footer-copy-1]]]
         [:div.testimonial-carousel-footer.footer-2
           {:class (name slug)
-           :onClick (str "OCStaticSwitchTestimonialImage(\"" (name slug) "\", \"2\");")}
+           :onClick (str "OCCarousel.carouselClicked(\"" (name slug) "\", \"2\");")
+           :onMouseLeave (str "OCCarousel.maybeRestartTimeout(\"" (name slug) "\", \"2\");")}
           [:div.testimonial-carousel-footer-progress]
           [:div.testimonial-carousel-footer-block
             [:div.testimonial-carousel-footer-icon]
@@ -367,7 +370,8 @@
               footer-copy-2]]]
         [:div.testimonial-carousel-footer.footer-3
           {:class (name slug)
-           :onClick (str "OCCarouselStopInterval(\"" (name slug) "\"); OCStaticSwitchTestimonialImage(\"" (name slug) "\", \"3\");")}
+           :onClick (str "OCCarousel.carouselClicked(\"" (name slug) "\", \"3\");")
+           :onMouseLeave (str "OCCarousel.maybeRestartTimeout(\"" (name slug) "\", \"3\");")}
           [:div.testimonial-carousel-footer-progress]
           [:div.testimonial-carousel-footer-block
             [:div.testimonial-carousel-footer-icon]

@@ -80,7 +80,7 @@ div.home-wrap {
         @include OC_Body_Bold()
         color: $deep_navy;
         line-height: 76px;
-        margin: 0 auto 24px;
+        margin: 0 auto;
         z-index: 2;
         position: relative;
 
@@ -104,7 +104,7 @@ div.home-wrap {
         margin: 9px auto 0;
         z-index: 2;
         position: relative;
-        max-width: 800px;
+        max-width: 820px;
 
         @include tablet(){
           font-size: 24px;
@@ -126,7 +126,7 @@ div.home-wrap {
       }
 
       div.get-started-button-container {
-        margin: 36px auto 80px;
+        margin: 0 auto 80px;
         width: 320px;
 
         @include mobile() {

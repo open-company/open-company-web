@@ -413,60 +413,118 @@ function isiPhoneWithoutPhysicalHomeBt(){
   return false;
 }
 
-function OCStaticSwitchTestimonialImage(testimonialSection, step) {
-  var $carousel = $("div.testimonial-carousel-block." + testimonialSection);
-  $carousel.removeClass("step-1");
-  $carousel.removeClass("step-2");
-  $carousel.removeClass("step-3");
+var OCCarousel = {
+  timeouts: {},
+  timing: 7000,
+  carouselClass: "div.testimonial-carousel-block",
+  initialized: {},
 
-  if (step === "1") {
-    $carousel.addClass("step-1");
+  init: function(){
+    return this;
+  },
+
+  start: function(carouselSection){
+    if (!this.initialized[carouselSection]) {
+      this.setTimeout(carouselSection);
+      $(this.carouselClass + "." + carouselSection).addClass("step-1");
+    }
+  },
+
+  setTimeout: function(carouselSection) {
+    this.initialized[carouselSection] = true;
+    var bindedAutoStep = this.autoStep.bind(this);
+    this.timeouts[carouselSection] = window.setTimeout(function(){bindedAutoStep(carouselSection)}, this.timing);
+  },
+
+  maybeRestartTimeout: function(carouselSection, step) {
+    if (!this.timeouts[carouselSection]) {
+      this.restartTimeout(carouselSection, step);
+    }
+  },
+
+  restartTimeout: function(carouselSection, step) {
+    // Start the progress bar
+    $carousel = $(this.carouselClass + "." + carouselSection);
+    this.doStep($carousel, step);
+    this.setTimeout(carouselSection);
+  },
+
+  getNextStep: function($carousel) {
+    if ($carousel.hasClass("step-1")) {
+      return "2";
+    } else if ($carousel.hasClass("step-2")) {
+      return "3";
+    } else {
+      return "1";
+    }
+  },
+
+  autoStep: function(carouselSection) {
+    var $carousel = $(this.carouselClass + "." + carouselSection);
+    var nextStep = this.getNextStep($carousel);
+    this.switchTestimonialImage(carouselSection, nextStep);
+    this.doStep($carousel, nextStep);
+    this.setTimeout(carouselSection);
+  },
+
+  doStep: function($carousel, step){
+    $carousel.removeClass("step-1");
+    $carousel.removeClass("step-2");
+    $carousel.removeClass("step-3");
+
+    $carousel.addClass("step-" + step);
+  },
+
+  switchTestimonialImage: function(testimonialSection, step) {
+    var $carousel = $(this.carouselClass + "." + testimonialSection);
+    $carousel.removeClass("image-1");
+    $carousel.removeClass("image-2");
+    $carousel.removeClass("image-3");
+
+    $carousel.addClass("image-" + step);
+  },
+
+  carouselClicked: function(carouselSection, step) {
+    if (this.timeouts[carouselSection]) {
+      window.clearTimeout(this.timeouts[carouselSection]);
+      this.timeouts[carouselSection] = undefined;
+    }
+
+    var $carousel = $(this.carouselClass + "." + carouselSection);
+
+    $carousel.removeClass("step-1");
+    $carousel.removeClass("step-2");
+    $carousel.removeClass("step-3");
+    this.switchTestimonialImage(carouselSection, step);
   }
-  if (step === "2") {
-    $carousel.addClass("step-2");
-  }
-  if (step === "3") {
-    $carousel.addClass("step-3");
-  }
-}
 
-function OCCarouselGetNextStep($carousel) {
-  if ($carousel.hasClass("step-1")) {
-    return "2";
-  } else if ($carousel.hasClass("step-2")) {
-    return "3";
-  } else {
-    return "1";
-  }
-}
+};
 
-function OCCarouselDoStep(carouselSection) {
-  var $carousel = $("div.testimonial-carousel-block." + carouselSection);
-  var nextStep = OCCarouselGetNextStep($carousel);
-  OCStaticSwitchTestimonialImage(carouselSection, nextStep);
-  return true;
-}
+$.fn.isInViewport = function() {
+  var elementTop = $(this).offset().top;
+  var elementBottom = elementTop + $(this).outerHeight();
+  var viewportTop = $(window).scrollTop();
+  var viewportBottom = viewportTop + $(window).height();
+  return elementBottom > viewportTop && elementTop < viewportBottom;
+};
 
-function OCCarouselStopInterval(carouselSection) {
-  if (carouselSection === "orange" && OCCarouselIntervals[0]) {
-    clearInterval(OCCarouselIntervals[0]);
-    OCCarouselIntervals[0] = undefined;
-  } else if (carouselSection === "blue" && OCCarouselIntervals[1]) {
-    clearInterval(OCCarouselIntervals[1]);
-    OCCarouselIntervals[1] = undefined;
-  } else if (carouselSection === "purple" && OCCarouselIntervals[2]){
-    clearInterval(OCCarouselIntervals[2]);
-    OCCarouselIntervals[2] = undefined;
-  }
-}
-
-var OCCarouselIntervals = {};
-var OCCarouselTiming = 5000;
-
+var ocCarousel = undefined;
 $(document).ready(function(){
-  if ($("div.testimonial-carousel-block").length > 0) {
-    OCCarouselIntervals[0] = setInterval(function() {OCCarouselDoStep("orange")}, OCCarouselTiming);
-    OCCarouselIntervals[1] = setInterval(function() {OCCarouselDoStep("blue")}, OCCarouselTiming);
-    OCCarouselIntervals[2] = setInterval(function() {OCCarouselDoStep("purple")}, OCCarouselTiming);
-  }
+  ocCarousel = OCCarousel.init();
+  
+  var orangeCarousel = $(ocCarousel.carouselClass + "." + "orange");
+  var blueCarousel = $(ocCarousel.carouselClass + "." + "blue");
+  var purpleCarousel = $(ocCarousel.carouselClass + "." + "purple");
+
+  $(window).on("scroll", function() {
+    if( !ocCarousel["orange"] && orangeCarousel.isInViewport() ) {
+      ocCarousel.start("orange");
+    }
+    if( !ocCarousel["blue"] &&  blueCarousel.isInViewport() ) {
+      ocCarousel.start("blue");
+    }
+    if( !ocCarousel["purple"] &&  purpleCarousel.isInViewport() ) {
+      ocCarousel.start("purple");
+    }
+  });
 });

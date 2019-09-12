@@ -10,10 +10,10 @@
       [:section.cta.group
 
         [:h1.headline
-          "Now it's clear"]
+          "Where teams find clarity"]
         [:div.subheadline
           (str
-           "Carrot brings order to team communication so it's easier to stay "
+           "Carrot organizes your team's communication so it's easier to stay "
            "engaged and informed. Ideal for keeping remote teams in sync.")]
 
         [:div.get-started-button-container.group

@@ -1,3 +1,5 @@
+$carousel_timing: 7s;
+
 div.main-animation-container {
   position: relative;
 
@@ -1233,46 +1235,94 @@ section.testimonials {
       text-align: center;
     }
 
-    &.step-1 {
+    &.image-1 {
       div.testimonial-carousel-images {
-        img:nth-child(1) {
-          display: block;
+        div.testimonial-carousel-images-inner {
+          img:nth-child(1) {
+            transition: opacity 180ms;
+            opacity: 1;
+            z-index: 2;
+          }
+          img:nth-child(2) {
+            transition: opacity 1s;
+            opacity: 0;
+            z-index: 1;
+          }
+          img:nth-child(3) {
+            transition: opacity 1s;
+            opacity: 0;
+            z-index: 1;
+          }
         }
       }
+    }
 
+    &.step-1{
       div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-1 {
         div.testimonial-carousel-footer-progress:after {
-          transition: width 5s linear;
+          transition: width $carousel_timing linear;
           width: 100%;
+        }
+      }
+    }
+
+    &.image-2 {
+      div.testimonial-carousel-images {
+        div.testimonial-carousel-images-inner {
+          img:nth-child(2) {
+            transition: opacity 180ms;
+            opacity: 1;
+            z-index: 2;
+          }
+          img:nth-child(1) {
+            transition: opacity 1s;
+            opacity: 0;
+            z-index: 1;
+          }
+          img:nth-child(3) {
+            transition: opacity 1s;
+            opacity: 0;
+            z-index: 1;
+          }
         }
       }
     }
 
     &.step-2 {
-      div.testimonial-carousel-images {
-        img:nth-child(2) {
-          display: block;
-        }
-      }
-
       div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-2 {
         div.testimonial-carousel-footer-progress:after {
-          transition: width 5s linear;
+          transition: width $carousel_timing linear;
           width: 100%;
         }
       }
     }
 
-    &.step-3 {
+    &.image-3 {
       div.testimonial-carousel-images {
-        img:nth-child(3) {
-          display: block;
+        div.testimonial-carousel-images-inner {
+          img:nth-child(3) {
+            transition: opacity 180ms;
+            opacity: 1;
+            z-index: 2;
+          }
+          img:nth-child(2) {
+            transition: opacity 1s;
+            opacity: 0;
+            z-index: 1;
+          }
+          img:nth-child(1) {
+            transition: opacity 1s;
+            opacity: 0;
+            z-index: 1;
+          }
         }
       }
+    }
 
+    &.step-3 {
       div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-3 {
         div.testimonial-carousel-footer-progress:after {
-          transition: width 5s linear;
+          transition: width $carousel_timing linear;
           width: 100%;
         }
       }
@@ -1280,14 +1330,31 @@ section.testimonials {
 
     div.testimonial-carousel-images {
       width: 100%;
-      margin-top: 40px;
+      margin: 40px auto 0;
+      max-width: 996px;
 
-      img {
+      div.testimonial-carousel-images-inner {
+        position: relative;
         width: 100%;
-        border: none;
-        box-shadow: none;
-        outline: none;
-        display: none;
+        height: 56%;
+        padding-bottom: 56%;
+
+        img {
+          width: 100%;
+          border: none;
+          box-shadow: none;
+          outline: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          opacity: 0;
+
+          // Start with first image visible
+          &:first-child {
+            opacity: 1;
+          }
+        }
       }
     }
 
@@ -1411,6 +1478,7 @@ section.testimonials {
             width: 0px;
             height: 6px;
             border-radius: 3px;
+            width: 0;
           }
         }
 
