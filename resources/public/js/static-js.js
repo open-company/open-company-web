@@ -461,11 +461,12 @@ function OCCarouselStopInterval(carouselSection) {
 }
 
 var OCCarouselIntervals = {};
+var OCCarouselTiming = 5000;
 
 $(document).ready(function(){
   if ($("div.testimonial-carousel-block").length > 0) {
-    OCCarouselIntervals[0] = setInterval(function() {OCCarouselDoStep("orange")}, 3000);
-    OCCarouselIntervals[1] = setInterval(function() {OCCarouselDoStep("blue")}, 3000);
-    OCCarouselIntervals[2] = setInterval(function() {OCCarouselDoStep("purple")}, 3000);
+    OCCarouselIntervals[0] = setInterval(function() {OCCarouselDoStep("orange")}, OCCarouselTiming);
+    OCCarouselIntervals[1] = setInterval(function() {OCCarouselDoStep("blue")}, OCCarouselTiming);
+    OCCarouselIntervals[2] = setInterval(function() {OCCarouselDoStep("purple")}, OCCarouselTiming);
   }
 });

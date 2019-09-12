@@ -1242,7 +1242,7 @@ section.testimonials {
 
       div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-1 {
         div.testimonial-carousel-footer-progress:after {
-          transition: width 3s;
+          transition: width 5s linear;
           width: 100%;
         }
       }
@@ -1257,7 +1257,7 @@ section.testimonials {
 
       div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-2 {
         div.testimonial-carousel-footer-progress:after {
-          transition: width 3s;
+          transition: width 5s linear;
           width: 100%;
         }
       }
@@ -1272,7 +1272,7 @@ section.testimonials {
 
       div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-3 {
         div.testimonial-carousel-footer-progress:after {
-          transition: width 3s;
+          transition: width 5s linear;
           width: 100%;
         }
       }
