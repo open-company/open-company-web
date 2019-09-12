@@ -182,10 +182,7 @@ button.get-started-button {
   margin: 48px auto 0;
   position: relative;
   text-align: center;
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
-  padding: 2px 0 0;
+  padding: 0;
 
   @include mobile(){
     width: 100%;
