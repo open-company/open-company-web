@@ -144,7 +144,6 @@
   [page]
   ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
-    {:class (when (= page :slack-lander) "no-border")}
     [:div.container-fluid.group
       [:div.right-column.group
 
@@ -152,46 +151,42 @@
           [:div.column-title
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
-          [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
           [:div.column-item [:a {:href "https://the.carrot.news/" :target "_blank"} "What’s new"]]
-          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]]
+          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
+          [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
 
         [:div.column.column-resources
           [:div.column-title
             "Company"]
-          [:div.column-item [:a {:href "/about"} "About Carrot"]]
-          [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]
+          [:div.column-item [:a {:href "/about"} "About"]]
           [:div.column-item [:a {:href "https://twitter.com/carrot_hq" :target "_blank"} "Twitter"]]
-          [:div.column-item [:a {:href "/press-kit"} "Press Kit"]]
-          [:div.column-item [:a {:class "intercom-chat-link"
-                                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-                              "Contact"]]]
+          [:div.column-item [:a {:href "https://blog.carrot.io" :target "_blank"} "Blog"]]]
 
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href "https://intercom.help/carrot-c8000b30b176/en" :target "_blank"} "Help center"]]
-          ;[:div.column-item [:a {:href "#" :target "_blank"} "Leadership in the age of Slack"]]
-          ;[:div.column-item [:a {:href "#" :target "_blank"} "How Slack works with Carrot"]]
-          ;[:div.column-item [:a {:href "#" :target "_blank"} "Carrot AI eliminates communication gaps"]]
-          ]]
+          [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
+          [:div.column-item [:a {:href "https://intercom.help/carrot-c8000b30b176/en" :target "_blank"} "Help center"]
+          [:div.column-item
+            [:a
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+              "Contact us"]]]]]
       [:div.left-column.group
         [:img.logo
           {:src (shared/cdn "/img/ML/carrot_wordmark.svg")}]
-        [:div.footer-communication-copy
-          "Leadership communication for fast-growing and remote teams."]
         [:div.footer-small-links.static
-          [:a {:href "/sign-up"} "Get started for free"]
+          [:a {:href "/login"} "Login"]
           "or"
-          [:a {:href "/login"} "Login"]]
-        [:div.copyright
-          "© 2015-2019 Carrot"]
+          [:a {:href "/sign-up"} "create your team"]]
         [:div.tos-and-pp
           [:a {:href "/privacy"}
            "Privacy"]
-          " • "
+          " & "
           [:a {:href "/terms"}
-           "Terms"]]]]])
+           "Terms"]]
+        [:div.copyright
+          "© 2019 Carrot"]]]])
 
 
 (defn read-edn [entry]

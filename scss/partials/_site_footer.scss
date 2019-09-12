@@ -1,22 +1,10 @@
 .navbar-bottom {
-  background-color: $grey_num_2 !important;
+  background-color: $ultra_light_gold !important;
   margin-bottom: 0px !important;
   border-radius: 0px;
   border: none;
   padding: 0 0 60px;
   overflow: hidden;
-
-  &.no-border {
-    div.container-fluid {
-      @include big_web_no_tablet() {
-        border-top: none;
-      }
-    }
-  }
-
-  &.light-background {
-    background-color: $ultra_light_gold !important;
-  }
 
   @include tablet(){
     padding: 80px 0;
@@ -43,7 +31,6 @@
     padding-left: 0px !important;
     padding-right: 0px !important;
     padding-top: 40px !important;
-    border-top: 1px solid $more_ultra_light_grey;
 
     @include mobile(){
       padding-left: 32px;
@@ -187,10 +174,10 @@
         }
 
         div.column-title {
-          @include OC_Body_Bold();
+          @include OC_Body_Book();
           color: $light_ui_grey;
-          font-size: 16px;
-          margin-bottom: 20px;
+          font-size: 18px;
+          margin-bottom: 16px;
 
           @include mobile(){
             border-bottom: 1px solid rgba(255,255,255,0.5);
@@ -201,7 +188,6 @@
         }
 
         div.column-item {
-          margin-top: 10px;
 
           @include mobile(){
             margin-top: 16px;
@@ -210,7 +196,8 @@
           a {
             @include OC_Body_Book();
             color: $deep_navy;
-            font-size: 16px;
+            font-size: 18px;
+            line-height: 32px;
 
             &:hover {
               color: $carrot_green;
