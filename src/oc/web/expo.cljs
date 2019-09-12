@@ -70,12 +70,10 @@
   "Callback for responding to the user tapping on a native push notification. Response contains
   a push notification payload, which is literally a Carrot notification map."
   [json-str]
-  (if-not (dis/org-data)
-    (bridge-pend-push-notification! json-str)
-    (when-let [notification (parse-bridge-data json-str)]
-      (let [fixed-notif (user-utils/fix-notification notification)
-            click-handler (:click fixed-notif)]
-        (click-handler)))))
+  (when-let [notification (parse-bridge-data json-str)]
+    (let [fixed-notif (user-utils/fix-notification notification)
+          click-handler (:click fixed-notif)]
+      (click-handler))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
