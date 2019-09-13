@@ -197,14 +197,19 @@
         old-change-data (get-in db change-key)]
     (assoc-in db change-key (update-unseen-remove old-change-data item-id container-id change-data))))
 
-(defn update-unseen-add [old-change-data item-id container-id new-changes]
+(defn update-unseen-unread-add [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
         old-unseen (or (:unseen old-container-change-data) [])
         next-unseen (vec (seq (conj old-unseen item-id)))
+        old-unread (or (:unread old-container-change-data) [])
+        next-unread (vec (seq (conj old-unread item-id)))
         next-container-change-data (if old-container-change-data
-                                     (assoc old-container-change-data :unseen next-unseen)
+                                     (assoc old-container-change-data
+                                      :unseen next-unseen
+                                      :unread next-unread)
                                      {:container-id container-id
-                                      :unseen next-unseen})]
+                                      :unseen next-unseen
+                                      :unread next-unread})]
     (assoc old-change-data container-id next-container-change-data)))
 
 (defmethod dispatcher/action :item-add/unseen
@@ -213,7 +218,7 @@
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
         old-change-data (get-in db change-key)]
-    (assoc-in db change-key (update-unseen-add old-change-data item-id container-id change-data))))
+    (assoc-in db change-key (update-unseen-unread-add old-change-data item-id container-id change-data))))
 
 ;; Section store specific reducers
 (defmethod reducer :default [db payload]
