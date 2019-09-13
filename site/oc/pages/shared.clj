@@ -471,7 +471,7 @@
           [:span.soon "SOON"]]
         [:div.tear-feature-separator]
         [:div.tear-feature
-          [:span "Free fuest users"]
+          [:span "Free guest users"]
           [:span.soon "SOON"]]
         [:div.tear-feature-separator]
         [:div.tear-feature
