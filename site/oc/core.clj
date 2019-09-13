@@ -102,10 +102,31 @@
             {:href "/"
              :class (when (= active-page "index") "active")}
             "Home"]
-          [:a
-            {:href "/about"
-             :class (when (= active-page "about") "active")}
-            "Apps"]
+          [:div.apps-container
+            [:button.mlb-reset.apps-bt
+              {:class (when (= active-page "about") "active")}
+              "Apps"]
+            [:div.apps-dropdow-menu
+              [:div.app-items-group
+                "Desktop apps"]
+              [:a.app-item
+                {:href "/app/mac"}
+                [:span "Mac"]
+                [:span.beta "BETA"]]
+              [:a.app-item
+                {:href "/app/win"}
+                [:span "Windows"]
+                [:span.beta "BETA"]]
+              [:div.app-items-group
+                "Mobile apps"]
+              [:a.app-item
+                {:href "/app/android"}
+                [:span "Android"]
+                [:span.beta "BETA"]]
+              [:a.app-item
+                {:href "/app/iphone"}
+                [:span "iPhone"]
+                [:span.beta "BETA"]]]]
           [:a
             {:href "/pricing"
              :class (when (= active-page "pricing") "active")}
