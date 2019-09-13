@@ -327,16 +327,17 @@ nav.site-navbar {
 
       a {
         @include OC_Body_Book();
-        padding: 0px 12px;
+        padding: 0px 20px;
         display: inline-block;
         font-size: 18px;
         line-height: 28px;
-        color: $carrot_dark_brown_1;
-        margin: 0px;
+        color: rgba($deep_navy, 0.5);
+        margin: 0;
         height: 28px;
+        z-index: 2;
 
         &.active {
-          color: rgba($carrot_dark_brown_1, 0.5);
+          color: $deep_navy;
         }
       }
 
@@ -346,25 +347,25 @@ nav.site-navbar {
 
         button.apps-bt {
           @include OC_Body_Book();
-          padding: 0px 12px;
           display: inline-block;
           font-size: 18px;
           line-height: 28px;
-          color: rgba($deep_navy, 0.5);
-          margin: 0px;
+          color: $deep_navy;
+          margin: 0;
+          padding: 0px 20px;
           height: 28px;
           position: relative;
           z-index: 2;
 
           &.active {
             color: $deep_navy;
-          }   
+          }
         }
 
         &.dropdow-menu-visible {
           div.apps-dropdow-menu {
             opacity: 1;
-            margin-top: 32px;
+            margin-top: 55px;
           }
 
           button.apps-bt {
@@ -383,7 +384,7 @@ nav.site-navbar {
           text-align: center;
           position: absolute;
           top: 0;
-          margin-top: 0;
+          margin-top: 35px;
           left: 50%;
           transform: translateX(-50%);
           z-index: 1;
