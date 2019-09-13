@@ -163,7 +163,7 @@ section.keep-aligned {
     img.keep-aligned-value {
       padding: 0 12px;
       display: inline-block;
-    }    
+    }
   }
 
   button.get-started-button {
@@ -1123,6 +1123,88 @@ div.dashed-string {
   }
 }
 
+div.testimonials-block {
+  width: 100%;
+  max-width: 894px;
+  margin: 0 auto;
+  position: relative;
+
+  &.ifttt {
+    div.testimonial-author-pic {
+      @include image-2x("/img/ML/testimonial_author_ifttt");
+    }
+  }
+
+  &.blend-labs {
+    div.testimonial-author-pic {
+      @include image-2x("/img/ML/testimonial_author_blend_labs");
+    }
+  }
+
+  &.novo {
+    div.testimonial-author-pic {
+      @include image-2x("/img/ML/testimonial_author_novo");
+    }
+  }
+
+  &.hello-tickets {
+    div.testimonial-author-pic {
+      @include image-2x("/img/ML/testimonial_author_hello_tickets");
+    }
+  }
+
+  div.testimonial-author-pic {
+    width: 78px;
+    height: 78px;
+    float: left;
+    margin-top: 38px;
+    background-size: 78px 78px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  div.testimonial-copy-bubble {
+    float: right;
+    background-color: $grey_num_5;
+    border-radius: 16px;
+    width: calc(100% - 78px - 24px);
+    height: 100%;
+    padding: 38px 40px;
+
+    &:before {
+      content: "";
+      width: 20px;
+      height: 20px;
+      transform: rotate(45deg);
+      position: absolute;
+      top: 40px;
+      left: 92px;
+      background-color: $grey_num_5;
+      display: block;
+    }
+
+    div.testimonial-copy {
+      @include OC_Body_Book();
+      font-size: 22px;
+      line-height: 28px;
+      color: $deep_navy;
+      text-align: left;
+    }
+
+    div.testimonial-copy-footer {
+      margin-top: 24px;
+      @include OC_Body_Bold();
+      font-size: 18px;
+      color: $deep_navy;
+      text-align: left;
+
+      a {
+        color: $carrot_green;
+      }
+    }
+  }
+}
+
 section.testimonials {
   text-align: center;
   position: relative;
@@ -1135,88 +1217,6 @@ section.testimonials {
     padding-top: 56px !important;
     padding-bottom: 56px !important;
     text-align: center;
-  }
-
-  div.testimonials-block {
-    width: 100%;
-    max-width: 894px;
-    margin: 0 auto;
-    position: relative;
-
-    &.ifttt {
-      div.testimonial-author-pic {
-        @include image-2x("/img/ML/testimonial_author_ifttt");
-      }
-    }
-
-    &.blend-labs {
-      div.testimonial-author-pic {
-        @include image-2x("/img/ML/testimonial_author_blend_labs");
-      }
-    }
-
-    &.novo {
-      div.testimonial-author-pic {
-        @include image-2x("/img/ML/testimonial_author_novo");
-      }
-    }
-
-    &.hello-tickets {
-      div.testimonial-author-pic {
-        @include image-2x("/img/ML/testimonial_author_hello_tickets");
-      }
-    }
-
-    div.testimonial-author-pic {
-      width: 78px;
-      height: 78px;
-      float: left;
-      margin-top: 38px;
-      background-size: 78px 78px;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    div.testimonial-copy-bubble {
-      float: right;
-      background-color: $grey_num_5;
-      border-radius: 16px;
-      width: calc(100% - 78px - 24px);
-      height: 100%;
-      padding: 38px 40px;
-
-      &:before {
-        content: "";
-        width: 20px;
-        height: 20px;
-        transform: rotate(45deg);
-        position: absolute;
-        top: 40px;
-        left: 92px;
-        background-color: $grey_num_5;
-        display: block;
-      }
-
-      div.testimonial-copy {
-        @include OC_Body_Book();
-        font-size: 22px;
-        line-height: 28px;
-        color: $deep_navy;
-        text-align: left;
-      }
-
-      div.testimonial-copy-footer {
-        margin-top: 24px;
-        @include OC_Body_Bold();
-        font-size: 18px;
-        color: $deep_navy;
-        text-align: left;
-
-        a {
-          color: $carrot_green;
-        }
-      }    
-    }
   }
 
   div.testimonial-carousel-block {
