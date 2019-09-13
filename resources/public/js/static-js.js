@@ -496,46 +496,53 @@ var OCCarousel = {
     $carousel.removeClass("step-2");
     $carousel.removeClass("step-3");
     this.switchTestimonialImage(carouselSection, step);
+  },
+
+  isInViewport: function($el) {
+    if ($el.length > 0) {
+      var elementTop = $el.offset().top;
+      var elementBottom = elementTop + $el.outerHeight();
+      var viewportTop = $(window).scrollTop();
+      var viewportBottom = viewportTop + $(window).height();
+      return elementBottom > viewportTop && elementTop < viewportBottom;
+    }
+    // The element we are trying to check the event with doesn't exists
+    // so we sure clicked outside it
+    return true;
   }
 
 };
 
-$.fn.isInViewport = function() {
-  var elementTop = $(this).offset().top;
-  var elementBottom = elementTop + $(this).outerHeight();
-  var viewportTop = $(window).scrollTop();
-  var viewportBottom = viewportTop + $(window).height();
-  return elementBottom > viewportTop && elementTop < viewportBottom;
-};
+(function(){
+  var ocCarousel = undefined;
+  $(document).ready(function(){
+    ocCarousel = OCCarousel.init();
 
-var ocCarousel = undefined;
-$(document).ready(function(){
-  ocCarousel = OCCarousel.init();
-  
-  var orangeCarousel = $(ocCarousel.carouselClass + "." + "orange");
-  var blueCarousel = $(ocCarousel.carouselClass + "." + "blue");
-  var purpleCarousel = $(ocCarousel.carouselClass + "." + "purple");
+    var $orangeCarousel = $(ocCarousel.carouselClass + "." + "orange div.testimonial-carousel-footers");
+    var $blueCarousel = $(ocCarousel.carouselClass + "." + "blue div.testimonial-carousel-footers");
+    var $purpleCarousel = $(ocCarousel.carouselClass + "." + "purple div.testimonial-carousel-footers");
 
-  $(window).on("scroll", function() {
-    if( !ocCarousel["orange"] && orangeCarousel.isInViewport() ) {
-      ocCarousel.start("orange");
-    }
-    if( !ocCarousel["blue"] &&  blueCarousel.isInViewport() ) {
-      ocCarousel.start("blue");
-    }
-    if( !ocCarousel["purple"] &&  purpleCarousel.isInViewport() ) {
-      ocCarousel.start("purple");
+    $(window).on("scroll", function() {
+      if( !ocCarousel["orange"] && ocCarousel.isInViewport($orangeCarousel) ) {
+        ocCarousel.start("orange");
+      }
+      if( !ocCarousel["blue"] && ocCarousel.isInViewport($blueCarousel) ) {
+        ocCarousel.start("blue");
+      }
+      if( !ocCarousel["purple"] && ocCarousel.isInViewport($purpleCarousel) ) {
+        ocCarousel.start("purple");
+      }
+    });
+
+    var $appsBt = $("button.apps-bt");
+    if ($appsBt.length > 0) {
+      $appsBt.click(function(event){
+        event.stopPropagation();
+        $("div.apps-container").toggleClass("dropdow-menu-visible");
+      });
+      $(window).click(function(event){
+        $("div.apps-container").removeClass("dropdow-menu-visible");
+      });
     }
   });
-
-  var $appsBt = $("button.apps-bt");
-  if ($appsBt.length > 0) {
-    $appsBt.click(function(event){
-      event.stopPropagation();
-      $("div.apps-container").toggleClass("dropdow-menu-visible");
-    });
-    $(window).click(function(event){
-      $("div.apps-container").removeClass("dropdow-menu-visible");
-    });
-  }
-});
+})();
