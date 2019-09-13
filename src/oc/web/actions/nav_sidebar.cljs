@@ -5,7 +5,6 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
-            [oc.web.lib.cookies :as cook]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -69,11 +68,13 @@
                      dis/other-sort-type
                      (activity-actions/saved-sort-type org-slug))]
      (if (= current-path url)
-       (do
+       (do ;; In case user is clicking on the currently highlighted section
+           ;; let's refresh the posts list only
          (routing-actions/routing @router/path)
          (user-actions/initial-loading true))
-       ; (router/nav! url)
-       (do
+       (do ;; If user clicked on a different section/container
+           ;; let's switch to it using pushState and changing
+           ;; the internal router state
          (refresh-board-data board-slug sort-type)
          (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
           {:org org-slug
