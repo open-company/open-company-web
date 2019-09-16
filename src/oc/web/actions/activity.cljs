@@ -454,6 +454,11 @@
   (send-item-read (:uuid activity-data))
   ;; Show the first post added tooltip if needed
   (nux-actions/show-post-added-tooltip (:uuid activity-data))
+  ;; Refresh the drafts board on publish
+  (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
+        drafts-link (utils/link-for (:links drafts-board) "self")]
+    (when drafts-link
+      (sa/section-get dis/other-sort-type drafts-link)))
   ;; Show follow-ups notifications if needed
   (when (pos? (count (:follow-ups activity-data)))
     (let [follow-ups (:follow-ups activity-data)
@@ -644,8 +649,13 @@
 (defn activity-change [section-uuid activity-uuid]
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
-        activity-data (dis/activity-data (:slug org-data) activity-uuid)]
-    (when activity-data
+        activity-data (dis/activity-data (:slug org-data) activity-uuid)
+        editing-activity-data (:cmail-data @dis/app-state)]
+    (when (and ;; if we have the activity in the app-state
+               activity-data
+               ;; and we are not currently editing it (if we are editing
+               ;; we don't need to refresh it on each change)
+               (not= (:uuid activity-data) (:uuid editing-activity-data)))
       (get-entry activity-data))))
 
 ;; Change service actions
@@ -885,6 +895,11 @@
                                                :dismiss true
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
+
+(defn saved-sort-type [org-slug]
+  (if-let [sort-type-cookie (cook/get-cookie (router/last-sort-cookie org-slug))]
+    (keyword sort-type-cookie)
+    dis/default-sort-type))
 
 (defn change-sort-type [type]
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)

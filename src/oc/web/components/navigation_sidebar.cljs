@@ -145,7 +145,7 @@
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-all-posts})
              :href (oc-urls/all-posts)
-             :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
+             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
@@ -154,7 +154,7 @@
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})
              :href (oc-urls/follow-ups)
-             :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
+             :on-click #(nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups))}
             [:div.follow-ups-icon]
             [:div.follow-ups-label
               "Follow-ups"]
@@ -170,7 +170,7 @@
                :data-board (name (:slug drafts-board))
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
-               :on-click #(nav-actions/nav-to-url! % board-url)}
+               :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
               [:div.drafts-icon]
               [:div.drafts-label.group
                 "Drafts "]
@@ -202,7 +202,7 @@
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(do
-                              (nav-actions/nav-to-url! % board-url))}
+                              (nav-actions/nav-to-url! % (:slug board) board-url))}
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")

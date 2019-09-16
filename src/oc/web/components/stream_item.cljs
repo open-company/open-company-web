@@ -48,7 +48,8 @@
         comments-data @(drv/get-ref s :comments-data)]
     (comment-actions/get-comments-if-needed activity-data comments-data)))
 
-(rum/defcs stream-item < rum/reactive
+(rum/defcs stream-item < rum/static
+                         rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
