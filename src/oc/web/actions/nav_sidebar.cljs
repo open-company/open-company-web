@@ -75,14 +75,14 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (refresh-board-data board-slug sort-type)
          (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
           {:org org-slug
            :board board-slug
            :sort-type sort-type
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
-         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top)))))
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+         (utils/after 0 #(refresh-board-data board-slug sort-type)))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
 
