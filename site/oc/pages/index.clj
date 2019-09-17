@@ -5,7 +5,6 @@
   [:div.home-wrap
     {:id "wrap"}
     [:div.main.home-page
-      shared/animation-lightbox
       ; Hope page header
       [:section.cta.group
 
@@ -35,11 +34,5 @@
 
       shared/testimonials-section
 
-      ; (shared/keep-aligned-section false)
-
       shared/pricing-table-section
-
-      ; shared/carrot-in-action
-
-      ; shared/keep-aligned-bottom
       ]])

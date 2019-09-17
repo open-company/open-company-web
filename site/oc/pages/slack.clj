@@ -9,18 +9,17 @@
   [:div.slack-wrap
     {:id "wrap"}
     [:div.main.slack
-      shared/animation-lightbox
       ; Hope page header
       [:section.carrot-plus-slack.group
 
         [:h1.slack-headline
-          "Where teams find clarity"]
+          "Slack & Carrot"]
         
         [:div.slack-subline
-          (str
-            "Carrot is the platform for team communication that matters. "
-            "Post important updates, news, decisions and stories "
-            "that nobody should miss — perfect for remote teams.")]
+          "Slack teams use Carrot to share important news, updates, and decisions nobody should miss."]
+
+        [:div.slack-subline
+          "Clear, organized communication. Ideal for remote teams."]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
@@ -30,15 +29,38 @@
         [:div.main-animation-container
           [:img.main-animation
             {:src (shared/cdn "/img/ML/slack_screenshot.png")
-             :srcSet (str (shared/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
+             :srcSet (str
+                      (shared/cdn "/img/ML/slack_screenshot@2x.png") " 2x, "
+                      (shared/cdn "/img/ML/slack_screenshot@3x.png") " 3x, "
+                      (shared/cdn "/img/ML/slack_screenshot@4x.png") " 4x")}]]
 
         shared/testimonials-logos-line]
 
-      (shared/keep-aligned-section true)
+      (shared/dashed-string 1)
 
-      shared/carrot-in-action
+      (shared/testimonials-screenshot-block :thoughtful-communication)
 
-      shared/testimonials-section
+      (shared/dashed-string 2)
 
-      shared/keep-aligned-bottom
+      (shared/testimonials-screenshot-block :start-in-sync)
+
+      (shared/dashed-string 3)
+
+      (shared/testimonials-screenshot-block :conversation)
+
+      (shared/dashed-string 4)
+
+      (shared/testimonials-screenshot-block :analytics)
+
+      (shared/dashed-string 4)
+
+      (shared/testimonials-screenshot-block :follow-ups)
+
+      (shared/dashed-string 5)
+
+      (shared/testimonials-screenshot-block :share-to-slack)
+
+      (shared/dashed-string 6)
+
+      shared/pricing-table-section
       ]])

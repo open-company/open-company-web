@@ -65,28 +65,18 @@ div.slack-wrap {
         z-index: 3;
       }
 
-      &:after {
-        background-color: $another_ui_grey;
-        content: "";
-        width: 100%;
-        height: 39%;
-        min-height: 500px;
-        display: block;
-        border-bottom-left-radius: 200px;
+      &:before {
         position: absolute;
         bottom: 0;
-        right: 0;
-
-        @include tablet() {
-          border-bottom-left-radius: 0;
-          border-top-right-radius: 200px;
-        }
-
-        @include mobile() {
-          border-top-right-radius: 100px;
-          min-height: 50px;
-          max-height: 216px;
-        }
+        left: 50%;
+        width: 100%;
+        height: 50%;
+        transform: translateX(-50%);
+        background-color: $another_ui_grey;
+        border-radius: 20px 200px 20px 20px;
+        display: block;
+        content: "";
+        max-width: 1200px;
       }
 
       h1.slack-headline {
@@ -113,9 +103,13 @@ div.slack-wrap {
         font-size: 26px;
         line-height: 36px;
         color: $deep_navy;
-        max-width: 880px;
+        max-width: 840px;
         margin: 24px auto 0px;
         text-align: center;
+
+        &:first-child {
+          margin-top: 8px;
+        }
 
         @include tablet(){
           width: 100%;
@@ -128,7 +122,7 @@ div.slack-wrap {
     }
 
     div.slack-button-container {
-      margin: 40px auto 0;
+      margin: 32px auto 80px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -144,7 +138,7 @@ div.slack-wrap {
         width: 320px;
         margin: 0 12px;
         float: left;
-        height: 64px;
+        height: 56px;
 
         @include tablet() {
           max-width: calc(50% - 16px);

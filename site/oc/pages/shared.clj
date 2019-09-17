@@ -271,22 +271,64 @@
              :target "_blank"}
             testimonial-company]]]]))
 
+(defn testimonials-screenshot-block [block]
+  (let [header (cond
+                (= block :thoughtful-communication)
+                "Thoughtful communication"
+                (= block :start-in-sync)
+                "Start every day in sync"
+                (= block :conversation)
+                "Organized, topic-based conversations"
+                (= block :analytics)
+                "Know who saw your update"
+                (= block :follow-ups)
+                "Request follow up from your team"
+                (= block :share-to-slack)
+                "Auto-share posts to Slack")
+        subline (cond
+                 (= block :thoughtful-communication)
+                 "Space to write longer updates that convey more information"
+                 (= block :start-in-sync)
+                 "Personalized digest each morning to know what’s important"
+                 (= block :conversation)
+                 "Threads make it easy to get caught up anytime - ideal for remote teams"
+                 (= block :analytics)
+                 "Carrot works in the background to make sure everyone sees what matters"
+                 (= block :follow-ups)
+                 "When you need a reply, Carrot reminds anyone that hasn’t followed up yet"
+                 (= block :share-to-slack)
+                 "Your Carrot posts are automatically shared to the right Slack #channel")
+        screenshot-num (cond
+                        (= block :thoughtful-communication)
+                        1
+                        (= block :start-in-sync)
+                        2
+                        (= block :conversation)
+                        3
+                        (= block :analytics)
+                        4
+                        (= block :follow-ups)
+                        5
+                        (= block :share-to-slack)
+                        6)]
+    [:div.testimonials-screenshot-block
+      [:div.testimonials-screenshot-header
+        header]
+      [:div.testimonials-screenshot-subheader
+        subline]
+      [:img.testimonials-screenshot
+        {:src (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num ".png"))
+         :srcSet (str
+                  (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@2x.png")) " 2x, "
+                  (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x, "
+                  (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@4x.png")) " 4x")}]]))
+
 (def testimonials-section
   [:section.testimonials
     (dashed-string 1)
     (testimonial-block :ifttt)
     (dashed-string 2)
-    [:div.testimonials-screenshot-block
-      [:div.testimonials-screenshot-header
-        "Thoughtful communication"]
-      [:div.testimonials-screenshot-subheader
-        "Space to write longer updates that convey more information"]
-      [:img.testimonials-screenshot
-        {:src (cdn "/img/ML/testimonials_screenshot.png")
-         :srcSet (str
-                  (cdn "/img/ML/testimonials_screenshot@2x.png") " 2x "
-                  (cdn "/img/ML/testimonials_screenshot@3x.png") " 3x "
-                  (cdn "/img/ML/testimonials_screenshot@4x.png") " 4x")}]]
+    (testimonials-screenshot-block :thoughtful-communication)    
     (dashed-string 3)
     (testimonial-block :blend-labs)
     (dashed-string 4)

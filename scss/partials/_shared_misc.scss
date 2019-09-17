@@ -1194,6 +1194,35 @@ div.testimonials-block {
   }
 }
 
+div.testimonials-screenshot-block {
+  width: 100%;
+  max-width: 1061px;
+  margin: 0 auto;
+
+  div.testimonials-screenshot-header {
+    @include OC_Body_Bold();
+    font-size: 60px;
+    line-height: 60px;
+    text-align: center;
+    color: $deep_navy;
+  }
+
+  div.testimonials-screenshot-subheader {
+    margin-top: 24px;
+    @include OC_Body_Book();
+    font-size: 24px;
+    line-height: 32px;
+    text-align: center;
+    color: $deep_navy; 
+  }
+
+  img.testimonials-screenshot {
+    max-width: 996px;
+    margin: 40px auto 0;
+    width: 100%;
+  }
+}
+
 section.testimonials {
   text-align: center;
   position: relative;
@@ -1206,35 +1235,6 @@ section.testimonials {
     padding-top: 56px !important;
     padding-bottom: 56px !important;
     text-align: center;
-  }
-
-  div.testimonials-screenshot-block {
-    width: 100%;
-    max-width: 996px;
-    margin: 0 auto;
-
-    div.testimonials-screenshot-header {
-      @include OC_Body_Bold();
-      font-size: 60px;
-      line-height: 60px;
-      text-align: center;
-      color: $deep_navy;
-    }
-
-    div.testimonials-screenshot-subheader {
-      margin-top: 24px;
-      @include OC_Body_Book();
-      font-size: 24px;
-      line-height: 32px;
-      text-align: center;
-      color: $deep_navy; 
-    }
-
-    img.testimonials-screenshot {
-      max-width: 100%;
-      width: 100%;
-      margin-top: 40px;
-    }
   }
 
   div.testimonials-floated-block {
