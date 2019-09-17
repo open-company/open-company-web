@@ -356,7 +356,7 @@
       [:a.chat-with-us
         {:class "intercom-chat-link"
          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-        "Chat with us!"]]
+        "Chat with us about Carrot"]]
 
     [:div.pricing-table.group
       [:div.pricing-table-left

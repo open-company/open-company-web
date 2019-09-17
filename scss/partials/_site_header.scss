@@ -362,10 +362,11 @@ nav.site-navbar {
           }
         }
 
-        &.dropdow-menu-visible {
-          div.apps-dropdow-menu {
+        &.dropdown-menu-visible {
+          div.apps-dropdown-menu {
             opacity: 1;
             margin-top: 55px;
+            top: 0;
           }
 
           button.apps-bt {
@@ -373,7 +374,7 @@ nav.site-navbar {
           }
         }
 
-        div.apps-dropdow-menu {
+        div.apps-dropdown-menu {
           opacity: 0;
           transition: opacity 180ms, margin-top 180ms;
           background-color: white;
@@ -383,11 +384,10 @@ nav.site-navbar {
           padding: 24px 40px;
           text-align: center;
           position: absolute;
-          top: 0;
+          top: -500px;
           margin-top: 35px;
           left: 50%;
           transform: translateX(-50%);
-          z-index: 1;
 
           & > div.app-items-group:first-child {
             margin-top: 0;

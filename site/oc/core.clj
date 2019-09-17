@@ -106,7 +106,7 @@
             [:button.mlb-reset.apps-bt
               {:class (when (= active-page "about") "active")}
               "Apps"]
-            [:div.apps-dropdow-menu
+            [:div.apps-dropdown-menu
               [:div.app-items-group
                 "Desktop apps"]
               [:a.app-item

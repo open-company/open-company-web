@@ -420,10 +420,10 @@ function isiPhoneWithoutPhysicalHomeBt(){
     if ($appsBt.length > 0) {
       $appsBt.click(function(event){
         event.stopPropagation();
-        $("div.apps-container").toggleClass("dropdow-menu-visible");
+        $("div.apps-container").toggleClass("dropdown-menu-visible");
       });
       $(window).click(function(event){
-        $("div.apps-container").removeClass("dropdow-menu-visible");
+        $("div.apps-container").removeClass("dropdown-menu-visible");
       });
     }
   });

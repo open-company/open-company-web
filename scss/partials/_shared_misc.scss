@@ -1435,11 +1435,12 @@ section.pricing-header {
     position: relative;
 
     div.pricing-table-left {
-      width: 29%;
+      width: 255px;
       position: absolute;
       left: 40px;
       top: 50%;
       transform: translateY(-50%);
+      padding-right: 60px;
 
       div.pricing-table-left-price {
         @include OC_Body_Book();
@@ -1454,7 +1455,7 @@ section.pricing-header {
         @include OC_Body_Book();
         font-size: 22px;
         line-height: 28px;
-        color: white;
+        color: rgba(white, 0.5);
         text-align: center;
       }
     }
@@ -1462,7 +1463,7 @@ section.pricing-header {
     div.pricing-table-right {
       float: right;
       width: 71%;
-      border-left: 1px solid white;
+      border-left: 1px solid rgba(white, 0.2);
       padding-left: 60px;
 
       div.pricing-table-right-copy {
@@ -1503,7 +1504,7 @@ section.pricing-header {
       border-radius: 50%;
       background-color: $grey_num_5;
       background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
-      background-size: 29px 16px;
+      background-size: 16px 29px;
       background-position: center;
       background-repeat: no-repeat;
     }
