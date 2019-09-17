@@ -75,6 +75,12 @@
                    :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
+(defn- get-desktop-version
+  []
+  (if (.-getElectronAppVersion js/OCCarrotDesktop)
+    (str "Version " (.getElectronAppVersion js/OCCarrotDesktop))
+    ""))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
@@ -100,7 +106,7 @@
         desktop-app-data (detect-desktop-app)
         app-version (cond
                       ua/mobile-app? (str "Version " (expo/get-app-version))
-                      ua/desktop-app? (str "Version " (.getElectronAppVersion js/OCCarrotDesktop))
+                      ua/desktop-app? (get-desktop-version)
                       :else "")]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
