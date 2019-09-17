@@ -88,7 +88,7 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
-(def other-resources-delay 2500)
+(def other-resources-delay 10000)
 
 (defn org-loaded
   "Dispatch the org data into the app-state to be used by all the components.
@@ -107,13 +107,14 @@
         follow-ups-link (utils/link-for (:links org-data) "follow-ups")
         recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
         is-all-posts? (= (router/current-board-slug) "all-posts")
+        is-follow-ups? (= (router/current-board-slug) "follow-ups")
         activity-delay (if is-all-posts?
                          0
                          other-resources-delay)
-        current-section-delay (if-not is-all-posts?
+        section-delay (if (and (not is-all-posts?)
+                                       (not is-follow-ups?))
                                 0
                                 other-resources-delay)
-        is-follow-ups? (= (router/current-board-slug) "follow-ups")
         follow-ups-delay (if is-follow-ups?
                            0
                            other-resources-delay)]
@@ -125,7 +126,7 @@
           ;; Load the current activity
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
-          (utils/maybe-after other-resources-delay #(sa/load-other-sections (:boards org-data)))
+          (utils/maybe-after section-delay #(sa/load-other-sections (:boards org-data)))
           ;; Preload all posts data
           (when activity-link
             (utils/maybe-after activity-delay #(aa/activity-get org-data)))
@@ -149,9 +150,9 @@
         ; Load the board data since there is a link to the board in the org data
         (do
           (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-            (utils/maybe-after current-section-delay #(sa/section-get :recently-posted board-link)))
+            (utils/maybe-after section-delay #(sa/section-get :recently-posted board-link)))
           (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
-            (utils/maybe-after current-section-delay #(sa/section-get :recent-activity recent-board-link))))
+            (utils/maybe-after section-delay #(sa/section-get :recent-activity recent-board-link))))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
@@ -173,7 +174,8 @@
             (oc-urls/board (:slug org-data) (:slug board-to))
             (oc-urls/all-posts (:slug org-data)))))))
   ;; Change service connection
-  (when (jwt/jwt) ; only for logged in users
+  (when (or (jwt/jwt)
+            (jwt/id-token)) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
       (ws-cc/reconnect ws-link (jwt/user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
 

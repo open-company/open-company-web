@@ -24,7 +24,7 @@
 
 (def help "http://help.carrot.io/")
 
-(def what-s-new "https://the.carrot.news/")
+(def what-s-new "https://carrot.news/")
 
 (def home-try-it-focus (str home "?tif"))
 

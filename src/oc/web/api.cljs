@@ -16,6 +16,7 @@
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
             [oc.web.lib.fullstory :as fullstory]
+            [oc.web.utils.ws-client-ids :as ws-client-ids]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -63,12 +64,19 @@
   (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
-  (if-let [jwt (or (j/jwt)
-                   (j/id-token))]
-    (-> {:with-credentials? false}
-        (merge params)
-        (update :headers merge {"Authorization" (str "Bearer " jwt)}))
-    params))
+  (let [change-client-id @ws-client-ids/change-client-id
+        interaction-client-id @ws-client-ids/interaction-client-id
+        notify-client-id @ws-client-ids/notify-client-id
+        with-client-ids (cond-> params
+                               change-client-id (assoc-in [:headers "OC-Change-Client-ID"] change-client-id)
+                               interaction-client-id (assoc-in [:headers "OC-Interaction-Client-ID"] interaction-client-id)
+                               notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))]
+    (if-let [jwt (or (j/jwt)
+                     (j/id-token))]
+      (-> {:with-credentials? false}
+          (merge with-client-ids)
+          (update :headers merge {"Authorization" (str "Bearer " jwt)}))
+      with-client-ids)))
 
 (defn headers-for-link [link]
  (let [acah-headers (cond

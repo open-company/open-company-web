@@ -390,7 +390,7 @@ div.stream-item {
 
         @include mobile() {
           margin-top: 16px;
-          @include activity-title(24px, 28px);
+          @include activity-title(22px, 28px);
         }
       }
 
@@ -485,8 +485,8 @@ div.stream-item {
         div.is-comments {
           div.is-comments-authors.show-border {
             div.is-comments-author {
-              background-color: $oc_gray_8;
-              border: 2px solid $oc_gray_8;
+              background-color: $grey_num_2;
+              border: 2px solid $grey_num_2;
 
               @include mobile() {
                 background-color: $grey_num_4;

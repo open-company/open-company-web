@@ -52,6 +52,7 @@
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
+  (reset! (::add-button-disabled s) true)
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
         args (vec (:rum/args s))
@@ -60,13 +61,9 @@
         dismiss-reply-cb (get args 2)
         edit-comment-data (get args 3 nil)
         save-done-cb (fn [success]
-                      (reset! (::add-button-disabled s) false)
                       (if success
-                        (do
-                          (when add-comment-div
-                            (set! (.-innerHTML add-comment-div) ""))
-                          (when (fn? dismiss-reply-cb)
-                            (dismiss-reply-cb false)))
+                        (when add-comment-div
+                          (set! (.-innerHTML add-comment-div) ""))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
@@ -75,9 +72,12 @@
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))
         complete? @(::complete-follow-up s)]
     (reset! (::add-button-disabled s) true)
+    (set! (.-innerHTML add-comment-div) "")
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
+    (when (fn? dismiss-reply-cb)
+      (dismiss-reply-cb false))
     (when complete?
       (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
             show-follow-up-button? (and follow-up
@@ -159,7 +159,8 @@
                                 parent-comment-uuid (second (:rum/args s))
                                 edit-comment-data (get (vec (:rum/args s)) 3 nil)
                                 add-comment-key (str (:uuid activity-data) "-" parent-comment-uuid "-" (:uuid edit-comment-data))
-                                activity-add-comment-data (get add-comment-data add-comment-key)]
+                                activity-add-comment-data (get add-comment-data add-comment-key)
+                                add-comment-activity-data (get add-comment-data (:uuid activity-data))]
                             (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
                             (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
@@ -261,7 +262,8 @@
         [:div.add-comment-footer
           {:class (when should-hide-post-button "hide-footer")}
           [:button.mlb-reset.send-btn
-            {:on-click #(send-clicked % s)
+            {:on-click #(when-not @(::add-button-disabled s)
+                          (send-clicked % s))
              :disabled @(::add-button-disabled s)}
             (if edit-comment-data
               "Save"

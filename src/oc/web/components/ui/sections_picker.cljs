@@ -17,7 +17,7 @@
         body-rect (.getBoundingClientRect (.-body js/document))
         elem-rect (.getBoundingClientRect dom-node)
         offset-top (- (.-top elem-rect) (+ (.-top body-rect) scroll-top))]
-    (reset! (::container-max-height s) (max 139 (- win-height offset-top 8 distance-from-bottom)))))
+    (reset! (::container-max-height s) (max 239 (- win-height offset-top 8 distance-from-bottom)))))
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive

@@ -190,8 +190,8 @@
   "Read the sort order from the cookie, fallback to the default,
    if it's on drafts board force the recently posted sort since that has only that"
   [params]
-  (let [last-sort-cookie (cook/get-cookie (router/last-sort-cookie (:org params)))]
-    (if (or (= last-sort-cookie "recently-posted")
+  (let [last-sort-type (aa/saved-sort-type (:org params))]
+    (if (or (= last-sort-type dis/other-sort-type)
             (= (:board params) utils/default-drafts-board-slug))
       :recently-posted
       dis/default-sort-type)))
@@ -282,6 +282,7 @@
      {:org org
       :activity (:entry params)
       :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
+      :comment (:comment params)
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
