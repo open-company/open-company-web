@@ -323,9 +323,7 @@
         (when (and published-entry?
                    (seq completed-follow-ups))
           (str " (" (count completed-follow-ups) " completed)"))
-        " in the “"
-        (:board-name cmail-data)
-        "” section."]
+        "."]
       (when can-toggle-follow-ups?
         (if is-mobile?
           [:div.mobile-follow-ups-remove-menu-container
@@ -642,7 +640,7 @@
             [:div.cmail-header-right-buttons
               (when-not follow-up?
                 [:button.mlb-reset.follow-up-button
-                  {:title "Create follow-ups"
+                  {:title "Request follow-up"
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
@@ -798,7 +796,7 @@
             (when (and (not follow-up?)
                        (not is-fullscreen?))
               [:button.mlb-reset.follow-up-button
-                {:title "Create follow-ups"
+                {:title "Request follow-up"
                  :data-toggle "tooltip"
                  :data-placement "top"
                  :data-container "body"
