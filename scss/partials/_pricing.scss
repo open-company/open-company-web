@@ -31,72 +31,191 @@ div.pricing-wrap {
       }
     }
 
-    section.pricing-faq {
-      width: 795px;
-      margin: 120px auto;
-      text-align: left;
+    section.pricing-apps {
+      padding: 80px 0;
+      background-color: $another_ui_grey;
 
-      @include tablet() {
+      div.pricing-apps-block {
         width: 100%;
-        margin: 80px auto;
-      }
+        max-width: 1114px;
+        max-height: 249px;
+        margin: 0 auto;
 
-      h2.faq-header {
-        @include OC_Title()
-        font-size: 60px;
-        color: $deep_navy;
-        margin-bottom: 80px;
+        & > div {
+          margin-left: 92px;
+          float: left;
 
-        @include mobile() {
-          font-size: 36px;
-          margin-bottom: 40px;
-        }
-      }
-
-      div.faq-row {
-        border-top: 1px solid $more_ultra_light_grey;
-        margin-top: 40px;
-
-        div.faq-row-question {
-          @include OC_Title()
-          font-size: 20px;
-          color: $deep_navy;
-          line-height: 28px;
-          margin-top: 40px;
+          &:first-child {
+            margin-left: 0;
+          }
         }
 
-        div.faq-row-answer {
-          @include OC_Body_Book();
-          font-size: 20px;
-          color: $deep_navy;
-          margin-top: 8px;
+        div.pricing-apps-separator {
+          width: 1px;
+          height: 100%;
+          background-color: rgba($deep_navy, 0.1);
+          height: 249px;
+        }
 
-          span.heavy {
+        div.pricing-apps-app-block {
+          width: calc((100% - 2px - (92px * 4)) / 3);
+
+          div.pricing-apps-app-header {
             @include OC_Body_Bold();
+            font-size: 30px;
+            line-height: 38px;
+            color: $deep_navy;
+            text-align: center;
           }
 
-          a.chat-with-us {
-            float: left;
+          img.pricing-apps-app-screenshot {
+            max-height: 140px;
+            max-width: 248px;
+            margin: 24px auto 0;
+            display: block;
+          }
+
+          div.pricing-apps-app-links {
+            margin-top: 24px;
+            text-align: center;
             color: $carrot_green;
             @include OC_Body_Bold();
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5;
+            font-size: 18px;
+            line-height: 23px;
 
-            &:hover {
-              text-decoration: underline;
-            }
-          }
+            a {
+              color: $carrot_green;
+              @include OC_Body_Bold();
+              font-size: 18px;
+              line-height: 23px;
 
-          a {
-            color: $carrot_green;
+              &:hover {
+                text-decoration: underline;
+              }
 
-            &:hover {
-              text-decoration: underline;
+              &.mac-icon {
+                padding-left: 22px;
+                position: relative;
+
+                &:before {
+                  content: "";
+                  display: block;
+                  width: 14px;
+                  height: 16px;
+                  background-image: cdnUrl("/img/ML/pricing_apps_mac_icon.svg");
+                  background-size: 14px 16px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  position: absolute;
+                  left: 0;
+                  top: 3.5px;
+                }
+              }
+
+              &.win-icon {
+                padding-left: 24px;
+                margin-left: 24px;
+                position: relative;
+
+                &:before {
+                  content: "";
+                  display: block;
+                  width: 16px;
+                  height: 16px;
+                  background-image: cdnUrl("/img/ML/pricing_apps_win_icon.svg");
+                  background-size: 16px 16px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  position: absolute;
+                  left: 0;
+                  top: 3.5px;
+                }
+              }
             }
           }
         }
       }
+    }
+
+    section.pricing-faq {
+      margin: 0 auto;
+      max-width: 1200px;
+      position: relative;
+
+      &:after {
+        content: "";
+        background-color: $another_ui_grey;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px 20px 200px 20px;
+        z-index: 1;
+      }
+
+      & > div {
+        position: relative;
+        z-index: 2;
+      }
+
+      div.pricing-faq-block {
+        max-width: 784px;
+        margin: 0 auto;
+        padding: 90px 0;
+        text-align: left;
+
+        h1.pricing-faq-header {
+          @include OC_Body_Bold();
+          font-size: 60px;
+          line-height: 62px;
+          color: $deep_navy;
+          margin: 0;
+          padding: 0;
+        }
+
+        div.pricing-faq-question-block {
+          margin: 40px 0;
+          border-top: 1px solid $more_ultra_light_grey;
+
+          &:first-of-type {
+            margin-top: 0;
+            border-top: none;
+          }
+
+          &:last-of-type {
+            margin-bottom: 0;
+          }
+
+          div.pricing-faq-question {
+            @include OC_Body_Bold();
+            font-size: 20px;
+            line-height: 28px;
+            color: #294154;
+            margin-top: 40px;
+          }
+
+          div.pricing-faq-answer {
+            @include OC_Body_Book();
+            font-size: 20px;
+            line-height: 28px;
+            color: $deep_navy;
+            margin-top: 8px;
+
+            a {
+              @include OC_Body_Book();
+              font-size: 20px;
+              line-height: 28px;
+              color: $carrot_green;
+            }
+          }
+        }
+      }
+    }
+
+    section.pricing-header:last-of-type {
+      padding: 80px 0;
+      background-color: $another_ui_grey;
     }
   }
 }
