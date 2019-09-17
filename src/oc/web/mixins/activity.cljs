@@ -11,7 +11,7 @@
                 (.dotdotdot $dom-node
                  #js {:height height
                       :wrap "word"
-                      :watch true
+                      :watch false
                       :ellipsis "..."}))))]
     {:did-mount (fn [s]
       (truncate-fn s)
@@ -31,7 +31,7 @@
         (.dotdotdot $collapsed-comments
           #js {:height (* 22 5)
                :wrap "word"
-               :watch true
+               :watch false
                :ellipsis "..."
                :callback (fn [is-truncated]
                 (this-as this

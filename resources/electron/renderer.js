@@ -2,6 +2,7 @@
 // https://electronjs.org/docs/tutorial/application-architecture#main-and-renderer-processes
 var electron = require('electron');
 var ipcRenderer = electron.ipcRenderer;
+var package = require('../package.json');
 
 console.log("Carrot desktop engage!");
 
@@ -23,3 +24,13 @@ window.OCCarrotDesktop.setBadgeCount = function(count) {
   console.log("Sending set-badge-count IPC: " + count);
   ipcRenderer.send('set-badge-count', count);
 };
+
+window.OCCarrotDesktop.windowHasFocus = function() {
+  console.log("Determining focus state of desktop window");
+  return ipcRenderer.sendSync('window-has-focus?');
+};
+
+window.OCCarrotDesktop.getElectronAppVersion = function() {
+  console.log("DBG Get electorn app version");
+  return package.version;
+}

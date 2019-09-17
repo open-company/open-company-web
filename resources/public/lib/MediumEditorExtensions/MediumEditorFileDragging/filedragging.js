@@ -25,6 +25,8 @@ var CarrotFileDragging = MediumEditor.Extension.extend({
 
     allowedTypes: ['.*'],
 
+    _lastSelection: undefined,
+
     options: undefined,
 
     constructor: function (options) {
@@ -56,6 +58,26 @@ var CarrotFileDragging = MediumEditor.Extension.extend({
                 target.classList.add(CLASS_DRAG_OVER);
             }
         }
+    },
+
+    internalRemoveSelection: function() {
+      // Remove the previous saved selection markers if any
+      if (this._lastSelection) {
+        rangy.removeMarkers(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+    },
+
+    saveSelection: function() {
+        // Remove the previous selection to avoid leaving
+        // markers in the body that are not needed
+        this.internalRemoveSelection();
+        // Save the current selection
+        this._lastSelection = rangy.saveSelection();
+        // Unfocus the field
+        this.getEditorElements().forEach(function(el){
+            el.blur();
+        });
     },
 
     handleDrop: function (event) {
@@ -99,9 +121,24 @@ var CarrotFileDragging = MediumEditor.Extension.extend({
             if (thumbnailURL) {
                 addImageElement.dataset.thumbnail = photoThumbnail;
             }
+            if (that._lastSelection) {
+                rangy.restoreSelection(that._lastSelection);
+                that._lastSelection = undefined;
+            } else {
+                that.getEditorElements()[0].focus();
+            }
             MediumEditor.util.insertHTMLCommand(that.document, addImageElement.outerHTML);
+            that.insertNewParagraph();
         };
         addImageElement.src = imageURL;
+    },
+
+    insertNewParagraph: function() {
+        this.base.execAction('insertparagraph');
+    },
+
+    destroy: function() {
+        this.internalRemoveSelection();
     }
 });
 

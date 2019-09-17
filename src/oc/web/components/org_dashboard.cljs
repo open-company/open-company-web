@@ -1,5 +1,4 @@
 (ns oc.web.components.org-dashboard
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [clojure.string :as s]
@@ -8,6 +7,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.mixins.ui :as ui-mixins]
@@ -40,32 +40,8 @@
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
-            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]))
-
-(defn refresh-board-data [s]
-  (when (and (not (router/current-activity-id))
-             (router/current-board-slug))
-    (utils/after 100 (fn []
-     (let [{:keys [org-data
-                   board-data]} @(drv/get-ref s :org-dashboard-data)]
-       (cond
-
-        (= (router/current-board-slug) "all-posts")
-        (activity-actions/all-posts-get org-data)
-
-        (= (router/current-board-slug) "follow-ups")
-        (activity-actions/follow-ups-sort-get org-data)
-
-        (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-get org-data)
-
-        :default
-        (let [sort-type (router/current-sort-type)
-              board-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
-          (when-let* [fixed-board-data (or board-data
-                       (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data)))
-                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
-            (section-actions/section-get sort-type board-link)))))))))
+            [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
+            [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
 (defn- init-whats-new []
   (when-not (responsive/is-tablet-or-mobile?)
@@ -77,12 +53,13 @@
                            (ui-mixins/render-on-resize nil)
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
+                           (drv/drv :user-responded-to-push-permission?)
+                           (drv/drv :route)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
-                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) 0))
-                             (refresh-board-data s)
+                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) (utils/page-scroll-top)))
                              (init-whats-new)
                              s)
                             :did-remount (fn [_ s]
@@ -101,33 +78,23 @@
                 show-section-add-cb
                 activity-share-container
                 cmail-state
-                showing-mobile-user-notifications
                 wrt-read-data
                 force-login-wall
-                panel-stack]} (drv/react s :org-dashboard-data)
+                panel-stack
+                app-loading]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
                          (count
                           (:results (drv/react s search/search-key))))
-        loading? (or ;; the org data are not loaded yet
+        loading? (or ;; force loading screen
+                     app-loading
+                     ;; the org data are not loaded yet
                      (not org-data)
                      ;; No board specified
                      (and (not (router/current-board-slug))
                           ;; but there are some
-                          (pos? (count (:boards org-data))))
-                     ;; Board specified
-                     (and (not= (router/current-board-slug) "all-posts")
-                          (not= (router/current-board-slug) "must-see")
-                          (not= (router/current-board-slug) "follow-ups")
-                          ;; But no board data yet
-                          (not board-data))
-                     ;; Another container
-                     (and (or (= (router/current-board-slug) "all-posts")
-                              (= (router/current-board-slug) "must-see")
-                              (= (router/current-board-slug) "follow-ups"))
-                          ;; But no all-posts data yet
-                         (not container-data)))
+                          (pos? (count (:boards org-data)))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
@@ -136,13 +103,19 @@
                                (not= (router/current-board-slug) "must-see")
                                (not= (router/current-board-slug) "follow-ups")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
-        entry-not-found (and (not section-not-found)
-                             (and (router/current-activity-id)
-                                  board-data)
+        entry-not-found (and ;; org is present
+                             (not org-not-found)
+                             ;; section is present
+                             (not section-not-found)
+                             ;; a post id is specified
+                             (router/current-activity-id)
+                             ;; posts data are present
                              (not (nil? posts-data))
-                             (or (and (router/current-activity-id)
-                                      (not ((set (keys posts-data)) (router/current-activity-id)))
-                                      (= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug))))))
+                             ;; and
+                             (or ;; the post is not present int he posts list
+                                 (not ((set (keys posts-data)) (router/current-activity-id)))
+                                 ;; the board of the post is wrong
+                                 (not= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug)))))
         show-login-wall (and (not jwt)
                              (or force-login-wall
                                  (and (router/current-activity-id)
@@ -171,7 +144,11 @@
                                     (s/starts-with? (name open-panel) "follow-ups-picker-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
-                                is-mobile?)]
+                                is-mobile?)
+        user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
+        show-push-notification-permissions-modal? (and ua/mobile-app?
+                                                       (jwt/jwt)
+                                                       (not user-responded-to-push-permission?))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -185,10 +162,6 @@
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
         (cond
-          ;; User menu
-          (and is-mobile?
-               (= open-panel :menu))
-          (menu)
           ;; Activity removed
           show-activity-removed
           (activity-removed)
@@ -238,11 +211,7 @@
           (wrt org-data)
           ;; Search results
           is-showing-mobile-search
-          (search-box)
-          ;; Mobile notifications
-          (and is-mobile?
-               showing-mobile-user-notifications)
-          (user-notifications))
+          (search-box))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -261,8 +230,13 @@
           (follow-ups-picker))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
-        (when-not is-mobile?
+        (when (or (not is-mobile?)
+                  (and is-mobile?
+                       (= open-panel :menu)))
           (menu))
+        ;; Mobile push notifications permission
+        (when show-push-notification-permissions-modal?
+          (push-notifications-permission-modal))
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
@@ -270,14 +244,13 @@
         (when (or (not is-mobile?)
                   (and (not is-sharing-activity)
                        (not show-mobile-cmail?)
-                       (not open-panel)))
+                       (not show-push-notification-permissions-modal?)))
           [:div.page
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
                          (and (or (not search-active?) (not search-results?))
-                              (not open-panel)
-                              (not is-showing-mobile-search)
-                              (not showing-mobile-user-notifications)))
+                              (or (not open-panel)
+                                  (= open-panel :menu))))
                  (dashboard-layout))]]])])))

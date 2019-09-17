@@ -34,6 +34,8 @@ html, body {
 
   @include mobile(){
     overflow-x: hidden;
+    background-color: white;
+    overflow-y: scroll;
   }
 }
 

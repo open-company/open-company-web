@@ -1,8 +1,11 @@
 (ns oc.web.actions.web-app-update
   (:require [taoensso.timbre :as timbre]
             [oc.web.api :as api]
+            [oc.web.dispatcher :as dis]
+            [oc.web.lib.utils :as utils]
             [oc.web.actions.notifications :as notification-actions]
-            [oc.shared.interval :as interval]))
+            [oc.shared.interval :as interval]
+            [oc.shared.useragent :as ua]))
 
 (declare web-app-update-interval)
 
@@ -10,9 +13,7 @@
 (def extended-update-interval-ms (* 1000 60 60 24)) ;; 24 hours
 
 (def update-verbage
-  (if js/window.OCCarrotDesktop
-    "Update"
-    "Refresh page"))
+  "Get the latest")
 
 (defn- on-notification-dismissed
   []
@@ -29,16 +30,23 @@
      (if (= status 404)
        (do
          (timbre/info "New app update avalable! Showing notification to the user")
-         (notification-actions/show-notification {:title "New version of Carrot available!"
-                                                  :web-app-update true
-                                                  :id :web-app-update-error
-                                                  :dismiss on-notification-dismissed
-                                                  :dismiss-x true
-                                                  :secondary-bt-title update-verbage
-                                                  :secondary-bt-style :green
-                                                  :secondary-bt-class :update-app-bt
-                                                  :secondary-bt-cb #(js/window.location.reload)
-                                                  :expire 0}))
+         (let [click-cb (fn [e]
+                         (dis/dispatch! [:input [:loading] true])
+                         (when e
+                           (utils/event-stop e))
+                         (.. js/window -location reload))]
+           (notification-actions/show-notification {:title "New version of Carrot available!"
+                                                    :web-app-update true
+                                                    :id :web-app-update-error
+                                                    :dismiss on-notification-dismissed
+                                                    :dismiss-x true
+                                                    :secondary-bt-title update-verbage
+                                                    :secondary-bt-style :green
+                                                    :secondary-bt-class :update-app-bt
+                                                    :secondary-bt-cb click-cb
+                                                    :secondary-bt-dismiss true
+                                                    :click click-cb
+                                                    :expire 0})))
        (interval/restart-interval! web-app-update-interval default-update-interval-ms)))))
 
 (defonce web-app-update-interval (interval/make-interval {:fn real-web-app-update-check

@@ -10,10 +10,10 @@
 (defn button-wrapper [s bt-ref bt-cb bt-title bt-style bt-dismiss]
   (let [has-html (string? bt-title)
         button-base-map {:on-click (fn [e]
-                                     (when bt-dismiss
-                                       (notification-actions/remove-notification (first (:rum/args s))))
                                      (when (fn? bt-cb)
-                                       (bt-cb e)))
+                                       (bt-cb e))
+                                     (when bt-dismiss
+                                       (notification-actions/remove-notification (first (:rum/args s)))))
                          :ref bt-ref
                          :class (utils/class-set {:solid-green (= bt-style :solid-green)
                                                   :default-link (= bt-style :default-link)})}
@@ -60,7 +60,7 @@
                                 ;; remove notification from list
                                 (notification-actions/remove-notification (first (:rum/args s)))))
                             s)}
-  [s {:keys [id title description slack-icon opac dismiss-bt server-error dismiss
+  [s {:keys [id title description slack-icon opac server-error dismiss
              primary-bt-cb primary-bt-title primary-bt-style primary-bt-dismiss
              primary-bt-inline secondary-bt-cb secondary-bt-title secondary-bt-style
              secondary-bt-dismiss web-app-update slack-bot mention mention-author
@@ -73,6 +73,9 @@
                               :opac opac
                               :light-theme light-theme
                               :mention-notification (and mention mention-author)
+                              :bottom-notch (js/isiPhoneWithoutPhysicalHomeBt)
+                              :dismiss dismiss
+                              :clickable (fn? click)
                               :inline-bt (or primary-bt-inline
                                              (and id
                                                   ((keyword id) #{:slack-team-added :slack-bot-added
@@ -80,23 +83,24 @@
                                                                   :cancel-invitation :member-removed-from-team
                                                                   :reminder-created :reminder-updated
                                                                   :reminder-deleted :resend-verification-ok})))
-                              :dismiss-button dismiss-bt})
+                              :dismiss-button dismiss})
      :on-mouse-enter #(clear-timeout s)
      :on-mouse-leave #(setup-timeout s)
      :on-click #(when (and (fn? click)
                            (not (utils/event-inside? % (rum/ref-node s :dismiss-bt)))
                            (not (utils/event-inside? % (rum/ref-node s :first-bt)))
                            (not (utils/event-inside? % (rum/ref-node s :second-bt))))
-                  (click %))
+                  (click %)
+                  (clear-timeout s)
+                  (notification-actions/remove-notification notification-data))
      :data-notificationid id}
     (when dismiss
       [:button.mlb-reset.notification-dismiss-bt
         {:on-click #(do
-                      (reset! (::timeout s) nil)
-                      (js/clearTimeout @(::timeout s))
-                      (notification-actions/remove-notification notification-data)
                       (when (fn? dismiss)
-                        (dismiss %)))
+                        (dismiss %))
+                      (clear-timeout s)
+                      (notification-actions/remove-notification notification-data))
          :class (when dismiss-x "dismiss-x")
          :ref :dismiss-bt}
         (when-not dismiss-x

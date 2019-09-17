@@ -10,6 +10,7 @@
             [oc.web.utils.activity :as au]
             [oc.web.lib.user-cache :as uc]
             [oc.web.utils.dom :as dom-utils]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.lib.json :refer (json->cljs)]))
 
 ;; Cached items
@@ -67,21 +68,12 @@
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
 
-;; 404
-
-(defn maybe-404 []
-  (if (jwt/jwt)
-    (router/redirect-404!)
-    (dis/dispatch! [:show-login-wall])))
-
 ;; Entry
 
 (defn get-entry-with-uuid [board-slug activity-uuid & [loaded-cb]]
   (api/get-current-entry (router/current-org-slug) board-slug activity-uuid
    (fn [{:keys [status success body]}]
-    (if (and (= status 404)
-             (= activity-uuid (router/current-activity-id)))
-      (maybe-404)
+    (when-not (= status 404)
       (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (when success (json->cljs body)) nil]))
     (when (fn? loaded-cb)
       (utils/after 100 #(loaded-cb success status))))))
@@ -141,7 +133,11 @@
        ;; If cmail is already open let's not reopen it
        #(when (or (not (:cmail-state @dis/app-state))
                   (:collapsed (:cmail-state @dis/app-state)))
-          (let [cmail-state {:auto true :fullscreen true :key (utils/activity-uuid)}]
+          (let [cmail-state {:auto true
+                             ;; reopen fullscreen on desktop, mobile doesn't use it
+                             :fullscreen (not (responsive/is-mobile-size?))
+                             :collapsed false
+                             :key (utils/activity-uuid)}]
             (if (and (contains? (router/query-params) :new)
                      (not (contains? (router/query-params) :access)))
               ;; We have the new GET parameter, let's open a new post with the specified headline if any

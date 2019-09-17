@@ -2,11 +2,13 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [dommy.core :as dommy :refer-macros (sel sel1)]
+            [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.local-settings :as ls]
@@ -65,12 +67,12 @@
 
 (defn- detect-desktop-app
   []
-  (when-not js/window.OCCarrotDesktop
+  (when-not ua/desktop-app?
     (cond
-      (js/window.isMac) {:title "Mac app"
-                         :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
-      (js/window.isWindows) {:title "Windows app"
-                             :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
+      ua/mac? {:title "Download Mac app"
+               :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.dmg"}
+      ua/windows? {:title "Download Windows app"
+                   :href "https://github.com/open-company/open-company-web/releases/latest/download/Carrot.exe"}
       :default nil)))
 
 (rum/defcs menu < rum/reactive
@@ -95,7 +97,11 @@
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
-        desktop-app-data (detect-desktop-app)]
+        desktop-app-data (detect-desktop-app)
+        app-version (cond
+                      ua/mobile-app? (str "Version " (expo/get-app-version))
+                      ua/desktop-app? (str "Version " (.getElectronAppVersion js/OCCarrotDesktop))
+                      :else "")]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -179,10 +185,8 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          (if is-mobile?
-            {:href "https://whats-new.carrot.io/"
+          {:href "https://carrot.news/"
              :target "_blank"}
-            {:on-click #(whats-new-click s %)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a
@@ -204,4 +208,9 @@
               "Sign out"]]
           [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
             [:div.oc-menu-item
-              "Sign in / Sign up"]])]]))
+              "Sign in / Sign up"]])
+        (when ua/pseudo-native?
+          [:div.oc-menu-separator])
+        (when ua/pseudo-native?
+          [:div.oc-menu-item.app-version
+             app-version])]]))

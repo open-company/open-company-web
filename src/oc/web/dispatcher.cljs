@@ -6,7 +6,8 @@
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]))
 
 (defonce app-state (atom {:loading false
                           :show-login-overlay false
@@ -68,6 +69,11 @@
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
+(defn add-comment-string-key [activity-uuid parent-comment-uuid comment-uuid]
+  (str activity-uuid "-" parent-comment-uuid "-" comment-uuid))
+
+(def add-comment-force-update-key :add-comment-force-update)
+
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
 
@@ -102,6 +108,8 @@
 
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
+
+(def expo-push-token-key [:expo-push-token])
 
 ;; Reminders
 
@@ -185,6 +193,11 @@
    :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
+   :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
+   :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
+   :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
+   :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
+   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -204,7 +217,6 @@
    :subscription        [[:base] (fn [base] (:subscription base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
-   :sections-setup      [[:base] (fn [base] (:sections-setup base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :drafts-data         [[:base :org-slug]
@@ -366,9 +378,11 @@
                                 (fn [notifications]
                                   (let [ncount (count notifications)]
                                     (timbre/info "Unread notification count updated: " ncount)
-                                    (when js/window.OCCarrotDesktop
+                                    (when ua/desktop-app?
                                       (js/window.OCCarrotDesktop.setBadgeCount ncount))
                                     ncount))]
+   :user-responded-to-push-permission? [[:base] (fn [base]
+                                                  (boolean (get-in base expo-push-token-key)))]
    :wrt-show              [[:base] (fn [base] (:wrt-show base))]
    :wrt-read-data         [[:base :panel-stack]
                             (fn [base panel-stack]
@@ -386,9 +400,9 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show]
+                                 show-sections-picker entry-editing jwt wrt-show loading]
                               {:jwt jwt
                                :orgs orgs
                                :org-data org-data
@@ -406,8 +420,8 @@
                                :entry-editing-board-slug (:board-slug entry-editing)
                                :activity-share-container (:activity-share-container base)
                                :cmail-state (:cmail-state base)
-                               :showing-mobile-user-notifications (:mobile-user-notifications base)
-                               :force-login-wall (:force-login-wall base)})]
+                               :force-login-wall (:force-login-wall base)
+                               :app-loading loading})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -421,7 +435,8 @@
    :reminders-roster      [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
-                                    (get-in base (reminder-edit-key org-slug)))]})
+                                    (get-in base (reminder-edit-key org-slug)))]
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
 
 ;; Action Loop =================================================================
 
@@ -516,7 +531,9 @@
     (board-data data org-slug board-slug (router/current-sort-type)))
   ([data org-slug board-slug sort-type]
     (when (and org-slug board-slug sort-type)
-      (get-in data (board-data-key org-slug board-slug sort-type)))))
+      (if (= board-slug utils/default-drafts-board-slug)
+        (get-in data (board-data-key org-slug board-slug other-sort-type))
+        (get-in data (board-data-key org-slug board-slug sort-type))))))
 
 (defn editable-boards-data
   ([] (editable-boards-data @app-state (router/current-org-slug)))

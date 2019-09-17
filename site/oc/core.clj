@@ -14,7 +14,7 @@
   [:head
     [:meta {:charset "utf-8"}]
     [:meta {:content "IE=edge", :http-equiv "X-UA-Compatible"}]
-    [:meta {:content "width=device-width, initial-scale=1", :name "viewport"}]
+    [:meta {:content "width=device-width, height=device-height, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
     [:title "Carrot | Asynchronous communication for teams"]
@@ -168,7 +168,7 @@
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "https://trello.com/b/eKs2LtLu" :target "_blank"} "Roadmap"]]
-          [:div.column-item [:a {:href "https://whats-new.carrot.io/" :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href "https://carrot.news/" :target "_blank"} "What’s new"]]
           [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]]
 
         [:div.column.column-resources

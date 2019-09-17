@@ -17,7 +17,7 @@
         body-rect (.getBoundingClientRect (.-body js/document))
         elem-rect (.getBoundingClientRect dom-node)
         offset-top (- (.-top elem-rect) (+ (.-top body-rect) scroll-top))]
-    (reset! (::container-max-height s) (max 139 (- win-height offset-top 8 distance-from-bottom)))))
+    (reset! (::container-max-height s) (max 239 (- win-height offset-top 8 distance-from-bottom)))))
 
 (rum/defcs sections-picker < ;; Mixins
                              rum/reactive
@@ -61,8 +61,13 @@
                 :let [active (= (:slug b) active-slug)]]
             [:div.sections-picker-section
               {:key (str "sections-picker-" (:uuid b))
-               :class (when active "active")
+               :class (utils/class-set {:active active
+                                        :has-access-icon (#{"public" "private"} (:access b))})
                :on-click #(when (fn? on-change)
                             (on-change b))}
               [:div.sections-picker-section-name
-                (:name b)]]))]]))
+                (:name b)]
+              (case (:access b)
+                "private" [:div.private-icon]
+                "public" [:div.public-icon]
+                nil)]))]]))

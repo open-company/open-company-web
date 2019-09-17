@@ -6,6 +6,7 @@ div.paginated-stream {
     width: 100%;
     margin-left: 0px;
     margin-top: 0px;
+    min-height: calc(100vh - 54px - 72px);
   }
 
   div.paginated-stream-cards {
@@ -37,11 +38,12 @@ div.paginated-stream {
         height: calc(100vh - 50px);
         width: #{$board_container_width}px;
         margin-left: -244px;
-        background-color: $oc_gray_8;
+        background-color: $grey_num_2;
         text-align: center;
 
         @include mobile() {
           width: 100%;
+          background-color: white;
         }
 
         div.oc-loading {

@@ -1,97 +1,76 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
+  border-top: 1px solid $ultra_light_grey;
+  padding-top: 24px;
 
   @include tablet() {
     padding: 0;
     width: 100%;
     position: relative;
+    margin-top: 8px;
+    padding-top: 16px;
   }
 
   div.add-comment-box {
     position: relative;
-    left: 0;
-    right: 0;
-    bottom: 0px;
     width: 100%;
-
-    @include tablet(){
-      box-shadow: none;
-    }
 
     @include user-profile(24);
 
+    @include mobile() {
+      @include user-profile(32);      
+    }
+
     div.user-avatar-img-container {
-      position: absolute;
-      top: 8px;
-      left: 0;
+      float: left;
+      margin-top: 10px;
 
       @include mobile() {
-        display: none;
+        margin-top: 6px;
       }
     }
 
-    @include mobile() {
-      background-color: white;
-      border: 1px solid $mid_light_grey;
-      border-radius: 4px;
-      padding: 9px 14px;
-    }
-
-    div.add-comment-internal{
-      position: absolute;
-      bottom: 0;
-      left: 40px;
-      width: calc(100% - 24px - 16px);
+    div.add-comment-internal {
+      margin-left: 40px;
       position: relative;
-      max-height: 200px;
       border-radius: 4px;
       border: 1px solid $mid_light_grey;
       overflow-x: hidden;
       overflow-y: auto;
+      padding: 9px 14px;
+      background-color: white;
+      width: calc(100% - 40px);
+
+      &.active {
+        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+      }
+
+      div.medium-editor-media-picker {
+        margin-top: 0;
+        top: 0;
+        left: unset;
+        right: 16px;
+      }
 
       @include mobile() {
-        width: 100%;
         left: unset;
         position: relative;
         bottom: unset;
-        max-height: unset;
-        border: none;
       }
 
       div.add-comment {
         resize: none;
         outline: none;
         cursor: auto;
-        white-space: pre-wrap;
-        word-wrap: break-word;
         margin: 0;
-        padding: 9px 14px;
-        background-color: white;
         height: auto;
-        min-height: 38px;
+        min-height: 24px;
         outline: none;
-        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
-        @include mobile() {
-          padding: 0;
-          border: none;
-          border-radius: 0;
-          box-shadow: none;
-          min-height: unset;
-        }
 
-        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-          @include OC_Body_Book();
-          font-size: 16px;
-          color: rgba($deep_navy, 0.5);
-          font-style: normal;
-        }
-
-        @include tablet() {
-          width: calc(100% - 48px);
-          resize: vertical;
-          padding-right: 0px;
+        &.medium-editor-placeholder-hidden:after {
+          display: none !important;
         }
 
         .emojione {
@@ -100,55 +79,98 @@ div.add-comment-box-container {
 
         @include activity-comment();
       }
-
-      // div.emoji-picker {
-      //   position: absolute;
-      //   top: unset;
-      //   bottom: 0px;
-      //   right: 0px;
-      //   display: none;
-
-      //   div.picker-container {
-      //     left: unset;
-      //     right: -5px;
-      //     top: 24px;
-      //   }
-
-      //   @include tablet() {
-      //     display: none;
-      //   }
-      // }
     }
   }
 
   div.add-comment-footer {
-    margin-top: 12px;
-    height: 24px;
-    position: relative;
+    height: 32px;
+    width: 100%;
+    margin-top: 16px;
+
+    &.hide-footer * {
+      display: none;
+    }
+
+    div.upload-progress {
+      float: right;
+      margin-right: 16px;
+      margin-top: 6px;
+
+      div.small-loading {
+        float: left;
+      }
+
+      span.attachment-uploading {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        float: left;
+      }
+    }
+
+    button.close-reply-bt {
+      width: 22px;
+      height: 32px;
+      background-image: cdnUrl("/img/ML/cmail_delete.svg");
+      background-size: 14px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.4;
+      padding: 0;
+      float: right;
+      margin-left: 12px;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      @include tablet() {
+        display: none;
+      }
+    }
+
+    div.emoji-picker {
+      float: right;
+
+      button.emoji-button {
+        width: 24px;
+        height: 32px;
+        background-position: center;
+        background-size: 16px 16px;
+        padding: 0px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        cursor: pointer;
+      }
+
+      div.picker-container {
+        right: -16px;
+        left: unset;
+
+        @include mobile() {
+          left: 0;
+          right: 0;
+          top: 0 !important;
+        }
+      }
+    }
 
     button.send-btn {
       float: right;
-      height: 24px;
-      padding: 0;
-      margin: 0;
-      text-align: right;
-      color: $carrot_green;
+      height: 32px;
+      padding: 7px 16px;
+      margin: 0 0 0 14px;
+      background-color: $carrot_green;
+      color: white;
       @include OC_Body_Bold();
-      font-size: 16px;
-      padding: 0 0 0 8px;
-
-      @include mobile() {
-        right: 10px;
-        width: 40px;
-      }
+      font-size: 14px;
+      line-height: 18px;
+      border-radius: 4px;
 
       &:disabled {
         cursor: not-allowed;
         opacity: 1 !important;
-
-        @include mobile() {
-          color: rgba($light_navy, 0.5);
-        }
 
         @include big_web() {
           &:hover {
@@ -163,7 +185,7 @@ div.add-comment-box-container {
       height: 16px;
       float: right;
       background-color: $ultra_light_grey;
-      margin: 4px 8px 0;
+      margin: 7px 8px 0;
     }
 
     button.complete-follow-up {
@@ -175,6 +197,7 @@ div.add-comment-box-container {
       color: $deep_navy;
       padding: 0 8px 0 24px;
       position: relative;
+      margin-top: 5px;
 
       div.carrot-checkbox {
         position: absolute;

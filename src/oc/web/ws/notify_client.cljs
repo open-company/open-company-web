@@ -9,7 +9,8 @@
             [oc.lib.time :as time]
             [oc.web.actions.jwt :as ja]
             [oc.web.local-settings :as ls]
-            [oc.web.ws.utils :as ws-utils]))
+            [oc.web.ws.utils :as ws-utils]
+            [oc.web.utils.ws-client-ids :as ws-client-ids]))
 
 ;; Sente WebSocket atoms
 (defonce channelsk (atom nil))
@@ -153,6 +154,11 @@
             (reset! channelsk chsk)
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
+            (when @ch-state
+              (remove-watch @ch-state :notify-client-state-watcher))
             (reset! ch-state state)
+            (add-watch @ch-state :notify-client-state-watcher
+             (fn [key a old-state new-state]
+               (reset! ws-client-ids/notify-client-id (:uid new-state))))
             (start-router!)))
       (notifications-watch))))

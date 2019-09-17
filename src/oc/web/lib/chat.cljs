@@ -1,7 +1,6 @@
 (ns oc.web.lib.chat
   (:require [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
-            [oc.web.components.ui.alert-modal :as alert-modal]
             [taoensso.timbre :as timbre]))
 
 (defn identify []

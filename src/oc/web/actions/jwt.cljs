@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]
             [oc.web.local-settings :as ls]
             [oc.web.lib.fullstory :as fullstory]))
@@ -15,8 +16,8 @@
 
 (defn logout
   ([]
-   (logout (if js/window.OCCarrotDesktop
-             oc-urls/desktop-login
+   (logout (if ua/pseudo-native?
+             oc-urls/native-login
              oc-urls/home)))
   ([location]
    (cook/remove-cookie! :jwt)

@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
@@ -47,7 +48,8 @@
         comments-data @(drv/get-ref s :comments-data)]
     (comment-actions/get-comments-if-needed activity-data comments-data)))
 
-(rum/defcs stream-item < rum/reactive
+(rum/defcs stream-item < rum/static
+                         rum/reactive
                          ;; Derivatives
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
@@ -57,7 +59,7 @@
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (when-not (js/isEdge)
+                         (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3)))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
@@ -174,7 +176,8 @@
             [:div.must-see-tag.big-web-tablet-only]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
-        (when is-published?
+        (when (and is-published?
+                   (not is-mobile?))
           (more-menu activity-data dom-element-id
            {:external-share (not is-mobile?)
             :external-follow-up (not is-mobile?)
@@ -213,10 +216,6 @@
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             (stream-item-summary activity-data)]]
-          (when (and (not is-drafts-board)
-                     is-mobile?)
-              [:div.stream-item-mobile-reactions
-                (reactions activity-data)])
           (if is-drafts-board
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
@@ -229,41 +228,44 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              [:div.stream-item-comments-summary
-                ; {:on-click #(expand s true true)}
-                (comments-summary activity-data true has-new-comments?)]
-              (when-not is-mobile?
+              (when is-mobile?
                 (reactions activity-data))
-              (when should-show-wrt
-                [:div.stream-item-wrt
-                  {:ref :stream-item-wrt}
-                  (when show-post-added-tooltip?
-                    [:div.post-added-tooltip-container
-                      {:ref :post-added-tooltip}
-                      [:div.post-added-tooltip-title
-                        "Post analytics"]
-                      [:div.post-added-tooltip
-                        (str "Invite your team to Carrot so you can know who read your "
-                         "post and when. Click here to access your post analytics anytime.")]
-                      [:button.mlb-reset.post-added-tooltip-bt
-                        {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                        "OK, got it"]])
-                  (wrt-count activity-data read-data)])
-              (when (seq activity-attachments)
-                [:div.stream-item-attachments
-                  {:ref :stream-item-attachments}
-                  [:div.stream-item-attachments-count
-                    (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
-                  [:div.stream-item-attachments-list
-                    (for [atc activity-attachments]
-                      [:a.stream-item-attachments-item
-                        {:href (:file-url atc)
-                         :target "_blank"}
-                        [:div.stream-item-attachments-item-desc
-                          [:span.file-name
-                            (:file-name atc)]
-                          [:span.file-size
-                            (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])
+              [:div.stream-item-footer-mobile-group
+                [:div.stream-item-comments-summary
+                  ; {:on-click #(expand s true true)}
+                  (comments-summary activity-data has-new-comments?)]
+                (when-not is-mobile?
+                  (reactions activity-data))
+                (when should-show-wrt
+                  [:div.stream-item-wrt
+                    {:ref :stream-item-wrt}
+                    (when show-post-added-tooltip?
+                      [:div.post-added-tooltip-container
+                        {:ref :post-added-tooltip}
+                        [:div.post-added-tooltip-title
+                          "Post analytics"]
+                        [:div.post-added-tooltip
+                          (str "Invite your team to Carrot so you can know who read your "
+                           "post and when. Click here to access your post analytics anytime.")]
+                        [:button.mlb-reset.post-added-tooltip-bt
+                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                          "OK, got it"]])
+                    (wrt-count activity-data read-data)])
+                (when (seq activity-attachments)
+                  [:div.stream-item-attachments
+                    {:ref :stream-item-attachments}
+                    [:div.stream-item-attachments-count
+                      (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
+                    [:div.stream-item-attachments-list
+                      (for [atc activity-attachments]
+                        [:a.stream-item-attachments-item
+                          {:href (:file-url atc)
+                           :target "_blank"}
+                          [:div.stream-item-attachments-item-desc
+                            [:span.file-name
+                              (:file-name atc)]
+                            [:span.file-size
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]
               [:div.time-since
                 (let [t (or (:published-at activity-data) (:created-at activity-data))]
                   [:time

@@ -105,6 +105,27 @@
     :id (if success? :email-domain-remove-success :email-domain-remove-error)
     :dismiss true}))
 
+(defn email-domain-added [success?]
+  (notification-actions/show-notification
+   {:title (if success? "Email domain successfully added" "Error")
+    :description (when-not success? "An error occurred while adding the email domain, please try again.")
+    :expire 3
+    :id (if success? :email-domain-add-success :email-domain-add-error)
+    :dismiss true}))
+
+(defn remove-email-domain-prompt [domain]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "org-email-domain-remove"
+                    :message "Are you sure you want to remove this email domain?"
+                    :link-button-title "Keep"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes"
+                    :solid-button-cb #(do
+                                        (alert-modal/hide-alert)
+                                        (team-actions/remove-team (:links domain) email-domain-removed))}]
+    (alert-modal/show-alert alert-data)))
+
 (rum/defcs org-settings-modal <
   ;; Mixins
   rum/reactive
@@ -133,7 +154,7 @@
         (notification-actions/show-notification {:title (if (:saved org-editing) "Settings saved" "Error saving, please retry")
                                                  :primary-bt-title "OK"
                                                  :primary-bt-dismiss true
-                                                 :expire 10
+                                                 :expire 3
                                                  :id :org-settings-saved})))
     s)}
   [s]
@@ -212,13 +233,13 @@
                                  (when (= (.-key e) "Enter")
                                    (let [domain (:domain um-domain-invite)]
                                      (when (utils/valid-domain? domain)
-                                       (team-actions/email-domain-team-add domain)))))}]
+                                       (team-actions/email-domain-team-add domain email-domain-added)))))}]
               [:button.mlb-reset.add-email-domain-bt
                 {:disabled (not (utils/valid-domain? (:domain um-domain-invite)))
                  :on-click (fn [e]
                              (let [domain (:domain um-domain-invite)]
                                (when (utils/valid-domain? domain)
-                                 (team-actions/email-domain-team-add domain))))}
+                                 (team-actions/email-domain-team-add domain email-domain-added))))}
                 "Add"]]
             [:div.org-settings-email-domains
               (for [domain (:email-domains team-data)]
@@ -227,7 +248,7 @@
                   (str "@" (:domain domain))
                   (when (utils/link-for (:links domain) "remove")
                     [:button.mlb-reset.remove-email-bt
-                      {:on-click #(team-actions/remove-team (:links domain) email-domain-removed)}
+                      {:on-click #(remove-email-domain-prompt domain)}
                       "Remove"])])]]
           (if-not @(::show-advanced-settings s)
             [:div.org-settings-advanced

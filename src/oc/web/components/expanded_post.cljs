@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
@@ -41,25 +42,11 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn make-images-interactive!
-  "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
-  [s]
-  (let [body (rum/ref s "post-body")
-        imgs (dom/sel body "img")]
-    (doseq [img  imgs
-            :let [href (.-src img)]]
-      (dom/add-class! img :interactive-image)
-      (dom/listen! img :click #(reset! (::image-modal-src s) href)))
-    s))
-
-(def interactive-images-mixin
-  {:did-mount make-images-interactive!
-   :did-remount (fn [_ new-state]
-                  (make-images-interactive! new-state))})
-
-(defn- load-comments [s]
+(defn- load-comments [s force?]
   (let [activity-data @(drv/get-ref s :activity-data)]
-    (comment-actions/get-comments activity-data)))
+    (if force?
+      (comment-actions/get-comments activity-data)
+      (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -69,21 +56,23 @@
   (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
+  (drv/drv :add-comment-highlight)
+  (drv/drv :expand-image-src)
+  (drv/drv :add-comment-force-update)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
-  (rum/local nil ::image-modal-src)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
-  interactive-images-mixin
+  (mixins/interactive-images-mixin "div.expanded-post-body")
   {:did-mount (fn [s]
     (save-fixed-comment-height! s)
     (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
-    (load-comments s)
+    (load-comments s true)
     s)
    :did-remount (fn [_ s]
-    (load-comments s)
+    (load-comments s false)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -95,7 +84,8 @@
         publisher (:publisher activity-data)
         is-mobile? (responsive/is-mobile-size?)
         route (drv/react s :route)
-        back-to-slug (or (:back-to route) (:board route))
+        org-data (dis/org-data)
+        back-to-slug (utils/back-to org-data)
         is-all-posts? (= back-to-slug "all-posts")
         is-follow-ups? (= back-to-slug "follow-ups")
         back-to-label (str "Back to "
@@ -117,16 +107,19 @@
                         :height @(::mobile-video-height s)}
                        {:width 638
                         :height (utils/calc-video-height 638)}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         activities-read (drv/react s :activities-read)
         reads-data (get activities-read (:uuid activity-data))
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))]
+        add-comment-highlight (drv/react s :add-comment-highlight)
+        expand-image-src (drv/react s :expand-image-src)
+        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
+        add-comment-force-update (drv/react s :add-comment-force-update)]
     [:div.expanded-post
-      {:class dom-node-class
+      {:class (utils/class-set {dom-node-class true
+                                :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
-      (image-modal/image-modal {:src @(::image-modal-src s)
-                                :on-close #(reset! (::image-modal-src s) nil)})
+      (image-modal/image-modal {:src expand-image-src})
       [:div.activity-share-container]
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
@@ -164,16 +157,17 @@
            :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
            :data-title (utils/activity-date-tooltip activity-data)
            :class utils/hide-class}
-          (str (:name publisher) " in "
-               (:board-name activity-data)
-               (when (= (:board-access activity-data) "private")
-                 " (private)")
-               (when (= (:board-access activity-data) "public")
-                 " (public)")
-               " on "
-               (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))
+          [:span.expanded-post-author-inner-label
+            (str (:name publisher) " in "
+                 (:board-name activity-data)
+                 (when (= (:board-access activity-data) "private")
+                   " (private)")
+                 (when (= (:board-access activity-data) "public")
+                   " (public)")
+                 " on "
+                 (utils/tooltip-date (:published-at activity-data)))]
           (if (and assigned-follow-up-data
-                     (not (:completed? assigned-follow-up-data)))
+                   (not (:completed? assigned-follow-up-data)))
             [:div.follow-up-tag]
             (when (:must-see activity-data)
               [:div.must-see-tag]))]]
@@ -186,17 +180,20 @@
          :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
       (stream-attachments (:attachments activity-data))
-      (when is-mobile?
-        [:div.expanded-post-mobile-reactions
-          (reactions activity-data)])
+      ; (when is-mobile?
+      ;   [:div.expanded-post-mobile-reactions
+      ;     (reactions activity-data)])
       [:div.expanded-post-footer.group
-        (comments-summary activity-data true)
-        (when-not is-mobile?
+        (when is-mobile?
           (reactions activity-data))
-        (when user-is-part-of-the-team
-          [:div.expanded-post-wrt-container
-            (wrt-count activity-data reads-data)])]
+        [:div.expanded-post-footer-mobile-group
+          (comments-summary activity-data)
+          (when-not is-mobile?
+            (reactions activity-data))
+          (when user-is-part-of-the-team
+            [:div.expanded-post-wrt-container
+              (wrt-count activity-data reads-data)])]]
       [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data)
+        (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data))))]]))
+          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]]))

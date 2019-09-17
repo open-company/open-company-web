@@ -6,12 +6,14 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.actions.nav-sidebar :as nav-actions]))
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -55,6 +57,7 @@
                                 (drv/drv :editable-boards)
                                 (drv/drv :show-add-post-tooltip)
                                 (drv/drv :hide-left-navbar)
+                                (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-ups-data)
                                 ;; Locals
@@ -62,6 +65,7 @@
                                 (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
+                                (rum/local nil ::last-mobile-navigation-panel)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -78,6 +82,19 @@
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
+                                  (when (responsive/is-mobile-size?)
+                                    (let [mobile-navigation-panel (boolean @(drv/get-ref s :mobile-navigation-sidebar))
+                                          last-mobile-navigation-panel (boolean @(::last-mobile-navigation-panel s))]
+                                      (when (not= mobile-navigation-panel last-mobile-navigation-panel)
+                                        (if mobile-navigation-panel
+                                          ;; Will open panel, let's block page scroll
+                                          (do
+                                            (dom-utils/lock-page-scroll)
+                                            (reset! (::last-mobile-navigation-panel s) true))
+                                          ;; Will close panel, let's unblock page scroll
+                                          (do
+                                            (dom-utils/unlock-page-scroll)
+                                            (reset! (::last-mobile-navigation-panel s) false))))))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -111,16 +128,24 @@
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)})}
+      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
+                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
+                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))}
       [:div.left-navigation-sidebar-content
         {:ref "left-navigation-sidebar-content"
          :class (when can-compose "can-compose")}
+        (when is-mobile?
+          [:div.left-navigation-sidebar-mobile-header
+            [:button.mlb-reset.mobile-close-bt
+              {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+            (orgs-dropdown)])
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-all-posts})
              :href (oc-urls/all-posts)
-             :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
+             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
@@ -129,7 +154,7 @@
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})
              :href (oc-urls/follow-ups)
-             :on-click #(nav-actions/nav-to-url! % (oc-urls/follow-ups))}
+             :on-click #(nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups))}
             [:div.follow-ups-icon]
             [:div.follow-ups-label
               "Follow-ups"]
@@ -145,7 +170,7 @@
                :data-board (name (:slug drafts-board))
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
-               :on-click #(nav-actions/nav-to-url! % board-url)}
+               :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
               [:div.drafts-icon]
               [:div.drafts-label.group
                 "Drafts "]
@@ -177,7 +202,7 @@
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(do
-                              (nav-actions/nav-to-url! % board-url))}
+                              (nav-actions/nav-to-url! % (:slug board) board-url))}
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")

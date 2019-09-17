@@ -29,20 +29,27 @@
   (or (.-clientWidth (.-documentElement js/document))
       (.-innerWidth js/window)))
 
+(defn- maybe-load-comments [s]
+  (let [activity-data @(drv/get-ref s :secure-activity-data)
+        comments-data @(drv/get-ref s :comments-data)]
+    (comment-utils/get-comments-if-needed activity-data comments-data)))
+
 (rum/defcs secure-activity < rum/reactive
                              ;; Derivatives
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
                              (drv/drv :comments-data)
+                             (drv/drv :add-comment-highlight)
                              ;; Locals
                              (rum/local 0 ::mobile-video-height)
                              ;; Mixins
                              (mention-mixins/oc-mentions-hover)
                              ui-mixins/refresh-tooltips-mixin
                              {:did-mount (fn [s]
-                               (let [activity-data @(drv/get-ref s :secure-activity-data)
-                                     comments-data @(drv/get-ref s :comments-data)]
-                                (comment-utils/get-comments-if-needed activity-data comments-data))
+                               (maybe-load-comments s)
+                               s)
+                              :will-update (fn [s]
+                               (maybe-load-comments s)
                                s)
                               :after-render (fn [s]
                                ;; Delay to make sure the change socket was initialized
@@ -50,6 +57,7 @@
                                s)}
   [s]
   (let [activity-data (drv/react s :secure-activity-data)
+        add-comment-highlight (drv/react s :add-comment-highlight)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         video-size (when (:fixed-video-id activity-data)
@@ -118,21 +126,21 @@
                               :video-processed (:video-processed activity-data)}))
             (when (:abstract activity-data)
               [:div.activity-abstract
-                {:class utils/hide-class}
-                (:abstract activity-data)])
+                {:class utils/hide-class
+                 :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
             (when (:body activity-data)
               [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :class utils/hide-class}])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (comments-summary activity-data true)
+              (comments-summary activity-data)
               (reactions activity-data)]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])
             (when comments-data
-              (stream-comments activity-data comments-data true))
+              (stream-comments activity-data comments-data add-comment-highlight))
             (when (:can-comment activity-data)
               (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
             [:div.secure-activity-footer

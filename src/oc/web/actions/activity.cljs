@@ -454,6 +454,11 @@
   (send-item-read (:uuid activity-data))
   ;; Show the first post added tooltip if needed
   (nux-actions/show-post-added-tooltip (:uuid activity-data))
+  ;; Refresh the drafts board on publish
+  (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
+        drafts-link (utils/link-for (:links drafts-board) "self")]
+    (when drafts-link
+      (sa/section-get dis/other-sort-type drafts-link)))
   ;; Show follow-ups notifications if needed
   (when (pos? (count (:follow-ups activity-data)))
     (let [follow-ups (:follow-ups activity-data)
@@ -622,24 +627,15 @@
   (let [secure-activity-data (if success (json->cljs body) {})
         org-data (org-data-from-secure-activity secure-activity-data)]
     (activity-get-finish status secure-activity-data (router/current-secure-activity-id))
-    (dis/dispatch! [:org-loaded org-data false])))
+    (dis/dispatch! [:org-loaded org-data])))
 
 (defn get-org [org-data cb]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
     (api/get-org org-link (fn [{:keys [status body success]}]
       (let [org-data (json->cljs body)]
-        (dis/dispatch! [:org-loaded org-data false nil])
+        (dis/dispatch! [:org-loaded org-data])
         (cb success))))))
-
-(defn connect-change-service []
-  ;; id token given and not logged in
-  (when-let* [claims (jwt/get-id-token-contents)
-              secure-uuid (:secure-uuid claims)
-              user-id (:user-id claims)
-              org-data (dis/org-data)
-              ws-link (utils/link-for (:links org-data) "changes")]
-    (ws-cc/reconnect ws-link user-id (:slug org-data) [])))
 
 (defn secure-activity-get [& [cb]]
   (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id)
@@ -653,8 +649,13 @@
 (defn activity-change [section-uuid activity-uuid]
   (let [org-data (dis/org-data)
         section-data (first (filter #(= (:uuid %) section-uuid) (:boards org-data)))
-        activity-data (dis/activity-data (:slug org-data) activity-uuid)]
-    (when activity-data
+        activity-data (dis/activity-data (:slug org-data) activity-uuid)
+        editing-activity-data (:cmail-data @dis/app-state)]
+    (when (and ;; if we have the activity in the app-state
+               activity-data
+               ;; and we are not currently editing it (if we are editing
+               ;; we don't need to refresh it on each change)
+               (not= (:uuid activity-data) (:uuid editing-activity-data)))
       (get-entry activity-data))))
 
 ;; Change service actions
@@ -894,6 +895,11 @@
                                                :dismiss true
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
+
+(defn saved-sort-type [org-slug]
+  (if-let [sort-type-cookie (cook/get-cookie (router/last-sort-cookie org-slug))]
+    (keyword sort-type-cookie)
+    dis/default-sort-type))
 
 (defn change-sort-type [type]
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
