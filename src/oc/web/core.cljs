@@ -282,6 +282,7 @@
      {:org org
       :activity (:entry params)
       :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
+      :comment (:comment params)
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
