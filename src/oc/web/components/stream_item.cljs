@@ -43,11 +43,6 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn- item-mounted [s]
-  (let [activity-data (first (:rum/args s))
-        comments-data @(drv/get-ref s :comments-data)]
-    (comment-actions/get-comments-if-needed activity-data comments-data)))
-
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
@@ -64,12 +59,6 @@
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
-                           s)
-                          :did-mount (fn [s]
-                           (item-mounted s)
-                           s)
-                          :did-remount (fn [_ s]
-                           (item-mounted s)
                            s)}
   [s activity-data read-data]
   (let [org-data (drv/react s :org-data)
