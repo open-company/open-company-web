@@ -39,7 +39,7 @@
 
       shared/pricing-table-section
 
-      shared/carrot-in-action
+      ; shared/carrot-in-action
 
-      shared/keep-aligned-bottom
+      ; shared/keep-aligned-bottom
       ]])

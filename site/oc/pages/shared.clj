@@ -29,7 +29,7 @@
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Growing and distributed teams around the world use Carrot."]
+      "Growing and distributed teams around the world ❤️ Carrot"]
     [:div.homepage-testimonials-logo.logo-ifttt]
     [:div.homepage-testimonials-logo.logo-hopper]
     [:div.homepage-testimonials-logo.logo-hinge]
@@ -236,266 +236,149 @@
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
-                          "Carrot helps us communicate more efficiently across multiple "
-                          "time zones and working hours. It minimizes the FOMO that can "
-                          "result from missed Slack conversations, and cuts out the ‘Did "
-                          "you see my message?’ nagging.")
+                          "\"Carrot helps us communicate efficiently across time zones. "
+                          "It minimizes FOMO from missed Slack conversations, and cuts out "
+                          "the \"Did you see my message?\" nagging.\"")
                          (= slug :blend-labs)
                          (str
-                          "Carrot is a perfect compliment for Slack. We use it for "
-                          "longer-form weekly updates no one should miss.")
-                         (= slug :novo)
-                         (str
-                          "Carrot keeps everyone across our global offices up to date. "
-                          "It helps us share big wins, and key information across our growing family.")
-                         (= slug :hello-tickets)
-                         "Love being able to quickly see who read my post and when.")
+                          "“Carrot is a perfect compliment for Slack. We use it for longer-form "
+                          "weekly updates no one should miss.”"))
         footer-copy (cond
                       (= slug :ifttt)
-                      "— Kevin Ebaugh, Senior Platform Community Manager at "
+                      "Kevin Ebaugh, Senior Platform Community Manager"
                       (= slug :blend-labs)
-                      "— Sara Vienna, Head of Design at "
-                      (= slug :novo)
-                      "— Tyler McIntyre, CEO at "
-                      (= slug :hello-tickets)
-                      "— Alberto Martinez, CEO at ")
+                      "Sara Vienna, Head of Design")
         testimonial-website (cond
                              (= slug :ifttt)
                              "https://ifttt.com/"
                              (= slug :blend-labs)
-                             "https://bl3ndlabs.com/"
-                             (= slug :novo)
-                             "https://banknovo.com/"
-                             (= slug :hello-tickets)
-                             "https://hellotickets.com/")
+                             "https://bl3ndlabs.com/")
         testimonial-company (cond
                              (= slug :ifttt)
                              "IFTTT"
                              (= slug :blend-labs)
-                             "Bl3NDlabs"
-                             (= slug :novo)
-                             "Novobank"
-                             (= slug :hello-tickets)
-                             "Hello Tickets")]
+                             "Bl3NDlabs")]
     [:div.testimonials-block.group
       {:class (name slug)}
-      [:div.testimonial-author-pic]
-      [:div.testimonial-copy-bubble
-        [:div.testimonial-copy
-          testimonial-copy]
-        [:div.testimonial-copy-footer
+      [:div.testimonial-copy
+        testimonial-copy]
+      [:div.testimonial-copy-footer
+        [:div.testimonial-author-pic]
+        [:div.testimonial-copy-footer-right
           footer-copy
           [:a.testimonial-copy-link
             {:href testimonial-website
              :target "_blank"}
             testimonial-company]]]]))
 
-(defn- testimonial-carousel [slug]
-  (let [images-prefix (cond
-                        (= slug :orange)
-                        "1"
-                        (= slug :blue)
-                        "2"
-                        (= slug :purple)
-                        "3")
-        headline (cond
-                  (= slug :orange)
-                  "Share what matters"
-                  (= slug :blue)
-                  "Organized, topic-based discussions"
-                  (= slug :purple)
-                  "Close communication gaps")
-        subheadline (cond
-                     (= slug :orange)
-                     "Thoughtful communication should never be lost in the noise."
-                     (= slug :blue)
-                     "Bring your team closer together despite location and timezone differences."
-                     (= slug :purple)
-                     "Make sure your team knows what matters most.")
-        footer-copy-1 (cond
-                       (= slug :orange)
-                       "Longer-form posts"
-                       (= slug :blue)
-                       "Reply later"
-                       (= slug :purple)
-                       "Analytics")
-        footer-copy-2 (cond
-                       (= slug :orange)
-                       "At-a-glance summary"
-                       (= slug :blue)
-                       "Threads"
-                       (= slug :purple)
-                       "Daily digest")
-        footer-copy-3 (cond
-                       (= slug :orange)
-                       "Follow-ups"
-                       (= slug :blue)
-                       "Stay current"
-                       (= slug :purple)
-                       "Integrations")]
-    [:div.testimonial-carousel-block
-      {:class (name slug)}
-      [:div.testimonial-carousel-headline
-        headline]
-      [:div.testimonial-carousel-subheadline
-        subheadline]
-      [:div.testimonial-carousel-images
-        [:div.testimonial-carousel-images-inner
-          [:img.testimonial-carousel-image.image-1
-            {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1.png"))
-             :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_1@2x.png")) " 2x")}]
-          [:img.testimonial-carousel-image.image-2
-            {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2.png"))
-             :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_2@2x.png")) " 2x")}]
-          [:img.testimonial-carousel-image.image-3
-            {:src (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3.png"))
-             :srcSet (str (cdn (str "/img/ML/testimonial_carousel_" images-prefix "_3@2x.png")) " 2x")}]]]
-      [:div.testimonial-carousel-footers.group
-        [:div.testimonial-carousel-footer.footer-1
-          {:class (name slug)
-           :onClick (str "OCCarousel.carouselClicked(\"" (name slug) "\", \"1\");")
-           :onMouseLeave (str "OCCarousel.maybeRestartTimeout(\"" (name slug) "\", \"1\");")}
-          [:div.testimonial-carousel-footer-progress]
-          [:div.testimonial-carousel-footer-block
-            [:div.testimonial-carousel-footer-icon]
-            [:div.testimonial-carousel-footer-copy
-              footer-copy-1]]]
-        [:div.testimonial-carousel-footer.footer-2
-          {:class (name slug)
-           :onClick (str "OCCarousel.carouselClicked(\"" (name slug) "\", \"2\");")
-           :onMouseLeave (str "OCCarousel.maybeRestartTimeout(\"" (name slug) "\", \"2\");")}
-          [:div.testimonial-carousel-footer-progress]
-          [:div.testimonial-carousel-footer-block
-            [:div.testimonial-carousel-footer-icon]
-            [:div.testimonial-carousel-footer-copy
-              footer-copy-2]]]
-        [:div.testimonial-carousel-footer.footer-3
-          {:class (name slug)
-           :onClick (str "OCCarousel.carouselClicked(\"" (name slug) "\", \"3\");")
-           :onMouseLeave (str "OCCarousel.maybeRestartTimeout(\"" (name slug) "\", \"3\");")}
-          [:div.testimonial-carousel-footer-progress]
-          [:div.testimonial-carousel-footer-block
-            [:div.testimonial-carousel-footer-icon]
-            [:div.testimonial-carousel-footer-copy
-              footer-copy-3]]]]]))
-
 (def testimonials-section
   [:section.testimonials
     (dashed-string 1)
     (testimonial-block :ifttt)
     (dashed-string 2)
-    (testimonial-carousel :orange)
+    [:div.testimonials-screenshot-block
+      [:div.testimonials-screenshot-header
+        "Thoughtful communication"]
+      [:div.testimonials-screenshot-subheader
+        "Space to write longer updates that convey more information"]
+      [:img.testimonials-screenshot
+        {:src (cdn "/img/ML/testimonials_screenshot.png")
+         :srcSet (str
+                  (cdn "/img/ML/testimonials_screenshot@2x.png") " 2x "
+                  (cdn "/img/ML/testimonials_screenshot@3x.png") " 3x "
+                  (cdn "/img/ML/testimonials_screenshot@4x.png") " 4x")}]]
     (dashed-string 3)
     (testimonial-block :blend-labs)
     (dashed-string 4)
-    (testimonial-carousel :blue)
+    [:div.testimonials-floated-block
+      [:div.testimonials-floated-block-inner.left-block.group
+        [:img.testimonials-floated-screenshot
+          {:src (cdn "/img/ML/testimonials_floated_screenshot_1.png")
+           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_1@2x.png") " 2x")}]
+        [:div.testimonials-floated-copy
+          [:div.testimonials-floated-header
+            "Clear, organized discussions"]
+          [:div.testimonials-floated-subheader
+            "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal for remote teams."]]]
+
+      [:div.testimonials-floated-block-inner.right-block.group
+        [:img.testimonials-floated-screenshot
+          {:src (cdn "/img/ML/testimonials_floated_screenshot_2.png")
+           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_2@2x.png") " 2x")}]
+        [:div.testimonials-floated-copy
+          [:div.testimonials-floated-header
+            "Request a follow-up"]
+          [:div.testimonials-floated-subheader
+            "When you need a reply or feedback from your team, Carrot makes sure they'll follow up."]]]
+
+      [:div.testimonials-floated-block-inner.left-block.group
+        [:img.testimonials-floated-screenshot
+          {:src (cdn "/img/ML/testimonials_floated_screenshot_3.png")
+           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_3@2x.png") " 2x")}]
+        [:div.testimonials-floated-copy
+          [:div.testimonials-floated-header
+            "Know who saw your update"]
+          [:div.testimonials-floated-subheader
+            "Carrot works in the background to make sure everyone sees what matters"]]]]
     (dashed-string 5)
-    (testimonial-block :novo)
-    (dashed-string 6)
-    (testimonial-carousel :purple)
-    (dashed-string 7)
-    (testimonial-block :hello-tickets)
-    (dashed-string 8)])
+    [:div.testimonials-commgaps-block
+      [:div.testimonals-commgaps-header
+        "Close communication gaps"]
+      [:div.testimonals-commgaps-subheader
+        "Carrot makes sure everyone will see what matters."]
+      [:div.testimonials.commgaps-block-inner.group
+        [:div.testimonials-commgaps-column.left-column
+          [:img.testimonials-commgaps-column-screenshot
+            {:src (cdn "/img/ML/testimonials_commgaps_email.png")
+             :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x")}]
+          [:div.testimonials-commgaps-column-header
+            "Daily digest to stay in sync"]
+          [:div.testimonials-commgaps-column-subheader
+            "Everyone gets a daily, personalized summary of what's important."]]
+        [:div.testimonials-commgaps-column.right-column
+          [:img.testimonials-commgaps-column-screenshot
+            {:src (cdn "/img/ML/testimonials_commgaps_slack.png")
+             :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x")}]
+          [:div.testimonials-commgaps-column-header
+            "Auto-share posts to Slack"]
+          [:div.testimonials-commgaps-column-subheader
+            "Your Carrot posts are automatically shared to the right Slack #channel"]]]]
+    (dashed-string 6)])
 
 (def pricing-table-section
   [:section.pricing-header
 
     [:h1.pricing-headline
-      "Free for unlimited users"]
+      "Simple pricing"]
 
     [:div.pricing-subheadline
-      "Carrot is open source and always free to use. Questions? "
+      "Questions? "
       [:a.chat-with-us
         {:class "intercom-chat-link"
          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
         "Chat with us!"]]
 
-    [:div.pricing-three-columns.group
-      ;; Free
-      [:div.pricing-column.free-column
-        [:h2.tear-title
-          "Free"]
-        [:div.tear-subtitle
-          "Perfect for any size team"]
-        [:h3.tear-price
-          "$0"]
-        [:div.tear-price-billing
-          "FREE for unlimited users"]
-        [:a.tear-start-bt
+    [:div.pricing-table.group
+      [:div.pricing-table-left
+        [:div.pricing-table-left-price
+          "$5"]
+        [:div.pricing-table-left-subprice
+          "/month per user"]]
+      [:div.pricing-table-right.group
+        [:div.pricing-table-right-copy
+          (str
+           "Carrot starts with a 14-day free trial, no credit card required. "
+           "After that, monthly pricing starts at $60, which includes your first "
+           "12 members. Then it’s just $5 a user after that.")]
+        [:a.pricing-table-right-link
           {:href "/sign-up"}
-          "Create your team"]
-        [:div.tear-feature
-          [:span "Unlimited users"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          [:span "Unlimited posts"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          [:span "2 GB storage"]]]
-      ;; Premium
-      [:div.pricing-column.team-column
-        [:h2.tear-title
-          "Premium"]
-        [:div.tear-subtitle
-          "Advanced permissions and analytics to boost engagement"]
-        [:h3.tear-price
-          "$4"]
-        [:div.tear-price-billing
-          "Per user, per month, billed annually"]
-        [:a.tear-start-bt
-          {:href "/sign-up"}
-          "Create your team"]
-        [:div.tear-feature-summary
-          "Everything in FREE plus:"]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          {:data-toggle "tooltip"
-           :data-placement "top"
-           :title "Advanced permissions"}
-          [:span "Advanced permissions"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          {:data-toggle "tooltip"
-           :data-placement "top"
-           :title "Follow-ups"}
-          [:span "Follow-ups"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          {:data-toggle "tooltip"
-           :data-placement "top"
-           :title "Analytics"}
-          [:span "Analytics"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          [:span "Scheduling"]
-          [:span.soon "SOON"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          [:span "Free guest users"]
-          [:span.soon "SOON"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          [:span "Unlimited storage"]]
-        [:div.tear-feature-separator]
-        [:div.tear-feature
-          [:span "Premium support"]]]
-      ;; Enterprise
-      [:div.pricing-column.enterprise-column
-        [:h2.tear-title
-          "Enterprise"]
-        [:div.tear-subtitle
-          "Tailored for corporate comms and HR departments"]
-        [:div.tear-price]
-        [:div.tear-price-billing
-          "Ideal for teams 250+"]
-        [:a.chat-with-us
-          {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-          "Chat with us"]]]
+          "Start your 14 day free trial"]]]
+    
     [:div.pricing-header-footer
-      [:div.pricing-header-footer-headline
-        "Non-profits and educational institutions save 50% on premium plans."]
+      [:div.pricing-header-footer-logo]
       [:div.pricing-header-footer-subheadline
-        (str
-         "Prices shown are for annual billing. When billed month-to-month, "
-         "the Premium plan is $5 per user per month.")]]])
+        "Have a team of 250+? Learn more about our "
+        [:a
+          {:href "/pricing"}
+          "Enterprise plan"]
+        "."]]])

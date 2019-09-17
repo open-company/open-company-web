@@ -1125,9 +1125,10 @@ div.dashed-string {
 
 div.testimonials-block {
   width: 100%;
-  max-width: 894px;
+  max-width: 960px;
   margin: 0 auto;
   position: relative;
+  text-align: center;
 
   &.ifttt {
     div.testimonial-author-pic {
@@ -1136,70 +1137,58 @@ div.testimonials-block {
   }
 
   &.blend-labs {
-    div.testimonial-author-pic {
+    div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_blend_labs");
     }
   }
 
   &.novo {
-    div.testimonial-author-pic {
+    div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_novo");
     }
   }
 
   &.hello-tickets {
-    div.testimonial-author-pic {
+    div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_hello_tickets");
     }
   }
 
-  div.testimonial-author-pic {
-    width: 78px;
-    height: 78px;
-    float: left;
-    margin-top: 38px;
-    background-size: 78px 78px;
-    background-position: center;
-    background-repeat: no-repeat;
+  div.testimonial-copy {
+    @include OC_Body_Book();
+    font-size: 22px;
+    line-height: 28px;
+    color: $deep_navy;
   }
 
-  div.testimonial-copy-bubble {
-    float: right;
-    background-color: $grey_num_5;
-    border-radius: 16px;
-    width: calc(100% - 78px - 24px);
-    height: 100%;
-    padding: 38px 40px;
+  div.testimonial-copy-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 24px;
 
-    &:before {
-      content: "";
-      width: 20px;
-      height: 20px;
-      transform: rotate(45deg);
-      position: absolute;
-      top: 40px;
-      left: 92px;
-      background-color: $grey_num_5;
-      display: block;
+    div.testimonial-author-pic {
+      width: 40px;
+      height: 40px;
+      background-size: 40px 40px;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin-top: 3px;
     }
 
-    div.testimonial-copy {
+    div.testimonial-copy-footer-right {
       @include OC_Body_Book();
-      font-size: 22px;
-      line-height: 28px;
-      color: $deep_navy;
-      text-align: left;
-    }
-
-    div.testimonial-copy-footer {
-      margin-top: 24px;
-      @include OC_Body_Bold();
       font-size: 18px;
       color: $deep_navy;
+      line-height: 23px;
       text-align: left;
+      margin-left: 16px;
 
       a {
+        display: block;
         color: $carrot_green;
+        line-height: 23px;
       }
     }
   }
@@ -1219,301 +1208,163 @@ section.testimonials {
     text-align: center;
   }
 
-  div.testimonial-carousel-block {
+  div.testimonials-screenshot-block {
     width: 100%;
     max-width: 996px;
     margin: 0 auto;
 
-    div.testimonial-carousel-headline {
+    div.testimonials-screenshot-header {
+      @include OC_Body_Bold();
+      font-size: 60px;
+      line-height: 60px;
+      text-align: center;
+      color: $deep_navy;
+    }
+
+    div.testimonials-screenshot-subheader {
+      margin-top: 24px;
+      @include OC_Body_Book();
+      font-size: 24px;
+      line-height: 32px;
+      text-align: center;
+      color: $deep_navy; 
+    }
+
+    img.testimonials-screenshot {
+      max-width: 100%;
+      width: 100%;
+      margin-top: 40px;
+    }
+  }
+
+  div.testimonials-floated-block {
+    width: 100%;
+    max-width: 1218px;
+    margin: 0 auto;
+
+    div.testimonials-floated-block-inner {
+      width: 100%;
+      // display: flex;
+      // align-items: center;
+      // justify-content: center;
+      margin-top: 40px;
+      position: relative;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &.left-block {
+        div.testimonials-floated-copy {
+          margin-left: 24px;
+          // float: left;
+          left: 50%;
+        }
+
+        img.testimonials-floated-screenshot {
+          float: left;
+        }
+      }
+
+      &.right-block {
+        div.testimonials-floated-copy {
+          margin-right: 24px;
+          // float: right;
+          right: 50%;
+        }
+
+        img.testimonials-floated-screenshot {
+          float: right;
+        }
+      }
+
+      div.testimonials-floated-copy {
+        max-width: 479px;
+        width: calc(50% + 12px);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+
+        div.testimonials-floated-header {
+          @include OC_Body_Bold();
+          font-size: 26px;
+          line-height: 33px;
+          color: $deep_navy;
+          text-align: left;
+        }
+
+        div.testimonials-floated-subheader {
+          margin-top: 8px;
+          @include OC_Body_Book();
+          font-size: 20px;
+          line-height: 26px;
+          color: $deep_navy;
+          text-align: left;
+        }
+      }
+
+      img.testimonials-floated-screenshot {
+        width: calc(50% - 12px);
+      }
+    }
+  }
+
+  div.testimonials-commgaps-block {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    div.testimonals-commgaps-header {
       @include OC_Body_Bold();
       font-size: 60px;
       line-height: 60px;
       color: $deep_navy;
-      text-align: center;
     }
 
-    div.testimonial-carousel-subheadline {
+    div.testimonals-commgaps-subheader {
       margin-top: 24px;
       @include OC_Body_Book();
       font-size: 24px;
       line-height: 32px;
       color: $deep_navy;
-      text-align: center;
     }
 
-    &.image-1 {
-      div.testimonial-carousel-images {
-        div.testimonial-carousel-images-inner {
-          img:nth-child(1) {
-            transition: opacity 180ms;
-            opacity: 1;
-            z-index: 2;
-          }
-          img:nth-child(2) {
-            transition: opacity 1s;
-            opacity: 0;
-            z-index: 1;
-          }
-          img:nth-child(3) {
-            transition: opacity 1s;
-            opacity: 0;
-            z-index: 1;
-          }
-        }
-      }
-    }
-
-    &.step-1{
-      div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-1 {
-        div.testimonial-carousel-footer-progress:after {
-          transition: width $carousel_timing linear;
-          width: 100%;
-        }
-      }
-    }
-
-    &.image-2 {
-      div.testimonial-carousel-images {
-        div.testimonial-carousel-images-inner {
-          img:nth-child(2) {
-            transition: opacity 180ms;
-            opacity: 1;
-            z-index: 2;
-          }
-          img:nth-child(1) {
-            transition: opacity 1s;
-            opacity: 0;
-            z-index: 1;
-          }
-          img:nth-child(3) {
-            transition: opacity 1s;
-            opacity: 0;
-            z-index: 1;
-          }
-        }
-      }
-    }
-
-    &.step-2 {
-      div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-2 {
-        div.testimonial-carousel-footer-progress:after {
-          transition: width $carousel_timing linear;
-          width: 100%;
-        }
-      }
-    }
-
-    &.image-3 {
-      div.testimonial-carousel-images {
-        div.testimonial-carousel-images-inner {
-          img:nth-child(3) {
-            transition: opacity 180ms;
-            opacity: 1;
-            z-index: 2;
-          }
-          img:nth-child(2) {
-            transition: opacity 1s;
-            opacity: 0;
-            z-index: 1;
-          }
-          img:nth-child(1) {
-            transition: opacity 1s;
-            opacity: 0;
-            z-index: 1;
-          }
-        }
-      }
-    }
-
-    &.step-3 {
-      div.testimonial-carousel-footers div.testimonial-carousel-footer.footer-3 {
-        div.testimonial-carousel-footer-progress:after {
-          transition: width $carousel_timing linear;
-          width: 100%;
-        }
-      }
-    }
-
-    div.testimonial-carousel-images {
+    div.testimonials.commgaps-block-inner {
       width: 100%;
-      margin: 40px auto 0;
-      max-width: 996px;
+      margin-top: 40px;
 
-      div.testimonial-carousel-images-inner {
-        position: relative;
-        width: 100%;
-        height: 56%;
-        padding-bottom: 56%;
+      div.testimonials-commgaps-column {
+        width: calc(50% - 12px);
+        text-align: center;
 
-        img {
+        &.left-column {
+          float: left;
+        }
+
+        &.right-column {
+          float: right;
+        }
+
+        img.testimonials-commgaps-column-screenshot {
           width: 100%;
-          border: none;
-          box-shadow: none;
-          outline: none;
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          opacity: 0;
-
-          // Start with first image visible
-          &:first-child {
-            opacity: 1;
-          }
-        }
-      }
-    }
-
-    div.testimonial-carousel-footers {
-      width: 620px;
-      height: 47px;
-      margin: 40px auto 0;
-
-      div.testimonial-carousel-footer {
-        float: left;
-        width: 193px;
-        height: 47px;
-        cursor: pointer;
-
-        &:not(:first-child) {
-          margin-left: 20px;
         }
 
-        &.orange {
-          div.testimonial-carousel-footer-progress:after {
-            background-color: $carrot_orange;
-          }
-
-          &.footer-1 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_1_1.svg");
-              }
-            }
-          }
-
-          &.footer-2 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_1_2.svg");
-              }
-            }
-          }
-
-          &.footer-3 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_1_3.svg");
-              }
-            }
-          }
+        div.testimonials-commgaps-column-header {
+          @include OC_Body_Bold();
+          font-size: 26px;
+          line-height: 33px;
+          color: $deep_navy;
+          max-width: 404px;
+          margin: 24px auto 0;
         }
 
-        &.blue {
-          div.testimonial-carousel-footer-progress:after {
-            background-color: $carrot_blue;
-          }
-
-          &.footer-1 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_2_1.svg");
-              }
-            }
-          }
-
-          &.footer-2 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_2_2.svg");
-              }
-            }
-          }
-
-          &.footer-3 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_2_3.svg");
-              }
-            }
-          }
-        }
-
-        &.purple {
-          div.testimonial-carousel-footer-progress:after {
-            background-color: $carrot_site_purple;
-          }
-
-          &.footer-1 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_3_1.svg");
-              }
-            }
-          }
-
-          &.footer-2 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_3_2.svg");
-              }
-            }
-          }
-
-          &.footer-3 {
-            div.testimonial-carousel-footer-block {
-              div.testimonial-carousel-footer-icon {
-                background-image: cdnUrl("/img/ML/testimonial_carousel_icon_3_3.svg");
-              }
-            }
-          }
-        }
-
-        div.testimonial-carousel-footer-progress {
-          width: 180px;
-          height: 6px;
-          margin: 0 auto;
-          background-color: $ultra_light_grey;
-          border-radius: 3px;
-          position: relative;
-
-          &:after {
-            content: "";
-            display: block;
-            position: absolute;
-            width: 0px;
-            height: 6px;
-            border-radius: 3px;
-            width: 0;
-          }
-        }
-
-        div.testimonial-carousel-footer-block {
-          height: 24px;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          margin-top: 16px;
-
-          div.testimonial-carousel-footer-icon {
-            display: block;
-            width: 24px;
-            height: 24px;
-            background-size: 24px 24px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-
-          div.testimonial-carousel-footer-copy {
-            @include OC_Body_Bold();
-            font-size: 16px;
-            line-height: 24px;
-            color: $deep_navy;
-            margin-left: 8px;
-            letter-spacing: 0px;
-          }
+        div.testimonials-commgaps-column-subheader {
+          @include OC_Body_Book();
+          font-size: 20px;
+          line-height: 26px;
+          color: $deep_navy;
+          max-width: 404px;
+          margin: 8px auto 0;
         }
       }
     }
@@ -1524,31 +1375,13 @@ section.pricing-header {
   padding: 80px 0;
   text-align: center;
   position: relative;
-
-  &:after {
-    content: "";
-    display: block;
-    background-color: $another_ui_grey;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    height: 100%;
-    border-radius: 20px 20px 200px 20px;
-    max-width: 1200px;
-  }
+  width: 100%;
 
   @include tablet() {
     overflow: visible;
     padding: 131px 0 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
-  }
-
-  & > * {
-    z-index: 2;
-    position: relative;
   }
 
   h1.pricing-headline {
@@ -1574,7 +1407,6 @@ section.pricing-header {
     line-height: 38px;
     @include OC_Body_Book();
     margin: 24px auto 0px;
-    z-index: 2;
     position: relative;
     max-width: 630px;
 
@@ -1592,209 +1424,105 @@ section.pricing-header {
     }
   }
 
-  div.pricing-three-columns {
-    margin: 80px auto 40px;
+  div.pricing-table {
+    background-color: $deep_navy;
+    border-radius: 16px;
+    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 1044px;
-    padding: 0 24px;
+    max-width: 960px;
+    margin: 40px auto 0;
+    padding: 40px;
+    position: relative;
 
-    @include pricing-tablet() {
-      width: 100%;
-    }
+    div.pricing-table-left {
+      width: 29%;
+      position: absolute;
+      left: 40px;
+      top: 50%;
+      transform: translateY(-50%);
 
-    @include mobile() {
-      padding: 0;
-    }
-
-    div.pricing-column {
-      width: calc(33% - 21px - 21px);
-      width: 336px;
-      background-color: $another_ui_grey;
-      float: left;
-      padding: 40px 38px;
-      text-align: center;
-      border-radius: 16px;
-
-      &:not(:first-child) {
-        margin-left: 21px;
-      }
-
-      @include pricing-tablet() {
-        float: unset;
-        padding: 40px 32px;
-        margin: 32px auto 0;
-      }
-
-      @include mobile() {
-        width: 100%;
-      }
-
-      h2.tear-title {
-        @include OC_Body_Bold()
-        font-size: 30px;
-        color: $deep_navy;
-        line-height: 38px;
-      }
-
-      div.tear-subtitle {
+      div.pricing-table-left-price {
         @include OC_Body_Book();
-        font-size: 16px;
-        color: $deep_navy;
-        line-height: 20px;
-        height: 40px;
-        margin: 32px auto 0;
-      }
-
-      h3.tear-price {
-        @include OC_Body_Bold();
-        font-size: 70px;
+        font-size: 80px;
         line-height: 90px;
-        color: $deep_navy;
-        margin-top: 16px;
+        color: white;
+        text-align: center;
       }
 
-      a.tear-start-bt {
-        display: block;
-        margin: 32px auto 24px;
-        width: 260px;
-        height: 56px;
-        background-color: $carrot_orange;
-        border-radius: 8px;
+      div.pricing-table-left-subprice {
+        margin-top: 8px;
+        @include OC_Body_Book();
+        font-size: 22px;
+        line-height: 28px;
         color: white;
+        text-align: center;
+      }
+    }
+
+    div.pricing-table-right {
+      float: right;
+      width: 71%;
+      border-left: 1px solid white;
+      padding-left: 60px;
+
+      div.pricing-table-right-copy {
+        @include OC_Body_Book();
+        font-size: 22px;
+        line-height: 28px;
+        color: white;
+        text-align: left;
+      }
+
+      a.pricing-table-right-link {
+        margin-top: 24px;
+        display: block;
+        height: 56px;
+        color: white;
+        background-color: #fb5e48;
+        border-radius: 6px;
+        text-align: center;
         @include OC_Body_Bold();
         font-size: 18px;
-        line-height: 24px;
-        padding: 16px 24px;
-      }
-
-      a.chat-with-us {
-        padding: 0;
-        margin: 0;
-        text-align: center;
-        color: $carrot_green;
-        margin-top: 7px;
-        @include OC_Body_Bold();
-        font-size: 16px;
-        line-height: 20px;
-      }
-
-      div.tear-price-billing {
-        @include OC_Body_Book();
-        font-size: 20px;
-        line-height: 24px;
-        max-width: 184px;
-        margin: 30px auto 0;
-      }
-
-      div.tear-feature-separator {
-        height: 1px;
-        width: 100%;
-        background-color: $more_ultra_light_grey;
-        margin-top: 16px;
-      }
-
-      div.tear-feature-summary {
-        max-width: 200px;
-        @include OC_Body_Bold();
-        font-size: 16px;
-        color: $deep_navy;
-        line-height: 20px;
-        text-align: center;
-        margin: 32px auto 0;
-      }
-
-      div.tear-feature {
-        max-width: 200px;
-        @include OC_Body_Book();
-        font-size: 16px;
-        color: $deep_navy;
-        text-align: center;
-        margin: 16px auto 0;
-        cursor: pointer;
-
-        &[data-toggle="tooltip"] {
-          span{
-            border-bottom: 1px dotted $deep_navy;
-          }
-        }
-
-        @include big_web() {
-          &[data-toggle="tooltip"] {
-            &:hover {
-              color: $deep_navy;
-            }
-          }
-        }
-
-        @include pricing-tablet() {
-          max-width: initial;
-        }
-
-        span.soon {
-          margin-left: 8px;
-          height: 18px;
-          background-color: $carrot_green;
-          border-radius: 4px;
-          padding: 2px 5px;
-          @include OC_Body_Bold();
-          font-size: 11px;
-          color: white;
-          line-height: 14px;
-        }
-      }
-
-      &.free-column {
-        margin-left: 0;
-        box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
-        background-color: white;
-
-        @include pricing-tablet() {
-          margin: 32px auto 0;
-        }
-
-        div.tear-price-billing {
-          max-width: 138px;
-        }
-      }
-
-      &.enterprise-column {
-        border-bottom-right-radius: 40px;
-        width: 282px;
-
-        div.tear-price {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          background-color: $deep_navy;
-          background-image: cdnUrl("/img/ML/carrot_logo_white.svg");
-          background-size: 23px 40px;
-          background-position: center;
-          background-repeat: no-repeat;
-          margin: 24px auto 0;
-        }
+        line-height: 23px;
+        padding: 16px 26px;
+        float: left;
       }
     }
   }
 
   div.pricing-header-footer {
     margin: 40px auto 0;
-    max-width: 720px;
-    text-align: center;
+    max-width: 560px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    div.pricing-header-footer-headline {
-      @include OC_Body_Book();
-      font-size: 20px;
-      line-height: 25px;
-      color: $deep_navy;
+    div.pricing-header-footer-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: $grey_num_5;
+      background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
+      background-size: 29px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
     }
 
     div.pricing-header-footer-subheadline {
-      margin: 24px auto 0;
+      margin-left: 16px;
       @include OC_Body_Book();
-      font-size: 16px;
-      line-height: 20px;
-      color: rgba($deep_navy, 0.5);
-      max-width: 490px;
+      font-size: 18px;
+      line-height: 23px;
+      color: $deep_navy;
+      text-align: left;
+
+      a {
+        color: $carrot_green;
+        &:hover {
+          color: $carrot_green;
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
