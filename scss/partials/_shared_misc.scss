@@ -188,10 +188,11 @@ button.get-started-button {
 
   @include mobile(){
     width: 100%;
-    margin: 16px auto;
-    padding: 2px 0 0;
+    margin: 24px auto 16px;
+    height: 48px;
     font-size: 18px;
-    line-height: 25px;
+    line-height: 23px;
+    padding: 12px 0;
   }
 }
 

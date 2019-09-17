@@ -9,18 +9,18 @@
       [:section.cta.group
 
         [:h1.headline
-          "Where teams find clarity"]
+          "Rise above the noise"]
         [:div.subheadline
           (str
-           "Carrot organizes your team's communication so it's easier to stay "
+           "Carrot organizes team communication so it’s easier to stay "
            "engaged and informed. Ideal for keeping remote teams in sync.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Create your team. It’s free!"]
+            "Create your team"]
           [:span.get-started-subtitle
-            "Carrot is open source and free for all teams."]]
+            "Free 14 day trial. No credit card required."]]
 
         [:div.main-animation-container
           [:img.main-animation
