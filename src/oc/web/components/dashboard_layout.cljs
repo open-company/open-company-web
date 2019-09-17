@@ -32,7 +32,8 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
-(rum/defcs dashboard-layout < rum/reactive
+(rum/defcs dashboard-layout < rum/static
+                              rum/reactive
                               ;; Derivative
                               (drv/drv :route)
                               (drv/drv :org-data)
@@ -131,14 +132,14 @@
               [:button.mlb-reset.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % (oc-urls/all-posts)))
+                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= (router/current-board-slug) "all-posts"))
                           "active")}]
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % (oc-urls/follow-ups)))
+                              (nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (or (= (router/current-board-slug) "follow-ups")
                                        (= (router/current-board-slug) "must-see")))

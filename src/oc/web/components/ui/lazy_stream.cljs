@@ -4,7 +4,8 @@
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]))
 
-(rum/defcs lazy-stream < rum/reactive
+(rum/defcs lazy-stream < rum/static
+                         rum/reactive
                          (drv/drv :board-data)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)

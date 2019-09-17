@@ -624,6 +624,10 @@ div.left-navigation-sidebar {
         width: 168px;
         float: left;
 
+        &.public-board, &.private-board {
+          width: 152px;
+        }
+
         div.internal {
           padding: 1px 0px 0px;
           white-space: nowrap;

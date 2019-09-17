@@ -172,7 +172,7 @@
           [:div.column-title
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
-          [:div.column-item [:a {:href "https://the.carrot.news/" :target "_blank"} "What’s new"]]
+          [:div.column-item [:a {:href "https://carrot.news/" :target "_blank"} "What’s new"]]
           [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
 

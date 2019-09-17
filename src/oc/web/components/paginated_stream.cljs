@@ -68,7 +68,8 @@
       (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))
     (did-scroll s nil)))
 
-(rum/defcs paginated-stream  < rum/reactive
+(rum/defcs paginated-stream  < rum/static
+                               rum/reactive
                         ;; Derivatives
                         (drv/drv :filtered-posts)
                         (drv/drv :container-data)

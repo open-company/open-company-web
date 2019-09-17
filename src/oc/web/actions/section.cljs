@@ -93,7 +93,7 @@
                            (finish-cb resp))))
         ;; Reload a secondary board data
         (let [sections (:boards (dispatcher/org-data))
-              filtered-sections (filter #(= (:uuid %) section-uuid) sections)]
+              filtered-sections (filterv #(= (:uuid %) section-uuid) sections)]
           (load-other-sections filtered-sections))))))
   ;; Update change-data state that the board has a change
   (dispatcher/dispatch! [:section-change section-uuid]))
