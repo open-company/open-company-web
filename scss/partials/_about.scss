@@ -12,180 +12,14 @@ div.about-wrap {
       text-align: center;
       position: relative;
       overflow: hidden;
-
-      // @include tablet() {
-      //   padding-top: 131px;
-      // }
-
-      h1.about {
-        @include OC_Title()
-        font-size: 60px;
-        line-height: 78px;
-        color: $deep_navy;
-        margin: 0 auto;
-        padding: 0 16px;
-
-        @include tablet() {
-          font-size: 36px;
-          line-height: 40px;
-          padding: 0 24px;
-          max-width: 690px;
-        }
-
-        @include mobile() {
-          max-width: 380px;
-          font-size: 36px;
-        }
-      }
-
-      div.team-container{
-        margin: 80px 0 120px;
-
-        @include tablet() {
-          margin: 28px 0 60px;
-          padding: 0 24px;
-        }
-
-        div.team-row {
-          margin: 0 auto;
-          width: 1210px;
-
-          @media screen and (max-width: 1258px) {
-            width: 605px;
-
-            div.team-card:nth-child(4) {
-              margin: 20px 0 20px 0;
-            }
-          }
-
-          @include mobile() {
-            width: 100%;
-          }
-
-          div.team-card {
-            display: inline-block;
-            text-align: left;
-            width: 176px;
-            position: relative;
-            z-index: 2;
-            margin: 20px 0 20px 30px;
-
-            @include mobile() {
-              display: block;
-              width: 100%;
-              margin-top: 32px;
-              padding-top: 24px;
-              border-top: 1px solid $more_ultra_light_grey;
-              margin-left: 0;
-            }
-
-            &:first-child {
-              margin-left: 0px;
-            }
-
-            &.iacopo-carraro div.user-avatar {
-              @include image-2x("/img/ML/about_team_iacopo_carraro");
-            }
-
-            &.sean-johnson div.user-avatar {
-              @include image-2x("/img/ML/about_team_sean_johnson");
-            }
-
-            &.georgiana-laudi div.user-avatar {
-              @include image-2x("/img/ML/about_team_georgiana_laudi");
-            }
-
-            &.stuart-levinson div.user-avatar {
-              @include image-2x("/img/ML/about_team_stuart_levinson");
-            }
-
-            &.ryan-le-roux div.user-avatar {
-              @include image-2x("/img/ML/about_team_ryan_le_roux");
-            }
-
-            &.nathan-zorn div.user-avatar {
-              @include image-2x("/img/ML/about_team_nathan_zorn");
-            }
-
-            div.user-avatar {
-              background-size: 176px 176px;
-              width: 176px;
-              height: 176px;
-              background-repeat: no-repeat;
-              background-position: center;
-              margin: 0px auto;
-
-              @include mobile() {
-                float: left;
-                width: 80px;
-                height: 80px;
-                background-size: 80px 80px;
-                margin-right: 24px;
-              }
-            }
-
-            div.user-name {
-              @include OC_Title()
-              font-size: 20px;
-              color: $deep_navy;
-              margin-top: 24px;
-
-              @include mobile() {
-                margin-top: 0;
-              }
-            }
-
-            div.user-position {
-              @include OC_Body_Bold();
-              font-size: 14px;
-              color: $deep_navy;
-              margin-top: 8px;
-            }
-
-            div.user-links {
-              margin-top: 16px;
-              height: 20px;
-
-              @include mobile() {
-                margin-left: 104px;
-              }
-
-              a.twitter-link {
-                display: block;
-                float: left;
-                background-image: cdnUrl("/img/ML/about_twitter_icon.svg");
-                width: 20px;
-                height: 20px;
-                background-size: 20px 20px;
-                background-repeat: no-repeat;
-                background-position: center;
-              }
-
-              a.linkedin-link {
-                display: block;
-                float: left;
-                background-image: cdnUrl("/img/ML/about_linkedin_icon.svg");
-                width: 22px;
-                height: 20px;
-                background-size: 22px 20px;
-                background-repeat: no-repeat;
-                background-position: center;
-                margin-left: 16px;
-              }
-            }
-          }
-        }
-      }
       
       h3.about-copy-header {
         @include OC_Title()
         color: $deep_navy;
         font-size: 60px;
-        line-height: 78px;
+        line-height: 76px;
         position: relative;
-        z-index: 3;
-        margin: 120px auto 0;
-        text-align: left;
+        margin: 138px auto 0;
         max-width: 795px;
 
         @include tablet() {
@@ -205,10 +39,9 @@ div.about-wrap {
         width: 100%;
         margin: 0 auto;
         border-radius: 8px;
-        padding: 0 0 120px;
+        padding: 0 0 80px;
         position: relative;
-        z-index: 1;
-        text-align: left;
+        text-align: center;
 
         @include tablet() {
           width: 100%;
@@ -219,34 +52,16 @@ div.about-wrap {
           width: 795px;
           margin: 0 auto;
           position: relative;
-          z-index: 3;
+          text-align: center;
 
           @include tablet() {
             width: 100%;
           }
 
-          div.about-copy-title {
-            @include OC_Body_Bold();
-            font-size: 30px;
-            color: $deep_navy;
-            text-align: left;
-            margin: 40px 0 0;
-            padding: 0;
-
-            @include tablet() {
-              font-size: 20px;
-              line-height: 26px;
-              margin: 32px 0 0;
-            }
-
-            @include mobile() {
-              margin: 24px 0 0;
-            }
-          }
-
           p {
             @include OC_Body_Book();
-            font-size: 30px;
+            font-size: 24px;
+            line-height: 32px;
             color: $deep_navy;
             text-align: left;
             margin: 40px 0 0;
@@ -282,9 +97,8 @@ div.about-wrap {
 
         div.about-bottom-copy {
           width: 795px;
-          margin: 80px auto 0;
+          margin: 40px auto 0;
           position: relative;
-          z-index: 3;
 
           @include tablet() {
             margin: 40px auto 0;
@@ -293,7 +107,7 @@ div.about-wrap {
 
           div.about-bottom-copy-row {
             border-top: 1px solid $more_ultra_light_grey;
-            padding: 40px 0;
+            padding: 40px 0 0;
 
             div.about-bottom-copy-left {
               float: left;
@@ -314,6 +128,7 @@ div.about-wrap {
             div.about-bottom-copy-right {
               float: right;
               width: 48%;
+              text-align: left;
 
               @include tablet() {
                 float: unset;
@@ -339,7 +154,7 @@ div.about-wrap {
               }
 
               div.about-bottom-copy-description {
-                @include OC_Body_Bold();
+                @include OC_Body_Book();
                 font-size: 20px;
                 line-height: 26px;
                 color: $deep_navy;
@@ -351,20 +166,10 @@ div.about-wrap {
               a {
                 margin-top: 16px;
                 color: $carrot_green;
-                text-transform: uppercase;
-                @include OC_Body_Bold();
-                font-size: 14px;
+                @include OC_Body_Book();
+                font-size: 19px;
+                line-height: 24px;
                 letter-spacing: 0.5;
-              }
-
-              span.link-or {
-                margin-left: 16px;
-                margin-right: 16px;
-                color: rgba($deep_navy, 0.5);
-                text-transform: uppercase;
-                @include OC_Body_Bold();
-                font-size: 14px;
-                letter-spacing: 0.5; 
               }
             }
           }
@@ -380,6 +185,129 @@ div.about-wrap {
 
       button.get-started-button.bottom-button {
         margin-top: 20px;
+      }
+    }
+
+    section.team-section {
+      padding: 80px 24px;
+      width: 100%;
+      max-width: 1200px;
+      position: relative;
+      margin: 0 auto;
+
+      &:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px 20px 200px 20px;
+        background-color: $another_ui_grey;
+        z-index: 1;
+      }
+
+      div.team-section-block {
+        max-width: 832px;
+        width: 100%;
+        margin: 0 auto;
+        z-index: 2;
+        position: relative;
+
+        div.team-section-header {
+          @include OC_Body_Bold();
+          font-size: 40px;
+          line-height: 51px;
+          color: $deep_navy;
+          text-align: center;
+        }
+
+        div.team-section-icons {
+          width: 100%;
+          text-align: center;
+
+          img.team-section-icon {
+            width: 72px;
+            height: 72px;
+            margin: 40px 16px 0;
+            display: inline-block;
+          }
+        }
+
+        div.team-section-bottom-copy {
+          width: 100%;
+          margin: 40px auto 0;
+          position: relative;
+
+          div.team-section-bottom-copy-row {
+            border-top: 1px solid $more_ultra_light_grey;
+            padding: 40px 0;
+
+            div.team-section-bottom-copy-left {
+              float: left;
+              width: 42%;
+              @include OC_Title()
+              font-size: 30px;
+              line-height: 40px;
+              color: $deep_navy;
+
+              @include tablet() {
+                float: unset;
+                width: 100%;
+                font-size: 20px;
+                line-height: 26px;
+              }
+            }
+
+            div.team-section-bottom-copy-right {
+              float: right;
+              width: 48%;
+              text-align: left;
+
+              @include tablet() {
+                float: unset;
+                width: 100%;
+                margin-top: 8px;
+              }
+
+              @include mobile() {
+                span.link-or {
+                  display: none;
+                }
+
+                a {
+                  // float: left;
+                  // width: 100%;
+                  display: block;
+                  margin-top: 16px;
+
+                  &:nth-child(2){
+                    margin-top: 24px;
+                  }
+                }
+              }
+
+              div.team-section-bottom-copy-description {
+                @include OC_Body_Book();
+                font-size: 20px;
+                line-height: 26px;
+                color: $deep_navy;
+                width: 100%;
+                display: block;
+                margin: 0 0 16px 0;
+              }
+
+              a {
+                margin-top: 16px;
+                color: $carrot_green;
+                @include OC_Body_Book();
+                font-size: 19px;
+                line-height: 24px;
+                letter-spacing: 0.5;
+              }
+            }
+          }
+        }
       }
     }
   }

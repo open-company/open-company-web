@@ -10,102 +10,6 @@
     [:div.main.about
       [:section.about-header
 
-        ; [:h1.about
-        ;   "Meet the team"]
-
-        ; [:div.team-container
-        ;   [:div.team-row.group.three-cards
-        ;     [:div.team-card.iacopo-carraro
-        ;       [:div.user-avatar]
-        ;       [:div.user-name
-        ;         "Iacopo Carraro"]
-        ;       [:div.user-position
-        ;         "Software Engineer"
-        ;         [:br]
-        ;         "in Livorno, Italy"]
-        ;       [:div.user-links
-        ;         [:a.twitter-link
-        ;           {:href "https://twitter.com/bago2k4"
-        ;            :target "_blank"}]
-        ;         [:a.linkedin-link
-        ;           {:href "https://linkedin.com/in/iacopocarraro/"
-        ;            :target "_blank"}]]]
-        ;     [:div.team-card.sean-johnson
-        ;       [:div.user-avatar]
-        ;       [:div.user-name
-        ;         "Sean Johnson"]
-        ;       [:div.user-position
-        ;         "CTO & Founder"
-        ;         [:br]
-        ;         "in Chapel Hill, USA"]
-        ;       [:div.user-links
-        ;         [:a.twitter-link
-        ;           {:href "https://twitter.com/belucid"
-        ;            :target "_blank"}]
-        ;         [:a.linkedin-link
-        ;           {:href "https://linkedin.com/in/snootymonkey/"
-        ;            :target "_blank"}]]]
-        ;     [:div.team-card.georgiana-laudi
-        ;       [:div.user-avatar]
-        ;       [:div.user-name
-        ;         "Georgiana Laudi"]
-        ;       [:div.user-position
-        ;         "Marketing & CX Advisor"
-        ;         [:br]
-        ;         "in Montreal, Canada"]
-        ;       [:div.user-links
-        ;         [:a.twitter-link
-        ;           {:href "https://twitter.com/ggiiaa"
-        ;            :target "_blank"}]
-        ;         [:a.linkedin-link
-        ;           {:href "https://linkedin.com/in/georgianalaudi/"
-        ;            :target "_blank"}]]]
-        ;     [:div.team-card.stuart-levinson
-        ;       [:div.user-avatar]
-        ;       [:div.user-name
-        ;         "Stuart Levinson"]
-        ;       [:div.user-position
-        ;         "CEO & Founder"
-        ;         [:br]
-        ;         "in Cambridge, USA"]
-        ;       [:div.user-links
-        ;         [:a.twitter-link
-        ;           {:href "https://twitter.com/stuartlevinson"
-        ;            :target "_blank"}]
-        ;         [:a.linkedin-link
-        ;           {:href "https://linkedin.com/in/stuartlevinson/"
-        ;            :target "_blank"}]]]
-        ;     [:div.team-card.ryan-le-roux
-        ;       [:div.user-avatar]
-        ;       [:div.user-name
-        ;         "Ryan Le Roux"]
-        ;       [:div.user-position
-        ;         "Head of Design"
-        ;         [:br]
-        ;         "in Vancouver, Canada"]
-        ;       [:div.user-links
-        ;         [:a.twitter-link
-        ;           {:href "https://twitter.com/ryanleroux"
-        ;            :target "_blank"}]
-        ;         [:a.linkedin-link
-        ;           {:href "https://linkedin.com/in/ryanleroux/"
-        ;            :target "_blank"}]]]
-        ;     [:div.team-card.nathan-zorn
-        ;       [:div.user-avatar]
-        ;       [:div.user-name
-        ;         "Nathan Zorn"]
-        ;       [:div.user-position
-        ;         "Software Engineer"
-        ;         [:br]
-        ;         "in Charleston, USA"]
-        ;       [:div.user-links
-        ;         [:a.twitter-link
-        ;           {:href "https://twitter.com/thepug"
-        ;            :target "_blank"}]
-        ;         [:a.linkedin-link
-        ;           {:href "https://linkedin.com/in/nathanzorn/"
-        ;            :target "_blank"}]]]]]
-
         [:h3.about-copy-header
           "Why we built Carrot"]
 
@@ -119,12 +23,10 @@
               (str
                "Chat apps keep everyone connected throughout the day, and yet "
                "it's become even more difficult for teams to stay "
-               "aligned around what matters most. ")
-              [:span.oblique "How can that be?"]]
+               "aligned around what matters most. How can that be?")]
             [:p
               "This is the question that led us to build Carrot. What we "
-              "found is that "
-              [:span.heavy "leadership is getting lost in the noise."]]
+              "found is that leadership is getting lost in the noise."]
             [:p
               (str
                "Sharing important team updates, news, and decisions alongside random chats "
@@ -155,25 +57,70 @@
                 [:a
                   {:class "intercom-chat-link"
                    :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-                   "Say hello"]]]
-            [:div.about-bottom-copy-row.group
-              [:div.about-bottom-copy-left
-                "Crazy for open source."]
-              [:div.about-bottom-copy-right
-                [:div.about-bottom-copy-description
+                   "Say hello"]]]]]]
+
+      [:section.team-section
+        [:div.team-section-block
+          [:div.team-section-header
+            "Those that helped make Carrot possible"]
+          [:div.team-section-icons.group
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_01.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_01@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_02.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_02@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_03.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_03@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_04.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_04@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_05.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_05@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_06.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_06@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_07.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_07@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_08.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_08@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_09.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_09@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_10.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_10@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_11.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_11@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_12.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_12@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_13.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_13@2x.png") " 2x")}]
+            [:img.team-section-icon
+              {:src (shared/cdn "/img/ML/team_section_14.png")
+               :srcSet (str (shared/cdn "/img/ML/team_section_14@2x.png") " 2x")}]]
+          [:div.team-section-bottom-copy
+            [:div.team-section-bottom-copy-row.group
+              [:div.team-section-bottom-copy-left
+                "Carrot is open source"]
+              [:div.team-section-bottom-copy-right
+                [:div.team-section-bottom-copy-description
                   (str
-                   "Have an idea you’d like to contribute? A "
-                   "new integration you’d like to see?")]
+                   "Have an idea you'd like to contribute? A new integration you'd like to see?")]
                 [:a
                   {:href "https://github.com/open-company"
                    :target "_blank"}
-                  "Build with us on git"]
-                [:span.link-or "or"]
+                   "Build with us on GitHub"]
                 [:a
-                  {:href "https://trello.com/b/eKs2LtLu"
+                  {:href "https://trello.com/b/eKs2LtLu/carrot-roadmap-https-carrotio"
                    :target "_blank"}
-                  "VISIT OUR ROADMAP"]]]]]]
-
-      shared/keep-aligned-bottom
+                   "View our roadmap"]]]]]]
     ] ;<!-- main -->
   ])
