@@ -49,8 +49,10 @@
     (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 (defn dismiss-post-modal []
-  (let [org (router/current-org-slug)
-        board (or (:back-to @router/path) (router/current-board-slug))
+  (let [org-data (dis/org-data)
+        org (router/current-org-slug)
+        ;; Go back to
+        board (utils/back-to org-data)
         to-url (oc-urls/board board)
         query-params (router/query-params)
         route [org board "dashboard"]

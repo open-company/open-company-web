@@ -3,6 +3,8 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.lib.user :as user-lib]
+            [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.cmail :as cmail-actions]
@@ -54,6 +56,10 @@
                                (drv/drv :follow-ups-picker-callback)
                                (drv/drv :follow-ups-activity-data)
                                (drv/drv :team-roster)
+                               (drv/drv :cmail-data)
+
+                               ui-mixins/refresh-tooltips-mixin
+
                                {:will-mount (fn [s]
                                  (set-users-list s true)
                                  (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
@@ -64,19 +70,27 @@
   [s]
   (let [activity-data (drv/react s :follow-ups-activity-data)
         team-roster (drv/react s :team-roster)
+        cmail-data (drv/react s :cmail-data)
         users-list @(::users-list s)
         follow-ups @(::follow-ups s)
         follow-ups-picker-callback (drv/react s :follow-ups-picker-callback)
         filtered-users-list (filter-users s)
         current-user-id (jwt/user-id)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        is-mobile? (responsive/is-mobile-size?)
+        all-users-set (set (map :user-id users-list))
+        current-assignees (set (map (comp :user-id :assignee) follow-ups))
+        users-diff (clojure.set/difference all-users-set current-assignees)
+        show-select-all? (if (= all-users-set  #{current-user-id})
+                             (empty? current-assignees)
+                             (and (not-empty users-diff)
+                                  (not= users-diff #{current-user-id})))]
     [:div.follow-ups-picker
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
       [:div.follow-ups-picker-container
         [:div.follow-ups-picker-header
           [:div.follow-ups-picker-header-title
-            "Create follow-ups"]
+            "Request a follow-up"]
           [:button.mlb-reset.save-bt
             {:on-click #(do
                          (when (fn? follow-ups-picker-callback)
@@ -89,17 +103,23 @@
         [:div.follow-ups-picker-body
           [:div.follow-ups-picker-body-head.group
             [:div.follow-ups-users-count
-              (cond
-                (zero? (count follow-ups))
-                "No one selected"
-                (= (count follow-ups) 1)
-                "1 person selected"
-                :else
-                (str (count follow-ups) " people selected"))]
+              (str (count follow-ups) " of " (count all-users-set) " ")
+              (if (or is-mobile?
+                      (not (jwt/is-admin? (:team-id team-roster)))
+                      (= (:board-slug cmail-data) utils/default-section-slug))
+                "section members"
+                [:button.mlb-reset.section-memeber-bt
+                  {:on-click (fn [e]
+                               (utils/event-stop e)
+                               (nav-actions/show-section-editor (:board-slug cmail-data)))
+                   :data-toggle "tooltip"
+                   :data-placement "top"
+                   :data-container "body"
+                   :title (str (:board-name cmail-data) " settings")}
+                  "section members"])]
             [:div.follow-ups-users-bt
               (when-not (seq @(::query s))
-                (cond
-                  (< (count follow-ups) (count users-list))
+                (if show-select-all?
                   [:button.mlb-reset.select-all
                     {:on-click (fn [_]
                                 (reset! (::follow-ups s) (map (fn [user]
@@ -109,7 +129,6 @@
                                                                                 :completed? false))))
                                                           users-list)))}
                     "Select all"]
-                  :else
                   [:button.mlb-reset.deselect-all
                     {:on-click (fn [_]
                                 (reset! (::follow-ups s)
@@ -135,7 +154,19 @@
                   :let [f (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) follow-ups))
                         disabled? (or (:completed? f)
                                       (and (map? (:author f))
-                                           (= (-> f :author :user-id) (-> f :assignee :user-id))))]]
+                                           (= (-> f :author :user-id) (-> f :assignee :user-id))))
+                        roster-user (first (filterv #(= (:user-id %) (:user-id u)) (:users team-roster)))
+                        ;; Retrieve the Slack display name for pending and active users
+                        slack-display-name (if (or (= (:status u) "uninvited")
+                                                   (= (:status u) "pending"))
+                                            (:slack-display-name roster-user)
+                                            (some #(when (seq (:display-name %)) (:display-name %)) (vals (:slack-users roster-user))))
+                        ;; Add @ in front of the slack display name if it's not there already
+                        fixed-display-name (if (and (seq slack-display-name)
+                                                    (not= slack-display-name "-")
+                                                    (not (clojure.string/starts-with? slack-display-name "@")))
+                                             (str "@" slack-display-name)
+                                             slack-display-name)]]
               [:div.follow-ups-user-item.group
                 {:key (str "follow-ups-user-" (:user-id u))
                  :title (when disabled?
@@ -157,6 +188,13 @@
                   {:class (when disabled? "disabled")}
                   (user-avatar-image u)
                   [:div.user-name
+                    {:title (str "<span>" (:email u)
+                              (when (seq fixed-display-name)
+                                (str " | <i class=\"mdi mdi-slack\"></i>" (when-not (= fixed-display-name "-") (str " " fixed-display-name))))
+                              "</span>")
+                     :data-toggle "tooltip"
+                     :data-html "true"
+                     :data-placement "top"}
                     (str
                      (user-lib/name-for u)
                      (when (= (:user-id u) current-user-id)

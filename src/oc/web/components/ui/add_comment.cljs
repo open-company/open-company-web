@@ -18,6 +18,7 @@
             [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
+            [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.actions.activity :as activity-actions]
@@ -51,6 +52,7 @@
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
+  (reset! (::add-button-disabled s) true)
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
         args (vec (:rum/args s))
@@ -59,13 +61,9 @@
         dismiss-reply-cb (get args 2)
         edit-comment-data (get args 3 nil)
         save-done-cb (fn [success]
-                      (reset! (::add-button-disabled s) false)
                       (if success
-                        (do
-                          (when add-comment-div
-                            (set! (.-innerHTML add-comment-div) ""))
-                          (when (fn? dismiss-reply-cb)
-                            (dismiss-reply-cb false)))
+                        (when add-comment-div
+                          (set! (.-innerHTML add-comment-div) ""))
                         (notification-actions/show-notification
                          {:title "An error occurred while saving your comment."
                           :description "Please try again"
@@ -74,9 +72,12 @@
                           :id (if edit-comment-data :update-comment-error :add-comment-error)})))
         complete? @(::complete-follow-up s)]
     (reset! (::add-button-disabled s) true)
+    (set! (.-innerHTML add-comment-div) "")
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
+    (when (fn? dismiss-reply-cb)
+      (dismiss-reply-cb false))
     (when complete?
       (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
             show-follow-up-button? (and follow-up
@@ -85,9 +86,10 @@
                                       (utils/link-for (:links follow-up) "mark-complete" "POST"))]
         (activity-actions/complete-follow-up activity-data follow-up)))))
 
-(defn me-options [reply-comment?]
+(defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
-   :placeholder (if reply-comment? "Reply…" "Add a comment…")
+   :comment-parent-uuid parent-uuid
+   :placeholder (if parent-uuid "Reply…" "Add a comment…")
    :use-inline-media-picker true
    :media-picker-initially-visible false})
 
@@ -128,13 +130,13 @@
                          (drv/drv :add-comment-data)
                          (drv/drv :team-roster)
                          (drv/drv :current-user-data)
+                         (drv/drv :attachment-uploading)
                          ;; Locals
                          (rum/local true ::add-button-disabled)
                          (rum/local "" ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
                          (rum/local false ::complete-follow-up)
-                         ;; Mixins
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -157,17 +159,12 @@
                                 parent-comment-uuid (second (:rum/args s))
                                 edit-comment-data (get (vec (:rum/args s)) 3 nil)
                                 add-comment-key (str (:uuid activity-data) "-" parent-comment-uuid "-" (:uuid edit-comment-data))
-                                activity-add-comment-data (get add-comment-data add-comment-key)]
+                                activity-add-comment-data (get add-comment-data add-comment-key)
+                                add-comment-activity-data (get add-comment-data (:uuid activity-data))]
                             (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
                             (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
                           :did-mount (fn [s]
-                           (let [activity-data (first (:rum/args s))
-                                 follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))]
-                             ;; Default to complete follow-up on add comment if user has one
-                             (when (and follow-up
-                                        (not (:completed? follow-up)))
-                               (reset! (::complete-follow-up s) true)))
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
                            (let [add-comment-node (rum/ref-node s "editor-node")]
                              (when (should-focus-field? s)
@@ -215,8 +212,10 @@
                                   (utils/link-for (:links follow-up) "mark-complete" "POST"))
         show-follow-up-button? (and follow-up
                                     (not (:completed? follow-up))
-                                    complete-follow-up-link
-                                    (not parent-comment-uuid))]
+                                    complete-follow-up-link)
+        attachment-uploading (drv/react s :attachment-uploading)
+        uploading? (and attachment-uploading
+                        (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))]
     [:div.add-comment-box-container
       {:class container-class}
       [:div.add-comment-box
@@ -263,7 +262,8 @@
         [:div.add-comment-footer
           {:class (when should-hide-post-button "hide-footer")}
           [:button.mlb-reset.send-btn
-            {:on-click #(send-clicked % s)
+            {:on-click #(when-not @(::add-button-disabled s)
+                          (send-clicked % s))
              :disabled @(::add-button-disabled s)}
             (if edit-comment-data
               "Save"
@@ -305,6 +305,12 @@
                :title "Complete follow-up when the comment is posted"
                :on-click #(do
                            (utils/event-stop %)
+                           (reset! (::show-post-button s) true)
                            (swap! (::complete-follow-up s) not))}
               (carrot-checkbox {:selected @(::complete-follow-up s)})
-              "Complete follow-up"])]]]))
+              "Complete follow-up"])
+          (when uploading?
+            [:div.upload-progress
+              (small-loading)
+              [:span.attachment-uploading
+                (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])]]]))

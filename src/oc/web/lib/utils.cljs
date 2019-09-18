@@ -374,15 +374,6 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace
-   original-url
-   team-id
-   (str
-    (when (seq team-id) (str team-id ":"))
-    (when (seq user-id) (str user-id ":"))
-    redirect)))
-
 (def network-error
  {:title "Network error"
   :description "Shoot, looks like there might be a connection issue. Please try again."
@@ -717,3 +708,13 @@
              is-mobile?)
       50
       0)))
+
+(defn back-to [org-data]
+  (cond
+    ;; the board specified in the router if there is one
+    (:back-to @router/path) (:back-to @router/path)
+    ;; if the user is part of the team we can go back to all posts
+    (jwt/user-is-part-of-the-team (:team-id org-data)) "all-posts"
+    ;; else go back to the current post board since it's probably the
+    ;; only one the user can see
+    :else (router/current-board-slug)))

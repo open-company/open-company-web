@@ -176,7 +176,7 @@
                                   (when (fn? will-close)
                                     (will-close))
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Create follow-up"])))
+                    "Follow-up later"])))
             (when can-react?
               [:li.react
                 {:on-click #(do
@@ -203,7 +203,7 @@
                                 (will-close))
                               (when (fn? comment-share-cb)
                                 (comment-share-cb)))}
-                "Share"])])
+                "Copy link"])])
         (when (and external-share
                    share-link)
           [:button.mlb-reset.more-menu-share-bt
@@ -244,4 +244,4 @@
                               (activity-actions/create-self-follow-up entity-data create-follow-up-link))
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
-                 :title "Create follow-up"}])))])))
+                 :title "Follow up later"}])))])))

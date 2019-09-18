@@ -131,6 +131,18 @@ div.follow-ups-picker {
           line-height: 22px;
           color: $light_navy;
           float: left;
+
+          button.section-memeber-bt {
+            padding: 0;
+            margin: 0;
+            display: inline-block;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 22px;
+            color: $light_navy;
+            text-decoration: underline;
+            cursor: pointer;
+          }
         }
 
         div.follow-ups-users-bt {

@@ -7,7 +7,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.actions.user :as user-actions]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
-            [oc.shared.useragent :as ua]))
+            [oc.shared.useragent :as ua]
+            [oc.web.expo :as expo]))
 
 (def default-title "Please log in to continue")
 (def default-desc "You need to be logged in to view a post.")
@@ -39,8 +40,18 @@
           [:div.login-wall-box]]
         [:div.login-wall-right
           [:div.login-wall-right-content
-            [:div.login-title (or title default-title)]
-            [:div.login-description (or desc default-desc)]
+            [:div.login-overlay-cta.group
+              [:button.mlb-reset.top-back-button
+                {:on-touch-start identity
+                 :on-click #(user-actions/show-login nil)
+                 :aria-label "Back"}]
+              [:div.login-title (or title default-title)]
+              [:button.mlb-reset.top-continue
+                {:aria-label "Login"
+                 :class (when-not login-enabled "disabled")
+                 :on-click login-action}]]
+            (when (seq (or desc default-desc))
+              [:div.login-description (or desc default-desc)])
             [:button.mlb-reset.signup-with-slack
               {:on-touch-start identity
                :on-click #(do
@@ -53,21 +64,22 @@
                 [:div.slack-icon
                   {:aria-label "slack"}]
                 "Continue with Slack"]]
-           (when-not ua/mobile-app?
-             [:button.mlb-reset.signup-with-google
-               {:on-touch-start identity
-                :on-click #(do
-                             (.preventDefault %)
-                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                                  {:auth-source "google"})]
+            [:button.mlb-reset.signup-with-google
+              {:on-touch-start identity
+               :on-click #(do
+                           (.preventDefault %)
+                           (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                {:auth-source "google"})]
                              (user-actions/maybe-save-login-redirect)
-                             (user-actions/login-with-google auth-link)))}
+                             (user-actions/login-with-google auth-link
+                                                             (when ua/mobile-app?
+                                                               {:redirect-origin (expo/get-deep-link-origin)}))))}
              [:div.signup-with-google-content
                [:div.google-icon
                 {:aria-label "google"}]
-                "Continue with Google "]])
+                "Continue with Google "]]
             [:div.or-login
-              "Or, sign in with email"]
+              [:div.or-login-copy "Or, sign in with email"]]
             ;; Email fields
             [:div.group
               ;; Error messages
@@ -110,9 +122,10 @@
                      :class utils/hide-class
                      :value @(::pswd s)
                      :on-change #(reset! (::pswd s) (.. % -target -value))}]
-                  [:a.forgot-password
-                    {:on-click #(user-actions/show-login :password-reset)}
-                    "Forgot password?"]]
+                  [:div.forgot-password
+                    [:a
+                      {:on-click #(user-actions/show-login :password-reset)}
+                      "Forgot password?"]]]
                 [:button.mlb-reset.continue-btn
                   {:aria-label "Login"
                    :class (when-not login-enabled "disabled")
@@ -121,7 +134,7 @@
                                  (not (seq @(::pswd s))))}
                   "Continue"]
                 [:div.footer-link
-                  "Don't have an account yet?  "
+                  "Don't have an account yet?"
                   [:a
                     {:href oc-urls/sign-up
                      :on-click (fn [e]

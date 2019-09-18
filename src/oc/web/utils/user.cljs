@@ -1,7 +1,9 @@
 (ns oc.web.utils.user
-  (:require [oc.web.lib.jwt :as jwt]
+  (:require [clojure.edn :as edn]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.lib.user :as user-lib]
+            [oc.lib.oauth :as oauth]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -155,3 +157,12 @@
   [current-user-data push-token]
   (let [current-push-tokens (set (:expo-push-tokens current-user-data))]
     (current-push-tokens push-token)))
+
+(defn auth-link-with-state [original-url {:keys [user-id team-id redirect redirect-origin] :as state}]
+  (let [parsed-url       (js/URL. original-url)
+        old-state-string (.. parsed-url -searchParams (get "state"))
+        decoded-state    (oauth/decode-state-string old-state-string)
+        combined-state   (merge decoded-state state)
+        new-state-string (oauth/encode-state-string combined-state)]
+    (.. parsed-url -searchParams (set "state" new-state-string))
+    (str parsed-url)))

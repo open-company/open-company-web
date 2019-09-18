@@ -17,7 +17,7 @@
             [goog.events.EventType :as EventType]))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
-(def scroll-card-threshold 5)
+(def scroll-card-threshold 2)
 (def card-avg-height 372)
 
 (defn did-scroll
@@ -31,9 +31,15 @@
                       :stale))
         max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
     ;; scrolling down
-    (when (and (not @(::bottom-loading s))
+    (when (and ;; not already loading more
+               (not @(::bottom-loading s))
+               ;; has a link to load more that can be used
                @(::has-next s)
-               (= direction :down)
+               ;; scroll is moving down
+               ;; or is static (if the user has a tall screen we need to load more posts right away)
+               (or (= direction :down)
+                   (= direction :stale))
+               ;; and the threshold point has been reached
                (>= scroll-top (- max-scroll (* scroll-card-threshold card-avg-height))))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
@@ -41,8 +47,6 @@
       (cond
         (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
-        (= (router/current-board-slug) "must-see")
-        (activity-actions/must-see-more @(::has-next s) :down)
         (= (router/current-board-slug) "follow-ups")
         (activity-actions/follow-ups-more @(::has-next s) :down)
         :else
@@ -61,9 +65,11 @@
     (reset! (::has-next s) next-link)
     (if next-link
       (reset! (::show-all-caught-up-message s) false)
-      (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))))
+      (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))
+    (did-scroll s nil)))
 
-(rum/defcs paginated-stream  < rum/reactive
+(rum/defcs paginated-stream  < rum/static
+                               rum/reactive
                         ;; Derivatives
                         (drv/drv :filtered-posts)
                         (drv/drv :container-data)

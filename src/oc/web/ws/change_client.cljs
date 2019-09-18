@@ -8,6 +8,7 @@
             [oc.lib.time :as time]
             [oc.web.local-settings :as ls]
             [oc.web.ws.utils :as ws-utils]
+            [oc.web.utils.ws-client-ids :as ws-client-ids]
             [goog.Uri :as guri]))
 
 (defonce last-ws-link (atom nil))
@@ -218,7 +219,12 @@
             (reset! channelsk chsk)
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
+            (when @ch-state
+              (remove-watch @ch-state :change-client-state-watcher))
             (reset! ch-state state)
+            (add-watch @ch-state :change-client-state-watcher
+             (fn [key a old-state new-state]
+               (reset! ws-client-ids/change-client-id (:uid new-state))))
             (start-router!)))
 
       ;; already connected, make sure we're watching all the current containers

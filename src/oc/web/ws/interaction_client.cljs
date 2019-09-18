@@ -10,6 +10,7 @@
             [oc.web.actions.jwt :as ja]
             [oc.web.local-settings :as ls]
             [oc.web.ws.utils :as ws-utils]
+            [oc.web.utils.ws-client-ids :as ws-client-ids]
             [goog.Uri :as guri]))
 
 (defonce current-board-path (atom nil))
@@ -190,7 +191,12 @@
             (reset! channelsk chsk)
             (reset! ch-chsk ch-recv)
             (reset! chsk-send! send-fn)
+            (when @ch-state
+              (remove-watch @ch-state :interaction-client-state-watcher))
             (reset! ch-state state)
+            (add-watch @ch-state :interaction-client-state-watcher
+             (fn [key a old-state new-state]
+               (reset! ws-client-ids/interaction-client-id (:uid new-state))))
             (start-router!)))
       (when (pos? (count @last-board-uuids))
         (boards-watch)))))

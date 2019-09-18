@@ -1,11 +1,15 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
+  border-top: 1px solid $ultra_light_grey;
+  padding-top: 24px;
 
   @include tablet() {
     padding: 0;
     width: 100%;
     position: relative;
+    margin-top: 8px;
+    padding-top: 16px;
   }
 
   div.add-comment-box {
@@ -23,7 +27,7 @@ div.add-comment-box-container {
       margin-top: 10px;
 
       @include mobile() {
-        top: 0;
+        margin-top: 6px;
       }
     }
 
@@ -37,11 +41,6 @@ div.add-comment-box-container {
       padding: 9px 14px;
       background-color: white;
       width: calc(100% - 40px);
-
-      @include mobile() {
-        margin-left: 0;
-        width: 100%;
-      }
 
       &.active {
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
@@ -88,9 +87,25 @@ div.add-comment-box-container {
     width: 100%;
     margin-top: 16px;
 
-
     &.hide-footer * {
       display: none;
+    }
+
+    div.upload-progress {
+      float: right;
+      margin-right: 16px;
+      margin-top: 6px;
+
+      div.small-loading {
+        float: left;
+      }
+
+      span.attachment-uploading {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        float: left;
+      }
     }
 
     button.close-reply-bt {
