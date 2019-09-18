@@ -282,6 +282,7 @@
      {:org org
       :activity (:entry params)
       :secure-id (or secure-id (:secure-uuid (jwt/get-id-token-contents)))
+      :comment (:comment params)
       :query-params query-params})
      ;; do we have the company data already?
     (when (or ;; if the company data are not present
@@ -658,7 +659,8 @@
   (user-actions/recall-expo-push-token)
   ;; Get the mobile app deep link origin if we're on mobile
   (when ua/mobile-app?
-    (expo/bridge-get-deep-link-origin))
+    (expo/bridge-get-deep-link-origin)
+    (expo/bridge-get-app-version))
 
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)

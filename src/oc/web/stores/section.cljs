@@ -42,21 +42,6 @@
               (dispatcher/board-data-key org-slug (:slug section-data) sort-type)
               (dissoc with-current-edit :fixed-items))))
 
-(defn new?
-  "
-  A board is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-     -and-
-    there at least un unseen item in the container
-  "
-  [change-data board]
-  (let [changes (get change-data (:uuid board))
-        unseen (:unseen changes)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
-        new? (and in-team?
-                  (seq unseen))]
-    new?))
-
 (defn fix-org-section-data
   [db org-data changes]
   (assoc-in db
@@ -179,14 +164,19 @@
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 
-(defn update-unseen-remove [old-change-data item-id container-id new-changes]
+(defn update-unseen-unread-remove [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
         old-unseen (or (:unseen old-container-change-data) [])
         next-unseen (filter #(not= % item-id) old-unseen)
+        old-unread (or (:unread old-container-change-data) [])
+        next-unread (filter #(not= % item-id) old-unread)
         next-container-change-data (if old-container-change-data
-                                     (assoc old-container-change-data :unseen next-unseen)
+                                     (assoc old-container-change-data
+                                      :unseen next-unseen
+                                      :unread next-unread)
                                      {:container-id container-id
-                                      :unseen next-unseen})]
+                                      :unseen next-unseen
+                                      :unread next-unread})]
     (assoc old-change-data container-id next-container-change-data)))
 
 (defmethod dispatcher/action :item-delete/unseen
@@ -195,16 +185,21 @@
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
         old-change-data (get-in db change-key)]
-    (assoc-in db change-key (update-unseen-remove old-change-data item-id container-id change-data))))
+    (assoc-in db change-key (update-unseen-unread-remove old-change-data item-id container-id change-data))))
 
-(defn update-unseen-add [old-change-data item-id container-id new-changes]
+(defn update-unseen-unread-add [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
         old-unseen (or (:unseen old-container-change-data) [])
         next-unseen (vec (seq (conj old-unseen item-id)))
+        old-unread (or (:unread old-container-change-data) [])
+        next-unread (vec (seq (conj old-unread item-id)))
         next-container-change-data (if old-container-change-data
-                                     (assoc old-container-change-data :unseen next-unseen)
+                                     (assoc old-container-change-data
+                                      :unseen next-unseen
+                                      :unread next-unread)
                                      {:container-id container-id
-                                      :unseen next-unseen})]
+                                      :unseen next-unseen
+                                      :unread next-unread})]
     (assoc old-change-data container-id next-container-change-data)))
 
 (defmethod dispatcher/action :item-add/unseen
@@ -213,7 +208,7 @@
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
         old-change-data (get-in db change-key)]
-    (assoc-in db change-key (update-unseen-add old-change-data item-id container-id change-data))))
+    (assoc-in db change-key (update-unseen-unread-add old-change-data item-id container-id change-data))))
 
 ;; Section store specific reducers
 (defmethod reducer :default [db payload]
