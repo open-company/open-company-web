@@ -1437,7 +1437,7 @@ section.testimonials {
   }
 }
 
-section.pricing-header {
+section.pricing-footer {
   padding: 80px 0;
   text-align: center;
   position: relative;
@@ -1446,12 +1446,12 @@ section.pricing-header {
   @include tablet() {
     overflow: visible;
     padding: 131px 0 0;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   @include mobile() {
-    padding: 40px 16px !important;
+    padding: 40px 16px;
   }
 
   h1.pricing-headline {
@@ -1493,159 +1493,323 @@ section.pricing-header {
       color: $carrot_green;
     }
   }
+}
 
-  div.pricing-table {
-    background-color: $deep_navy;
-    border-radius: 16px;
-    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 960px;
-    margin: 40px auto 0;
-    padding: 40px;
-    position: relative;
+div.pricing-table {
+  background-color: $deep_navy;
+  border-radius: 16px;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 960px;
+  margin: 40px auto 0;
+  padding: 40px;
+  position: relative;
+
+  @include mobile() {
+    margin-top: 16px;
+    padding: 40px 24px;
+  }
+
+  div.pricing-table-left {
+    width: 255px;
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-right: 60px;
 
     @include mobile() {
-      margin-top: 16px;
-      padding: 40px 24px;
+      position: initial;
+      width: 100%;
+      left: unset;
+      top: unset;
+      transform: unset;
+      padding-right: 0;
     }
 
-    div.pricing-table-left {
-      width: 255px;
-      position: absolute;
-      left: 40px;
-      top: 50%;
-      transform: translateY(-50%);
-      padding-right: 60px;
-
-      @include mobile() {
-        position: initial;
-        width: 100%;
-        left: unset;
-        top: unset;
-        transform: unset;
-        padding-right: 0;
-      }
-
-      div.pricing-table-left-price {
-        @include OC_Body_Book();
-        font-size: 80px;
-        line-height: 90px;
-        color: white;
-        text-align: center;
-      }
-
-      div.pricing-table-left-subprice {
-        margin-top: 8px;
-        @include OC_Body_Book();
-        font-size: 22px;
-        line-height: 28px;
-        color: rgba(white, 0.5);
-        text-align: center;
-      }
+    div.pricing-table-left-price {
+      @include OC_Body_Book();
+      font-size: 80px;
+      line-height: 90px;
+      color: white;
+      text-align: center;
     }
 
-    div.pricing-table-right {
-      float: right;
-      width: 71%;
-      border-left: 1px solid rgba(white, 0.2);
-      padding-left: 60px;
-
-      @include mobile() {
-        float: unset;
-        width: 100%;
-        border-left: none;
-        padding-left: 0;
-        border-top: 1px solid rgba(white, 0.2);
-        margin-top: 40px;
-        padding-top: 24px;
-      }
-
-      div.pricing-table-right-copy {
-        @include OC_Body_Book();
-        font-size: 22px;
-        line-height: 28px;
-        color: white;
-        text-align: left;
-
-        @include mobile() {
-          text-align: center;
-          font-size: 20px;
-          line-height: 25px;
-        }
-      }
-
-      a.pricing-table-right-link {
-        margin-top: 24px;
-        display: block;
-        height: 56px;
-        color: white;
-        background-color: #fb5e48;
-        border-radius: 6px;
-        text-align: center;
-        @include OC_Body_Bold();
-        font-size: 18px;
-        line-height: 23px;
-        padding: 16px 26px;
-        float: left;
-
-        @include mobile() {
-          float: unset;
-          width: 100%;
-        }
-      }
+    div.pricing-table-left-subprice {
+      margin-top: 8px;
+      @include OC_Body_Book();
+      font-size: 22px;
+      line-height: 28px;
+      color: rgba(white, 0.5);
+      text-align: center;
     }
   }
 
-  div.pricing-header-footer {
-    margin: 40px auto 0;
-    max-width: 560px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  div.pricing-table-right {
+    float: right;
+    width: 71%;
+    border-left: 1px solid rgba(white, 0.2);
+    padding-left: 60px;
 
     @include mobile() {
-      display: block;
-      justify-content: unset;
-      align-items: unset;
+      float: unset;
       width: 100%;
-      margin-top: 24px;
+      border-left: none;
+      padding-left: 0;
+      border-top: 1px solid rgba(white, 0.2);
+      margin-top: 40px;
+      padding-top: 24px;
     }
 
-    div.pricing-header-footer-logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background-color: $grey_num_5;
-      background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
-      background-size: 16px 29px;
-      background-position: center;
-      background-repeat: no-repeat;
-
-      @include mobile() {
-        margin: 0 auto;
-      }
-    }
-
-    div.pricing-header-footer-subheadline {
-      margin-left: 16px;
+    div.pricing-table-right-copy {
       @include OC_Body_Book();
-      font-size: 18px;
-      line-height: 23px;
-      color: $deep_navy;
+      font-size: 22px;
+      line-height: 28px;
+      color: white;
       text-align: left;
 
       @include mobile() {
         text-align: center;
+        font-size: 20px;
+        line-height: 25px;
+      }
+    }
+
+    a.pricing-table-right-link {
+      margin-top: 24px;
+      display: block;
+      height: 56px;
+      color: white;
+      background-color: #fb5e48;
+      border-radius: 6px;
+      text-align: center;
+      @include OC_Body_Bold();
+      font-size: 18px;
+      line-height: 23px;
+      padding: 16px 26px;
+      float: left;
+
+      @include mobile() {
+        float: unset;
         width: 100%;
-        margin-left: 0;
-        margin-top: 16px;
+      }
+    }
+  }
+}
+
+div.pricing-header-footer {
+  margin: 40px auto 0;
+  max-width: 560px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @include mobile() {
+    display: block;
+    justify-content: unset;
+    align-items: unset;
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  div.pricing-header-footer-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: $grey_num_5;
+    background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
+    background-size: 16px 29px;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    @include mobile() {
+      margin: 0 auto;
+    }
+  }
+
+  div.pricing-header-footer-subheadline {
+    margin-left: 16px;
+    @include OC_Body_Book();
+    font-size: 18px;
+    line-height: 23px;
+    color: $deep_navy;
+    text-align: left;
+
+    @include mobile() {
+      text-align: center;
+      width: 100%;
+      margin-left: 0;
+      margin-top: 16px;
+    }
+
+    a {
+      color: $carrot_green;
+      &:hover {
+        color: $carrot_green;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+section.testimonials-section-old {
+  text-align: center;
+  position: relative;
+
+  div.testimonials-cards-container {
+    $testimonials_num: 4;
+    $testimonials_breakpoint: ((278 + 16) * $testimonials_num);
+    margin: 55px auto 0px;
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    @include tablet() {
+      width: calc(100% + 48px);
+      margin-left: -24px;
+    }
+
+    div.testimonials-cards-inner {
+      width: #{($testimonials_breakpoint + 1)}px;
+      margin: 0 auto;
+
+      @media screen and (max-width: #{$testimonials_breakpoint + 48}px){
+        width: #{$testimonials_breakpoint + 48}px;
+        padding: 0 24px;
+      }
+    }
+
+    div.testimonals-cards-column {
+      width: 278px;
+      margin: 0 8px;
+      float: left;
+
+      div.testimonial-card {
+        &:not(:first-child) {
+          margin-top: 16px;
+        }
+      }
+    }
+
+    div.testimonial-card {
+      float: left;
+      width: 278px;
+      padding: 24px;
+      text-align: left;
+      position: relative;
+      border-radius: 8px;
+      background-color: $another_ui_grey;
+
+      &.peak-support {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_peak_support");
+          }
+        }
       }
 
-      a {
-        color: $carrot_green;
-        &:hover {
-          color: $carrot_green;
-          text-decoration: underline;
+      &.wayne-state-univerity {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_wayne_state_university");
+          }
+        }
+      }
+
+      &.oval-money {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_oval_money");
+          }
+        }
+      }
+
+      &.hellotickets {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_hellotickets");
+          }
+        }
+      }
+
+      &.m-io {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_m_io");
+          }
+        }
+      }
+
+      &.partner-hero {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_partner_hero");
+          }
+        }
+      }
+
+      &.novo {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_novo");
+          } 
+        }
+      }
+
+      &.skylight-digital {
+        div.testimonial-footer {
+          div.testimonial-image {
+            @include image-2x("/img/ML/testimonial_skylight_digital");
+          }
+        }
+      }
+
+      div.testimonial-quote {
+        @include OC_Body_Book();
+        font-size: 18px;
+        color: $deep_navy;
+        line-height: 22px;
+        text-align: center;
+      }
+
+      div.testimonial-footer {
+        margin-top: 16px;
+
+        div.testimonial-image {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-position: center;
+          background-size: 40px 40px;
+          background-repeat: no-repeat;
+          margin: 0 auto;
+        }
+
+        div.testimonial-name {
+          @include OC_Title()
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 18px;
+          margin-top: 8px;
+          text-align: center;
+        }
+
+        div.testimonial-role {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: rgba($deep_navy, 0.6);
+          line-height: 18px;
+          text-align: center;
+
+          a {
+            color: rgba($deep_navy, 0.6);
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
       }
     }

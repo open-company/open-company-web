@@ -8,13 +8,14 @@
     {:id "wrap"}
     [:div.main.pricing
 
-      shared/pricing-table-section
+      [:section.pricing-header
 
-      (shared/dashed-string 1)
+        [:h1.pricing-headline
+          "Organized communication keeps remote teams in sync"]
 
-      (shared/testimonial-block :ifttt)
-
-      (shared/dashed-string 2)
+        shared/pricing-table
+        
+        shared/pricing-table-footer]
 
       [:section.pricing-apps
         [:div.pricing-apps-block.group
@@ -58,6 +59,12 @@
                 {:href "/apps/android"}
                 "Android"]]]]]
 
+      (shared/dashed-string 1)
+
+      (shared/testimonial-block :bank-novo)
+
+      (shared/dashed-string 2)
+
       [:section.pricing-faq
         [:div.pricing-faq-block
           [:h1.pricing-faq-header
@@ -93,10 +100,10 @@
 
       (shared/dashed-string 3)
 
-      (shared/testimonial-block :blend-labs)
+      shared/testimonials-section-old
 
       (shared/dashed-string 4)
 
-      shared/pricing-table-section
+      shared/pricing-footer
 
     ]])

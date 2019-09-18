@@ -24,10 +24,36 @@ div.pricing-wrap {
     }
 
     section.pricing-header {
-      padding-top: 200px;
+      padding: 200px 0 80px;
+      text-align: center;
+      position: relative;
+      width: 100%;
 
-      &:after {
-        display: none;
+      @include tablet() {
+        overflow: visible;
+        padding: 131px 0 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      @include mobile() {
+        padding: 88px 16px 40px;
+      }
+
+      h1.pricing-headline {
+        font-size: 60px;
+        line-height: 78px;
+        @include OC_Title()
+        color: $deep_navy;
+        margin: 0 auto;
+
+        @include mobile() {
+          margin: 0 auto 40px;
+          font-size: 36px;
+          line-height: initial;
+          max-width: initial;
+          padding: 0 24px;
+        }
       }
     }
 
@@ -213,7 +239,7 @@ div.pricing-wrap {
       }
     }
 
-    section.pricing-header:last-of-type {
+    section.pricing-footer {
       padding: 80px 0;
       background-color: $another_ui_grey;
     }

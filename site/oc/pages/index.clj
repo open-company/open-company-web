@@ -35,5 +35,5 @@
 
       shared/testimonials-section
 
-      shared/pricing-table-section
+      shared/pricing-footer
       ]])

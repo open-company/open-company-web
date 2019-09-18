@@ -59,5 +59,5 @@
 
       (shared/dashed-string 6)
 
-      shared/pricing-table-section
+      shared/pricing-footer
       ]])

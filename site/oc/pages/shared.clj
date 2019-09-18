@@ -245,22 +245,32 @@
                          (= slug :blend-labs)
                          (str
                           "“Carrot is a perfect compliment for Slack. We use it for longer-form "
-                          "weekly updates no one should miss.”"))
+                          "weekly updates no one should miss.”")
+                         (= slug :bank-novo)
+                         (str
+                          "“Carrot keeps everyone across our global offices up to date. It "
+                          "helps us share big wins, and key information across our growing family.”"))
         footer-copy (cond
                       (= slug :ifttt)
                       "Kevin Ebaugh, Senior Platform Community Manager"
                       (= slug :blend-labs)
-                      "Sara Vienna, Head of Design")
+                      "Sara Vienna, Head of Design"
+                      (= slug :bank-novo)
+                      "Tyler McIntyre, CEO")
         testimonial-website (cond
                              (= slug :ifttt)
                              "https://ifttt.com/"
                              (= slug :blend-labs)
-                             "https://bl3ndlabs.com/")
+                             "https://bl3ndlabs.com/"
+                             (= slug :bank-novo)
+                             "https://banknovo.com/")
         testimonial-company (cond
                              (= slug :ifttt)
                              "IFTTT"
                              (= slug :blend-labs)
-                             "Bl3NDlabs")]
+                             "Bl3NDlabs"
+                             (= slug :bank-novo)
+                             "Banknovo.com")]
     [:div.testimonials-block.group
       {:class (str (name slug) " " responsive-class)}
       [:div.testimonial-copy
@@ -410,8 +420,35 @@
     (testimonials-screenshot-block :share-to-slack "mobile-only")
     (dashed-string 3 "mobile-only")])
 
-(def pricing-table-section
-  [:section.pricing-header
+(def pricing-table
+  [:div.pricing-table.group
+    [:div.pricing-table-left
+      [:div.pricing-table-left-price
+        "$5"]
+      [:div.pricing-table-left-subprice
+        "/month per user"]]
+    [:div.pricing-table-right.group
+      [:div.pricing-table-right-copy
+        (str
+         "Carrot starts with a 14-day free trial, no credit card required. "
+         "After that, monthly pricing starts at $60, which includes your first "
+         "12 members. Then it’s just $5 a user after that.")]
+      [:a.pricing-table-right-link
+        {:href "/sign-up"}
+        "Start your 14 day free trial"]]])
+
+(def pricing-table-footer
+  [:div.pricing-header-footer
+    [:div.pricing-header-footer-logo]
+    [:div.pricing-header-footer-subheadline
+      "Have a team of 250+? Learn more about our "
+      [:a
+        {:href "/pricing"}
+        "Enterprise plan"]
+      "."]])
+
+(def pricing-footer
+  [:section.pricing-footer
 
     [:h1.pricing-headline
       "Simple pricing"]
@@ -423,27 +460,145 @@
          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
         "Chat with us about Carrot"]]
 
-    [:div.pricing-table.group
-      [:div.pricing-table-left
-        [:div.pricing-table-left-price
-          "$5"]
-        [:div.pricing-table-left-subprice
-          "/month per user"]]
-      [:div.pricing-table-right.group
-        [:div.pricing-table-right-copy
-          (str
-           "Carrot starts with a 14-day free trial, no credit card required. "
-           "After that, monthly pricing starts at $60, which includes your first "
-           "12 members. Then it’s just $5 a user after that.")]
-        [:a.pricing-table-right-link
-          {:href "/sign-up"}
-          "Start your 14 day free trial"]]]
+    pricing-table
     
-    [:div.pricing-header-footer
-      [:div.pricing-header-footer-logo]
-      [:div.pricing-header-footer-subheadline
-        "Have a team of 250+? Learn more about our "
-        [:a
-          {:href "/pricing"}
-          "Enterprise plan"]
-        "."]]])
+    pricing-table-footer])
+
+(def testimonials-section-old
+  [:section.testimonials-section-old.big-web-tablet-only
+    [:div.testimonials-cards-container.group
+      [:div.testimonials-cards-inner.group
+        ;; First column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.peak-support
+            [:div.testimonial-quote
+              (str
+               "“Carrot fixed our issue of email overload. "
+               "We use it for important company communications, "
+               "shout- outs, and announcements so they won’t get "
+               "buried in everyone’s inbox. It’s been a big win for us.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Jon Steiman"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://www.peaksupport.io/"
+                   :target "_blank"}
+                  "Peak Support, CEO"]]]]
+            [:div.testimonial-card.wayne-state-univerity
+              [:div.testimonial-quote
+                (str
+                 "“Carrot helps me share things "
+                 "the entire team needs to know "
+                 "- instead of burying it somewhere "
+                 "it won’t get noticed.”")]
+              [:div.testimonial-footer.group
+                [:div.testimonial-image]
+                [:div.testimonial-name
+                  "Nick DeNardis"]
+                [:div.testimonial-role
+                  [:a
+                    {:href "https://wayne.edu/"
+                     :targe "_blank"}
+                    "Wayne State University, Director of Communications"]]]]]
+        ;; Second column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.oval-money
+            [:div.testimonial-quote
+              (str
+               "“Carrot keeps our distributed teams "
+               "informed about what matters most.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Edoardo Benedetto"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Oval Money, Head of Design"]]]]
+          [:div.testimonial-card.hellotickets
+            [:div.testimonial-quote
+              (str
+               "“Staying aligned across two offices "
+               "is hard. Slack feels too ‘light’ and "
+               "crazy for important information; and "
+               "no one wants to read weekly emails. With "
+               "Carrot, we have a knowledge base of what's "
+               "going on with the company that’s made it "
+               "easy to stay aligned.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Alberto Martinez"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://ovalmoney.com/"
+                   :target "_blank"}
+                  "Hellotickets, CEO"]]]]]
+        ;; Third column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.m-io
+            [:div.testimonial-quote
+              (str
+               "“On Carrot, my updates get noticed "
+               "and get the team talking. I love that.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tom Hadfield"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://m.io/"
+                   :target "_blank"}
+                  "M.io, CEO"]]]]
+          [:div.testimonial-card.partner-hero
+            [:div.testimonial-quote
+              (str
+               "“Carrot is where we communicate important "
+               "information when we need everyone to see it "
+               "- regardless of their time zone.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Andrew Love"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://partnerhero.com/"
+                   :targe "_blank"}
+                  "PartnerHero, Director of R&D"]]]]]
+        ;; Fourth column
+        [:div.testimonals-cards-column.group
+          [:div.testimonial-card.novo
+            [:div.testimonial-quote
+              (str
+               "“We use Carrot when we need to make sure everyone "
+               "is on the same page across all our offices here "
+               "and abroad. It helps us share BIG wins, and in a "
+               "fast-growing startup keeping that family vibe, "
+               "its awesome.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Tyler McIntyre"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://banknovo.com/"
+                   :target "_blank"}
+                  "Novo, CEO"]]]]
+          [:div.testimonial-card.skylight-digital
+            [:div.testimonial-quote
+              (str
+               "“Carrot is a perfect compliment for Slack. We "
+               "use it for longer-form weekly updates no one "
+               "should miss.”")]
+            [:div.testimonial-footer.group
+              [:div.testimonial-image]
+              [:div.testimonial-name
+                "Chris Cairns"]
+              [:div.testimonial-role
+                [:a
+                  {:href "https://skylight.digital/"
+                   :target "_blank"}
+                  "Skylight Digital, Managing Director"]]]]]]]])
