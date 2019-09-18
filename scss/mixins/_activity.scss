@@ -490,6 +490,10 @@ $h2_top_margin: 24;
       max-width: calc(100% + 32px);
     }
   }
+
+  pre {
+    min-height: 36px;
+  }
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -752,5 +756,9 @@ $h2_top_margin: 24;
 
   p, ul > li, i {
     min-height: 24px;
+  }
+
+  pre {
+    min-height: 36px;
   }
 }

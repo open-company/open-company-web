@@ -365,13 +365,17 @@
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
-            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote"]
+            code-button {:name "pre"
+                         :contentDefault "code snippet"
+                         :contentFA "<i class=\"fa fa-code\"></i>"}
+            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "code" (clj->js code-button)]
                       show-subtitle (conj "h2"))
             extensions (cond-> {"autolist" (js/AutoList.)
                                 "mention" (mention-utils/mention-ext users-list)
                                 "fileDragging" false}
                          (not mobile-editor) (assoc "media-picker" media-picker-ext
                                                     "autoquote" (js/AutoQuote.)
+                                                    "autocode" (js/AutoCode.)
                                                     "carrotFileDragging" file-dragging-ext)
                          true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})

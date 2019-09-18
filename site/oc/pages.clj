@@ -1267,6 +1267,8 @@
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorAutoquote
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutoquote/autoquote.js"}]
+          ;; MediumEditorAutocode
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutocode/autocode.js"}]
           ;; MediumEditorMediaPicker
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
           ;; MediumEditorFileDragging
