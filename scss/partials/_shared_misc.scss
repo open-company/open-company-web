@@ -194,7 +194,7 @@ button.get-started-button {
   @include OC_Body_Bold();
   font-size: 20px;
   line-height: 25px;
-  margin: 48px auto 0;
+  margin: 32px auto 0;
   position: relative;
   text-align: center;
   padding: 0;
@@ -1444,7 +1444,7 @@ section.testimonials {
 }
 
 section.pricing-footer {
-  padding: 80px 0;
+  padding: 0;
   text-align: center;
   position: relative;
   width: 100%;
@@ -1479,8 +1479,8 @@ section.pricing-footer {
 
   div.pricing-subheadline {
     color: $deep_navy;
-    font-size: 30px;
-    line-height: 38px;
+    font-size: 22px;
+    line-height: 28px;
     @include OC_Body_Book();
     margin: 24px auto 0px;
     position: relative;

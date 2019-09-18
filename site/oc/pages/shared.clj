@@ -347,16 +347,23 @@
 
 (def testimonials-section
   [:section.testimonials
+
     (dashed-string 1)
+
     (testimonial-block :ifttt "big-web-tablet-only")
     (testimonials-screenshot-block :thoughtful-communication "mobile-only")
+
     (dashed-string 2)
+
     (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
     (testimonial-block :ifttt "mobile-only")
+
     (dashed-string 3)
-    (testimonial-block :blend-labs "big-web-tablet-only")
+
     (testimonials-screenshot-block :conversation "mobile-only")
-    (dashed-string 4)
+
+    (dashed-string 4 "mobile-only")
+
     [:div.testimonials-floated-block.big-web-tablet-only
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
@@ -388,7 +395,9 @@
           [:div.testimonials-floated-subheader
             "Carrot works in the background to make sure everyone sees what matters"]]]]
     (testimonials-screenshot-block :analytics "mobile-only")
+
     (dashed-string 5)
+
     [:div.testimonials-commgaps-block.big-web-tablet-only
       [:div.testimonals-commgaps-header
         "Close communication gaps"]
@@ -412,12 +421,23 @@
           [:div.testimonials-commgaps-column-subheader
             "Your Carrot posts are automatically shared to the right Slack #channel"]]]]
     (testimonial-block :blend-labs "mobile-only")
+
     (dashed-string 6)
+
+    (testimonial-block :blend-labs "big-web-tablet-only")
+
+    (dashed-string 1 "big-web-tablet-only")
+
     (testimonials-screenshot-block :follow-ups "mobile-only")
+
     (dashed-string 5 "mobile-only")
+
     (testimonials-screenshot-block :stay-in-sync "mobile-only")
+
     (dashed-string 2 "mobile-only")
+
     (testimonials-screenshot-block :share-to-slack "mobile-only")
+
     (dashed-string 3 "mobile-only")])
 
 (def pricing-table

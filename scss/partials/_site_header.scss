@@ -335,13 +335,13 @@ nav.site-navbar {
         display: inline-block;
         font-size: 18px;
         line-height: 28px;
-        color: rgba($deep_navy, 0.5);
+        color: $deep_navy;
         margin: 0;
         height: 28px;
         z-index: 2;
 
         &.active {
-          color: $deep_navy;
+          color: rgba($deep_navy, 0.5);
         }
       }
 
