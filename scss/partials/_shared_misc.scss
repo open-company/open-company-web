@@ -43,7 +43,7 @@ div.homepage-testimonials-container {
   }
 
   @include mobile() {
-    display: none;
+    padding: 0 0 24px;
   }
 
   @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1247px) {
@@ -75,11 +75,6 @@ div.homepage-testimonials-container {
     display: inline-block;
     background-position: center;
     background-repeat: no-repeat;
-
-    @include mobile() {
-      // Temp hide the logos on mobile since they don't look good
-      display: none;
-    }
 
     &.logo-ifttt {
       @include image-2x("/img/ML/logo_ifttt");
@@ -1236,6 +1231,12 @@ section.testimonials {
     padding-top: 56px !important;
     padding-bottom: 56px !important;
     text-align: center;
+  }
+
+  @include mobile() {
+    padding: 0 24px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 
   div.testimonials-floated-block {

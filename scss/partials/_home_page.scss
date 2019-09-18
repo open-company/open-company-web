@@ -30,7 +30,7 @@ div.home-wrap {
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding: 88px 24px 40px;
+        padding: 88px 24px 24px;
       }
 
       & > * {
@@ -42,14 +42,14 @@ div.home-wrap {
         position: absolute;
         bottom: 0;
         left: 50%;
-        width: 100%;
+        width: calc(100% - 32px);
         height: 50%;
         transform: translateX(-50%);
         background-color: $another_ui_grey;
         border-radius: 20px 200px 20px 20px;
         display: block;
         content: "";
-        max-width: 1200px;
+        max-width: 1232px;
       }
 
       // &:after {
