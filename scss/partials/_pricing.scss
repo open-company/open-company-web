@@ -17,6 +17,11 @@ div.pricing-wrap {
         padding-left: 24px !important;
         padding-right: 24px !important;
       }
+
+      @include mobile(){
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
     }
 
     section {
@@ -61,11 +66,19 @@ div.pricing-wrap {
       padding: 80px 0;
       background-color: $another_ui_grey;
 
+      @include mobile() {
+        padding: 40px 0 0;
+      }
+
       div.pricing-apps-block {
         width: 100%;
         max-width: 1114px;
         max-height: 249px;
         margin: 0 auto;
+
+        @include mobile() {
+          max-height: initial;
+        }
 
         & > div {
           margin-left: 92px;
@@ -73,6 +86,11 @@ div.pricing-wrap {
 
           &:first-child {
             margin-left: 0;
+          }
+
+          @include mobile() {
+            margin-left: 0;
+            float: unset; 
           }
         }
 
@@ -86,12 +104,21 @@ div.pricing-wrap {
         div.pricing-apps-app-block {
           width: calc((100% - 2px - (92px * 4)) / 3);
 
+          @include mobile() {
+            width: 100%;
+          }
+
           div.pricing-apps-app-header {
             @include OC_Body_Bold();
             font-size: 30px;
             line-height: 38px;
             color: $deep_navy;
             text-align: center;
+
+            @include mobile() {
+              font-size: 20px;
+              line-height: 25px;
+            }
           }
 
           img.pricing-apps-app-screenshot {
@@ -109,11 +136,24 @@ div.pricing-wrap {
             font-size: 18px;
             line-height: 23px;
 
+            @include mobile() {
+              margin-top: 10px;
+              @include OC_Body_Bold();
+              font-size: 20px;
+              line-height: 26px;
+            }
+
             a {
               color: $carrot_green;
               @include OC_Body_Bold();
               font-size: 18px;
               line-height: 23px;
+
+              @include mobile() {
+                @include OC_Body_Bold();
+                font-size: 20px;
+                line-height: 26px;
+              }
 
               &:hover {
                 text-decoration: underline;
@@ -159,6 +199,13 @@ div.pricing-wrap {
               }
             }
           }
+
+          img.pricing-apps-mobile-screenshot {
+            width: 226px;
+            height: 196px;
+            margin: 24px auto 0;
+            display: block;
+          }
         }
       }
     }
@@ -178,6 +225,10 @@ div.pricing-wrap {
         height: 100%;
         border-radius: 20px 20px 200px 20px;
         z-index: 1;
+
+        @include mobile() {
+          border-radius: 0px 0px 0px 0px;
+        }
       }
 
       & > div {
@@ -198,15 +249,31 @@ div.pricing-wrap {
           color: $deep_navy;
           margin: 0;
           padding: 0;
+
+          @include mobile() {
+            font-size: 36px;
+            line-height: 40px;
+            text-align: center;
+          }
         }
 
         div.pricing-faq-question-block {
           margin: 40px 0;
           border-top: 1px solid $more_ultra_light_grey;
 
+          @include mobile() {
+            margin-top: 24px;
+            padding-top: 24px;
+          }
+
           &:first-of-type {
             margin-top: 0;
             border-top: none;
+
+            @include mobile() {
+              margin-top: 24px;
+              border-top: 1px solid $more_ultra_light_grey;
+            }
           }
 
           &:last-of-type {
@@ -218,7 +285,6 @@ div.pricing-wrap {
             font-size: 20px;
             line-height: 28px;
             color: #294154;
-            margin-top: 40px;
           }
 
           div.pricing-faq-answer {

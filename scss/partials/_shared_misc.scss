@@ -1168,6 +1168,12 @@ div.testimonials-block {
     }
   }
 
+  &.bank-novo {
+    div.testimonial-copy-footer div.testimonial-author-pic {
+      @include image-2x("/img/ML/testimonial_author_bank_novo");
+    }
+  }
+
   div.testimonial-copy {
     @include OC_Body_Book();
     font-size: 22px;

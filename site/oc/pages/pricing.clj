@@ -17,7 +17,9 @@
         
         shared/pricing-table-footer]
 
-      [:section.pricing-apps
+      (shared/dashed-string 1)      
+
+      [:section.pricing-apps.big-web-tablet-only
         [:div.pricing-apps-block.group
           [:div.pricing-apps-app-block
             [:div.pricing-apps-app-header
@@ -59,11 +61,27 @@
                 {:href "/apps/android"}
                 "Android"]]]]]
 
-      (shared/dashed-string 1)
+      [:section.pricing-apps.mobile-only
+        [:div.pricing-apps-block.group
+          [:div.pricing-apps-app-block
+            [:div.pricing-apps-app-header
+              "Get the mobile app"]
+            [:div.pricing-apps-app-links
+              [:a
+                {:href "/apps/detect"}
+                "Download from the App store"]]
+            [:img.pricing-apps-mobile-screenshot
+              {:src (shared/cdn "/img/ML/pricing_apps_mobile_mobile.png")
+               :srcSet (str
+                        (shared/cdn "/img/ML/pricing_apps_mobile_mobile@2x.png") " 2x, "
+                        (shared/cdn "/img/ML/pricing_apps_mobile_mobile@3x.png") " 3x, "
+                        (shared/cdn "/img/ML/pricing_apps_mobile_mobile@4x.png") " 4x")}]]]]
+
+      (shared/dashed-string 2)
 
       (shared/testimonial-block :bank-novo)
 
-      (shared/dashed-string 2)
+      (shared/dashed-string 3)
 
       [:section.pricing-faq
         [:div.pricing-faq-block
@@ -98,11 +116,11 @@
                  :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                 "Chat with us about Carrot"]]]]]
 
-      (shared/dashed-string 3)
+      (shared/dashed-string 4)
 
       shared/testimonials-section-old
 
-      (shared/dashed-string 4)
+      (shared/dashed-string 5 "big-web-tablet-only")
 
       shared/pricing-footer
 
