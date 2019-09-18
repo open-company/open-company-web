@@ -88,6 +88,7 @@ div.home-wrap {
         margin: 0 auto;
         z-index: 2;
         position: relative;
+        max-width: 680px;
 
         @include mobile(){
           font-size: 36px;

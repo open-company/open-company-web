@@ -29,7 +29,7 @@
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Growing and distributed teams around the world ❤️ Carrot"]
+      "Remote teams around the world ❤️ Carrot"]
     [:div.homepage-testimonials-logo.logo-ifttt]
     [:div.homepage-testimonials-logo.logo-hopper]
     [:div.homepage-testimonials-logo.logo-hinge]
