@@ -232,7 +232,7 @@
   [:div.dashed-string
     {:class (str "dashed-string-" num)}])
 
-(defn testimonial-block [slug]
+(defn testimonial-block [slug & [responsive-class]]
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
@@ -259,7 +259,7 @@
                              (= slug :blend-labs)
                              "Bl3NDlabs")]
     [:div.testimonials-block.group
-      {:class (name slug)}
+      {:class (str (name slug) " " responsive-class)}
       [:div.testimonial-copy
         testimonial-copy]
       [:div.testimonial-copy-footer
@@ -271,7 +271,7 @@
              :target "_blank"}
             testimonial-company]]]]))
 
-(defn testimonials-screenshot-block [block]
+(defn testimonials-screenshot-block [block & [responsive-class]]
   (let [header (cond
                 (= block :thoughtful-communication)
                 "Thoughtful communication"
@@ -312,11 +312,18 @@
                         (= block :share-to-slack)
                         6)]
     [:div.testimonials-screenshot-block
+      {:class responsive-class}
       [:div.testimonials-screenshot-header
         header]
       [:div.testimonials-screenshot-subheader
         subline]
-      [:img.testimonials-screenshot
+      [:img.testimonials-screenshot.mobile-only
+        {:src (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num ".png"))
+         :srcSet (str
+                  (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@2x.png")) " 2x, "
+                  (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@3x.png")) " 3x, "
+                  (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@4x.png")) " 4x")}]
+      [:img.testimonials-screenshot.big-web-tablet-only
         {:src (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num ".png"))
          :srcSet (str
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@2x.png")) " 2x, "
@@ -326,9 +333,11 @@
 (def testimonials-section
   [:section.testimonials
     (dashed-string 1)
-    (testimonial-block :ifttt)
+    (testimonial-block :ifttt "big-web-tablet-only")
+    (testimonials-screenshot-block :thoughtful-communication "mobile-only")
     (dashed-string 2)
-    (testimonials-screenshot-block :thoughtful-communication)    
+    (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
+    (testimonial-block :ifttt "mobile-only")
     (dashed-string 3)
     (testimonial-block :blend-labs)
     (dashed-string 4)

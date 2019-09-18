@@ -30,7 +30,7 @@ div.home-wrap {
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding: 88px 24px 24px;
+        padding: 88px 16px 24px;
       }
 
       & > * {
