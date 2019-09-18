@@ -30,13 +30,16 @@
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
       "Remote teams around the world ❤️ Carrot"]
-    [:div.homepage-testimonials-logo.logo-ifttt]
-    [:div.homepage-testimonials-logo.logo-hopper]
-    [:div.homepage-testimonials-logo.logo-hinge]
-    [:div.homepage-testimonials-logo.logo-resy]
-    [:div.homepage-testimonials-logo.logo-flyt]
-    [:div.homepage-testimonials-logo.logo-oval]
-    [:div.homepage-testimonials-logo.logo-novo]])
+    [:div.homepage-testimonials-logos
+      [:div.homepage-testimonials-logo.logo-ifttt]
+      [:div.homepage-testimonials-logo.logo-hopper]
+      [:div.homepage-testimonials-logo.logo-primary]
+      [:div.homepage-testimonials-logo.logo-hinge]
+      [:div.homepage-testimonials-logo.logo-resy]
+      [:div.homepage-testimonials-logo.logo-flyt]
+      [:div.homepage-testimonials-logo.logo-weblify]
+      [:div.homepage-testimonials-logo.logo-novo]
+      [:div.homepage-testimonials-logo.logo-gamercraft]]])
 
 (defn slack-email-switch [slack?]
   [:div.slack-email-container.group.big-web-only
@@ -228,9 +231,9 @@
     [:button.mlb-reset.get-started-button.get-started-action
       "Create your team. It’s free!"]])
 
-(defn dashed-string [num]
+(defn dashed-string [num & [responsive-class]]
   [:div.dashed-string
-    {:class (str "dashed-string-" num)}])
+    {:class (str "dashed-string-" num " " responsive-class)}])
 
 (defn testimonial-block [slug & [responsive-class]]
   (let [testimonial-copy (cond
@@ -275,40 +278,42 @@
   (let [header (cond
                 (= block :thoughtful-communication)
                 "Thoughtful communication"
-                (= block :start-in-sync)
-                "Start every day in sync"
                 (= block :conversation)
-                "Organized, topic-based conversations"
+                "Clear, organized discussions"
                 (= block :analytics)
                 "Know who saw your update"
                 (= block :follow-ups)
-                "Request follow up from your team"
+                "Request a follow-up"
+                (= block :stay-in-sync)
+                "Daily digest to stay in sync"
                 (= block :share-to-slack)
                 "Auto-share posts to Slack")
         subline (cond
                  (= block :thoughtful-communication)
                  "Space to write longer updates that convey more information"
-                 (= block :start-in-sync)
-                 "Personalized digest each morning to know what’s important"
                  (= block :conversation)
-                 "Threads make it easy to get caught up anytime - ideal for remote teams"
+                 (str
+                  "Threaded comments make it easy for your team to stay engaged "
+                  "asynchronously. Ideal for remote teams.")
                  (= block :analytics)
                  "Carrot works in the background to make sure everyone sees what matters"
                  (= block :follow-ups)
-                 "When you need a reply, Carrot reminds anyone that hasn’t followed up yet"
+                 "When you need a reply or feedback from your team, Carrot makes sure they'll follow up."
+                 (= block :stay-in-sync)
+                 "Everyone gets a daily, personalized summary of what's important."
                  (= block :share-to-slack)
                  "Your Carrot posts are automatically shared to the right Slack #channel")
         screenshot-num (cond
                         (= block :thoughtful-communication)
                         1
-                        (= block :start-in-sync)
-                        2
                         (= block :conversation)
-                        3
+                        2
                         (= block :analytics)
-                        4
+                        3
                         (= block :follow-ups)
-                        5
+                        4
+                        (= block :stay-in-sync)
+                        2
                         (= block :share-to-slack)
                         6)]
     [:div.testimonials-screenshot-block
@@ -339,9 +344,10 @@
     (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
     (testimonial-block :ifttt "mobile-only")
     (dashed-string 3)
-    (testimonial-block :blend-labs)
+    (testimonial-block :blend-labs "big-web-tablet-only")
+    (testimonials-screenshot-block :conversation "mobile-only")
     (dashed-string 4)
-    [:div.testimonials-floated-block
+    [:div.testimonials-floated-block.big-web-tablet-only
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_1.png")
@@ -371,8 +377,9 @@
             "Know who saw your update"]
           [:div.testimonials-floated-subheader
             "Carrot works in the background to make sure everyone sees what matters"]]]]
+    (testimonials-screenshot-block :analytics "mobile-only")
     (dashed-string 5)
-    [:div.testimonials-commgaps-block
+    [:div.testimonials-commgaps-block.big-web-tablet-only
       [:div.testimonals-commgaps-header
         "Close communication gaps"]
       [:div.testimonals-commgaps-subheader
@@ -394,7 +401,14 @@
             "Auto-share posts to Slack"]
           [:div.testimonials-commgaps-column-subheader
             "Your Carrot posts are automatically shared to the right Slack #channel"]]]]
-    (dashed-string 6)])
+    (testimonial-block :blend-labs "mobile-only")
+    (dashed-string 6)
+    (testimonials-screenshot-block :follow-ups "mobile-only")
+    (dashed-string 5 "mobile-only")
+    (testimonials-screenshot-block :stay-in-sync "mobile-only")
+    (dashed-string 2 "mobile-only")
+    (testimonials-screenshot-block :share-to-slack "mobile-only")
+    (dashed-string 3 "mobile-only")])
 
 (def pricing-table-section
   [:section.pricing-header

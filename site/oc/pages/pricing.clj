@@ -58,12 +58,6 @@
                 {:href "/apps/android"}
                 "Android"]]]]]
 
-      (shared/dashed-string 3)
-
-      (shared/testimonial-block :blend-labs)
-
-      (shared/dashed-string 4)
-
       [:section.pricing-faq
         [:div.pricing-faq-block
           [:h1.pricing-faq-header
@@ -97,7 +91,11 @@
                  :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
                 "Chat with us about Carrot"]]]]]
 
-      (shared/dashed-string 5)
+      (shared/dashed-string 3)
+
+      (shared/testimonial-block :blend-labs)
+
+      (shared/dashed-string 4)
 
       shared/pricing-table-section
 

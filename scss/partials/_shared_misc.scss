@@ -33,7 +33,6 @@ div.main-animation-container {
 div.homepage-testimonials-container {
   margin: 0 auto;
   width: 100%;
-  max-width: 784px;
   text-align: center;
   z-index: 3;
   position: relative;
@@ -46,18 +45,11 @@ div.homepage-testimonials-container {
     padding: 0 0 24px;
   }
 
-  @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1247px) {
-    max-width: 670px;
-  }
+  // @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1067px) {
+  //   max-width: 100%;
+  //   width: 640px;
+  // }
 
-  @media screen and (min-width: 600px) and (max-width: #{$min_big_web_width}px) {
-    max-width: 520px;
-  }
-
-  @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1067px) {
-    max-width: 100%;
-    width: 677px;
-  }
 
   div.homepage-testimonials-copy {
     text-align: center;
@@ -69,46 +61,78 @@ div.homepage-testimonials-container {
     margin-bottom: 24px;
   }
 
-  div.homepage-testimonials-logo {
-    width: 112px;
-    height: 66px;
-    display: inline-block;
-    background-position: center;
-    background-repeat: no-repeat;
+  div.homepage-testimonials-logos {
+    max-width: 1014px;
+    width: 100%;
+    margin: 0 auto;
 
-    &.logo-ifttt {
-      @include image-2x("/img/ML/logo_ifttt");
-      background-size: 78px 21px;
+    @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1150px) {
+      max-width: 640px;
     }
 
-    &.logo-hopper {
-      @include image-2x("/img/ML/logo_hopper");
-      background-size: 74px 66px;
+    @media screen and (min-width: 477px) and (max-width: #{$min_big_web_width}px) {
+      max-width: 430px;
     }
 
-    &.logo-hinge {
-      @include image-2x("/img/ML/logo_hinge");
-      background-size: 78px 30px;
-    }
+    div.homepage-testimonials-logo {
+      height: 66px;
+      display: inline-block;
+      background-position: center;
+      background-repeat: no-repeat;
 
-    &.logo-resy {
-      @include image-2x("/img/ML/logo_resy");
-      background-size: 78px 34px;
-    }
+      &.logo-ifttt {
+        @include image-2x("/img/ML/logo_ifttt");
+        background-size: 78px 21px;
+        width: calc(78px + 24px);
+      }
 
-    &.logo-flyt {
-      @include image-2x("/img/ML/logo_flyt");
-      background-size: 80px 37px;
-    }
+      &.logo-hopper {
+        @include image-2x("/img/ML/logo_hopper");
+        background-size: 74px 66px;
+        width: calc(74px + 24px);
+      }
 
-    &.logo-oval {
-      @include image-2x("/img/ML/logo_oval");
-      background-size: 78px 32px;
-    }
+      &.logo-primary {
+        @include image-2x("/img/ML/logo_primary");
+        background-size: 120px 31px;
+        width: calc(120px + 24px);
+      }
 
-    &.logo-novo {
-      @include image-2x("/img/ML/logo_novo");
-      background-size: 78px 39px;
+      &.logo-hinge {
+        @include image-2x("/img/ML/logo_hinge");
+        background-size: 78px 30px;
+        width: calc(78px + 24px);
+      }
+
+      &.logo-resy {
+        @include image-2x("/img/ML/logo_resy");
+        background-size: 78px 34px;
+        width: calc(78px + 24px);
+      }
+
+      &.logo-flyt {
+        @include image-2x("/img/ML/logo_flyt");
+        background-size: 80px 37px;
+        width: calc(80px + 24px);
+      }
+
+      &.logo-weblify {
+        @include image-2x("/img/ML/logo_weblify");
+        background-size: 98px 20px;
+        width: calc(98px + 24px);
+      }
+
+      &.logo-novo {
+        @include image-2x("/img/ML/logo_novo");
+        background-size: 78px 39px;
+        width: calc(78px + 24px);
+      }
+
+      &.logo-gamercraft {
+        @include image-2x("/img/ML/logo_gamercraft");
+        background-size: 112px 15px;
+        width: calc(112px + 24px);
+      }
     }
   }
 }
@@ -1107,12 +1131,12 @@ button.show-animation-bt {
 div.dashed-string {
   margin: 40px auto;
   width: 80px;
-  height: 280px;
-  background-size: 80px 280px;
+  height: 200px;
+  background-size: 80px 200px;
   background-repeat: no-repeat;
   background-position: center;
 
-  @for $i from 1 through 8 {
+  @for $i from 1 through 6 {
     &.dashed-string-#{$i} {
       background-image: cdnUrl("/img/ML/dashed_string_#{$i}.svg");
     }
@@ -1155,6 +1179,11 @@ div.testimonials-block {
     font-size: 22px;
     line-height: 28px;
     color: $deep_navy;
+
+    @include mobile() {
+      font-size: 24px;
+      line-height: 30px;
+    }
   }
 
   div.testimonial-copy-footer {
@@ -1164,6 +1193,13 @@ div.testimonials-block {
     text-align: center;
     margin-top: 24px;
 
+    @include mobile() {
+      display: block;
+      justify-content: unset;
+      align-items: unset;
+      text-align: center;
+    }
+
     div.testimonial-author-pic {
       width: 40px;
       height: 40px;
@@ -1171,6 +1207,10 @@ div.testimonials-block {
       background-position: center;
       background-repeat: no-repeat;
       margin-top: 3px;
+
+      @include mobile() {
+        margin: 0 auto;
+      }
     }
 
     div.testimonial-copy-footer-right {
@@ -1185,6 +1225,17 @@ div.testimonials-block {
         display: block;
         color: $carrot_green;
         line-height: 23px;
+      }
+
+      @include mobile() {
+        width: 100%;
+        margin-left: 0;
+        text-align: center;
+        margin-top: 8px;
+
+        a {
+          text-align: center;
+        }
       }
     }
   }
@@ -1459,6 +1510,11 @@ section.pricing-header {
     padding: 40px;
     position: relative;
 
+    @include mobile() {
+      margin-top: 16px;
+      padding: 40px 24px;
+    }
+
     div.pricing-table-left {
       width: 255px;
       position: absolute;
@@ -1466,6 +1522,15 @@ section.pricing-header {
       top: 50%;
       transform: translateY(-50%);
       padding-right: 60px;
+
+      @include mobile() {
+        position: initial;
+        width: 100%;
+        left: unset;
+        top: unset;
+        transform: unset;
+        padding-right: 0;
+      }
 
       div.pricing-table-left-price {
         @include OC_Body_Book();
@@ -1491,12 +1556,28 @@ section.pricing-header {
       border-left: 1px solid rgba(white, 0.2);
       padding-left: 60px;
 
+      @include mobile() {
+        float: unset;
+        width: 100%;
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid rgba(white, 0.2);
+        margin-top: 40px;
+        padding-top: 24px;
+      }
+
       div.pricing-table-right-copy {
         @include OC_Body_Book();
         font-size: 22px;
         line-height: 28px;
         color: white;
         text-align: left;
+
+        @include mobile() {
+          text-align: center;
+          font-size: 20px;
+          line-height: 25px;
+        }
       }
 
       a.pricing-table-right-link {
@@ -1512,6 +1593,11 @@ section.pricing-header {
         line-height: 23px;
         padding: 16px 26px;
         float: left;
+
+        @include mobile() {
+          float: unset;
+          width: 100%;
+        }
       }
     }
   }
@@ -1523,6 +1609,14 @@ section.pricing-header {
     justify-content: center;
     align-items: center;
 
+    @include mobile() {
+      display: block;
+      justify-content: unset;
+      align-items: unset;
+      width: 100%;
+      margin-top: 24px;
+    }
+
     div.pricing-header-footer-logo {
       width: 56px;
       height: 56px;
@@ -1532,6 +1626,10 @@ section.pricing-header {
       background-size: 16px 29px;
       background-position: center;
       background-repeat: no-repeat;
+
+      @include mobile() {
+        margin: 0 auto;
+      }
     }
 
     div.pricing-header-footer-subheadline {
@@ -1541,6 +1639,13 @@ section.pricing-header {
       line-height: 23px;
       color: $deep_navy;
       text-align: left;
+
+      @include mobile() {
+        text-align: center;
+        width: 100%;
+        margin-left: 0;
+        margin-top: 16px;
+      }
 
       a {
         color: $carrot_green;

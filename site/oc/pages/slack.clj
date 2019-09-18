@@ -16,10 +16,7 @@
           "Slack & Carrot"]
         
         [:div.slack-subline
-          "Slack teams use Carrot to share important news, updates, and decisions nobody should miss."]
-
-        [:div.slack-subline
-          "Clear, organized communication. Ideal for remote teams."]
+          "Slack teams use Carrot to share important news, updates, and decisions nobody should miss. Ideal for remote teams."]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button

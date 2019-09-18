@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="84px" height="283px" viewBox="0 0 84 283" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="84px" height="201px" viewBox="0 0 84 201" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Path 4</title>
+    <title>Path 2 Copy</title>
     <desc>Created with Sketch.</desc>
     <g id="Website-2.0" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="8,10" stroke-linecap="round">
-        <g id="Home-(July-2)" transform="translate(-648.000000, -3671.000000)" stroke="#ECECEC" stroke-width="4">
-            <g id="Group-39" transform="translate(202.000000, 3131.000000)">
-                <path d="M508.904501,541 C527.327311,627.313812 403.113745,540.286221 465.855068,634.797405 C528.59639,729.308589 432.67557,710.955942 465.855068,674.775879 C499.034565,638.595816 577.470843,704.18019 482.981732,821" id="Path-4" transform="translate(488.000000, 681.000000) scale(1, -1) translate(-488.000000, -681.000000) "></path>
+        <g id="Home-(Sept)-Copy" transform="translate(-665.000000, -4089.000000)" stroke="#ECECEC" stroke-width="4">
+            <g id="Group-11" transform="translate(336.000000, 4088.000000)">
+                <g id="Group-64">
+                    <path d="M363.746019,0 C342.045029,16.9661753 342.045029,38.5128591 363.746019,64.6400517 C396.297505,103.83084 378.874069,141.067694 350.399252,134.978709 C321.924435,128.889724 324.446142,94.0129207 360.28683,103.990715 C396.127517,113.968509 448.295048,162.278827 370.861857,200" id="Path-2-Copy" transform="translate(371.000000, 100.000000) scale(1, -1) translate(-371.000000, -100.000000) "></path>
+                </g>
             </g>
         </g>
     </g>

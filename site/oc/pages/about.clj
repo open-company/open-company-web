@@ -66,46 +66,28 @@
           [:div.team-section-icons.group
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_01.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_01@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_1@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_02.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_02@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_2@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_03.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_03@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_3@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_04.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_04@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_4@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_05.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_05@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_5@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_06.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_06@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_6@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_07.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_07@2x.png") " 2x")}]
+               :srcSet (str (shared/cdn "/img/ML/team_section_7@2x.png") " 2x")}]
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_08.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_08@2x.png") " 2x")}]
-            [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_09.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_09@2x.png") " 2x")}]
-            [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_10.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_10@2x.png") " 2x")}]
-            [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_11.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_11@2x.png") " 2x")}]
-            [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_12.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_12@2x.png") " 2x")}]
-            [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_13.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_13@2x.png") " 2x")}]
-            [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_14.png")
-               :srcSet (str (shared/cdn "/img/ML/team_section_14@2x.png") " 2x")}]]
+               :srcSet (str (shared/cdn "/img/ML/team_section_8@2x.png") " 2x")}]]
           [:div.team-section-bottom-copy
             [:div.team-section-bottom-copy-row.group
               [:div.team-section-bottom-copy-left
