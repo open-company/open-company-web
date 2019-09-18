@@ -1,6 +1,6 @@
 (ns oc.web.stores.comment
   (:require [taoensso.timbre :as timbre]
-            [defun.core :refer (defun-)]
+            [defun.core :refer (defun)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
@@ -18,7 +18,7 @@
          (.match plain-text is-emoji?)
          (not (.match plain-text is-text-message?)))))
 
-(defun- parse-comment
+(defun parse-comment
   ([org-data activity-data comments :guard sequential?]
     (map #(parse-comment org-data activity-data %) comments))
   ([org-data activity-data comment-map :guard nil?]
@@ -272,5 +272,7 @@
                         (assoc with-authors :new-at created-at))]
       (-> db
         (assoc-in (dispatcher/activity-comments-key org-slug activity-uuid) sorted-comments-data)
-        (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)))
+        (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)
+        ;; Highlight the comment being added
+        (update-in [:add-comment-highlight] #(if comment-from-current-user? % (:uuid comment-data)))))
     db))

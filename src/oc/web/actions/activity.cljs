@@ -637,15 +637,6 @@
         (dis/dispatch! [:org-loaded org-data])
         (cb success))))))
 
-(defn connect-change-service []
-  ;; id token given and not logged in
-  (when-let* [claims (jwt/get-id-token-contents)
-              secure-uuid (:secure-uuid claims)
-              user-id (:user-id claims)
-              org-data (dis/org-data)
-              ws-link (utils/link-for (:links org-data) "changes")]
-    (ws-cc/reconnect ws-link user-id (:slug org-data) [])))
-
 (defn secure-activity-get [& [cb]]
   (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id)
    (fn [resp]
