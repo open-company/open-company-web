@@ -183,7 +183,7 @@
                         :method (method-name method)
                         :jwt (j/jwt)
                         :params params
-                        :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
+                        :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
         (on-complete response)))))
@@ -211,7 +211,7 @@
   (sentry/capture-message-with-extra-context!
     (merge {:callee callee-name
             :link link
-            :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
+            :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}
      parameters)
     (str "Client API error on: " callee-name))
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))

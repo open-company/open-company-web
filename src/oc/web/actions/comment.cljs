@@ -8,6 +8,7 @@
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.utils.comment :as comment-utils]
+            [oc.web.stores.comment :as comment-store]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.notifications :as notification-actions]))
 

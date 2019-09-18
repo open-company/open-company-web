@@ -149,22 +149,26 @@ div.more-menu {
     list-style-type: none;
 
     &.has-create-follow-up {
-      left: calc(100% - 146px);
+      left: unset;
+      right: 0;
       width: 144px;
 
       @include mobile() {
-        left: calc(100% - 108px);
-        width: 74px;
+        left: unset;
+        right: 0;
+        width: 128px;
       }
     }
 
     &.has-complete-follow-up {
-      left: calc(100% - 126px);
+      left: unset;
+      right: 0;
       width: 162px;
 
       @include mobile() {
-        left: calc(100% - 108px);
-        width: 74px;
+        left: unset;
+        right: 0;
+        width: 162px;
       }
     }
 

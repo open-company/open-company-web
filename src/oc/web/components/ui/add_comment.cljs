@@ -52,6 +52,7 @@
       (comment-actions/add-comment-blur))))
 
 (defn- send-clicked [event s]
+  (reset! (::add-button-disabled s) true)
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
         args (vec (:rum/args s))
@@ -60,7 +61,6 @@
         dismiss-reply-cb (get args 2)
         edit-comment-data (get args 3 nil)
         save-done-cb (fn [success]
-                      (reset! (::add-button-disabled s) false)
                       (if success
                         (when add-comment-div
                           (set! (.-innerHTML add-comment-div) ""))
@@ -262,7 +262,8 @@
         [:div.add-comment-footer
           {:class (when should-hide-post-button "hide-footer")}
           [:button.mlb-reset.send-btn
-            {:on-click #(send-clicked % s)
+            {:on-click #(when-not @(::add-button-disabled s)
+                          (send-clicked % s))
              :disabled @(::add-button-disabled s)}
             (if edit-comment-data
               "Save"
