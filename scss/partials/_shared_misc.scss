@@ -1457,6 +1457,7 @@ section.pricing-footer {
   text-align: center;
   position: relative;
   width: 100%;
+  background-color: $another_ui_grey;
 
   @include tablet() {
     overflow: visible;
