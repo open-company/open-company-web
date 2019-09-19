@@ -46,6 +46,7 @@
     [cljsjs/emoji-mart "2.2.1-0"] ; EmojiMart picker for native emoji picking https://github.com/missive/emoji-mart
     [cljsjs/localforage "1.5.3-0"] ; Offline storage, improved. Wraps IndexedDB, WebSQL, or localStorage using a simple but powerful API. https://github.com/localForage/localForage
     [cljsjs/react-giphy-selector "0.0.3-0"] ;; A very customizable react search component for picking the perfect giphy. https://github.com/tshaddix/react-giphy-selector
+    [cljsjs/react-virtualized "9.21.1-0" :exclusions [cljsjs/react cljsjs/react-dom]] ;; React components for efficiently rendering large lists and tabular data
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
     [open-company/lib "0.17.16" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
