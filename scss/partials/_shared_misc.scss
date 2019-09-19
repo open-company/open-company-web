@@ -1154,6 +1154,10 @@ div.testimonials-block {
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_blend_labs");
     }
+
+    div.testimonial-copy {
+      max-width: 670px;
+    }
   }
 
   &.novo {
@@ -1179,6 +1183,7 @@ div.testimonials-block {
     font-size: 22px;
     line-height: 28px;
     color: $deep_navy;
+    margin: 0 auto;
 
     @include mobile() {
       font-size: 24px;
@@ -1444,7 +1449,7 @@ section.testimonials {
 }
 
 section.pricing-footer {
-  padding: 0;
+  padding: 80px 0;
   text-align: center;
   position: relative;
   width: 100%;
