@@ -63,6 +63,10 @@ nav.site-navbar {
       div.site-navbar-right {
         top: 16px;
       }
+
+      div.mobile-ham-menu {
+        top: 14px;
+      }
     }
   }
 
@@ -92,8 +96,8 @@ nav.site-navbar {
         background-size: 16px 16px;
         background-repeat: no-repeat;
         background-position: 0 center;
-        top: 14px;
-        left: 24px;
+        top: 21px;
+        left: 16px;
       }
     }
 
@@ -145,13 +149,8 @@ nav.site-navbar {
       top: 39px;
       transform: top 180ms;
 
-      @include tablet() {
-        right: 24px;
-      }
-
       @include mobile() {
         top: 21px;
-        right: 24px;
 
         a.go-to-digest-bt {
           display: none;
