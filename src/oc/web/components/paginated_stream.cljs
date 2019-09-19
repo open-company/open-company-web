@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.react-utils :as rutils]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.mixins.ui :as mixins]
@@ -14,11 +15,15 @@
             [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.stream-item :refer (stream-item)]
             [goog.events :as events]
-            [goog.events.EventType :as EventType]))
+            [goog.events.EventType :as EventType]
+            cljsjs.react-virtualized))
+
+(def virtualized-list (partial rutils/build js/ReactVirtualized.List))
+(def window-scroller (partial rutils/build js/ReactVirtualized.WindowScroller))
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
-(def scroll-card-threshold 2)
-(def card-avg-height 372)
+(def scroll-card-threshold 1)
+(def card-avg-height 220)
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -36,9 +41,7 @@
                ;; has a link to load more that can be used
                @(::has-next s)
                ;; scroll is moving down
-               ;; or is static (if the user has a tall screen we need to load more posts right away)
-               (or (= direction :down)
-                   (= direction :stale))
+               (= direction :down)
                ;; and the threshold point has been reached
                (>= scroll-top (- max-scroll (* scroll-card-threshold card-avg-height))))
       ;; Show a spinner at the bottom
@@ -67,6 +70,42 @@
       (reset! (::show-all-caught-up-message s) false)
       (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))
     (did-scroll s nil)))
+
+(rum/defc wrapped-stream-item < rum/static
+  [{:keys [key style]} entry]
+  [:div
+   {:style style}
+   (stream-item entry nil)])
+
+(rum/defc virtualized-stream < rum/static
+  [items props]
+  (let [{:keys [height
+                isScrolling
+                onChildScroll
+                scrollTop
+                registerChild]} (js->clj props :keywordize-keys true)
+        row-renderer (fn [row-props]
+                       (let [{:keys [key
+                                     index
+                                     isScrolling
+                                     isVisible
+                                     style] :as row-props} (js->clj row-props :keywordize-keys true)
+                             entry (nth items index)]
+                         (rum/with-key
+                           (wrapped-stream-item row-props entry)
+                           (str "stream-item-" key))))]
+    (virtualized-list {:autoHeight true
+                       :height height
+                       :width 720
+                       :isScrolling isScrolling
+                       :onScroll onChildScroll
+                       :rowCount (count items)
+                       :rowHeight card-avg-height
+                       :rowRenderer row-renderer
+                       :scrollTop scrollTop
+                       :ref registerChild
+                       :overscanRowCount 10
+                       })))
 
 (rum/defcs paginated-stream  < rum/static
                                rum/reactive
@@ -116,7 +155,10 @@
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
-          (for [e items
+         (window-scroller
+          {}
+          (partial virtualized-stream items))
+          #_(for [e items
                 :let [reads-data (get activities-read (:uuid e))]]
             (rum/with-key
              (stream-item e reads-data)
