@@ -296,6 +296,8 @@
                 "Request a follow-up"
                 (= block :stay-in-sync)
                 "Daily digest to stay in sync"
+                (= block :stay-in-sync-slack)
+                "Daily digest to stay in sync"
                 (= block :share-to-slack)
                 "Auto-share posts to Slack")
         subline (cond
@@ -311,6 +313,8 @@
                  "When you need a reply or feedback from your team, Carrot makes sure they'll follow up."
                  (= block :stay-in-sync)
                  "Everyone gets a daily, personalized summary of what's important."
+                 (= block :stay-in-sync-slack)
+                 "Everyone gets a daily, personalized summary of what's important."
                  (= block :share-to-slack)
                  "Your Carrot posts are automatically shared to the right Slack #channel")
         screenshot-num (cond
@@ -324,6 +328,8 @@
                         4
                         (= block :stay-in-sync)
                         2
+                        (= block :stay-in-sync-slack)
+                        7
                         (= block :share-to-slack)
                         6)]
     [:div.testimonials-screenshot-block
@@ -360,7 +366,9 @@
 
     (dashed-string 3)
 
-    (testimonials-screenshot-block :conversation "mobile-only")
+    (if (= page :slack)
+      (testimonials-screenshot-block :stay-in-sync-slack "mobile-only")
+      (testimonials-screenshot-block :conversation "mobile-only"))
 
     (dashed-string 4 "mobile-only")
 
@@ -394,7 +402,9 @@
             "Know who saw your update"]
           [:div.testimonials-floated-subheader
             "Carrot works in the background to make sure everyone sees what matters"]]]]
-    (testimonials-screenshot-block :analytics "mobile-only")
+    (if (= page :slack)
+      (testimonials-screenshot-block :conversation "mobile-only")
+      (testimonials-screenshot-block :analytics "mobile-only"))
 
     (dashed-string 5)
 
@@ -432,11 +442,15 @@
 
     (dashed-string 1 "big-web-tablet-only")
 
-    (testimonials-screenshot-block :follow-ups "mobile-only")
+    (if (= page :slack)
+      (testimonials-screenshot-block :analytics "mobile-only")
+      (testimonials-screenshot-block :follow-ups "mobile-only"))
 
     (dashed-string 5 "mobile-only")
 
-    (testimonials-screenshot-block :stay-in-sync "mobile-only")
+    (if (= page :slack)
+      (testimonials-screenshot-block :follow-ups "mobile-only")
+      (testimonials-screenshot-block :stay-in-sync "mobile-only"))
 
     (dashed-string 2 "mobile-only")
 
