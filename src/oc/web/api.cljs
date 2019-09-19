@@ -15,6 +15,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.lib.fullstory :as fullstory]
             [oc.web.utils.ws-client-ids :as ws-client-ids]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
@@ -183,7 +184,7 @@
                         :method (method-name method)
                         :jwt (j/jwt)
                         :params params
-                        :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}]
+                        :sessionURL (fullstory/session-url)}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
         (on-complete response)))))
@@ -211,7 +212,7 @@
   (sentry/capture-message-with-extra-context!
     (merge {:callee callee-name
             :link link
-            :sessionURL (when (exists? js/FS) (.getCurrentSessionURL js/FS))}
+            :sessionURL (fullstory/session-url)}
      parameters)
     (str "Client API error on: " callee-name))
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
