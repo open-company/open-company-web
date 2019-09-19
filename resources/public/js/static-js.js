@@ -1,3 +1,4 @@
+
 /***********************************************************************************************
  * When updating this library please update also cljsjs/jwt-decode package in build.boot file. *
  ***********************************************************************************************/
@@ -160,6 +161,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   if (jwt) {
     $("#site-header-login-item").hide();
+    $(".login-signup-or").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
     $("div.main.slack").addClass("no-get-started-button");

@@ -1,39 +1,17 @@
 /* Header */
 
 span.go-to-digest {
-  width: 194px;
-  height: 40px;
-  border-radius: 8px;
-  background-color: $carrot_green;
-  color: white;
-  @include OC_Body_Bold();
-  font-size: 14px;
+  // height: 40px;
+  color: $carrot_green;
   position: relative;
   display: block;
   text-align: right;
-  padding: 11px 26px 11px 26px;
 
   @include tablet() {
-    padding: 11px 16px 11px 16px;
-    text-align: center;
-    width: 164px;
 
     &:before {
       display: none;
     }
-  }
-
-  &:before {
-    content: "";
-    position: absolute;
-    left: 22px;
-    top: 11px;
-    width: 18px;
-    height: 16px;
-    background-image: cdnUrl("/img/ML/digest_white.svg");
-    background-size: 18px 16px;
-    background-repeat: no-repeat;
-    background-position: center;
   }
 }
 
