@@ -7,11 +7,14 @@ div.about-wrap {
     width: 100%;
 
     section.about-header {
-      // padding-top: 239px;
-      padding-top: 80px;
+      padding: 138px 0 0;
       text-align: center;
       position: relative;
       overflow: hidden;
+
+      @include mobile() {
+        padding: 88px 16px 0;
+      }
       
       h3.about-copy-header {
         @include OC_Title()
@@ -19,19 +22,17 @@ div.about-wrap {
         font-size: 60px;
         line-height: 76px;
         position: relative;
-        margin: 138px auto 0;
+        margin: 0 auto;
         max-width: 795px;
 
         @include tablet() {
           max-width: 595px;
           text-align: center;
-          margin: 80px auto 0;
         }
 
         @include mobile() {
           font-size: 36px;
-          line-height: normal;
-          max-width: 202px;
+          line-height: 40px;
         }
       }
 
@@ -45,7 +46,10 @@ div.about-wrap {
 
         @include tablet() {
           width: 100%;
-          padding: 0 24px 80px;
+        }
+
+        @include mobile() {
+          padding: 0 0 40px;
         }
 
         div.about-copy-inner {
@@ -123,6 +127,10 @@ div.about-wrap {
                 font-size: 20px;
                 line-height: 26px;
               }
+
+              @include mobile() {
+                text-align: left;
+              }
             }
 
             div.about-bottom-copy-right {
@@ -195,6 +203,10 @@ div.about-wrap {
       position: relative;
       margin: 0 auto;
 
+      @include mobile() {
+        padding: 40px 16px;
+      }
+
       &:before {
         content: "";
         position: absolute;
@@ -205,6 +217,10 @@ div.about-wrap {
         border-radius: 20px 20px 200px 20px;
         background-color: $another_ui_grey;
         z-index: 1;
+
+        @include mobile() {
+          border-radius: 0;
+        }
       }
 
       div.team-section-block {
@@ -241,7 +257,6 @@ div.about-wrap {
 
           div.team-section-bottom-copy-row {
             border-top: 1px solid $more_ultra_light_grey;
-            padding: 40px 0;
 
             div.team-section-bottom-copy-left {
               float: left;

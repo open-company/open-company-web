@@ -65,28 +65,28 @@
             "Those that helped make Carrot possible"]
           [:div.team-section-icons.group
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_01.png")
+              {:src (shared/cdn "/img/ML/team_section_1.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_1@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_02.png")
+              {:src (shared/cdn "/img/ML/team_section_2.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_2@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_03.png")
+              {:src (shared/cdn "/img/ML/team_section_3.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_3@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_04.png")
+              {:src (shared/cdn "/img/ML/team_section_4.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_4@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_05.png")
+              {:src (shared/cdn "/img/ML/team_section_5.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_5@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_06.png")
+              {:src (shared/cdn "/img/ML/team_section_6.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_6@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_07.png")
+              {:src (shared/cdn "/img/ML/team_section_7.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_7@2x.png") " 2x")}]
             [:img.team-section-icon
-              {:src (shared/cdn "/img/ML/team_section_08.png")
+              {:src (shared/cdn "/img/ML/team_section_8.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_8@2x.png") " 2x")}]]
           [:div.team-section-bottom-copy
             [:div.team-section-bottom-copy-row.group
@@ -104,5 +104,10 @@
                   {:href "https://trello.com/b/eKs2LtLu/carrot-roadmap-https-carrotio"
                    :target "_blank"}
                    "View our roadmap"]]]]]]
+
+    (shared/dashed-string 1)
+
+    shared/pricing-footer
+
     ] ;<!-- main -->
   ])
