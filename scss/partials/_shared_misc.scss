@@ -1392,7 +1392,7 @@ section.testimonials {
 
   div.testimonials-commgaps-block {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1212px;
     margin: 0 auto;
 
     div.testimonals-commgaps-header {
@@ -1415,7 +1415,7 @@ section.testimonials {
       margin-top: 40px;
 
       div.testimonials-commgaps-column {
-        width: calc(50% - 12px);
+        width: calc(50% - 3px);
         text-align: center;
 
         &.left-column {
@@ -1436,7 +1436,7 @@ section.testimonials {
           line-height: 33px;
           color: $deep_navy;
           max-width: 404px;
-          margin: 24px auto 0;
+          margin: 16px auto 0;
         }
 
         div.testimonials-commgaps-column-subheader {

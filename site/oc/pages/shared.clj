@@ -345,7 +345,7 @@
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@3x.png")) " 3x, "
                   (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num "@4x.png")) " 4x")}]]))
 
-(def testimonials-section
+(defn testimonials-section [page]
   [:section.testimonials
 
     (dashed-string 1)
@@ -405,9 +405,13 @@
         "Carrot makes sure everyone will see what matters."]
       [:div.testimonials.commgaps-block-inner.group
         [:div.testimonials-commgaps-column.left-column
-          [:img.testimonials-commgaps-column-screenshot
-            {:src (cdn "/img/ML/testimonials_commgaps_email.png")
-             :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x")}]
+          (if (= page :slack)
+            [:img.testimonials-commgaps-column-screenshot
+              {:src (cdn "/img/ML/testimonials_commgaps_slack_digest.png")
+               :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x")}]
+            [:img.testimonials-commgaps-column-screenshot
+              {:src (cdn "/img/ML/testimonials_commgaps_email.png")
+               :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x")}])
           [:div.testimonials-commgaps-column-header
             "Daily digest to stay in sync"]
           [:div.testimonials-commgaps-column-subheader

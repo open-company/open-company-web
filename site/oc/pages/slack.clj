@@ -14,9 +14,12 @@
 
         [:h1.slack-headline
           "Slack & Carrot"]
-        
+
         [:div.slack-subline
-          "Slack teams use Carrot to share important news, updates, and decisions nobody should miss. Ideal for remote teams."]
+          "Slack teams use Carrot to share important news, updates, and decisions nobody should miss."]
+
+        [:div.slack-subline
+          "Clear, organized communication. Ideal for remote teams."]
 
         [:div.slack-button-container.group
             [:a.add-to-slack-button
@@ -33,31 +36,7 @@
 
         shared/testimonials-logos-line]
 
-      (shared/dashed-string 1)
-
-      (shared/testimonials-screenshot-block :thoughtful-communication)
-
-      (shared/dashed-string 2)
-
-      (shared/testimonials-screenshot-block :start-in-sync)
-
-      (shared/dashed-string 3)
-
-      (shared/testimonials-screenshot-block :conversation)
-
-      (shared/dashed-string 4)
-
-      (shared/testimonials-screenshot-block :analytics)
-
-      (shared/dashed-string 4)
-
-      (shared/testimonials-screenshot-block :follow-ups)
-
-      (shared/dashed-string 5)
-
-      (shared/testimonials-screenshot-block :share-to-slack)
-
-      (shared/dashed-string 6)
+      (shared/testimonials-section :slack)
 
       shared/pricing-footer
       ]])

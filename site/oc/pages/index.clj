@@ -33,7 +33,7 @@
 
         shared/testimonials-logos-line]
 
-      shared/testimonials-section
+      (shared/testimonials-section :index)
 
       shared/pricing-footer
       ]])
