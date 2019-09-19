@@ -72,13 +72,13 @@
     (did-scroll s nil)))
 
 (rum/defc wrapped-stream-item < rum/static
-  [{:keys [key style]} entry]
+  [{:keys [key style]} entry reads-data]
   [:div
    {:style style}
-   (stream-item entry nil)])
+   (stream-item entry reads-data)])
 
 (rum/defc virtualized-stream < rum/static
-  [items props]
+  [items activities-read props]
   (let [{:keys [height
                 isScrolling
                 onChildScroll
@@ -90,9 +90,10 @@
                                      isScrolling
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
-                             entry (nth items index)]
+                             entry (nth items index)
+                             reads-data (get activities-read (:uuid entry))]
                          (rum/with-key
-                           (wrapped-stream-item row-props entry)
+                           (wrapped-stream-item row-props entry reads-data)
                            (str "stream-item-" key))))]
     (virtualized-list {:autoHeight true
                        :height height
@@ -157,12 +158,7 @@
         [:div.paginated-stream-cards-inner.group
          (window-scroller
           {}
-          (partial virtualized-stream items))
-          #_(for [e items
-                :let [reads-data (get activities-read (:uuid e))]]
-            (rum/with-key
-             (stream-item e reads-data)
-             (str "paginated-stream-entry-" (:uuid e) "-" (:updated-at e))))]
+          (partial virtualized-stream items activities-read))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Loading more posts..."])
