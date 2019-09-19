@@ -1,5 +1,5 @@
 (ns oc.web.lib.react-utils)
 
-(defn build [component props]
+(defn build [component props & children]
   (let [React (.-React js/window)]
-    (.createElement React component (clj->js props))))
+    (apply React/createElement component (clj->js props) children)))
