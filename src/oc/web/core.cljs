@@ -312,7 +312,19 @@
 
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
-      (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login" target params true))
+      ;; In case user is logged in and has a last org cookie
+      
+      (let [last-org-cookie (cook/get-cookie (router/last-org-cookie))]
+        (if (and (jwt/jwt)
+                   (seq last-org-cookie))
+          (do
+            ;; remove the last used org cookie
+            ;; to avoid infinite loop redirects.
+            (cook/remove-cookie! (router/last-org-cookie))
+            ;; and redirect him there,
+            (router/redirect! (urls/all-posts last-org-cookie)))
+          ;; if no cookie or logged out do the login dance
+          (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login" target params true))))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
