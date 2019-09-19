@@ -51,12 +51,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
-            [oc.web.components.about :refer (about)]
-            [oc.web.components.home-page :refer (home-page)]
-            [oc.web.components.pricing :refer (pricing)]
-            [oc.web.components.slack :refer (slack)]
-            [oc.web.components.press-kit :refer (press-kit)]
-            [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
             [oc.web.components.ui.notifications :refer (notifications)]
@@ -144,15 +138,6 @@
 (defn post-routing []
   (routing-actions/routing @router/path)
   (user-actions/initial-loading))
-
-;; home
-(defn home-handler [target params]
-  (pre-routing (:query-params params) true)
-  ;; save route
-  (router/set-route! ["home"] {:query-params (:query-params params)})
-  (post-routing)
-  ;; render component
-  (drv-root home-page target))
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
@@ -327,12 +312,7 @@
 
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
-      (when (and (not (contains? (:query-params params) :jwt))
-                 (not (jwt/jwt)))
-        (if (contains? (:query-params params) :slack)
-          (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
-          (swap! dis/app-state assoc :show-login-overlay :login-with-slack)))
-      (simple-handler home-page "login" target params))
+      (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login" target params true))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
@@ -348,22 +328,6 @@
                  (seq (cook/get-cookie (router/last-org-cookie))))
         (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
-
-    (defroute sign-up-slack-route urls/sign-up-slack {:as params}
-      (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
-      (when (jwt/jwt)
-        (if (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
-          (router/redirect! urls/sign-up-profile)))
-      (simple-handler slack-lander "slack-lander" target params))
-
-    (defroute sign-up-slack-slash-route (str urls/sign-up-slack "/") {:as params}
-      (timbre/info "Routing sign-up-slack-slash-route" (str urls/sign-up-slack "/"))
-      (when (jwt/jwt)
-        (if (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
-          (router/redirect! urls/sign-up-profile)))
-      (simple-handler slack-lander "slack-lander" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
@@ -436,22 +400,6 @@
       (timbre/info "Routing google-lander-check-slash-route" (str urls/google-lander-check "/"))
       ;; Check if the user already have filled the needed data or if it needs to
       (google-lander-check params))
-
-    (defroute about-route urls/about {:as params}
-      (timbre/info "Routing about-route" urls/about)
-      (simple-handler about "about" target params))
-
-    (defroute slack-route urls/slack {:as params}
-      (timbre/info "Routing slack-route" urls/slack)
-      (simple-handler slack "slack" target params))
-
-    (defroute pricing-route urls/pricing {:as params}
-      (timbre/info "Routing pricing-route" urls/pricing)
-      (simple-handler pricing "pricing" target params))
-
-    (defroute press-kit-route urls/press-kit {:as params}
-      (timbre/info "Routing press-kit-route" urls/press-kit)
-      (simple-handler press-kit "press-kit" target params))
 
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
@@ -531,10 +479,6 @@
            (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
-
-    (defroute home-page-route urls/home {:as params}
-      (timbre/info "Routing home-page-route" urls/home)
-      (home-handler target params))
 
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
