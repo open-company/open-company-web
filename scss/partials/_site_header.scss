@@ -38,6 +38,14 @@ nav.site-navbar {
     div.site-navbar-container {
       padding: 16px;
 
+      &.is-slack-header {
+        a.navbar-brand-left {
+          @include mobile() {
+            top: 16px;
+          }
+        }
+      }
+
       div.site-navbar-right {
         top: 16px;
       }
@@ -103,11 +111,10 @@ nav.site-navbar {
 
     &.is-slack-header {
       a.navbar-brand-left {
-        @include tablet() {
-          float: left;
-          position: relative;
-          left: unset;
-          margin: 2px 0px 0px;
+        @include mobile() {
+          position: absolute;
+          top: 24px;
+          left: 50%;
         }
       }
 
@@ -159,6 +166,29 @@ nav.site-navbar {
         &:hover {
           text-decoration: none;
           opacity: 1;
+        }
+
+        &.continue-with-slack {
+          padding-left: 32px;
+          position: relative;
+
+          &:before {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            background-image: cdnUrl("/img/ML/slack_green_logo.svg");
+            background-position: center;
+            background-size: 24px 24px;
+            background-repeat: no-repeat;
+          }
+
+          @include mobile() {
+            padding-left: 0;
+            width: 24px;
+          }
         }
       }
 

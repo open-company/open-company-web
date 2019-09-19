@@ -26,13 +26,7 @@
               {:id "get-started-centred-bt"
                :href (env :slack-signup-url)}]]
 
-        [:div.main-animation-container
-          [:img.main-animation
-            {:src (shared/cdn "/img/ML/slack_screenshot.png")
-             :srcSet (str
-                      (shared/cdn "/img/ML/slack_screenshot@2x.png") " 2x, "
-                      (shared/cdn "/img/ML/slack_screenshot@3x.png") " 3x, "
-                      (shared/cdn "/img/ML/slack_screenshot@4x.png") " 4x")}]]
+        shared/slack-hero-screenshot
 
         shared/testimonials-logos-line]
 

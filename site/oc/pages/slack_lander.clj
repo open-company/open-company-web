@@ -21,9 +21,6 @@
         [:a.continue-with-slack-bt
           {:href (env :slack-signup-url)}]
 
-        [:div.main-animation-container
-          [:img.main-animation
-            {:src (shared/cdn "/img/ML/slack_screenshot.png")
-             :src-set (str (shared/cdn "/img/ML/slack_screenshot@2x.png") " 2x")}]]
+        shared/slack-hero-screenshot
 
         shared/testimonials-logos-line]]])

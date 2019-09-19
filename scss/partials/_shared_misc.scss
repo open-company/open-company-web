@@ -3,7 +3,7 @@ $carousel_timing: 7s;
 div.main-animation-container {
   position: relative;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 80px auto 0;
 
   @include tablet() {
     width: 100%;

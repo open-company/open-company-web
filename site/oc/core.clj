@@ -88,11 +88,10 @@
   [active-page]
   ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
   (let [is-slack-lander? (= active-page "slack-lander")
+        is-slack-page? (= active-page "slack")
         site-navbar-container (if is-slack-lander?
                                :div.site-navbar-container.is-slack-header
-                               :div.site-navbar-container)
-        use-slack-url? (or is-slack-lander?
-                           (= active-page "slack"))]
+                               :div.site-navbar-container)]
     [:nav.site-navbar
       [site-navbar-container
         [:a.navbar-brand-left
@@ -131,31 +130,46 @@
             {:href "/pricing"
              :class (when (= active-page "pricing") "active")}
             "Pricing"]]
-        [:div.site-navbar-right.big-web-only
-          [:a.login
-            {:id "site-header-login-item"
-             :href "/login"}
-              "Login"]
-          [:span.login-signup-or "or"]
-          [:a.signup
-            {:id "site-header-signup-item"
-             :href "/sign-up"}
-            "Sign up"]]
-        [:div.site-navbar-right.tablet-only
-          [:a.login
-            {:id "site-header-tablet-login-item"
-             :href "/login"}
-              "Login"]
-          [:span.login-signup-or "or"]
-          [:a.signup
-            {:id "site-header-tablet-signup-item"
-             :href "/sign-up"}
-            "Sign up"]]
-        [:div.site-navbar-right.mobile-only
-          [:a.login
-            {:id "site-header-mobile-signup-item"
-             :href "/login"}
-            "Login"]]
+
+        ;; Desktop & tablet
+        (cond
+          is-slack-page?
+          [:div.site-navbar-right.big-web-tablet-only
+            [:a.login
+              {:id "site-header-login-item"
+               :href (env :slack-signup-url)}
+                "Add to Slack"]]
+          is-slack-lander?
+          [:div.site-navbar-right.big-web-tablet-only
+            [:a.signup.continue-with-slack
+              {:id "site-header-login-item"
+               :href (env :slack-signup-url)}
+                "Continue with Slack"]]
+          :else
+          [:div.site-navbar-right.big-web-tablet-only
+            [:a.login
+              {:id "site-header-login-item"
+               :href "/login"}
+                "Login"]
+            [:span.login-signup-or "or"]
+            [:a.signup
+              {:id "site-header-signup-item"
+               :href "/sign-up"}
+              "Sign up"]])
+
+        ;; Mobile
+        (cond
+          (or is-slack-page? is-slack-lander?)
+          [:div.site-navbar-right.mobile-only
+            [:a.signup.continue-with-slack
+              {:id "site-header-login-item"
+               :href (env :slack-signup-url)}]]
+          :else
+          [:div.site-navbar-right.mobile-only
+            [:a.login
+              {:id "site-header-login-item"
+               :href "/login"}
+                "Login"]])
         [:div.mobile-ham-menu
           {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
 

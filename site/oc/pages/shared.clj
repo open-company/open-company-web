@@ -640,3 +640,12 @@
                   {:href "https://skylight.digital/"
                    :target "_blank"}
                   "Skylight Digital, Managing Director"]]]]]]]])
+
+(def slack-hero-screenshot
+  [:div.main-animation-container
+    [:img.main-animation
+      {:src (cdn "/img/ML/slack_screenshot.png")
+       :srcSet (str
+                (cdn "/img/ML/slack_screenshot@2x.png") " 2x, "
+                (cdn "/img/ML/slack_screenshot@3x.png") " 3x, "
+                (cdn "/img/ML/slack_screenshot@4x.png") " 4x")}]])
