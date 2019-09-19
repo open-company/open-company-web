@@ -1144,6 +1144,10 @@ div.testimonials-block {
   position: relative;
   text-align: center;
 
+  @include mobile() {
+    padding: 0 16px;
+  }
+
   &.ifttt {
     div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_ifttt");
@@ -1517,7 +1521,7 @@ div.pricing-table {
   position: relative;
 
   @include mobile() {
-    margin-top: 16px;
+    margin-top: 24px;
     padding: 40px 24px;
   }
 

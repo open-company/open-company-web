@@ -37,16 +37,14 @@ div.site-mobile-menu {
       a {
         @include OC_Body_Book();
         font-size: 28px;
-        color: $ui_grey;
+        color: $deep_navy;
         
         &:focus, &:active {
           text-decoration: none;
         }
 
         &.active {
-          @include OC_Body_Bold();
-          font-size: 28px;
-          color: $deep_navy;
+          color: rgba($deep_navy, 0.5);
           text-decoration: none;
         }
       }
