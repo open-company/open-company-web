@@ -106,6 +106,7 @@
                        :scrollTop scrollTop
                        :ref registerChild
                        :overscanRowCount 10
+                       :style {:outline "none"}
                        })))
 
 (rum/defcs paginated-stream  < rum/static
