@@ -64,6 +64,7 @@
               [:div.press-kit-intro-footer-right
                 "Carrot logo assets. Light, dark, and the Carrot icon."
                 [:a
+                  {:href "https://carrot-press-kit.s3.amazonaws.com/Carrot-Logo.zip"}
                   "Download"]]]
             [:div.press-kit-intro-footer
               [:div.press-kit-intro-footer-left
@@ -71,6 +72,7 @@
               [:div.press-kit-intro-footer-right
                 "Press-friendly product screenshots."
                 [:a
+                  {:href "https://carrot-press-kit.s3.amazonaws.com/screenshots.zip"}
                   "Download"]]]]]
 
         (shared/dashed-string 1)
