@@ -460,6 +460,8 @@
       (dispatch-expo-push-token push-token)
       ;; Novel push token, add it to the Auth service for storage
       (when (and add-token-link push-token)
+        ;; Immediately dispatch placeholder token so we don't wait on network request
+        (dispatch-expo-push-token "PENDING_PUSH_TOKEN")
         (api/add-expo-push-token
          add-token-link
          push-token
