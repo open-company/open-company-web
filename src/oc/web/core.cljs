@@ -500,6 +500,16 @@
                           urls/native-login
                           urls/home)))
 
+    (defroute apps-detect-route urls/apps-detect {:as params}
+      (timbre/info "Routing apps-detect-route" urls/apps-detect)
+      (router/redirect!
+       (cond
+        ua/mac? ls/mac-app-url
+        ua/windows? ls/win-app-url
+        ua/ios? ls/iphone-app-url
+        ua/android? ls/android-app-url
+        :else oc-urls/home)))
+
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
       (org-handler "org" target org-dashboard params))

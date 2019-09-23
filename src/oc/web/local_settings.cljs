@@ -74,3 +74,8 @@
 
 ;; Image upload limit
 (def file-upload-size (* 20 1024 1024))
+
+(def mac-app-url "https://github.com/open-company/open-company-web/releases/download/untagged-a060f76d2ed11d47ff35/Carrot.dmg")
+(def win-app-url "https://github.com/open-company/open-company-web/releases/download/untagged-a060f76d2ed11d47ff35/Carrot.exe")
+(def iphone-app-url "https://")
+(def android-app-url "https://play.google.com/apps/testing/io.carrot.mobile")

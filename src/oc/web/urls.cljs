@@ -87,6 +87,8 @@
 
 (def login-wall "/login-wall")
 
+(def apps-detect "/apps/detect")
+
 ;; Organizations
 
 (defn org
