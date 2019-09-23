@@ -245,7 +245,10 @@
                    (not= (:user-id change-data) (jwt/user-id)))
           (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
         (when (= change-type :delete)
-          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
+          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))
+        (when (= change-type :move)
+          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data])
+          (section-change section-uuid))))))
 
 (defn ws-interaction-subscribe []
   (ws-ic/subscribe :interaction-comment/add
