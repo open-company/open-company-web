@@ -9,7 +9,7 @@
       [:section.cta.group
 
         [:h1.headline
-          "Clear communication for remote team"]
+          "Clear communication for remote teams"]
         [:div.subheadline
           (str
            "Carrot organizes team communication so it’s easier to stay "

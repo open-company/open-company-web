@@ -489,14 +489,14 @@
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      "Simple pricing"]
+      "Simple pricing for remote team communication"]
 
     [:div.pricing-subheadline
       "Questions? "
       [:a.chat-with-us
         {:class "intercom-chat-link"
          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-        "Chat with us about Carrot"]]
+        "Let's chat"]]
 
     pricing-table
     
