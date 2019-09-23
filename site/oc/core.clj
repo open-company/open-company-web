@@ -66,9 +66,8 @@
           "Home"]]
       [:div.site-mobile-menu-item
         [:a
-          {:href "/about"
-           :class (when (= active-page "about") "active")}
-          "About"]]
+          {:href "/apps/detect"}
+          "App"]]
       [:div.site-mobile-menu-item
         [:a
           {:href "/pricing"
