@@ -36,7 +36,7 @@
     ;; Update together with resources/public/lib/jwt_decode/
     [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     ;; -----------------------------------------------------
-    [cljsjs/sentry-browser "5.4.3-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/sentry-browser
+    [cljsjs/sentry-browser "5.6.2-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/sentry-browser
     [cljsjs/medium-editor "5.23.2-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
     [cljsjs/clipboard "1.6.1-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
@@ -48,7 +48,7 @@
     [cljsjs/react-giphy-selector "0.0.3-0"] ;; A very customizable react search component for picking the perfect giphy. https://github.com/tshaddix/react-giphy-selector
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.16" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
+    [open-company/lib "0.17.18-alpha" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
