@@ -82,10 +82,8 @@
         "Get started for free"]]])
 
 (defn nav
-  "Static hiccup for the site header. This is a copy of oc.web.components.ui.site-header
-   and every change here should be reflected there."
+  "Static hiccup for the site header."
   [active-page]
-  ;; NB: copy of oc.web.components.ui.site-header, every change should be reflected there and vice-versa
   (let [is-slack-lander? (= active-page "slack-lander")
         is-slack-page? (= active-page "slack")
         site-navbar-container (if is-slack-lander?
@@ -173,10 +171,8 @@
           {:onClick "javascript:OCStaticSiteMobileMenuToggle();"}]]]))
 
 (defn footer
-  "Static hiccup for the site footer. This is a copy of oc.web.components.ui.site-footer
-   and every change here should be reflected there."
+  "Static hiccup for the site footer."
   [page]
-  ;; NB: copy of oc.web.components.ui.site-footer, every change should be reflected there and vice-versa
   [:footer.navbar.navbar-default.navbar-bottom
     [:div.container-fluid.group
       [:div.right-column.group
