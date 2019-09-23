@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [dommy.core :as dommy :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as rutils]
             [oc.web.router :as router]
@@ -72,18 +73,32 @@
     (did-scroll s nil)))
 
 (rum/defc wrapped-stream-item < rum/static
-  [{:keys [key style]} entry reads-data]
-  [:div
-   {:style style}
-   (stream-item entry reads-data)])
+  [{:keys [key style] :as row-props}
+   {:keys [entry
+           reads-data
+           org-data
+           comments-data
+           editable-boards] :as props}]
+  (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
+                       (activity-utils/is-published? entry))]
+   [:div
+    {:style style}
+    (stream-item {:activity-data entry
+                  :comments-data comments-data
+                  :read-data reads-data
+                  :show-wrt? show-wrt?
+                  :editable-boards editable-boards})]))
 
 (rum/defc virtualized-stream < rum/static
-  [items activities-read props]
+  [{:keys [items
+           activities-read]
+    :as derivatives}
+   virtualized-props]
   (let [{:keys [height
                 isScrolling
                 onChildScroll
                 scrollTop
-                registerChild]} (js->clj props :keywordize-keys true)
+                registerChild]} (js->clj virtualized-props :keywordize-keys true)
         row-renderer (fn [row-props]
                        (let [{:keys [key
                                      index
@@ -93,7 +108,9 @@
                              entry (nth items index)
                              reads-data (get activities-read (:uuid entry))]
                          (rum/with-key
-                           (wrapped-stream-item row-props entry reads-data)
+                           (wrapped-stream-item row-props (merge derivatives
+                                                                 {:entry entry
+                                                                  :reads-data reads-data}))
                            (str "stream-item-" key))))]
     (virtualized-list {:autoHeight true
                        :height height
@@ -112,9 +129,12 @@
 (rum/defcs paginated-stream  < rum/static
                                rum/reactive
                         ;; Derivatives
+                        (drv/drv :org-data)
                         (drv/drv :filtered-posts)
                         (drv/drv :container-data)
                         (drv/drv :activities-read)
+                        (drv/drv :comments-data)
+                        (drv/drv :editable-boards)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local (.-scrollTop (.-scrollingElement js/document)) ::last-scroll)
@@ -151,7 +171,10 @@
                             (events/unlistenByKey @(::scroll-listener s)))
                           s)}
   [s]
-  (let [container-data (drv/react s :container-data)
+  (let [org-data (drv/react s :org-data)
+        comments-data (drv/react s :comments-data)
+        editable-boards (drv/react s :editable-boards)
+        container-data (drv/react s :container-data)
         items (drv/react s :filtered-posts)
         activities-read (drv/react s :activities-read)]
     [:div.paginated-stream.group
@@ -159,7 +182,11 @@
         [:div.paginated-stream-cards-inner.group
          (window-scroller
           {}
-          (partial virtualized-stream items activities-read))]
+          (partial virtualized-stream {:org-data org-data
+                                       :comments-data comments-data
+                                       :items items
+                                       :activities-read activities-read
+                                       :editable-boards editable-boards}))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Loading more posts..."])

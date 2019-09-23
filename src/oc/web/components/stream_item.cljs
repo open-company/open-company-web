@@ -44,15 +44,13 @@
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (defn- item-mounted [s]
-  (let [activity-data (first (:rum/args s))
-        comments-data @(drv/get-ref s :comments-data)]
+  (let [activity-data (-> s :rum/args first :activity-data)
+        comments-data (-> s :rum/args first :comments-data)]
     (comment-actions/get-comments-if-needed activity-data comments-data)))
 
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
-                         (drv/drv :org-data)
-                         (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
                          (drv/drv :show-post-added-tooltip)
                          ;; Locals
@@ -60,7 +58,7 @@
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (when-not ua/edge?
-                           (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3)))
+                           #_(am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3)))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
@@ -71,13 +69,9 @@
                           :did-remount (fn [_ s]
                            (item-mounted s)
                            s)}
-  [s activity-data read-data]
-  (let [org-data (drv/react s :org-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
         current-user-id (jwt/user-id)
-        ;; Fallback to the activity inline comments if we didn't load
-        ;; the full comments just yet
-        _ (drv/react s :comments-data)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         dom-element-id (str "stream-item-" (:uuid activity-data))
@@ -96,9 +90,6 @@
                         :height @(::mobile-video-height s)}
                        {:width 136
                         :height (utils/calc-video-height 136)}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
-        should-show-wrt (and user-is-part-of-the-team
-                             is-published?)
         ;; Add NEW tag besides comment summary
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
@@ -178,13 +169,16 @@
         [:div.activity-share-container]
         (when (and is-published?
                    (not is-mobile?))
-          (more-menu activity-data dom-element-id
-           {:external-share (not is-mobile?)
-            :external-follow-up (not is-mobile?)
-            :show-edit? true
-            :show-delete? true
-            :show-move? (not is-mobile?)
-            :assigned-follow-up-data assigned-follow-up-data}))]
+          (more-menu
+            {:entity-data activity-data
+             :share-container-id dom-element-id
+             :editable-boards editable-boards
+             :external-share (not is-mobile?)
+             :external-follow-up (not is-mobile?)
+             :show-edit? true
+             :show-delete? true
+             :show-move? (not is-mobile?)
+             :assigned-follow-up-data assigned-follow-up-data}))]
       [:div.must-see-tag.mobile-only]
       [:div.follow-up-tag.mobile-only]
       [:div.new-tag.mobile-only "NEW"]
@@ -233,10 +227,12 @@
               [:div.stream-item-footer-mobile-group
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
-                  (comments-summary activity-data has-new-comments?)]
+                  (comments-summary {:entry-data activity-data
+                                     :comments-data comments-data
+                                     :show-new-tag? has-new-comments?})]
                 (when-not is-mobile?
                   (reactions activity-data))
-                (when should-show-wrt
+                (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
                     (when show-post-added-tooltip?
@@ -250,7 +246,8 @@
                         [:button.mlb-reset.post-added-tooltip-bt
                           {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                           "OK, got it"]])
-                    (wrt-count activity-data read-data)])
+                    (wrt-count {:activity-data activity-data
+                                :reads-data read-data})])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
