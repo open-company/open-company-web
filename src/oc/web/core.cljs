@@ -508,7 +508,7 @@
         ua/windows? ls/win-app-url
         ua/ios? ls/iphone-app-url
         ua/android? ls/android-app-url
-        :else oc-urls/home)))
+        :else urls/home)))
 
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
