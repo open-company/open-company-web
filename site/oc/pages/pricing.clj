@@ -11,7 +11,7 @@
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Organized communication keeps remote teams in sync"]
+          "Simple pricing for remote team communication"]
 
         shared/pricing-table
         

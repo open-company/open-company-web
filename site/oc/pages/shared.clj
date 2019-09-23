@@ -308,15 +308,17 @@
                   "Threaded comments make it easy for your team to stay engaged "
                   "asynchronously. Ideal for remote teams.")
                  (= block :analytics)
-                 "Carrot works in the background to make sure everyone sees what matters"
+                 "Carrot works in the background to make sure everyone sees what matters."
                  (= block :follow-ups)
-                 "When you need a reply or feedback from your team, Carrot makes sure they'll follow up."
+                 (str
+                  "When you’re looking for a reply, or want to guarantee nobody misses your post, "
+                  "request a follow-up. Carrot reminds anyone that misses it to improve engagement.")
                  (= block :stay-in-sync)
                  "Everyone gets a daily, personalized summary of what's important."
                  (= block :stay-in-sync-slack)
                  "Everyone gets a daily, personalized summary of what's important."
                  (= block :share-to-slack)
-                 "Your Carrot posts are automatically shared to the right Slack #channel")
+                 "Your Carrot posts are automatically shared to the right Slack #channel.")
         screenshot-num (cond
                         (= block :thoughtful-communication)
                         1
@@ -391,7 +393,9 @@
           [:div.testimonials-floated-header
             "Request a follow-up"]
           [:div.testimonials-floated-subheader
-            "When you need a reply or feedback from your team, Carrot makes sure they'll follow up."]]]
+            (str
+             "When you’re looking for a reply, or want to guarantee nobody misses your post, "
+             "request a follow-up. Carrot reminds anyone that misses it to improve engagement.")]]]
 
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
@@ -401,7 +405,7 @@
           [:div.testimonials-floated-header
             "Know who saw your update"]
           [:div.testimonials-floated-subheader
-            "Carrot works in the background to make sure everyone sees what matters"]]]]
+            "Carrot works in the background to make sure everyone sees what matters."]]]]
     (if (= page :slack)
       (testimonials-screenshot-block :conversation "mobile-only")
       (testimonials-screenshot-block :analytics "mobile-only"))
@@ -412,7 +416,7 @@
       [:div.testimonals-commgaps-header
         "Close communication gaps"]
       [:div.testimonals-commgaps-subheader
-        "Carrot makes sure everyone will see what matters."]
+        "Your team stays engaged and informed no matter where they are."]
       [:div.testimonials.commgaps-block-inner.group
         [:div.testimonials-commgaps-column.left-column
           (if (= page :slack)
@@ -433,7 +437,7 @@
           [:div.testimonials-commgaps-column-header
             "Auto-share posts to Slack"]
           [:div.testimonials-commgaps-column-subheader
-            "Your Carrot posts are automatically shared to the right Slack #channel"]]]]
+            "Your Carrot posts are automatically shared to the right Slack #channel."]]]]
     (testimonial-block :blend-labs "mobile-only")
 
     (dashed-string 6)
