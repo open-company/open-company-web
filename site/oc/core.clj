@@ -109,21 +109,21 @@
               [:div.app-items-group
                 "Desktop apps"]
               [:a.app-item
-                {:href "/app/mac"}
+                {:href "/apps/mac"}
                 [:span "Mac"]
                 [:span.beta "BETA"]]
               [:a.app-item
-                {:href "/app/win"}
+                {:href "/apps/win"}
                 [:span "Windows"]
                 [:span.beta "BETA"]]
               [:div.app-items-group
                 "Mobile apps"]
               [:a.app-item
-                {:href "/app/android"}
+                {:href "/apps/android"}
                 [:span "Android"]
                 [:span.beta "BETA"]]
               [:a.app-item
-                {:href "/app/iphone"}
+                {:href "/apps/iphone"}
                 [:span "iPhone"]
                 [:span.beta "BETA"]]]]
           [:a
