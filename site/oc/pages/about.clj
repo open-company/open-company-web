@@ -100,11 +100,7 @@
                 [:a
                   {:href "https://github.com/open-company"
                    :target "_blank"}
-                   "Build with us on GitHub"]
-                [:a
-                  {:href "https://trello.com/b/eKs2LtLu/carrot-roadmap-https-carrotio"
-                   :target "_blank"}
-                   "View our roadmap"]]]]]]
+                   "Build with us on GitHub"]]]]]]
 
     (shared/dashed-string 1)
 

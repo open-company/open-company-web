@@ -65,14 +65,6 @@
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
-(def oc-twitter "https://twitter.com/carrot_hq")
-
-(def oc-facebook "https://www.facebook.com/Carrot-111981319388047/")
-
-(def oc-github "https://github.com/open-company")
-
-(def oc-trello-public "https://trello.com/b/eKs2LtLu")
-
 (def subscription-callback "/subscription-completed")
 
 (def email-confirmation "/verify")
