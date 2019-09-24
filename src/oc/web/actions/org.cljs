@@ -150,6 +150,7 @@
                                               (= (:uuid %) (router/current-board-slug))) boards))]
         ; Load the board data since there is a link to the board in the org data
         (do
+          ;; Rewrite the URL in case it's using the board UUID instead of the slug
           (when (= (:uuid board-data) (router/current-board-slug))
             (router/rewrite-board-uuid-as-slug (router/current-board-slug) (:slug board-data)))
           (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
