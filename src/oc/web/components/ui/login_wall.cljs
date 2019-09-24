@@ -48,7 +48,7 @@
               [:div.login-overlay-cta.group
                 [:button.mlb-reset.top-back-button
                   {:on-touch-start identity
-                   :on-click #(user-actions/show-login nil)
+                   :on-click #(router/nav! oc-urls/home)
                    :aria-label "Back"}]
                 [:div.login-title (or title default-title)]
                 [:button.mlb-reset.top-continue

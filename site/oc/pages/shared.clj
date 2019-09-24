@@ -484,8 +484,9 @@
     [:div.pricing-header-footer-logo]
     [:div.pricing-header-footer-subheadline
       "Have a team of 250+? "
-      [:a
-        {:href "/pricing"}
+      [:a.chat-with-us
+        {:class "intercom-chat-link"
+         :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
         "Let’s chat"]
       " about our Enterprise plan."]])
 

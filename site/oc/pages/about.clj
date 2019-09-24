@@ -73,6 +73,22 @@
             [:img.team-section-icon
               {:src (shared/cdn "/img/ML/team_section_8.png")
                :srcSet (str (shared/cdn "/img/ML/team_section_8@2x.png") " 2x")}]]
+
+          [:div.team-section-bottom-copy
+            [:div.team-section-bottom-copy-row.group
+              [:div.team-section-bottom-copy-left
+                "Distributed by design"]
+              [:div.team-section-bottom-copy-right
+                [:div.team-section-bottom-copy-description
+                  (str
+                   "Want to join us? We are always looking for "
+                   "amazing people regardless of where they "
+                   "call home.")]
+                [:a
+                  {:href "https://github.com/open-company"
+                   :target "_blank"}
+                   "Say hello"]]]]
+
           [:div.team-section-bottom-copy
             [:div.team-section-bottom-copy-row.group
               [:div.team-section-bottom-copy-left
@@ -88,23 +104,7 @@
                 [:a
                   {:href "https://trello.com/b/eKs2LtLu/carrot-roadmap-https-carrotio"
                    :target "_blank"}
-                   "View our roadmap"]]]]
-
-
-          [:div.team-section-bottom-copy
-            [:div.team-section-bottom-copy-row.group
-              [:div.team-section-bottom-copy-left
-                "Distributed by design"]
-              [:div.team-section-bottom-copy-right
-                [:div.team-section-bottom-copy-description
-                  (str
-                   "Want to join us? We are always looking for "
-                   "amazing people regardless of where they "
-                   "call home.")]
-                [:a
-                  {:href "https://github.com/open-company"
-                   :target "_blank"}
-                   "Say hello"]]]]]]
+                   "View our roadmap"]]]]]]
 
     (shared/dashed-string 1)
 
