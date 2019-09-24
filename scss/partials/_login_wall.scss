@@ -156,7 +156,7 @@ div.login-wall-container {
               top: 12px;
               right: 24px;
 
-              &.disabled {
+              &.disabled, &:disabled {
                 background-color: $light_ui_grey;
                 opacity: 1;
               }
@@ -319,7 +319,7 @@ div.login-wall-container {
           line-height: 23px;
           border-radius: 6px;
 
-          &.disabled {
+          &.disabled, &:disabled {
             background-color: $light_ui_grey;
           }
         }

@@ -21,12 +21,10 @@
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
         login-enabled (and auth-settings
-                           (not (nil?
-                            (utils/link-for
-                             (:links auth-settings)
-                             "authenticate"
-                             "GET"
-                             {:auth-source "email"}))))
+                           (seq (utils/link-for (:links auth-settings) "authenticate" "GET"
+                            {:auth-source "email"}))
+                           (seq @(::email s))
+                           (seq @(::pswd s)))
         login-action #(when login-enabled
                         (.preventDefault %)
                         (user-actions/maybe-save-login-redirect)
@@ -129,9 +127,7 @@
                 [:button.mlb-reset.continue-btn
                   {:aria-label "Login"
                    :class (when-not login-enabled "disabled")
-                   :on-click login-action
-                   :disabled (or (not (seq @(::email s)))
-                                 (not (seq @(::pswd s))))}
+                   :on-click login-action}
                   "Continue"]
                 [:div.footer-link
                   "Don't have an account yet?"
