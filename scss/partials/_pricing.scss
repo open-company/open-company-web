@@ -262,6 +262,7 @@ div.pricing-wrap {
         div.pricing-faq-question-block {
           margin: 40px 0;
           border-top: 1px solid $more_ultra_light_grey;
+          padding: 40px 0 0;
 
           @include mobile() {
             margin-top: 24px;
