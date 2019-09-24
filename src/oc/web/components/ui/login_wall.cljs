@@ -12,7 +12,7 @@
             [oc.shared.useragent :as ua]
             [oc.web.expo :as expo]))
 
-(def default-title "Please log in to continue")
+(def default-title "Login to Carrot")
 (def default-desc "You need to be logged in to view a post.")
 
 (rum/defcs login-wall < rum/reactive
@@ -50,11 +50,8 @@
                   {:on-touch-start identity
                    :on-click #(router/redirect! oc-urls/home)
                    :aria-label "Back"}]
-                [:div.login-title (or title default-title)]
-                [:button.mlb-reset.top-continue
-                  {:aria-label "Login"
-                   :class (when-not login-enabled "disabled")
-                   :on-click login-action}]]
+                [:div.login-logo.mobile-only]
+                [:div.login-title (or title default-title)]]
               (when (seq (or desc default-desc))
                 [:div.login-description (or desc default-desc)])
               [:button.mlb-reset.signup-with-slack
@@ -84,7 +81,7 @@
                   {:aria-label "google"}]
                   "Continue with Google "]]
               [:div.or-login
-                [:div.or-login-copy "Or, sign in with email"]]
+                [:div.or-login-copy "Or, login with email"]]
               ;; Email fields
               [:div.group
                 ;; Error messages
@@ -137,7 +134,7 @@
                      :on-click login-action
                      :disabled (or (not (seq @(::email s)))
                                    (not (seq @(::pswd s))))}
-                    "Continue"]
+                    "Login"]
                   [:div.footer-link
                     "Don't have an account yet?"
                     [:a

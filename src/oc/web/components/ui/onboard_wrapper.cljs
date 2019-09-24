@@ -57,10 +57,11 @@
     [:div.onboard-lander.lander
       [:div.main-cta
         [:div.mobile-header
-          [:button.mlb-reset.top-back-button
-            {:on-touch-start identity
-             :on-click #(router/history-back!)
-             :aria-label "Back"}]
+          (when-not ua/mobile-app?
+            [:button.mlb-reset.top-back-button
+              {:on-touch-start identity
+               :on-click #(router/history-back!)
+               :aria-label "Back"}])
           [:div.mobile-logo]]
         [:div.title.main-lander
           "Create an account"]]

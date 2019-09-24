@@ -227,7 +227,7 @@
       [:div.ph-banner-cat]
       [:div.ph-banner-copy
         [:span.heavy "Hello Product Hunter! "]
-        " We can't wait to hear what you think about our new Remove Team edition."]]
+        " We can't wait to hear what you think about Carrot 2.0."]]
     [:div.ph-banner-opac-bg]
     [:button.mlb-reset.ph-banner-close-button
       {:onclick "OCStaticHidePHBanner();"}]])
