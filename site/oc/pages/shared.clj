@@ -487,8 +487,7 @@
       [:a.chat-with-us
         {:class "intercom-chat-link"
          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-        "Let’s chat"]
-      " about our Enterprise plan."]])
+        "Let’s chat about our Enterprise plan."]]])
 
 (def pricing-footer
   [:section.pricing-footer
