@@ -329,7 +329,7 @@
                         (= block :follow-ups)
                         4
                         (= block :stay-in-sync)
-                        2
+                        5
                         (= block :stay-in-sync-slack)
                         7
                         (= block :share-to-slack)
