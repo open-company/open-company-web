@@ -341,7 +341,7 @@
       [:div.testimonials-screenshot-subheader
         subline]
       [:img.testimonials-screenshot.mobile-only
-        {:src (cdn (str "/img/ML/testimonials_screenshot_" screenshot-num ".png"))
+        {:src (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num ".png"))
          :srcSet (str
                   (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@2x.png")) " 2x, "
                   (cdn (str "/img/ML/testimonials_screenshot_mobile_" screenshot-num "@3x.png")) " 3x, "
@@ -483,11 +483,11 @@
   [:div.pricing-header-footer
     [:div.pricing-header-footer-logo]
     [:div.pricing-header-footer-subheadline
-      "Have a team of 250+? Learn more about our "
+      "Have a team of 250+? "
       [:a
         {:href "/pricing"}
-        "Enterprise plan"]
-      "."]])
+        "Let’s chat"]
+      " about our Enterprise plan."]])
 
 (def pricing-footer
   [:section.pricing-footer

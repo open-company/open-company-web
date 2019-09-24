@@ -241,6 +241,11 @@ div.about-wrap {
         div.team-section-icons {
           width: 100%;
           text-align: center;
+          margin-bottom: 80px;
+
+          @include mobile() {
+            margin-bottom: 24px;
+          }
 
           img.team-section-icon {
             width: 72px;
@@ -255,8 +260,21 @@ div.about-wrap {
           margin: 40px auto 0;
           position: relative;
 
+          &:first-of-type {
+            margin: 80px auto 0;
+          }
+
+          @include mobile() {
+            margin: 24px auto 0;
+          }
+
           div.team-section-bottom-copy-row {
             border-top: 1px solid $more_ultra_light_grey;
+            padding-top: 40px;
+
+            @include mobile() {
+              padding-top: 24px;
+            }
 
             div.team-section-bottom-copy-left {
               float: left;
@@ -285,22 +303,15 @@ div.about-wrap {
                 margin-top: 8px;
               }
 
-              @include mobile() {
-                span.link-or {
-                  display: none;
-                }
+              a {
+                display: block;
+                margin-top: 16px;
 
-                a {
-                  // float: left;
-                  // width: 100%;
-                  display: block;
-                  margin-top: 16px;
-
-                  &:nth-child(2){
-                    margin-top: 24px;
-                  }
+                @include mobile() {
+                  margin-top: 8px;
                 }
               }
+
 
               div.team-section-bottom-copy-description {
                 @include OC_Body_Book();

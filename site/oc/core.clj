@@ -67,7 +67,7 @@
       [:div.site-mobile-menu-item
         [:a
           {:href "/apps/detect"}
-          "App"]]
+          "Get the mobile app"]]
       [:div.site-mobile-menu-item
         [:a
           {:href "/pricing"
@@ -156,7 +156,7 @@
 
         ;; Mobile
         (cond
-          (or is-slack-page? is-slack-lander?)
+          is-slack-lander?
           [:div.site-navbar-right.mobile-only
             [:a.signup.continue-with-slack
               {:id "site-header-login-item"

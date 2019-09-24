@@ -42,22 +42,7 @@
             [:p
               (str
                "The result is Carrot - a platform for must-see communication that keeps "
-               "everyone focused on what matters to build transparency, trust, and stronger teams.")]]
-
-          [:div.about-bottom-copy
-            [:div.about-bottom-copy-row.group
-              [:div.about-bottom-copy-left
-                "Distributed by design."]
-              [:div.about-bottom-copy-right
-                [:div.about-bottom-copy-description
-                  (str
-                   "Want to join us? We are always looking for "
-                   "amazing people regardless of where they "
-                   "call home.")]
-                [:a
-                  {:class "intercom-chat-link"
-                   :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-                   "Say hello"]]]]]]
+               "everyone focused on what matters to build transparency, trust, and stronger teams.")]]]]
 
       [:section.team-section
         [:div.team-section-block
@@ -103,7 +88,23 @@
                 [:a
                   {:href "https://trello.com/b/eKs2LtLu/carrot-roadmap-https-carrotio"
                    :target "_blank"}
-                   "View our roadmap"]]]]]]
+                   "View our roadmap"]]]]
+
+
+          [:div.team-section-bottom-copy
+            [:div.team-section-bottom-copy-row.group
+              [:div.team-section-bottom-copy-left
+                "Distributed by design"]
+              [:div.team-section-bottom-copy-right
+                [:div.team-section-bottom-copy-description
+                  (str
+                   "Want to join us? We are always looking for "
+                   "amazing people regardless of where they "
+                   "call home.")]
+                [:a
+                  {:href "https://github.com/open-company"
+                   :target "_blank"}
+                   "Say hello"]]]]]]
 
     (shared/dashed-string 1)
 
