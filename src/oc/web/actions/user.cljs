@@ -75,9 +75,13 @@
      (entry-point-get-finished success body
        (fn [orgs collection]
          (if org-slug
-           (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-             ;; We got the org we were looking for
-             (org-actions/get-org org-data)
+           (if-let [org-data (first (filter #(or (= (:slug %) org-slug)
+                                                 (= (:uuid %) org-slug)) orgs))]
+             ;; We got the org we were looking for. Possibly redirect if the client
+             ;; used org uuid in token.
+             (if (= (:uuid org-data) org-slug)
+               (router/rewrite-org-uuid-as-slug org-slug (:slug org-data))
+               (org-actions/get-org org-data))
              (if (router/current-secure-activity-id)
                (activity-actions/secure-activity-get
                 #(comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
