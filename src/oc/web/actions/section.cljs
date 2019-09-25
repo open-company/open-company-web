@@ -277,15 +277,17 @@
          (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
 
-(defn section-more-finish [direction {:keys [success body]}]
+(defn section-more-finish [board-slug sort-type direction {:keys [success body]}]
   (when success
     (request-reads-count (json->cljs body)))
-  (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) (router/current-board-slug)
-   direction (router/current-sort-type) (when success (json->cljs body))]))
+  (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) board-slug
+   direction sort-type (when success (json->cljs body))]))
 
 (defn section-more [more-link direction]
-  (api/load-more-items more-link direction (partial section-more-finish direction))
-  (dispatcher/dispatch! [:section-more (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)]))
+  (let [board-slug (router/current-board-slug)
+        sort-type (router/current-sort-type)]
+    (api/load-more-items more-link direction (partial section-more-finish board-slug sort-type direction))
+    (dispatcher/dispatch! [:section-more (router/current-org-slug) board-slug sort-type])))
 
 (defn setup-section-editing [section-slug]
   (when-let [board-data (dispatcher/board-data (router/current-org-slug) section-slug)]

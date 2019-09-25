@@ -55,18 +55,6 @@
       (user-actions/deny-push-notification-permission))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Handling of user tapping on push notification
-
-(defn- ^:export on-push-notification-tapped
-  "Callback for responding to the user tapping on a native push notification. Response contains
-  a push notification payload, which is literally a Carrot notification map."
-  [json-str]
-  (when-let [notification (parse-bridge-data json-str)]
-    (let [fixed-notif (user-utils/fix-notification notification)
-          click-handler (:click fixed-notif)]
-      (click-handler))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
 
 (def ^:private deep-link-origin (atom nil))
