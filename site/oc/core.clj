@@ -108,21 +108,21 @@
               [:a.app-item
                 {:href "/apps/mac"}
                 [:span "Mac"]
-                [:span.beta "BETA"]]
+                [:span.beta-app-label "BETA"]]
               [:a.app-item
                 {:href "/apps/win"}
                 [:span "Windows"]
-                [:span.beta "BETA"]]
+                [:span.beta-app-label "BETA"]]
               [:div.app-items-group
                 "Mobile apps"]
               [:a.app-item
                 {:href "/apps/android"}
                 [:span "Android"]
-                [:span.beta "BETA"]]
+                [:span.beta-app-label "BETA"]]
               [:a.app-item
                 {:href "/apps/iphone"}
                 [:span "iPhone"]
-                [:span.beta "BETA"]]]]
+                [:span.beta-app-label "BETA"]]]]
           [:a
             {:href "/pricing"
              :class (when (= active-page "pricing") "active")}

@@ -433,18 +433,6 @@ nav.site-navbar {
               line-height: 23px;
               color: $deep_navy;
             }
-
-            span.beta {
-              margin-left: 8px;
-              padding: 2px 6px;
-              border-radius: 4px;
-              background-color: $grey_num_5;
-              height: 18px;
-              @include OC_Body_Bold();
-              line-height: 14px;
-              font-size: 11px;
-              color: rgba($light_navy, 0.5);
-            }
           }
         }
       }

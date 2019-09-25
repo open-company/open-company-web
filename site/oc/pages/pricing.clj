@@ -38,13 +38,15 @@
             [:img.pricing-apps-app-screenshot
               {:src (shared/cdn "/img/ML/pricing_apps_desktop.png")
                :srcSet (str (shared/cdn "/img/ML/pricing_apps_desktop@2x.png") " 2x")}]
-            [:div.pricing-apps-app-links
+            [:div.pricing-apps-app-links.mac-and-windows
               [:a.mac-icon
                 {:href "/apps/mac"}
-                "Mac"]
+                "Mac"
+                [:span.beta-app-label "BETA"]]
               [:a.win-icon
                 {:href "/apps/windows"}
-                "Windows"]]]
+                "Windows"
+                [:span.beta-app-label "BETA"]]]]
           [:div.pricing-apps-separator]
           [:div.pricing-apps-app-block
             [:div.pricing-apps-app-header
@@ -59,7 +61,8 @@
               " & "
               [:a
                 {:href "/apps/android"}
-                "Android"]]]]]
+                "Android"]
+              [:span.beta-app-label "BETA"]]]]]
 
       [:section.pricing-apps.mobile-only
         [:div.pricing-apps-block.group
@@ -69,7 +72,8 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/apps/detect"}
-                "Download from the App store"]]
+                "Download the app"
+                [:span.beta-app-label "BETA"]]]
             [:img.pricing-apps-mobile-screenshot
               {:src (shared/cdn "/img/ML/pricing_apps_mobile_mobile.png")
                :srcSet (str

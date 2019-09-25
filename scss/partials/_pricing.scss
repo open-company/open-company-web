@@ -64,7 +64,7 @@ div.pricing-wrap {
     }
 
     section.pricing-apps {
-      padding: 80px 0;
+      padding: 80px 16px;
       background-color: $another_ui_grey;
 
       @include mobile() {
@@ -136,6 +136,11 @@ div.pricing-wrap {
             @include OC_Body_Bold();
             font-size: 18px;
             line-height: 23px;
+
+            &.mac-and-windows {
+              width: 280px;
+              margin-left: -20px;
+            }
 
             @include mobile() {
               margin-top: 10px;
