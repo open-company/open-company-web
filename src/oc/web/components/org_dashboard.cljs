@@ -138,10 +138,11 @@
                              ;; posts data are present
                              (not (nil? posts-data))
                              ;; and
-                             (or ;; the post is not present int he posts list
+                             (or ;; the post is not present in the posts list
                                  (not ((set (keys posts-data)) (router/current-activity-id)))
-                                 ;; the board of the post is wrong
-                                 (not= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug)))))
+                                 ;; the board of the post is wrong (with slug and uuid)
+                                 (and (not= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug)))
+                                      (not= (:board-uuid (get posts-data (router/current-activity-id)) (router/current-board-slug))))))
         show-login-wall (and (not jwt)
                              (or force-login-wall
                                  (and (router/current-activity-id)
