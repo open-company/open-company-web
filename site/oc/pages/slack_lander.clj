@@ -19,7 +19,8 @@
           "Carrot makes it simple for Slack teams to stay aligned around what matters most."]
 
         [:a.continue-with-slack-bt
-          {:href (env :slack-signup-url)}]
+          {:id "get-started-centred-bt"
+           :href (env :slack-signup-url)}]
 
         shared/slack-hero-screenshot
 
