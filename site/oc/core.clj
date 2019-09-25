@@ -120,7 +120,7 @@
                 [:span "Android"]
                 [:span.beta-app-label "BETA"]]
               [:a.app-item
-                {:href "/apps/iphone"}
+                {:href "/apps/ios"}
                 [:span "iPhone"]
                 [:span.beta-app-label "BETA"]]]]
           [:a
