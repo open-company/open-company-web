@@ -7,7 +7,6 @@
   [:div.press-kit-wrap
     {:id "wrap"}
     [:div.main.press-kit
-      shared/animation-lightbox
       [:section.cta.group
 
         [:h1.headline

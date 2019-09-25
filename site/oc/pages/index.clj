@@ -18,7 +18,7 @@
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Create your team"]
+            "Start your free trial"]
           [:span.get-started-subtitle
             "Free 14 day trial. No credit card required."]]
 

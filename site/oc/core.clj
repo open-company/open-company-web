@@ -79,7 +79,7 @@
         "Login"]
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
-        "Get started for free"]]])
+        "Start your free trial"]]])
 
 (defn nav
   "Static hiccup for the site header."

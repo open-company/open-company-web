@@ -114,24 +114,9 @@ function OCWebSetupStaticPagesJS(){
     switchFn();
   })
   $("button.keep-aligned-section-next-bt").on("click", switchFn);
-
-  $("div.pricing-toggle").on("click", function(){
-    var $teamColumn = $("div.pricing-column.team-column");
-    if ($teamColumn.hasClass("monthly")) {
-      $teamColumn.removeClass("monthly");
-      $teamColumn.addClass("annual");
-    } else {
-      $teamColumn.removeClass("annual");
-      $teamColumn.addClass("monthly");
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
-
-  if ($("#youtube-player").length > 0) {
-    OCYTVideoInit();
-  }
 
   if(OCStaticGetParameterByName("ref") === "producthunt"){
     $(document.body).addClass("ph-banner");
@@ -294,71 +279,6 @@ function OCStaticShowPHBanner(){
 
 function OCStaticHidePHBanner(){
   $(document.body).removeClass("ph-banner");
-}
-
-var OCYTVideoPlayer = null,
-OCYTVideoFinished = false,
-OCUTVScriptAdded = false;
-
-function OCYTVideoInit() {
-  if (!OCUTVScriptAdded) {
-    OCUTVScriptAdded = true;
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  }
-}
-
-function onYouTubeIframeAPIReady() {
-  var winWidth = document.documentElement.clientWidth || window.innerWidth,
-  winHeight = document.documentElement.clientHeight || window.innerHeight;
-  OCYTVideoPlayer = new YT.Player('youtube-player', {
-    height: Math.min(winHeight, 608).toString(),
-    width: Math.min(winWidth, 1080).toString(),
-    videoId: 'dMWpnHxQMP4',
-    allowsInlineMediaPlayback: 'TRUE',
-    allowfullscreen: 'true',
-    playerVars: {
-        showinfo: 0,
-        rel: 0,
-        playsinline: 1,
-        autoplay: 0
-    },
-    events: {
-      'onReady': OCYTVideoOnPlayerReady,
-      'onStateChange': OCYTVideoOnPlayerStateChange
-    }
-  });
-}
-
-function OCYTVideoOnPlayerReady(event) {
-}
-
-function OCStaticShowAnimationLightbox() {
-  $(document.body).addClass('show-animation-lightbox no-scroll');
-
-  if (OCYTVideoFinished) {
-    OCYTVideoPlayer.seekTo(0);
-    OCYTVideoFinished = false;
-  }
-  OCYTVideoPlayer.playVideo();
-}
-
-function OCYTVideoOnPlayerStateChange(event){
-  if (event.data === 0) {
-    OCYTVideoFinished = true;
-    OCStaticHideAnimationLightbox();
-  }
-}
-
-function OCStaticHideAnimationLightbox(e) {
-  OCYTVideoPlayer.pauseVideo();
-  $(document.body).removeClass('show-animation-lightbox no-scroll');
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
 }
 
 function OCStaticTextareaSaveSelection() {
