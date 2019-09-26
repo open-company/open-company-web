@@ -1,5 +1,6 @@
 div.stream-item {
   width: #{$board_container_width}px;
+  height: #{$foc_height}px;
   margin: 0;
   border-bottom: 1px solid $ultra_light_grey;
   padding: 24px 40px;
@@ -233,6 +234,10 @@ div.stream-item {
   }
 
   div.stream-item-body-ext {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 166px;
     padding: 0px;
     border-radius: 6px;
 
@@ -272,6 +277,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
+      min-height: 110px;
       position: relative;
       cursor: pointer;
 
