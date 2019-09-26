@@ -411,9 +411,7 @@ div.stream-item {
         white-space: pre-wrap;
         word-break: break-word;
 
-        &.no-abstract {
-          max-height: #{24 * 3}px;
-        }
+        max-height: #{24 * 3}px;
 
         @include mobile() {
           margin-top: 4px;
