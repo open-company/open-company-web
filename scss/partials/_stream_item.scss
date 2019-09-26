@@ -390,9 +390,10 @@ div.stream-item {
       }
 
       div.stream-item-headline {
+        height: 27px;
         @include activity-title(24px, 28px);
         color: $deep_navy;
-        display: inline;
+        overflow: hidden;
 
         @include mobile() {
           margin-top: 16px;
