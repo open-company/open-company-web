@@ -146,7 +146,7 @@ div.pricing-wrap {
               margin-top: 10px;
               @include OC_Body_Bold();
               font-size: 20px;
-              line-height: 26px;
+              line-height: 23px;
             }
 
             a {
@@ -158,7 +158,21 @@ div.pricing-wrap {
               @include mobile() {
                 @include OC_Body_Bold();
                 font-size: 20px;
-                line-height: 26px;
+                line-height: 23px;
+                display: block;
+              }
+
+              span.app-lablel {
+                color: $carrot_green;
+                @include OC_Body_Bold();
+                font-size: 18px;
+                line-height: 23px;
+
+                @include mobile() {
+                  @include OC_Body_Bold();
+                  font-size: 20px;
+                  line-height: 23px;
+                }                
               }
 
               &:hover {

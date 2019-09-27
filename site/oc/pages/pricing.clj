@@ -57,11 +57,11 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/apps/ios"}
-                "iOS"]
+                [:span.app-label "iOS"]]
               " & "
               [:a
                 {:href "/apps/android"}
-                "Android"]
+                [:span.app-label "Android"]]
               [:span.beta-app-label "BETA"]]]]]
 
       [:section.pricing-apps.mobile-only
@@ -72,7 +72,7 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/apps/detect"}
-                "Download the app"
+                [:span.app-label "Download the app"]
                 [:span.beta-app-label "BETA"]]]
             [:img.pricing-apps-mobile-screenshot
               {:src (shared/cdn "/img/ML/pricing_apps_mobile_mobile.png")
