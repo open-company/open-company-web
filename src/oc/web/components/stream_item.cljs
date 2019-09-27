@@ -58,7 +58,7 @@
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (when-not ua/edge?
-                           (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 2)))
+                           (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
