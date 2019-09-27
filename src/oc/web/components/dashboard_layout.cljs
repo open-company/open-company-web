@@ -114,15 +114,21 @@
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
-        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)]
+        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
+        show-expanded-post (and current-activity-id
+                                activity-data
+                                (not= activity-data :404)
+                                ;; Do not show the post under the wrong board slug/uuid
+                                (or (= (:board-slug activity-data) (router/current-board-slug))
+                                    (= (:board-uuid activity-data) (router/current-board-slug))))]
       ;; Entries list
       [:div.dashboard-layout.group
-        {:class (when current-activity-id "expanded-post-view")}
+        {:class (when show-expanded-post "expanded-post-view")}
         [:div.dashboard-layout-container.group
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (navigation-sidebar)
           (when (and is-mobile?
-                     (not current-activity-id)
+                     (not show-expanded-post)
                      (or (:collapsed cmail-state)
                          (not cmail-state))
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
@@ -168,7 +174,7 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when-not current-activity-id
+            (when-not show-expanded-post
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}
@@ -249,7 +255,7 @@
                                          "decisions to keep you and your team pulling in the same direction.")
                   is-second-user (= add-post-tooltip :is-second-user)]
               (when (and (not is-drafts-board)
-                         (not current-activity-id)
+                         (not show-expanded-post)
                          add-post-tooltip)
                 [:div.add-post-tooltip-container.group
                   [:button.mlb-reset.add-post-tooltip-dismiss
@@ -279,8 +285,7 @@
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; Expanded post
-              (and current-activity-id
-                   activity-data)
+              show-expanded-post
               (expanded-post)
               ;; Empty board
               empty-board?

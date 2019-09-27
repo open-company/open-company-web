@@ -9,7 +9,8 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.cmail :as cmail-actions]
-            [oc.web.utils.activity :as activity-utils]))
+            [oc.web.utils.activity :as activity-utils]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (def user-avatar-filestack-config
   {:accept "image/*"
@@ -91,10 +92,22 @@
     (let [url (if interaction-uuid
                 (oc-urls/comment-url board-slug entry-uuid interaction-uuid)
                 (oc-urls/entry board-slug entry-uuid))]
-      #(if (seq (get (dis/posts-data) entry-uuid))
-         (router/nav! url)
-         (cmail-actions/get-entry-with-uuid board-slug entry-uuid
-          (fn [s] (when s (router/nav! url))))))))
+      #(if (seq (dis/activity-data entry-uuid))
+        (router/nav! url)
+        (cmail-actions/get-entry-with-uuid board-slug entry-uuid
+         (fn [success status]
+          (if success
+            (router/nav! url)
+            (let [alert-data {:icon "/img/ML/trash.svg"
+                              :action "notification-click-item-load"
+                              :title (if (= status 404) "Post not found" "An error occurred")
+                              :message (if (= status 404)
+                                         "The post you are trying to access it's probably been moved or deleted."
+                                         "Please try again")
+                              :solid-button-title "Ok"
+                              :solid-button-style :red
+                              :solid-button-cb alert-modal/hide-alert}]
+              (alert-modal/show-alert alert-data)))))))))
 
 (defn fix-notification [notification & [unread]]
   (let [board-id (:board-id notification)
