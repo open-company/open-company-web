@@ -13,6 +13,7 @@
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
+            [oc.web.lib.chat :as chat]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
@@ -177,6 +178,7 @@
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
             (oc-urls/all-posts (:slug org-data)))))))
+
   ;; Change service connection
   (when (or (jwt/jwt)
             (jwt/id-token)) ; only for logged in users
@@ -196,6 +198,8 @@
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data)
+  (chat/identify) ; Intercom
+
   ;; Change page title when an org page is loaded
   (set! (.-title js/document) (str "Carrot | " (:name org-data))))
 

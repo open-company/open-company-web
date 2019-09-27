@@ -7,7 +7,7 @@
 (defn identify []
   (when (jwt/get-key :email)
     (timbre/info "Identify user to Intercom")
-    (utils/after 5000 #(do
+    (utils/after 100 #(do
         (let [user (dispatcher/current-user-data)
               org (dispatcher/org-data)]
                 (.Intercom js/window "update"
