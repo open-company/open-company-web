@@ -1,4 +1,7 @@
 div.stream-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: #{$board_container_width}px;
   height: #{$foc_height}px;
   margin: 0;
@@ -237,13 +240,8 @@ div.stream-item {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 166px;
     padding: 0px;
     border-radius: 6px;
-
-    @include mobile() {
-      display: block;
-    }
 
     &.expanded {
       div.thumbnail-container {
@@ -411,7 +409,7 @@ div.stream-item {
         white-space: pre-wrap;
         word-break: break-word;
 
-        max-height: #{24 * 3}px;
+        max-height: #{24 * 2}px;
 
         @include mobile() {
           margin-top: 4px;

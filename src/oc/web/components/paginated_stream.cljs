@@ -24,7 +24,7 @@
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
-(def card-avg-height 220)
+(def foc-height 220)
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -44,7 +44,7 @@
                ;; scroll is moving down
                (= direction :down)
                ;; and the threshold point has been reached
-               (>= scroll-top (- max-scroll (* scroll-card-threshold card-avg-height))))
+               (>= scroll-top (- max-scroll (* scroll-card-threshold foc-height))))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
@@ -114,11 +114,13 @@
                            (str "stream-item-" key))))]
     (virtualized-list {:autoHeight true
                        :height height
-                       :width 720
+                       :width (if responsive/is-tablet-or-mobile?
+                                js/window.innerWidth
+                                720)
                        :isScrolling isScrolling
                        :onScroll onChildScroll
                        :rowCount (count items)
-                       :rowHeight card-avg-height
+                       :rowHeight foc-height
                        :rowRenderer row-renderer
                        :scrollTop scrollTop
                        :ref registerChild
