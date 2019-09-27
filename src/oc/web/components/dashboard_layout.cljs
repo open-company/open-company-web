@@ -280,7 +280,8 @@
               (empty-org)
               ;; Expanded post
               (and current-activity-id
-                   activity-data)
+                   activity-data
+                   (not= activity-data :404))
               (expanded-post)
               ;; Empty board
               empty-board?
