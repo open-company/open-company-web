@@ -381,7 +381,9 @@
         (fn [{:keys [status success body]}]
           (if (and (= status 404)
                    (= (:uuid entry-data) (router/current-activity-id)))
-            (routing-actions/maybe-404)
+            (do
+              (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid entry-data) nil])
+              (routing-actions/maybe-404))
             (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
              nil])))))))
 
