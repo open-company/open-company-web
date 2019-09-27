@@ -113,7 +113,7 @@ div.stream-item {
       display: none;
     }
 
-    div.follow-up-tag {
+    div.follow-up-tag, div.follow-up-tag-small {
       display: inline-block;
     }
   }
@@ -224,9 +224,11 @@ div.stream-item {
 
   @include follow-up-tag();
 
-  div.follow-up-tag, div.must-see-tag {
+  div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
     display: none;
+  }
 
+  div.follow-up-tag, div.must-see-tag {
     @include mobile() {
       margin-top: 8px;
     }
