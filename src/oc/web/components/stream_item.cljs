@@ -162,6 +162,9 @@
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
+              [:div.must-see-tag.mobile-only]
+              [:div.follow-up-tag-small.mobile-only]
+              [:div.new-tag.mobile-only "NEW"]
               [:div.mobile-time-since
                 (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
             [:div.must-see-tag.big-web-tablet-only]
@@ -179,9 +182,6 @@
              :show-delete? true
              :show-move? (not is-mobile?)
              :assigned-follow-up-data assigned-follow-up-data}))]
-      [:div.must-see-tag.mobile-only]
-      [:div.follow-up-tag.mobile-only]
-      [:div.new-tag.mobile-only "NEW"]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video
