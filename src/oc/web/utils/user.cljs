@@ -102,7 +102,7 @@
                               :action "notification-click-item-load"
                               :title (if (= status 404) "Post not found" "An error occurred")
                               :message (if (= status 404)
-                                         "The post you are trying to access it's probably been moved or deleted."
+                                         "The post you're trying to access may have been moved or deleted."
                                          "Please try again")
                               :solid-button-title "Ok"
                               :solid-button-style :red
