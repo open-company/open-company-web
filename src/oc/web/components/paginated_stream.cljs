@@ -114,7 +114,7 @@
                            (str "stream-item-" key))))]
     (virtualized-list {:autoHeight true
                        :height height
-                       :width (if responsive/is-tablet-or-mobile?
+                       :width (if (responsive/is-tablet-or-mobile?)
                                 js/window.innerWidth
                                 720)
                        :isScrolling isScrolling
