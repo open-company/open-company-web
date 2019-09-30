@@ -437,12 +437,10 @@ div.stream-item {
 
     div.stream-item-footer {
       min-height: 26px;
-      margin-top: 16px;
 
       @include mobile() {
         height: auto;
         overflow: hidden;
-        margin-top: 10px;
         min-height: 32px;
       }
 
