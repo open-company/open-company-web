@@ -18,7 +18,7 @@
     [:meta {:content "width=device-width, height=device-height, initial-scale=1", :name "viewport"}]
     [:meta {:name "slack-app-id" :content (env :oc-slack-app-id)}]
     ;; The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
-    [:title "Carrot | Asynchronous communication for teams"]
+    [:title "Carrot | Remote team communication"]
     (pages/circular-book-font)
     (pages/circular-bold-font)
     pages/google-fonts

@@ -258,12 +258,16 @@
   ;; do nothing for now
   db)
 
+(defmethod dispatcher/action :activity-get/not-found
+  [db [_ org-slug activity-uuid secure-uuid]]
+  (let [activity-key (if secure-uuid
+                       (dispatcher/secure-activity-key org-slug secure-uuid)
+                       (dispatcher/activity-key org-slug activity-uuid))]
+    (assoc-in db activity-key :404)))
+
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status org-slug activity-data secure-uuid]]
-  (let [next-db (if (= status 404)
-                  (dissoc db :latest-entry-point)
-                  db)
-        activity-uuid (:uuid activity-data)
+  (let [activity-uuid (:uuid activity-data)
         board-data (au/board-by-uuid (:board-uuid activity-data))
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)

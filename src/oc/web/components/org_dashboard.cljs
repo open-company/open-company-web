@@ -102,19 +102,19 @@
                                (not= (router/current-board-slug) "must-see")
                                (not= (router/current-board-slug) "follow-ups")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
+        current-activity-data (when (router/current-activity-id)
+                                (get posts-data (router/current-activity-id)))
         entry-not-found (and ;; org is present
                              (not org-not-found)
                              ;; section is present
                              (not section-not-found)
-                             ;; a post id is specified
-                             (router/current-activity-id)
-                             ;; posts data are present
-                             (not (nil? posts-data))
-                             ;; and
-                             (or ;; the post is not present int he posts list
-                                 (not ((set (keys posts-data)) (router/current-activity-id)))
-                                 ;; the board of the post is wrong
-                                 (not= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug)))))
+                             ;; route is for a single post and it's been loaded
+                             current-activity-data
+                             ;; post wasn't found
+                             (or (= current-activity-data :404)
+                                 ;; route has wrong board slug/uuid for the current post
+                                 (and (not= (:board-slug current-activity-data) (router/current-board-slug))
+                                      (not= (:board-uuid current-activity-data) (router/current-board-slug)))))
         show-login-wall (and (not jwt)
                              (or force-login-wall
                                  (and (router/current-activity-id)
