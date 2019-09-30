@@ -13,7 +13,7 @@
         [:div.subheadline
           (str
            "Carrot gives you space to share longer updates, and keeps discussions "
-           "organized so it’s easy to easy to see what matters.")]
+           "organized so it’s easy to see what matters.")]
         [:div.subheadline
           "It’s how remote teams stay in sync."]
 

@@ -46,10 +46,11 @@
           [:div.login-wall-right
             [:div.login-wall-right-content
               [:div.login-overlay-cta.group
-                [:button.mlb-reset.top-back-button
-                  {:on-touch-start identity
-                   :on-click #(router/redirect! oc-urls/home)
-                   :aria-label "Back"}]
+                (when ua/mobile-app?
+                  [:button.mlb-reset.top-back-button
+                    {:on-touch-start identity
+                     :on-click #(router/redirect! oc-urls/home)
+                     :aria-label "Back"}])
                 [:div.login-logo.mobile-only]
                 [:div.login-title (or title default-title)]]
               (when (seq (or desc default-desc))
