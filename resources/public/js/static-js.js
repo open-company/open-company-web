@@ -1,3 +1,4 @@
+
 /***********************************************************************************************
  * When updating this library please update also cljsjs/jwt-decode package in build.boot file. *
  ***********************************************************************************************/
@@ -113,24 +114,9 @@ function OCWebSetupStaticPagesJS(){
     switchFn();
   })
   $("button.keep-aligned-section-next-bt").on("click", switchFn);
-
-  $("div.pricing-toggle").on("click", function(){
-    var $teamColumn = $("div.pricing-column.team-column");
-    if ($teamColumn.hasClass("monthly")) {
-      $teamColumn.removeClass("monthly");
-      $teamColumn.addClass("annual");
-    } else {
-      $teamColumn.removeClass("annual");
-      $teamColumn.addClass("monthly");
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
-
-  if ($("#youtube-player").length > 0) {
-    OCYTVideoInit();
-  }
 
   if(OCStaticGetParameterByName("ref") === "producthunt"){
     $(document.body).addClass("ph-banner");
@@ -160,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   if (jwt) {
     $("#site-header-login-item").hide();
+    $(".login-signup-or").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
     $("div.main.slack").addClass("no-get-started-button");
@@ -173,6 +160,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("section.keep-aligned").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
+    $("a.pricing-table-right-link").css({"display": "none"});
     // Change Get started button to Your digest on site mobile menu
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
     siteMobileMenuGetStarted.text( "Your digest" );
@@ -294,71 +282,6 @@ function OCStaticHidePHBanner(){
   $(document.body).removeClass("ph-banner");
 }
 
-var OCYTVideoPlayer = null,
-OCYTVideoFinished = false,
-OCUTVScriptAdded = false;
-
-function OCYTVideoInit() {
-  if (!OCUTVScriptAdded) {
-    OCUTVScriptAdded = true;
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  }
-}
-
-function onYouTubeIframeAPIReady() {
-  var winWidth = document.documentElement.clientWidth || window.innerWidth,
-  winHeight = document.documentElement.clientHeight || window.innerHeight;
-  OCYTVideoPlayer = new YT.Player('youtube-player', {
-    height: Math.min(winHeight, 608).toString(),
-    width: Math.min(winWidth, 1080).toString(),
-    videoId: 'dMWpnHxQMP4',
-    allowsInlineMediaPlayback: 'TRUE',
-    allowfullscreen: 'true',
-    playerVars: {
-        showinfo: 0,
-        rel: 0,
-        playsinline: 1,
-        autoplay: 0
-    },
-    events: {
-      'onReady': OCYTVideoOnPlayerReady,
-      'onStateChange': OCYTVideoOnPlayerStateChange
-    }
-  });
-}
-
-function OCYTVideoOnPlayerReady(event) {
-}
-
-function OCStaticShowAnimationLightbox() {
-  $(document.body).addClass('show-animation-lightbox no-scroll');
-
-  if (OCYTVideoFinished) {
-    OCYTVideoPlayer.seekTo(0);
-    OCYTVideoFinished = false;
-  }
-  OCYTVideoPlayer.playVideo();
-}
-
-function OCYTVideoOnPlayerStateChange(event){
-  if (event.data === 0) {
-    OCYTVideoFinished = true;
-    OCStaticHideAnimationLightbox();
-  }
-}
-
-function OCStaticHideAnimationLightbox(e) {
-  OCYTVideoPlayer.pauseVideo();
-  $(document.body).removeClass('show-animation-lightbox no-scroll');
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}
-
 function OCStaticTextareaSaveSelection() {
     if (window.getSelection) {
         var sel = window.getSelection();
@@ -412,3 +335,19 @@ function isiPhoneWithoutPhysicalHomeBt(){
   }
   return false;
 }
+
+(function(){
+  $(document).ready(function(){
+    
+    var $appsBt = $("button.apps-bt");
+    if ($appsBt.length > 0) {
+      $appsBt.click(function(event){
+        event.stopPropagation();
+        $("div.apps-container").toggleClass("dropdown-menu-visible");
+      });
+      $(window).click(function(event){
+        $("div.apps-container").removeClass("dropdown-menu-visible");
+      });
+    }
+  });
+})();
