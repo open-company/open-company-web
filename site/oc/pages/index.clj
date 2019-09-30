@@ -12,8 +12,8 @@
           "Remote teams communicate differently"]
         [:div.subheadline
           (str
-           "Carrot gives you space to share longer updates, and keeps discussion "
-           "organized so it’s easy to know what matters.")]
+           "Carrot gives you space to share longer updates, and keeps discussions "
+           "organized so it’s easy to easy to see what matters.")]
         [:div.subheadline
           "It’s how remote teams stay in sync."]
 
