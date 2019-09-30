@@ -18,9 +18,7 @@
             [:p
               (str
                "In the age of Slack and fast-moving conversations, the lack of "
-               "focus and clarity have become a huge problem in the workplace.")]
-            [:p
-              (str
+               "focus and clarity have become a huge problem in the workplace."
                "Teams are hyper-connected throughout the day, and yet "
                "it's become even more difficult to know what matters. "
                "How can that be?")]
@@ -30,9 +28,9 @@
                "that important and thoughtful communication gets lost in the noise.")]
             [:p
               (str
-               "That problem is even worse for distributed teams working in different "
+               "This “lost communication“ problem is even worse for distributed teams working in different "
                "places or time zones. Sharing important team updates, news, and decisions "
-               "alongside real-time chats just increases the likelihood it will scroll "
+               "alongside real-time chats just increases the likelihood they will scroll "
                "by without being noticed. Plus, it’s difficult to know if anyone even "
                "hears what you’ve said.")]
             [:p
