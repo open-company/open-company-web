@@ -9,11 +9,13 @@
       [:section.cta.group
 
         [:h1.headline
-          "Clear communication for remote teams"]
+          "Remote teams communicate differently"]
         [:div.subheadline
           (str
-           "Carrot organizes team communication so it’s easier to stay "
-           "engaged and informed. Ideal for keeping remote teams in sync.")]
+           "Carrot gives you space to share longer updates, and keeps discussion "
+           "organized so it’s easy to know what matters.")]
+        [:div.subheadline
+          "It’s how remote teams stay in sync."]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
