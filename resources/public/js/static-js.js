@@ -160,6 +160,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("section.keep-aligned").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
+    $("a.pricing-table-right-link").css({"display": "none"});
     // Change Get started button to Your digest on site mobile menu
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
     siteMobileMenuGetStarted.text( "Your digest" );
