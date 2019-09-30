@@ -78,5 +78,5 @@
 
 (def mac-app-url "https://github.com/open-company/open-company-web/releases/download/untagged-a060f76d2ed11d47ff35/Carrot.dmg")
 (def win-app-url "https://github.com/open-company/open-company-web/releases/download/untagged-a060f76d2ed11d47ff35/Carrot.exe")
-(def iphone-app-url "https://apps.apple.com/us/app/carrot-mobile/id1473028573")
+(def ios-app-url "https://apps.apple.com/us/app/carrot-mobile/id1473028573")
 (def android-app-url "https://play.google.com/apps/testing/io.carrot.mobile")

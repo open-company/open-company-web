@@ -506,7 +506,7 @@
        (cond
         ua/mac? ls/mac-app-url
         ua/windows? ls/win-app-url
-        ua/ios? ls/iphone-app-url
+        ua/ios? ls/ios-app-url
         ua/android? ls/android-app-url
         :else urls/home)))
 
