@@ -470,7 +470,7 @@
                         (reset! (::saving s) false)
                         (reset! (::disable-post s) false)
                         (when-not (:error cmail-data)
-                          (real-close)))
+                          (utils/after 100 real-close)))
                       (when (and @(::publishing s)
                                  (not (:publishing cmail-data)))
                         (reset! (::publishing s) false)

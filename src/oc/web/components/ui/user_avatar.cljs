@@ -18,6 +18,7 @@
                          (:avatar-url user-data))]
     [:div.user-avatar-img-container
       {:data-user-id (:user-id user-data)
+       :data-intercom-target "User avatar dropdown"
        :class utils/hide-class}
       [:div.user-avatar-img-helper]
       [:img.user-avatar-img
