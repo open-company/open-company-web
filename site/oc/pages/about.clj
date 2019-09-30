@@ -21,28 +21,33 @@
                "focus and clarity have become a huge problem in the workplace.")]
             [:p
               (str
-               "Chat apps keep everyone connected throughout the day, and yet "
-               "it's become even more difficult for teams to stay "
-               "aligned around what matters most. How can that be?")]
-            [:p
-              "This is the question that led us to build Carrot. What we "
-              "found is that leadership is getting lost in the noise."]
+               "Teams are hyper-connected throughout the day, and yet "
+               "it's become even more difficult to know what matters. "
+               "How can that be?")]
             [:p
               (str
-               "Sharing important team updates, news, and decisions alongside random chats "
-               "just increases the likelihood it will scroll by without being noticed. "
-               "It’s difficult for the team to know what matters, and leaders have no idea "
-               "if anyone even heard what they said.")]
+               "This is the question that led us to build Carrot. What we found is "
+               "that important and thoughtful communication gets lost in the noise.")]
+            [:p
+              (str
+               "That problem is even worse for distributed teams working in different "
+               "places or time zones. Sharing important team updates, news, and decisions "
+               "alongside real-time chats just increases the likelihood it will scroll "
+               "by without being noticed. Plus, it’s difficult to know if anyone even "
+               "hears what you’ve said.")]
             [:p
               (str
                "Heavy Slack users ourselves, we wanted to design a Slack-friendly approach "
-               "to handle must-see communication. We wanted this “non-chat” communication "
-               "to be as fun, delightful and interactive as chat; but we also wanted it "
-               "to be asynchronous so people could get caught up on their own time.")]
+               "to transform asynchronous communication into something more useful. "
+               "We wanted this “non-chat” communication to be as fun, delightful and "
+               "interactive as chat; but organized in a way that made it easier for "
+               "everyone to get caught up on their own time.")]
+
             [:p
               (str
-               "The result is Carrot - a platform for must-see communication that keeps "
-               "everyone focused on what matters to build transparency, trust, and stronger teams.")]]]]
+               "The result is Carrot - a platform for remote team communication that "
+               "keeps everyone focused on what matters to build transparency, "
+               "trust, and stronger teams.")]]]]
 
       [:section.team-section
         [:div.team-section-block
