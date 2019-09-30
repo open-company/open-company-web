@@ -95,7 +95,7 @@
           {:href "/?no_redirect=1"}]
         [:div.navbar-brand-center
           [:a
-            {:href "/"
+            {:href "/?no_redirect=1"
              :class (when (= active-page "index") "active")}
             "Home"]
           [:div.apps-container
