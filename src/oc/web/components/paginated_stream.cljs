@@ -159,7 +159,6 @@
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                           (check-pagination s)
-                          (utils/scroll-to-y (:scroll-y @router/path) 0)
                           s)
                          :before-render (fn [s]
                           (let [container-data @(drv/get-ref s :container-data)]
