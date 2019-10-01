@@ -390,10 +390,13 @@ div.stream-item {
       }
 
       div.stream-item-headline {
-        height: 27px;
+        height: 28px;
         @include activity-title(24px, 28px);
         color: $deep_navy;
         overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
 
         @include mobile() {
           margin-top: 16px;
