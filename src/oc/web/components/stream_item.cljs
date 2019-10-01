@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
+            [oc.web.images :as img]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -190,7 +191,10 @@
                 {:class (:type (:body-thumbnail activity-data))}
                 [:img.body-thumbnail
                   {:data-image (:thumbnail (:body-thumbnail activity-data))
-                   :src (:thumbnail (:body-thumbnail activity-data))}]]))
+                   :src (-> activity-data
+                            :body-thumbnail
+                            :thumbnail
+                            (img/optimize-image-url 102))}]]))
           [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
                                       :has-video (:fixed-video-id activity-data)
