@@ -114,15 +114,21 @@
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
-        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)]
+        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
+        show-expanded-post (and current-activity-id
+                                activity-data
+                                (not= activity-data :404)
+                                ;; Do not show the post under the wrong board slug/uuid
+                                (or (= (:board-slug activity-data) (router/current-board-slug))
+                                    (= (:board-uuid activity-data) (router/current-board-slug))))]
       ;; Entries list
       [:div.dashboard-layout.group
-        {:class (when current-activity-id "expanded-post-view")}
+        {:class (when show-expanded-post "expanded-post-view")}
         [:div.dashboard-layout-container.group
           {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (navigation-sidebar)
           (when (and is-mobile?
-                     (not current-activity-id)
+                     (not show-expanded-post)
                      (or (:collapsed cmail-state)
                          (not cmail-state))
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
@@ -165,10 +171,39 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
+            ; (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
+            ;       non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+            ;                              "decisions to keep you and your team pulling in the same direction.")
+            ;       is-second-user (= add-post-tooltip :is-second-user)]
+            ;   (when (and (not is-drafts-board)
+            ;              (not current-activity-id)
+            ;              add-post-tooltip)
+            ;     [:div.add-post-tooltip-container.group
+            ;       [:button.mlb-reset.add-post-tooltip-dismiss
+            ;         {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+            ;       [:div.add-post-tooltips
+            ;         {:class (when is-second-user "second-user")}
+            ;         [:div.add-post-tooltip-box-mobile]
+            ;         [:div.add-post-tooltip-title
+            ;           "Welcome to Carrot!"]
+            ;           [:div.add-post-tooltip
+            ;             (if is-admin-or-author
+            ;               (if is-second-user
+            ;                 non-admin-tooltip
+            ;                 "Create your first post now to see how Carrot works. Don't worry, you can delete it anytime.")
+            ;               non-admin-tooltip)]
+            ;           (when (and is-admin-or-author
+            ;                      (not is-second-user))
+            ;             [:button.mlb-reset.add-post-bt
+            ;               {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+            ;               [:span.add-post-bt-pen]
+            ;               "New post"])
+            ;         [:div.add-post-tooltip-box.big-web-only
+            ;           {:class (when is-second-user "second-user")}]]]))
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when-not current-activity-id
+            (when-not show-expanded-post
               ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}
@@ -244,43 +279,14 @@
                                         (reset! (::sorting-menu-expanded s) false)
                                         (activity-actions/change-sort-type :recently-posted))}
                           "Recently posted"]]]))])
-            (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-                  non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
-                                         "decisions to keep you and your team pulling in the same direction.")
-                  is-second-user (= add-post-tooltip :is-second-user)]
-              (when (and (not is-drafts-board)
-                         (not current-activity-id)
-                         add-post-tooltip)
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-                  [:div.add-post-tooltips
-                    {:class (when is-second-user "second-user")}
-                    [:div.add-post-tooltip-box-mobile]
-                    [:div.add-post-tooltip-title
-                      "Welcome to Carrot!"]
-                      [:div.add-post-tooltip
-                        (if is-admin-or-author
-                          (if is-second-user
-                            non-admin-tooltip
-                            "Create your first post now to see how Carrot works. Don't worry, you can delete it anytime.")
-                          non-admin-tooltip)]
-                      (when (and is-admin-or-author
-                                 (not is-second-user))
-                        [:button.mlb-reset.add-post-bt
-                          {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-                          [:span.add-post-bt-pen]
-                          "New post"])
-                    [:div.add-post-tooltip-box.big-web-only
-                      {:class (when is-second-user "second-user")}]]]))
+
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
               (zero? (count (:boards org-data)))
               (empty-org)
               ;; Expanded post
-              (and current-activity-id
-                   activity-data)
+              show-expanded-post
               (expanded-post)
               ;; Empty board
               empty-board?

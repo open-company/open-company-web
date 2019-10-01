@@ -43,16 +43,11 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn- item-mounted [s]
-  (let [activity-data (-> s :rum/args first :activity-data)
-        comments-data (-> s :rum/args first :comments-data)]
-    (comment-actions/get-comments-if-needed activity-data comments-data)))
-
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
                          (drv/drv :activity-share-container)
-                         (drv/drv :show-post-added-tooltip)
+                         ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
@@ -62,12 +57,6 @@
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
-                           s)
-                          :did-mount (fn [s]
-                           (item-mounted s)
-                           s)
-                          :did-remount (fn [_ s]
-                           (item-mounted s)
                            s)}
   [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
@@ -97,9 +86,10 @@
                                (< (.getTime (utils/js-date (:last-read-at read-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
-        post-added-tooltip (drv/react s :show-post-added-tooltip)
-        show-post-added-tooltip? (and post-added-tooltip
-                                      (= post-added-tooltip (:uuid activity-data)))]
+        ; post-added-tooltip (drv/react s :show-post-added-tooltip)
+        ; show-post-added-tooltip? (and post-added-tooltip
+        ;                               (= post-added-tooltip (:uuid activity-data)))
+        ]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -235,17 +225,17 @@
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    (when show-post-added-tooltip?
-                      [:div.post-added-tooltip-container
-                        {:ref :post-added-tooltip}
-                        [:div.post-added-tooltip-title
-                          "Post analytics"]
-                        [:div.post-added-tooltip
-                          (str "Invite your team to Carrot so you can know who read your "
-                           "post and when. Click here to access your post analytics anytime.")]
-                        [:button.mlb-reset.post-added-tooltip-bt
-                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                          "OK, got it"]])
+                    ; (when show-post-added-tooltip?
+                    ;   [:div.post-added-tooltip-container
+                    ;     {:ref :post-added-tooltip}
+                    ;     [:div.post-added-tooltip-title
+                    ;       "Post analytics"]
+                    ;     [:div.post-added-tooltip
+                    ;       (str "Invite your team to Carrot so you can know who read your "
+                    ;        "post and when. Click here to access your post analytics anytime.")]
+                    ;     [:button.mlb-reset.post-added-tooltip-bt
+                    ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                    ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
                                 :reads-data read-data})])
                 (when (seq activity-attachments)
