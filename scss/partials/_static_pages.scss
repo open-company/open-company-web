@@ -56,7 +56,7 @@ div.homepage-testimonials-container {
   }
 
   div.homepage-testimonials-logos {
-    max-width: 1014px;
+    max-width: 914px;
     width: 100%;
     margin: 0 auto;
 
@@ -102,12 +102,6 @@ div.homepage-testimonials-container {
         @include image-2x("/img/ML/logo_resy");
         background-size: 78px 34px;
         width: calc(78px + 24px);
-      }
-
-      &.logo-flyt {
-        @include image-2x("/img/ML/logo_flyt");
-        background-size: 80px 37px;
-        width: calc(80px + 24px);
       }
 
       &.logo-weblify {

@@ -14,7 +14,6 @@
       [:div.homepage-testimonials-logo.logo-primary]
       [:div.homepage-testimonials-logo.logo-hinge]
       [:div.homepage-testimonials-logo.logo-resy]
-      [:div.homepage-testimonials-logo.logo-flyt]
       [:div.homepage-testimonials-logo.logo-weblify]
       [:div.homepage-testimonials-logo.logo-novo]
       [:div.homepage-testimonials-logo.logo-gamercraft]]])
