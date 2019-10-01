@@ -7,23 +7,22 @@
 (defn identify []
   (when (jwt/get-key :email)
     (timbre/info "Identify user to Intercom")
-    (utils/after 100 #(do
-        (let [user (dispatcher/current-user-data)
-              org (dispatcher/org-data)]
-                (.Intercom js/window "update"
-                  (clj->js {; Intercom standard
-                            :user_id (:user-id user)
-                            :created_at (:created-at user)
-                            :name (jwt/get-key :name)
-                            :email (:email user)
-                            :avatar {
-                              :type :avatar
-                              :image_url (:avatar-url (:avatar-url user))
-                            }
-                            :company {
-                              :id (:slug org)
-                              :name (:name org)
-                              :created_at (:created-at org)
-                             }
-                            ; custom
-                            :timezone (:timezone user)})))))))
+    (utils/after 100 #(let [user (dispatcher/current-user-data)
+                            org (dispatcher/org-data)]
+                       (.Intercom js/window "update"
+                         (clj->js {; Intercom standard
+                                   :user_id (:user-id user)
+                                   :created_at (:created-at user)
+                                   :name (jwt/get-key :name)
+                                   :email (:email user)
+                                   :avatar {
+                                     :type :avatar
+                                     :image_url (:avatar-url (:avatar-url user))
+                                   }
+                                   :company {
+                                     :id (:slug org)
+                                     :name (:name org)
+                                     :created_at (:created-at org)
+                                    }
+                                   ; custom
+                                   :timezone (:timezone user)}))))))
