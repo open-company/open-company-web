@@ -51,6 +51,7 @@
     (alert-modal/show-alert alert-data)))
 
 (rum/defcs more-menu < rum/reactive
+                       rum/static
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (ui-mixins/on-window-click-mixin (fn [s e]
@@ -62,16 +63,13 @@
                               (will-close)))
                          (reset! (::showing-menu s) false))))
                        ui-mixins/refresh-tooltips-mixin
-                       (drv/drv :editable-boards)
-  [s entity-data share-container-id
-   {:keys [will-open will-close external-share tooltip-position
-           show-edit? show-delete? edit-cb delete-cb show-move? can-comment-share?
-           comment-share-cb can-react? react-cb can-reply? reply-cb
-           assigned-follow-up-data external-follow-up]}]
+  [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
+             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
+             can-comment-share? comment-share-cb can-react? react-cb can-reply?
+             reply-cb assigned-follow-up-data external-follow-up]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
-        editable-boards (drv/react s :editable-boards)
         is-mobile? (responsive/is-tablet-or-mobile?)
         create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
         complete-follow-up-link (when (and assigned-follow-up-data

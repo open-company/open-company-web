@@ -92,6 +92,34 @@ $h2_top_margin: 24;
       background-color: rgba(white, 0.2);
     }
   }
+
+
+  div.follow-up-tag-small {
+    height: 18px;
+    width: 18px;
+    margin-right: 8px;
+    position: relative;
+    vertical-align: top;
+    border-radius: 4px;
+    background-color: rgba($sea_blue, 0.2);
+
+    &.white-bg {
+      @include image-2x("/img/ML/follow_up_tag_white");
+      background-color: rgba(white, 0.2);
+    }
+
+    &::before {
+      @include image-2x("/img/ML/follow_up_tag");
+      background-size: 86px 12px;
+      background-position: 5px 3px;
+      background-repeat: no-repeat;
+      position: absolute;
+      content: '';
+      z-index: 1;
+      width: 15px;
+      height: 15px;
+    }
+  }
 }
 
 @mixin must-see(){

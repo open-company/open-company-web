@@ -127,14 +127,15 @@
           [:div.back-arrow]
           [:div.back-to-board-inner
             back-to-label]]
-        (more-menu activity-data dom-element-id
-         {:external-share (not is-mobile?)
-          :external-follow-up true
-          :show-edit? true
-          :show-delete? true
-          :show-move? (not is-mobile?)
-          :tooltip-position "bottom"
-          :assigned-follow-up-data assigned-follow-up-data})]
+       (more-menu {:entity-data activity-data
+                   :share-container-id dom-element-id
+                   :external-share (not is-mobile?)
+                   :external-follow-up true
+                   :show-edit? true
+                   :show-delete? true
+                   :show-move? (not is-mobile?)
+                   :tooltip-position "bottom"
+                   :assigned-follow-up-data assigned-follow-up-data})]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
@@ -187,12 +188,14 @@
         (when is-mobile?
           (reactions activity-data))
         [:div.expanded-post-footer-mobile-group
-          (comments-summary activity-data)
+          (comments-summary {:entry-data activity-data
+                             :comments-data comments-data})
           (when-not is-mobile?
             (reactions activity-data))
           (when user-is-part-of-the-team
             [:div.expanded-post-wrt-container
-              (wrt-count activity-data reads-data)])]]
+              (wrt-count {:activity-data activity-data
+                          :reads-data reads-data})])]]
       [:div.expanded-post-comments.group
         (stream-comments activity-data comments-data add-comment-highlight)
         (when (:can-comment activity-data)

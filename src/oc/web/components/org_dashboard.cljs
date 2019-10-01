@@ -53,7 +53,6 @@
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
-                           (drv/drv :route)
                            (drv/drv search/search-key)
                            (drv/drv search/search-active?)
 

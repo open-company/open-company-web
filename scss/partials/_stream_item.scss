@@ -1,5 +1,9 @@
 div.stream-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: #{$board_container_width}px;
+  height: #{$foc_height}px;
   margin: 0;
   border-bottom: 1px solid $ultra_light_grey;
   padding: 24px 40px;
@@ -109,7 +113,7 @@ div.stream-item {
       display: none;
     }
 
-    div.follow-up-tag {
+    div.follow-up-tag, div.follow-up-tag-small {
       display: inline-block;
     }
   }
@@ -220,9 +224,11 @@ div.stream-item {
 
   @include follow-up-tag();
 
-  div.follow-up-tag, div.must-see-tag {
+  div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
     display: none;
+  }
 
+  div.follow-up-tag, div.must-see-tag {
     @include mobile() {
       margin-top: 8px;
     }
@@ -233,12 +239,11 @@ div.stream-item {
   }
 
   div.stream-item-body-ext {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 0px;
     border-radius: 6px;
-
-    @include mobile() {
-      display: block;
-    }
 
     &.expanded {
       div.thumbnail-container {
@@ -272,6 +277,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
+      min-height: 110px;
       position: relative;
       cursor: pointer;
 
@@ -384,9 +390,13 @@ div.stream-item {
       }
 
       div.stream-item-headline {
+        height: 28px;
         @include activity-title(24px, 28px);
         color: $deep_navy;
-        display: inline;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
 
         @include mobile() {
           margin-top: 16px;
@@ -404,9 +414,7 @@ div.stream-item {
         white-space: pre-wrap;
         word-break: break-word;
 
-        &.no-abstract {
-          max-height: #{24 * 3}px;
-        }
+        max-height: #{24 * 2}px;
 
         @include mobile() {
           margin-top: 4px;
@@ -432,12 +440,10 @@ div.stream-item {
 
     div.stream-item-footer {
       min-height: 26px;
-      margin-top: 16px;
 
       @include mobile() {
         height: auto;
         overflow: hidden;
-        margin-top: 10px;
         min-height: 32px;
       }
 
