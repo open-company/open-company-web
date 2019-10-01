@@ -49,7 +49,7 @@
                          (drv/drv :org-data)
                          (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
-                         (drv/drv :show-post-added-tooltip)
+                         ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
@@ -95,9 +95,10 @@
                                (< (.getTime (utils/js-date (:last-read-at read-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
-        post-added-tooltip (drv/react s :show-post-added-tooltip)
-        show-post-added-tooltip? (and post-added-tooltip
-                                      (= post-added-tooltip (:uuid activity-data)))]
+        ; post-added-tooltip (drv/react s :show-post-added-tooltip)
+        ; show-post-added-tooltip? (and post-added-tooltip
+        ;                               (= post-added-tooltip (:uuid activity-data)))
+        ]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -228,17 +229,17 @@
                 (when should-show-wrt
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    (when show-post-added-tooltip?
-                      [:div.post-added-tooltip-container
-                        {:ref :post-added-tooltip}
-                        [:div.post-added-tooltip-title
-                          "Post analytics"]
-                        [:div.post-added-tooltip
-                          (str "Invite your team to Carrot so you can know who read your "
-                           "post and when. Click here to access your post analytics anytime.")]
-                        [:button.mlb-reset.post-added-tooltip-bt
-                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                          "OK, got it"]])
+                    ; (when show-post-added-tooltip?
+                    ;   [:div.post-added-tooltip-container
+                    ;     {:ref :post-added-tooltip}
+                    ;     [:div.post-added-tooltip-title
+                    ;       "Post analytics"]
+                    ;     [:div.post-added-tooltip
+                    ;       (str "Invite your team to Carrot so you can know who read your "
+                    ;        "post and when. Click here to access your post analytics anytime.")]
+                    ;     [:button.mlb-reset.post-added-tooltip-bt
+                    ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                    ;       "OK, got it"]])
                     (wrt-count activity-data read-data)])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments

@@ -334,13 +334,6 @@ div.cmail-outer {
           display: block;
         }
 
-        div.edit-tooltip-outer-container {
-
-          div.edit-tooltip-container {
-            top: -32px;
-          }
-        }
-
         div.rich-body-editor-container {
           margin-top: 32px;
 
@@ -1201,56 +1194,6 @@ div.cmail-outer {
           color: rgba($deep_navy, 0.5) !important;
           font-style: none;
           height: 28px;
-        }
-      }
-
-      div.edit-tooltip-outer-container {
-        position: relative;
-        width: 100%;
-        height: 0;
-
-        div.edit-tooltip-container {
-          position: absolute;
-          top: -16px;
-          left: 0;
-          width: 320px;
-          padding: 16px;
-          border-radius: 4px;
-          background-color: $deep_navy;
-          z-index: 2;
-
-          &:after {
-            content: " ";
-            position: absolute;
-            left: 24px;
-            top: -3px;
-            width: 6px;
-            height: 6px;
-            transform: rotate(-45deg);
-            background-color: $deep_navy;
-          }
-
-          div.edit-tooltip-title {
-            color: white;
-            @include OC_Body_Bold();
-            font-size: 16px;
-          }
-
-          div.edit-tooltip {
-            margin-top: 8px;
-            color: white;
-            @include OC_Body_Book();
-            font-size: 14px;
-          }
-
-          button.edit-tooltip-bt {
-            @include OC_Body_Bold();
-            font-size: 14px;
-            color: $carrot_green;
-            margin-top: 8px;
-            padding: 0;
-            display: block;
-          }
         }
       }
 

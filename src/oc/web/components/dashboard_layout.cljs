@@ -171,6 +171,35 @@
           ;; Show the board always on desktop except when there is an expanded post and
           ;; on mobile only when the navigation menu is not visible
           [:div.board-container.group
+            ; (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
+            ;       non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
+            ;                              "decisions to keep you and your team pulling in the same direction.")
+            ;       is-second-user (= add-post-tooltip :is-second-user)]
+            ;   (when (and (not is-drafts-board)
+            ;              (not current-activity-id)
+            ;              add-post-tooltip)
+            ;     [:div.add-post-tooltip-container.group
+            ;       [:button.mlb-reset.add-post-tooltip-dismiss
+            ;         {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
+            ;       [:div.add-post-tooltips
+            ;         {:class (when is-second-user "second-user")}
+            ;         [:div.add-post-tooltip-box-mobile]
+            ;         [:div.add-post-tooltip-title
+            ;           "Welcome to Carrot!"]
+            ;           [:div.add-post-tooltip
+            ;             (if is-admin-or-author
+            ;               (if is-second-user
+            ;                 non-admin-tooltip
+            ;                 "Create your first post now to see how Carrot works. Don't worry, you can delete it anytime.")
+            ;               non-admin-tooltip)]
+            ;           (when (and is-admin-or-author
+            ;                      (not is-second-user))
+            ;             [:button.mlb-reset.add-post-bt
+            ;               {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
+            ;               [:span.add-post-bt-pen]
+            ;               "New post"])
+            ;         [:div.add-post-tooltip-box.big-web-only
+            ;           {:class (when is-second-user "second-user")}]]]))
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
@@ -250,35 +279,7 @@
                                         (reset! (::sorting-menu-expanded s) false)
                                         (activity-actions/change-sort-type :recently-posted))}
                           "Recently posted"]]]))])
-            (let [add-post-tooltip (drv/react s :show-add-post-tooltip)
-                  non-admin-tooltip (str "Carrot is where you'll find key announcements, updates, and "
-                                         "decisions to keep you and your team pulling in the same direction.")
-                  is-second-user (= add-post-tooltip :is-second-user)]
-              (when (and (not is-drafts-board)
-                         (not show-expanded-post)
-                         add-post-tooltip)
-                [:div.add-post-tooltip-container.group
-                  [:button.mlb-reset.add-post-tooltip-dismiss
-                    {:on-click #(nux-actions/dismiss-add-post-tooltip)}]
-                  [:div.add-post-tooltips
-                    {:class (when is-second-user "second-user")}
-                    [:div.add-post-tooltip-box-mobile]
-                    [:div.add-post-tooltip-title
-                      "Welcome to Carrot!"]
-                      [:div.add-post-tooltip
-                        (if is-admin-or-author
-                          (if is-second-user
-                            non-admin-tooltip
-                            "Create your first post now to see how Carrot works. Don't worry, you can delete it anytime.")
-                          non-admin-tooltip)]
-                      (when (and is-admin-or-author
-                                 (not is-second-user))
-                        [:button.mlb-reset.add-post-bt
-                          {:on-click #(when can-compose? (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-                          [:span.add-post-bt-pen]
-                          "New post"])
-                    [:div.add-post-tooltip-box.big-web-only
-                      {:class (when is-second-user "second-user")}]]]))
+
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
               ;; No boards
