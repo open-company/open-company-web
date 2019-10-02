@@ -161,11 +161,12 @@
     (api/auth-with-email auth-link email pswd (partial login-with-email-finish email))
     (dis/dispatch! [:login-with-email])))
 
-(defn login-with-slack [auth-url]
+(defn login-with-slack [auth-url & [state-map]]
   (let [auth-url-with-redirect (user-utils/auth-link-with-state
-                                 (:href auth-url)
-                                 {:team-id "open-company-auth"
-                                  :redirect oc-urls/slack-lander-check})]
+                                (:href auth-url)
+                                (or state-map
+                                    {:team-id "open-company-auth"
+                                     :redirect oc-urls/slack-lander-check}))]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
