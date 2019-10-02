@@ -9,10 +9,8 @@
                          (drv/drv :board-data)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
-                         (rum/local false ::mounted)
                          {:did-mount (fn [s]
                            (utils/scroll-to-y (:scroll-y @router/path) 0)
-                           (utils/after 180 #(reset! (::mounted s) true))
                            s)}
   [s stream-comp]
   (let [board-data (drv/react s :board-data)
@@ -32,8 +30,7 @@
                      (and (router/current-activity-id)
                           (not activity-data)))]
     [:div.lazy-stream
-      (if (and (not loading?)
-               @(::mounted s))
+      (if (not loading?)
         (stream-comp)
         [:div.lazy-stream-interstitial
           {:style {:height (str (+ (:scroll-y @router/path)
