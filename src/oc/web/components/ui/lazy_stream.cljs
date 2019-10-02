@@ -30,7 +30,7 @@
                      (and (router/current-activity-id)
                           (not activity-data)))]
     [:div.lazy-stream
-      (if (not loading?)
+      (if-not loading?
         (stream-comp)
         [:div.lazy-stream-interstitial
           {:style {:height (str (+ (:scroll-y @router/path)
