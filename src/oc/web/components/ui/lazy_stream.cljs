@@ -17,12 +17,14 @@
         container-data (drv/react s :container-data)
         activity-data (drv/react s :activity-data)
         loading? (or ;; Board specified
-                     (and (not= (router/current-board-slug) "all-posts")
+                     (and (not (router/current-activity-id))
+                          (not= (router/current-board-slug) "all-posts")
                           (not= (router/current-board-slug) "follow-ups")
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
-                     (and (or (= (router/current-board-slug) "all-posts")
+                     (and (not (router/current-activity-id))
+                          (or (= (router/current-board-slug) "all-posts")
                               (= (router/current-board-slug) "follow-ups"))
                           ;; But no all-posts data yet
                          (not container-data))
