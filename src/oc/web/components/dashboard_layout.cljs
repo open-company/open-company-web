@@ -115,12 +115,17 @@
         user-notifications-data (drv/react s :user-notifications)
         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
-        show-expanded-post (and current-activity-id
-                                activity-data
-                                (not= activity-data :404)
-                                ;; Do not show the post under the wrong board slug/uuid
-                                (or (= (:board-slug activity-data) (router/current-board-slug))
-                                    (= (:board-uuid activity-data) (router/current-board-slug))))]
+        show-expanded-post ;; show the expanded post component when there is a uuid set in the url and
+                           (and current-activity-id
+                                ;; or the post is not laodede yet (a ghost screen will be shown) or
+                                (or (not activity-data)
+                                    ;; if the activity is loaded
+                                    (and activity-data
+                                         ;; show it if it's not a not found
+                                         (not= activity-data :404)
+                                         ;; and the board is right
+                                         (or (= (:board-slug activity-data) (router/current-board-slug))
+                                             (= (:board-uuid activity-data) (router/current-board-slug))))))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when show-expanded-post "expanded-post-view")}
@@ -287,7 +292,7 @@
               (empty-org)
               ;; Expanded post
               show-expanded-post
-              (expanded-post)
+              (rum/with-key (lazy-stream expanded-post) "paginated-posts-component-expanded-post")
               ;; Empty board
               empty-board?
               (empty-board)
