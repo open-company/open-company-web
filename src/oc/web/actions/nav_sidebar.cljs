@@ -66,7 +66,8 @@
          org-slug (router/current-org-slug)
          sort-type (if is-drafts-board?
                      dis/other-sort-type
-                     (activity-actions/saved-sort-type org-slug))]
+                     (activity-actions/saved-sort-type org-slug))
+         back-y (or (:back-y @router/path) (utils/page-scroll-top))]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -79,12 +80,46 @@
           {:org org-slug
            :board board-slug
            :sort-type sort-type
+           :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (utils/after 0 #(refresh-board-data board-slug sort-type)))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
+
+(defn dismiss-post-modal [e]
+  (let [org-data (dis/org-data)
+        ;; Go back to
+        board (utils/back-to org-data)
+        to-url (oc-urls/board board)]
+    (nav-to-url! e board to-url)))
+
+(defn open-post-modal [activity-data dont-scroll]
+  (let [org (router/current-org-slug)
+        old-board (router/current-board-slug)
+        board (:board-slug activity-data)
+        back-to (if (= old-board utils/default-drafts-board-slug)
+                  board
+                  old-board)
+        activity (:uuid activity-data)
+        post-url (oc-urls/entry board activity)
+        query-params (router/query-params)
+        route [org board activity "activity"]
+        scroll-y-position (.. js/document -scrollingElement -scrollTop)]
+    (router/set-route! route {:org org
+                              :board board
+                              :sort-type (router/current-sort-type)
+                              :activity activity
+                              :query-params query-params
+                              :back-to back-to
+                              :back-y scroll-y-position})
+    (cmail-actions/cmail-hide)
+    (when-not dont-scroll
+      (if ua/mobile?
+        (utils/after 10 #(utils/scroll-to-y 0 0))
+        (utils/scroll-to-y 0 0)))
+    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 ;; Push panel
 
