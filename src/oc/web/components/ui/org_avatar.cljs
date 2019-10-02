@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
+            [oc.web.images :as img]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -16,7 +17,7 @@
     {:class (utils/class-set {:no-avatar (not show-org-avatar?)})}
     (when show-org-avatar?
       [:img.org-avatar-img
-        {:src (:logo-url org-data)
+       {:src (-> org-data :logo-url (img/optimize-image-url default-max-logo-height))
          :on-error #(reset! (::img-load-failed s) true)}])
     (when show-org-name?
       [:span.org-name
