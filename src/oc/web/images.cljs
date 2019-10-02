@@ -13,7 +13,7 @@
       url
       (let [cur-path    (.getPath uri)
             resize-frag (str "resize=height:" preferred-height)
-            new-path    (str resize-frag "/" cur-path)
+            new-path    (str resize-frag cur-path)
             new-uri     (.setPath uri new-path)]
         (str new-uri)))))
 
