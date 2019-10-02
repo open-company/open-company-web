@@ -12,7 +12,7 @@
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
-            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.comment :as comment-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
@@ -26,8 +26,8 @@
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]))
 
-(defn close-expanded-post []
-  (routing-actions/dismiss-post-modal))
+(defn close-expanded-post [e]
+  (nav-actions/dismiss-post-modal e))
 
 (defn save-fixed-comment-height! [s]
   (let [cur-height (.outerHeight (js/$ (rum/ref-node s :expanded-post-fixed-add-comment)))]

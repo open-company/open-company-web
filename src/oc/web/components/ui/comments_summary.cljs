@@ -8,7 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-author-name [author]
@@ -61,7 +61,7 @@
     (when comments-count
       [:div.is-comments
         {:on-click (fn [e]
-                     (routing-actions/open-post-modal entry-data true)
+                     (nav-actions/open-post-modal entry-data true)
                      (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
         [:div.is-comments-authors.group
