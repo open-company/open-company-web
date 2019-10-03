@@ -21,16 +21,27 @@
   [uri]
   (= (.getDomain uri) "avatars.slack-edge.com"))
 
+(defn- approximate-slack-height
+  [pref-height]
+  (cond
+    (<= pref-height 34)  34
+    (<= pref-height 44)  44
+    (<= pref-height 88)  88
+    (<= pref-height 132) 132
+    :default 230
+    ))
+
 (defn optimize-slack-image-url
   [url preferred-height]
   (let [uri (Uri. url)]
     (if-not (is-slack? uri)
       url
-      (let [cur-path (.getPath uri)
-            re       #"_(\d{2,3})\.([a-z]+)$"
-            template (str "_" preferred-height ".$2")
-            new-path (cstr/replace cur-path re template)
-            new-uri  (.setPath uri new-path)]
+      (let [cur-path      (.getPath uri)
+            re            #"_(\d{2,3})\.([a-z]+)$"
+            approx-height (approximate-slack-height preferred-height)
+            template      (str "_" approx-height ".$2")
+            new-path      (cstr/replace cur-path re template)
+            new-uri       (.setPath uri new-path)]
         (str new-uri)))))
 
 (defn optimize-image-url
