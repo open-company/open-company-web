@@ -164,9 +164,9 @@
 (defn login-with-slack [auth-url & [state-map]]
   (let [auth-url-with-redirect (user-utils/auth-link-with-state
                                 (:href auth-url)
-                                (or state-map
-                                    {:team-id "open-company-auth"
-                                     :redirect oc-urls/slack-lander-check}))]
+                                (merge {:team-id "open-company-auth"
+                                        :redirect oc-urls/slack-lander-check}
+                                       state-map))]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
