@@ -194,7 +194,7 @@
                    :src (-> activity-data
                             :body-thumbnail
                             :thumbnail
-                            (img/optimize-image-url 102))}]]))
+                            (img/optimize-image-url (* 102 3)))}]]))
           [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
                                       :has-video (:fixed-video-id activity-data)
