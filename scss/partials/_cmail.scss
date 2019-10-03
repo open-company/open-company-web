@@ -143,59 +143,12 @@ div.cmail-outer {
           }
         }
 
-        div.cmail-header-vertical-separator {
-          display: none;
-        }
-
-        div.cmail-header-board-follow-ups-container {
-          float: unset;
-          position: absolute;
-          left: 50%;
-          top: 12px;
-          margin-left: -104px;
-
-          div.board-name {
-            background-image: cdnUrl("/img/ML/select_arrows.svg");
-            background-color: $ultra_light_grey;
-            color: $deep_navy;
-
-            &:hover, &.active {
-              background-color: $more_ultra_light_grey;
-            }
-          }
-
-          div.follow-ups-toggle-container {
-            &.disabled {
-              div.follow-ups-toggle {
-                opacity: 0.5;
-                cursor: not-allowed;
-              }
-            }
-
-            &.on {
-              div.follow-ups-toggle {
-                background-color: rgba($sea_blue, 0.2);
-              }
-            }
-
-            div.follow-ups-toggle {
-              background-color: $ultra_light_grey;
-
-              span.follow-ups-toggle-circle {
-                background-color: rgba($deep_navy, 0.5);
-                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
-              }
-            }
-          }
-        }
-
         div.cmail-header-right-buttons {
           position: absolute;
           height: 32px;
-          right: 96px;
+          right: 16px;
           top: 12px;
-          padding: 4px 20px 4px 0px;
-          border-right: 1px solid $ultra_light_grey;
+          padding: 4px 0 4px 0;
 
           div.delete-button-container {
             float: left;
@@ -499,216 +452,47 @@ div.cmail-outer {
         background-color: white;
       }
 
-      div.cmail-header-board-follow-ups-container {
-        float: left;
-        height: 32px;
-        width: 208px;
-        position: relative;
+      div.cmail-header-center {
+        position: absolute;
+        height: 24px;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        @include user-profile(24);
+
+        div.user-avatar-img-container {
+          float: left;
+        }
 
         @include mobile() {
-          width: 100%;
-          min-height: 32px;
-          height: auto;
-          float: unset;
-        }
-
-        &.follow-ups-on {
-          width: 304px;
-
-          @include mobile() {
-            width: 100%;
-
-            div.follow-up-tag {
-              margin-left: 0;
-              margin-top: 16px;
-              background-color: rgba($sea_blue, 0.2) !important;
-            }
+          div.user-avatar-img-container {
+            display: none;
           }
         }
 
-        div.board-name {
-          width: 160px;
-          height: 32px;
-          cursor: pointer;
-          position: relative;
-          float: left;
+        div.cmail-header-center-title {
+          margin-left: 8px;
+          height: 18px;
+          margin-top: 3px;
           @include OC_Body_Book();
           font-size: 14px;
-          color: white;
-          line-height: 16px;
-          padding: 7px 8px;
-          background-image: cdnUrl("/img/ML/select_arrows_white.svg");
-          background-size: 8px 10px;
-          background-position: top 11px right 8px;
-          background-repeat: no-repeat;
-          background-color: rgba(white, 0.2);
-          border-radius: 4px;
-
-          @include big_web() {
-            &:hover, &.active {
-              background-color: black;
-            }
-          }
-
-          div.board-name-inner {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: calc(100% - 16px);
-            white-space: nowrap;
-          }
-
-          @include mobile() {
-            width: calc(100% - 16px - 32px);
-            margin-right: 16px;
-            background-image: cdnUrl("/img/ML/select_arrows.svg");
-            background-color: $ultra_light_grey;
-            color: $deep_navy;
-
-            &.has-follow-ups-button {
-              width: calc(100% - 16px - 32px - 8px - 32px);
-            }
-
-            &:hover, &.open {
-              background-color: $more_ultra_light_grey;
-            }
-          }
-        }
-
-        div.sections-picker {
-          position: absolute;
-          top: 40px;
-          left: 0;
-          z-index: #{$navbar_zindex + 156};
-          max-height: 370px;
-          overflow: auto;
-
-          @include mobile() {
-            width: 100%;
-          }
-        }
-
-        button.mobile-attachment-button {
-          display: none;
-
-          @include mobile() {
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-            background-size: 14px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: $ultra_light_grey;
-            border-radius: 4px;
-            opacity: 1;
-            padding: 0;
-            display: block;
-            float: left;
-          }
-        }
-
-        button.mobile-follow-up-button {
-          display: none;
-
-          @include mobile() {
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-            background-size: 13px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: $ultra_light_grey;
-            border-radius: 4px;
-            opacity: 1;
-            padding: 0;
-            margin-left: 8px;
-            display: block;
-            float: left;
-          }
-        }
-
-        div.follow-ups-toggle-container {
+          color: $deep_navy;
+          line-height: 18px;
           float: left;
-          position: relative;
-          width: 32px;
-          height: 20px;
-          margin-top: 6px;
-          margin-left: 16px;
-
-          .tooltip {
-            width: 97px;
-          }
-
-          &.on {
-            div.follow-ups-toggle {
-              background-color: $chalk_blue; //rgba($sea_blue, 0.2);
-
-              span.follow-ups-toggle-circle {
-                margin-left: 12px;
-                background-color: $sea_blue;
-                background-image: cdnUrl("/img/ML/cmail_must_see_bolt_white.svg");
-              }
-            }
-          }
-
-          div.follow-ups-toggle {
-            width: 32px;
-            height: 16px;
-            position: absolute;
-            top: 2px;
-            left: 0px;
-            background-color: rgba(white, 0.2);
-            border-radius: 100px;
-            cursor: pointer;
-
-            span.follow-ups-toggle-circle {
-              display: block;
-              width: 20px;
-              height: 20px;
-              position: absolute;
-              top: -2px;
-              left: 0px;
-              border-radius: 50%;
-              background-color: white;
-              background-image: cdnUrl("/img/ML/cmail_must_see_bolt.svg");
-              background-size: 8px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
-              transition: margin-left 180ms ease-in, background-color 180ms ease-in;
-              box-shadow: 0 2px 2px 0 rgba(0,0,0,0.12);
-            }
-          }
-
-          @include mobile() {
-            display: block;
-            width: 24px;
-            height: 24px;
-            background-image: cdnUrl("/img/ML/follow_up_add.svg");
-            background-size: 16px 16px;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.5;
-            padding: 0;
-            float: left;
-            margin-left: 16px;
-            margin-top: 4px;
-          }
-        }
-
-        @include follow-up-tag();
-
-        div.follow-up-tag {
-          float: left;
-          margin: 7px 0 0 16px;
+          max-width: 25vw;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: pre;
         }
       }
 
       div.cmail-header-right-buttons {
         position: absolute;
         height: 32px;
-        right: 97px;
+        right: 16px;
         top: 12px;
-        padding: 4px 19px 4px 0px;
-        border-right: 1px solid $ultra_light_grey;
+        padding: 4px 0 4px 0;
 
         @include mobile() {
           display: none;
@@ -898,68 +682,14 @@ div.cmail-outer {
         //   margin-top: -16px;
         // }
       }
-
-      div.cmail-header-vertical-separator {
-        width: 1px;
-        margin: 0px 16px;
-        height: 100%;
-        background-color: rgba(white, 0.1);
-        float: left;
-
-        @include mobile() {
-          display: none;
-        }
-      }
     }
 
-    button.post-button, button.mobile-post-button {
+    div.post-button-container {
       position: relative;
-
-      &.force-show-tooltip div.post-bt-tooltip {
-        display: block;
-      }
-
-      @include big_web() {
-        &:hover {
-          div.post-bt-tooltip {
-            display: block;
-          }
-        }
-      }
-
-      &.tt-title div.post-bt-tooltip {
-        width: 142px;
-      }
-
-      &.tt-abstract div.post-bt-tooltip {
-        width: 144px;
-      }
-
-      div.post-bt-tooltip {
-        background-color: white;
-        white-space:pre-wrap;
-        max-width: none;
-        text-align: left;
-        opacity: 1;
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: $light_navy;
-        line-height: 18px;
-        padding: 11px 16px;
-        border-radius: 4px;
-        box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
-        border: 1px solid $mid_light_grey;
-        position: absolute;
-        top: 34px;
-        right: 0;
-        z-index: 2;
-        display: none;
-
-        @include mobile() {
-          right: -8px;
-          top: 36px;
-        }
-      }
+      margin-left: 16px;
+      padding-left: 16px;
+      border-left: 1px solid $ultra_light_grey;
+      float: right;
     }
 
     &:not(.fullscreen) > {
@@ -1412,28 +1142,20 @@ div.cmail-outer {
           }
         }
 
-        button.post-button {
+        div.post-button-container {
           float: right;
-          background-color: $carrot_green;
-          color: white;
-          width: 56px;
-          height: 32px;
-          @include OC_Body_Bold();
-          font-size: 14px;
-          border-radius: 4px;
+          // background-color: $carrot_green;
+          // color: white;
+          // width: 56px;
+          // height: 32px;
+          // @include OC_Body_Bold();
+          // font-size: 14px;
+          // border-radius: 4px;
           margin-left: 16px;
 
-          &.tt-title div.post-bt-tooltip {
-            right: -42px;
-          }
-
-          &.disabled {
-            cursor: not-allowed;
-
-            &:hover {
-              opacity: 1;
-            }
-          }
+          // div.post-to-button div.post-to-bt-container.tt-title div.post-bt-tooltip {
+          //   right: -42px;
+          // }
 
           @include mobile() {
             display: none;
@@ -1480,25 +1202,6 @@ div.cmail-outer {
 
             &:hover, &.open {
               background-color: $more_ultra_light_grey;
-            }
-          }
-        }
-
-        div.sections-picker-container {
-          position: absolute;
-          top: 40px;
-          left: 134px;
-          z-index: #{$navbar_zindex + 156};
-          max-height: 370px;
-
-          div.sections-picker {
-            overflow: auto;
-            position: relative;
-            top: unset;
-            left: unset;
-
-            @include mobile() {
-              width: calc(100% - 16px - 32px);
             }
           }
         }
