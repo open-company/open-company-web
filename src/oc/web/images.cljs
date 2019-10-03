@@ -26,9 +26,11 @@
   (cond
     (<= pref-height 34)  34
     (<= pref-height 44)  44
+    (<= pref-height 68)  68
     (<= pref-height 88)  88
+    (<= pref-height 102) 102
     (<= pref-height 132) 132
-    :default 230
+    :default             230
     ))
 
 (defn optimize-slack-image-url
