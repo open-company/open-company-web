@@ -9,7 +9,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.actions.routing :as routing-actions]))
 
-(def default-max-logo-height 42)
+(def default-max-logo-height 96) ;; 32 * 3 for retina
 
 (defn internal-org-avatar
   [s org-data show-org-avatar? show-org-name?]
