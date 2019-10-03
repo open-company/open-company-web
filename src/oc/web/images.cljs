@@ -35,7 +35,8 @@
     (<= pref-height 68)  68
     (<= pref-height 88)  88
     (<= pref-height 102) 102
-    :default             132
+    (<= pref-height 132) 132
+    :default             nil
     ))
 
 (defn- approximate-slack-user-height
@@ -46,7 +47,8 @@
     (<= pref-height 48)  48
     (<= pref-height 72)  72
     (<= pref-height 192) 192
-    :default             512
+    (<= pref-height 512) 512
+    :default             nil
     ))
 
 (defn- optimize-slack-avatar
@@ -63,11 +65,15 @@
 
 (defn- optimize-slack-org-avatar
   [url preferred-height]
-  (optimize-slack-avatar url (approximate-slack-org-height preferred-height)))
+  (if-let [approx-height (approximate-slack-org-height preferred-height)]
+    (optimize-slack-avatar url approx-height)
+    url))
 
 (defn- optimize-slack-user-avatar
   [url preferred-height]
-  (optimize-slack-avatar url (approximate-slack-user-height preferred-height)))
+  (if-let [approx-height (approximate-slack-user-height preferred-height)]
+    (optimize-slack-avatar url approx-height)
+    url))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Image optimization API
