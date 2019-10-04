@@ -112,7 +112,7 @@ div.expanded-post {
   }
 
   div.expanded-post-headline {
-    @include activity-title(36px, 40px);
+    @include activity-title(26px, 33px);
     margin-top: 16px;
 
     @include mobile() {
@@ -190,7 +190,7 @@ div.expanded-post {
   }
 
   div.expanded-post-abstract {
-    @include activity-abstract(18px, 24px);
+    @include activity-abstract(16px, 20px);
     margin: 16px 0 24px;
     @include OC_Body_Bold();
     white-space: pre-wrap;
@@ -209,11 +209,12 @@ div.expanded-post {
   }
 
   div.expanded-post-body {
-    @include activity-body(18, 24, $deep_navy);
+    @include activity-body(16, 20, $deep_navy);
     margin-top: 16px;
 
     @include mobile() {
       margin-top: 8px;
+      @include activity-body(18, 24, $deep_navy);
     }
 
     .interactive-image {
