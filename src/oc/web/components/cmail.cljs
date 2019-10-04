@@ -567,7 +567,10 @@
                               (when has-changes
                                 (debounced-autosave! s)))
                             (when (fn? dismiss-action)
-                              (dismiss-action))))]
+                              (dismiss-action))))
+        current-user-data (drv/react s :current-user-data)
+        header-user-data (or (:publisher cmail-data)
+                             current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)})
@@ -624,7 +627,7 @@
                  :data-container "body"
                  :on-click #(delete-clicked s % cmail-data)}]]]
           [:div.cmail-header-center.group
-            (user-avatar-image (drv/react s :current-user-data))
+            (user-avatar-image header-user-data)
             [:div.cmail-header-center-title
               (:headline cmail-data)]]
           (when is-fullscreen?
