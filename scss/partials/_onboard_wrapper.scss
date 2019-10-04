@@ -165,6 +165,10 @@ div.onboard-email-container {
 div.onboard-lander {
   text-align: center;
 
+  @include mobile() {
+    padding: 104px 16px 24px;
+  }
+
   div.main-cta {
     @include mobile() {
       padding-top: 54px;
@@ -880,10 +884,6 @@ div.onboard-lander {
   }
 
   @include mobile() {
-    &.lander {
-      padding: 104px 16px 24px;
-    }
-
     div.main-cta {
       padding-top: 0;
       div.mobile-header {

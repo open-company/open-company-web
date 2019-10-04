@@ -711,9 +711,10 @@
   (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title
           "Join your team on Carrot"]
-        [:div.mobile-logo.mobile-only]
         (if (:invitation-error confirm-invitation)
           [:div.subtitle
             "An error occurred while confirming your invitation, please try again."]
