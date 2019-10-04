@@ -603,33 +603,33 @@
                    is-mobile?)
           (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
         [:div.cmail-header.group
-          [:div.close-bt-container
-            {:class (when long-tooltip "long-tooltip")}
-            [:button.mlb-reset.close-bt
-              {:on-click close-cb
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement "auto"
-               :title (if long-tooltip
-                        "Save & Close"
-                        "Close")}]]
+          {:class (when-not follow-up? "has-follow-ups-button")}
+          [:div.cmail-header-left-buttons.group
+            [:div.close-bt-container
+              {:class (when long-tooltip "long-tooltip")}
+              [:button.mlb-reset.close-bt
+                {:on-click close-cb
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title (if long-tooltip
+                          "Save & Close"
+                          "Close")}]]
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-toggle "tooltip"
+                 :data-placement "bottom"
+                 :data-container "body"
+                 :on-click #(delete-clicked s % cmail-data)}]]]
           [:div.cmail-header-center.group
             (user-avatar-image (drv/react s :current-user-data))
             [:div.cmail-header-center-title
               (:headline cmail-data)]]
           (when is-fullscreen?
             [:div.cmail-header-right-buttons
-              (when-not follow-up?
-                [:button.mlb-reset.follow-up-button
-                  {:title "Request follow-up"
-                   :data-toggle "tooltip"
-                   :data-placement "bottom"
-                   :data-container "body"
-                   :on-click #(when can-toggle-follow-ups?
-                                (cmail-actions/cmail-toggle-follow-up cmail-data))
-                   :class (when-not can-toggle-follow-ups? "disabled")}])
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                             :width 24
-                             :height 24
+                             :width 32
+                             :height 32
                              :position "bottom"
                              :tooltip-position "bottom"
                              :default-field-selector "div.cmail-content div.rich-body-editor"
@@ -640,13 +640,15 @@
                  :data-placement "auto"
                  :data-container "body"
                  :title "Add attachment"}]
-              [:div.delete-button-container
-                [:button.mlb-reset.delete-button
-                  {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+              (when-not follow-up?
+                [:button.mlb-reset.follow-up-button
+                  {:title "Request follow-up"
                    :data-toggle "tooltip"
                    :data-placement "bottom"
                    :data-container "body"
-                   :on-click #(delete-clicked s % cmail-data)}]]
+                   :on-click #(when can-toggle-follow-ups?
+                                (cmail-actions/cmail-toggle-follow-up cmail-data))
+                   :class (when-not can-toggle-follow-ups? "disabled")}])
               [:div.post-button-container.group
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
@@ -655,17 +657,6 @@
                                  :current-board-slug (:board-slug cmail-data)
                                  :post-tt-kw post-tt-kw
                                  :force-show-tooltip @(::show-post-tooltip s)})]])]
-        (when (and (not (:collapsed cmail-state))
-                   (not is-fullscreen?))
-          [:div.dismiss-inline-cmail-container
-            {:class (when long-tooltip "long-tooltip")}
-            [:button.mlb-reset.dismiss-inline-cmail
-              {:on-click close-cb
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement "auto"
-               :title (if long-tooltip
-                        "Save & Close"
-                        "Close")}]])
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
                                     :has-follow-ups follow-up?})}
@@ -759,21 +750,23 @@
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))]
         [:div.cmail-footer
+          (when (and (not (:collapsed cmail-state))
+                     (not is-fullscreen?))
+            [:div.dismiss-inline-cmail-container
+              {:class (when long-tooltip "long-tooltip")}
+              [:button.mlb-reset.dismiss-inline-cmail
+                {:on-click close-cb
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title (if long-tooltip
+                          "Save & Close"
+                          "Close")}]])
           [:div.fullscreen-bt-container
             [:button.mlb-reset.fullscreen-bt
               {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
               "Full-screen"]]
           [:div.cmail-footer-right
-            (when (and (not follow-up?)
-                       (not is-fullscreen?))
-              [:button.mlb-reset.follow-up-button
-                {:title "Request follow-up"
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :on-click #(when can-toggle-follow-ups?
-                              (cmail-actions/cmail-toggle-follow-up cmail-data))
-                 :class (when-not can-toggle-follow-ups? "disabled")}])
+            {:class (when-not follow-up? "has-follow-ups-button")}
             (when-not is-fullscreen?
               [:div.post-button-container.group
                 (post-to-button {:on-submit #(post-clicked s)
@@ -783,24 +776,28 @@
                                  :current-board-slug (:board-slug cmail-data)
                                  :post-tt-kw post-tt-kw
                                  :force-show-tooltip @(::show-post-tooltip s)})])
-            [:div.delete-button-container
-              [:button.mlb-reset.delete-button
-                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :on-click #(delete-clicked s % cmail-data)}]]
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :width 32
+                           :height 32
+                           :position "bottom"
+                           :default-field-selector "div.cmail-content div.rich-body-editor"
+                           :container-selector "div.cmail-content"})
             [:button.mlb-reset.attachment-button
               {:on-click #(add-attachment s)
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
                :title "Add attachment"}]
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :width 24
-                           :height 24
-                           :position "bottom"
-                           :default-field-selector "div.cmail-content div.rich-body-editor"
-                           :container-selector "div.cmail-content"})]
+            (when (and (not follow-up?)
+                       (not is-fullscreen?))
+              [:button.mlb-reset.follow-up-button
+                {:title "Request follow-up"
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :on-click #(when can-toggle-follow-ups?
+                              (cmail-actions/cmail-toggle-follow-up cmail-data))
+                 :class (when-not can-toggle-follow-ups? "disabled")}])]
           (when (and (not= (:status cmail-data) "published")
                      (not is-mobile?))
             (if (or (:has-changes cmail-data)
