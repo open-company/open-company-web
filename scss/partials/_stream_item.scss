@@ -277,20 +277,20 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 110px;
+      min-height: 88px;
       position: relative;
       cursor: pointer;
 
       div.ziggeo-player {
-        width: 136px;
-        height: 102px;
+        width: 106px;
+        height: 80px;
         position: absolute;
         right: 0;
         top: 50%;
         transform: translateY(-50%);
 
         video {
-          max-height: 102px;
+          max-height: 80px;
         }
 
         @include tablet(){
@@ -315,9 +315,9 @@ div.stream-item {
       }
 
       div.body-thumbnail-wrapper {
-        width: 136px;
-        // height: 102px;
-        max-height: 102px;
+        width: 106px;
+        // height: 80px;
+        max-height: 80px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
@@ -329,8 +329,8 @@ div.stream-item {
         img.body-thumbnail {
           border-radius: 4px;
           object-fit: contain;
-          max-width: 136px;
-          max-height: 102px;
+          max-width: 106px;
+          max-height: 80px;
         }
 
         &.video {
@@ -363,10 +363,10 @@ div.stream-item {
       &.has-thumbnail, &.has-video {
         float: left;
         width: 484px;
-        min-height: 98px;
+        min-height: 80px;
 
         @include mobile() {
-          width: calc(100% - 136px - 16px);
+          width: calc(100% - 106px - 16px);
         }
       }
 
@@ -377,7 +377,7 @@ div.stream-item {
 
       &.has-thumbnail {
         @include tablet() {
-          width: calc(100% - 136px - 16px);
+          width: calc(100% - 106px - 16px);
         }
       }
 
@@ -391,7 +391,7 @@ div.stream-item {
 
       div.stream-item-headline {
         height: 28px;
-        @include activity-title(24px, 28px);
+        @include activity-title(20px, 25px);
         color: $deep_navy;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -405,26 +405,34 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        margin-top: 8px;
-        @include activity-body(18, 24, $deep_navy);
+        margin-top: 3px;
+        @include activity-body(16, 20, $deep_navy);
         color: $deep_navy;
         @include OC_Body_Book();
-        line-height: 24px;
+        line-height: 20px;
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
 
-        max-height: #{24 * 2}px;
+        max-height: #{20 * 2}px;
 
         @include mobile() {
           margin-top: 4px;
+          @include activity-body(18, 24, $deep_navy);
+          max-height: #{24 * 2}px;
+          line-height: 24px;
         }
 
         h2 {
           color: $deep_navy;
           @include OC_Body_Book();
-          font-size: 18px;
-          line-height: 24px;
+          font-size: 16px;
+          line-height: 20px;
+
+          @include mobile() {
+            font-size: 16px;
+            line-height: 24px;
+          }
         }
 
         b, strong, &.editing b, &.editing strong {
