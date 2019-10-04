@@ -631,7 +631,7 @@
             [:div.cmail-header-center-title
               (:headline cmail-data)]]
           (when is-fullscreen?
-            [:div.cmail-header-right-buttons
+            [:div.cmail-header-right-buttons.group
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                              :width 32
                              :height 32
