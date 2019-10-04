@@ -74,7 +74,7 @@ div.login-wall-container {
 
         @include mobile() {
           width: 100%;
-          padding: 0px 32px;
+          padding: 0 16px;
           margin: 0 auto;
         }
 
@@ -90,9 +90,19 @@ div.login-wall-container {
 
           @include mobile() {
             width: 100vw;
-            margin-left: -32px;
+            margin-left: -16px;
+            height: 124px;
+            border: none;
+          }
+
+          div.login-logo {
+            margin: 40px auto 16px;
+            width: 36px;
             height: 64px;
-            box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.1);
+            background-image: cdnUrl("/img/ML/carrot_logo.svg");
+            background-size: 36px 64px;
+            background-position: center;
+            background-repeat: no-repeat;
           }
 
           div.login-title {
@@ -100,43 +110,31 @@ div.login-wall-container {
             font-size: 32px;
             color: $deep_navy;
             text-transform: none;
-
-            @include mobile() {
-              font-size: 18px;
-              padding-top: 24px;
-            }
-
-            @include mobile() {
-              font-size: 18px;
-              padding-top: 24px;
-            }
           }
 
           button.top-back-button {
             display: none;
 
-            @include tablet(){
+            @include mobile(){
               display: block;
-              float: left;
-              height: 40px;
-              width: 40px;
-              background-color: white;
-              background-image: cdnUrl("/img/ML/gray_back_x.svg");
-              background-size: 14px 14px;
+              width: 32px;
+              height: 32px;
               background-position: center;
               background-repeat: no-repeat;
-              padding: 0px;
+              background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+              background-size: 12px 12px;
+              background-color: $ultra_light_grey;
+              border-radius: 4px;
               position: absolute;
-              margin-top: 0px;
-              top: 12px;
-              left: 24px;
+              top: 16px;
+              left: 16px;
             }
           }
 
           button.top-continue {
             display: none;
 
-            @include tablet(){
+            @include mobile(){
               display: block;
               float: right;
               @include OC_Body_Bold();
@@ -166,10 +164,18 @@ div.login-wall-container {
 
         button.signup-with-slack {
           margin-top: 32px;
+
+          @include mobile() {
+            margin-top: 24px;
+          }
         }
 
         button.signup-with-google {
           margin-top: 16px;
+
+          @include mobile() {
+            margin-top: 8px;
+          }
         }
 
         button.signup-with-slack, button.signup-with-google {
@@ -289,15 +295,16 @@ div.login-wall-container {
           }
 
           div.forgot-password {
-            margin-top: 4px;
+            margin-top: 8px;
             float: right;
 
             a {
               @include OC_Body_Book();
               font-size: 12px;
               line-height: 1.5;
-              color: $light_ui_grey;
-              text-decoration: underline;
+              color: rgba($light_navy, 0.5);
+              line-height: 15px;
+              text-decoration: none
 
               &:hover {
                 text-decoration: underline;
@@ -321,6 +328,10 @@ div.login-wall-container {
 
           &.disabled, &:disabled {
             background-color: $light_ui_grey;
+          }
+
+          @include mobile() {
+            margin-top: 16px;
           }
         }
 

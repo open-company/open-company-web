@@ -259,20 +259,15 @@
         win-height (.-innerHeight js/window)]
     (>= fixed-top-position (/ win-height 2))))
 
-(rum/defcs wrt-count < rum/reactive
-                       ;; Derivatives
-                       (drv/drv :wrt-show)
-
-  [s activity-data read-data]
+(rum/defc wrt-count < rum/static
+  [{:keys [activity-data reads-data]}]
   (let [item-id (:uuid activity-data)
-        read-count (:count read-data)
-        wrt-show (drv/react s :wrt-show)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        reads-count (:count reads-data)]
     [:div.wrt-count-container
       [:div.wrt-count
         {:ref :wrt-count
          :on-click #(nav-actions/show-wrt item-id)
-         :class (when (pos? (count (:reads read-data))) "has-read-list")}
-        (if read-count
-          (str read-count " viewer" (when (not= read-count 1) "s"))
+         :class (when (pos? (count (:reads reads-data))) "has-read-list")}
+        (if reads-count
+          (str reads-count " viewer" (when (not= reads-count 1) "s"))
           "0 viewers")]]))

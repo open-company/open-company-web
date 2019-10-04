@@ -248,3 +248,29 @@
 (defmethod dispatcher/action :setup-section-editing
   [db [_ board-data]]
   (assoc db :initial-section-editing board-data))
+
+(defmethod dispatcher/action :item-move
+  [db [_ org-slug change-data]]
+  (let [old-container-id (:old-container-id change-data)
+        container-id (:container-id change-data)
+        item-id (:item-id change-data)
+        change-key (dispatcher/change-data-key org-slug)
+        old-change-data (get-in db change-key)
+        old-container-change-data (get old-change-data old-container-id)
+        is-unseen? (utils/in? (:unseen old-container-change-data) item-id)
+        is-unread? (utils/in? (:unread old-container-change-data) item-id)
+        next-old-unseen (filterv #(not= % item-id) (:unseen old-container-change-data))
+        next-old-unread (filterv #(not= % item-id) (:unread old-container-change-data))
+        next-old-container-change-data (-> old-container-change-data
+                                        (assoc :unseen next-old-unseen)
+                                        (assoc :unread next-old-unread))
+        new-container-change-data (get old-change-data container-id)
+        next-new-unseen (concat (:unseen new-container-change-data) (if is-unseen? [item-id] []))
+        next-new-unread (concat (:unread new-container-change-data) (if is-unread? [item-id] []))
+        next-new-container-change-data (-> new-container-change-data
+                                        (assoc :unseen next-new-unseen)
+                                        (assoc :unread next-new-unread))
+        next-change-data (-> old-change-data
+                          (assoc old-container-id next-old-container-change-data)
+                          (assoc container-id next-new-container-change-data))]
+    (assoc-in db change-key next-change-data)))

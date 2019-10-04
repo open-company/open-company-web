@@ -166,7 +166,7 @@ div.onboard-lander {
   text-align: center;
 
   div.main-cta {
-    @include mobile(){
+    @include mobile() {
       padding-top: 54px;
     }
 
@@ -206,18 +206,17 @@ div.onboard-lander {
 
         button.top-back-button {
           display: block;
-          float: left;
-          height: 40px;
-          width: 40px;
-          background-color: white;
-          background-image: cdnUrl("/img/ML/gray_back_x.svg");
-          background-size: 14px 14px;
+          width: 32px;
+          height: 32px;
           background-position: center;
           background-repeat: no-repeat;
-          padding: 0px;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
           position: absolute;
-          top: 8px;
-          left: 24px;
+          top: 16px;
+          left: 16px;
         }
 
         button.top-continue {
@@ -343,14 +342,14 @@ div.onboard-lander {
 
     @include mobile() {
       width: 100%;
-      padding: 0 32px;
+      padding: 0;
     }
 
     button.signup-with-slack {
       margin-top: 35px;
 
       @include mobile() {
-        margin-top: 26px;
+        margin-top: 24px;
       }
     }
 
@@ -414,6 +413,10 @@ div.onboard-lander {
       height: 19px;
       margin-top: 24px;
       position: relative;
+
+      @include mobile() {
+        margin-top: 16px;
+      }
 
       div.or-with-email-copy {
         text-align: center;
@@ -576,7 +579,7 @@ div.onboard-lander {
         margin-top: 24px;
 
         @include mobile() {
-          margin-top: 8px;
+          margin-top: 16px;
         }
       }
 
@@ -649,12 +652,14 @@ div.onboard-lander {
       @include OC_Body_Book();
       font-size: 16px;
       color: $light_navy;
+      line-height: 20px;
       text-align: center;
 
       a {
         @include OC_Body_Book();
         font-size: 16px;
         color: $carrot_green;
+        line-height: 20px;
         margin-left: 4px;
 
         &:hover {
@@ -843,6 +848,40 @@ div.onboard-lander {
         color: $carrot_green;
         padding: 0;
         margin-left: 4px;
+      }
+    }
+  }
+
+  @include mobile() {
+    &.lander {
+      padding: 104px 16px 24px;
+
+      div.main-cta {
+        padding-top: 0;
+        div.mobile-header {
+          height: 104px;
+          border-bottom: none;
+          position: absolute;
+
+          div.mobile-logo {
+            width: 36px;
+            height: 64px;
+            background-size: 36px 64px;
+            position: relative;
+            top: unset;
+            left: unset;
+            margin: 40px auto 0;
+          } 
+        }
+
+        div.title {
+          padding-top: 0;
+          margin-top: 16px;
+          @include OC_Body_Bold();
+          font-size: 32px;
+          line-height: 41px;
+          color: $deep_navy;
+        }
       }
     }
   }

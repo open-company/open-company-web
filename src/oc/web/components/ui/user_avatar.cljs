@@ -5,7 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.stores.user :as store]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.images :as img]))
 
 (rum/defcs user-avatar-image < rum/static
                                (rum/local false ::use-default)
@@ -15,9 +16,10 @@
         default-avatar (store/user-icon (:user-id user-data))
         user-avatar-url (if (or use-default (empty? (:avatar-url user-data)))
                          (utils/cdn default-avatar)
-                         (:avatar-url user-data))]
+                         (-> user-data :avatar-url (img/optimize-user-avatar-url 72)))]
     [:div.user-avatar-img-container
       {:data-user-id (:user-id user-data)
+       :data-intercom-target "User avatar dropdown"
        :class utils/hide-class}
       [:div.user-avatar-img-helper]
       [:img.user-avatar-img

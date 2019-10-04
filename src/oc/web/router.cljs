@@ -6,7 +6,8 @@
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
             [oc.web.lib.sentry :as sentry]
-            [oc.web.lib.jwt :as jwt]))
+            [oc.web.lib.jwt :as jwt]
+            [clojure.string :as cstr]))
 
 (def path (atom {}))
 
@@ -58,6 +59,18 @@
   (timbre/info "nav!" token)
   (timbre/debug "history:" @history)
   (.setToken @history token))
+
+(defn rewrite-org-uuid-as-slug
+  [org-uuid org-slug]
+  (timbre/info "Navigate from org" org-uuid "to slug:" org-slug)
+  (nav! (cstr/replace (get-token) (re-pattern org-uuid) org-slug)))
+
+(defn rewrite-board-uuid-as-slug
+  [board-uuid board-slug]
+  (timbre/info "Rewrite URL from board" board-uuid "to slug:" board-slug)
+  (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
+    (swap! path assoc :board board-slug)
+    (.replaceState js/window.history #js {} js/window.title new-path)))
 
 (defn redirect! [loc]
   (timbre/info "redirect!" loc)

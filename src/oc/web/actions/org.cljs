@@ -13,6 +13,7 @@
             [oc.web.actions.section :as sa]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
+            [oc.web.lib.chat :as chat]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
@@ -146,9 +147,13 @@
 
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
-      (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
+      (if-let [board-data (first (filter #(or (= (:slug %) (router/current-board-slug))
+                                              (= (:uuid %) (router/current-board-slug))) boards))]
         ; Load the board data since there is a link to the board in the org data
         (do
+          ;; Rewrite the URL in case it's using the board UUID instead of the slug
+          (when (= (:uuid board-data) (router/current-board-slug))
+            (router/rewrite-board-uuid-as-slug (router/current-board-slug) (:slug board-data)))
           (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
             (utils/maybe-after section-delay #(sa/section-get :recently-posted board-link)))
           (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
@@ -173,6 +178,7 @@
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
             (oc-urls/all-posts (:slug org-data)))))))
+
   ;; Change service connection
   (when (or (jwt/jwt)
             (jwt/id-token)) ; only for logged in users
@@ -192,6 +198,8 @@
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data)
+  (chat/identify) ; Intercom
+
   ;; Change page title when an org page is loaded
   (set! (.-title js/document) (str "Carrot | " (:name org-data))))
 
