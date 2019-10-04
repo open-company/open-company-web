@@ -166,7 +166,11 @@ div.cmail-outer {
             background-color: rgba($deep_navy, 0.1);
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
-            border-left: 1px solid rgba($deep_navy, 0.1);
+            border-left: 1px solid rgba($deep_navy, 0.2);
+
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
           }
 
           div.emoji-picker {
@@ -188,6 +192,10 @@ div.cmail-outer {
               left: 0px;
               cursor: pointer;
               opacity: 1;
+
+              &:not(.disabled):hover {
+                background-color: rgba($deep_navy, 0.2);
+              }
             }
 
             @include mobile() {
@@ -418,8 +426,8 @@ div.cmail-outer {
 
           button.attachment-button {
             border-radius: 0;
-            border-left: 1px solid rgba($deep_navy, 0.1);
-            border-right: 1px solid rgba($deep_navy, 0.1);
+            border-left: 1px solid rgba($deep_navy, 0.2);
+            border-right: 1px solid rgba($deep_navy, 0.2);
           }
 
           div.emoji-picker {
@@ -492,6 +500,10 @@ div.cmail-outer {
             padding: 0;
             opacity: 1;
 
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
+
             @include mobile() {
               margin-left: 0;
               background-size: 14px 14px;
@@ -528,6 +540,10 @@ div.cmail-outer {
             padding: 0;
             display: block;
             opacity: 1;
+
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
           }
         }
       }
@@ -556,6 +572,10 @@ div.cmail-outer {
           float: left;
           opacity: 1;
 
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
+
           &.disabled {
             cursor: not-allowed;
           }
@@ -582,6 +602,10 @@ div.cmail-outer {
           border-top-right-radius: 4px;
           border-bottom-right-radius: 4px;
           opacity: 1;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
         }
 
         div.emoji-picker {
@@ -604,6 +628,10 @@ div.cmail-outer {
             left: 0px;
             cursor: pointer;
             opacity: 1;
+
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
           }
 
           @include mobile() {
@@ -963,6 +991,10 @@ div.cmail-outer {
           background-color: rgba($deep_navy, 0.1);
           opacity: 1;
           border-radius: 4px;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
         }
 
         &.long-tooltip {
@@ -999,6 +1031,10 @@ div.cmail-outer {
           font-size: 14px;
           color: $deep_navy;
           opacity: 1;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
         }
 
         .tooltip {
@@ -1014,7 +1050,7 @@ div.cmail-outer {
           button.attachment-button {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
-            border-right: 1px solid rgba($deep_navy, 0.1);
+            border-right: 1px solid rgba($deep_navy, 0.2);
           }
         }
 
@@ -1034,6 +1070,7 @@ div.cmail-outer {
 
           &:not(.disabled):hover {
             opacity: 1;
+            background-color: rgba($deep_navy, 0.2);
           }
 
           &.disabled {
@@ -1060,9 +1097,13 @@ div.cmail-outer {
           background-repeat: no-repeat;
           background-position: center;
           opacity: 1;
-          border-left: 1px solid rgba($deep_navy, 0.1);
+          border-left: 1px solid rgba($deep_navy, 0.2);
           border-top-right-radius: 4px;
           border-bottom-right-radius: 4px;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
         }
 
         div.emoji-picker {
@@ -1084,6 +1125,10 @@ div.cmail-outer {
             opacity: 1;
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
+
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
           }
 
           @include mobile() {
