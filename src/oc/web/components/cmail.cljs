@@ -581,24 +581,26 @@
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
-          [:div.cmail-mobile-header-title
-            (if (= (:status cmail-data) "published")
-              "Edit"
-              "New")
-            (when (not= (:status cmail-data) "published")
-              (if (or (:has-changes cmail-data)
-                      (:auto-saving cmail-data))
-                [:span.saving-saved " (saving)"]
-                (when (false? (:auto-saving cmail-data))
-                  [:span.saving-saved " (saved)"])))]
-          [:div.post-button-container.group
-            (post-to-button {:on-submit #(post-clicked s)
-                             :disabled disabled?
-                             :title post-button-title
-                             :did-pick-section did-pick-section
-                             :current-board-slug (:board-slug cmail-data)
-                             :post-tt-kw post-tt-kw
-                             :force-show-tooltip @(::show-post-tooltip s)})]]
+          [:div.cmail-mobile-header-right
+            [:button.mlb-reset.mobile-attachment-button
+              {:on-click #(add-attachment s)}]
+            (when-not follow-up?
+              [:button.mlb-reset.follow-up-button
+                {:title "Request follow-up"
+                 :data-toggle "tooltip"
+                 :data-placement "bottom"
+                 :data-container "body"
+                 :on-click #(when can-toggle-follow-ups?
+                              (cmail-actions/cmail-toggle-follow-up cmail-data))
+                 :class (when-not can-toggle-follow-ups? "disabled")}])
+            [:div.post-button-container.group
+              (post-to-button {:on-submit #(post-clicked s)
+                               :disabled disabled?
+                               :title post-button-title
+                               :did-pick-section did-pick-section
+                               :current-board-slug (:board-slug cmail-data)
+                               :post-tt-kw post-tt-kw
+                               :force-show-tooltip @(::show-post-tooltip s)})]]]
         (when (and follow-up?
                    is-mobile?)
           (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))

@@ -347,46 +347,44 @@ div.cmail-outer {
           border-radius: 4px;
         }
 
-        div.cmail-mobile-header-bt-separator {
-          width: 1px;
-          height: 24px;
-          margin: 1px 16px 0;
-          background-color: $ultra_light_grey;
-          float: right;
-        }
-
-        button.mobile-attachment-button {
-          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-size: 14px 16px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 24px;
-          height: 24px;
-          margin-top: 1px;
-          padding: 0;
-          float: right;
-          opacity: 0.5;
-        }
-
-        button.mobile-post-button {
-          display: block;
-          color: $carrot_green;
-          width: auto;
-          height: 24px;
-          @include OC_Body_Bold();
-          font-size: 18px;
-          line-height: 24px;
-          margin: 1px 0 0;
-          padding: 0;
-          position: relative;
-          opacity: 1;
+        div.cmail-mobile-header-right {
           position: absolute;
+          top: 11px;
           right: 16px;
-          top: 15px;
 
-          &.disabled {
-            color: rgba($carrot_green, 0.4);
+          button.mobile-attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 14px 16px;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            float: left;
+            opacity: 1;
+            background-color: rgba($deep_navy, 0.1);
+            border-radius: 4px;
           }
+
+          button.follow-up-button {
+            width: 32px;
+            height: 32px;
+            background-color: rgba($deep_navy, 0.1);
+            border-radius: 4px;
+            background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+            background-size: 12px 14px;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 0;
+            float: left;
+            margin-left: 8px;
+            opacity: 1;
+
+            &.disabled {
+              cursor: not-allowed;
+            }
+          }
+
         }
       }
     }
