@@ -603,14 +603,29 @@ div.onboard-lander {
 
       &.left-half-field-label, &.right-half-field-label {
         width: calc(50% - 8px);
+
+        @include mobile() {
+          width: 100%;
+        }
       }
 
       &.left-half-field-label {
         float: left;
+
+        @include mobile() {
+          float: unset;
+        }
       }
 
       &.right-half-field-label {
         float: right;
+
+        @include mobile() {
+          &.field-label.name-fields {
+            float: unset;
+            margin-top: 24px;
+          }
+        }
       }
 
       &.email-domain-field-label {
@@ -700,14 +715,26 @@ div.onboard-lander {
 
       &.right-half-field, &.left-half-field {
         width: calc(50% - 8px);
+
+        @include mobile() {
+          width: 100%;
+        }
       }
 
       &.left-half-field {
         float: left;
+
+        @include mobile() {
+          float: unset;
+        }
       }
 
       &.right-half-field {
         float: right;
+
+        @include mobile() {
+          float: unset;
+        }
       }
     }
 
@@ -855,38 +882,41 @@ div.onboard-lander {
   @include mobile() {
     &.lander {
       padding: 104px 16px 24px;
+    }
 
-      div.main-cta {
+    div.main-cta {
+      padding-top: 0;
+      div.mobile-header {
+        height: 104px;
+        border-bottom: none;
+        position: absolute;
+
+        div.mobile-logo {
+          width: 36px;
+          height: 64px;
+          background-size: 36px 64px;
+          position: relative;
+          top: unset;
+          left: unset;
+          margin: 40px auto 0;
+        }
+      }
+
+      div.title {
         padding-top: 0;
-        div.mobile-header {
-          height: 104px;
-          border-bottom: none;
-          position: absolute;
-
-          div.mobile-logo {
-            width: 36px;
-            height: 64px;
-            background-size: 36px 64px;
-            position: relative;
-            top: unset;
-            left: unset;
-            margin: 40px auto 0;
-          } 
-        }
-
-        div.title {
-          padding-top: 0;
-          margin-top: 16px;
-          @include OC_Body_Bold();
-          font-size: 32px;
-          line-height: 41px;
-          color: $deep_navy;
-        }
+        margin-top: 16px;
+        @include OC_Body_Bold();
+        font-size: 32px;
+        line-height: 41px;
+        color: $deep_navy;
       }
     }
   }
 
   &.lander-profile {
+    @include mobile() {
+      padding: 104px 16px 24px;
+    }
     div.mobile-header {
       button.top-continue {
         color: $sea_blue;
