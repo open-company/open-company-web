@@ -26,21 +26,6 @@ div.stream-item {
             display: initial;
           }
         }
-
-        div.stream-item-body-ext {
-          div.stream-item-footer {
-            div.stream-item-comments-summary {
-              div.is-comments {
-                div.is-comments-authors.show-border {
-                  div.is-comments-author {
-                    background-color: $foc_hover_color;
-                    border: 2px solid $foc_hover_color;
-                  }
-                }
-              }
-            }
-          }
-        }
       }
     }
   }
@@ -73,36 +58,6 @@ div.stream-item {
         background-color: $foc_new_color;
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-
-        div.stream-item-body-ext {
-          div.stream-item-footer {
-            div.stream-item-comments-summary {
-              div.is-comments {
-                div.is-comments-authors.show-border {
-                  div.is-comments-author {
-                    background-color: $foc_new_color;
-                    border: 2px solid $foc_new_color;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      div.stream-item-body-ext {
-        div.stream-item-footer {
-          div.stream-item-comments-summary {
-            div.is-comments {
-              div.is-comments-authors.show-border {
-                div.is-comments-author {
-                  background-color: $foc_new_color;
-                  border: 2px solid $foc_new_color;
-                }
-              }
-            }
-          }
-        }
       }
     }
   }
@@ -501,20 +456,6 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
-
-        div.is-comments {
-          div.is-comments-authors.show-border {
-            div.is-comments-author {
-              background-color: $foc_background_color;
-              border: 2px solid $foc_background_color;
-
-              @include mobile() {
-                background-color: $grey_num_4;
-                border: 2px solid $grey_num_4;
-              }
-            }
-          }
-        }
       }
 
       div.reactions {
