@@ -47,7 +47,7 @@ div.cmail-content-abstract-container {
   }
 
   div.cmail-content-abstract {
-    @include activity-abstract(18px, 26px);
+    @include activity-abstract(16px, 20px);
     width: 100%;
     background-color: transparent;
     border: none;
@@ -58,6 +58,10 @@ div.cmail-content-abstract-container {
     margin: 0;
     min-height: 26px;
     border-bottom: 1px solid transparent;
+
+    @include mobile() {
+      @include activity-abstract(18px, 26px);
+    }
 
     &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
       color: rgba($deep_navy, 0.5);

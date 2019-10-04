@@ -321,7 +321,7 @@ div.cmail-outer {
 
         div.cmail-content-headline {
           min-height: 34px;
-          @include activity-title(32px, 34px);
+          @include activity-title(24px, 30px);
 
           @include mobile() {
             @include activity-title(32px, 40px);
@@ -340,11 +340,15 @@ div.cmail-outer {
           div.rich-body-editor {
             padding-bottom: 30vh;
             min-height: calc(100vh - 334px);
-            @include activity-body(18, 26, $deep_navy);
+            @include activity-body(16, 20, $deep_navy);
 
             @media screen and (min-height: 556px) {
               max-height: initial;
               min-height: calc(100vh - 354px);
+            }
+
+            @include mobile() {
+              @include activity-body(18, 26, $deep_navy);
             }
           }
         }
