@@ -177,7 +177,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s activity-data comments-data new-added-comment]
+  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
   (let [add-comment-force-update (drv/react s :add-comment-force-update)]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}
@@ -314,7 +314,11 @@
                           [:div.stream-comment-author-name
                             (:name (:author comment-data))]
                           [:div.stream-comment-author-timestamp
-                            (utils/foc-date-time (:created-at comment-data))]]]
+                            (utils/foc-date-time (:created-at comment-data))]
+                          (when (and (not= (-> comment-data :author :user-id) current-user-id)
+                                     (< (.getTime (utils/js-date last-read-at))
+                                        (.getTime (utils/js-date (:created-at comment-data)))))
+                            [:div.new-comment-tag "(NEW)"])]]
                       [:div.stream-comment-content
                         [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                           {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))

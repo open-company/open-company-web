@@ -423,6 +423,16 @@ div.stream-comments {
               margin-left: 8px;
               line-height: 14px;
             }
+
+            div.new-comment-tag {
+              float: left;
+              margin-left: 8px;
+              color: $carrot_green;
+              @include OC_Body_Bold();
+              text-transform: uppercase;
+              font-size: 12px;
+              line-height: 14px;
+            }
           }
         }
 
