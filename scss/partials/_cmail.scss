@@ -24,6 +24,7 @@ div.cmail-outer {
 
       div.cmail-content-outer {
         padding: 16px 20px;
+        border-radius: 4px;
 
         div.cmail-content {
           height: 24px;
@@ -91,6 +92,7 @@ div.cmail-outer {
       background-color: $grey_num_2;
       position: absolute;
       box-shadow: none;
+      border-radius: 0;
 
       @include mobile() {
         margin-left: 0;
@@ -1020,16 +1022,14 @@ div.cmail-outer {
 
         button.fullscreen-bt {
           height: 32px;
+          width: 32px;
           background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
           background-size: 12px 12px;
-          background-position: top 10px left 10px;
+          background-position: center;
           background-repeat: no-repeat;
           background-color: rgba($deep_navy, 0.1);
           border-radius: 4px;
-          padding: 7px 10px 7px 30px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: $deep_navy;
+          padding: 0;
           opacity: 1;
 
           &:not(.disabled):hover {

@@ -7,8 +7,7 @@ div.post-to-button {
   &.disabled {
     div.post-to-bt-container button.post-to-bt {
       cursor: not-allowed;
-      background-color: rgba($deep_navy, 0.1);
-      color: rgba($deep_navy, 0.5);
+      color: rgba(white, 0.7);
     }
   }
 
@@ -39,13 +38,13 @@ div.post-to-button {
       display: block;
     }
 
-    @include big_web() {
-      &:hover {
-        div.post-bt-tooltip {
-          display: block;
-        }
-      }
-    }
+    // @include big_web() {
+    //   &:hover {
+    //     div.post-bt-tooltip {
+    //       display: block;
+    //     }
+    //   }
+    // }
 
     &.tt-title div.post-bt-tooltip {
       width: 142px;

@@ -550,8 +550,8 @@
                               (str "Save to " (:board-name cmail-data))
                               "Save")
                             (if (seq (:board-name cmail-data))
-                              (str "Post to " (:board-name cmail-data))
-                              "Post"))
+                              (str "Send to " (:board-name cmail-data))
+                              "Send"))
         did-pick-section (fn [board-data note dismiss-action]
                            (dis/dispatch! [:input [:show-sections-picker] false])
                            (when (and board-data
@@ -768,8 +768,7 @@
                           "Close")}]])
           [:div.fullscreen-bt-container
             [:button.mlb-reset.fullscreen-bt
-              {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
-              "Full-screen"]]
+              {:on-click #(cmail-actions/cmail-toggle-fullscreen)}]]
           [:div.cmail-footer-right
             {:class (when-not follow-up? "has-follow-ups-button")}
             (when-not is-fullscreen?
