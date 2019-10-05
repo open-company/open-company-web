@@ -644,13 +644,13 @@ $h2_top_margin: 24;
 }
 
 
-@mixin activity-comment(){
+@mixin activity-comment($font-size: 18px, $line-height: 24px){
   @include OC_Body_Book();
-  font-size: 18px;
+  font-size: $font-size;
   color: $deep_navy;
   white-space: pre-wrap;
   word-wrap: break-word;
-  line-height: 24px;
+  line-height: $line-height;
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -779,6 +779,6 @@ $h2_top_margin: 24;
   }
 
   p, ul > li, i {
-    min-height: 24px;
+    min-height: $line-height
   }
 }

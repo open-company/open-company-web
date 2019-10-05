@@ -209,7 +209,7 @@ div.expanded-post {
   }
 
   div.expanded-post-body {
-    @include activity-body(16, 20, $deep_navy);
+    @include activity-body(17, 22, $deep_navy);
     margin-top: 16px;
 
     @include mobile() {

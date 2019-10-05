@@ -433,7 +433,11 @@ div.stream-comments {
 
           div.stream-comment-body {
             display: inline;
-            @include activity-comment();
+            @include activity-comment(17px, 22px);
+
+            @include mobile() {
+              @include activity-comment();              
+            }
 
             .interactive-image {
               cursor: zoom-in;

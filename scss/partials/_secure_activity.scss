@@ -146,8 +146,12 @@ div.secure-activity-container {
       }
 
       div.activity-title {
-        @include activity-title(36px, 40px);
+        @include activity-title(26px, 33px);
         color: $deep_navy;
+
+        @include mobile() {
+          @include activity-title(36px, 40px);
+        }
 
         .emojione {
           @include emoji-size(30);
@@ -172,8 +176,12 @@ div.secure-activity-container {
       div.activity-abstract {
         margin: 16px 0 32px;
         cursor: text;
-        @include activity-abstract(18px, 24px);
+        @include activity-abstract(16px, 20px);
         @include OC_Body_Bold();
+
+        @include mobile() {
+          @include activity-abstract(18px, 24px);
+        }
       }
 
       div.activity-body {
@@ -181,11 +189,18 @@ div.secure-activity-container {
         outline: none;
         margin: 16px 0 0;
         cursor: text;
-        @include activity-body(18, 24, $deep_navy);
+        @include activity-body(17, 22, $deep_navy);
+        @include mobile() {
+          @include activity-body(18, 24, $deep_navy);
+        }
         color: $deep_navy;
         @include OC_Body_Book();
-        font-size: 18px;
-        line-height: 24px;
+        font-size: 17px;
+        line-height: 22px;
+        @include mobile() {
+          font-size: 18px;
+          line-height: 24px;
+        }
 
         & > *:first-child {
           margin-top: 0px;
