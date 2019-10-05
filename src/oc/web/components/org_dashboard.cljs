@@ -23,6 +23,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -146,7 +147,11 @@
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        (jwt/jwt)
-                                                       (not user-responded-to-push-permission?))]
+                                                       (not user-responded-to-push-permission?))
+        show-expanded-post (and (not show-activity-removed)
+                                (not show-login-wall)
+                                (router/current-activity-id)
+                                current-activity-data)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -210,6 +215,8 @@
           ;; Search results
           is-showing-mobile-search
           (search-box))
+        (when show-expanded-post
+          (expanded-post))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -238,11 +245,14 @@
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
-        ;; On mobile don't show the dashboard/stream when showing another panel
-        (when (or (not is-mobile?)
-                  (and (not is-sharing-activity)
-                       (not show-mobile-cmail?)
-                       (not show-push-notification-permissions-modal?)))
+        
+        (when (and ;; Do not render navbar and dashboard-layout when expanded post is open
+                   (not show-expanded-post)
+                   ;; On mobile don't show the dashboard/stream when showing another panel
+                   (or (not is-mobile?)
+                       (and (not is-sharing-activity)
+                            (not show-mobile-cmail?)
+                            (not show-push-notification-permissions-modal?))))
           [:div.page
             (navbar)
             [:div.org-dashboard-container

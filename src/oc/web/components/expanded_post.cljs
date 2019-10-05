@@ -127,6 +127,15 @@
           [:div.back-arrow]
           [:div.back-to-board-inner
             back-to-label]]
+       [:div.expanded-post-header-center.group
+         (user-avatar-image (:publisher activity-data))
+         [:span.header-title
+           (:headline activity-data)]
+         (if (and assigned-follow-up-data
+                  (not (:completed? assigned-follow-up-data)))
+            [:div.follow-up-tag]
+            (when (:must-see activity-data)
+              [:div.must-see-tag]))]
        (more-menu {:entity-data activity-data
                    :share-container-id dom-element-id
                    :external-share (not is-mobile?)
@@ -135,7 +144,8 @@
                    :show-delete? true
                    :show-move? (not is-mobile?)
                    :tooltip-position "bottom"
-                   :assigned-follow-up-data assigned-follow-up-data})]
+                   :assigned-follow-up-data assigned-follow-up-data
+                   :complete-follow-up-title "Complete follow-up"})]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
@@ -169,9 +179,9 @@
                  (utils/tooltip-date (:published-at activity-data)))]
           (if (and assigned-follow-up-data
                    (not (:completed? assigned-follow-up-data)))
-            [:div.follow-up-tag]
+            [:div.follow-up-tag.mobile-only]
             (when (:must-see activity-data)
-              [:div.must-see-tag]))]]
+              [:div.must-see-tag.mobile-only]))]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
           {:class utils/hide-class
