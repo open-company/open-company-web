@@ -367,7 +367,7 @@ div.stream-item {
 
       div.stream-item-body {
         margin-top: 3px;
-        @include activity-body(16, 20, $deep_navy);
+        @include activity-body(17, 22, $deep_navy);
         color: $deep_navy;
         @include OC_Body_Book();
         line-height: 20px;

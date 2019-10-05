@@ -24,7 +24,7 @@
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
-(def foc-height 184)
+(def foc-height 188)
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
