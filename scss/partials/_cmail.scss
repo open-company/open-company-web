@@ -92,6 +92,7 @@ div.cmail-outer {
       background-color: $grey_num_2;
       position: absolute;
       box-shadow: none;
+      border: none;
       border-radius: 0;
 
       @include mobile() {
