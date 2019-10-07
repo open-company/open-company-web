@@ -109,77 +109,6 @@
         (and (seq parent-comment-uuid)
              (= parent-comment-uuid add-comment-focus)))))
 
-(defn- get-add-comment-class [s]
-  (str "add-comment-" @(::add-comment-id s)))
-
-(defn- add-comment-footer
-  [s activity-data should-hide-post-button edit-comment-data parent-comment-uuid dismiss-reply-cb]
-  (let [add-comment-class (get-add-comment-class s)
-        follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
-        complete-follow-up-link (when follow-up
-                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))
-        show-follow-up-button? (and follow-up
-                                    (not (:completed? follow-up))
-                                    complete-follow-up-link)
-        attachment-uploading (drv/react s :attachment-uploading)
-        uploading? (and attachment-uploading
-                        (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))]
-    [:div.add-comment-footer
-      {:class (when should-hide-post-button "hide-footer")}
-      [:button.mlb-reset.send-btn
-        {:on-click #(when-not @(::add-button-disabled s)
-                      (send-clicked % s))
-         :disabled @(::add-button-disabled s)}
-        (if edit-comment-data
-          "Save"
-          "Comment")]
-      (when (and parent-comment-uuid
-                 (fn? dismiss-reply-cb))
-        [:button.mlb-reset.close-reply-bt
-          {:on-click (fn [_]
-                      (if @(::did-change s)
-                        (let [alert-data {:icon "/img/ML/trash.svg"
-                                          :action "cancel-comment-edit"
-                                          :message "Are you sure you want to cancel? All your changes to this comment will be lost."
-                                          :link-button-title "Keep"
-                                          :link-button-cb #(alert-modal/hide-alert)
-                                          :solid-button-style :red
-                                          :solid-button-title "Yes"
-                                          :solid-button-cb (fn []
-                                                            (dismiss-reply-cb true)
-                                                            (alert-modal/hide-alert))}]
-                          (alert-modal/show-alert alert-data))
-                        (dismiss-reply-cb true)))
-           :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-           :data-placement "top"
-           :title (if edit-comment-data "Cancel edit" "Close")}])
-      (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
-                     :width (if (responsive/is-mobile-size?) 24 32)
-                     :height (if (responsive/is-mobile-size?) 24 32)
-                     :position "top"
-                     :default-field-selector (str "div." add-comment-class)
-                     :container-selector (str "div." add-comment-class)})
-      (when show-follow-up-button?
-        [:div.buttons-separator])
-      (when show-follow-up-button?
-        [:button.mlb-reset.complete-follow-up
-          {:class (when-not @(::complete-follow-up s) "unselected")
-           :data-toggle "tooltip"
-           :data-placement "top"
-           :data-container "body"
-           :title "Complete follow-up when the comment is posted"
-           :on-click #(do
-                       (utils/event-stop %)
-                       (reset! (::show-post-button s) true)
-                       (swap! (::complete-follow-up s) not))}
-          (carrot-checkbox {:selected @(::complete-follow-up s)})
-          "Complete follow-up"])
-      (when uploading?
-        [:div.upload-progress
-          (small-loading)
-          [:span.attachment-uploading
-            (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])]))
-
 (rum/defcs add-comment < rum/reactive
                          ;; Locals
                          (rum/local nil :me/editor)
@@ -277,7 +206,17 @@
                                      (not parent-comment-uuid)
                                      (not @(::show-post-button s))
                                      (not is-focused?))
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
+        complete-follow-up-link (when follow-up
+                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))
+        show-follow-up-button? (and follow-up
+                                    (not (:completed? follow-up))
+                                    complete-follow-up-link)
+        attachment-uploading (drv/react s :attachment-uploading)
+        uploading? (and attachment-uploading
+                        (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
+        add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
       {:class container-class}
       [:div.add-comment-box
@@ -286,11 +225,15 @@
           {:class (when-not should-hide-post-button "active")}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
            {:ref "editor-node"
-            :class (utils/class-set {(get-add-comment-class s) true
+            :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden @(::did-change s)
                                      utils/hide-class true})
             :on-focus #(focus-add-comment s)
-            :on-blur #(disable-add-comment-if-needed s)
+            :on-blur #(if parent-comment-uuid
+                        (let [add-comment-node (rum/ref-node s "editor-node")]
+                          (when-not (seq (.-innerHTML add-comment-node))
+                            (dismiss-reply-cb true)))
+                        (disable-add-comment-if-needed s))
             :on-key-down (fn [e]
                           (let [add-comment-node (rum/ref-node s "editor-node")]
                             (when (and (= (.-key e) "Escape")
@@ -305,8 +248,58 @@
                               (send-clicked e s))))
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
-          (when-not is-mobile?
-            (add-comment-footer s activity-data should-hide-post-button edit-comment-data parent-comment-uuid dismiss-reply-cb))]
+          [:div.add-comment-footer
+            [:button.mlb-reset.send-btn
+              {:on-click #(when-not @(::add-button-disabled s)
+                            (send-clicked % s))
+               :disabled @(::add-button-disabled s)}
+              (if edit-comment-data
+                "Save"
+                "Comment")]
+            ; (when (and parent-comment-uuid
+            ;            (fn? dismiss-reply-cb))
+            ;   [:button.mlb-reset.close-reply-bt
+            ;     {:on-click (fn [_]
+            ;                 (if @(::did-change s)
+            ;                   (let [alert-data {:icon "/img/ML/trash.svg"
+            ;                                     :action "cancel-comment-edit"
+            ;                                     :message "Are you sure you want to cancel? All your changes to this comment will be lost."
+            ;                                     :link-button-title "Keep"
+            ;                                     :link-button-cb #(alert-modal/hide-alert)
+            ;                                     :solid-button-style :red
+            ;                                     :solid-button-title "Yes"
+            ;                                     :solid-button-cb (fn []
+            ;                                                       (dismiss-reply-cb true)
+            ;                                                       (alert-modal/hide-alert))}]
+            ;                     (alert-modal/show-alert alert-data))
+            ;                   (dismiss-reply-cb true)))
+            ;      :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+            ;      :data-placement "top"
+            ;      :title (if edit-comment-data "Cancel edit" "Close")}])
+            (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
+                           :width (if (responsive/is-mobile-size?) 24 32)
+                           :height (if (responsive/is-mobile-size?) 24 32)
+                           :position "top"
+                           :default-field-selector (str "div." add-comment-class)
+                           :container-selector (str "div." add-comment-class)})
+            (when show-follow-up-button?
+              [:button.mlb-reset.complete-follow-up
+                {:class (when-not @(::complete-follow-up s) "unselected")
+                 :data-toggle "tooltip"
+                 :data-placement "top"
+                 :data-container "body"
+                 :title "Complete follow-up when the comment is posted"
+                 :on-click #(do
+                             (utils/event-stop %)
+                             (reset! (::show-post-button s) true)
+                             (swap! (::complete-follow-up s) not))}
+                (carrot-checkbox {:selected @(::complete-follow-up s)})
+                "Complete follow-up"])
+            (when uploading?
+              [:div.upload-progress
+                (small-loading)
+                [:span.attachment-uploading
+                  (str "Uploading " (or (:progress attachment-uploading) 0) "%...")]])]]
         (when @(:me/showing-media-video-modal s)
           [:div.video-container
             {:ref :video-container}
@@ -322,6 +315,4 @@
                                          (reset! (:me/showing-gif-selector s) false)
                                          (me-media-utils/media-gif-add s @(:me/media-picker-ext s) gif-obj))
                          :offset-element-selector [(keyword (str "div." container-class))]
-                         :outer-container-selector [(keyword (str "div." container-class))]}))
-        (when is-mobile?
-          (add-comment-footer s activity-data should-hide-post-button edit-comment-data parent-comment-uuid dismiss-reply-cb))]]))
+                         :outer-container-selector [(keyword (str "div." container-class))]}))]]))
