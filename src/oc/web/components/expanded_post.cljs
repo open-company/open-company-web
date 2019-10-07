@@ -85,6 +85,9 @@
    :did-remount (fn [_ s]
     (load-comments s false)
     (save-initial-last-read-at s)
+    s)
+   :will-unmount (fn [s]
+    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
