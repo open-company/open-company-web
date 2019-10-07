@@ -228,83 +228,24 @@
                                             :indented-comment is-indented-comment?})
                    :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
                   [:div.stream-comment-inner
-                    (when-not is-editing?
-                      (if (responsive/is-tablet-or-mobile?)
-                        [:div.stream-comment-mobile-menu
-                          (more-menu {:entity-data comment-data
-                                      :external-share false
-                                      :entity-type "comment"
-                                      :show-edit? true
-                                      :edit-cb (partial start-editing s)
-                                      :show-delete? true
-                                      :delete-cb (partial delete-clicked s activity-data)
-                                      :can-comment-share? true
-                                      :comment-share-cb #(share-clicked comment-data)
-                                      :can-react? true
-                                      :react-cb #(reset! (::show-picker s) (:uuid comment-data))
-                                      :can-reply? true
-                                      :reply-cb #(reply-to s (:reply-parent comment-data))})
-                          (when showing-picker?
-                            (emoji-picker-container s comment-data))]
-                        [:div.stream-comment-floating-buttons
-                          {:key (str "stream-comment-floating-buttons"
-                                 (when can-show-edit-bt?
-                                   "-edit")
-                                 (when can-show-delete-bt?
-                                   "-delete"))}
-                          [:div.stream-comment-floating-buttons-inner
-                            ;; Green buttons more menu
-                            (when (= @(::show-more-menu s) (:uuid comment-data))
-                              [:div.stream-comment-floating-buttons-more-menu
-                                (when can-show-edit-bt?
-                                  [:button.mlb-reset.edit-bt
-                                    {:on-click (fn [_]
-                                                (start-editing s comment-data))}
-                                    "Edit"])
-                                (when can-show-delete-bt?
-                                  [:button.mlb-reset.delete-bt
-                                    {:on-click (fn [_]
-                                                (delete-clicked s activity-data comment-data))}
-                                    "Delete"])
-                                [:button.mlb-reset.share-bt
-                                  {:on-click #(share-clicked comment-data)}
-                                  "Copy link"]])
-                            ;; More menu button or share button (depends if user is author of the comment)
-                            (if (or can-show-edit-bt?
-                                    can-show-delete-bt?)
-                              [:button.mlb-reset.floating-bt.more-menu-bt
-                                {:on-click (fn [_] (swap! (::show-more-menu s) #(if (= % (:uuid comment-data)) nil (:uuid comment-data))))
-                                 :data-toggle "tooltip"
-                                 :data-placement "top"
-                                 :title "More"}]
-                              [:button.mlb-reset.floating-bt.share-bt
-                                {:data-toggle "tooltip"
-                                 :data-placement "top"
-                                 :on-click #(do
-                                              (copy-comment-url (:url comment-data))
-                                              (notification-actions/show-notification {:title "Share link copied to clipboard"
-                                                                                       :dismiss true
-                                                                                       :expire 3
-                                                                                       :id (keyword (str "comment-url-copied-"
-                                                                                        (:uuid comment-data)))}))
-                                 :title "Copy link"}])
-                            ;; Reply to comment
-                            (when (:reply-parent comment-data)
-                              [:button.mlb-reset.floating-bt.reply-bt
-                                {:data-toggle "tooltip"
-                                 :data-placement "top"
-                                 :on-click #(reply-to s (:reply-parent comment-data))
-                                 :title "Reply"}])
-                            ;; React container
-                            [:div.react-bt-container
-                              [:button.mlb-reset.floating-bt.react-bt
-                                {:data-toggle "tooltip"
-                                 :data-placement "top"
-                                 :title "Add reaction"
-                                 :class (when (or can-show-edit-bt? can-show-delete-bt?) "has-more-menu")
-                                 :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                              (when showing-picker?
-                                (emoji-picker-container s comment-data))]]]))
+                    (when (and (not is-editing?)
+                               (responsive/is-tablet-or-mobile?))
+                      [:div.stream-comment-mobile-menu
+                        (more-menu {:entity-data comment-data
+                                    :external-share false
+                                    :entity-type "comment"
+                                    :show-edit? true
+                                    :edit-cb (partial start-editing s)
+                                    :show-delete? true
+                                    :delete-cb (partial delete-clicked s activity-data)
+                                    :can-comment-share? true
+                                    :comment-share-cb #(share-clicked comment-data)
+                                    :can-react? true
+                                    :react-cb #(reset! (::show-picker s) (:uuid comment-data))
+                                    :can-reply? true
+                                    :reply-cb #(reply-to s (:reply-parent comment-data))})
+                        (when showing-picker?
+                          (emoji-picker-container s comment-data))])
                     [:div.stream-comment-author-avatar
                       (user-avatar-image (:author comment-data))]
 
