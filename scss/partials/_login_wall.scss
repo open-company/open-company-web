@@ -130,36 +130,6 @@ div.login-wall-container {
               left: 16px;
             }
           }
-
-          button.top-continue {
-            display: none;
-
-            @include mobile(){
-              display: block;
-              float: right;
-              @include OC_Body_Bold();
-              font-size: 15px;
-              height: 40px;
-              width: 40px;
-              border-radius: 20px;
-              background-color: $sea_blue;
-              background-image: cdnUrl("/img/ML/white_continue_arrow.svg");
-              background-size: 14px 19px;
-              background-position: center;
-              background-repeat: no-repeat;
-              outline: none;
-              border: none;
-              padding: 0px;
-              position: absolute;
-              top: 12px;
-              right: 24px;
-
-              &.disabled, &:disabled {
-                background-color: $light_ui_grey;
-                opacity: 1;
-              }
-            }
-          }
         }
 
         button.signup-with-slack {
@@ -328,6 +298,8 @@ div.login-wall-container {
 
           &.disabled, &:disabled {
             background-color: $light_ui_grey;
+            color: white;
+            opacity: 1 !important;
           }
 
           @include mobile() {
