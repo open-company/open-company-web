@@ -5,9 +5,20 @@ div.post-to-button {
   border-radius: 4px;
 
   &.disabled {
+    
     div.post-to-bt-container button.post-to-bt {
       cursor: not-allowed;
-      color: rgba(white, 0.7);
+      color: rgba($deep_navy, 0.5);
+      background-color: rgba($deep_navy, 0.1);
+    }
+
+    div.post-to-arrows-container {
+      background-color: rgba($deep_navy, 0.1);
+
+      button.post-to-arrows {
+        background-color: rgba($deep_navy, 0.1);
+        background-image: cdnUrl("/img/ML/select_arrows.svg");
+      }
     }
   }
 
