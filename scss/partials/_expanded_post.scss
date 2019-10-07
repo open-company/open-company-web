@@ -58,15 +58,10 @@ div.expanded-post {
       border-radius: 4px;
       opacity: 1;
       background-color: rgba($deep_navy, 0.1);
-      background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
       background-repeat: no-repeat;
-      background-size: 16px 10px;
       background-position: center;
-
-      @include mobile() {
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        background-size: 12px 12px;
-      }
 
       @include big_web(){
         &:hover {

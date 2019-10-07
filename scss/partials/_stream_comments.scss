@@ -36,6 +36,10 @@ div.stream-comments {
         padding-bottom: 16px;
       }
 
+      &:last-child, &.closing-thread:last-child {
+        padding-bottom: 0;
+      }
+
       div.stream-comment:not(.indented-comment) {
         padding-top: 16px;
       }
