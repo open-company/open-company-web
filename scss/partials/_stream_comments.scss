@@ -76,22 +76,11 @@ div.stream-comments {
 
         div.stream-comment-inner {
           padding: 8px 0;
-
-          @include mobile() {
-
-          }
-        }
-
-        @include big_web() {
-          &:not(.editing-other-comment):hover {
-            div.stream-comment-floating-buttons {
-              display: block;
-            }
-          }
         }
 
         div.stream-comment-mobile-menu {
           display: none;
+          float: right;
 
           div.emoji-picker-container {
             button.close-bt {
@@ -201,61 +190,14 @@ div.stream-comments {
         }
 
         div.stream-comment-floating-buttons {
-          position: absolute;
-          right: 0;
-          top: 16px;
-          height: 26px;
-          width: 84px;
-          display: none;
+          float: left;
+          height: 24px;
           z-index: 2;
 
-          div.stream-comment-floating-buttons-inner {
-            position: relative;
-            height: 26px;
-            width: 84px;
-
-            div.stream-comment-floating-buttons-more-menu {
-              Width: 94px;
-              position: absolute;
-              top: 28px;
-              left: -24px;
-              background-color: transparent;
-              padding: 8px 0;
-              border: 1px solid $mid_light_grey;
-              box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
-              border-radius: 4px;
-              background-color: white;
-              z-index: 2;
-
-              button {
-                width: 100%;
-                height: 34px;
-                padding: 8px 16px;
-                background-color: white;
-                margin: 0;
-                @include OC_Body_Book();
-                font-size: 14px;
-                color: $light_navy;
-                text-align: left;
-
-                &:hover, &.active {
-                  background-color: #ebf8f1;
-                  color: $carrot_green;
-                }
-              }
-            }
-          }
-
           div.react-bt-container {
-            width: 30px;
-            height: 26px;
-            position: absolute;
-            left: 60px;
-            top: 0;
-
-            &.has-more-menu {
-              left: 58px;
-            }
+            // width: 30px;
+            height: 24px;
+            float: left;
 
             div.emoji-mart {
               position: absolute;
@@ -311,47 +253,62 @@ div.stream-comments {
             }
           }
 
-          div.stream-comment-floating-buttons-inner button.floating-bt {
+          .separator-bt {
+            margin-left: 15px;
+            position: relative;
+
+            &:before {
+              content: "";
+              width: 3px;
+              height: 3px;
+              background-color: rgba($deep_navy, 0.2);
+              border-radius: 50%;
+              position: absolute;
+              left: -9px;
+              top: 10px;
+            }
+          }
+
+          button.floating-bt {
             padding: 0;
-            margin: 0;
-            width: 30px;
-            height: 26px;
+            height: 24px;
+            min-width: 20px;
             background-position: center;
             background-repeat: no-repeat;
-            margin: 0;
             padding: 0;
-            position: absolute;
-            top: 0;
+            float: left;
+            @include OC_Body_Book();
+            font-size: 12px;
+            line-height: 15px;
+            color: $deep_navy;
 
             @include big_web() {
               opacity: 0.5;
               &:hover {
                 opacity: 1;
+
+                &:before {
+                  opacity: 0.5;
+                }
               }
             }
 
             &.share-bt {
+              // width: 30px;
               background-image: cdnUrl("/img/ML/comment_share.svg");
-              background-size: 14px 14px;
-              left: 0;
+              background-size: 12px 12px;
+              // left: 0;
             }
 
             &.reply-bt {
-              width: 30px;
+              // width: 30px;
               background-image: cdnUrl("/img/ML/comment_reply.svg");
-              background-size: 14px 14px;
-              left: 30px;
-            }
-
-            &.more-menu-bt {
-              width: 26px;
-              background-image: cdnUrl("/img/ML/comment_more_menu.svg");
-              background-size: 18px 4px;
-              left: 0;
+              background-size: 12px 12px;
+              // left: 30px;
             }
 
             &.react-bt {
-              width: 30px;
+              // width: 30px;
               background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
               background-size: 14px 14px;
               border-right: none;
@@ -401,7 +358,7 @@ div.stream-comments {
         }
 
         div.stream-comment-header {
-          height: 16px;
+          height: 24px;
 
           div.stream-comment-author-right  {
             float: left;
@@ -411,7 +368,7 @@ div.stream-comments {
               @include OC_Body_Bold();
               font-size: 12px;
               color: $deep_navy;
-              line-height: 15px;
+              line-height: 24px;
               float: left;
             }
 
@@ -421,7 +378,7 @@ div.stream-comments {
               color: rgba($deep_navy, 0.5);
               float: left;
               margin-left: 8px;
-              line-height: 14px;
+              line-height: 24px;
             }
 
             div.new-comment-tag {
@@ -431,7 +388,7 @@ div.stream-comments {
               @include OC_Body_Bold();
               text-transform: uppercase;
               font-size: 12px;
-              line-height: 14px;
+              line-height: 24px;
             }
           }
         }
