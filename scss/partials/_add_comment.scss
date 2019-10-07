@@ -77,7 +77,11 @@ div.add-comment-box-container {
           @include emoji-size(13);
         }
 
-        @include activity-comment();
+        @include activity-comment(17px, 22px);
+
+        @include mobile() {
+          @include activity-comment();          
+        }
       }
     }
   }

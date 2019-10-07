@@ -712,6 +712,8 @@ $h2_top_margin: 24;
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     color: rgba($deep_navy, 0.5);
     font-style: normal;
+    font-size: $font-size;
+    line-height: $line-height;
   }
 
   img, a > img {
