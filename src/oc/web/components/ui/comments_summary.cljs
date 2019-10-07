@@ -56,7 +56,7 @@
         face-pile-width (if (pos? face-pile-count)
                           (if is-mobile?
                             (+ 8 (* 12 face-pile-count))
-                            (+ 14 (* 14 face-pile-count)))
+                            (+ 10 (* 12 face-pile-count)))
                             0)]
     (when comments-count
       [:div.is-comments
