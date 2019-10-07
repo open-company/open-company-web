@@ -1,7 +1,6 @@
 div.add-comment-box-container {
   position: relative;
   width: 100%;
-  border-top: 1px solid $ultra_light_grey;
   padding-top: 24px;
 
   @include tablet() {

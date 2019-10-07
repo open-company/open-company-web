@@ -232,15 +232,15 @@
                :title "Complete follow-up"}
               complete-follow-up-title]
             (when create-follow-up-link
-              [:button.mlb-reset.more-menu-create-follow-up-bt
-                {:type "button"
-                 :ref "more-menu-create-follow-up-bt"
-                 :data-container "body"
-                 :on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
-                              (activity-actions/create-self-follow-up entity-data create-follow-up-link))
-                 :data-toggle (if is-mobile? "" "tooltip")
-                 :data-placement (or tooltip-position "top")
-                 :title "Follow up later"}])))])))
+              [:div.more-menu-create-follow-up-bt-container
+                [:button.mlb-reset.more-menu-create-follow-up-bt
+                  {:type "button"
+                   :ref "more-menu-create-follow-up-bt"
+                   :on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/create-self-follow-up entity-data create-follow-up-link))
+                   :data-toggle (if is-mobile? "" "tooltip")
+                   :data-placement (or tooltip-position "top")
+                   :title "Follow up later"}]])))])))

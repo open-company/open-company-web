@@ -85,17 +85,6 @@
         is-mobile? (responsive/is-mobile-size?)
         route (drv/react s :route)
         org-data (dis/org-data)
-        back-to-slug (utils/back-to org-data)
-        is-all-posts? (= back-to-slug "all-posts")
-        is-follow-ups? (= back-to-slug "follow-ups")
-        back-to-label (str "Back to "
-                           (cond
-                             is-all-posts?
-                             "All posts"
-                             is-follow-ups?
-                             "Follow-ups"
-                             :else
-                             (:name (dis/board-data back-to-slug))))
         has-video (seq (:fixed-video-id activity-data))
         uploading-video (dis/uploading-video-data (:video-id activity-data))
         current-user-id (jwt/user-id)
@@ -120,13 +109,9 @@
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}}
       (image-modal/image-modal {:src expand-image-src})
-      [:div.activity-share-container]
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
-          {:on-click close-expanded-post}
-          [:div.back-arrow]
-          [:div.back-to-board-inner
-            back-to-label]]
+          {:on-click close-expanded-post}]
        [:div.expanded-post-header-center.group
          (user-avatar-image (:publisher activity-data))
          [:span.header-title
@@ -136,6 +121,7 @@
             [:div.follow-up-tag]
             (when (:must-see activity-data)
               [:div.must-see-tag]))]
+       [:div.activity-share-container]
        (more-menu {:entity-data activity-data
                    :share-container-id dom-element-id
                    :external-share (not is-mobile?)

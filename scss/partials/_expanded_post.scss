@@ -20,9 +20,12 @@ div.expanded-post {
   }
 
   div.activity-share-container {
+    // position: unset;
+
     div.activity-share-modal-container {
-      top: -21px;
-      right: 0;
+      top: 36px;
+      right: 64px;
+      margin-top: 0;
     }
   }
 
@@ -35,6 +38,7 @@ div.expanded-post {
     padding: 12px 16px;
     border-bottom: 1px solid rgba($deep_navy, 0.15);
     background-color: $grey_num_2;
+    z-index: 2;
 
     @include mobile() {
       width: 100vw;
@@ -45,60 +49,28 @@ div.expanded-post {
       left: 0;
       border-bottom: 1px solid $divider_line_grey;
       background-color: white;
-      z-index: 2;
     }
 
     button.back-to-board {
       float: left;
       height: 32px;
+      width: 32px;
       border-radius: 4px;
-      padding: 7px 16px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      background-color: rgba($deep_navy, 0.1);
       opacity: 1;
-
-      &:hover {
-        background-color: rgba($deep_navy, 0.2);
-      }
+      background-color: rgba($deep_navy, 0.1);
+      background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+      background-repeat: no-repeat;
+      background-size: 16px 10px;
+      background-position: center;
 
       @include mobile() {
-        background-color: transparent;
-        padding: 7px 0;
-        width: 32px;
-        height: 32px;
-        background-color: $ultra_light_grey;
-        border-radius: 4px;
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-size: 12px 12px;
       }
 
-      div.back-to-board-inner {
-        @include OC_Body_Book();
-        font-size: 14px;
-        color: $light_navy;
-        line-height: 18px;
-        margin-left: 8px;
-
-        @include mobile() {
-          display: none;
-        }
-      }
-
-      div.back-arrow {
-        content: " ";
-        width: 16px;
-        height: 10px;
-        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
-        background-repeat: no-repeat;
-        background-size: 16px 10px;
-        background-position: center;
-
-        @include mobile() {
-          width: 12px;
-          height: 12px;
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
+      @include big_web(){
+        &:hover {
+          background-color: rgba($deep_navy, 0.2);
         }
       }
     }
@@ -126,7 +98,7 @@ div.expanded-post {
 
       span.header-title {
         margin-left: 8px;
-        @include OC_Body_Book();
+        @include OC_Body_Bold();
         font-size: 14px;
         line-height: 24px;
         color: $deep_navy;
@@ -215,7 +187,7 @@ div.expanded-post {
         }
       }
 
-      button.more-menu-create-follow-up-bt, button.more-menu-complete-follow-up-bt {
+      div.more-menu-create-follow-up-bt-container button.more-menu-create-follow-up-bt, button.more-menu-complete-follow-up-bt {
         &:before {
           position: absolute;
           content: "";
@@ -247,23 +219,37 @@ div.expanded-post {
         float: right;
       }
 
-      button.more-menu-create-follow-up-bt {
+      div.more-menu-create-follow-up-bt-container {
+        float: right;
+        margin-left: 32px;
         width: 32px;
         height: 32px;
-        position: relative;
-        margin-left: 32px;
-        background-color: rgba($deep_navy, 0.1);
-        background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-        background-size: 13px 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-radius: 4px;
-        opacity: 1;
-        float: right;
 
-        &:not(.disabled):hover {
-          background-color: rgba($deep_navy, 0.2);
+        div.tooltip {
+          width: 128px;
         }
+
+        button.more-menu-create-follow-up-bt {
+          width: 32px;
+          height: 32px;
+          position: relative;
+          background-color: rgba($deep_navy, 0.1);
+          background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+          background-size: 13px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          border-radius: 4px;
+          opacity: 1;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
+        }
+      }
+
+      ul.more-menu-list {
+        top: 34px;
+        left: 0px;
       }
     }
   }

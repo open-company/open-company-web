@@ -151,7 +151,8 @@
         show-expanded-post (and (not show-activity-removed)
                                 (not show-login-wall)
                                 (router/current-activity-id)
-                                current-activity-data)]
+                                current-activity-data
+                                (not (:fullscreen cmail-state)))]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
