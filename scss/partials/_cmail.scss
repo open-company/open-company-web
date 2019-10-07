@@ -464,7 +464,7 @@ div.cmail-outer {
           margin-left: 8px;
           height: 18px;
           margin-top: 3px;
-          @include OC_Body_Book();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $deep_navy;
           line-height: 18px;
