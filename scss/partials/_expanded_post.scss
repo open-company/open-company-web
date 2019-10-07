@@ -79,7 +79,7 @@ div.expanded-post {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 500px;
+      width: 40vw;
       height: 24px;
       position: absolute;
       top: 16px;
@@ -103,7 +103,7 @@ div.expanded-post {
         line-height: 24px;
         color: $deep_navy;
         white-space: pre;
-        max-width: 250px;
+        max-width: calc(100% - 24px - 8px - 86px - 8px);
         overflow: hidden;
         text-overflow: ellipsis;
       }
