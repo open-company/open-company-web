@@ -170,9 +170,6 @@ div.onboard-lander {
   }
 
   div.main-cta {
-    @include mobile() {
-      padding-top: 54px;
-    }
 
     div.mobile-header {
       display: none;
@@ -885,7 +882,6 @@ div.onboard-lander {
 
   @include mobile() {
     div.main-cta {
-      padding-top: 0;
       div.mobile-header {
         height: 104px;
         border-bottom: none;
@@ -913,10 +909,13 @@ div.onboard-lander {
     }
   }
 
-  &.lander-profile {
+  &.lander {
     @include mobile() {
-      padding: 104px 16px 24px;
+      padding: 0 0 24px;
     }
+  }
+
+  &.lander-profile {
     div.mobile-header {
       button.top-continue {
         color: $sea_blue;
