@@ -213,6 +213,7 @@
                             (will-close))
                           (activity-actions/activity-share-show entity-data share-container-id))
              :data-toggle (if is-mobile? "" "tooltip")
+             :data-container "body"
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
