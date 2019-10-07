@@ -216,16 +216,13 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              (when is-mobile?
-                (reactions activity-data))
+              (reactions activity-data)
               [:div.stream-item-footer-mobile-group
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
                   (comments-summary {:entry-data activity-data
                                      :comments-data comments-data
                                      :show-new-tag? has-new-comments?})]
-                (when-not is-mobile?
-                  (reactions activity-data))
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
