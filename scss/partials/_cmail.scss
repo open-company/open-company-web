@@ -35,6 +35,10 @@ div.cmail-outer {
           }
 
           div.rich-body-editor-outer-container {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+
             div.rich-body-editor-container {
               margin-top: 0;
               height: 24px;
@@ -268,18 +272,23 @@ div.cmail-outer {
           padding-bottom: 32px;
           display: block;
         }
+        div.rich-body-editor-outer-container {
+          border-top: none;
+          margin-top: 0;
+          padding-top: 0;
 
-        div.rich-body-editor-container {
-          margin-top: 32px;
+          div.rich-body-editor-container {
+            margin-top: 32px;
 
-          div.rich-body-editor {
-            padding-bottom: 30vh;
-            min-height: calc(100vh - 334px);
-            @include activity-body(18, 26, $deep_navy);
+            div.rich-body-editor {
+              padding-bottom: 30vh;
+              min-height: calc(100vh - 334px);
+              @include activity-body(18, 26, $deep_navy);
 
-            @media screen and (min-height: 556px) {
-              max-height: initial;
-              min-height: calc(100vh - 354px);
+              @media screen and (min-height: 556px) {
+                max-height: initial;
+                min-height: calc(100vh - 354px);
+              }
             }
           }
         }
@@ -691,6 +700,17 @@ div.cmail-outer {
     &:not(.fullscreen) > {
       div.follow-ups-header {
         margin-top: -1px;
+        width: calc(100% - 32px);
+        margin: 0 16px;
+        height: 32px;
+        background-color: $sea_blue;
+        padding: 7px 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+        border-radius: 4px;
 
         @include mobile() {
           margin-top: 0;
@@ -710,6 +730,17 @@ div.cmail-outer {
       position: relative;
 
       @include follow-up-tag();
+
+      div.follow-up-icon {
+        width: 10px;
+        height: 12px;
+        background-image: cdnUrl("/img/ML/follow_up_icon_white.svg");
+        background-size: 10px 12px;
+        background-repeat: no-repeat;
+        background-position: center;
+        margin-right: 8px;
+        margin-top: 1px;
+      }
 
       @include mobile() {
         text-align: center;
@@ -740,7 +771,7 @@ div.cmail-outer {
       button.remove-follow-up-button {
         position: absolute;
         right: 16px;
-        top: 8px;
+        top: 4px;
         width: auto;
         height: 24px;
         padding: 0;
@@ -887,6 +918,9 @@ div.cmail-outer {
 
       div.rich-body-editor-outer-container {
         position: relative;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid rgba($deep_navy, 0.15);
 
         @include mobile() {
           min-height: calc(100vh - 334px);
@@ -921,7 +955,7 @@ div.cmail-outer {
           }
 
           @media screen and (min-height: 556px) {
-            min-height: 130px;
+            min-height: 82px;
           }
 
           @include mobile() {

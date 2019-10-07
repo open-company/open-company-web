@@ -308,7 +308,7 @@
                         (debounced-autosave! s)))))
        :ref :follow-ups-header}
       (when-not is-mobile?
-        [:div.follow-up-tag.white-bg])
+        [:div.follow-up-icon])
       [:div.follow-ups-label
         "Follow-ups "
         (when-not published-entry?
