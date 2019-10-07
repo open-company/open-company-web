@@ -286,12 +286,13 @@ $h2_top_margin: 24;
   }
 
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-    @include OC_Body_Book();
+    @include OC_Body_Bold();
     font-size: #{$font_size}px;
     line-height: #{$line_height}px;
-    color: $grey_num_1;
+    color: rgba($deep_navy, 0.5);
     opacity: 1;
-    font-style: none !important;
+    font-style: normal;
+    text-transform: none;
   }
 
   p, ul > li, i {

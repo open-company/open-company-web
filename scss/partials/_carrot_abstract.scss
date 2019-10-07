@@ -62,11 +62,5 @@ div.cmail-content-abstract-container {
     @include mobile() {
       @include activity-abstract(18px, 26px);
     }
-
-    &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-      color: rgba($deep_navy, 0.5);
-      font-style: normal;
-      text-transform: none;
-    }
   }
 }
