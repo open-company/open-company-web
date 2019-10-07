@@ -33,18 +33,6 @@ div.stream-comments {
         padding-top: 16px;
       }
 
-      // &.closing-thread {
-      //   padding-bottom: 16px;
-      // }
-
-      // &:last-child, &.closing-thread:last-child {
-      //   padding-bottom: 0;
-      // }
-
-      // div.stream-comment:not(.indented-comment) {
-      //   padding-top: 16px;
-      // }
-
       div.stream-comment.indented-comment div.stream-comment-inner {
         margin-left: 40px;
         width: calc(100% - 40px);
