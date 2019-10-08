@@ -37,7 +37,7 @@ div.stream-item {
     border-top: none;
     border-bottom: 1px solid $divider_line_grey;
     background-color: $grey_num_4;
-    padding: 16px 16px 22px;
+    padding: 16px 16px 16px;
   }
 
   &.draft {
@@ -102,10 +102,6 @@ div.stream-item {
         margin-right: 8px;
       }
 
-      @include mobile() {
-        @include activity-author(32);
-      }
-
       div.name {
         height: 24px;
         float: left;
@@ -113,7 +109,6 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          height: 32px;
           width: calc(100% - 48px);
           max-width: unset;
         }
@@ -137,7 +132,6 @@ div.stream-item {
               flex: 1;
               min-width: 0;
               display: block;
-              line-height: 32px;
             }
           }
 
@@ -203,8 +197,15 @@ div.stream-item {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 0px;
+    padding: 0;
     border-radius: 6px;
+
+    @include mobile() {
+      display: block;
+      flex-direction: unset;
+      justify-content: unset;
+      border-radius: 0;
+    }
 
     &.expanded {
       div.thumbnail-container {
@@ -333,7 +334,7 @@ div.stream-item {
 
       @include tablet() {
         width: 100%;
-        margin: 8px 0px 0px;
+        margin: 0;
       }
 
       &.has-thumbnail {
@@ -358,11 +359,6 @@ div.stream-item {
         text-overflow: ellipsis;
         max-width: 100%;
         white-space: nowrap;
-
-        @include mobile() {
-          margin-top: 16px;
-          @include activity-title(22px, 28px);
-        }
       }
 
       div.stream-item-body {
@@ -377,23 +373,11 @@ div.stream-item {
 
         max-height: #{20 * 2}px;
 
-        @include mobile() {
-          margin-top: 4px;
-          @include activity-body(18, 24, $deep_navy);
-          max-height: #{24 * 2}px;
-          line-height: 24px;
-        }
-
         h2 {
           color: $deep_navy;
           @include OC_Body_Book();
           font-size: 16px;
           line-height: 20px;
-
-          @include mobile() {
-            font-size: 16px;
-            line-height: 24px;
-          }
         }
 
         b, strong, &.editing b, &.editing strong {
@@ -413,7 +397,7 @@ div.stream-item {
       @include mobile() {
         height: auto;
         overflow: hidden;
-        min-height: 32px;
+        height: 32px;
       }
 
       div.reactions {
@@ -425,8 +409,8 @@ div.stream-item {
       div.stream-item-footer-mobile-group {
         @include mobile() {
           display: inline-block;
+          padding-top: 4px;
           height: 32px;
-          padding-top: 8px;
         }
       }
 
