@@ -55,7 +55,7 @@
     (-> db
       (update-in add-comment-key dissoc comment-key)
       ;; Force refresh of the add comment field to remove the body
-      (assoc-in [dispatcher/add-comment-force-update-key comment-key] (utils/activity-uuid)))))
+      (assoc-in (dispatcher/add-comment-force-update-key comment-key) (utils/activity-uuid)))))
 
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
