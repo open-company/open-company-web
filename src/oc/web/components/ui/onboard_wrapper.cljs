@@ -308,7 +308,7 @@
             :aria-label "Continue"}
             "Continue"]]
         [:div.title.about-yourself
-          "Tell us about you"]]
+          "Create your team"]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -399,7 +399,7 @@
                                   (check-email-domain cleaned-email-domain s))))
                  :placeholder "@domain.com"}]
             [:div.field-label.info
-              "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."]])
+              "When someone signs up with this email domain, they'll join your team."]])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -817,7 +817,7 @@
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]]
         [:div.title.about-yourself
-          "Tell us a bit about you"]
+          "Create your team"]
         (when (:error edit-user-profile)
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]
