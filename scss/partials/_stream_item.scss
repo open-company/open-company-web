@@ -389,18 +389,18 @@ div.stream-item {
         @include activity-body(17, 22, $deep_navy);
         color: $deep_navy;
         @include OC_Body_Book();
-        line-height: 20px;
+        line-height: 22px;
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
 
-        max-height: #{20 * 2}px;
+        max-height: #{22 * 2}px;
 
         h2 {
           color: $deep_navy;
           @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 20px;
+          font-size: 17px;
+          line-height: 22px;
         }
 
         b, strong, &.editing b, &.editing strong {
