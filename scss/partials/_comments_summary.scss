@@ -15,6 +15,10 @@ div.is-comments {
       display: none;
     }
 
+    @include mobile (){
+      margin-top: -1px;
+    }
+
     &:not(:empty){
       margin-right: 8px;
     }
@@ -42,7 +46,6 @@ div.is-comments {
         height: 20px;
         border: 1px solid transparent;
         margin-left: -8px;
-        margin-top: 0;
 
         @include user-profile(16);
       }
@@ -90,6 +93,10 @@ div.is-comments {
     div.new-comments-tag {
       margin-left: 8px;
       display: inline-block;
+
+      @include mobile() {
+        margin-left: 4px;
+      }
     }
 
     span.add-a-comment {
