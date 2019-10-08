@@ -231,18 +231,19 @@
                     (when-not is-editing?
                       (if (responsive/is-tablet-or-mobile?)
                         [:div.stream-comment-mobile-menu
-                          (more-menu comment-data nil {:external-share false
-                                                       :entity-type "comment"
-                                                       :show-edit? true
-                                                       :edit-cb (partial start-editing s)
-                                                       :show-delete? true
-                                                       :delete-cb (partial delete-clicked s activity-data)
-                                                       :can-comment-share? true
-                                                       :comment-share-cb #(share-clicked comment-data)
-                                                       :can-react? true
-                                                       :react-cb #(reset! (::show-picker s) (:uuid comment-data))
-                                                       :can-reply? true
-                                                       :reply-cb #(reply-to s (:reply-parent comment-data))})
+                          (more-menu {:entity-data comment-data
+                                      :external-share false
+                                      :entity-type "comment"
+                                      :show-edit? true
+                                      :edit-cb (partial start-editing s)
+                                      :show-delete? true
+                                      :delete-cb (partial delete-clicked s activity-data)
+                                      :can-comment-share? true
+                                      :comment-share-cb #(share-clicked comment-data)
+                                      :can-react? true
+                                      :react-cb #(reset! (::show-picker s) (:uuid comment-data))
+                                      :can-reply? true
+                                      :reply-cb #(reply-to s (:reply-parent comment-data))})
                           (when showing-picker?
                             (emoji-picker-container s comment-data))]
                         [:div.stream-comment-floating-buttons
