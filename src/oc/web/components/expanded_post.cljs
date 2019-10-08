@@ -59,6 +59,7 @@
   (drv/drv :add-comment-highlight)
   (drv/drv :expand-image-src)
   (drv/drv :add-comment-force-update)
+  (drv/drv :editable-boards)
   ;; Locals
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
@@ -78,6 +79,7 @@
   (let [activity-data (drv/react s :activity-data)
         comments-drv (drv/react s :comments-data)
         _add-comment-focus (drv/react s :add-comment-focus)
+        editable-boards (drv/react s :editable-boards)
         comments-data (au/get-comments activity-data comments-drv)
         dom-element-id (str "expanded-post-" (:uuid activity-data))
         dom-node-class (str "expanded-post-" (:uuid activity-data))
@@ -124,6 +126,7 @@
        [:div.activity-share-container]
        (more-menu {:entity-data activity-data
                    :share-container-id dom-element-id
+                   :editable-boards editable-boards
                    :external-share (not is-mobile?)
                    :external-follow-up true
                    :show-edit? true
