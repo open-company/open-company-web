@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
@@ -114,7 +115,8 @@
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
-        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
+        no-phisical-home-button (and ua/mobile-app?
+                                     (js/isiPhoneWithoutPhysicalHomeBt))
         show-expanded-post (and current-activity-id
                                 activity-data
                                 (not= activity-data :404)
