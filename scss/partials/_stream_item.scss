@@ -116,30 +116,44 @@ div.stream-item {
         }
 
         div.mobile-name {
-          display: inline-block;
-
-          @include mobile() {
-            display: block;
-            white-space: nowrap;
-            float: left;
-          }
+          display: block;
+          float: left;
+          white-space: nowrap;
 
           div.name-inner {
-            display: inline-block;
+            display: block;
             text-overflow: ellipsis;
             overflow: hidden;
             line-height: 24px;
             margin-right: 8px;
-
-            @include mobile() {
-              display: block;
-              white-space: nowrap;
-              float: left;
-            }
+            float: left;
+            white-space: nowrap;
           }
 
-          div.mobile-time-since {
-            display: none;
+          div.time-since {
+            display: block;
+            float: left;
+            height: 24px;
+            line-height: 24px;
+            text-align: left;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: rgba($deep_navy, 0.5);
+            position: relative;
+            margin-right: 8px;
+            margin-left: 6px;
+            overflow: visible;
+
+            &:before {
+              content: "";
+              width: 3px;
+              height: 3px;
+              background-color: rgba($deep_navy, 0.2);
+              border-radius: 50%;
+              position: absolute;
+              top: 12px;
+              left: -8px;
+            }
 
             @include mobile() {
               display: block;
@@ -581,21 +595,6 @@ div.stream-item {
         @include mobile() {
           margin-left: 2px;
           margin-top: 0;
-        }
-      }
-
-      div.time-since {
-        float: right;
-        max-width: 30%;
-        height: 24px;
-        line-height: 24px;
-        text-align: right;
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: rgba($deep_navy, 0.5);
-
-        @include mobile() {
-          display: none;
         }
       }
     }

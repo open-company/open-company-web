@@ -151,11 +151,19 @@
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
+              [:div.time-since
+                (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                  [:time
+                    {:date-time t
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip activity-data)}
+                    (utils/foc-date-time t)])]
               [:div.must-see-tag.mobile-only]
               [:div.follow-up-tag-small.mobile-only]
-              [:div.new-tag.mobile-only "NEW"]
-              [:div.mobile-time-since
-                (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
+              [:div.new-tag.mobile-only "NEW"]]
             [:div.must-see-tag.big-web-tablet-only]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
@@ -251,14 +259,4 @@
                             [:span.file-name
                               (:file-name atc)]
                             [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/foc-date-time t)])]])]]))
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])]]))
