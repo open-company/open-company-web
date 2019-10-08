@@ -97,10 +97,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :follow-up-item (and (map? assigned-follow-up-data)
                                                      (not (:completed? assigned-follow-up-data)))
-                                :unseen-item (or has-new-comments?
-                                                 (:unseen activity-data))
-                                :unread-item (or (:unread activity-data)
-                                                 has-new-comments?)
+                                :unseen-item (:unseen activity-data)
+                                :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
