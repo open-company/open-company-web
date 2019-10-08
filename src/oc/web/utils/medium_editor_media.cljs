@@ -395,7 +395,7 @@
                                  :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
                                                        (when-not show-subtitle "h2") "h3" "h4" "h5"
                                                        "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                       "details" "summary" "nav" "abbr"
+                                                       "details" "summary" "nav" "abbr" "mark"
                                                        "table" "thead" "tbody" "tr" "th" "td"]))}
                      :placeholder #js {:text placeholder
                                        :hideOnClick false
