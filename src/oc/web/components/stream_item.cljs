@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
+            [oc.web.images :as img]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -96,10 +97,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :follow-up-item (and (map? assigned-follow-up-data)
                                                      (not (:completed? assigned-follow-up-data)))
-                                :unseen-item (or has-new-comments?
-                                                 (:unseen activity-data))
-                                :unread-item (or (:unread activity-data)
-                                                 has-new-comments?)
+                                :unseen-item (:unseen activity-data)
+                                :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
@@ -190,7 +189,10 @@
                 {:class (:type (:body-thumbnail activity-data))}
                 [:img.body-thumbnail
                   {:data-image (:thumbnail (:body-thumbnail activity-data))
-                   :src (:thumbnail (:body-thumbnail activity-data))}]]))
+                   :src (-> activity-data
+                            :body-thumbnail
+                            :thumbnail
+                            (img/optimize-image-url (* 102 3)))}]]))
           [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
                                       :has-video (:fixed-video-id activity-data)
