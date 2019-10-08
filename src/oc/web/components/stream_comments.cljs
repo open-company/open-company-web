@@ -37,7 +37,7 @@
 
 (defn start-editing [s comment-data]
   (let [comment-node (rum/ref-node s (str "comment-body-" (:uuid comment-data)))
-        activity-data (first (:rum/args s))]
+        activity-data (-> s :rum/args first :activity-data)]
     (comment-actions/edit-comment (:uuid activity-data) comment-data)
     (reset! (::show-more-menu s) nil)
     (reset! (::editing? s) (:uuid comment-data))))
@@ -61,7 +61,7 @@
     (set! (.-scrollTop scrolling-node) (.-scrollHeight scrolling-node))))
 
 (defn emoji-picked-cb [s comment-data emoji]
-  (comment-actions/react-from-picker (first (:rum/args s)) comment-data (get emoji "native")))
+  (comment-actions/react-from-picker (-> s :rum/args first :activity-data) comment-data (get emoji "native")))
 
 (defn- reply-to [s parent-uuid]
   (swap! (::replying-to s) #(conj % parent-uuid))
@@ -86,7 +86,7 @@
       (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
 
 (defn- maybe-highlight-comment [s]
-  (let [comments-data (second (:rum/args s))]
+  (let [comments-data (-> s :rum/args first :comments-data)]
     (when (and (seq comments-data)
                (router/current-comment-id)
                (not @(::initial-comment-scroll s))
@@ -115,7 +115,7 @@
                   (add-emoji-cb emoji))})])
 
 (defn- emoji-picker-container [s comment-data]
-  (let [activity-data (first (:rum/args s))
+  (let [activity-data (-> s :rum/args first :activity-data)
         showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid comment-data)))]
     (when showing-picker?
@@ -149,7 +149,7 @@
                                           (.get (js/$ "div.emoji-mart" (rum/dom-node s)) 0))))
                                 (reset! (::show-picker s) nil))))
                              {:after-render (fn [s]
-                               (let [activity-uuid (:uuid (first (:rum/args s)))
+                               (let [activity-uuid (-> s :rum/args first :activity-data :uuid)
                                      focused-uuid @(drv/get-ref s :add-comment-focus)
                                      current-local-state @(::last-focused-state s)
                                      is-self-focused? (= focused-uuid activity-uuid)]
@@ -167,10 +167,9 @@
                               (maybe-highlight-comment s)
                               s)
                              :did-remount (fn [o s]
-                              (when (not= (count (second (:rum/args o))) (count (second (:rum/args s))))
+                              (when (not= (-> o :rum/args first :comments-data count) (-> s :rum/args first :comments-data count))
                                  (reset! (::replying-to s) #{}))
-                              (let [args (vec (:rum/args s))
-                                    new-added-comment (get args 2)]
+                              (let [new-added-comment (-> s :rum/args first :new-added-comment)]
                                 (when new-added-comment
                                   (utils/after 180 #(highlight-comment s new-added-comment false))
                                   (comment-actions/add-comment-highlight-reset)))
