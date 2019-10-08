@@ -2,13 +2,10 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
-            [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
-            [oc.web.lib.utils :as utils]
-            [oc.web.actions.user :as user-actions]
-            [oc.web.actions.routing :as routing-actions]))
+            [oc.web.images :as img]
+            [oc.web.lib.utils :as utils]))
 
-(def default-max-logo-height 42)
+(def default-max-logo-height 96) ;; 32 * 3 for retina
 
 (defn internal-org-avatar
   [s org-data show-org-avatar? show-org-name?]
@@ -16,7 +13,7 @@
     {:class (utils/class-set {:no-avatar (not show-org-avatar?)})}
     (when show-org-avatar?
       [:img.org-avatar-img
-        {:src (:logo-url org-data)
+       {:src (-> org-data :logo-url (img/optimize-org-avatar-url default-max-logo-height))
          :on-error #(reset! (::img-load-failed s) true)}])
     (when show-org-name?
       [:span.org-name
@@ -58,15 +55,6 @@
                             (oc-urls/all-posts org-slug))]
           (if should-show-link
             [:a.org-link
-              {:href avatar-link
-               :on-click (fn [e]
-                           (.preventDefault e)
-                           (when should-show-link
-                             (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))]
-                              (if (= current-path avatar-link)
-                                (do
-                                  (routing-actions/routing @router/path)
-                                  (user-actions/initial-loading true))
-                                (router/nav! avatar-link)))))}
+              {:href avatar-link}
               (internal-org-avatar s org-data show-org-avatar? show-org-name?)]
             (internal-org-avatar s org-data show-org-avatar? show-org-name?))))]))

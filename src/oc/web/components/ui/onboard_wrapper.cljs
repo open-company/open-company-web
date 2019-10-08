@@ -72,7 +72,9 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
-                         (user-actions/login-with-slack auth-link)))}
+                         (user-actions/login-with-slack auth-link
+                                                        (when ua/mobile-app?
+                                                          {:redirect-origin (expo/get-deep-link-origin)}))))}
           "Continue with Slack"
           [:div.slack-icon
             {:aria-label "slack"}]]
