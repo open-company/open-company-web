@@ -134,7 +134,7 @@
                          (routing-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-item-header.group
-        [:div.stream-header-head-author.group
+        [:div.stream-header-head-author
           (user-avatar-image publisher)
           [:div.name
             [:div.mobile-name
