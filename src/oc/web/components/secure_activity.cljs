@@ -142,7 +142,7 @@
             (when comments-data
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
-                                :add-comment-highlight add-comment-highlight}))
+                                :new-added-comment add-comment-highlight}))
             (when (:can-comment activity-data)
               (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
             [:div.secure-activity-footer

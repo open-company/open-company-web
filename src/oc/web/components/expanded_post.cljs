@@ -220,7 +220,7 @@
       [:div.expanded-post-comments.group
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
-                          :add-comment-highlight add-comment-highlight
+                          :new-added-comment add-comment-highlight
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})
         (when (:can-comment activity-data)
