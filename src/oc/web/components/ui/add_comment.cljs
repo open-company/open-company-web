@@ -256,26 +256,26 @@
               (if edit-comment-data
                 "Save"
                 "Comment")]
-            ; (when (and parent-comment-uuid
-            ;            (fn? dismiss-reply-cb))
-            ;   [:button.mlb-reset.close-reply-bt
-            ;     {:on-click (fn [_]
-            ;                 (if @(::did-change s)
-            ;                   (let [alert-data {:icon "/img/ML/trash.svg"
-            ;                                     :action "cancel-comment-edit"
-            ;                                     :message "Are you sure you want to cancel? All your changes to this comment will be lost."
-            ;                                     :link-button-title "Keep"
-            ;                                     :link-button-cb #(alert-modal/hide-alert)
-            ;                                     :solid-button-style :red
-            ;                                     :solid-button-title "Yes"
-            ;                                     :solid-button-cb (fn []
-            ;                                                       (dismiss-reply-cb true)
-            ;                                                       (alert-modal/hide-alert))}]
-            ;                     (alert-modal/show-alert alert-data))
-            ;                   (dismiss-reply-cb true)))
-            ;      :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-            ;      :data-placement "top"
-            ;      :title (if edit-comment-data "Cancel edit" "Close")}])
+            (when (and edit-comment-data
+                       (fn? dismiss-reply-cb))
+              [:button.mlb-reset.close-reply-bt
+                {:on-click (fn [_]
+                            (if @(::did-change s)
+                              (let [alert-data {:icon "/img/ML/trash.svg"
+                                                :action "cancel-comment-edit"
+                                                :message "Are you sure you want to cancel? All your changes to this comment will be lost."
+                                                :link-button-title "Keep"
+                                                :link-button-cb #(alert-modal/hide-alert)
+                                                :solid-button-style :red
+                                                :solid-button-title "Yes"
+                                                :solid-button-cb (fn []
+                                                                  (dismiss-reply-cb true)
+                                                                  (alert-modal/hide-alert))}]
+                                (alert-modal/show-alert alert-data))
+                              (dismiss-reply-cb true)))
+                 :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+                 :data-placement "top"
+                 :title (if edit-comment-data "Cancel edit" "Close")}])
             (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
                            :width (if (responsive/is-mobile-size?) 24 32)
                            :height (if (responsive/is-mobile-size?) 24 32)

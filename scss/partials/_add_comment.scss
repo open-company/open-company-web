@@ -104,6 +104,8 @@ div.add-comment-box-container {
           width: 32px;
           height: 32px;
           opacity: 1;
+          background-image: cdnUrl("/img/ML/cmail_delete.svg");
+          background-size: 14px 16px;
           background-color: rgba($deep_navy, 0.1);
           border-radius: 4px;
           background-position: center;
@@ -116,7 +118,7 @@ div.add-comment-box-container {
             background-color: rgba($deep_navy, 0.2);
           }
 
-          @include tablet() {
+          @include mobile() {
             display: none;
           }
         }
