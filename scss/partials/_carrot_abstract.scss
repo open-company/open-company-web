@@ -7,6 +7,8 @@ div.cmail-content-abstract-container {
 
   @include tablet() {
     display: block;
+    border-bottom: none;
+    padding: 0;
   }
 
   div.cmail-content-abstract-counter {
