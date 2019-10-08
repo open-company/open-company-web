@@ -1,4 +1,5 @@
 $foc_background_color: transparent;
+$mobile_foc_background_color: rgba($deep_navy, 0.05);
 $foc_hover_color: #F5F5F5;
 $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
@@ -35,8 +36,8 @@ div.stream-item {
     margin: 0;
     border-radius: 0;
     border-top: none;
-    border-bottom: 1px solid $divider_line_grey;
-    background-color: $grey_num_4;
+    border-bottom: 1px solid $foc_divider_line_color;
+    background-color: $mobile_foc_background_color;
     padding: 16px 16px 16px;
   }
 
