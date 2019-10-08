@@ -39,6 +39,7 @@ div.stream-item {
     border-bottom: 1px solid $foc_divider_line_color;
     background-color: $mobile_foc_background_color;
     padding: 16px 16px 16px;
+    height: #{$mobile_foc_height}px;
   }
 
   &.draft {
@@ -118,8 +119,9 @@ div.stream-item {
           display: inline-block;
 
           @include mobile() {
-            display: flex;
-            align-items: center;
+            display: block;
+            white-space: nowrap;
+            float: left;
           }
 
           div.name-inner {
@@ -130,9 +132,9 @@ div.stream-item {
             margin-right: 8px;
 
             @include mobile() {
-              flex: 1;
-              min-width: 0;
               display: block;
+              white-space: nowrap;
+              float: left;
             }
           }
 
@@ -142,7 +144,13 @@ div.stream-item {
             @include mobile() {
               display: block;
               white-space: nowrap;
+              float: left;
+              line-height: 24px;
             }
+          }
+
+          div.follow-up-tag-small {
+            float: left;
           }
         }
       }
@@ -244,6 +252,10 @@ div.stream-item {
       position: relative;
       cursor: pointer;
 
+      @include mobile() {
+        min-height: 80px;
+      }
+
       div.ziggeo-player {
         width: 106px;
         height: 80px;
@@ -294,6 +306,16 @@ div.stream-item {
           object-fit: contain;
           max-width: 106px;
           max-height: 80px;
+        }
+
+        @include mobile() {
+          width: 95px;
+          top: 0;
+
+          img.body-thumbnail {
+            max-height: 72px;
+            max-width: 95px;
+          }
         }
 
         &.video {

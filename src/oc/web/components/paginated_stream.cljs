@@ -25,6 +25,7 @@
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
 (def foc-height 188)
+(def mobile-foc-height 173)
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -35,7 +36,8 @@
                     (if (< @(::last-scroll s) scroll-top)
                       :down
                       :stale))
-        max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))]
+        max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))
+        card-height (if (responsive/is-mobile-size?) mobile-foc-height foc-height)]
     ;; scrolling down
     (when (and ;; not already loading more
                (not @(::bottom-loading s))
@@ -44,7 +46,7 @@
                ;; scroll is moving down
                (= direction :down)
                ;; and the threshold point has been reached
-               (>= scroll-top (- max-scroll (* scroll-card-threshold foc-height))))
+               (>= scroll-top (- max-scroll (* scroll-card-threshold card-height))))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
@@ -99,6 +101,7 @@
                 onChildScroll
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
+        is-mobile? (responsive/is-mobile-size?)
         row-renderer (fn [row-props]
                        (let [{:keys [key
                                      index
@@ -114,13 +117,13 @@
                            (str "stream-item-" key))))]
     (virtualized-list {:autoHeight true
                        :height height
-                       :width (if (responsive/is-tablet-or-mobile?)
+                       :width (if is-mobile?
                                 js/window.innerWidth
                                 720)
                        :isScrolling isScrolling
                        :onScroll onChildScroll
                        :rowCount (count items)
-                       :rowHeight foc-height
+                       :rowHeight (if is-mobile? mobile-foc-height foc-height)
                        :rowRenderer row-renderer
                        :scrollTop scrollTop
                        :ref registerChild

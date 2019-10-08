@@ -16,7 +16,7 @@ div.is-comments {
     }
 
     @include mobile (){
-      margin-top: -1px;
+      margin-top: 1px;
     }
 
     &:not(:empty){
