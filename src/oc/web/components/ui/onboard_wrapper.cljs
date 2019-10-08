@@ -292,6 +292,7 @@
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])))]
     [:div.onboard-lander.lander-profile
+      {:class "ayo"}
       [:div.main-cta
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]
@@ -313,7 +314,7 @@
           [:div.group
             [:div.field-label.left-half-field-label.name-fields
               "First name"]
-            [:div.field-label.right-half-field-label.name-fields
+            [:div.field-label.right-half-field-label.name-fields.big-web-tablet-only
               "Last name"]]
           [:div.group
             [:input.field.left-half-field.oc-input
@@ -324,6 +325,8 @@
                :max-length user-utils/user-name-max-lenth
                :value (or (:first-name user-data) "")
                :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+            [:div.field-label.right-half-field-label.name-fields.mobile-only
+              "Last name"]
             [:input.field.right-half-field.oc-input
               {:class utils/hide-class
                :type "text"
@@ -710,9 +713,10 @@
   (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
       [:div.main-cta
+        [:div.mobile-header.mobile-only
+          [:div.mobile-logo]]
         [:div.title
           "Join your team on Carrot"]
-        [:div.mobile-logo.mobile-only]
         (if (:invitation-error confirm-invitation)
           [:div.subtitle
             "An error occurred while confirming your invitation, please try again."]
