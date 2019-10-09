@@ -303,6 +303,10 @@ $h2_top_margin: 24;
     display: grid;
     min-width: 1px;
   }
+
+  p:only-child {
+    margin-bottom: 0;
+  }
 }
 
 @mixin activity-headline(){
