@@ -2,7 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.lib.chat :as chat]
+            [oc.web.lib.utils :as utils]
             [goog.object :as gobj]
             [goog.dom :as gdom]))
 
@@ -124,8 +124,10 @@
   [s org-data dismiss-settings-cb]
   (let [team-data (drv/react s :team-data)]
     [:div.org-settings-panel
+      {:on-click dismiss-settings-cb}
       ;; Panel rows
       [:div.org-settings-billing
+        {:on-click #(utils/event-stop %)}
         (case @(::billing-tab s)
           :summary
           (plan-summary s team-data)
