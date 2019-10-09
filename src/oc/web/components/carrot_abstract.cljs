@@ -45,7 +45,7 @@
                                        :hide-on-click false}
                      :keyboardCommands #js {:commands #js [
                                         #js {
-                                          :command "bold"
+                                          :command false
                                           :key "B"
                                           :meta true
                                           :shift false
