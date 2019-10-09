@@ -249,8 +249,7 @@
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
-            (when (and edit-comment-data
-                       (fn? dismiss-reply-cb))
+            (when (fn? dismiss-reply-cb)
               [:button.mlb-reset.close-reply-bt
                 {:on-click (fn [_]
                             (if @(::did-change s)
