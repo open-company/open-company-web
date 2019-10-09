@@ -259,18 +259,6 @@ div.expanded-post {
     div.is-comments {
       margin-right: 16px;
       float: left;
-
-      div.is-comments-authors.show-border {
-        div.is-comments-author {
-          background-color: $grey_num_2;
-          border: 2px solid $grey_num_2;
-
-          @include mobile(){
-            background-color: white;
-            border: 2px solid white;
-          }
-        }
-      }
     }
 
     div.reactions {
