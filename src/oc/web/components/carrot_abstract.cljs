@@ -14,7 +14,7 @@
       (let [options (first (:rum/args s))
             mobile-editor (responsive/is-tablet-or-mobile?)
             body-el (rum/ref-node s "abstract")
-            buttons ["bold" "italic" "anchor"]
+            buttons ["italic" "anchor"]
             abstract-on-change (:on-change-cb (first (:rum/args s)))
             extensions #js {"autolist" (js/AutoList.)
                             "mention" (mention-utils/mention-ext users-list)}
@@ -39,7 +39,7 @@
                                  :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1" "h2" "h3" "h4" "h5"
                                                        "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                                        "details" "summary" "nav" "abbr" "ol" "ul" "li"
-                                                       "table" "thead" "tbody" "tr" "th" "td" "p" "div"]))}
+                                                       "table" "thead" "tbody" "tr" "th" "td" "p" "div" "strong" "b"]))}
                      :placeholder #js {:text utils/default-abstract
                                        :hideOnClick false
                                        :hide-on-click false}

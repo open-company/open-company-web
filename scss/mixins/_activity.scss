@@ -239,44 +239,16 @@ $h2_top_margin: 24;
   font-size: $font_size;
   color: $deep_navy;
   line-height: $line_height;
-
-  b, strong{
-    @include OC_Body_Bold();
-    font-weight: normal;
-
-    a, span[data-auto-link] {
-      text-decoration: none;
-      color: $carrot_green;
-      background-color: transparent;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-  }
+  font-weight: 700;
 
   &.editing {
-    b, strong {
-      @include OC_Body_Book();
-      font-weight: 700;
-    }
-
     i {
       @include OC_Body_Book_Italic();
-    }
-
-    b i, b strong, i b, i strong {
-      @include OC_Body_Book_Italic();
-      font-weight: 700;
     }
   }
 
   i {
     @include OC_Body_Book_Italic();
-  }
-
-  i b, i strong, strong i, b i {
-    @include OC_Body_Bold_Italic(); 
   }
 
   a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
@@ -298,7 +270,7 @@ $h2_top_margin: 24;
     min-height: #{$line_height}px;
   }
 
-  i:empty, li:empty, b:empty, strong:empty {
+  i:empty, li:empty {
     display: grid;
     min-width: 1px;
   }
