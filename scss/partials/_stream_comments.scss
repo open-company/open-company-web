@@ -18,21 +18,18 @@ div.stream-comments {
   }
 
   div.stream-comments-empty {
-    display: none;
+    border-top: 1px solid rgba($deep_navy, 0.15);
+    margin: 0 16px;
   }
 
   div.stream-comments-list {
 
     div.stream-comment-outer {
       background-color: #FFF7DD;
-      padding: 0 16px;
+      padding: 0 8px;
 
-      &.closing-thread {
-        padding-bottom: 16px;
-      }
-
-      div.stream-comment:not(.indented-comment) {
-        border-top: 1px solid $ultra_light_grey;
+      &:first-child div.stream-comment {
+        border-top: 1px solid rgba($deep_navy, 0.15);
         padding-top: 16px;
       }
 

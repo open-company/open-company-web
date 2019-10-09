@@ -597,7 +597,7 @@
 
 (def default-headline "Title")
 
-(def default-abstract "Quick summary")
+(def default-abstract "Quick summary (optional)")
 
 (def max-abstract-length 280)
 
