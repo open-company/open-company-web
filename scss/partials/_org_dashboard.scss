@@ -23,6 +23,19 @@ div.org-dashboard {
     }
   }
 
+  &.trial-expired {
+    padding-top: #{$navbar_height * 2}px;
+
+    nav.oc-navbar {
+      top: 56px;
+    }
+
+    div.left-navigation-sidebar {
+      top: #{$navbar_height * 2}px;
+      height: calc(100vh - #{($navbar_height * 2) + 1}px);
+    }
+  }
+
   &.expanded-activity div.page {
     @include mobile() {
       padding-top: 0;

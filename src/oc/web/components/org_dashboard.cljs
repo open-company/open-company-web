@@ -37,6 +37,7 @@
             [oc.web.components.ui.login-wall :refer (login-wall)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
@@ -148,7 +149,8 @@
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        (jwt/jwt)
-                                                       (not user-responded-to-push-permission?))]
+                                                       (not user-responded-to-push-permission?))
+        show-trial-expired? false]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -158,6 +160,7 @@
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
                                   :expanded-activity (router/current-activity-id)
+                                  :trial-expired show-trial-expired?
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
@@ -248,6 +251,8 @@
                        (not show-mobile-cmail?)
                        (not show-push-notification-permissions-modal?)))
           [:div.page
+            (when show-trial-expired?
+              (trial-expired-banner))
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner

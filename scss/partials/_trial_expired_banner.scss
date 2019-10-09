@@ -1,0 +1,29 @@
+div.trial-expired-banner-container {
+  height: #{$navbar_height}px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: $navbar_zindex;
+  background-color: $carrot_orange;
+
+  div.trial-expired-banner {
+    @include OC_Body_Book();
+    font-size: 16px;
+    line-height: 26px;
+    color: white;
+
+    button.open-billing-bt, a.chat-with-us {
+      display: inline;
+      text-decoration: underline;
+      @include OC_Body_Book();
+      font-size: 16px;
+      line-height: 26px;
+      color: white;
+    }
+  }
+}
