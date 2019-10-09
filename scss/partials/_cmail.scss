@@ -120,10 +120,6 @@ div.cmail-outer {
         display: block;
 
         div.close-bt-container {
-          // position: absolute;
-          // left: 16px;
-          // top: 12px;
-          // float: unset;
 
           button.close-bt {
             background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
@@ -322,6 +318,7 @@ div.cmail-outer {
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
     border: 1px solid $mid_light_grey;
     border-radius: 4px;
+    background-color: white;
 
     &.has-follow-ups {
       @include mobile() {
@@ -528,10 +525,6 @@ div.cmail-outer {
               margin-left: -24px;
             }
           }
-
-          // .tooltip {
-          //   margin-top: -16px;
-          // }
         }
 
         div.delete-button-container {
@@ -825,7 +818,7 @@ div.cmail-outer {
     }
 
     div.cmail-content-outer {
-      padding: 24px 40px;
+      padding: 24px;
       background-color: white;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
@@ -931,7 +924,7 @@ div.cmail-outer {
       div.rich-body-editor-container {
         position: relative;
         height: auto;
-        margin-top: 8px;
+        margin-top: 0;
 
         div.medium-editor-media-picker {
           margin-top: 1px;
@@ -943,7 +936,7 @@ div.cmail-outer {
         div.rich-body-editor {
           border: none;
           outline: none;
-          margin: 8px 0px 0px;
+          margin: 0;
           cursor: text;
           color: $deep_navy;
           @include OC_Body_Book();
@@ -1179,18 +1172,7 @@ div.cmail-outer {
 
         div.post-button-container {
           float: right;
-          // background-color: $carrot_green;
-          // color: white;
-          // width: 56px;
-          // height: 32px;
-          // @include OC_Body_Bold();
-          // font-size: 14px;
-          // border-radius: 4px;
           margin-left: 16px;
-
-          // div.post-to-button div.post-to-bt-container.tt-title div.post-bt-tooltip {
-          //   right: -42px;
-          // }
 
           @include mobile() {
             display: none;
