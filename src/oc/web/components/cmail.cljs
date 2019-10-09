@@ -400,6 +400,8 @@
                       (reset! (::initial-uuid s) (:uuid cmail-data))
                       (reset! (::abstract-length s) (count abstract-text))
                       (reset! (::abstract-exceeds-limit s) abstract-exceeds)
+                      (reset! (::saving s) (:loading cmail-data))
+                      (reset! (::publishing s) (:publishing cmail-data))
                       (reset! (::post-tt-kw s)
                         (cond
                           abstract-exceeds :abstract
@@ -458,7 +460,7 @@
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
-                    (let [cmail-data @(drv/get-ref s :cmail-data)]
+                    (when-let [cmail-data @(drv/get-ref s :cmail-data)]
                       ;; Did activity get removed in another client?
                       (when (and @(::deleting s)
                                  (:delete cmail-data))
