@@ -46,7 +46,7 @@
       (assoc-in add-comment-activity-key comment-body)
       ;; Force refresh of the add comment field, needed in case the post comment fails and we need
       ;; to move the body back in the field to let the user retry
-      (update-in [dispatcher/add-comment-force-update-key comment-key] #(if force-update? (utils/activity-uuid) %)))))
+      (update-in (dispatcher/add-comment-force-update-key comment-key) #(if force-update? (utils/activity-uuid) %)))))
 
 (defmethod dispatcher/action :add-comment-reset
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid]]
@@ -55,7 +55,7 @@
     (-> db
       (update-in add-comment-key dissoc comment-key)
       ;; Force refresh of the add comment field to remove the body
-      (assoc-in [dispatcher/add-comment-force-update-key comment-key] (utils/activity-uuid)))))
+      (assoc-in (dispatcher/add-comment-force-update-key comment-key) (utils/activity-uuid)))))
 
 (defmethod dispatcher/action :add-comment-focus
   [db [_ focus-uuid]]
