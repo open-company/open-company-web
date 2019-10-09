@@ -160,11 +160,10 @@
                      :data-container "body"
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/foc-date-time t)])]
-              [:div.must-see-tag.mobile-only]
-              [:div.follow-up-tag-small.mobile-only]
-              [:div.new-tag.mobile-only "NEW"]]
-            [:div.must-see-tag.big-web-tablet-only]
+                    (utils/foc-date-time t)])]]
+            [:div.must-see-tag]
+            [:div.follow-up-tag-small.mobile-only]
+            [:div.must-see-tag]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
         (when (and is-published?

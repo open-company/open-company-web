@@ -111,7 +111,7 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: calc(100% - 48px);
+          width: calc(100% - 32px);
           max-width: unset;
         }
 
@@ -162,10 +162,11 @@ div.stream-item {
               line-height: 24px;
             }
           }
+        }
 
-          div.follow-up-tag-small {
-            float: left;
-          }
+        div.follow-up-tag-small {
+          float: right;
+          margin-right: 0;
         }
       }
 
@@ -194,10 +195,6 @@ div.stream-item {
     }
   }
 
-  div.new-tag {
-    display: none;
-  }
-
   @include must-see-tag();
 
   @include follow-up-tag();
@@ -212,7 +209,7 @@ div.stream-item {
     }
   }
 
-  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
+  & > div.must-see-tag, & > div.follow-up-tag {
     margin-top: 16px;
   }
 
