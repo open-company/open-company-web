@@ -52,7 +52,7 @@
     [cljsjs/localforage "1.5.3-0"] ; Offline storage, improved. Wraps IndexedDB, WebSQL, or localStorage using a simple but powerful API. https://github.com/localForage/localForage
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.16.3" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
+    [open-company/lib "0.17.5" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let

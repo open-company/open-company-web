@@ -68,7 +68,7 @@
            :on-click (fn [e]
                       (utils/event-stop e)
                       (show-modal :billing))}
-          "BILLING"]])])
+          "PAYMENTS & BILLING"]])])
 
 (defn close-clicked [s]
   (let [org-data @(drv/get-ref s :org-data)

@@ -115,20 +115,18 @@
       (fn [{:keys [status body success]}]
         (dispatcher/dispatch! [:org-loaded (json->cljs body)])))))
 
-(defn section-name-error [status]
+(defn section-save-error [status]
   ;; Board name exists or too short
   (dispatcher/dispatch! [:update [:section-editing]
    #(-> %
-     (assoc :section-name-error
-      (cond
-        (= status 409) "Section name already exists or isn't allowed"
-        :else "An error occurred, please retry."))
+     (assoc :section-name-error (when (= status 409) "Section name already exists or isn't allowed"))
+     (assoc :section-error (when-not (= status 409) "An error occurred, please retry."))
      (dissoc :loading))]))
 
 (defn section-save
   ([section-data note] (section-save section-data note nil))
   ([section-data note success-cb]
-    (section-save section-data note success-cb section-name-error))
+    (section-save section-data note success-cb section-save-error))
   ([section-data note success-cb error-cb]
     (timbre/debug section-data)
     (if (empty? (:links section-data))
@@ -255,7 +253,7 @@
     (api/pre-flight-section-check pre-flight-link section-slug section-name
      (fn [{:keys [success body status]}]
        (when-not success
-         (section-name-error status))
+         (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
 
 (defn show-section-add-with-callback [callback]
