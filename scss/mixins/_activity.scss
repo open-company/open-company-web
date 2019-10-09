@@ -235,20 +235,13 @@ $h2_top_margin: 24;
 }
 
 @mixin activity-abstract($font_size: 14px, $line_height: 18px){
-  @include OC_Body_Book();
+  @include OC_Body_Bold();
   font-size: $font_size;
   color: $deep_navy;
   line-height: $line_height;
-  font-weight: 700;
-
-  &.editing {
-    i {
-      @include OC_Body_Book_Italic();
-    }
-  }
 
   i {
-    @include OC_Body_Book_Italic();
+    @include OC_Body_Bold_Italic();
   }
 
   a, span[data-auto-link], a.noreferrer, a.noopener, a.noreferrer.noopener {
@@ -258,7 +251,7 @@ $h2_top_margin: 24;
   }
 
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-    @include OC_Body_Book();
+    @include OC_Body_Bold();
     font-size: #{$font_size}px;
     line-height: #{$line_height}px;
     color: $grey_num_1;
