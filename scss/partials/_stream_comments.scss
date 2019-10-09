@@ -477,30 +477,12 @@ div.stream-comments {
 
       div.stream-comment.indented-comment {
         div.add-comment-box-container {
-          margin-left: 40px;
+          margin-left: 32px;
           margin-top: 8px;
           margin-bottom: 8px;
 
-          @include mobile() {
-            margin-left: 32px;
-          }
-
           div.add-comment-box {
-            width: calc(100% - 40px);
-
-            @include mobile() {
-              width: calc(100% - 32px);
-            }
-
-            div.add-comment-internal {
-              div.add-comment {
-                min-height: 92px;
-
-                @include mobile() {
-                  min-height: 48px;
-                }
-              }
-            }
+            width: calc(100% - 32px);
 
             div.add-comment-footer.hide-footer {
               display: none;
