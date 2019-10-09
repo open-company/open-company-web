@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
+            [oc.web.images :as img]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -46,27 +47,21 @@
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
-                         (drv/drv :org-data)
-                         (drv/drv :comments-data)
                          (drv/drv :activity-share-container)
-                         (drv/drv :show-post-added-tooltip)
+                         ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
                          (when-not ua/edge?
-                           (am/truncate-element-mixin "div.stream-item-body.no-abstract" (* 24 3)))
+                           (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)}
-  [s activity-data read-data]
-  (let [org-data (drv/react s :org-data)
-        is-mobile? (responsive/is-tablet-or-mobile?)
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
+  (let [is-mobile? (responsive/is-tablet-or-mobile?)
         current-user-id (jwt/user-id)
-        ;; Fallback to the activity inline comments if we didn't load
-        ;; the full comments just yet
-        _ (drv/react s :comments-data)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         dom-element-id (str "stream-item-" (:uuid activity-data))
@@ -85,9 +80,6 @@
                         :height @(::mobile-video-height s)}
                        {:width 136
                         :height (utils/calc-video-height 136)}))
-        user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
-        should-show-wrt (and user-is-part-of-the-team
-                             is-published?)
         ;; Add NEW tag besides comment summary
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
@@ -95,19 +87,18 @@
                                (< (.getTime (utils/js-date (:last-read-at read-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
-        post-added-tooltip (drv/react s :show-post-added-tooltip)
-        show-post-added-tooltip? (and post-added-tooltip
-                                      (= post-added-tooltip (:uuid activity-data)))]
+        ; post-added-tooltip (drv/react s :show-post-added-tooltip)
+        ; show-post-added-tooltip? (and post-added-tooltip
+        ;                               (= post-added-tooltip (:uuid activity-data)))
+        ]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
                                 :follow-up-item (and (map? assigned-follow-up-data)
                                                      (not (:completed? assigned-follow-up-data)))
-                                :unseen-item (or has-new-comments?
-                                                 (:unseen activity-data))
-                                :unread-item (or (:unread activity-data)
-                                                 has-new-comments?)
+                                :unseen-item (:unseen activity-data)
+                                :unread-item (:unread activity-data)
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
@@ -160,6 +151,9 @@
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
+              [:div.must-see-tag.mobile-only]
+              [:div.follow-up-tag-small.mobile-only]
+              [:div.new-tag.mobile-only "NEW"]
               [:div.mobile-time-since
                 (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
             [:div.must-see-tag.big-web-tablet-only]
@@ -167,16 +161,16 @@
         [:div.activity-share-container]
         (when (and is-published?
                    (not is-mobile?))
-          (more-menu activity-data dom-element-id
-           {:external-share (not is-mobile?)
-            :external-follow-up (not is-mobile?)
-            :show-edit? true
-            :show-delete? true
-            :show-move? (not is-mobile?)
-            :assigned-follow-up-data assigned-follow-up-data}))]
-      [:div.must-see-tag.mobile-only]
-      [:div.follow-up-tag.mobile-only]
-      [:div.new-tag.mobile-only "NEW"]
+          (more-menu
+            {:entity-data activity-data
+             :share-container-id dom-element-id
+             :editable-boards editable-boards
+             :external-share (not is-mobile?)
+             :external-follow-up (not is-mobile?)
+             :show-edit? true
+             :show-delete? true
+             :show-move? (not is-mobile?)
+             :assigned-follow-up-data assigned-follow-up-data}))]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video
@@ -195,7 +189,10 @@
                 {:class (:type (:body-thumbnail activity-data))}
                 [:img.body-thumbnail
                   {:data-image (:thumbnail (:body-thumbnail activity-data))
-                   :src (:thumbnail (:body-thumbnail activity-data))}]]))
+                   :src (-> activity-data
+                            :body-thumbnail
+                            :thumbnail
+                            (img/optimize-image-url (* 102 3)))}]]))
           [:div.stream-body-left.group
             {:class (utils/class-set {:has-thumbnail (:has-thumbnail activity-data)
                                       :has-video (:fixed-video-id activity-data)
@@ -222,24 +219,27 @@
               [:div.stream-item-footer-mobile-group
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
-                  (comments-summary activity-data has-new-comments?)]
+                  (comments-summary {:entry-data activity-data
+                                     :comments-data comments-data
+                                     :show-new-tag? has-new-comments?})]
                 (when-not is-mobile?
                   (reactions activity-data))
-                (when should-show-wrt
+                (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
-                    (when show-post-added-tooltip?
-                      [:div.post-added-tooltip-container
-                        {:ref :post-added-tooltip}
-                        [:div.post-added-tooltip-title
-                          "Post analytics"]
-                        [:div.post-added-tooltip
-                          (str "Invite your team to Carrot so you can know who read your "
-                           "post and when. Click here to access your post analytics anytime.")]
-                        [:button.mlb-reset.post-added-tooltip-bt
-                          {:on-click #(nux-actions/dismiss-post-added-tooltip)}
-                          "OK, got it"]])
-                    (wrt-count activity-data read-data)])
+                    ; (when show-post-added-tooltip?
+                    ;   [:div.post-added-tooltip-container
+                    ;     {:ref :post-added-tooltip}
+                    ;     [:div.post-added-tooltip-title
+                    ;       "Post analytics"]
+                    ;     [:div.post-added-tooltip
+                    ;       (str "Invite your team to Carrot so you can know who read your "
+                    ;        "post and when. Click here to access your post analytics anytime.")]
+                    ;     [:button.mlb-reset.post-added-tooltip-bt
+                    ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
+                    ;       "OK, got it"]])
+                    (wrt-count {:activity-data activity-data
+                                :reads-data read-data})])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}

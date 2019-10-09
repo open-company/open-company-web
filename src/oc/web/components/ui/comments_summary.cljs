@@ -32,24 +32,23 @@
 
 (def max-face-pile 3)
 
-(rum/defcs comments-summary < rum/static
-                              rum/reactive
-                              (drv/drv :comments-data)
-  [s entry-data should-show-new-tag?]
-  (let [all-comments-data (drv/react s :comments-data)
-        _comments-data (get all-comments-data (:uuid entry-data))
-        comments-data (:sorted-comments _comments-data)
+(rum/defc comments-summary < rum/static
+  [{:keys [entry-data
+           comments-data
+           show-new-tag?]}]
+  (let [entry-comments (get comments-data (:uuid entry-data))
+        sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
-        has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
+        has-comments-data (and (sequential? sorted-comments) (pos? (count sorted-comments)))
         comments-authors (if has-comments-data
                            (vec
                             (map
                              first
                              (vals
-                              (group-by :avatar-url (map :author (sort-by :created-at comments-data))))))
+                              (group-by :avatar-url (map :author (sort-by :created-at sorted-comments))))))
                            (reverse (:authors comments-link)))
-        comments-count (if comments-data
-                         (count comments-data)
+        comments-count (if sorted-comments
+                         (count sorted-comments)
                          (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))
         is-mobile? (responsive/is-mobile-size?)
@@ -79,7 +78,7 @@
           (if (pos? comments-count)
             [:div.group
               (str comments-count " comment" (when (not= comments-count 1) "s"))
-              (when should-show-new-tag?
+              (when show-new-tag?
                 [:div.new-comments-tag
                   "(NEW)"])]
             [:span.add-a-comment
