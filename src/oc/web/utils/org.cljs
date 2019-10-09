@@ -1,10 +1,11 @@
-(ns oc.web.utils.org)
+(ns oc.web.utils.org
+  (:require [oc.web.lib.jwt :as jwt]))
 
 (def org-avatar-filestack-config
   {:accept "image/*"
    :fromSources ["local_file_system"]})
 
-(def org-name-max-length 64)
+(def org-name-max-length 50)
 
 (defn clean-email-domain [email-domain]
   (when email-domain
@@ -25,3 +26,6 @@
       (if (.startsWith no-beginning-https "www.")
         (subs no-beginning-https 4)
         no-beginning-https))))
+
+(defn is-org-creator? [org-data]
+  (= (:user-id (:author org-data)) (jwt/user-id)))

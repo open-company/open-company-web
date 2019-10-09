@@ -19,22 +19,30 @@
   ;; We need to remove the boards that are no longer in the org
   (let [boards-key (dispatcher/boards-key (:slug org-data))
         old-boards (get-in db boards-key)
-        board-slugs (set (map (comp keyword :slug) (:boards org-data)))
+        ;; No need to add a spacial case for drafts board here since
+        ;; we are only excluding keys that already exists in the app-state
+        board-slugs (set (mapcat #(vec [(keyword (str (:slug %) "-recent-activity"))
+                                        (keyword (str (:slug %) "-recently-posted"))])
+                          (:boards org-data)))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))
         section-names (:default-board-names org-data)
         selected-sections (map :name (:boards org-data))
         sections (vec (map #(hash-map :name % :selected (utils/in? selected-sections %)) section-names))
-        fixed-org-data (fix-org org-data)]
+        fixed-org-data (fix-org org-data)
+        with-saved? (if (nil? saved?)
+                      ;; If saved? is nil it means no save happened, so we keep the old saved? value
+                      org-data
+                      ;; If save actually happened let's update the saved value
+                      (assoc org-data :saved saved?))
+        next-org-editing (-> with-saved?
+                          (assoc :email-domain email-domain)
+                          (dissoc :has-changes))]
     (-> db
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
-      (assoc :org-editing (-> org-data
-                              (assoc :saved saved?)
-                              (assoc :email-domain email-domain)
-                              (dissoc :has-changes)))
+      (assoc :org-editing next-org-editing)
       (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))
-      (assoc :sections-setup sections)
       (assoc-in boards-key next-boards))))
 
 (defmethod dispatcher/action :org-avatar-update/failed

@@ -2,6 +2,7 @@
   (:require [clojure.set :refer (rename-keys)]
             [clojure.string :as s]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
@@ -71,7 +72,7 @@
         occurrence-value-kw (keyword occurrence-value)
         occurrence-value (get-in occurrence-values [frequency-kw occurrence-value-kw])
         assignee-map (:assignee reminder-data)
-        assignee-name (or (:name assignee-map) (utils/name-or-email assignee-map))
+        assignee-name (or (:name assignee-map) (user-lib/name-for assignee-map))
         short-assignee (short-assignee-name assignee-map)]
     (-> with-parsed-date
       ;; The freuqncy keyword
@@ -112,12 +113,15 @@
                                        :tooltip tooltip}))
                       (:items roster-data))
         users-list (vec (map #(-> %
-                                (assoc :name (utils/name-or-email %))
+                                (assoc :name (str (user-lib/name-for %) (when (= (:user-id %) (jwt/user-id)) " (you)")))
                                 (select-keys [:name :user-id :disabled :tooltip])
                                 (rename-keys {:name :label :user-id :value})
                                 (assoc :user-map %))
-                     fixed-roster))]
-    (sort-by :label users-list)))
+                     fixed-roster))
+        splitted (group-by #(= (:value %) (jwt/user-id)) users-list)
+        self-user (-> splitted (get true) first)
+        without-user (get splitted false)]
+    (concat [self-user] (sort-by :label without-user))))
 
 (defn sort-fn [reminder-a reminder-b]
   (let [assignee-compare (compare (:name (:assignee reminder-a)) (:name (:assignee reminder-b)))]

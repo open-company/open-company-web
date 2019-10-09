@@ -1,78 +1,76 @@
 @mixin default-item(){
   background-color: transparent;
+  height: 34px;
+  padding-top: 6px;
 
   @include mobile() {
-    height: 72px;
-    padding: 24px 16px;
-    position: relative;
-
-    &:before {
-      content: "";
-      position: absolute;
-      top: 0px;
-      left: 46px;
-      height: 1px;
-      width: calc(100% - 65px);
-      background-color: $ultra_light_grey;
-    }
-
-    &:first-child:before {
-      width: 100%;
-      left: 0px;
-    }
+    height: 40px;
+    margin: 2px 0;
+    padding: 7px 16px;
   }
 
   .internal {
-    @include avenir_R();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
+
+    &.new {
+      @include OC_Body_Bold();
+    }
 
     @include mobile() {
       font-size: 16px;
+      line-height: 24px;
     }
+  }
 
-    &.new {
-      @include avenir_H();
-      color: $deep_navy;
+  span.count {
+    float: right;
+    @include OC_Body_Book();
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    color: $deep_navy;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-color: rgba($light_navy, 0.1);
+    border-radius: 4px;
+    margin-top: 4px;
+    margin-right: 16px;
+
+    @include mobile() {
+      float: left;
+      margin-top: 5px;
+      margin-left: 8px;
     }
   }
 
   div.drafts-label {
-    @include avenir_R();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
 
     @include mobile() {
       font-size: 16px;
-    }
-
-    span.count {
-      @include avenir_M();
-      color: #C5C6C8;
-    }
-
-    &.new {
-      color: $deep_navy;
+      line-height: 24px;
     }
   }
 
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.must-see-label, div.drafts-label {
+    div.all-posts-label, div.follow-ups-label, div.must-see-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
   div.all-posts-label {
-    @include avenir_R();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -80,6 +78,7 @@
 
     @include mobile() {
       font-size: 16px;
+      line-height: 24px;
     }
 
     &:active, &:focus {
@@ -87,16 +86,15 @@
     }
 
     &.new {
-      @include avenir_H();
+      @include OC_Body_Bold();
       color: $deep_navy;
     }
   }
 
-  div.must-see-label {
-    @include avenir_R();
+  div.follow-ups-label {
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
-    color: $ui_grey;
+    color: $deep_navy;
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -104,6 +102,7 @@
 
     @include mobile() {
       font-size: 16px;
+      line-height: 24px;
     }
 
     &:active, &:focus {
@@ -111,62 +110,89 @@
     }
 
     &.new {
-      @include avenir_H();
-      color: $deep_navy;
+      @include OC_Body_Bold();
+    }
+  }
+
+  div.must-see-label {
+    @include OC_Body_Bold();
+    font-size: 14px;
+    color: $deep_navy;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    &:active, &:focus {
+      text-decoration: none;
+    }
+
+    &.new {
+      @include OC_Body_Bold();
     }
   }
 }
 
 @mixin item-selected() {
-  background-color: #D4F6E4;
-  border-radius: 6px;
+  background-color: $grey_num_2;
+  outline: none;
 
   @include mobile() {
-    border-radius: 0px;
-    background-color: transparent;
+    background-color: $carrot_green;
   }
 
-  .internal, div.all-posts-label, div.drafts-label, div.must-see-label {
-    color: $carrot_green;
-    @include avenir_H();
+  .internal, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+    // color: $carrot_green;
+    @include OC_Body_Bold();
     font-size: 14px;
-    line-height: 25px;
     text-decoration: none;
 
     @include mobile() {
-      @include avenir_H();
       font-size: 16px;
+      line-height: 24px;
     }
 
     span.count {
       color: $carrot_green;
+    }
 
-      @include mobile() {
-        @include avenir_H();
-        font-size: 16px;
-      }
+    @include mobile() {
+      color: white;
     }
   }
 
-  div.all-posts-label, div.drafts-label, div.must-see-label {
+  @include mobile() {
+    span.count {
+      background-color: rgba(white, 0.1);
+      color: white;
+    }
+  }
+
+  div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     font-size: 14px;
     text-decoration: none;
 
     @include mobile() {
       font-size: 16px;
+      line-height: 24px;
     }
   }
 
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.must-see-label, div.drafts-label {
+    div.all-posts-label, div.follow-ups-label, div.must-see-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
-  div.all-posts-label, div.must-see-label {
-    @include avenir_H();
+  div.all-posts-label, div.follow-ups-label, div.must-see-label {
+    @include OC_Body_Bold();
     text-decoration: none;
 
     &:active, &:focus {
@@ -176,58 +202,41 @@
 }
 
 @mixin item-hover(){
-  background-color: #EFF0ED;
-  border-radius: 6px;
+  background-color: $grey_num_2;
+  outline: none;
+  text-decoration: none;
+  -webkit-tap-highlight-color: $grey_num_2;
 
   @include mobile() {
     background-color: transparent;
-    border-radius: 0px;
   }
 
   .internal {
-    color: $ui_grey;
-    @include avenir_R();
+    @include OC_Body_Book();
     font-size: 14px;
-    line-height: 25px;
+    color: $deep_navy;
     text-decoration: none;
 
     @include mobile() {
-      @include avenir_M();
       font-size: 16px;
+      line-height: 24px;
     }
 
     &.new {
-      @include avenir_H();
-      color: $deep_navy;
+      @include OC_Body_Bold();
     }
   }
 
-  &:active, &:focus {
+  div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+    color: $deep_navy;
     text-decoration: none;
-
-    div.all-posts-label, div.must-see-label, div.drafts-label {
-      text-decoration: none;
-    }
-  }
-
-  div.all-posts-label, div.drafts-label, div.must-see-label {
-
-    color: $ui_grey;
-    font-size: 14px;
-    line-height: 25px;
-    text-decoration: none;
-
-    @include mobile() {
-      font-size: 16px;
-    }
 
     &:active, &:focus {
       text-decoration: none;
     }
 
     &.new {
-      @include avenir_H();
-      color: $deep_navy;
+      @include OC_Body_Bold();
     }
   }
 }
@@ -235,117 +244,118 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - 90px);
+  max-height: calc(100vh - #{$navbar_height + 1}px);
   overflow-y: auto;
   overflow-x: visible;
-  padding-bottom: 20px;
   width: #{$left_navigation_sidebar_width}px;
-  top: 90px;
-  height: calc(100vh - 90px);
+  top: #{$navbar_height}px;
+  left: 0;
+  height: calc(100vh - #{$navbar_height + 1}px);
   @include no-user-select();
+  background-color: $ultra_light_grey;
+  float: left;
+  transition: left 180ms ease-in;
+
+  &.hide-left-navbar {
+    left: -216px;
+  }
+
+  @media screen and (max-width: 975px) {
+    position: absolute; 
+  }
 
   @include mobile() {
-    position: absolute;
+    position: fixed;
     margin-top: 0;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
     display: none;
-    z-index: 10000;
-    background-color: transparent;
-    max-height: unset;
-    height: unset;
-    overflow-y: unset;
-    overflow-x: unset;
+    z-index: #{$navbar_zindex + 7};
+    background-color: $carrot_modal_bg;
+    overflow-y: hidden;
+    overflow-x: hidden;
     padding-bottom: 0;
+    max-height: initial;
 
-    &.show-mobile-boards-menu {
+    &.mobile-show-side-panel {
       display: block;
-    }
-  }
-
-  &.navigation-sidebar-overflow {
-    position: relative;
-    overflow-x: unset;
-    overflow-y: unset;
-    overflow: auto;
-    height: auto;
-    max-height: unset;
-    top: unset;
-    left: unset;
-    float: left;
-    min-height: calc(100vh - 90px);
-  }
-
-  div.mobile-header-container {
-    display: none;
-
-    @include mobile() {
-      width: 100%;
-      height: 56px;
-      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-      background-color: white;
-      display: block;
-      padding: 12px 16px;
-
-      button.mobile-header-close {
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/mobile_close_x.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 14px 14px;
-        margin: 4px 16px 0 -5px;
-        float: left;
-      }
-
-      div.orgs-dropdown {
-        float: left;
-        margin-top: -1px;
-      }
-
-      button.mobile-menu {
-        padding: 0;
-        position: relative;
-        float: right;
-
-        @include user-profile(32);
-      }
     }
   }
 
   div.left-navigation-sidebar-content {
-    padding-bottom: 32px;
     width: #{$left_navigation_sidebar_width}px;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &.can-compose {
+      height: calc(100% - 72px);
+
+      @include mobile() {
+        height: 100%;
+      }
+    }
 
     @include mobile() {
       position: relative;
-      padding-bottom: 0px;
+      padding-bottom: 40px;
+      width: 85%;
+      height: auto;
       background-color: white;
-      width: 100%;
+      min-height: 100%;
+      padding-top: #{$mobile_navbar_height + 16}px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    div.left-navigation-sidebar-mobile-header {
+      display: none;
+
+      @include mobile() {
+        display: block;
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 85vw;
+        background-color: white;
+        padding: 11px 16px;
+        border-bottom: 1px solid $divider_line_grey;
+
+        button.mobile-close-bt {
+          display: block;
+          position: absolute;
+          right: 16px;
+          top: 11px;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat; 
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+          
+        }
+
+        div.orgs-dropdown  {
+          width: calc(100% - 40px);
+
+          div.orgs-dropdown-container {
+            z-index: 2;
+          }
+        }
+      }
     }
   }
 
-  a.all-posts {
-    margin-bottom: 0px;
-  }
-
-  a.must-see {
-    margin-bottom: 16px;
-
-    &.showing-drafts {
-      margin-bottom: 0px;
-    }
-  }
-
-  a.all-posts, a.drafts, a.must-see {
+  a.all-posts, a.follow-ups, a.drafts, a.must-see {
     display: block;
     background-color: transparent;
     border: none;
     outline: none;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
     padding-left: 16px;
 
     @include mobile() {
@@ -360,7 +370,7 @@ div.left-navigation-sidebar {
       }
 
       @include big_web() {
-        &:not(.item-selected):hover, &:not(.item-selected):active {
+        &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
           @include item-hover();
         }
       }
@@ -370,17 +380,45 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label, div.drafts-label, div.must-see-label {
-      padding: 2px 0px 0px 16px;
-      width: 148px;
+    @include mobile() {
+      &.item-selected {
+
+        div.all-posts-icon {
+          background-image: cdnUrl("/img/ML/digest_icon_white.svg");
+        }
+
+        div.must-see-icon {
+          background-image: cdnUrl("/img/ML/must_see_bolt_white.svg");
+        }
+
+        div.follow-ups-icon {
+          background-image: cdnUrl("/img/ML/must_see_bolt_white.svg");
+        }
+
+        div.drafts-icon {
+          background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
+        }
+      }
+    }
+
+    div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+      padding: 2px 0px 0px 0;
+      float: left;
       text-align: left;
-      margin-left: 16px;
+      margin-left: 12px;
       text-decoration: none;
 
       @include mobile() {
-        margin-left: 32px;
-        width: auto;
         padding: 0px;
+        line-height: 18px;
+      }
+    }
+
+    div.must-see-label {
+      padding: 2px 0px 0px 14px;
+
+      @include mobile() {
+        padding: 0;
       }
     }
 
@@ -388,9 +426,24 @@ div.left-navigation-sidebar {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
       background-size: 16px 16px;
       background-repeat: no-repeat;
-      background-position: center 6px;
+      background-position: center;
       width: 16px;
-      height: 28px;
+      height: 23px;
+      float: left;
+
+      @include mobile() {
+        opacity: 1;
+        height: 24px;
+      }
+    }
+
+    div.follow-ups-icon {
+      background-image: cdnUrl("/img/ML/follow_ups_icon_grey.svg");
+      background-size: 12px 16px;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 16px;
+      height: 23px;
       float: left;
 
       @include mobile() {
@@ -398,13 +451,6 @@ div.left-navigation-sidebar {
         margin-top: 0px;
         background-position: center 4px;
         opacity: 1;
-      }
-      
-      @include preload_image(cdnUrl("/img/ML/digest_icon_green.svg"));
-
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/digest_icon_green.svg");
       }
     }
 
@@ -414,27 +460,33 @@ div.left-navigation-sidebar {
       background-position: center 4px;
       background-repeat: no-repeat;
       width: 18px;
-      height: 28px;
+      height: 23px;
       float: left;
 
-      @include preload_image(cdnUrl("/img/ML/must_see_bolt_green.svg"));
+      @include mobile() {
+        opacity: 1;
+        height: 24px;
+      }
+    }
+
+    div.drafts-icon {
+      background-image: cdnUrl("/img/ML/drafts_icon_grey.svg");
+      background-size: 12px 16px;
+      background-repeat: no-repeat;
+      background-position: center 3px;
+      width: 16px;
+      height: 23px;
+      float: left;
 
       @include mobile() {
-        margin-left: 0px;
-        margin-top: 0px;
-        background-position: center 3px;
+        background-position: center;
         opacity: 1;
-      }
-
-      &.selected {
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/must_see_bolt_green.svg");
+        height: 24px;
       }
     }
   }
 
   a.drafts {
-    margin-bottom: 16px;
 
     @include mobile() {
       margin-bottom: 0px;
@@ -450,38 +502,21 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
-    height: 20px;
-
-    @include mobile() {
-      border-top: 1px solid $ultra_light_grey;
-      height: 32px;
-    }
+    margin-top: 8px;
 
     .left-navigation-sidebar-top-title {
-      padding: 0px 0px 0px 48px;
+      padding: 8px 16px;
       margin: 0;
-      margin-bottom: 8px;
-
-      @include mobile() {
-        background-color: $ultra_light_grey;
-        height: 32px;
-        width: 100%;
-        padding: 8px 48px 6px;
-        margin-bottom: 0px;
-      }
+      height: 34px;
+      width: 100%;
 
       span {
-        @include avenir_B();
-        font-size: 13px;
-        color: rgba($ui_grey, 0.5);
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: rgba($deep_navy, 0.5);
         float: left;
         cursor: default;
-
-        @include mobile() {
-          display: block;
-          height: 18px;
-          line-height: 18px;
-        }
       }
 
       div.boards-icon {
@@ -499,39 +534,19 @@ div.left-navigation-sidebar {
     button.left-navigation-sidebar-top-title-button {
       width: 20px;
       height: 20px;
-      margin-left: 8px;
-      margin-top: -5px;
-      float: left;
+      margin-right: -2px;
+      float: right;
       padding: 0;
       cursor: pointer;
       transition: 230ms;
-      background-color: #F0EFEA;
       background-image: cdnUrl("/img/ML/plus_button_icon.svg");
       background-repeat: no-repeat;
-      background-position: 50%;
-      background-size: 8px 8px;
-      border-radius: 10px;
-      @include avenir_H();
-
-      @include preload_image(cdnUrl("/img/ML/plus_button_icon_white.svg"));
-
-      &:hover, &.active {
-        background-image: cdnUrl("/img/ML/plus_button_icon_white.svg");
-        background-color: $carrot_green_2;
-      }
-
-      &.qsg-add-section-1 {
-        position: relative;
-      }
+      background-position: center;
+      background-size: 16px 16px;
+      @include OC_Body_Bold();
 
       @include mobile() {
         display: none;
-        float: right;
-
-        &:hover {
-          background-color: #F0EFEA;
-          background-image: cdnUrl("/img/ML/plus_button_icon.svg");
-        }
       }
     }
   }
@@ -540,12 +555,11 @@ div.left-navigation-sidebar {
 
     a.left-navigation-sidebar-item {
       display: block;
-      cursor: default;
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
+      cursor: pointer;
       padding-left: 16px;
       margin: 0;
       text-decoration: none;
+      width: 100%;
 
       &:hover {
         text-decoration: none;
@@ -574,7 +588,7 @@ div.left-navigation-sidebar {
         }
 
         @include big_web() {
-          &:not(.item-selected):hover, &:not(.item-selected):active {
+          &:not(.item-selected):hover, &:not(.item-selected):active, &:not(.item-selected):focus {
             @include item-hover();
           }
         }
@@ -585,52 +599,42 @@ div.left-navigation-sidebar {
       }
 
       div.public {
-        float: left;
+        float: right;
+        margin-right: 12px;
         width: 16px;
-        height: 28px;
+        height: 21px;
         background-image: cdnUrl("/img/ML/board_public.svg");
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        opacity: 0.5;
-
-        @include preload_image(cdnUrl("/img/ML/board_public_green.svg"));
-
-        &.selected {
-          opacity: 1;
-          background-image: cdnUrl("/img/ML/board_public_green.svg");
-        }
       }
 
       div.private {
-        float: left;
+        float: right;
+        margin-right: 12px;
         width: 16px;
-        height: 28px;
+        height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
-        background-size: 9px 11px;
+        background-size: 10px 12px;
         background-position: center;
         background-repeat: no-repeat;
-        opacity: 0.5;
-
-        @include preload_image(cdnUrl("/img/ML/board_private_green.svg"));
-
-        &.selected {
-          opacity: 1;
-          background-image: cdnUrl("/img/ML/board_private_green.svg");
-        }
       }
 
       div.board-name {
-        margin-left: 32px;
+        width: 168px;
+        float: left;
+
+        &.public-board, &.private-board {
+          width: 152px;
+        }
 
         div.internal {
-          padding: 3px 0px 0px;
+          padding: 1px 0px 0px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
-          width: 120px;
-          float: left;
           cursor: pointer;
+          max-width: 100%;
 
           @include mobile() {
             width: auto;
@@ -646,81 +650,54 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-footer {
-    margin-left: 16px;
     position: relative;
-    padding-bottom: 23px;
+    width: 100%;
 
     @include mobile() {
-      // Temp remove bottom links on mobile
-      display: none;
-
-      opacity: 0.5;
-      margin-left: 16px;
-
       button {
         width: 100%;
         text-align: left;
       }
     }
 
-    &.push-to-bottom {
-      position: absolute;
-      bottom: 23px;
-      padding-bottom: 0px;
-    }
+    button.compose-green-bt {
+      border-radius: 6px;
+      background-color: $carrot_green;
+      margin: 16px;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: calc(100% - 32px);
+      height: 40px;
+      opacity: 1;
 
-    button.bottom-nav-bt {
-      @include avenir_M();
-      width: 100%;
-      text-align: left;
-      padding: 2px 0px;
-      height: 28px;
-      display: block;
-      position: relative;
-
-      &:hover {
-        text-decoration: underline;
+      @include big_web() {
+        &:hover {
+          opacity: 0.9;
+        }
       }
 
-      div.bottom-nav-icon {
-        background-size: 16px 16px;
+      @include mobile() {
+        display: none;
+      }
+
+      span.compose-green-icon {
+        width: 12px;
+        height: 22px;
+        background-image: cdnUrl("/img/ML/white_pen.svg");
+        background-size: 12px 12px;
+        background-position: center;
         background-repeat: no-repeat;
-        background-position: center 5px;
-        width: 16px;
-        height: 28px;
-        float: left;
-        opacity: 1;
-
-        @include mobile() {
-          opacity: 1;
-        }
-
-        &.invite-people-icon {
-          background-image: cdnUrl("/img/ML/invite_team.svg");
-        }
-
-        &.support-icon {
-          background-image: cdnUrl("/img/ML/support.svg");
-        }
-
-        &.reminders-icon {
-          background-image: cdnUrl("/img/ML/reminders_logo_dark.svg");
-          opacity: 0.6;
-        }
-
       }
 
-      span {
-        font-size: 14px;
-        line-height: 28px;
-        color: $ui_grey;
-        display: block;
-        float: left;
-        margin-left: 16px;
-
-        @include mobile() {
-          color: white;
-        }
+      span.compose-green-label {
+        @include OC_Body_Bold();
+        font-size: 16px;
+        line-height: 22px;
+        color: white;
+        margin-left: 8px;
+        margin-top: 1px;
       }
     }
   }

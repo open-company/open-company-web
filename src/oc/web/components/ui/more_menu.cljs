@@ -6,9 +6,9 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
 
@@ -51,9 +51,10 @@
     (alert-modal/show-alert alert-data)))
 
 (rum/defcs more-menu < rum/reactive
+                       rum/static
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
-                       (on-window-click-mixin (fn [s e]
+                       (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
                           (when-let* [args (vec (:rum/args s))
                                       opts (get args 2)
@@ -61,23 +62,37 @@
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))
-                       (drv/drv :editable-boards)
-                       {:did-mount (fn [s]
-                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]"))
-                         s)}
-  [s activity-data share-container-id
-   {:keys [will-open will-close external-share tooltip-position]}]
-  (let [delete-link (utils/link-for (:links activity-data) "delete")
-        edit-link (utils/link-for (:links activity-data) "partial-update")
-        share-link (utils/link-for (:links activity-data) "share")
-        editable-boards (drv/react s :editable-boards)]
+                       ui-mixins/refresh-tooltips-mixin
+  [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
+             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
+             can-comment-share? comment-share-cb can-react? react-cb can-reply?
+             reply-cb assigned-follow-up-data external-follow-up]}]
+  (let [delete-link (utils/link-for (:links entity-data) "delete")
+        edit-link (utils/link-for (:links entity-data) "partial-update")
+        share-link (utils/link-for (:links entity-data) "share")
+        is-mobile? (responsive/is-tablet-or-mobile?)
+        create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
+        complete-follow-up-link (when (and assigned-follow-up-data
+                                           (not (:completed? assigned-follow-up-data)))
+                                  (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))]
     (when (or edit-link
               share-link
-              delete-link)
+              delete-link
+              can-comment-share?
+              can-react?
+              can-reply?
+              create-follow-up-link
+              complete-follow-up-link)
       [:div.more-menu
-        {:ref "more-menu"}
+        {:ref "more-menu"
+         :class (when (or @(::move-activity s)
+                          @(::showing-menu s))
+                  "menu-expanded")}
         (when (or edit-link
                   delete-link
+                  can-comment-share?
+                  can-react?
+                  can-reply?
                   (and (not external-share)
                        share-link))
           [:button.mlb-reset.more-menu-bt
@@ -85,40 +100,48 @@
              :ref "more-menu-bt"
              :on-click #(show-hide-menu s will-open will-close)
              :class (when @(::showing-menu s) "active")
-             :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+             :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "More"}])
         (cond
           @(::move-activity s)
           (activity-move {:boards-list (vals editable-boards)
-                          :activity-data activity-data
+                          :activity-data entity-data
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
-            (when edit-link
+            {:class (utils/class-set {:has-complete-follow-up (and is-mobile?
+                                                                   complete-follow-up-link)
+                                      :has-create-follow-up (and is-mobile?
+                                                                 create-follow-up-link)})}
+            (when (and edit-link
+                       show-edit?)
               [:li.edit
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/activity-edit activity-data))}
+                              (if (fn? edit-cb)
+                                (edit-cb entity-data)
+                                (activity-actions/activity-edit entity-data)))}
                 "Edit"])
-            (when delete-link
+            (when (and delete-link
+                       show-delete?)
               [:li.delete
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (delete-clicked % activity-data))}
+                              (if (fn? delete-cb)
+                                (delete-cb entity-data)
+                                (delete-clicked % entity-data)))}
                 "Delete"])
-            (when edit-link
+            (when (and edit-link
+                       show-move?)
               [:li.move
                {:on-click #(do
-                             (utils/event-stop %)
                              (reset! (::showing-menu s) false)
                              (reset! (::move-activity s) true))}
                "Move"])
@@ -126,15 +149,61 @@
                        share-link)
               [:li.share
                 {:on-click #(do
-                              (utils/event-stop %)
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/activity-share-show activity-data share-container-id))}
-                "Share"])])
+                              (activity-actions/activity-share-show entity-data share-container-id))}
+                "Share"])
+            (when (and is-mobile?
+                       (not external-follow-up))
+              (if complete-follow-up-link
+                [:li.complete-follow-up
+                  {:ref "more-menu-complete-follow-up-bt"
+                   :on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/complete-follow-up entity-data assigned-follow-up-data))}
+                  "Complete follow-up"]
+                (when create-follow-up-link
+                  [:li.create-follow-up
+                    {:ref "more-menu-create-follow-up-bt"
+                     :data-container "body"
+                     :on-click #(do
+                                  (reset! (::showing-menu s) false)
+                                  (when (fn? will-close)
+                                    (will-close))
+                                  (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
+                    "Follow-up later"])))
+            (when can-react?
+              [:li.react
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (react-cb)))}
+                "React"])
+            (when can-reply?
+              [:li.reply
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (reply-cb)))}
+                "Reply"])
+            (when can-comment-share?
+              [:li.comment-share
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (when (fn? comment-share-cb)
+                                (comment-share-cb)))}
+                "Copy link"])])
         (when (and external-share
-                   share-link
-                   (not (responsive/is-tablet-or-mobile?)))
+                   share-link)
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
@@ -142,8 +211,35 @@
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))
-                          (activity-actions/activity-share-show activity-data share-container-id))
-             :data-toggle "tooltip"
+                          (activity-actions/activity-share-show entity-data share-container-id))
+             :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-             :title "Share"}])])))
+             :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
+             :title "Share"}])
+        (when external-follow-up
+          (if complete-follow-up-link
+            [:button.mlb-reset.more-menu-complete-follow-up-bt
+              {:type "button"
+               :ref "more-menu-complete-follow-up-bt"
+               :on-click #(do
+                            (reset! (::showing-menu s) false)
+                            (when (fn? will-close)
+                              (will-close))
+                            (activity-actions/complete-follow-up entity-data assigned-follow-up-data))
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement (or tooltip-position "top")
+               :data-container "body"
+               :title "Complete follow-up"}]
+            (when create-follow-up-link
+              [:button.mlb-reset.more-menu-create-follow-up-bt
+                {:type "button"
+                 :ref "more-menu-create-follow-up-bt"
+                 :data-container "body"
+                 :on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/create-self-follow-up entity-data create-follow-up-link))
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement (or tooltip-position "top")
+                 :title "Follow up later"}])))])))

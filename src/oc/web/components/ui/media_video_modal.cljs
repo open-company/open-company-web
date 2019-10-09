@@ -2,9 +2,12 @@
   (:require [rum.core :as rum]
             [cuerdas.core :as string]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :refer (first-render-mixin)]))
+
+(def media-video-modal-height 153)
 
 (def youtube-regexp
  "https?://(?:www\\.|m\\.)*(?:youtube\\.com|youtu\\.be)/watch/?\\?(?:(?:time_continue|t)=\\d+s?&)?v=([a-zA-Z0-9_-]{11}).*")
@@ -20,7 +23,7 @@
 
 (def loom-regexp
  (str
-  "(?:http|https)?:\\/\\/(?:www\\.)?useloom.com\\/share\\/"
+  "(?:http|https)?:\\/\\/(?:www\\.)?(?:useloom|loom).com\\/share\\/"
   "([a-zA-Z0-9_-]*/?)"))
 
 (defn get-video-data [url]
@@ -109,32 +112,58 @@
                                (rum/local false ::dismiss)
                                (rum/local "" ::video-url)
                                (rum/local false ::video-url-focused)
+                               (rum/local 0 ::offset-top)
                                ;; Derivatives
                                (drv/drv :current-user-data)
                                ;; Mixins
                                first-render-mixin
-  [s {:keys [dismiss-modal-cb record-video-cb]}]
+                               {:will-mount (fn [s]
+                                 (let [outer-container-selector (:outer-container-selector (first (:rum/args s)))]
+                                   (when-let [picker-el (sel1 (concat outer-container-selector [:div.medium-editor-media-picker]))]
+                                     (reset! (::offset-top s) (.-offsetTop picker-el))))
+                                 s)
+                                :did-mount (fn [s]
+                                 (when-let [video-field (rum/ref-node s "video-input")]
+                                  (.focus video-field))
+                                s)}
+  [s {:keys [fullscreen dismiss-cb outer-container-selector offset-element-selector]}]
   (let [current-user-data (drv/react s :current-user-data)
-        valid-url (valid-video-url? @(::video-url s))]
+        valid-url (valid-video-url? @(::video-url s))
+        scrolling-element (if fullscreen (sel1 outer-container-selector) (.-scrollingElement js/document))
+        win-height (or (.-clientHeight (.-documentElement js/document))
+                       (.-innerHeight js/window))
+        top-offset-limit (.-offsetTop (sel1 offset-element-selector))
+        scroll-top (.-scrollTop scrolling-element)
+        top-position (max 0 @(::offset-top s))
+        relative-position (+ top-position
+                             top-offset-limit
+                             (* scroll-top -1)
+                             media-video-modal-height)
+        adjusted-position (if (> relative-position win-height)
+                            (max 0 (- top-position (- relative-position win-height) 16))
+                            top-position)]
     [:div.media-video-modal-container
-      {:class (when @(::video-url-focused s) "video-url-focused")}
-      [:input.media-video-modal-input
+      {:class (when @(::video-url-focused s) "video-url-focused")
+       :style {:top (str adjusted-position "px")}}
+      [:div.media-video-modal-title
+        "Embed video"]
+      [:input.media-video-modal-input.oc-input
           {:type "text"
            :value @(::video-url s)
            :ref "video-input"
            :on-change #(reset! (::video-url s) (.. % -target -value))
            :on-focus #(reset! (::video-url-focused s) true)
+           :on-key-press (fn [e]
+                           (when (and valid-url
+                                      (= (.-key e) "Enter"))
+                             (video-add-click s)))
            :on-blur #(when (clojure.string/blank? @(::video-url s))
                        (reset! (::video-url-focused s) false))
-           :placeholder "Paste link from Youtube, Vimeo, or Loom"}]
+           :placeholder "Paste the video link…"}]
       [:button.mlb-reset.embed-video-bt
         {:class (when-not valid-url "disabled")
          :on-click #(when valid-url
                       (video-add-click s))}
         "Embed video"]
-      [:span.middle-or
-        "Or"]
-      [:button.mlb-reset.record-video-bt
-        {:on-click #(record-video-cb %)}
-        [:span.white-video-icon]
-        "Record a video"]]))
+      [:div.media-video-description
+        "Works with Loom, Youtube, and Vimeo"]]))

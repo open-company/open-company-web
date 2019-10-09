@@ -20,14 +20,14 @@
      (swap! dispatcher/app-state reducer payload))))
 
 (defmethod dispatcher/action :section
-  [db [_ section-data]]
+  [db [_ sort-type section-data]]
   (let [db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
         with-entries (:entries section-data)
         org-slug (utils/section-org-slug section-data)
         fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
-        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
+        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data) sort-type))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
                             old-section-data
@@ -39,25 +39,8 @@
                             (assoc-in db-loading posts-key merged-items)
                             db-loading)]
     (assoc-in with-merged-items
-              (dispatcher/board-data-key
-               org-slug
-               (:slug section-data))
+              (dispatcher/board-data-key org-slug (:slug section-data) sort-type)
               (dissoc with-current-edit :fixed-items))))
-
-(defn new?
-  "
-  A board is new if:
-    user is part of the team (we don't track new for non-team members accessing public boards)
-     -and-
-    there at least un unseen item in the container
-  "
-  [change-data board]
-  (let [changes (get change-data (:uuid board))
-        unseen (:unseen changes)
-        in-team? (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))
-        new? (and in-team?
-                  (seq unseen))]
-    new?))
 
 (defn fix-org-section-data
   [db org-data changes]
@@ -70,9 +53,9 @@
   (let [posts-data (dispatcher/posts-data db)
         org-slug (:org (:router-path db))]
     (reduce
-      #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))
-             new-key (vec (conj posts-key :new))]
-          (assoc-in %1 new-key (au/post-new? %2 changes)))
+      #(let [posts-key (dispatcher/activity-key org-slug (:uuid %2))]
+          (update-in %1 posts-key merge {:unseen (au/post-unseen? %2 changes)
+                                         :unread (au/post-unread? %2 changes)}))
       db
       (vals posts-data))))
 
@@ -81,13 +64,25 @@
   db)
 
 (defmethod dispatcher/action :section-edit-save/finish
-  [db [_ section-data]]
+  [db [_ sort-type section-data]]
   (let [org-slug (utils/section-org-slug section-data)
         section-slug (:slug section-data)
-        board-key (dispatcher/board-data-key org-slug section-slug)
-        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))]
+        board-key (dispatcher/board-data-key org-slug section-slug :recently-posted)
+        recent-board-key (dispatcher/board-data-key org-slug section-slug :recent-activity)
+        ;; Parse the new section data
+        fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
+        old-board-data (get-in db board-key)
+        ;; Replace the old section data for :recently-posted sort
+        ;; w/o overriding the posts and links to avoid breaking pagination
+        next-board-data (merge fixed-section-data
+                         (select-keys old-board-data [:posts-list :fixed-items :links]))
+        old-recent-board-data (get-in db recent-board-key)
+        ;; Same for the :recent-activity sort
+        next-recent-board-data (merge fixed-section-data
+                                (select-keys old-recent-board-data [:posts-list :fixed-items :links]))]
     (-> db
-        (assoc-in board-key fixed-section-data)
+        (assoc-in board-key next-board-data)
+        (assoc-in recent-board-key next-recent-board-data)
         (dissoc :section-editing))))
 
 (defmethod dispatcher/action :section-edit/dismiss
@@ -101,7 +96,7 @@
                                        (:private-notifications section-data))
         current-authors (filterv #(not= % (:user-id user)) (:authors section-data))
         current-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))
-        next-authors (if (= user-type :author)
+        next-authors (if (#{:admin :author} user-type)
                        (vec (conj current-authors (:user-id user)))
                        current-authors)
         next-viewers (if (= user-type :viewer)
@@ -109,7 +104,8 @@
                        current-viewers)
         next-notifications (vec (conj current-notifications user))]
     (assoc db :section-editing
-           (merge section-data {:authors next-authors
+           (merge section-data {:has-changes true
+                                :authors next-authors
                                 :viewers next-viewers
                                 :private-notifications next-notifications}))))
 
@@ -121,7 +117,8 @@
         next-authors (filterv #(not= % (:user-id user)) (:authors section-data))
         next-viewers (filterv #(not= % (:user-id user)) (:viewers section-data))]
     (assoc db :section-editing
-           (merge section-data {:authors next-authors
+           (merge section-data {:has-changes true
+                                :authors next-authors
                                 :viewers next-viewers
                                 :private-notifications private-notifications}))))
 
@@ -153,34 +150,33 @@
   (timbre/debug "Change status received:" change-data)
   (if change-data
     (let [org-data (dispatcher/org-data db)
-          old-change-data (dispatcher/change-data db)
           current-board-slug (:board (:router-path db))
           current-board-uuid (:uuid (dispatcher/board-data db))
           filtered-change-data (if (= current-board-slug "all-posts")
                                  {} ;; ignore all changes if we are on AP
                                  (into {} (filter (fn [[buid _]](not= buid current-board-uuid)) change-data)))
-          new-change-data (if (or replace-change-data?
-                                  (empty? old-change-data))
-                            change-data
-                            (merge old-change-data filtered-change-data))
-          old-change-cache-data (dispatcher/change-cache-data db)
-          new-change-cache-data (merge old-change-cache-data change-data)
+          old-change-data (dispatcher/change-data db)
+          new-change-data (merge old-change-data change-data)
           next-db (fix-org-section-data db org-data new-change-data)]
       (timbre/debug "Change status data:" new-change-data)
       (-> next-db
         (fix-posts-new-label new-change-data)
-        (assoc-in (dispatcher/change-cache-data-key (:slug org-data)) new-change-cache-data)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
     db))
 
-(defn update-unseen-remove [old-change-data item-id container-id new-changes]
+(defn update-unseen-unread-remove [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
         old-unseen (or (:unseen old-container-change-data) [])
         next-unseen (filter #(not= % item-id) old-unseen)
+        old-unread (or (:unread old-container-change-data) [])
+        next-unread (filter #(not= % item-id) old-unread)
         next-container-change-data (if old-container-change-data
-                                     (assoc old-container-change-data :unseen next-unseen)
+                                     (assoc old-container-change-data
+                                      :unseen next-unseen
+                                      :unread next-unread)
                                      {:container-id container-id
-                                      :unseen next-unseen})]
+                                      :unseen next-unseen
+                                      :unread next-unread})]
     (assoc old-change-data container-id next-container-change-data)))
 
 (defmethod dispatcher/action :item-delete/unseen
@@ -188,21 +184,22 @@
   (let [item-id (:item-id change-data)
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
-        change-cache-key (dispatcher/change-cache-data-key org-slug)
-        old-change-data (get-in db change-key)
-        old-change-cache-data (get-in db change-cache-key)]
-    (-> db
-      (assoc-in change-key (update-unseen-remove old-change-data item-id container-id change-data))
-      (assoc-in change-key (update-unseen-remove old-change-cache-data item-id container-id change-data)))))
+        old-change-data (get-in db change-key)]
+    (assoc-in db change-key (update-unseen-unread-remove old-change-data item-id container-id change-data))))
 
-(defn update-unseen-add [old-change-data item-id container-id new-changes]
+(defn update-unseen-unread-add [old-change-data item-id container-id new-changes]
   (let [old-container-change-data (get old-change-data container-id)
         old-unseen (or (:unseen old-container-change-data) [])
         next-unseen (vec (seq (conj old-unseen item-id)))
+        old-unread (or (:unread old-container-change-data) [])
+        next-unread (vec (seq (conj old-unread item-id)))
         next-container-change-data (if old-container-change-data
-                                     (assoc old-container-change-data :unseen next-unseen)
+                                     (assoc old-container-change-data
+                                      :unseen next-unseen
+                                      :unread next-unread)
                                      {:container-id container-id
-                                      :unseen next-unseen})]
+                                      :unseen next-unseen
+                                      :unread next-unread})]
     (assoc old-change-data container-id next-container-change-data)))
 
 (defmethod dispatcher/action :item-add/unseen
@@ -210,12 +207,8 @@
   (let [item-id (:item-id change-data)
         container-id (:container-id change-data)
         change-key (dispatcher/change-data-key org-slug)
-        change-cache-key (dispatcher/change-cache-data-key org-slug)
-        old-change-data (get-in db change-key)
-        old-change-cache-data (get-in db change-cache-key)]
-    (-> db
-     (assoc-in change-key (update-unseen-add old-change-data item-id container-id change-data))
-     (assoc-in change-cache-key (update-unseen-add old-change-cache-data item-id container-id change-data)))))
+        old-change-data (get-in db change-key)]
+    (assoc-in db change-key (update-unseen-unread-add old-change-data item-id container-id change-data))))
 
 ;; Section store specific reducers
 (defmethod reducer :default [db payload]
@@ -225,3 +218,59 @@
 (defmethod reducer :org-loaded
   [db [_ org-data saved?]]
   (fix-org-section-data db org-data (dispatcher/change-data db)))
+
+(defmethod dispatcher/action :section-more
+  [db [_ org-slug board-slug sort-type]]
+  (let [container-key (dispatcher/board-data-key org-slug board-slug sort-type)
+        container-data (get-in db container-key)
+        next-container-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-container-data)))
+
+(defmethod dispatcher/action :section-more/finish
+  [db [_ org board direction sort-type next-board-data]]
+  (if next-board-data
+    (let [container-key (dispatcher/board-data-key org board sort-type)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-board-data (merge next-board-data {:posts-list (:posts-list container-data)
+                                                     :old-links (:links container-data)})
+          fixed-posts-data (au/fix-board prepare-board-data (dispatcher/change-data db) direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (-> db
+        (assoc-in container-key new-container-data)
+        (assoc-in posts-data-key new-items-map)))
+    db))
+
+(defmethod dispatcher/action :setup-section-editing
+  [db [_ board-data]]
+  (assoc db :initial-section-editing board-data))
+
+(defmethod dispatcher/action :item-move
+  [db [_ org-slug change-data]]
+  (let [old-container-id (:old-container-id change-data)
+        container-id (:container-id change-data)
+        item-id (:item-id change-data)
+        change-key (dispatcher/change-data-key org-slug)
+        old-change-data (get-in db change-key)
+        old-container-change-data (get old-change-data old-container-id)
+        is-unseen? (utils/in? (:unseen old-container-change-data) item-id)
+        is-unread? (utils/in? (:unread old-container-change-data) item-id)
+        next-old-unseen (filterv #(not= % item-id) (:unseen old-container-change-data))
+        next-old-unread (filterv #(not= % item-id) (:unread old-container-change-data))
+        next-old-container-change-data (-> old-container-change-data
+                                        (assoc :unseen next-old-unseen)
+                                        (assoc :unread next-old-unread))
+        new-container-change-data (get old-change-data container-id)
+        next-new-unseen (concat (:unseen new-container-change-data) (if is-unseen? [item-id] []))
+        next-new-unread (concat (:unread new-container-change-data) (if is-unread? [item-id] []))
+        next-new-container-change-data (-> new-container-change-data
+                                        (assoc :unseen next-new-unseen)
+                                        (assoc :unread next-new-unread))
+        next-change-data (-> old-change-data
+                          (assoc old-container-id next-old-container-change-data)
+                          (assoc container-id next-new-container-change-data))]
+    (assoc-in db change-key next-change-data)))

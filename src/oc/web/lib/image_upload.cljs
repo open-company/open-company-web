@@ -2,7 +2,7 @@
   (:require [oc.web.local-settings :as ls]
             [cljsjs.filestack]
             [goog.object :as gobj]
-            [oc.web.lib.raven :as sentry]))
+            [oc.web.lib.sentry :as sentry]))
 
 (def _fs (atom nil))
 
@@ -24,7 +24,7 @@
                         ["local_file_system" "imagesearch" "googledrive" "dropbox" "onedrive" "box"]
                         ["local_file_system" "googledrive" "dropbox" "onedrive" "box"])
         base-config   {:maxFiles 1
-                       :maxSize (* 20 1024 1024) ; Limit the uploaded file to be at most 20MB
+                       :maxSize ls/file-upload-size ; Limit the uploaded file to be at most 20MB
                        :storeTo store-to
                        :transformations {
                          :crop {:circle true}
@@ -62,17 +62,17 @@
           (when (= (count files-uploaded)1)
             (success-cb (get files-uploaded 0))))))))
 
-(defn upload-file! [file success-cb & [error-cb]]
+(defn upload-file! [file success-cb & [error-cb progress-cb]]
   (try
     (let [fs-client (init-filestack)]
       (.then
-        (.upload fs-client file #js {})
+        (.upload fs-client file #js {:onProgress #(when (fn? progress-cb) (progress-cb (.-totalPercent %)))})
         (fn [res]
           (let [url (gobj/get res "url")]
             (when (fn? success-cb)
               (success-cb url))))))
     (catch :default e
-      (sentry/capture-error e)
+      (sentry/capture-error! e)
       (when (fn? error-cb)
         (error-cb e)))))
 
@@ -112,6 +112,6 @@
             (when (fn? success-cb)
               (success-cb url)))))
       (catch :default e
-        (sentry/capture-error e)
+        (sentry/capture-error! e)
         (when (fn? error-cb)
           (error-cb e))))))

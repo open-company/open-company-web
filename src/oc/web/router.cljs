@@ -5,8 +5,9 @@
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
-            [oc.web.lib.raven :as raven]
-            [oc.web.lib.jwt :as jwt]))
+            [oc.web.lib.sentry :as sentry]
+            [oc.web.lib.jwt :as jwt]
+            [clojure.string :as cstr]))
 
 (def path (atom {}))
 
@@ -19,7 +20,7 @@
 (defn get-token []
   (when (or (not js/window.location.pathname)
             (not js/window.location.search))
-    (raven/capture-message (str "Window.location problem:"
+    (sentry/capture-message! (str "Window.location problem:"
                                 " windown.location.pathname:" js/window.location.pathname
                                 " window.location.search:" js/window.location.search
                                 " return:" (str js/window.location.pathname js/window.location.search))))
@@ -52,13 +53,24 @@
     (.setUseFragment false)))
 
 (def history (atom nil))
-(def route-dispatcher (atom nil))
 
 ; FIXME: remove the warning of history not found
 (defn nav! [token]
   (timbre/info "nav!" token)
   (timbre/debug "history:" @history)
   (.setToken @history token))
+
+(defn rewrite-org-uuid-as-slug
+  [org-uuid org-slug]
+  (timbre/info "Navigate from org" org-uuid "to slug:" org-slug)
+  (nav! (cstr/replace (get-token) (re-pattern org-uuid) org-slug)))
+
+(defn rewrite-board-uuid-as-slug
+  [board-uuid board-slug]
+  (timbre/info "Rewrite URL from board" board-uuid "to slug:" board-slug)
+  (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
+    (swap! path assoc :board board-slug)
+    (.replaceState js/window.history #js {} js/window.title new-path)))
 
 (defn redirect! [loc]
   (timbre/info "redirect!" loc)
@@ -88,8 +100,7 @@
   (timbre/info "history-back!")
   (.go (.-history js/window) -1))
 
-(defn setup-navigation! [cb-fn sec-route-dispatcher]
-  (reset! route-dispatcher sec-route-dispatcher)
+(defn setup-navigation! [cb-fn]
   (let [h (doto (make-history)
             (events/listen HistoryEventType/NAVIGATE
               ;; wrap in a fn to allow live reloading
@@ -107,11 +118,17 @@
 (defn current-posts-filter []
   (:board @path))
 
+(defn current-sort-type []
+  (or (:sort-type @path) :recent-activity))
+
 (defn current-activity-id []
   (:activity @path))
 
 (defn current-secure-activity-id []
   (:secure-id @path))
+
+(defn current-comment-id []
+  (:comment @path))
 
 (defn query-params []
   (:query-params @path))
@@ -139,6 +156,11 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
+(defn last-sort-cookie
+  "Cookie to save the last sort selected"
+  [org-slug]
+  (str "last-sort-" (jwt/user-id) "-" (name org-slug)))
+
 (defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
@@ -160,6 +182,8 @@
   (str "invite-people-tooltip-" (jwt/user-id)))
 
 (def login-redirect-cookie "login-redirect")
+
+(def expo-push-token-cookie "expo-push-token")
 
 ;; Debug
 

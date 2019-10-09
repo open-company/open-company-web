@@ -1,28 +1,15 @@
 $avatar_size: 32;
+$mobile_avatar_size: 32;
 
 button.user-avatar-button{
   margin: 0;
   border: 0px solid transparent;
   background-color: transparent;
-  width: #{$avatar_size + 16}px;
+  width: #{$avatar_size}px;
   height: #{$avatar_size}px;
-  border-radius: #{$avatar-size / 2}px;
-  padding: 0px 16px 0px 0px;
+  border-radius: 50%;
+  padding: 0;
   position: relative;
-
-  &:after {
-    content: "";
-    width: 8px;
-    height: 6px;
-    background-image: cdnUrl("/img/ML/user_menu_chevron.svg");
-    background-size: 8px 6px;
-    background-repeat: no-repeat;
-    background-position: center;
-    position: absolute;
-    top: #{($avatar_size - 6) / 2}px;
-    right: 0px;
-    opacity: 0.4;
-  }
 
   &.disabled-user-menu {
     cursor: default;
@@ -34,4 +21,10 @@ button.user-avatar-button{
   }
 
   @include user-profile($avatar_size);
+
+  @include mobile() {
+    width: #{$mobile_avatar_size}px;
+    height: #{$mobile_avatar_size}px;
+    @include user-profile($mobile_avatar_size);
+  }
 }

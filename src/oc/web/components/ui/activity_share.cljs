@@ -10,10 +10,12 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.team :as team-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.org-settings :as org-settings]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.web.actions.notifications :as notification-actions]
             [oc.web.components.ui.small-loading :refer (small-loading)]
+            [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]
             [oc.web.components.ui.slack-channels-dropdown :refer (slack-channels-dropdown)]))
 
 (defn dismiss []
@@ -44,7 +46,6 @@
                             ;; Locals
                             (rum/local {:note ""} ::slack-data)
                             (rum/local false ::dismiss)
-                            (rum/local false ::copied)
                             (rum/local false ::sharing)
                             (rum/local false ::shared)
                             (rum/local (rand 1000) ::slack-channels-dropdown-key)
@@ -103,30 +104,30 @@
           (when is-mobile?
             [:button.mobile-modal-close-bt.mlb-reset
               {:on-click #(close-clicked s)}])
-          "Share this post"]
-        (when can-share-to-slack?
-          [:div.activity-share-medium-selector-container
-            [:div.activity-share-medium-selector
-              {:class (when (= medium :url) "selected")
-               :on-click (fn [_]
-                          (when-not @(::sharing s)
-                            (dis/dispatch! [:input [:activity-share-medium] :url])
-                            (utils/after
-                             500
-                             #(highlight-url s))))}
-              "URL"]
-            [:div.activity-share-medium-selector
-              {:class (utils/class-set {:selected (= medium :slack)})
-               :on-click (fn [e]
-                           (utils/event-stop e)
-                           (when-not @(::sharing s)
-                             (if has-bot?
-                               (dis/dispatch! [:input [:activity-share-medium] :slack])
-                               (when (jwt/is-admin? (:team-id org-data))
-                                 (org-settings/show-modal :main)))))}
-              "Slack"]])
-        [:div.activity-share-divider-line
-          {:class (when-not has-bot? "no-tabs")}]
+          "Share post"]
+        ; (when can-share-to-slack?
+        ;   [:div.activity-share-medium-selector-container
+        ;     [:div.activity-share-medium-selector
+        ;       {:class (when (= medium :url) "selected")
+        ;        :on-click (fn [_]
+        ;                   (when-not @(::sharing s)
+        ;                     (dis/dispatch! [:input [:activity-share-medium] :url])
+        ;                     (utils/after
+        ;                      500
+        ;                      #(highlight-url s))))}
+        ;       "URL"]
+        ;     [:div.activity-share-medium-selector
+        ;       {:class (utils/class-set {:selected (= medium :slack)})
+        ;        :on-click (fn [e]
+        ;                    (utils/event-stop e)
+        ;                    (when-not @(::sharing s)
+        ;                      (if has-bot?
+        ;                        (dis/dispatch! [:input [:activity-share-medium] :slack])
+        ;                        (when (jwt/is-admin? (:team-id org-data))
+        ;                          (nav-actions/show-org-settings :integrations)))))}
+        ;       "Slack"]])
+        ; [:div.activity-share-divider-line
+        ;   {:class (when-not has-bot? "no-tabs")}]
         (when (= medium :url)
           [:div.activity-share-modal-shared.group
             [:form
@@ -134,19 +135,15 @@
               (when-not disallow-public-share?
                 [:div.medium-row.group
                   [:div.fields
-                    [:div.checkbox-row.group
-                      {:on-click #(reset! (::url-audience s) :team)}
-                      [:div.checkbox
-                        {:class (when (= @(::url-audience s) :team)
-                                  "selected")}]
-                      [:div.checkbox-label "Link that requires a Carrot login"]]
-                    [:div.checkbox-row.group
-                      {:on-click #(reset! (::url-audience s) :all)}
-                      [:div.checkbox
-                        {:class (when (= @(::url-audience s) :all)
-                                  "selected")}]
-                      [:div.checkbox-label "Link that anyone can use"]]]])
-              [:div.medium-row.url-field-row.group
+                    [:button.mlb-reset.checkbox-row
+                      {:on-click (fn [_] (swap! (::url-audience s) #(if (= % :team) :all :team)))}
+                      (carrot-option-button {:selected (= @(::url-audience s) :team)})
+                      [:div.checkbox-label "Require authentication"]]
+                    [:button.mlb-reset.checkbox-row
+                      {:on-click (fn [_] (swap! (::url-audience s) #(if (= % :all) :team :all)))}
+                      (carrot-option-button {:selected (= @(::url-audience s) :all)})
+                      [:div.checkbox-label "Public (anyone with this link)"]]]])
+              [:div.medium-row.group
                 (let [url-protocol (str "http" (when ls/jwt-cookie-secure "s") "://")
                       secure-url (oc-urls/secure-activity (router/current-org-slug) secure-uuid)
                       post-url (oc-urls/entry (router/current-org-slug) (:board-slug activity-data) (:uuid activity-data))
@@ -155,7 +152,7 @@
                                     post-url
                                     secure-url))]
                   [:div.shared-url-container.group
-                    [:input
+                    [:input.oc-input
                       {:value share-url
                        :key share-url
                        :read-only true
@@ -168,12 +165,15 @@
                               (utils/event-stop e)
                               (let [url-input (rum/ref-node s "activity-share-url-field")]
                                 (highlight-url s)
-                                (when (utils/copy-to-clipboard url-input)
-                                  (reset! (::copied s) true)
-                                  (utils/after 2000 #(reset! (::copied s) false)))))}
-                  (if @(::copied s)
-                    "Copied!"
-                    "Copy URL")]]]])
+                                (let [copied? (utils/copy-to-clipboard url-input)]
+                                  (notification-actions/show-notification {:title (if copied? "Share URL copied to clipboard" "Error copying the share URL")
+                                                                           :description (when-not copied? "Please try copying the URL manually")
+                                                                           :primary-bt-title "OK"
+                                                                           :primary-bt-dismiss true
+                                                                           :primary-bt-inline copied?
+                                                                           :expire 3
+                                                                           :id (if copied? :share-url-copied :share-url-copy-error)}))))}
+                  "Copy URL"]]]])
         (when (= medium :slack)
           [:div.activity-share-share
             {:class utils/hide-class}

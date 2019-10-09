@@ -7,7 +7,9 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
-            [oc.web.lib.responsive :as responsive]))
+            [oc.web.lib.ziggeo :as ziggeo]
+            [oc.web.lib.responsive :as responsive]
+            [oc.web.utils.comment :as comment-utils]))
 
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
@@ -104,7 +106,7 @@
         delete (utils/link-for links "delete")]
     (and (nil? partial-update) (nil? delete))))
 
-(defn post-new?
+(defn post-unseen?
   "An entry is new if its uuid is contained in container's unseen."
   [entry changes]
   (let [board-uuid (:board-uuid entry)
@@ -113,6 +115,14 @@
         user-id (jwt/user-id)]
     (and (utils/in? board-unseen (:uuid entry))
          (not= (:user-id (:publisher entry)) user-id))))
+
+(defn post-unread?
+  "An entry is new if its uuid is contained in container's unread."
+  [entry changes]
+  (let [board-uuid (:board-uuid entry)
+        board-change-data (get changes board-uuid {})
+        board-unread (:unread board-change-data)]
+    (utils/in? board-unread (:uuid entry))))
 
 (defn body-for-stream-view [inner-html]
   (if (seq inner-html)
@@ -143,51 +153,80 @@
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
         fixed-video-id (:video-id entry-data)
         body-thumbnail (html/first-body-thumbnail (:body entry-data))]
+    (when (seq fixed-video-id)
+      (ziggeo/init-ziggeo true))
     (-> entry-data
       (assoc :content-type "entry")
-      (assoc :new (post-new? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+      (assoc :unseen (post-unseen? (assoc entry-data :board-uuid fixed-board-uuid) changes))
+      (assoc :unread (post-unread? (assoc entry-data :board-uuid fixed-board-uuid) changes))
       (assoc :read-only (readonly-entry? (:links entry-data)))
       (assoc :board-uuid fixed-board-uuid)
       (assoc :board-slug fixed-board-slug)
       (assoc :board-name fixed-board-name)
+      (update :board-access #(or % (:access board-data)))
       (assoc :has-comments (boolean comments-link))
       (assoc :can-comment (boolean add-comment-link))
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
       (assoc :has-thumbnail body-thumbnail)
-      (assoc :body-thumbnail body-thumbnail))))
+      (assoc :body-thumbnail body-thumbnail)
+      (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
 (defn fix-board
-  "Add `:read-only` and fix each entry of the board, then create a :fixed-items map with the entry UUID."
+  "Parse board data coming from the API."
   ([board-data]
-    (fix-board board-data {}))
-
-  ([board-data changes]
+   (fix-board board-data {}))
+  ([board-data change-data & [direction]]
     (let [links (:links board-data)
-          read-only (readonly-board? links)
-          with-read-only (assoc board-data :read-only read-only)
-          with-fixed-entries (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
-                                       (fix-entry %2 board-data changes))
-                                       with-read-only (:entries board-data))
-          with-entry-count (if (:entries board-data)
-                             (assoc with-fixed-entries
-                              :entry-count
-                              (count (:fixed-items with-fixed-entries)))
-                             with-fixed-entries)
-          without-entries (dissoc with-entry-count :entries)]
-      without-entries)))
-
-(defn fix-container
-  "Fix container data coming from the API."
-  ([container-data]
-   (fix-container container-data {}))
-  ([container-data change-data & [direction]]
-    (let [with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
+          with-read-only (assoc board-data :read-only (readonly-board? links))
+          with-fixed-activities (reduce #(assoc-in %1 [:fixed-items (:uuid %2)]
                                           (fix-entry %2 {:slug (:board-slug %2)
                                                          :name (:board-name %2)
                                                          :uuid (:board-uuid %2)}
                                            change-data))
+                                 with-read-only
+                                 (:entries board-data))
+          next-links (when direction
+                      (vec
+                       (remove
+                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
+                        links)))
+          link-to-move (when direction
+                         (if (= direction :down)
+                           (utils/link-for (:old-links board-data) "previous")
+                           (utils/link-for (:old-links board-data) "next")))
+          fixed-next-links (if direction
+                             (if link-to-move
+                               (vec (conj next-links link-to-move))
+                               next-links)
+                             links)
+          with-links (-> with-fixed-activities
+                       (dissoc :old-links)
+                       (assoc :links fixed-next-links))
+          new-items (map :uuid (:entries board-data))
+          without-items (dissoc with-links :entries)
+          with-posts-list (assoc without-items :posts-list (vec
+                                                             (case direction
+                                                              :up (concat new-items (:posts-list board-data))
+                                                              :down (concat (:posts-list board-data) new-items)
+                                                              new-items)))
+          with-saved-items (if direction
+                             (assoc with-posts-list :saved-items (count (:posts-list board-data)))
+                             with-posts-list)]
+      with-saved-items)))
+
+(defn fix-container
+  "Parse container data coming from the API, like All posts or Must see."
+  ([container-data]
+   (fix-container container-data {} (dis/org-data)))
+  ([container-data change-data org-data & [direction]]
+    (let [all-boards (:boards org-data)
+          with-fixed-activities (reduce (fn [ret item]
+                                          (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
+                                                            all-boards))]
+                                            (assoc-in ret [:fixed-items (:uuid item)]
+                                             (fix-entry item board-data change-data))))
                                  container-data
                                  (:items container-data))
           next-links (when direction
@@ -225,7 +264,7 @@
           :sorted-comments)
       (:comments activity-data)))
 
-(defn- is-element-visible?
+(defn is-element-visible?
    "Given a DOM element return true if it's actually visible in the viewport."
   [el]
   (let [rect (.getBoundingClientRect el)

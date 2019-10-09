@@ -1,0 +1,325 @@
+div.expanded-post {
+  width: 640px;
+  margin: 0 auto;
+  padding-bottom: 24px;
+
+  @include mobile() {
+    width: 100%;
+    padding: 16px;
+    margin-top: 56px;
+    background-color: white;
+
+    // Add some extra padding on android at the bottom
+    // to make sure the add comment field is not hidden
+    // behind the keyboard, Safari resize the viewport when
+    // the keyboard pops out so it's not a problem
+    &.android {
+      padding-bottom: 25vh;
+    }
+  }
+
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      top: -21px;
+      right: 0;
+    }
+  }
+
+  div.expanded-post-header {
+    height: 32px;
+
+    @include mobile() {
+      width: 100vw;
+      height: #{$mobile_navbar_height}px;
+      padding: 11px 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      border-bottom: 1px solid $divider_line_grey;
+      background-color: white;
+      z-index: 2;
+    }
+
+    button.back-to-board {
+      float: left;
+      height: 32px;
+      border-radius: 4px;
+      padding: 7px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background-color: $ultra_light_grey;
+
+      @include mobile() {
+        background-color: transparent;
+        padding: 7px 0;
+        width: 32px;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+      }
+
+      div.back-to-board-inner {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+        line-height: 18px;
+        margin-left: 8px;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+
+      div.back-arrow {
+        content: " ";
+        width: 16px;
+        height: 10px;
+        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+        background-repeat: no-repeat;
+        background-size: 16px 10px;
+        background-position: center;
+
+        @include mobile() {
+          width: 12px;
+          height: 12px;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+        }
+      }
+    }
+
+    div.more-menu {
+      float: right;
+    }
+  }
+
+  div.ziggeo-player {
+    margin-top: 16px;
+    width: 638px;
+    height: 478px;
+    position: relative;
+
+    video {
+      max-height: 478px;
+    }
+
+    @include mobile(){
+      width: 100vw;
+      height: calc(100vw *  0.75);
+    }
+  }
+
+  div.expanded-post-headline {
+    @include activity-title(36px, 40px);
+    margin-top: 16px;
+
+    @include mobile() {
+      @include activity-title(22px, 28px);
+      margin-top: 0;
+    }
+  }
+
+  div.expanded-post-author {
+    @include user-profile(24);
+    margin-top: 16px;
+    min-height: 24px;
+
+    @include mobile() {
+      margin-top: 8px;
+    }
+
+    div.user-avatar-img-container {
+      float: left;
+      margin-right: 8px;
+    }
+
+    div.expanded-post-author-inner {
+      @include OC_Body_Book();
+      font-size: 12px;
+      color: rgba($deep_navy, 0.5);
+      line-height: 24px;
+
+      span.expanded-post-author-inner-label {
+        @include mobile() {
+          margin-right: 8px;
+          margin-bottom: 8px;
+          display: inline-block;
+        }
+      }
+
+      @include must-see-tag();
+
+      div.must-see-tag {
+        display: inline-block;
+        margin-left: 8px;
+        margin-top: 2px;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 3px;
+          margin-bottom: 8px;
+          overflow: hidden;
+          max-width: 100%;
+          text-overflow: ellipsis;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+      }
+
+      @include follow-up-tag();
+
+      div.follow-up-tag {
+        display: inline-block;
+        margin-left: 8px;
+        margin-top: 2px;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 3px;
+          margin-bottom: 8px;
+          overflow: hidden;
+          max-width: 100%;
+          text-overflow: ellipsis;
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+      }
+    }
+  }
+
+  div.expanded-post-abstract {
+    @include activity-abstract(18px, 24px);
+    margin: 16px 0 24px;
+    @include OC_Body_Bold();
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    // Abstract is bold only in expanded post view
+    // we need to make sure italic doesn't override
+    // the font weight only here
+    i, i strong, i b, b i, strong i {
+      @include OC_Body_Bold_Italic();
+    }
+
+    @include mobile() {
+      margin: 8px 0 16px;
+    }
+  }
+
+  div.expanded-post-body {
+    @include activity-body(18, 24, $deep_navy);
+    margin-top: 16px;
+
+    @include mobile() {
+      margin-top: 8px;
+    }
+
+    .interactive-image {
+      cursor: zoom-in;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+  }
+
+  // div.expanded-post-mobile-reactions {
+  //   display: none;
+
+  //   @include mobile() {
+  //     display: block;
+  //     height: 48px;
+  //     margin: 24px 0 0;
+  //     padding-bottom: 16px;
+  //     border-bottom: 1px solid $ultra_light_grey;
+  //   }
+  // }
+
+  div.expanded-post-footer {
+    margin-top: 24px;
+    min-height: 26px;
+    position: relative;
+
+    @include mobile() {
+      margin-top: 3px;
+      min-height: 32px;
+    }
+
+    div.expanded-post-footer-mobile-group {
+      @include mobile() {
+        float: left;
+        height: 20px;
+        margin-top: 20px;
+      }
+    }
+
+    div.is-comments {
+      margin-right: 16px;
+      float: left;
+
+      div.is-comments-authors.show-border {
+        div.is-comments-author {
+          background-color: $grey_num_2;
+          border: 2px solid $grey_num_2;
+
+          @include mobile(){
+            background-color: white;
+            border: 2px solid white;
+          }
+        }
+      }
+    }
+
+    div.reactions {
+      float: left;
+      margin-right: 16px;
+
+      @include mobile() {
+        margin-top: 13px;
+      }
+
+      div.reactions-picker-container {
+        div.emoji-mart {
+          bottom: unset;
+          top: 0;
+          left: calc(100% + 8px);
+
+          @include mobile(){
+            bottom: unset;
+            right: unset;
+            top: unset;
+            left: unset;
+          }
+        }
+      }
+    }
+
+    div.expanded-post-wrt-container {
+      float: left;
+      position: relative;
+      margin-top: 4px;
+
+      @include mobile() {
+        margin-top: 0;
+      }
+    }
+  }
+
+  div.expanded-post-comments {
+    padding-bottom: 0;
+    margin-top: 24px;
+
+    @include mobile() {
+      margin-top: 16px;
+      width: 100%;
+      padding: 16px 0;
+    }
+
+    div.stream-comments {
+      width: calc(100% + 32px);
+      margin-left: -16px;
+    }
+  }
+}

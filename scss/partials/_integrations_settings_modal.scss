@@ -1,0 +1,254 @@
+div.integrations-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.integrations-settings {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    div.integrations-settings-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      div.integrations-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+        margin-right: 8px;
+      }
+
+      button.save-bt {
+        height: 32px;
+        padding: 7px 14px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+        color: white;
+        float: right;
+        border-radius: 4px;
+      }
+    }
+
+    div.integrations-settings-body {
+      width: 272px;
+      margin: 24px auto 0;
+
+      button.add-slack-team-bt {
+        width: 100%;
+        height: 32px;
+        border-radius: 4px;
+        background-color: $ultra_light_grey;
+        color: $deep_navy;
+        font-size: 14px;
+        @include OC_Body_Book();
+        line-height: 14px;
+        text-align: center;
+        position: relative;
+        padding: 9px 8px;
+
+        div.slack-icon {
+          width: 14px;
+          height: 14px;
+          background-image: cdnUrl("/img/ML/slack_normal.svg");
+          background-size: 14px 14px;
+          background-repeat: no-repeat;
+          background-position: center;
+          position: absolute;
+          left: 8px;
+          top: 9px;
+        }
+      }
+
+      div.integrations-settings-list {
+        margin-top: 16px;
+        border-top: 1px solid $ultra_light_grey;
+        padding-top: 16px;
+
+        div.integrations-settings-list-title {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $light_navy;
+        }
+
+        div.integrations-settings-item {
+          margin-top: 8px;
+
+          &:not(:first-child) {
+            margin-top: 24px;
+          }
+
+          div.integration-item-header {
+            width: 100%;
+            height: 32px;
+            background-color: $ultra_light_grey;
+            border-radius: 4px;
+
+            div.logo-container {
+              float: left;
+              width: 32px;
+              height: 32px;
+              border: 1px solid $grey_num_3;
+              background-color: white;
+              border-radius: 4px;
+
+              img.slack-logo {
+                width: 30px;
+                height: 30px;
+                padding: 2px;
+
+                &.no-logo {
+                  width: 18px;
+                  height: 18px;
+                  padding: 0px;
+                  margin: 6px;
+                }
+              }
+            }
+
+            div.slack-team-name {
+              @include OC_Body_Bold();
+              font-size: 14px;
+              color: $deep_navy;
+              float: left;
+              margin-left: 8px;
+              margin-top: 6px;
+            }
+
+            button.remove-slack-team-bt {
+              width: 32px;
+              height: 32px;
+              background-image: cdnUrl("/img/ML/remove_slack_team.svg");
+              background-size: 10px 10px;
+              background-position: center;
+              background-repeat: no-repeat;
+              float: right;
+            }
+          }
+
+          div.linked-to {
+            margin-top: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $light_navy;
+            line-height: 18px;
+          }
+
+          div.self-join {
+            margin-top: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: rgba($light_navy, 0.4);
+            line-height: 18px;
+
+            select.self-join-select {
+              width: 100%;
+              height: 32px;
+              border-radius: 4px;
+              padding: 7px 8px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: $deep_navy;
+              margin-top: 8px;
+              display: block;
+              border: none;
+              outline: none;
+              display: block;
+              appearance: none;
+              -webkit-appearance: none;
+              background-color: $ultra_light_grey;
+              position: relative;
+              background-image: cdnUrl("/img/ML/select_arrows.svg");
+              background-size: 8px 10px;
+              background-position: top 11px right 8px;
+              background-repeat: no-repeat;
+            
+              &::-ms-expand {
+                display: none;
+              }
+
+              &:hover {
+                border-color: #888;
+              }
+
+              &:focus {
+                border-color: none;
+                box-shadow: none;
+                outline: none;
+              }
+
+              option {
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: $deep_navy;
+              }
+            }
+          }
+
+          div.bot-line {
+            margin-top: 8px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $light_navy;
+            line-height: 18px;
+             
+            button.turn-on-bot-bt {
+              padding: 0;
+              margin: 0;
+              display: inline-block;
+              color: $carrot_green;
+            }
+
+            i.mdi-information-outline {
+              margin-left: 6px;
+
+              &:before {
+                font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+body.electron {
+  &.mac-electron {
+    div.login-wall-container div.login-wall-wrapper div.login-wall-left div.login-wall-logo {
+      margin-top: 20px !important;
+    }
+
+    nav.oc-navbar div.oc-navbar-header div.oc-navbar-header-container {
+      padding-left: 60px !important;
+    }
+
+    div.close-bt-container {
+      left: 76px !important;
+    }
+
+    div.fullscreen-bt-container {
+      left: 108px !important;
+    }
+  }
+
+  &.win-electron {
+  }
+}

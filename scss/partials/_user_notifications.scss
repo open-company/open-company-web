@@ -2,14 +2,18 @@ div.user-notifications {
   position: relative;
 
   @include mobile() {
-    position: absolute;
+    position: fixed;
     top: 0;
-    left: 0px;
+    left: 0;
     width: 100%;
-    height: 100vh;
-    background-color: transparent;
+    // Has fixed navbar and visible tabbar at the bottom
+    height: calc(100vh - #{$mobile_navbar_height * 2}px);
+    margin-top: #{$mobile_navbar_height}px;
+    margin-bottom: #{$mobile_navbar_height}px;
+    background-color: white;
     z-index: 21;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 
     button.notification-bell-bt {
       display: none;
@@ -17,31 +21,30 @@ div.user-notifications {
   }
 
   button.notification-bell-bt {
-    width: 20px;
-    height: 21px;
+    width: 32px;
+    height: 32px;
     background-image: cdnUrl("/img/ML/notification_bell.svg");
-    background-size: 16px 20px;
+    background-size: 32px 32px;
     background-position: 0px;
     background-repeat: no-repeat;
     position: relative;
     padding: 0;
     margin: 0;
 
-    &.active {
-      background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
-    }
+    // &.active {
+    //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
+    // }
 
     &.new:after {
       position: absolute;
       content: "";
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       top: 0px;
       right: 0px;
-      background-image: cdnUrl("/img/ML/notification_green_dot.svg");
-      background-size: 10px 10px;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-color: $carrot_green;
+      border-radius: 50%;
+      border: 2px solid $grey_num_2;
     }
   }
 
@@ -50,13 +53,14 @@ div.user-notifications {
     top: 31px;
     right: 0px;
     background-color: white;
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid $deep_tan;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
+    width: 375px;
 
     &.hidden-tray {
-      display: none;
+      top: -99999px;
+      right: -99999px;
     }
 
     @include mobile() {
@@ -66,22 +70,20 @@ div.user-notifications {
       width: 100%;
       box-shadow: none;
       border: none;
-      height: 100%;
       background-color: white;
 
       &.hidden-tray {
-        display: block;
+        top: unset;
+        right: unset;
       }
     }
 
     div.user-notifications-tray-header {
       padding: 16px;
+      position: relative;
 
       @include mobile(){
-        height: 56px;
-        background-color: white;
-        padding: 20px 16px;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+        display: none;
       }
 
       button.user-notifications-tray-mobile-close {
@@ -95,18 +97,34 @@ div.user-notifications {
           background-position: center;
           background-repeat: no-repeat;
           background-size: 14px 14px;
-          margin: -4px 16px 0 0;
-          float: left;
+          position: absolute;
+          top: 12px;
+          right: 11px;
         }
       }
 
+      button.notification-settings-bt {
+        position:absolute;
+        top: 12px;
+        right: 12px;
+        width: 24px;
+        height: 24px;
+        background-image: cdnUrl("/img/ML/notification_settings_bt.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 15px 16px;
+      }
+
       div.title {
-        @include avenir_H();
+        @include OC_Body_Book();
         color: $deep_navy;
-        font-size: 15px;
-        float: left;
+        font-size: 14px;
+        text-align: center;
+        width: 100px;
+        margin: 0 auto;
         line-height: 20px;
-        height: 20px;
+        height: 18px;
+        line-height: 18px;
 
         @include mobile() {
           font-size: 16px;
@@ -114,14 +132,17 @@ div.user-notifications {
       }
 
       button.all-read-bt {
-        float: right;
-        height: 20px;
+        position:absolute;
+        top: 12px;
+        left: 12px;
+        height: 24px;
+        width: 24px;
         padding: 0px;
         margin: 0px;
-        @include avenir_R();
-        font-size: 14px;
-        color: $ui_grey;
-        line-height: 20px;
+        background-image: cdnUrl("/img/ML/notifications_mark_all_read.svg");
+        background-size: 14px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
       }
     }
 
@@ -129,6 +150,13 @@ div.user-notifications {
       max-height: calc(90vh - 100px);
       overflow-y: auto;
       overflow-x: hidden;
+
+      @include mobile() {
+        min-height: 100%;
+        max-height: initial;
+        overflow-y: hidden;
+        overflow-x: hidden;
+      }
 
       div.user-notifications-tray-empty {
         @include mobile() {
@@ -146,11 +174,18 @@ div.user-notifications {
         text-align: left;
         opacity: 0.9;
         position: relative;
+        background-color: $grey_num_2;
+
+        @include mobile() {
+          background-color: white;
+          border-top: 1px solid $divider_line_grey;
+
+          &:first-child {
+            border-top: none;
+          }
+        }
 
         &:hover {
-          opacity: 1;
-          background-color: $oc_gray_8;
-
           button.read-bt {
             display: block;
           }
@@ -162,7 +197,11 @@ div.user-notifications {
         }
 
         &.unread {
-          background-color: $oc_gray_8;
+          background-color: white;
+
+          @include mobile() {
+            background-color: $oc_gray_8;
+          }
         }
 
         @include user-profile(24);
@@ -173,9 +212,10 @@ div.user-notifications {
 
         div.user-notification-title {
           margin-left: 16px;
-          width: calc(100% - 40px);
+          float: left;
+          width: calc(100% - 24px - 16px - 42px);
           padding-right: 8px;
-          @include avenir_H();
+          @include OC_Body_Book();
           font-size: 14px;
           line-height: 16px;
           color: $deep_navy;
@@ -183,14 +223,12 @@ div.user-notifications {
         }
 
         div.user-notification-time-since {
-          float: left;
-          text-align: left;
-          margin-top: 4px;
-          margin-left: 40px;
-          width: calc(50%);
-          @include avenir_R();
+          float: right;
+          text-align: right;
+          width: 42px;
+          @include OC_Body_Book();
           font-size: 12px;
-          color: $ui_grey;
+          color: rgba($ui_grey, 0.5);
           height: 12px;
           line-height: 12px;
         }
@@ -200,10 +238,10 @@ div.user-notifications {
           margin-top: 4px;
           width: calc(100% - 40px);
           padding-right: 8px;
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 14px;
-          line-height: 16px;
-          color: $deep_navy;
+          line-height: 18px;
+          color: #848D95;
           float: right;
           overflow-wrap: break-word;
 
@@ -214,6 +252,10 @@ div.user-notifications {
 
           a {
             color: $carrot_green;
+          }
+
+          img {
+            display: none;
           }
         }
 

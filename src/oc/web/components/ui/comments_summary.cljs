@@ -7,6 +7,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.routing :as routing-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-author-name [author]
@@ -30,49 +32,54 @@
 
 (def max-face-pile 3)
 
-(rum/defcs comments-summary < rum/static
-                              rum/reactive
-                              (drv/drv :comments-data)
-  [s entry-data show-zero-comments?]
-  (let [all-comments-data (drv/react s :comments-data)
-        _comments-data (get all-comments-data (:uuid entry-data))
-        comments-data (:sorted-comments _comments-data)
+(rum/defc comments-summary < rum/static
+  [{:keys [entry-data
+           comments-data
+           show-new-tag?]}]
+  (let [entry-comments (get comments-data (:uuid entry-data))
+        sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
-        has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
+        has-comments-data (and (sequential? sorted-comments) (pos? (count sorted-comments)))
         comments-authors (if has-comments-data
                            (vec
                             (map
                              first
                              (vals
-                              (group-by :avatar-url (map :author (sort-by :created-at comments-data))))))
+                              (group-by :avatar-url (map :author (sort-by :created-at sorted-comments))))))
                            (reverse (:authors comments-link)))
-        comments-count (if comments-data
-                         (count comments-data)
+        comments-count (if sorted-comments
+                         (count sorted-comments)
                          (:count comments-link))
         face-pile-count (min max-face-pile (count comments-authors))
-        short-label? (and (responsive/is-mobile-size?)
-                          (> (count (:reactions entry-data)) 3))]
-    (when (and comments-count
-               (or show-zero-comments?
-                   (not (zero? comments-count))))
+        is-mobile? (responsive/is-mobile-size?)
+        faces-to-render (take max-face-pile comments-authors)
+        face-pile-width (if (pos? face-pile-count)
+                          (if is-mobile?
+                            (+ 8 (* 12 face-pile-count))
+                            (+ 10 (* 18 face-pile-count)))
+                            0)]
+    (when comments-count
       [:div.is-comments
+        {:on-click (fn [e]
+                     (routing-actions/open-post-modal entry-data true)
+                     (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
         [:div.is-comments-authors.group
-          {:style {:width (str (if (pos? face-pile-count) (+ 10 (* 18 face-pile-count)) 0) "px")}}
-          (for [user-data (take max-face-pile comments-authors)]
+          {:style {:width (str face-pile-width "px")}
+           :class (when (> (count faces-to-render) 1) "show-border")}
+          (for [user-data faces-to-render]
             [:div.is-comments-author
               {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
               (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
         ; Comments count
         [:div.is-comments-summary
           {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))
-                                    utils/hide-class true})}
+                                    :add-a-comment (not (pos? comments-count))})}
           (if (pos? comments-count)
-            (str comments-count
-              (when-not short-label?
-                (str " comment" (when (not= comments-count 1) "s"))))
+            [:div.group
+              (str comments-count " comment" (when (not= comments-count 1) "s"))
+              (when show-new-tag?
+                [:div.new-comments-tag
+                  "(NEW)"])]
             [:span.add-a-comment
-              (if short-label?
-                "Comment"
-                "Add a comment")])]])))
+              "Add a comment"])]])))

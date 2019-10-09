@@ -4,21 +4,16 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
-            [oc.web.lib.chat :as chat]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.qsg-breadcrumb :refer (qsg-breadcrumb)]
-            [goog.events :as events]
-            [taoensso.timbre :as timbre]
-            [goog.events.EventType :as EventType]))
+            [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -55,18 +50,22 @@
 
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
-                                (drv/drv :qsg)
                                 (drv/drv :org-data)
                                 (drv/drv :board-data)
-                                (drv/drv :show-section-add)
-                                (drv/drv :change-cache-data)
+                                (drv/drv :change-data)
                                 (drv/drv :current-user-data)
+                                (drv/drv :editable-boards)
+                                (drv/drv :show-add-post-tooltip)
+                                (drv/drv :hide-left-navbar)
                                 (drv/drv :mobile-navigation-sidebar)
+                                (drv/drv :drafts-data)
+                                (drv/drv :follow-ups-data)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
+                                (rum/local nil ::last-mobile-navigation-panel)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -80,99 +79,90 @@
                                   s)
                                  :did-mount (fn [s]
                                   (save-content-height s)
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
                                   s)
                                  :will-update (fn [s]
                                   (save-content-height s)
-                                  s)
-                                 :did-update (fn [s]
-                                  (when-not (utils/is-test-env?)
-                                    (.tooltip (js/$ "[data-toggle=\"tooltip\"]")))
+                                  (when (responsive/is-mobile-size?)
+                                    (let [mobile-navigation-panel (boolean @(drv/get-ref s :mobile-navigation-sidebar))
+                                          last-mobile-navigation-panel (boolean @(::last-mobile-navigation-panel s))]
+                                      (when (not= mobile-navigation-panel last-mobile-navigation-panel)
+                                        (if mobile-navigation-panel
+                                          ;; Will open panel, let's block page scroll
+                                          (do
+                                            (dom-utils/lock-page-scroll)
+                                            (reset! (::last-mobile-navigation-panel s) true))
+                                          ;; Will close panel, let's unblock page scroll
+                                          (do
+                                            (dom-utils/unlock-page-scroll)
+                                            (reset! (::last-mobile-navigation-panel s) false))))))
                                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
-        change-data (drv/react s :change-cache-data)
+        change-data (drv/react s :change-data)
         current-user-data (drv/react s :current-user-data)
-        mobile-navigation-sidebar (drv/react s :mobile-navigation-sidebar)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         is-all-posts (= (router/current-board-slug) "all-posts")
-        is-must-see (= (router/current-board-slug) "must-see")
+        is-follow-ups (= (router/current-board-slug) "follow-ups")
         is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
-        show-all-posts (and (jwt/user-is-part-of-the-team (:team-id org-data))
+        user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "activity"))
+        show-follow-ups (and user-is-part-of-the-team?
+                             (utils/link-for (:links org-data) "follow-ups"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
-        is-admin-or-author? (utils/is-admin-or-author? org-data)
-        show-invite-people (and org-slug
-                                is-admin-or-author?)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (or (not @(::content-height s))
                             (not @(::footer-height s))
                             (not (neg?
                              (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        is-wide-enough? (pos? (- @(::window-width s) 980))
-        window-overflow? (and (not is-mobile?)
-                              (or (not is-tall-enough?)
-                                  (not is-wide-enough?)))
-        show-reminders? (utils/link-for (:links org-data) "reminders")
-        qsg-data (drv/react s :qsg)
-        showing-qsg (:visible qsg-data)]
+        editable-boards (drv/react s :editable-boards)
+        can-compose (pos? (count editable-boards))
+        follow-ups-data (drv/react s :follow-ups-data)
+        drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:show-mobile-boards-menu mobile-navigation-sidebar
-                                :navigation-sidebar-overflow window-overflow?})
-       :style {:left (when (and (not is-mobile?)
-                                is-tall-enough?
-                                is-wide-enough?)
-                      (str (/ (- @(::window-width s) 952 (when showing-qsg 220)) 2) "px"))
-               :overflow (when (= (:step qsg-data) :add-section-1)
-                           "visible")}}
-      [:div.mobile-header-container
-        [:button.mlb-reset.mobile-header-close
-          {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
-        (orgs-dropdown)
-        [:button.btn-reset.mobile-menu.group
-          {:on-click #(do
-                       (when is-mobile?
-                         (dis/dispatch! [:input [:user-settings] nil])
-                         (dis/dispatch! [:input [:org-settings] nil]))
-                       (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
-                       (menu/mobile-menu-toggle))}
-          (user-avatar-image current-user-data)]]
+      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
+                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
+                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))}
       [:div.left-navigation-sidebar-content
-        {:ref "left-navigation-sidebar-content"}
+        {:ref "left-navigation-sidebar-content"
+         :class (when can-compose "can-compose")}
+        (when is-mobile?
+          [:div.left-navigation-sidebar-mobile-header
+            [:button.mlb-reset.mobile-close-bt
+              {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
+            (orgs-dropdown)])
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
             {:class (utils/class-set {:item-selected is-all-posts})
              :href (oc-urls/all-posts)
-             :on-click #(nav-actions/nav-to-url! % (oc-urls/all-posts))}
-            [:div.all-posts-icon
-              {:class (when is-all-posts "selected")}]
+             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
+            [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unseen (vals change-data))))})}
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
               "All posts"]])
-        (when show-all-posts
-           [:a.must-see.hover-item.group
-            {:class (utils/class-set {:item-selected is-must-see
-                                      :showing-drafts drafts-link})
-              :href (oc-urls/must-see)
-              :on-click #(nav-actions/nav-to-url! % (oc-urls/must-see))}
-             [:div.must-see-icon
-               {:class (when is-must-see "selected")}]
-             [:div.must-see-label
-               "Must see"]])
+        (when show-follow-ups
+          [:a.follow-ups.hover-item.group
+            {:class (utils/class-set {:item-selected is-follow-ups})
+             :href (oc-urls/follow-ups)
+             :on-click #(nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups))}
+            [:div.follow-ups-icon]
+            [:div.follow-ups-label
+              "Follow-ups"]
+            (when (pos? (:follow-ups-count org-data))
+              [:span.count (:follow-ups-count org-data)])])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
-                draft-posts (dis/draft-posts-data)
-                draft-count (or (count draft-posts) (:count drafts-link))]
+                draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
               {:class (when (and (not is-all-posts)
                                  (= (router/current-board-slug) (:slug drafts-board)))
@@ -180,30 +170,25 @@
                :data-board (name (:slug drafts-board))
                :key (str "board-list-" (name (:slug drafts-board)))
                :href board-url
-               :on-click #(nav-actions/nav-to-url! % board-url)}
+               :on-click #(nav-actions/nav-to-url! % (:slug drafts-board) board-url)}
+              [:div.drafts-icon]
               [:div.drafts-label.group
-                "Drafts "
-                (when (pos? draft-count)
-                  [:span.count "(" draft-count ")"])]]))
+                "Drafts "]
+              (when (pos? draft-count)
+                [:span.count draft-count])]))
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
-            {:class (when (drv/react s :show-section-add) "show-section-add")}
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              [:span
-                "SECTIONS"]
+              [:span "Sections"]
               (when create-link
-                [:button.left-navigation-sidebar-top-title-button.btn-reset.qsg-add-section-1
+                [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
-                   :class (when (= (:step qsg-data) :add-section-1) "active")
                    :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
-                   :data-container "body"
-                   :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-                  (when (= (:step qsg-data) :add-section-1)
-                    (qsg-breadcrumb qsg-data))])]])
+                   :data-container "body"}])]])
         (when show-boards
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
@@ -217,57 +202,25 @@
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url
                  :on-click #(do
-                              (nav-actions/nav-to-url! % board-url))}
-                (when (= (:access board) "public")
-                  [:div.public
-                    {:class (when is-current-board "selected")}])
-                (when (= (:access board) "private")
-                  [:div.private
-                    {:class (when is-current-board "selected")}])
+                              (nav-actions/nav-to-url! % (:slug board) board-url))}
                 [:div.board-name.group
                   {:class (utils/class-set {:public-board (= (:access board) "public")
                                             :private-board (= (:access board) "private")
                                             :team-board (= (:access board) "team")})}
                   [:div.internal
-                    {:class (utils/class-set {:new (seq (:unseen board-change-data))
+                    {:class (utils/class-set {:new (seq (:unread board-change-data))
                                               :has-icon (#{"public" "private"} (:access board))})
                      :key (str "board-list-" (name (:slug board)) "-internal")
-                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]])])]
-      [:div.left-navigation-sidebar-footer
-        {:ref "left-navigation-sidebar-footer"
-         :class (utils/class-set {:push-to-bottom is-tall-enough?})}
-        (when show-reminders?
-          [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(do
-                          (nav-actions/show-reminders)
-                          (utils/after 500 utils/remove-tooltips))
-             :title "Set reminders to update your team on time"
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            [:div.bottom-nav-icon.reminders-icon]
-            [:span "Reminders"]])
-        (when show-invite-people
-          [:button.mlb-reset.bottom-nav-bt
-            {:on-click #(do
-                          (nav-actions/show-invite)
-                          (utils/after 500 utils/remove-tooltips))
-             :title "Invite teammates with email or Slack"
-             :data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :data-container "body"
-             :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-            [:div.bottom-nav-icon.invite-people-icon]
-            [:span "Invite team"]])
-        [:button.mlb-reset.bottom-nav-bt
-          {:on-click #(do
-                        (chat/chat-click 42861)
-                        (utils/after 500 utils/remove-tooltips))
-           :title "Have a question for Carrot? Chat with us."
-           :data-toggle (when-not is-mobile? "tooltip")
-           :data-placement "top"
-           :data-container "body"
-           :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"}
-          [:div.bottom-nav-icon.support-icon]
-          [:span "Get support"]]]]))
+                     :dangerouslySetInnerHTML (utils/emojify (or (:name board) (:slug board)))}]]
+                (when (= (:access board) "public")
+                  [:div.public])
+                (when (= (:access board) "private")
+                  [:div.private])])])]
+      (when can-compose
+        [:div.left-navigation-sidebar-footer
+          {:ref "left-navigation-sidebar-footer"}
+          [:button.mlb-reset.compose-green-bt
+            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+            [:span.compose-green-icon]
+            [:span.compose-green-label
+              "New post"]]])]))

@@ -1,93 +1,127 @@
 div.stream-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: #{$board_container_width}px;
-  margin: 12px 0px 16px;
-  border: 1px solid $ultra_light_grey;
-  border-radius: 6px;
-  padding: 24px 32px;
-  background-color: white;
+  height: #{$foc_height}px;
+  margin: 0;
+  border-bottom: 1px solid $ultra_light_grey;
+  padding: 24px 40px;
+
+  &.expandable {
+    cursor: pointer;
+
+    @include big_web() {
+      &:hover {
+        background-color: #F5F5F5;
+
+        div.stream-item-header {
+          div.more-menu button {
+            display: initial;
+          }
+        }
+
+        div.stream-item-body-ext {
+          div.stream-item-footer {
+            div.stream-item-comments-summary {
+              div.is-comments {
+                div.is-comments-authors.show-border {
+                  div.is-comments-author {
+                    background-color: #F5F5F5;
+                    border: 2px solid #F5F5F5;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   @include mobile() {
     width: 100%;
-    padding: 16px;
     margin: 0;
-    border: none;
-    border-bottom: 1px solid $ultra_light_grey;
     border-radius: 0;
+    border-top: none;
+    border-bottom: 1px solid $divider_line_grey;
+    background-color: $grey_num_4;
+    padding: 16px 16px 22px;
   }
 
   &.draft {
     cursor: pointer;
   }
 
-  &.new-item {
-    div.new-tag {
-      display: inline-block;
+  &.unread-item {
+    background-color: white;
+    z-index: 1;
+    position: relative;
+
+    &.showing-share {
+      z-index: 3;
     }
 
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 52px);
-          @include mobile() {
-            max-width: 100%;
+    @include big_web(){
+      &:hover {
+        background-color: white;
+        z-index: 2;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+
+        div.stream-item-body-ext {
+          div.stream-item-footer {
+            div.stream-item-comments-summary {
+              div.is-comments {
+                div.is-comments-authors.show-border {
+                  div.is-comments-author {
+                    background-color: white;
+                    border: 2px solid white;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      div.stream-item-body-ext {
+        div.stream-item-footer {
+          div.stream-item-comments-summary {
+            div.is-comments {
+              div.is-comments-authors.show-border {
+                div.is-comments-author {
+                  background-color: white;
+                  border: 2px solid white;
+                }
+              }
+            }
           }
         }
       }
     }
   }
 
-  &.must-see-item {
+  &:not(.follow-up-item).must-see-item {
+
     div.must-see-tag {
       display: inline-block;
     }
-
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 94px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
-    }
   }
 
-  &.must-see-item.new-item {
-    div.stream-item-header {
-      div.stream-header-head-author {
-        div.name div.name-inner {
-          max-width: calc(100% - 138px);
-          @include mobile() {
-            max-width: 100%;
-          }
-        }
-      }
-    }
-  }
-
-  &.show-continue-reading:not(.single-post-view) {
-    button.expand-button {
-      display: flex;
-    }
-  }
-
-  &:not(.show-continue-reading):not(.single-post-view) {
-    button.expand-button {
+  &.follow-up-item, &.follow-up-item.must-see-item {
+    div.must-see-tag {
       display: none;
     }
 
-    @include mobile(){
-      div.stream-item-bottom-footer {
-        display: none;
-      }
+    div.follow-up-tag, div.follow-up-tag-small {
+      display: inline-block;
     }
-  }  
+  }
 
   div.activity-share-container {
     div.activity-share-modal-container {
       right: -9px;
-      margin-top: 0;
+      margin-top: 32px;
     }
   }
 
@@ -97,131 +131,90 @@ div.stream-item {
     @include mobile() {
       width: 100%;
     }
-    
-    div.more-menu {
-      float: right;
-
-      @include mobile() {
-        ul.more-menu-list {
-          left: unset;
-          right: 16px;
-        }
-      }
-    }
 
     div.stream-header-head-author {
-      float: left;
-      width: 567px;
+      width: 100%;
 
-      @include activity-author(32);
+      @include activity-author(24);
+
+      div.user-avatar-img-container {
+        margin-right: 8px;
+      }
 
       @include mobile() {
-        width: calc(100% - 46px);
+        @include activity-author(32);
       }
 
       div.name {
-        height: 20px;
+        height: 24px;
+        float: left;
+        max-width: 70%;
+        color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          width: auto;
+          height: 32px;
+          width: calc(100% - 48px);
+          max-width: unset;
         }
 
-        div.name-inner {
+        div.mobile-name {
           display: inline-block;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          line-height: 20px;
-          margin-right: 8px;
+
+          @include mobile() {
+            display: flex;
+            align-items: center;
+          }
+
+          div.name-inner {
+            display: inline-block;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 24px;
+            margin-right: 8px;
+
+            @include mobile() {
+              flex: 1;
+              min-width: 0;
+              display: block;
+              line-height: 32px;
+            }
+          }
+
+          div.mobile-time-since {
+            display: none;
+
+            @include mobile() {
+              display: block;
+              white-space: nowrap;
+            }
+          }
         }
       }
 
-      div.time-since {
-        float: left;
-        @include mobile() {
-          width: auto;
+      div.follow-up-tag, div.must-see-tag {
+        margin-top: 2px;
+      }
+    }
+
+    div.more-menu {
+      height: 24px;
+
+      @include big_web() {
+        &:not(.menu-expanded) button {
+          display: none;
         }
       }
 
-      div.separator {
-        width: 3px;
-        height: 3px;
-        border-radius: 4px;
-        background-color: $light_ui_grey;
-        margin: 6px 8px 0px;
-        float: left;
-      }
+      @include mobile() {
+        height: 32px;
 
-      div.stream-item-wrt {
-        float: left;
-        position: relative;
-
-        div.post-added-tooltip-container {
-          border: 1px solid rgba($carrot_gold, 0.5);
-          background-color: #FDF6E4;
-          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-          width: 300px;
-          border-radius: 6px;
-          padding: 24px 20px;
-          margin: 12px 0 0;
-          position: absolute;
-          left: calc(50% - 150px);
-          top: 18px;
-          text-align: center;
-          z-index: 5;
-
-          div.post-added-tooltip-top-arrow {
-            position: absolute;
-            top: -12px;
-            width: 24px;
-            height: 12px;
-            margin-left: -12px;
-            left: 50%;
-            background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
-            background-position: center;
-            background-size: 24px 12px;
-            background-repeat: no-repeat;
-          }
-
-          button.post-added-tooltip-dismiss {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 32px;
-            height: 32px;
-            background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
-            background-size: 8px 8px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-
-          div.post-added-tooltips {
-
-            div.post-added-tooltip {
-              @include avenir_R();
-              font-size: 16px;
-              color: $deep_navy;
-              line-height: 20px;
-            }
-
-            button.post-added-bt {
-              width: auto;
-              margin-top: 16px;
-              height: 32px;
-              width: 96px;
-              background-color: transparent;
-              border-radius: 6px;
-              color: white;
-              background-color: $carrot_green;
-              @include avenir_H();
-              font-size: 16px;
-            }
-          }
+        ul.more-menu-list {
+          left: unset;
+          right: 0;
         }
       }
     }
   }
-
-  @include new-tag();
 
   div.new-tag {
     display: none;
@@ -229,28 +222,28 @@ div.stream-item {
 
   @include must-see-tag();
 
-  div.must-see-tag {
+  @include follow-up-tag();
+
+  div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
     display: none;
   }
 
-  & > div.new-tag, & > div.must-see-tag {
+  div.follow-up-tag, div.must-see-tag {
+    @include mobile() {
+      margin-top: 8px;
+    }
+  }
+
+  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
     margin-top: 16px;
   }
 
   div.stream-item-body-ext {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 0px;
     border-radius: 6px;
-
-    @include mobile() {
-      display: block;
-    }
-
-    div.stream-attachments {
-      @include mobile() {
-        position: relative;
-        bottom: unset;
-      }
-    }
 
     &.expanded {
       div.thumbnail-container {
@@ -277,13 +270,14 @@ div.stream-item {
           }
         }
 
-        div.body-thumbnail {
+        div.body-thumbnail-wrapper {
           display: none;
         }
       }
     }
 
     div.thumbnail-container {
+      min-height: 110px;
       position: relative;
       cursor: pointer;
 
@@ -320,17 +314,24 @@ div.stream-item {
         }
       }
 
-      div.body-thumbnail {
+      div.body-thumbnail-wrapper {
         width: 136px;
-        height: 102px;
+        // height: 102px;
+        max-height: 102px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
-        transform: translateY(-50%);
         position: absolute;
         right: 0;
-        top: 50%;
+        top: 10px;
         cursor: pointer;
+
+        img.body-thumbnail {
+          border-radius: 4px;
+          object-fit: contain;
+          max-width: 136px;
+          max-height: 102px;
+        }
 
         &.video {
           &:hover:after {
@@ -361,7 +362,7 @@ div.stream-item {
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 400px;
+        width: 484px;
         min-height: 98px;
 
         @include mobile() {
@@ -389,103 +390,76 @@ div.stream-item {
       }
 
       div.stream-item-headline {
-        @include activity-title();
-        @include avenir_H();
-        font-size: 22px;
+        height: 28px;
+        @include activity-title(24px, 28px);
         color: $deep_navy;
-        line-height: 28px;
-        display: inline;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+
         @include mobile() {
           margin-top: 16px;
+          @include activity-title(22px, 28px);
         }
       }
 
-      div.stream-item-body-container {
-
-        div.stream-item-body {
-
-          &.expanded {
-            div.stream-item-body-inner.to-truncate {
-              display: none;
-            }
-
-            div.stream-item-body-inner.no-truncate {
-              display: block;
-            }
-          }
-
-          div.stream-item-body-inner {
-            margin-top: 8px;
-
-            &.to-truncate{
-              @include activity-body(16, 22, 22, $deep_navy);
-              color: $deep_navy;
-              @include avenir_R();
-              line-height: 22px;
-
-              @include mobile() {
-                @include activity-body(18, 24, 24, $deep_navy); 
-                line-height: 24px;
-              }
-
-              &.hide-images {
-                img {
-                  display: none;
-                }
-              }
-            }
-
-            &.no-truncate {
-              @include activity-body(16, 22, 22, $deep_navy);
-              color: $deep_navy;
-              @include avenir_R();
-              line-height: 22px;
-              display: none;
-
-              @include mobile() {
-                @include activity-body(18, 24, 24, $deep_navy); 
-                line-height: 24px;
-              }
-            }
-
-            &>*:first-child {
-              margin-top: 0px;
-            }
-
-            div.carrot-no-preview, a.carrot-no-preview {
-              display: none;
-            }
-          }
-        }
-      }
-    }
-
-    div.stream-item-transcript {
-      margin-top: 16px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      width: 100%;
-      background-color: rgba($ultra_light_grey, 0.2);
-      border-top: 1px solid $ultra_light_grey;
-      padding: 24px;
-
-      div.stream-item-transcript-header {
-        @include avenir_M();
-        font-size: 12px;
-        color: $light_ui_grey;
-      }
-
-      div.stream-item-transcript-content {
-        margin-top: 24px;
-        @include avenir_BOOK();
-        font-size: 16px;
+      div.stream-item-body {
+        margin-top: 8px;
+        @include activity-body(18, 24, $deep_navy);
         color: $deep_navy;
+        @include OC_Body_Book();
+        line-height: 24px;
+        overflow: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
+
+        max-height: #{24 * 2}px;
+
+        @include mobile() {
+          margin-top: 4px;
+        }
+
+        h2 {
+          color: $deep_navy;
+          @include OC_Body_Book();
+          font-size: 18px;
+          line-height: 24px;
+        }
+
+        b, strong, &.editing b, &.editing strong {
+          @include OC_Body_Book();
+          font-weight: normal;
+        }
+
+        .carrot-no-preview {
+          display: none;
+        }
       }
     }
 
     div.stream-item-footer {
-      height: 26px;
-      margin-top: 16px;
+      min-height: 26px;
+
+      @include mobile() {
+        height: auto;
+        overflow: hidden;
+        min-height: 32px;
+      }
+
+      div.reactions {
+        @include mobile() {
+          display: inline-block;
+        }
+      }
+
+      div.stream-item-footer-mobile-group {
+        @include mobile() {
+          display: inline-block;
+          height: 32px;
+          padding-top: 8px;
+        }
+      }
 
       div.stream-body-draft-edit {
         float: left;
@@ -493,7 +467,7 @@ div.stream-item {
         button.edit-draft-bt {
           text-align: left;
           padding: 0px;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $carrot_green;
         }
@@ -504,7 +478,7 @@ div.stream-item {
         button.delete-draft-bt {
           text-align: right;
           padding: 0px;
-          @include avenir_R();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $ui_grey;
         }
@@ -513,17 +487,25 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
-        cursor: pointer;
 
-        @include mobile() {
-          max-width: calc(50% - 16px);
-          overflow: hidden;
-          text-overflow: ellipsis;
+        div.is-comments {
+          div.is-comments-authors.show-border {
+            div.is-comments-author {
+              background-color: $grey_num_2;
+              border: 2px solid $grey_num_2;
+
+              @include mobile() {
+                background-color: $grey_num_4;
+                border: 2px solid $grey_num_4;
+              }
+            }
+          }
         }
       }
 
       div.reactions {
         float: left;
+        margin-right: 16px;
 
         div.reactions-picker-container {
           div.emoji-mart {
@@ -540,93 +522,120 @@ div.stream-item {
           }
         }
       }
-    }
-  }
 
-  div.stream-body-right {
-    position: relative;
-    margin-top: 16px;
-    padding-top: 24px;
-    border-top: 1px solid $ultra_light_grey;
+      div.stream-item-attachments {
+        float: left;
+        margin-right: 16px;
+        height: 26px;
+        position: relative;
 
-    @include tablet(){
-      border-top: none;
-      margin-top: 16px;
-      padding-top: 0;
-    }
+        @include mobile() {
+          height: 20px;
+        }
 
-    div.stream-body-comments {
-      height: 100%;
-    }
-  }
+        &:hover {
+          div.stream-item-attachments-count {
+            opacity: 1;
+          }
 
-  div.stream-item-bottom-footer {
-    margin-top: 16px;
-    border-top: 1px solid $ultra_light_grey;
-    padding-top: 12px;
-    height: 36px;
+          div.stream-item-attachments-list {
+            display: block;
+          }
+        }
 
-    @include mobile() {
-      border-top: 0px solid transparent;
-      padding-top: 0;
-      height: 32px;
-    }
+        div.stream-item-attachments-count {
+          position: relative;
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: $deep_navy;
+          opacity: 0.5;
+          margin-top: 4px;
 
-    &.expanded {
-      margin-top: 0;
-      border-top: 0px solid transparent;
+          @include mobile() {
+            margin-top: 0;
+            padding-left: 0;
+            line-height: 20px;
+          }
+        }
 
-      @include mobile() {
-        margin-top: 16px;
-        height: 24px;
-      }
-    }
+        div.stream-item-attachments-list {
+          position: absolute;
+          top: 26px;
+          left: calc(50% - 120px);
+          width: 240px;
+          max-height: 200px;
+          background-color: white;
+          border-radius: 4px;
+          border: 1px solid $mid_light_grey;
+          padding: 8px 0;
+          display: none;
+          z-index: 2;
 
-    button.expand-button {
-      padding: 0;
-      height: 24px;
-      color: $carrot_green;
-      @include avenir_H();
-      font-size: 14px;
-      justify-content: center;
-      align-items: center;
-      display: none;
-      float: none;
-      opacity: 1;
-      float: left;
-      width: 100px;
-      margin-top: 0;
+          a.stream-item-attachments-item {
+            padding: 8px 16px;
+            height: 34px;
+            display: block;
 
-      @include mobile(){
-        width: 100%;
-      }
+            &:active, &:hover {
+              background-color: #EBF8F1;
+              div.stream-item-attachments-item-desc {
+                color: $carrot_green;
+              }
+            }
 
-      @include preload_image(cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg"));
+            div.stream-item-attachments-item-desc {
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: rgba($light_navy, 0.5);
+              white-space: nowrap;
+              max-width: 100%;
 
-      span.expand-icon {
-        background-image: cdnUrl("/img/ML/keep_reading_chevron.svg");
-        background-size: 14px 8px;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 14px;
-        height: 8px;
-        transition: rotate 180ms;
-        margin-right: 8px;
-        display: block;
-      }
+              span.file-name {
+                display: inline-block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-transform: capitalize;
+                max-width: calc(100% - 80px);
+              }
 
-      &.expanded {
-        color: $ui_grey;
-
-        span.expand-icon {
-          background-image: cdnUrl("/img/ML/keep_reading_chevron_up_grey.svg");
+              span.file-size {
+                white-space: nowrap;
+                overflow: hidden;
+                display: inline-block;
+                margin-left: 8px;
+              }
+            }
+          }
         }
       }
-    }
 
-    div.more-menu {
-      float: right;
-      margin-top: -4px;
+      div.stream-item-wrt {
+        float: left;
+        position: relative;
+        margin-top: 4px;
+        margin-right: 16px;
+
+        @include mobile() {
+          margin-left: 2px;
+          margin-top: 0;
+        }
+      }
+
+      div.time-since {
+        float: right;
+        max-width: 30%;
+        height: 24px;
+        line-height: 24px;
+        text-align: right;
+        @include OC_Body_Book();
+        font-size: 12px;
+        color: rgba($deep_navy, 0.5);
+
+        @include mobile() {
+          display: none;
+        }
+      }
     }
   }
 }

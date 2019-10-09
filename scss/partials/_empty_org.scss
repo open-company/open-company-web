@@ -6,7 +6,7 @@ div.empty-org {
   width: 600px;
 
   div.empty-org-headline {
-    @include avenir_H();
+    @include OC_Body_Bold();
     font-size: 16px;
     color: $carrot_light_gray;
     margin: 32px auto;

@@ -1,0 +1,312 @@
+div.org-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.org-settings-modal-container {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    div.org-settings-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      div.org-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        margin-right: 8px;
+        float: right;
+      }
+      
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        background-color: $carrot_green;
+        border-radius: 4px;
+        color: white;
+        line-height: 18px;
+        float: right;
+      }
+    }
+
+    div.org-settings-body {
+      margin-top: 24px;
+
+      div.org-settings-header-avatar {
+        height: 32px;
+        cursor: pointer;
+
+        div.org-avatar.missing-logo {
+          position: relative;
+          width: 32px;
+          height: 32px;
+          background-color: #F8FCFA;
+          border: 1px dashed $carrot_green;
+          border-radius: 8px;
+          background-image: cdnUrl("/img/ML/company_avatar_green_plus.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+
+          div.org-avatar-container {
+            display: none;
+          }
+        }
+
+        @include org-avatar(32);
+
+        div.org-avatar-container img.org-avatar-img {
+          padding: 4px;
+        }
+
+        &:hover {
+          div.org-avatar-container img.org-avatar-img {
+            border: 1px solid $carrot_green;
+          }
+        }
+
+        div.org-avatar.missing-logo {
+          div.org-avatar-container.no-avatar.force-label {
+            &:before {
+              left: 10px;
+              top: 2px;
+            }
+          }
+        }
+
+        div.org-avatar * {
+          border-radius: 4px;
+        }
+
+        span.edit-company-logo {
+          float: left;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $carrot_green;
+          margin-left: 16px;
+          margin-top: 7px;
+        }
+      }
+    }
+
+    div.org-settings-fields {
+      margin-top: 16px;
+      border-top: 1px solid $ultra_light_grey;
+
+      div.org-settings-label {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+        margin-top: 16px;
+
+        i.mdi-information-outline {
+          margin-left: 6px;
+
+          &:before {
+            font-size: 14px;
+          }
+        }
+      }
+
+      div.org-settings-field-container {
+        margin-top: 8px;
+        height: 32px;
+        padding: 0 8px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+        border: 1px solid $ultra_light_grey;
+        border: none;
+        outline: none;
+        width: 100%;
+
+        &.error {
+          border: 1px solid $carrot_orange;
+        }
+
+        input.org-settings-field {
+          padding: 7px 0;
+          height: 32px;
+          float: left;
+          width: calc(100% - 32px);
+          margin-top: 0;
+        }
+
+        button.add-email-domain-bt {
+          float: right;
+          width: auto;
+          padding: 0;
+          @include OC_Body_Bold();
+          color: $carrot_green;
+          font-size: 13px;
+          height: 18px;
+          margin-top: 7px;
+
+          &:disabled, &.disabled {
+            color:rgba($deep_navy, 0.5);
+            opacity: 1;
+          }
+        }
+      }
+
+      input.org-settings-field {
+        margin-top: 8px;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 18px;
+        padding: 7px 8px;
+        width: 100%;
+        border: none;
+        outline: none;
+        border: 1px solid $ultra_light_grey;
+
+        &:focus, &:active, &.active {
+          border: 1px solid $ultra_light_grey;
+          outline: none;
+        }
+
+        @include placeholder(){
+          opacity: 0.6;
+        }
+
+        &.error {
+          border: 1px solid $carrot_orange;
+        }
+      }
+
+      div.error {
+        margin-top: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_orange;
+        line-height: 18px;
+      }
+
+      div.org-settings-desc {
+        margin-top: 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        opacity: 0.5;
+      }
+
+      div.org-settings-email-domains {
+        margin-top: 16px;
+
+        div.org-settings-email-domain-row {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          margin-top: 8px;
+          line-height: 18px;
+          height: 18px;
+
+          button.remove-email-bt {
+            padding: 0;
+            float: right;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: $deep_navy;
+            opacity: 0.5;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+
+    div.org-settings-advanced {
+      margin-top: 24px;
+      border-top: 1px solid $ultra_light_grey;
+      padding-top: 16px;
+
+      button.advanced-settings-bt {
+        height: 18px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        padding: 0;
+        color: $carrot_green;
+      }
+
+      div.org-settings-advanced-title {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $light_navy;
+      }
+
+      div.org-settings-advanced-row {
+        margin-top: 8px;
+
+        div.carrot-checkbox {
+          float: left;
+        }
+
+        div.checkbox-label {
+          float: left;
+          margin-left: 8px;
+          width: calc(100% - 24px);
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
+          cursor: pointer;
+
+          i.mdi-information-outline {
+            margin-left: 6px;
+
+            &:before {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

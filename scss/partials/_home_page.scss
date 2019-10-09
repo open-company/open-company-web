@@ -8,15 +8,21 @@ div.home-wrap {
       background-color: $ultra_light_gold;
     }
 
+    section.pricing-footer {
+      background-color: $another_ui_grey;
+    }
+
     section.cta {
-      padding-top: 239px;
+      padding-top: 138px;
       padding-bottom: 73px;
+      padding-left: 24px !important;
+      padding-right: 24px !important;
       text-align: center;
       position: relative;
       overflow: hidden;
+      position: relative;
 
       @include tablet() {
-        padding-top: 131px;
         padding-bottom: 0px;
         padding: 131px 24px 0;
       }
@@ -24,7 +30,7 @@ div.home-wrap {
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding-bottom: 40px;
+        padding: 88px 16px 24px;
       }
 
       & > * {
@@ -32,46 +38,61 @@ div.home-wrap {
         z-index: 3;
       }
 
-      &:after {
-        background-color: $another_ui_grey;
-        content: "";
-        width: 100%;
-        height: 39%;
-        display: block;
-        border-bottom-left-radius: 200px;
+      &:before {
         position: absolute;
         bottom: 0;
-        right: 0;
-        z-index: 2;
-
-        @include tablet() {
-          border-bottom-left-radius: 0;
-          border-top-right-radius: 200px;
-        }
-
-        @include mobile() {
-          border-top-right-radius: 100px;
-          min-height: 280px;
-          min-height: 50px;
-        }
-
-        @media screen and (max-width: 440px) {
-          height: 25%;
-        }
+        left: 50%;
+        width: calc(100% - 32px);
+        height: 50%;
+        transform: translateX(-50%);
+        background-color: $another_ui_grey;
+        border-radius: 20px 200px 20px 20px;
+        display: block;
+        content: "";
+        max-width: 1232px;
       }
 
+      // &:after {
+      //   background-color: $another_ui_grey;
+      //   content: "";
+      //   width: 100%;
+      //   height: 39%;
+      //   display: block;
+      //   border-bottom-left-radius: 200px;
+      //   position: absolute;
+      //   bottom: 0;
+      //   right: 0;
+      //   z-index: 2;
+
+      //   @include tablet() {
+      //     border-bottom-left-radius: 0;
+      //     border-top-right-radius: 200px;
+      //   }
+
+      //   @include mobile() {
+      //     border-top-right-radius: 100px;
+      //     min-height: 280px;
+      //     min-height: 50px;
+      //   }
+
+      //   @media screen and (max-width: 440px) {
+      //     height: 25%;
+      //   }
+      // }
+
       h1.headline {
-        font-size: 64px;
-        @include PTSerif()
+        font-size: 60px;
+        @include OC_Body_Bold()
         color: $deep_navy;
-        margin: 0 auto 24px;
+        line-height: 60px;
+        margin: 0 auto;
         z-index: 2;
         position: relative;
+        max-width: 720px;
 
         @include mobile(){
-          font-size: 50px;
-          line-height: 56px;
-          margin-bottom: 16px;
+          font-size: 36px;
+          line-height: 40px;
         }
 
         @media screen and (max-width: 380px) {
@@ -82,13 +103,21 @@ div.home-wrap {
 
       div.subheadline {
         color: $deep_navy;
-        font-size: 26px;
-        line-height: 36px;
-        @include avenir_R();
+        font-size: 28px;
+        line-height: 38px;
+        @include OC_Body_Book();
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 720px;
+        max-width: 820px;
+
+        &:first-of-type {
+          margin-top: 9px;
+
+          @include tablet() {
+            margin-top: 16px;
+          }
+        }
 
         @include tablet(){
           font-size: 24px;
@@ -110,42 +139,14 @@ div.home-wrap {
       }
 
       div.get-started-button-container {
-        margin: 40px auto 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        margin: 0 auto 80px;
+        width: 320px;
 
         @include mobile() {
           width: 100%;
           display: block;
           justify-content: initial;
           align-items: initial;
-        }
-
-        button {
-          width: 320px;
-          margin: 0;
-          float: left;
-          height: 64px;
-
-          @include tablet() {
-            max-width: calc(50% - 16px);
-            margin: 0 8px;
-          }
-
-          @include mobile() {
-            float: unset;
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-            height: 48px;
-          }
-        }
-
-        button.get-started-button {
-          @include mobile() {
-            margin-top: 16px;
-          }
         }
       }
     }

@@ -1,454 +1,235 @@
 div.menu {
-  top: 38px;
-  right: -4px !important;
-  border: 1px solid $deep_tan;
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  width: 240px;
-  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
   padding: 24px;
   text-transform: none;
-  background-color: white;
-  max-height: calc(100vh - 68px);
-  overflow: auto;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+
+  @include mobile() {
+    position: fixed;
+    width: 100vw;
+    padding: 0;
+    overflow: initial;
+  }
 
   &.dropdown-menu {
     letter-spacing: 0em;
   }
 
-  div.menu-header {
-    width: 100%;
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
 
     @include mobile() {
-      height: 56px;
-      width: calc(100% + 32px);
-      margin-left: -16px;
-      background-color: white;
-      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-      padding: 16px;
-    }
-
-    button.mobile-close-bt {
       display: none;
+    }
+  }
 
+  &.expanded-user-menu {
+    div.menu-container {
       @include mobile() {
         display: block;
-        width: 24px;
-        height: 24px;
-        background-image: cdnUrl("/img/ML/mobile_back_arrow.svg");
-        background-size: 16px 12px;
-        background-position: center;
-        background-repeat: no-repeat;
-        margin: 2px 16px 0 -5px;
-        float: left;
+        opacity: 1;
       }
     }
+  }
 
-    @include user-profile(32);
+  div.menu-container {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
 
     @include mobile() {
-      @include user-profile(24);
+      top: 0;
+      left: unset;
+      right: 0;
+      width: 85vw;
+      min-height: calc(100vh - #{$mobile_navbar_height}px);
+      border: none;
+      box-shadow: none;
+      transition: 230ms;
+      display: block;
+      text-align: left;
+      background-color: white;
+      display: none;
+      opacity: 0;
+      padding: 0 16px;
+      padding-top: #{$mobile_navbar_height}px;
     }
 
-    div.user-avatar-img-container {
-      float: left;
-      margin-right: 16px;
+    div.menu-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px 12px 24px;
+      margin-bottom: 24px;
 
       @include mobile() {
-        margin-right: 8px;
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 85vw;
+        border-bottom: 1px solid $divider_line_grey;
+        background-color: white;
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
+      }
+
+      button.mobile-close-bt {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          position: absolute;
+          right: 16px;
+          top: 11px;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-color: $ultra_light_grey;
+          border-radius: 4px;
+        }
+      }
+
+      @include user-profile(32);
+
+      @include mobile() {
+        @include user-profile(24);
+      }
+
+      div.user-avatar-img-container {
+        float: right;
+        @include mobile() {
+          float: left;
+        }
+      }
+
+      div.user-name {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+
+        @include mobile() {
+          margin-left: 8px;
+          font-size: 16px;
+          line-height: 24px;
+        }
       }
     }
 
-    div.user-name {
-      @include avenir_H();
-      font-size: 15px;
-      color: $deep_navy;
-      line-height: 18px;
+    div.oc-menu-separator {
+      height: 1px;
+      background-color: $ultra_light_grey;
+      margin: 16px 0;
 
-      @include mobile(){
+      @include mobile() {
+        margin: 24px 0;
+      }
+    }
+
+    a {
+      display: block;
+      background-color: transparent;
+      padding: 0px;
+      @include OC_Body_Book();
+      font-size: 16px;
+      line-height: 18px;
+      color: $light_navy;
+      text-align: left;
+      margin: 16px 0;
+
+      @include big_web() {
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      &.app-version {
+        cursor: default;
+
+        div.oc-menu-item {
+          color: rgba($deep_navy, 0.5);
+        }
+      }
+    }
+
+    @include mobile() {
+      // Remove the last bottom line on mobile
+      & > *:last-child div.oc-menu-item:after{
         display: none;
       }
     }
 
-    div.mobile-user-name {
-      display: none;
-
-      @include mobile() {
-        display: block;
-        float: left;
-        @include avenir_H();
-        font-size: 16px;
-        color: $deep_navy;
-        line-height: 24px;
-        height: 24px;
-      }
-    }
-
-    div.user-type {
-      color: $light_ui_grey;
-      @include avenir_R();
-      font-size: 13px;
-
-      @include mobile() {
-        float: right;
-        font-size: 14px;
-      }
-    }
-  }
-
-  @include mobile() {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100vh;
-    border: none;
-    box-shadow: none;
-    transition: 230ms;
-    display: block;
-    text-align: right;
-    background-color: white;
-    display: none;
-    opacity: 0;
-    padding: 0 16px;
-
-    &.mobile-menu-open {
-      display: block;
-      opacity: 1;
-    }
-  }
-
-  div.billing-yellow-box {
-    width: 100%;
-    margin: 16px 0;
-    padding: 16px;
-    border-radius: 6px;
-    background-color: $opac_yellow;
-
-    @include mobile() {
-      display: none;
-    }
-
-    div.billing-yellow-box-title {
-      @include avenir_H();
-      font-size: 14px;
-      color: $deep_navy;
-    }
-
-    div.billing-yellow-box-desc {
-      @include avenir_R();
-      font-size: 14px;
-      color: $deep_navy;
-      margin-top: 4px;
-    }
-
-    a.billing-yellow-box-link {
-      display: block;
-      @include avenir_H();
-      font-size: 12px;
-      color: $carrot_green;
-      margin-top: 8px;
-    }
-  }
-
-  div.oc-menu-separator {
-    width: calc(100% + 48px);
-    height: 1px;
-    background-color: rgba($deep_tan, 0.6);
-    margin-left: -24px;
-    margin-top: 20px;
-
-    @include mobile() {
-      display: none;
-    }
-  }
-
-  a {
-    display: block;
-    background-color: transparent;
-    padding: 0px;
-    @include avenir_R();
-    font-size: 14px;
-    color: $deep_navy;
-    text-align: left;
-
-    @include mobile() {
-      font-size: 21px;
-    }
-
-    &:hover {
-      color: $carrot_green;
-    }
-  }
-
-  div.org-item {
-    padding: 24px 0px 3px 0px;
-
-    @include mobile() {
-      display: none;
-    }
-
-    div.org-avatar {
-      @include org-avatar(32);
-      margin-right: 16px;
-      float: left;
-
-      div.org-avatar-container {
-        span.org-name {
-          display: none !important;
-        }
-      }
-    }
-
-    div.org-name {
-      @include avenir_H();
-      font-size: 15px;
-      color: $deep_navy;
-      width: calc(100% - 48px);
-      line-height: 18px;
-      height: 18px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    div.org-url {
-      @include avenir_R();
-      font-size: 13px;
-      width: calc(100% - 48px);
-      height: 15px;
-      color: $light_ui_grey;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 15px;
-      white-space: nowrap;
-    }
-  }
-
-  a:hover {
     div.oc-menu-item {
-      &.personal-profile {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_personal_profile_hover.svg");
-        }
+      padding: 0;
+      position: relative;
+      @include OC_Body_Book();
+      font-size: 16px;
+
+      @include mobile() {
+        font-size: 16px;
+        line-height: 24px;
       }
 
-      &.notifications-settings {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_user_notifications_hover.svg");
-        }
-      }
-
-      &.reminders {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_reminders_hover.svg");
-        }
-      }
-
-      &.manage-team {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_manage_team_hover.svg");
-        }
-      }
-
-      &.digest-settings {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_digest_settings_hover.svg");
-        }
-      }
-
-      &.billing {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_billing_hover.svg");
-        }
+      &.app-version {
+        display: block;
+        background-color: transparent;
+        padding: 0px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        color: rgba($light_navy, 0.5);
+        text-align: left;
+        margin: 16px 0;
       }
 
       &.whats-new {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_whats_new_hover.svg");
+        #HW_badge_cont {
+          display: inline;
         }
-      }
-      
-      &.show-qsg {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_quickstart_guide_hover.svg");
-        }
-      }
-
-      &.support {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_support_hover.svg");
+        #HW_badge {
+          top: 1px;
+          width: 16px;
+          height: 16px;
+          background-color: $carrot_green;
+          border-radius: 4px;
         }
       }
 
-      &.logout {
-        &:before {
-          background-image: cdnUrl("/img/ML/menu_logout_hover.svg");
-        }
-      }
-    }
-  }
-
-  a.qsg-profile-photo-2, a.qsg-company-logo-2, a.qsg-invite-team-2, a.qsg-create-reminder-2 {
-    position: relative;
-  }
-
-  @include mobile() {
-    // Remove the last bottom line on mobile
-    & > *:last-child div.oc-menu-item:after{
-      display: none;
-    }
-  }
-
-  div.oc-menu-item {
-    opacity: 0.9;
-    padding: 14px 0px 0px 48px;
-    position: relative;
-    @include avenir_R();
-
-    @include mobile() {
-      padding: 24px 0 24px 30px;
-      font-size: 14px;
-    }
-
-    &.divider-item {
-      box-shadow: inset 0 -1px 0 0 $carrot_dark_bg_gray;
-    }
-
-    &:before {
-      content: "";
-      position: absolute;
-      background-size: 16px 16px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 16px;
-      height: 16px;
-      top: 15px;
-      left: 8px;
-
-      @include mobile() {
-        left: 0;
-        top: 25px;
-      }
-    }
-
-    &:after {
-      @include mobile() {
-        content: "";
-        display: block;
-        position: absolute;
-        bottom: 0;
-        left: 30px;
-        width: calc(100% - 16px);
-        height: 1px;
-        background-color: $ultra_light_grey;
-      }
-    }
-
-    &.personal-profile {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_personal_profile_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_personal_profile.svg");
-      }
-    }
-
-    &.notifications-settings {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_user_notifications_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_user_notifications.svg");
-      }
-    }
-
-    &.reminders {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_reminders_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_reminders.svg");
-      }
-    }
-
-    &.manage-team {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_manage_team_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_manage_team.svg");
-      }
-    }
-
-    &.digest-settings {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_digest_settings_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_digest_settings.svg");
-      }
-    }
-
-    &.show-qsg {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_quickstart_guide_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_quickstart_guide.svg");
-      }
-    }
-
-    &.billing {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_billing_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_billing.svg");
-        background-size: 16px 12px;
-      }
-    }
-
-    &.whats-new {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_whats_new_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_whats_new.svg");
-      }
-      #HW_badge_cont {
-        display: inline;
-      }
-      #HW_badge {
-        top: -1px;
-      }
-    }
-
-    &.support {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_support_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_support.svg");
-      }
-    }
-
-    &.logout {
-      @include big_web(){
-        @include preload_image(cdnUrl("/img/ML/menu_logout_hover.svg"));
-      }
-
-      &:before {
-        background-image: cdnUrl("/img/ML/menu_logout.svg");
+      &.native-app::after {
+        @include OC_Body_Bold();
+        content: "BETA";
+        margin-left: 0.5em;
+        padding: 0.3em 0.5em;
+        color: $light_navy;
+        background-color: $oc_gray_6;
+        border-radius: 4px;
+        opacity: 0.5;
+        font-size: 0.8em;
       }
     }
   }

@@ -3,6 +3,7 @@ div.stream-attachments {
 
   @include mobile() {
     width: 100%;
+    margin-top: 16px;
   }
 
   div.stream-attachments-content {
@@ -19,7 +20,7 @@ div.stream-attachments {
       cursor: pointer;
       height: 20px;
       margin-top: 8px;
-      @include avenir_R();
+      @include OC_Body_Book();
       font-size: 12px;
       color: $deep_navy;
       line-height: 20px;
@@ -27,48 +28,70 @@ div.stream-attachments {
     }
 
     div.stream-attachments-item {
-      margin-right: 8px;
-      height: 28px;
-      float: left;
+      max-width: 100%;
 
-      a {
+      div.small-loading {
+        float: left;
+      }
+
+      span.attachment-uploading {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
         float: left;
       }
 
       div.attachment-info {
         margin-top: 8px;
-        height: 20px;
 
         div.attachment-icon {
           width: 18px;
           height: 20px;
-          background-image: cdnUrl("/img/ML/attachment_icon.svg");
-          background-size: 18px 20px;
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+          background-size: 14px 16px;
           background-repeat: no-repeat;
           background-position: center;
           float: left;
+          opacity: 0.5;
+
+          @include mobile() {
+            width: 14px;
+          }
         }
 
-        span.attachment-name {
-          @include avenir_R();
-          font-size: 12px;
-          color: $deep_navy;
-          white-space: nowrap;
-          line-height: 20px;
-          display: block;
+        div.attachment-labels {
+          display: flex;
+          align-items: center;
+          max-width: calc(100% - 18px);
           float: left;
-          margin-left: 6px;
-        }
 
-        span.attachment-description {
-          @include avenir_R();
-          font-size: 12px;
-          color: $light_ui_grey;
-          white-space: nowrap;
-          line-height: 20px;
-          display: block;
-          float: left;
-          margin-left: 6px;
+          &.edit {
+            max-width: calc(100% - 54px);
+          }
+
+          span.attachment-name {
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: $carrot_green;
+            line-height: 20px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: block;
+            flex: 1;
+            min-width: 0;
+            margin-left: 6px;
+          }
+
+          span.attachment-description {
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: rgba($deep_navy, 0.5);
+            white-space: nowrap;
+            line-height: 20px;
+            display: block;
+            margin-left: 6px;
+          }
         }
 
         button.remove-attachment-bt {
@@ -78,15 +101,12 @@ div.stream-attachments {
           background-size: 16px 16px;
           background-position: center;
           background-repeat: no-repeat;
-          display: inline-block;
           margin-left: 8px;
           padding-left: 8px;
           border-left: 1px solid $light_ui_grey;
           opacity: 0.4;
-
-          @include mobile() {
-            opacity: 1;
-          }
+          display: block;
+          float: left;
 
           @include big_web(){
             &:hover {

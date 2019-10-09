@@ -3,7 +3,15 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  &.expanded-post-view {
+    div.cmail-outer:not(.fullscreen) {
+      display: none;
+    }
+  }
+
   @include mobile() {
+    background-color: $grey_num_4;
+
     &.sticky-board-name {
       padding-top: 48px;
       div.dashboard-layout-container {
@@ -17,192 +25,203 @@ div.dashboard-layout {
     }
   }
 
+  button.mobile-floating-compose-bt {
+    display: none;
+
+    @include mobile() {
+      display: block;
+      background-image: cdnUrl("/img/ML/white_pen.svg");
+      background-size: 16px 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 48px;
+      height: 48px;
+      background-color: $carrot_green;
+      border-radius: 6px;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2;
+      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
+    }
+  }
+
   div.dashboard-layout-container {
-    padding: 24px 0px;
+    padding: 0;
     margin: 0 auto;
     width: auto;
     width: 100%;
-    max-width: 952px;
+    max-width: calc(100% - #{$left_navigation_sidebar_width}px);
+    margin-left: #{$left_navigation_sidebar_width}px;
+    transition: margin-left 180ms ease-in, width 180ms ease-in, max-width 180ms ease-in;
+
+    &.hide-left-navbar {
+      margin-left: 0;
+      max-width: 100vw;
+    }
 
     @include mobile(){
       padding: 0px;
+      transition: none;
+      margin-left: 0;
+      width: 100%;
+      max-width: initial;
+      min-width: initial;
+      padding-bottom: 52px;
+    }
+
+    div.dashboard-layout-mobile-tabbar {
+      display: none;
+
+      @include mobile (){
+        display: block;
+        background-color: white;
+        padding: 15px 0;
+        border-top: 1px solid $divider_line_grey;
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        z-index: #{$navbar_zindex + 5};
+
+        &.ios-tabbar {
+          height: #{$mobile_navbar_height + 24}px;
+          padding: 7px 0 48px;
+
+          span.unread-notifications-dot {
+            bottom: 32px;
+          }
+        }
+
+        &.can-compose {
+          button {
+            width: 25%;
+          }
+
+          span.unread-notifications-dot {
+            right: 37vw;
+          }
+        }
+
+        button {
+          width: 33.3%;
+          height: 24px;
+          margin: 0;
+          padding: 0;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.5;
+
+          &.active {
+            opacity: 1;
+          }
+        }
+
+        button.all-posts-tab {
+          background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
+          backgorund-size: 22px 18px;
+
+          @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+          }
+        }
+
+        button.follow-ups-tab {
+          background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
+          backgorund-size: 18px 20px;
+
+          @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
+          }
+        }
+
+        button.notifications-tab {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+          backgorund-size: 18px 20px;
+          position: relative;
+
+          @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+          }
+        }
+
+        span.unread-notifications-dot {
+          display: block;
+          width: 4px;
+          height: 4px;
+          position: absolute;
+          bottom: 4px;
+          background-color: $carrot_green;
+          border-radius: 50%;
+          right: 16.1vw;
+        }
+
+        button.new-post-tab {
+          background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
+          backgorund-size: 20px 20px;
+
+          @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+          }
+        }
+      }
     }
 
     div.board-container {
       width: #{$board_container_width}px;
-      background-color: $oc_gray_8;
+      background-color: $grey_num_2;
       position: relative;
-      float: right;
+      margin: 0 auto;
+      padding: 24px 0 0;
 
       @include mobile() {
         width: 100%;
-        background-color: $ultra_light_grey;
-      }
-
-      @include mobile() {
-        width: 100%;
-        margin: 0px;
-        left: unset;
-      }
-
-      div.add-post-tooltip-container {
-        border: 1px solid rgba($carrot_gold, 0.5);
-        background-color: #FDF6E4;
-        border-radius: 6px;
-        padding: 34px 40px;
-        margin: 8px 0px;
-        position: relative;
-
-        @include tablet() {
-          width: calc(100% - 48px);
-          margin: 16px 24px;
-          padding: 24px 24px;
-        }
-
-        button.add-post-tooltip-dismiss {
-          position: absolute;
-          top: 16px;
-          right: 16px;
-          width: 32px;
-          height: 32px;
-          background-image: cdnUrl("/img/ML/dismiss_tooltip_x.svg");
-          background-size: 32px 32px;
-          background-position: center;
-          background-repeat: no-repeat;
-        }
-
-        div.add-post-tooltips {
-          width: 374px;
-          float: left;
-
-          &.second-user {
-            width: 444px;
-          }
-
-          @include tablet() {
-            width: 100%;
-
-            &.second-user {
-              width: 100%;
-            }
-          }
-
-          div.add-post-tooltip-box-mobile {
-            display: none;
-
-            @include mobile() {
-              display: block;
-              width: 125px;
-              height: 130px;
-              @include image-2x("/img/ML/add_post_tooltip_box");
-              background-size: 125px 130px;
-              background-repeat: no-repeat;
-              background-position: center;
-              margin: 0 auto 20px;
-            }
-          }
-
-          div.add-post-tooltip-title {
-            @include avenir_H();
-            font-size: 22px;
-            color: $deep_navy;
-            line-height: 20px;
-          }
-
-          div.add-post-tooltip {
-            @include avenir_R();
-            font-size: 16px;
-            color: $deep_navy;
-            line-height: 20px;
-            margin-top: 8px;
-
-            button.add-post-bt {
-              display: block;
-              background-color: $carrot_green;
-              height: 40px;
-              border-radius: 6px;
-              padding: 0;
-              margin: 16px 0 0;
-              color: white;
-              @include avenir_H();
-              font-size: 16px;
-              line-height: 27px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              padding: 0 24px;
-
-              span.add-post-bt-pen {
-                width: 14px;
-                height: 14px;
-                background-size: 14px 14px;
-                background-image: cdnUrl("/img/ML/add_post_tooltip_pen.svg");
-                background-position: center;
-                background-repeat: no-repeat;
-                margin-right: 8px;
-              }
-
-              @include tablet() {
-                width: 100%;
-                max-width: 294px;
-              }
-            }
-
-            @include tablet() {
-              float: unset;
-              margin: 24px auto 0px;
-              width: 100%;
-            }
-          }
-
-          div.add-post-tooltip-box {
-            position: absolute;
-            bottom: 0px;
-            right: 80px;
-            width: 154px;
-            height: 160px;
-            @include image-2x("/img/ML/add_post_tooltip_box");
-            background-size: 154px 160px;
-            background-repeat: no-repeat;
-            background-position: center;
-
-            &.second-user {
-              width: 114px;
-              height: 150px;
-              background-size: 114px 150px;
-              @include image-2x("/img/ML/add_post_tooltip_box_second_user");
-            }
-
-            @include mobile() {
-              display: none;
-            }
-          }
-        }
+        padding: 0;
+        min-height: calc(100vh - 76px);
+        margin: 0;
       }
 
       div.board-name-container {
         padding: 0px 0px 8px;
         position: relative;
+        height: 40px;
+        border-bottom: 1px solid $ultra_light_grey;
 
         @include mobile() {
-          display: none;
+          height: 50px;
+          border-bottom: none;
+          padding: 0;
+
+          &.drafts-board {
+            height: 0;
+          }
         }
           
         div.board-name {
           float: left;
           position: relative;
+          height: 32px;
 
           @include preload_image(cdnUrl("/img/ML/remove_video_icon.svg"));
           @include preload_image(cdnUrl("/img/ML/capture_video_icon.svg"), "before");
 
           @include mobile() {
-            float: unset;
-            text-align: center;
+            display: none;
           }
 
           div.board-name-with-icon {
-            @include avenir_H();
-            font-size: 28px;
+            @include OC_Body_Bold();
+            font-size: 18px;
+            line-height: 32px;
             color: $deep_navy;
             float: left;
             max-width: 350px;
@@ -220,7 +239,7 @@ div.dashboard-layout {
                 display: block;
                 content: "";
                 width: 14px;
-                height: 8px;
+                height: 32px;
                 background-image: cdnUrl("/img/ML/section_chevron.svg");
                 background-size: 14px 8px;
                 background-repeat: no-repeat;
@@ -239,7 +258,7 @@ div.dashboard-layout {
             }
 
             @include mobile() {
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 15px;
               color: $deep_navy;
               width: auto;
@@ -290,34 +309,34 @@ div.dashboard-layout {
           div.board-settings-container {
             float: left;
             position: relative;
+            height: 32px;
 
             button.board-settings-bt {
               background-image: cdnUrl("/img/ML/section_settings_gear.svg");
               background-size: 16px 16px;
               background-repeat: no-repeat;
-              background-position: 16px center;
+              background-position: center;
               background-color: transparent;
-              border-radius: 10px;
-              width: 40px;
-              height: 40px;
-              opacity: 0.8;
+              width: 48px;
+              height: 25px;
               padding: 0 0 0 16px;
-              margin: 0 0 0 16px;
+              margin: 3px 0 0 16px;
               position: relative;
+              border-left: 1px solid $ultra_light_grey;
 
-              &:before {
-                content: "";
-                position: absolute;
-                left: 0;
-                top: 12px;
-                width: 1px;
-                height: 16px;
-                background-color: $light_ui_grey;
+              // &:before {
+              //   content: "";
+              //   position: absolute;
+              //   left: 0;
+              //   top: 12px;
+              //   width: 1px;
+              //   height: 16px;
+              //   background-color: $light_ui_grey;
 
-                @include mobile(){
-                  display: none;
-                }
-              }
+              //   @include mobile(){
+              //     display: none;
+              //   }
+              // }
 
               @include mobile(){
                 margin-right: -30px;
@@ -330,172 +349,165 @@ div.dashboard-layout {
                 // Remove to show settings button on mobile
                 display: none;
               }
-
-              &:hover {
-                opacity: 1;
-              }
-            }
-
-            div.section-settings-tooltip-container {
-              border: 1px solid rgba($carrot_gold, 0.5);
-              background-color: #FDF6E4;
-              box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-              width: 300px;
-              border-radius: 6px;
-              padding: 24px 20px;
-              margin: 0 0 0 12px;
-              position: absolute;
-              left: 52px;
-              top: -26px;
-              text-align: center;
-              z-index: 5;
-
-              div.section-settings-tooltip-top-arrow {
-                position: absolute;
-                top: 38px;
-                left: -18px;
-                width: 24px;
-                height: 12px;
-                transform: rotate(-90deg);
-                background-image: cdnUrl("/img/ML/floating_tooltip_top_arrow.svg");
-                background-position: center;
-                background-size: 24px 12px;
-                background-repeat: no-repeat;
-              }
-
-              button.section-settings-tooltip-dismiss {
-                position: absolute;
-                top: 0;
-                right: 0;
-                width: 32px;
-                height: 32px;
-                background-image: cdnUrl("/img/ML/dismiss_tooltip_x_small.svg");
-                background-size: 8px 8px;
-                background-position: center;
-                background-repeat: no-repeat;
-              }
-
-              div.section-settings-tooltips {
-
-                div.section-settings-tooltip {
-                  @include avenir_R();
-                  font-size: 16px;
-                  color: $deep_navy;
-                  line-height: 20px;
-                }
-
-                button.section-settings-bt {
-                  width: auto;
-                  margin-top: 16px;
-                  height: 32px;
-                  width: 96px;
-                  background-color: transparent;
-                  border-radius: 6px;
-                  color: white;
-                  background-color: $carrot_green;
-                  @include avenir_H();
-                  font-size: 16px;
-                }
-              }
             }
           }
 
           div.private-board {
-            @include avenir_M();
-            font-size: 14px;
-            color: rgba($deep_navy, 0.5);
             position: relative;
-            padding-left: 16px;
+            width: 12px;
+            height: 23px;
+            background-image: cdnUrl("/img/ML/board_private_dark.svg");
+            background-size: 10px 12px;
+            background-repeat: no-repeat;
+            background-position: left 0 bottom 1px;
             float: left;
-            margin-top: 12px;
-            margin-left: 12px;
+            margin-left: 6px;
 
-            @include mobile() {
-              display: none;
-            }
-
-            &:before {
-              content: "";
-              background-image: cdnUrl("/img/ML/board_private.svg");
-              background-size: 8px 10px;
-              background-repeat: no-repeat;
-              width: 8px;
-              height: 10px;
-              position: absolute;
-              top: 3px;
-              left: 0px;
-              opacity: 0.5;
-
-              @include mobile(){
-                left: unset;
-                top: 0px;
-                margin-left: -12px;
-              }
+            @include mobile(){
+              left: unset;
+              height: 12px;
+              top: 0px;
+              margin-left: -12px;
             }
           }
 
           div.public-board {
-            @include avenir_M();
-            font-size: 14px;
-            color: rgba($deep_navy, 0.5);
             position: relative;
-            padding-left: 16px;
+            width: 12px;
+            height: 23px;
+            background-image: cdnUrl("/img/ML/board_public_dark.svg");
+            background-size: 12px 12px;
+            background-repeat: no-repeat;
+            background-position: left 0 bottom 1px;
             float: left;
-            margin-top: 12px;
-            margin-left: 12px;
+            margin-left: 6px;
 
-            @include mobile() {
-              display: none;
-            }
-
-            &:before {
-              content: "";
-              background-image: cdnUrl("/img/ML/board_public.svg");
-              background-size: 10px 10px;
-              background-repeat: no-repeat;
-              width: 10px;
-              height: 10px;
-              position: absolute;
-              top: 4px;
-              left: 0px;
-              opacity: 0.5;
-
-              @include mobile(){
-                left: unset;
-                top: 0px;
-                margin-left: -12px;
-              }
+            @include mobile(){
+              left: unset;
+              height: 12px;
+              top: 0px;
+              margin-left: -12px;
             }
           }
         }
 
-        div.board-switcher {
+        div.board-sort {
           float: right;
-          width: 32px;
-          height: 32px;
-          margin-top: 2px;
+          height: 40px;
+          position: relative;
 
           @include mobile() {
-            display: none;
+            width: 100%;
+            height: 50px;
+            background-color: $grey_num_4;
+            border-bottom: 1px solid $more_ultra_light_grey;
           }
 
-          button.board-switcher-bt {
-            width: 32px;
-            height: 32px;
-            background-size: 16px 16px;
-            background-repeat: no-repeat;
-            background-position: center 8px;
-            float: left;
-            padding: 0;
-            margin: 0;
-            opacity: 0.7;
+          button.mobile-search-bt {
+            display: none;
 
-            &.stream-view {
-              background-image: cdnUrl("/img/ML/stream_view_button.svg");
+            @include mobile() {
+              display: block;
+              position: absolute;
+              left: 16px;
+              top: 13px;
+              background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          button.board-sort-bt {
+            height: 23px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 23px;
+            color: $deep_navy;
+            padding: 0 14px 0 0;
+            margin: 0;
+            position: relative;
+
+            @include mobile(){
+              width: 200px;
+              position: absolute;
+              top: 0;
+              left: 50%;
+              margin-left: -100px;
+              height: 50px;
+              line-height: 50px;
+              text-align: center;
+              color: $deep_navy;
+              opacity: 1;
             }
 
-            &.grid-view {
-              background-image: cdnUrl("/img/ML/grid_view_button.svg");
+            @include big_web() {
+              opacity: 0.5;
+
+              &:hover, &:active, &:focus, &.active {
+                opacity: 1;
+              }
+            }
+
+            &:after {
+              content: "";
+              width: 8px;
+              height: 4px;
+              position: absolute;
+              top: 9px;
+              right: 0;
+              background-image: cdnUrl("/img/ML/board_sort_dropdown.svg");
+              background-size: 8px 4px;
+              background-repeat: no-repeat;
+              background-position: center;
+
+              @include mobile() {
+                position: absolute;
+                top: 24px;
+                left: 50%;
+                margin-left: 47px;
+              }
+            }
+          }
+
+          div.board-sort-menu {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: white;
+            width: 138px;
+            padding: 9px 0;
+            border-radius: 4px;
+            border: 1px solid $mid_light_grey;
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            display: none;
+            z-index: 100;
+
+            @include mobile() {
+              right: unset;
+              left: 50%;
+              margin-left: -69px;
+              top: 38px;
+            }
+
+            &.show-menu {
+              display: block;
+            }
+
+            div.board-sort-menu-item {
+              height: 34px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              padding: 8px 16px;
+              cursor: pointer;
+
+              &.active, &:hover, &:active, &:focus {
+                background-color: $feint_emerald;
+                color: $carrot_green;
+                -webkit-tap-highlight-color: $feint_emerald;
+              }
             }
           }
         }
@@ -565,7 +577,7 @@ div.dashboard-layout {
             }
 
             label.add-to-board-label {
-              @include avenir_H();
+              @include OC_Body_Bold();
               font-size: 16px;
               color: $carrot_orange;
               margin-left: 6px;
@@ -597,7 +609,7 @@ div.dashboard-layout {
               }
 
               button.compose-type {
-                @include avenir_H();
+                @include OC_Body_Bold();
                 font-size: 14px;
                 color: $carrot_green;
                 cursor: pointer;
@@ -642,10 +654,6 @@ div.dashboard-layout {
         display: none;
       }
 
-      &.showing-qsg {
-        right: 244px;
-      }
-
       button.add-to-board-floating-button {
         width: 56px;
         height: 56px;
@@ -655,10 +663,6 @@ div.dashboard-layout {
         opacity: 1;
         padding: 0px;
         margin: 0px;
-
-        div.qsg-breadcrumb.create-post-1 {
-          top: 12px;
-        }
 
         &:hover, &.active {
           background-color: #FF7C6C;

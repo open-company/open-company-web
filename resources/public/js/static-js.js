@@ -1,3 +1,4 @@
+
 /***********************************************************************************************
  * When updating this library please update also cljsjs/jwt-decode package in build.boot file. *
  ***********************************************************************************************/
@@ -93,7 +94,7 @@ if (jwt) {
   }
 }
 
-function OCWebSetupMarketingSiteJS(){
+function OCWebSetupStaticPagesJS(){
   var switchFn = function() {
     $("button.keep-aligned-section-next-bt").toggleClass("active");
     var $switchContainer = $("div.slack-email-switch-container");
@@ -113,24 +114,9 @@ function OCWebSetupMarketingSiteJS(){
     switchFn();
   })
   $("button.keep-aligned-section-next-bt").on("click", switchFn);
-
-  $("div.pricing-toggle").on("click", function(){
-    var $teamColumn = $("div.pricing-column.team-column");
-    if ($teamColumn.hasClass("monthly")) {
-      $teamColumn.removeClass("monthly");
-      $teamColumn.addClass("annual");
-    } else {
-      $teamColumn.removeClass("annual");
-      $teamColumn.addClass("monthly");
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", function(_) {
-
-  if ($("#youtube-player").length > 0) {
-    OCYTVideoInit();
-  }
 
   if(OCStaticGetParameterByName("ref") === "producthunt"){
     $(document.body).addClass("ph-banner");
@@ -149,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     });
   }
 
-  OCWebSetupMarketingSiteJS();
+  OCWebSetupStaticPagesJS();
 
   $(window).on("click", function(e){
     $target = $(e.target);
@@ -160,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   if (jwt) {
     $("#site-header-login-item").hide();
+    $(".login-signup-or").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
     $("div.main.slack").addClass("no-get-started-button");
@@ -173,6 +160,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("section.keep-aligned").css({"display": "none"});
     // Remove login button from the site mobile menu
     $("button#site-mobile-menu-login").css({"display": "none"});
+    $("a.pricing-table-right-link").css({"display": "none"});
     // Change Get started button to Your digest on site mobile menu
     var siteMobileMenuGetStarted = $("button#site-mobile-menu-getstarted");
     siteMobileMenuGetStarted.text( "Your digest" );
@@ -238,48 +226,6 @@ function OCStaticGetParameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-function isSafari(){
-  var ua = navigator.userAgent.toLowerCase(); 
-  if (ua.indexOf('safari') > -1) { 
-    if (ua.indexOf('chrome') > -1) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isFireFox(){
-  var ua = navigator.userAgent.toLowerCase();
-  if (ua.match(/Firefox/) && !ua.match(/Seamonkey/)) {
-      return true;
-  } else {
-      return false;
-  }
-}
-
-function isEdge(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv:11/) || navigator.userAgent.match(/Edge\/\d+/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
-}
-
-function isIE(){
-  if (navigator.appName == 'Microsoft Internet Explorer' ||
-      !!(navigator.userAgent.match(/Trident/) ||
-         navigator.userAgent.match(/rv:11/)))
-  {
-    return true;
-  }else{
-    return false;
-  }
-}
-
 function OCStaticSiteMobileMenuToggle(){
   var menuClass = "mobile-menu-expanded";
   var body = document.body;
@@ -336,67 +282,72 @@ function OCStaticHidePHBanner(){
   $(document.body).removeClass("ph-banner");
 }
 
-var OCYTVideoPlayer = null,
-OCYTVideoFinished = false,
-OCUTVScriptAdded = false;
-
-function OCYTVideoInit() {
-  if (!OCUTVScriptAdded) {
-    OCUTVScriptAdded = true;
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  }
+function OCStaticTextareaSaveSelection() {
+    if (window.getSelection) {
+        var sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+            return sel.getRangeAt(0);
+        }
+    } else if (document.selection && document.selection.createRange) {
+        return document.selection.createRange();
+    }
+    return null;
 }
 
-function onYouTubeIframeAPIReady() {
-  var winWidth = document.documentElement.clientWidth || window.innerWidth,
-  winHeight = document.documentElement.clientHeight || window.innerHeight;
-  OCYTVideoPlayer = new YT.Player('youtube-player', {
-    height: Math.min(winHeight, 608).toString(),
-    width: Math.min(winWidth, 1080).toString(),
-    videoId: 'dMWpnHxQMP4',
-    allowsInlineMediaPlayback: 'TRUE',
-    allowfullscreen: 'true',
-    playerVars: {
-        showinfo: 0,
-        rel: 0,
-        playsinline: 1,
-        autoplay: 0
-    },
-    events: {
-      'onReady': OCYTVideoOnPlayerReady,
-      'onStateChange': OCYTVideoOnPlayerStateChange
+function OCStaticTextareaRestoreSelection(range) {
+    if (range) {
+        if (window.getSelection) {
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (document.selection && range.select) {
+            range.select();
+        }
+    }
+}
+
+function isiPhoneWithoutPhysicalHomeBt(){
+  // Really basic check for the ios platform
+  // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+  var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  // Get the device pixel ratio
+  var ratio = window.devicePixelRatio || 1;
+
+  // Define the users device screen dimensions
+  var screen = {
+    width : window.screen.width * ratio,
+    height : window.screen.height * ratio
+  };
+
+  // iPhone X and Xs Detection
+  if (iOS && screen.width === 1125 && screen.height === 2436) {
+    return true;
+  }
+  // iPhone Xr Detection
+  if (iOS && screen.width === 828 && screen.height === 1792) {
+    return true;
+  }
+
+  // iPhone Xs Max Detection
+  if (iOS && screen.width === 1242 && screen.height === 2688) {
+    return true;
+  }
+  return false;
+}
+
+(function(){
+  $(document).ready(function(){
+    
+    var $appsBt = $("button.apps-bt");
+    if ($appsBt.length > 0) {
+      $appsBt.click(function(event){
+        event.stopPropagation();
+        $("div.apps-container").toggleClass("dropdown-menu-visible");
+      });
+      $(window).click(function(event){
+        $("div.apps-container").removeClass("dropdown-menu-visible");
+      });
     }
   });
-}
-
-function OCYTVideoOnPlayerReady(event) {
-}
-
-function OCStaticShowAnimationLightbox() {
-  $(document.body).addClass('show-animation-lightbox no-scroll');
-
-  if (OCYTVideoFinished) {
-    OCYTVideoPlayer.seekTo(0);
-    OCYTVideoFinished = false;
-  }
-  OCYTVideoPlayer.playVideo();
-}
-
-function OCYTVideoOnPlayerStateChange(event){
-  if (event.data === 0) {
-    OCYTVideoFinished = true;
-    OCStaticHideAnimationLightbox();
-  }
-}
-
-function OCStaticHideAnimationLightbox(e) {
-  OCYTVideoPlayer.pauseVideo();
-  $(document.body).removeClass('show-animation-lightbox no-scroll');
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}
+})();

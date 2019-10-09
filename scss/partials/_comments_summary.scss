@@ -3,23 +3,48 @@ div.is-comments {
   text-align: right;
   height: 26px;
 
+  @include mobile() {
+    height: 20px;
+  }
+
   div.is-comments-authors {
     float: left;
 
+    @media screen and (max-width: 374px) {
+      display: none;
+    }
+
     &:not(:empty){
       margin-right: 8px;
+    }
+
+    &.show-border {
+      div.is-comments-author {
+        background-color: white;
+        border: 2px solid white;
+      }
     }
 
     div.is-comments-author {
       float: left;
       width: 28px;
       height: 28px;
-      border: 2px solid white;
-      background-color: white;
-      border-radius: 12px;
+      background-color: transparent;
+      border: 2px solid transparent;
+      border-radius: 50%;
       margin-left: -10px;
 
       @include user-profile(24);
+
+      @include mobile(){
+        width: 20px;
+        height: 20px;
+        border: 1px solid transparent;
+        margin-left: -8px;
+        margin-top: 0;
+
+        @include user-profile(16);
+      }
 
       &:first-child {
         margin-left: 0px;
@@ -30,42 +55,57 @@ div.is-comments {
   div.is-comments-summary {
     float: left;
     font-size: 12px;
-    color: $ui_grey;
-    @include avenir_R();
-    margin-top: 6px;
+    color: rgba($deep_navy, 0.5);
+    @include OC_Body_Book();
+    margin-top: 4px;
     text-align: left;
     white-space: nowrap;
-    // max-width: 74%;
     overflow: hidden;
     text-overflow: ellipsis;
 
-    &.add-a-comment {
-      opacity: 0.5;
+    @include big_web() {
+      cursor: pointer;
+
+      &:hover {
+        color: $deep_navy;
+
+        span.add-a-comment {
+          color: $deep_navy;
+
+          &:before {
+            opacity: 1;
+          }
+        }
+      }
     }
 
     @include mobile() {
-      max-width: 68vw;
-      opacity: 1;
+      margin-top: 0;
+      line-height: 20px;
     }
 
-    &:hover {
-      opacity: 1;
+    @include new-comments-tag();
+
+    div.new-comments-tag {
+      margin-left: 8px;
+      display: inline-block;
     }
 
     span.add-a-comment {
       padding-left: 6px;
-      color: $deep_navy;
+      color: rgba($deep_navy, 0.5);
 
       &:before {
         content: "";
         background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
-        background-size: 14px 14px;
-        background-position: center;
+        background-size: 12px 12px;
+        background-position: center 3px;
         background-repeat: no-repeat;
         width: 14px;
-        height: 14px;
+        height: 15px;
         float: left;
         display: block;
+        opacity: 0.5;
       }
     }
   }

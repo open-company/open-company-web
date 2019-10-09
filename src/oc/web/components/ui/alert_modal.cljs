@@ -74,8 +74,10 @@
        :on-click #(when-not has-buttons
                     (hide-alert))}
       [:div.modal-wrapper
-        [:button.settings-modal-close.mlb-reset
-          {:on-click #(if (fn? (:link-button-cb alert-modal)) (link-button-clicked alert-modal %) (close-clicked s))}]
+        [:button.mlb-reset.modal-close-bt
+          {:on-click #(if (fn? (:link-button-cb alert-modal))
+                        (link-button-clicked alert-modal %)
+                        (close-clicked s))}]
         [:div.alert-modal
           {:class (utils/class-set {:has-buttons has-buttons
                                     :has-bottom-button (seq (:bottom-button-title alert-modal))})}

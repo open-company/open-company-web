@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="11px" viewBox="0 0 16 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="12px" height="10px" viewBox="0 0 12 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Fill 115</title>
+    <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <g id="Settings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Enhanced-security-(mar)" transform="translate(-825.000000, -787.000000)" fill="#FFFFFF" stroke="#4C67FC">
-            <g id="Group-2" transform="translate(800.000000, 80.000000)">
-                <g id="Group-11" transform="translate(25.000000, 647.000000)">
-                    <g id="Group" transform="translate(0.000000, 25.000000)">
-                        <g id="checkbox" transform="translate(0.000000, 32.000000)">
-                            <polygon id="Fill-115" points="6.5128532 14 1 8.27215279 3.10282558 6.08945373 6.5128532 9.63151243 12.8971744 3 15 5.18269906"></polygon>
-                        </g>
+    <g id="Settings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="Admin-settings:-Advanced-settings" transform="translate(-986.000000, -540.000000)" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5">
+            <g id="Group-29" transform="translate(984.000000, 387.000000)">
+                <g id="Group-28" transform="translate(0.000000, 149.000000)">
+                    <g id="Group-17" transform="translate(0.000000, 1.000000)">
+                        <path d="M6.43137255,9.68625072 L11.5429429,4.07138727 C11.9330488,3.64287091 12.5823573,3.64287091 12.9724632,4.07138727 C13.3425123,4.47787187 13.3425123,5.12212813 12.9724632,5.52861273 L7.14613271,11.9286127 C6.75602678,12.3571291 6.10671832,12.3571291 5.71661239,11.9286127 L3.02753676,8.97476658 C2.65748775,8.56828197 2.65748775,7.92402572 3.02753676,7.51754112 C3.41764269,7.08902476 4.06695115,7.08902476 4.45705708,7.51754112 L6.43137255,9.68625072 Z" id="Combined-Shape"></path>
                     </g>
                 </g>
             </g>

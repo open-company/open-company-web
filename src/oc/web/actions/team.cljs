@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
@@ -41,8 +42,8 @@
            (dis/dispatch! [:team-roster-loaded fixed-roster-data])
            ;; The roster is also used by the WRT component to show the unseen, rebuild the unseen lists
            (let [activities-read (dis/activity-read-data)]
-             (doseq [read-data activities-read]
-               (dis/dispatch! [:activity-reads (:item-id read-data) (:reads read-data) fixed-roster-data])))))))))
+             (doseq [[activity-uuid read-data] activities-read]
+               (dis/dispatch! [:activity-reads (router/current-org-slug) activity-uuid (:count read-data) (:reads read-data) fixed-roster-data])))))))))
 
 (defn enumerate-channels-cb [team-id {:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))
@@ -75,16 +76,23 @@
       (roster-get roster-link))))
 
 (defn read-teams [teams]
-  (doseq [team teams
-          :let [team-link (utils/link-for (:links team) "item")
-                channels-link (utils/link-for (:links team) "channels")
-                roster-link (utils/link-for (:links team) "roster")]]
-    ; team link may not be present for non-admins, if so they can still get team users from the roster
-    (if team-link
-      (team-get team-link)
-      (when channels-link (enumerate-channels team)))
-    (when roster-link
-      (roster-get roster-link))))
+  (let [current-panel (last (:panel-stack @dis/app-state))
+        load-delay (if (#{:org :integrations :team :invite} current-panel)
+                     0
+                     2500)]
+    (doseq [team teams
+            :let [team-link (utils/link-for (:links team) "item")
+                  channels-link (utils/link-for (:links team) "channels")
+                  roster-link (utils/link-for (:links team) "roster")]]
+      ; team link may not be present for non-admins, if so they can still get team users from the roster
+      (if team-link
+        (utils/maybe-after load-delay #(team-get team-link))
+        (when channels-link
+          (utils/maybe-after load-delay #(enumerate-channels team))))
+      ;; Do not delay the roster load since it's needed for the mentions extention
+      ;; that needs to be initialized with the rich-body-editor or the add-comment components
+      (when roster-link
+        (roster-get roster-link)))))
 
 (defn teams-get-cb [{:keys [success body status]}]
   (let [fixed-body (when success (json->cljs body))]
@@ -118,7 +126,7 @@
 
 (defn author-change-cb [{:keys [success]}]
   (when success
-    (org-actions/get-org)))
+    (org-actions/get-org nil true)))
 
 (defn remove-author [author]
   (let [remove-author-link (utils/link-for (:links author) "remove")]
@@ -315,7 +323,7 @@
     (teams-get))
   (dis/dispatch! [:email-domain-team-add/finish (= status 204)]))
 
-(defn email-domain-team-add [domain]
+(defn email-domain-team-add [domain cb]
   (when (utils/valid-domain? domain)
     (let [team-data (dis/team-data)
           add-email-domain-link (utils/link-for
@@ -324,7 +332,12 @@
                                    "POST"
                                    {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
           fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
-      (api/add-email-domain add-email-domain-link fixed-domain email-domain-team-add-cb team-data))
+      (api/add-email-domain add-email-domain-link fixed-domain
+       (fn [{:keys [success] :as resp}]
+        (email-domain-team-add-cb resp)
+        (when (fn? cb)
+         (cb success)))
+       team-data))
     (dis/dispatch! [:email-domain-team-add])))
 
 ;; Slack team add
@@ -339,15 +352,19 @@
                         (if (> (.indexOf redirect "?") -1)
                           (str redirect "&add=team")
                           (str redirect "?add=team")))
-        fixed-add-slack-team-link (utils/slack-link-with-state
+        fixed-add-slack-team-link (uu/auth-link-with-state
                                    (:href add-slack-team-link)
-                                   (:user-id current-user-data)
-                                   team-id
-                                   with-add-team)]
+                                   {:user-id (:user-id current-user-data)
+                                    :team-id team-id
+                                    :redirect with-add-team})]
     (when fixed-add-slack-team-link
       (router/redirect! fixed-add-slack-team-link))))
 
 ;; Remove team
 
-(defn remove-team [team-links]
-  (api/user-action (utils/link-for team-links "remove" "DELETE") nil user-action-cb))
+(defn remove-team [team-links & [cb]]
+  (api/user-action (utils/link-for team-links "remove" "DELETE") nil
+   (fn [{:keys [status body success] :as resp}]
+    (when (fn? cb)
+      (cb success))
+    (user-action-cb resp))))

@@ -3,10 +3,10 @@ div.secure-activity-container {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: $oc_gray_8;
+  background-color: $grey_num_2;
   min-height: 100vh;
 
-  @include tablet() {
+  @include mobile() {
     background-color: white;
   }
 
@@ -15,14 +15,18 @@ div.secure-activity-container {
     position: fixed;
     top: 0px;
     width: 100%;
-    background-color: white;
-    padding: 12px 24px;
+    padding: 12px 16px;
     border-bottom: 1px solid $ultra_light_grey;
+    background-color: inherit;
     text-align: center;
     z-index: 10;
 
     @include tablet() {
       position: absolute;
+      height: 72px;
+      padding: 16px;
+      background-color: white;
+      border-bottom: 1px solid $divider_line_grey;
     }
 
     div.org-avatar {
@@ -32,11 +36,14 @@ div.secure-activity-container {
       @include tablet(){
         float: unset;
         margin: 0 auto;
+        @include org-avatar(40);
       }
 
       div.org-avatar-container{
         span.org-name {
-          font-size: 22px;
+          @include OC_Body_Bold();
+          font-size: 18px;
+          max-width: calc(50vw - 56px - 32px);
         }
       }
     }
@@ -46,13 +53,21 @@ div.secure-activity-container {
       top: 12px;
       right: 24px;
 
+      @include tablet() {
+        top: 20px;
+      }
+
       button.login-as-bt {
         float: right;
-        @include avenir_H();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_green;
         @include user-profile(32);
         padding: 0;
+
+        @include tablet() {
+          @include user-profile(40);
+        }
 
         span.login-as {
           margin-top: 4px;
@@ -69,48 +84,42 @@ div.secure-activity-container {
         }
       }
 
+      span.or {
+        float: right;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        height: 32px;
+        display: block;
+        line-height: 32px;
+        padding: 0 8px;
+      }
+
       button.login-bt {
         float: right;
         padding: 0;
         height: 32px;
-        @include avenir_B();
-        font-size: 12px;
-        color: $ui_grey;
-        text-transform: uppercase;
-        margin-right: 16px;
-
-        @include tablet() {
-          display: none;
-        }
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_green;
       }
 
       button.learn-more-bt {
         float: right;
-        width: 116px;
         height: 32px;
-        text-align: center;
-        background-color: $coral;
-        border-radius: 4px;
-        @include avenir_B();
-        font-size: 12px;
-        color: $carrot_orange;
-        text-transform: uppercase;
+        text-align: left;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_green;
         padding: 0;
-
-        @include tablet() {
-          display: none;
-        }
+        margin: 0;
       }
     }
   }
 
   div.activity-content-outer {
-    margin: 88px auto 0;
-    width: 720px;
-    border-radius: 6px;
-    background-color: white;
-    padding: 32px 40px;
-    border: 1px solid $ultra_light_grey;
+    margin: 96px auto 0;
+    width: 640px;
 
     @include tablet() {
       width: 100%;
@@ -118,35 +127,13 @@ div.secure-activity-container {
       padding: 24px 16px;
     }
 
-    div.activity-content-header {
-      @include tablet() {
-        display: block;
-
-        @include activity-author(32);
-      }
-
-      div.activity-content-header-author {
-        overflow: hidden;
-        line-height: 18px;
-
-        @include activity-author(32);
-
-        div.name {
-          @include avenir_R();
-          font-size: 14px;
-          color: $deep_navy;
-        }
-
-        div.time-since {
-          @include avenir_R();
-          font-size: 12px;
-          color: $ui_grey;
-        }
-      }
-    }
-
     div.activity-content {
       position: relative;
+      min-height: calc(100vh - 201px);
+
+      @include tablet() {
+        min-height: calc(100vh - 210px);
+      }
 
       div.ziggeo-player {
         margin-top: 16px;
@@ -159,49 +146,60 @@ div.secure-activity-container {
       }
 
       div.activity-title {
-        @include activity-title();
-        @include avenir_H();
-        font-size: 22px;
-        line-height: 28px;
+        @include activity-title(36px, 40px);
         color: $deep_navy;
-        margin-top: 16px;
 
         .emojione {
           @include emoji-size(30);
         }
       }
 
+      div.activity-content-author {
+        overflow: hidden;
+        line-height: 18px;
+        margin-top: 16px;
+
+        @include activity-author(24);
+
+        div.name {
+          @include OC_Body_Book();
+          font-size: 12px;
+          color: rgba($light_navy, 0.5);
+          line-height: 24px;
+        }
+      }
+
+      div.activity-abstract {
+        margin: 16px 0 32px;
+        cursor: text;
+        @include activity-abstract(18px, 24px);
+        @include OC_Body_Bold();
+      }
+
       div.activity-body {
         border: none;
         outline: none;
-        margin: 4px 0 0;
+        margin: 16px 0 0;
         cursor: text;
-        @include activity-body(16, 22, 22, $deep_navy);
+        @include activity-body(18, 24, $deep_navy);
         color: $deep_navy;
-        @include avenir_R();
-        font-size: 16px;
-        line-height: 22px;
-
-        @include tablet() {
-          @include activity-body(18, 24, 24, $deep_navy); 
-          line-height: 24px;
-          font-size: 18px;
-          line-height: 24px;
-        }
+        @include OC_Body_Book();
+        font-size: 18px;
+        line-height: 24px;
 
         & > *:first-child {
           margin-top: 0px;
         }
 
         p:not(:last-child) {
-          margin: 22px 0px;
+          margin: 24px 0px;
         }
 
         div.carrot-no-preview, a.carrot-no-preview {
           display: none;
         }
 
-        &.medium-editor-placeholder:after {
+        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
           color: $deep_navy !important;
         }
 
@@ -210,138 +208,60 @@ div.secure-activity-container {
         }
       }
 
-      div.activity-video-transcript {
-        max-height: 330px;
-        margin-top: 16px;
-        width: 100%;
-        background-color: rgba($ultra_light_grey, 0.2);
-        border-top: 1px solid $ultra_light_grey;
-        padding: 24px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-
-        div.activity-video-transcript-header {
-          @include avenir_M();
-          font-size: 12px;
-          color: $light_ui_grey;
-        }
-
-        div.activity-video-transcript-content {
-          margin-top: 24px;
-          @include avenir_BOOK();
-          font-size: 16px;
-          color: $deep_navy;
-        }
-      }
-
       div.activity-content-footer {
         height: 26px;
         margin-top: 16px;
-
-        @include tablet() {
-          height: 68px;
-        }
 
         div.is-comments {
           margin-right: 16px;
 
           @include tablet() {
-            margin-right: 0;
-            margin-top: 16px;
-            float: unset;
+            margin-right: 16px;
           }
         }
 
-        @include tablet() {
-          div.reactions {
-            float: unset;
+        div.reactions {
+          @include tablet() {
+            float: left;
           }
         }
+      }
+
+      div.comments-separator {
+        margin: 24px 0;
+        width: 100%;
+        height: 1px;
+        background-color: $ultra_light_grey;
       }
 
       div.stream-comments {
         width: 100%;
         float: unset;
-        margin-top: 24px;
-        border-top: 1px solid $ultra_light_grey;
-        padding-top: 24px;
       }
     }
-  }
 
-  div.secure-activity-footer {
-    text-align: center;
+    div.secure-activity-footer {
+      text-align: center;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid $ultra_light_grey;
+      padding-bottom: 30px;
 
-    button.secure-activity-footer-bt {
-      margin: 40px auto;
-      @include avenir_H();
-      font-size: 14px;
-      color: $carrot_green;
-      padding: 0;
-
-      @include mobile() {
-        margin: 32px auto;
-      }
-
-      div.right-arrow {
-        float: right;
-        width: 16px;
-        height: 10px;
-        background-image: cdnUrl("/img/ML/green_right_arrow.svg");
-        background-position: center;
-        background-size: 16px 10px;
-        background-repeat: no-repeat;
-        margin-left: 8px;
-        margin-top: 4px;
-      }
-
-      &.with-id-token {
-        @include avenir_R();
+      a.sent-via-carrot {
+        margin: 0 auto;
+        height: 18px;
+        display: block;
+        @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
-        height: 32px;
+        color: rgba($light_navy, 0.5);
+      }
 
-        &:hover {
-          span.green-user-button {
-            opacity: 1;
-          }
-        }
-
-        span.pre-login-span {
-          vertical-align: middle;
-          height: 32px;
-          line-height: 32px;
-          display: inline-block;
-          margin-top: -21px;
-        }
-
-        span.green-user-button {
-          opacity: 0.9;
-          height: 32px;
-          width: auto;
-          display: inline-block;
-          margin-left: 8px;
-          background-color: $carrot_green;
-          border-radius: 6px;
-          padding: 8px 12px;
-          @include avenir_H();
-          color: white;
-          font-size: 14px;
-
-          @include user-profile(16);
-
-          div.user-avatar-img-container {
-            float: left;
-            margin-top: -3px;
-          }
-
-          span.inner {
-            float: left;
-            margin-left: 8px;
-          }
-        }
+      button.secure-activity-footer-bt {
+        height: 18px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_green;
+        padding: 0;
       }
     }
   }

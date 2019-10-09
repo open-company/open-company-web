@@ -11,10 +11,12 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
+            [oc.web.lib.sentry :as sentry]
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.lib.fullstory :as fullstory]
+            [oc.web.utils.ws-client-ids :as ws-client-ids]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
 
@@ -27,6 +29,8 @@
 (def ^:private pay-endpoint ls/pay-server-domain)
 
 (def ^:private interaction-endpoint ls/interaction-server-domain)
+
+(def ^:private change-endpoint ls/change-server-domain)
 
 (def ^:private search-endpoint ls/search-server-domain)
 
@@ -60,12 +64,19 @@
   (def network-error-handler network-error-hn))
 
 (defn complete-params [params]
-  (if-let [jwt (or (j/jwt)
-                   (j/id-token))]
-    (-> {:with-credentials? false}
-        (merge params)
-        (update :headers merge {"Authorization" (str "Bearer " jwt)}))
-    params))
+  (let [change-client-id @ws-client-ids/change-client-id
+        interaction-client-id @ws-client-ids/interaction-client-id
+        notify-client-id @ws-client-ids/notify-client-id
+        with-client-ids (cond-> params
+                               change-client-id (assoc-in [:headers "OC-Change-Client-ID"] change-client-id)
+                               interaction-client-id (assoc-in [:headers "OC-Interaction-Client-ID"] interaction-client-id)
+                               notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))]
+    (if-let [jwt (or (j/jwt)
+                     (j/id-token))]
+      (-> {:with-credentials? false}
+          (merge with-client-ids)
+          (update :headers merge {"Authorization" (str "Bearer " jwt)}))
+      with-client-ids)))
 
 (defn headers-for-link [link]
  (let [acah-headers (cond
@@ -154,8 +165,11 @@
 
       (let [{:keys [status body] :as response} (<! (method (str endpoint path) (complete-params params)))]
         (timbre/debug "Resp:" (method-name method) (str endpoint path) status response)
-        ; when a request get a 401 logout the user (presumably using an old token, or attempting anonymous access)
-        (when (= status 401)
+        ; when a request gets a 401, redirect the user to logout
+        ; (presumably they are using an old token, or attempting anonymous access),
+        ; but only if they are already logged in
+        (when (and jwt
+                   (= status 401))
           (router/redirect! oc-urls/logout))
         ; If it was a 5xx or a 0 show a banner for network issues
         (when (or (zero? status)
@@ -170,11 +184,9 @@
                         :method (method-name method)
                         :jwt (j/jwt)
                         :params params
-                        :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
+                        :sessionURL (fullstory/session-url)}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
-            (sentry/set-extra-context! report)
-            (sentry/capture-error-with-message (str "xhr response error:" status))
-            (sentry/clear-extra-context!)))
+            (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
         (on-complete response)))))
 
 (def ^:private web-http (partial req web-endpoint))
@@ -187,6 +199,8 @@
 
 (def ^:private interaction-http (partial req interaction-endpoint))
 
+(def ^:private change-http (partial req change-endpoint))
+
 (def ^:private search-http (partial req search-endpoint))
 
 (def ^:private reminders-http (partial req reminders-endpoint))
@@ -195,12 +209,12 @@
 
 (defn- handle-missing-link [callee-name link callback & [parameters]]
   (timbre/error "Handling missing link:" callee-name ":" link)
-  (sentry/set-extra-context! (merge {:callee callee-name
-                                     :link link
-                                     :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
-                                    parameters))
-  (sentry/capture-error-with-message (str "Client API error on: " callee-name))
-  (sentry/clear-extra-context!)
+  (sentry/capture-message-with-extra-context!
+    (merge {:callee callee-name
+            :link link
+            :sessionURL (fullstory/session-url)}
+     parameters)
+    (str "Client API error on: " callee-name))
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
   (when (fn? callback)
     (callback {:success false :status 0})))
@@ -209,13 +223,15 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
-(def entry-allowed-keys [:headline :body :attachments :video-id :video-transcript :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :follow-ups])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
+
+(def follow-up-assignee-keys [:user-id :name :avatar-url])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -285,15 +301,6 @@
         callback))
     (handle-missing-link "patch-org" org-patch-link callback {:data data})))
 
-(defn patch-org-sections [org-patch-link data callback]
-  (if (and org-patch-link data)
-    (let [json-data (cljs->json data)]
-      (storage-http (method-for-link org-patch-link) (relative-href org-patch-link)
-        {:json-params json-data
-         :headers (headers-for-link org-patch-link)}
-        callback))
-    (handle-missing-link "patch-org-sections" org-patch-link callback {:data data})))
-
 (defn add-email-domain [add-email-domain-link domain callback team-data & [pre-flight]]
   (if (and add-email-domain-link domain)
     (let [email-domain-payload {:email-domain domain}
@@ -332,8 +339,7 @@
   (if board-link
     (storage-http (method-for-link board-link) (relative-href board-link)
       {:headers (headers-for-link board-link)}
-      (fn [{:keys [status body success]}]
-        (callback status body success)))
+      callback)
     (handle-missing-link "get-board" board-link callback)))
 
 (defn patch-board [board-patch-link data note callback]
@@ -394,24 +400,20 @@
 
 ;; All Posts
 
-(defn get-all-posts [activity-link from callback]
+(defn get-all-posts [activity-link callback]
   (if activity-link
-    (let [href (relative-href activity-link)
-          final-href (if from
-                       (str href "?start=" from "&direction=around")
-                       href)]
-      (storage-http (method-for-link activity-link) final-href
+    (let [href (relative-href activity-link)]
+      (storage-http (method-for-link activity-link) href
         {:headers (headers-for-link activity-link)}
         callback))
-    (handle-missing-link "get-all-posts" activity-link callback
-     {:from from})))
+    (handle-missing-link "get-all-posts" activity-link callback)))
 
-(defn load-more-all-posts [more-link direction callback]
+(defn load-more-items [more-link direction callback]
   (if (and more-link direction)
     (storage-http (method-for-link more-link) (relative-href more-link)
       {:headers (headers-for-link more-link)}
       callback)
-    (handle-missing-link "load-more-all-posts" more-link callback {:direction direction})))
+    (handle-missing-link "load-more-items" more-link callback {:direction direction})))
 
 ;; Auth
 
@@ -571,7 +573,7 @@
     (auth-http (method-for-link user-link) (relative-href user-link)
       {:headers (headers-for-link user-link)}
       (fn [{:keys [status body success]}]
-        (callback body)))
+        (callback success body)))
     (handle-missing-link "get-user" user-link callback)))
 
 (defn patch-user [patch-user-link new-user-data callback]
@@ -635,6 +637,16 @@
      (fn [{:keys [status success body]}]
       (callback success)))))
 
+(defn add-expo-push-token [add-token-link push-token callback]
+  (if (and add-token-link push-token)
+    (auth-http (method-for-link add-token-link) (relative-href add-token-link)
+               {:headers (headers-for-link add-token-link)
+                :body push-token}
+               (fn [{:keys [status success body]}]
+                 (callback success)))
+    (handle-missing-link "add-expo-push-token" add-token-link callback
+                         {:push-token push-token})))
+
 ;; Interactions
 
 (defn get-comments [comments-link callback]
@@ -644,9 +656,10 @@
       callback)
     (handle-missing-link "get-comments" comments-link callback)))
 
-(defn add-comment [add-comment-link comment-body callback]
+(defn add-comment [add-comment-link comment-body parent-comment-uuid callback]
   (if (and add-comment-link comment-body)
-    (let [json-data (cljs->json {:body comment-body})]
+    (let [json-data (cljs->json {:body comment-body
+                                 :parent-uuid parent-comment-uuid})]
       (interaction-http (method-for-link add-comment-link) (relative-href add-comment-link)
         {:headers (headers-for-link add-comment-link)
          :json-params json-data}
@@ -663,15 +676,15 @@
     (handle-missing-link "delete-comment" delete-comment-link callback)))
 
 (defn patch-comment
-  [patch-comment-link new-data callback]
-  (if (and patch-comment-link new-data)
-    (let [json-data (cljs->json {:body new-data})]
+  [patch-comment-link new-comment-body callback]
+  (if (and patch-comment-link new-comment-body)
+    (let [json-data (cljs->json {:body new-comment-body})]
       (interaction-http (method-for-link patch-comment-link) (relative-href patch-comment-link)
         {:headers (headers-for-link patch-comment-link)
          :json-params json-data}
         callback))
     (handle-missing-link "patch-comment" patch-comment-link callback
-     {:new-data new-data})))
+     {:new-comment-body new-comment-body})))
 
 (defn toggle-reaction
   [reaction-link callback]
@@ -776,6 +789,18 @@
        {:org-slug org-slug
         :secure-activity-id secure-activity-id}))))
 
+(defn get-current-entry [org-slug board-slug activity-uuid callback]
+  (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
+                         :method "GET"
+                         :rel ""
+                         :accept "application/vnd.open-company.entry.v1+json"}]
+    (if (and org-slug board-slug activity-uuid)
+      (storage-http (method-for-link activity-link) (relative-href activity-link)
+       {:headers (headers-for-link activity-link)}
+       callback)
+      (handle-missing-link "get-current-entry" activity-link callback
+       {:org-slug org-slug :board-slug board-slug :activity-uuid activity-uuid}))))
+
 ;; Search
 
 (defn query
@@ -837,7 +862,30 @@
     (reminders-http (method-for-link roster-link) (relative-href roster-link)
      {:headers (headers-for-link roster-link)}
      callback)
-    (handle-missing-link "ger-reminders-roster" roster-link callback)))
+    (handle-missing-link "get-reminders-roster" roster-link callback)))
+
+;; Follow-ups
+
+(defn complete-follow-up [complete-follow-up-link callback]
+  (if complete-follow-up-link
+    (storage-http (method-for-link complete-follow-up-link) (relative-href complete-follow-up-link)
+     {:headers (headers-for-link complete-follow-up-link)}
+     callback)
+    (handle-missing-link "complete-follow-up" complete-follow-up-link callback)))
+
+(defn create-follow-ups [create-follow-up-link follow-ups-map callback]
+  (if create-follow-up-link
+    (let [filtered-assignees (if (:assignees follow-ups-map)
+                               (map #(select-keys % follow-up-assignee-keys) (:assignees follow-ups-map))
+                               [])
+          final-data {:self (:self follow-ups-map)
+                      :assignees filtered-assignees}
+          json-data (cljs->json final-data)]
+      (storage-http (method-for-link create-follow-up-link) (relative-href create-follow-up-link)
+       {:headers (headers-for-link create-follow-up-link)
+        :json-params json-data}
+       callback))
+    (handle-missing-link "create-follow-ups" create-follow-up-link callback)))
 
 ;; WRT
 
@@ -848,3 +896,13 @@
 (defn request-reads-count [item-ids]
   (when (seq item-ids)
     (ws-cc/who-read-count item-ids)))
+
+;; Change service http
+
+(defn mark-unread [mark-unread-link container-id callback]
+  (if mark-unread-link
+    (change-http (method-for-link mark-unread-link) (relative-href mark-unread-link)
+     {:headers (headers-for-link mark-unread-link)
+      :body container-id}
+     callback)
+    (handle-missing-link "mark-unread" mark-unread-link callback)))

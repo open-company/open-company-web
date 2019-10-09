@@ -4,9 +4,12 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.react-utils :as react-utils]
             [oc.web.mixins.ui :refer (on-window-click-mixin)]
+            [oc.shared.useragent :as ua]
+            [oc.web.utils.dom :as dom-utils]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.events.EventType :as EventType]
+            [oc.shared.useragent :as ua]
             [cljsjs.react]
             [cljsjs.react.dom]
             [cljsjs.emoji-mart]))
@@ -18,8 +21,9 @@
   (>= (.indexOf (.-className (.-activeElement js/document)) emojiable-class) 0))
 
 (defn remove-markers [s]
-  (when @(::caret-pos s)
-    (.removeMarkers js/rangy @(::caret-pos s))))
+  (when-let  [caret-pos @(::caret-pos s)]
+    (when (= (:type caret-pos) "rangy")
+      (.removeMarkers js/rangy (:selection caret-pos)))))
 
 (defn on-click-out [s e]
   (when-not (utils/event-inside? e (rum/ref-node s "emoji-picker"))
@@ -28,21 +32,31 @@
       (let [will-close-picker (:will-close-picker (first (:rum/args s)))]
         (when (fn? will-close-picker)
           (will-close-picker))))
+    (when ua/mobile?
+      (dom-utils/unlock-page-scroll))
     (reset! (::visible s) false)))
 
 (defn save-caret-position [s]
   (remove-markers s)
-  (let [caret-pos (::caret-pos s)]
-    (if (emojiable-active?)
+  (let [caret-pos (::caret-pos s)
+        emojiable-active (emojiable-active?)
+        active-element (.-activeElement js/document)]
+    (if emojiable-active
       (do
-        (reset! (::last-active-element s) (.-activeElement js/document))
-        (reset! caret-pos (.saveSelection js/rangy js/window)))
+        (reset! (::last-active-element s) active-element)
+        (reset! caret-pos
+         (if (#{"TEXTAREA" "INPUT"} (.-tagName active-element))
+           {:type "default" :selection (js/OCStaticTextareaSaveSelection)}
+           {:type "rangy" :selection (.saveSelection js/rangy js/window)})))
       (reset! caret-pos nil))))
 
-(defn replace-with-emoji [caret-pos emoji]
-  (when @caret-pos
-    (.restoreSelection js/rangy @caret-pos)
-    (js/pasteHtmlAtCaret (gobj/get emoji "native") (.getSelection js/rangy js/window) false)))
+(defn replace-with-emoji [s emoji]
+  (when-let [caret-pos @(::caret-pos s)]
+    (if (= (:type caret-pos) "rangy")
+      (do (.restoreSelection js/rangy (:selection caret-pos))
+          (js/pasteHtmlAtCaret (gobj/get emoji "native") (.getSelection js/rangy js/window) false))
+      (do (js/OCStaticTextareaRestoreSelection (:selection caret-pos))
+          (js/pasteTextAtSelection @(::last-active-element s) (gobj/get emoji "native"))))))
 
 (defn check-focus [s _]
   (let [container-selector (or (:container-selector (first (:rum/args s))) "document.body")
@@ -78,12 +92,12 @@
                                  js/document
                                  EventType/FOCUSOUT
                                  (partial check-focus s))
-                       ff-click (when js/isFireFox
+                       ff-click (when ua/firefox?
                                   (events/listen
                                    js/window
                                    EventType/CLICK
                                    (partial check-focus s)))
-                       ff-keypress (when js/isFireFox
+                       ff-keypress (when ua/firefox?
                                      (events/listen
                                       js/window
                                       EventType/KEYPRESS
@@ -107,7 +121,7 @@
                           ::ff-window-click
                           ::ff-keypress))}
   [s {:keys [add-emoji-cb position width height container-selector force-enabled default-field-selector
-             will-open-picker will-close-picker]
+             will-open-picker will-close-picker tooltip-position]
       :as arg
       :or {position "top"
            width 25
@@ -123,7 +137,7 @@
       [:button.emoji-button.btn-reset
         {:type "button"
          :title "Insert emoji"
-         :data-placement "top"
+         :data-placement (or tooltip-position "top")
          :data-container "body"
          :data-toggle "tooltip"
          :disabled (and (not default-field-selector) (not force-enabled) @(::disabled s))
@@ -134,17 +148,31 @@
                                               @caret-pos)
                                           (not @visible))]
                              (if vis
-                               (when (fn? will-open-picker)
-                                 (will-open-picker vis))
-                               (when (fn? will-close-picker)
-                                 (will-close-picker vis)))
+                               (do
+                                (when ua/mobile?
+                                  (dom-utils/lock-page-scroll))
+                                (when (fn? will-open-picker)
+                                  (will-open-picker vis)))
+                               (do
+                                 (when (fn? will-close-picker)
+                                   (will-close-picker vis))
+                                 (when ua/mobile?
+                                   (dom-utils/unlock-page-scroll))))
                              (reset! visible vis)))}]
      (when @visible
        [:div.picker-container
          {:class (utils/class-set {position true})}
+         [:button.mlb-reset.mobile-cancel-bt
+          {:on-click #(do
+                        (remove-markers s)
+                        (when (fn? will-close-picker)
+                          (will-close-picker))
+                        (reset! visible false))}
+          "Cancel"]
          (when-not (utils/is-test-env?)
            (react-utils/build (.-Picker js/EmojiMart)
              {:native true
+              :autoFocus true
               :onClick (fn [emoji event]
                          (when (and default-field-selector
                                     (not @(::caret-pos s)))
@@ -152,7 +180,7 @@
                            (save-caret-position s))
                          (let [add-emoji? (boolean @(::caret-pos s))]
                            (when add-emoji?
-                             (replace-with-emoji caret-pos emoji)
+                             (replace-with-emoji s emoji)
                              (remove-markers s)
                              (.focus @last-active-element))
                            (when (fn? will-close-picker)

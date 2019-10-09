@@ -5,8 +5,12 @@ div.oc-loading {
   width: 100%;
   height: 100%;
   display: none;
-  background-color: $oc_gray_8;
+  background-color: $grey_num_2;
   z-index: #{$navbar_zindex + 3001};
+
+  @include mobile() {
+    background-color: white;
+  }
 
   &.active {
     display: inline;

@@ -6,18 +6,6 @@
   padding: 0 0 60px;
   overflow: hidden;
 
-  &.no-border {
-    div.container-fluid {
-      @include big_web_no_tablet() {
-        border-top: none;
-      }
-    }
-  }
-
-  &.light-background {
-    background-color: $ultra_light_gold !important;
-  }
-
   @include tablet(){
     padding: 80px 0;
   }
@@ -43,11 +31,11 @@
     padding-left: 0px !important;
     padding-right: 0px !important;
     padding-top: 40px !important;
-    border-top: 1px solid $more_ultra_light_grey;
 
     @include mobile(){
       padding-left: 32px;
       padding-right: 32px;
+      margin-bottom: 40px;
     }
 
     div.left-column {
@@ -59,7 +47,12 @@
         width: 100%;
         float: none;
         padding-top: 40px;
-        border-top: 1px solid $more_ultra_light_grey;
+      }
+
+      @include mobile() {
+        float: unset;
+        width: 100%;
+        text-align: center;
       }
 
       img.logo {
@@ -72,7 +65,7 @@
 
       div.footer-communication-copy {
         margin-top: 15px;
-        @include avenir_M();
+        @include OC_Body_Book();
         font-size: 16px;
         color: $deep_navy;
 
@@ -84,12 +77,12 @@
       div.footer-small-links {
         margin-top: 15px;
         color: $carrot_dark_gray;
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 16px;
 
         a {
           margin: 0px 5px;
-          @include avenir_R();
+          @include OC_Body_Book();
           color: $carrot_green;
           font-size: 16px;
           text-decoration: none;
@@ -107,21 +100,31 @@
 
       div.copyright {
         font-size: 14px;
-        @include avenir_M();
+        @include OC_Body_Book();
         color: $ui_grey;
         margin-top: 40px;
         max-width: 180px;
 
         @include mobile(){
-          text-align: left;
+          text-align: center;
+          max-width: unset;
+          width: 100%;
+          margin-top: 0;
         }
       }
 
       div.tos-and-pp {
         font-size: 14px;
-        @include avenir_M();
+        @include OC_Body_Book();
         color: $ui_grey;
         max-width: 180px;
+
+        @include mobile() {
+          width: 100%;
+          max-width: initial;
+          text-align: center;
+          margin-top: 16px;
+        }
 
         a {
           color: $ui_grey;
@@ -129,10 +132,6 @@
           &:hover {
             text-decoration: underline;
           }
-        }
-
-        @include mobile(){
-          text-align: left;
         }
       }
     }
@@ -148,6 +147,10 @@
         padding-bottom: 40px;
       }
 
+      @include mobile() {
+        float: unset;
+      }
+
       div.column {
         float: left;
         margin-right: 40px;
@@ -155,14 +158,6 @@
 
         &:nth-child(3) {
           width: 300px;
-        }
-
-        @include mobile() {
-          width: 48%;
-
-          &:nth-child(2), &:nth-child(3) {
-            float: left;
-          }
         }
 
         @media screen and (max-width: 1200px) {
@@ -177,20 +172,26 @@
           margin-right: 0px;
         }
 
-        @include mobile(){
-          margin-right: 0px;
-          margin-bottom: 20px;
-        }
-
         &:last-child {
           margin-right: 0px;
         }
 
+        @include mobile() {
+          margin-right: 0px;
+          margin-bottom: 40px;
+          width: 100%;
+          text-align: center;
+
+          &:nth-child(3) {
+            width: 100%;
+          }
+        }
+
         div.column-title {
-          @include avenir_M();
+          @include OC_Body_Book();
           color: $light_ui_grey;
-          font-size: 16px;
-          margin-bottom: 20px;
+          font-size: 18px;
+          margin-bottom: 16px;
 
           @include mobile(){
             border-bottom: 1px solid rgba(255,255,255,0.5);
@@ -201,20 +202,19 @@
         }
 
         div.column-item {
-          margin-top: 10px;
 
           @include mobile(){
             margin-top: 16px;
           }
 
           a {
-            @include avenir_M();
+            @include OC_Body_Book();
             color: $deep_navy;
-            font-size: 16px;
+            font-size: 18px;
+            line-height: 32px;
 
             &:hover {
-              color: $carrot_green;
-              text-decoration: none;
+              text-decoration: underline;
               opacity: 1;
             }
           }

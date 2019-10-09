@@ -1,7 +1,8 @@
 (ns oc.web.components.ui.empty-org
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.dispatcher :as dis]))
+            [oc.web.dispatcher :as dis]
+            [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (rum/defcs empty-org < rum/reactive
                        (drv/drv :org-data)
@@ -14,6 +15,6 @@
         [:div.empty-org-headline
           (str "You don’t have any sections yet. ")
           [:button.mlb-reset
-            {:on-click #(dis/dispatch! [:input [:show-section-add] true])}
+            {:on-click #(nav-actions/show-section-add)}
             "Add one?"]])
       [:div.empty-org-image]]))

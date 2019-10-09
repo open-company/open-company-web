@@ -3,6 +3,7 @@
             [goog.format.EmailAddress :as email]
             [goog.fx.dom :refer (Scroll)]
             [goog.object :as gobj]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.urls :as oc-urls]
@@ -102,32 +103,47 @@
   [past-date & [flags]]
   (let [past-js-date (js-date past-date)
         past (.getTime past-js-date)
-        now (.getTime (js-date))
+        now-date (js-date)
+        now (.getTime now-date)
         seconds (.floor js/Math (/ (- now past) 1000))
         years-interval (.floor js/Math (/ seconds 31536000))
         months-interval (.floor js/Math (/ seconds 2592000))
         days-interval (.floor js/Math (/ seconds 86400))
         hours-interval (.floor js/Math (/ seconds 3600))
-        minutes-interval (.floor js/Math (/ seconds 60))]
+        minutes-interval (.floor js/Math (/ seconds 60))
+        short? (in? flags :short)]
     (cond
       (pos? years-interval)
       (date-string past-js-date (concat flags [:year]))
 
-      (or (pos? months-interval)
-          (> days-interval 7))
+      (pos? months-interval)
       (date-string past-js-date flags)
 
       (pos? days-interval)
-      (str days-interval " " (pluralize "day" days-interval) " ago")
+      (str days-interval (if short? "d" (str " " (pluralize "day" days-interval) " ago")))
 
       (pos? hours-interval)
-      (str hours-interval " " (pluralize "hour" hours-interval) " ago")
+      (str hours-interval (if short? "h" (str " " (pluralize "hour" hours-interval) " ago")))
 
       (pos? minutes-interval)
-      (str minutes-interval " " (pluralize "min" minutes-interval) " ago")
+      (str minutes-interval (if short? "m" (str " " (pluralize "minute" minutes-interval) " ago")))
 
       :else
-      "Just now")))
+      (if short? "now" "Just now"))))
+
+(defn foc-date-time [past-date & [flags]]
+  (let [past-js-date (js-date past-date)
+        past (.getTime past-js-date)
+        now-date (js-date)
+        now (.getTime now-date)]
+    (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
+             (= (.getMonth past-js-date) (.getMonth now-date))
+             (= (.getDate past-js-date) (.getDate now-date)))
+      (s/lower
+       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
+                                                                                  :minute "2-digit"
+                                                                                  :format "hour:minute"}))
+      (time-since past-date (concat flags [:short])))))
 
 (defn class-set
   "Given a map of class names as keys return a string of the those classes that evaulates as true"
@@ -174,12 +190,16 @@
     (map #(-> (conj % "0x") (clojure.string/join) (reader/read-string)) [red green blue])))
 
 (defn scroll-to-y [scroll-y & [duration]]
-  (.play
-    (new Scroll
-         (.-scrollingElement js/document)
-         #js [0 (.-scrollY js/window)]
-         #js [0 scroll-y]
-         (if (integer? duration) duration oc-animation-duration))))
+  (if (and duration (zero? duration))
+    (if ua/edge?
+      (set! (.. js/document -scrollingElement -scrollTop) scroll-y)
+      (.scrollTo (.-scrollingElement js/document) 0 scroll-y))
+    (.play
+      (new Scroll
+           (.-scrollingElement js/document)
+           #js [0 (.-scrollY js/window)]
+           #js [0 scroll-y]
+           (if (integer? duration) duration oc-animation-duration)))))
 
 (defn scroll-to-bottom [elem & [animated]]
   (let [elem-scroll-top (.-scrollHeight elem)]
@@ -199,6 +219,11 @@
 
 (defn after [ms fn]
   (js/setTimeout fn ms))
+
+(defn maybe-after [ms fn]
+  (if (zero? ms)
+   (fn)
+   (js/setTimeout fn ms)))
 
 (defn every [ms fn]
   (js/setInterval fn ms))
@@ -274,14 +299,23 @@
       (.collapse rg false)
       (.select rg))))
 
+;; Based on https://github.com/google/closure-library/blob/master/closure/goog/format/emailaddress.js#L134
+;;      and https://github.com/google/closure-library/blob/master/closure/goog/format/emailaddress.js#L142
+;; It is designed to match about 99.9% of the valid emails while accepting some invalid emails.
+(def valid-email-pattern "[+a-zA-Z0-9_.!#$%&'*\\/=?^`{|}~-]+@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z0-9]{2,63}")
+(def valid-email-re (re-pattern (str "^" valid-email-pattern "$")))
+
 (defn valid-email? [addr]
   (when addr
     (email/isValidAddress addr)))
 
+;; Based on https://github.com/google/closure-library/blob/master/closure/goog/format/emailaddress.js#L142
+(def valid-domain-pattern "@?(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z0-9]{2,63}")
+(def valid-domain-re (re-pattern (str "^" valid-domain-pattern "$")))
+
 (defn valid-domain? [domain]
   (when (string? domain)
-    (let [re #"(?i)^@?([a-z0-9][a-z0-9\-]{1,61}[A-Za-z0-9]\.)+[A-Za-z]+$"]
-      (pos? (count (.match domain re))))))
+    (re-matches valid-domain-re domain)))
 
 (defn remove-tooltips []
   (.remove (js/$ "div.tooltip")))
@@ -325,9 +359,9 @@
     (= :admin user-type)))
 
 (defn is-admin-or-author?
-  [org-data]
+  [org-data & [board-data]]
   (let [user-data (jwt/get-contents)
-        user-type (get-user-type user-data org-data)]
+        user-type (get-user-type user-data org-data board-data)]
     (or (= :admin user-type)
         (= :author user-type))))
 
@@ -340,45 +374,12 @@
       (f (first items)) idx
       :else (recur (inc idx) (rest items)))))
 
-(defn name-or-email [user]
-  (let [user-name (:name user)
-        first-name (:first-name user)
-        last-name (:last-name user)]
-    (cond
-      (and (seq first-name)
-           (seq last-name))
-      (str first-name " " last-name)
-      (seq first-name)
-      first-name
-      (seq last-name)
-      last-name
-      (seq user-name)
-      user-name
-      :else
-      (:email user))))
-
-(defn slack-link-with-state [original-url user-id team-id redirect]
-  (clojure.string/replace
-   original-url
-   team-id
-   (str
-    (when (seq team-id) (str team-id ":"))
-    (when (seq user-id) (str user-id ":"))
-    redirect)))
-
 (def network-error
  {:title "Network error"
   :description "Shoot, looks like there might be a connection issue. Please try again."
   :server-error true
   :id :generic-network-error
   :dismiss true})
-
-(def app-update-error
-  {:title "App has been updated"
-   :description "You’re using an out of date version of Carrot. Please refresh your browser."
-   :app-update true
-   :id :app-update-error
-   :dismiss true})
 
 (def internal-error
   {:title "Internal error occurred"
@@ -444,6 +445,14 @@
      (when-not hide-time
       (str " at " time-string)))))
 
+(defn tooltip-date [past-date]
+  (let [past-js-date (js-date past-date)
+        now-date (js-date)
+        hide-time (or (not= (.getFullYear past-js-date) (.getFullYear now-date))
+                      (not= (.getMonth past-js-date) (.getMonth now-date))
+                      (not= (.getDate past-js-date) (.getDate now-date)))]
+    (activity-date-string past-js-date hide-time false)))
+
 (defn activity-date
   "Get a string representing the elapsed time from a date in the past"
   [past-js-date & [hide-time]]
@@ -476,21 +485,26 @@
         :else
         "Just now"))))
 
-(defn entry-date-tooltip [entry-data]
-  (let [created-at (js-date (or (:published-at entry-data) (:created-at entry-data)))
-        updated-at (when (:updated-at entry-data) (js-date (:updated-at entry-data)))
-        created-str (activity-date created-at)
-        updated-str (activity-date updated-at)
+(defn activity-date-tooltip [entry-data]
+  (let [created-at (or (:published-at entry-data) (:created-at entry-data))
+        last-edit (last (:author entry-data))
+        updated-at (when (:updated-at last-edit)
+                     (:updated-at last-edit))
+        same-author? (= (:user-id last-edit) (:user-id (:publisher entry-data)))
+        ;; Show edit only if happened at least 24 hours after publish
+        should-show-updated-at? (or (not same-author?)
+                                    (> (- (.getTime (js-date updated-at)) (.getTime (js-date created-at)))
+                                     (* 1000 60 60 24)))
+        created-str (tooltip-date created-at)
+        updated-str (tooltip-date updated-at)
         label-prefix (if (= (:status entry-data) "published")
-                       "Posted "
-                       "Created ")]
-    (if (or (= (:created-at entry-data) (:updated-at entry-data))
-            (not (:updated-at entry-data)))
+                       "Posted on "
+                       "Created on ")]
+    (if-not should-show-updated-at?
       (str label-prefix created-str)
-      (str label-prefix created-str "\nEdited " updated-str " by " (:name (last (:author entry-data)))))))
-
-(defn activity-date-tooltip [activity-data]
-  (entry-date-tooltip activity-data))
+      (if same-author?
+        (str label-prefix created-str "\nEdited " updated-str)
+        (str label-prefix created-str "\nEdited " updated-str " by " (:name last-edit))))))
 
 (defn ios-copy-to-clipboard [el]
   (let [old-ce (.-contentEditable el)
@@ -508,8 +522,7 @@
 
 (defn copy-to-clipboard [el]
   (try
-    (when (and (responsive/is-tablet-or-mobile?)
-               (js/isSafari))
+    (when ua/ios?
       (ios-copy-to-clipboard el))
     (.execCommand js/document "copy")
     (catch :default e
@@ -541,38 +554,17 @@
         (newest-org orgs)))
     (newest-org orgs)))
 
-;; Get the board to show counting the last accessed and the last created
-
-(def default-board "all-posts")
-
-(defn get-default-board [org-data]
-  (let [last-board-slug default-board]
-    ; Replace default-board with the following to go back to the last visited board
-    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (and (= last-board-slug "all-posts")
-             (link-for (:links org-data) "activity"))
-      {:slug "all-posts"}
-      (let [boards (:boards org-data)
-            board (first (filter #(= (:slug %) last-board-slug) boards))]
-        (or
-          ; Get the last accessed board from the saved cookie
-          board
-          (let [sorted-boards (vec (sort-by :name boards))]
-            (first sorted-boards)))))))
-
 (defn clean-body-html [inner-html]
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
-        _ (.append (js/$ (.-body js/document)) $container)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
+        _ (.remove (js/$ ".oc-mention-popup" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))
         has-empty-ending-paragraph (when (seq last-p-html)
                                      (.match last-p-html reg-ex))
         _ (when has-empty-ending-paragraph
-            (.remove (js/$ "p:last-child" $container)))
-        cleaned-html (.html $container)
-        _ (.detach $container)]
-    cleaned-html))
+            (.remove (js/$ "p:last-child" $container)))]
+    (.html $container)))
 
 (defn your-digest-url []
   (if-let [org-slug (cook/get-cookie (router/last-org-cookie))]
@@ -603,7 +595,11 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-headline "Untitled post")
+(def default-headline "Title")
+
+(def default-abstract "Quick summary")
+
+(def max-abstract-length 280)
 
 (def default-drafts-board-name "Drafts")
 
@@ -646,6 +642,21 @@
 
 (def hide-class "fs-hide") ;; Use fs-hide for FullStory
 
+(defn element-clicked? [e element-name]
+  (loop [el (.-target e)]
+    (if (or (not el) (= (.-tagName el) element-name))
+      el
+      (recur (.-parentElement el)))))
+
+(defn button-clicked? [e]
+  (element-clicked? e "BUTTON"))
+
+(defn input-clicked? [e]
+  (element-clicked? e "INPUT"))
+
+(defn anchor-clicked? [e]
+  (element-clicked? e "A"))
+
 (defn debounced-fn
   "Debounce function: give a function and a wait time call it immediately
   and avoid calling it again for the wait time.
@@ -681,3 +692,29 @@
             (reset! timeout nil)
             (reset! last-call now)
             (apply f args)))))))
+
+(defn observe []
+  (if (.-attachEvent js/window)
+    (fn [el e handler] (.attachEvent el (str "on" e) handler))
+    (fn [el e handler] (.addEventListener el e handler))))
+
+(defn page-scroll-top []
+  (let [is-mobile? (responsive/is-mobile-size?)
+        board-slug (router/current-board-slug)
+        activity-id (router/current-activity-id)]
+    (if (and (not activity-id)
+             (seq board-slug)
+             (not= board-slug default-drafts-board-slug)
+             is-mobile?)
+      50
+      0)))
+
+(defn back-to [org-data]
+  (cond
+    ;; the board specified in the router if there is one
+    (:back-to @router/path) (:back-to @router/path)
+    ;; if the user is part of the team we can go back to all posts
+    (jwt/user-is-part-of-the-team (:team-id org-data)) "all-posts"
+    ;; else go back to the current post board since it's probably the
+    ;; only one the user can see
+    :else (router/current-board-slug)))

@@ -5,17 +5,19 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.utils.user :as uu]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.comment :as ca]
             [oc.web.actions.section :as sa]
-            [oc.web.actions.reaction :as ra]
             [oc.web.actions.activity :as aa]
             [oc.web.lib.fullstory :as fullstory]
+            [oc.web.lib.chat :as chat]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.ws.notify-client :as ws-nc]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.notifications :as notification-actions]))
@@ -35,8 +37,10 @@
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
         auth-link (utils/link-for (:links team-data) "bot")
-        fixed-auth-url (utils/slack-link-with-state (:href auth-link) (:user-id user-data) (:team-id team-data)
-                        redirect)]
+        fixed-auth-url (uu/auth-link-with-state (:href auth-link)
+                                                {:user-id (:user-id user-data)
+                                                 :team-id (:team-id team-data)
+                                                 :redirect redirect})]
     (router/redirect! fixed-auth-url)))
 
 (defn maybe-show-integration-added-notification? []
@@ -47,14 +51,14 @@
       (notification-actions/show-notification {:title "Carrot Bot enabled"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
+                                                      :expire 5
                                                       :id :slack-bot-added}))
     (when (and (= bot-access "team")
                (not= (:new (router/query-params)) "true"))
       (notification-actions/show-notification {:title "Integration added"
                                                       :primary-bt-title "OK"
                                                       :primary-bt-dismiss true
-                                                      :expire 10
+                                                      :expire 5
                                                       :id :slack-team-added}))
     (dis/dispatch! [:input [:bot-access] nil])))
 
@@ -64,44 +68,100 @@
     ;; avoid infinite loop of the Go to digest button
     ;; by changing the value of the last visited slug
     (if (pos? (count orgs))
-      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) (* 60 60 24 6))
+      (cook/set-cookie! (router/last-org-cookie) (:slug (first orgs)) cook/default-cookie-expire)
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
-(defn org-loaded [org-data saved? & [email-domain]]
+(def default-board "all-posts")
+
+(defn get-default-board [org-data]
+  (let [last-board-slug default-board]
+    ; Replace default-board with the following to go back to the last visited board
+    ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
+    (if (and (= last-board-slug "all-posts")
+             (utils/link-for (:links org-data) "activity"))
+      {:slug "all-posts"}
+      (let [boards (:boards org-data)
+            board (first (filter #(= (:slug %) last-board-slug) boards))]
+        (or
+          ; Get the last accessed board from the saved cookie
+          board
+          (let [sorted-boards (vec (sort-by :name boards))]
+            (first sorted-boards)))))))
+
+(def other-resources-delay 10000)
+
+(defn org-loaded
+  "Dispatch the org data into the app-state to be used by all the components.
+   Do all the needed loading when the org data are loaded if complete-refresh? is true.
+   The saved? flag is used as a strict boolean, if it's nil it means no org data PATCH happened, false
+   means that the save went wrong, true went well."
+  [org-data & [saved? email-domain complete-refresh?]]
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
-    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) (* 60 60 24 6)))
+    (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
-  (let [ap-initial-at (:ap-initial-at @dis/app-state)
-        boards (:boards org-data)
-        activity-link (utils/link-for (:links org-data) "activity")]
-    (sa/load-other-sections (:boards org-data))
-    (when activity-link
-      ;; Preload all posts data
-      (aa/all-posts-get org-data ap-initial-at)
-      ;; Preload must see data
-      (aa/must-see-get org-data))
+  (let [boards (:boards org-data)
+        activity-link (utils/link-for (:links org-data) "entries")
+        recent-activity-link (utils/link-for (:links org-data) "activity")
+        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
+        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
+        is-all-posts? (= (router/current-board-slug) "all-posts")
+        is-follow-ups? (= (router/current-board-slug) "follow-ups")
+        activity-delay (if is-all-posts?
+                         0
+                         other-resources-delay)
+        section-delay (if (and (not is-all-posts?)
+                                       (not is-follow-ups?))
+                                0
+                                other-resources-delay)
+        follow-ups-delay (if is-follow-ups?
+                           0
+                           other-resources-delay)]
+    (when complete-refresh?
+      ;; Load secure activity
+      (if (router/current-secure-activity-id)
+        (aa/secure-activity-get)
+        (do
+          ;; Load the current activity
+          (when (router/current-activity-id)
+            (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
+          (utils/maybe-after section-delay #(sa/load-other-sections (:boards org-data)))
+          ;; Preload all posts data
+          (when activity-link
+            (utils/maybe-after activity-delay #(aa/activity-get org-data)))
+          (when recent-activity-link
+            (utils/maybe-after activity-delay #(aa/recent-activity-get org-data)))
+          ;; Preload follow-ups data
+          (when follow-ups-link
+            (utils/maybe-after follow-ups-delay #(aa/follow-ups-get org-data)))
+          (when recent-follow-ups-link
+            (utils/maybe-after follow-ups-delay #(aa/recent-follow-ups-get org-data))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
-      (and (not ap-initial-at)
-           (or (= (router/current-board-slug) "all-posts")
-               (= (router/current-board-slug) "must-see")))
+      (or (= (router/current-board-slug) "all-posts")
+          (= (router/current-board-slug) "follow-ups"))
       (when-not activity-link
         (check-org-404))
 
       ; If there is a board slug let's load the board data
       (router/current-board-slug)
-      (if-let [board-data (first (filter #(= (:slug %) (router/current-board-slug)) boards))]
+      (if-let [board-data (first (filter #(or (= (:slug %) (router/current-board-slug))
+                                              (= (:uuid %) (router/current-board-slug))) boards))]
         ; Load the board data since there is a link to the board in the org data
-        (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-          (sa/section-get board-link))
+        (do
+          ;; Rewrite the URL in case it's using the board UUID instead of the slug
+          (when (= (:uuid board-data) (router/current-board-slug))
+            (router/rewrite-board-uuid-as-slug (router/current-board-slug) (:slug board-data)))
+          (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
+            (utils/maybe-after section-delay #(sa/section-get :recently-posted board-link)))
+          (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
+            (utils/maybe-after section-delay #(sa/section-get :recent-activity recent-board-link))))
         ; The board wasn't found, showing a 404 page
         (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-          (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
-          (when (and (not (router/current-activity-id)) ;; user is not asking for a specific post
-                     (not ap-initial-at)) ;; neither for a briefing link
+          (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
+          (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
       (and (not (utils/in? (:route @router/path) "org-settings-invite"))
@@ -113,13 +173,15 @@
            (not (utils/in? (:route @router/path) "confirm-invitation"))
            (not (utils/in? (:route @router/path) "secure-activity")))
       ;; Redirect to the first board if at least one is present
-      (let [board-to (utils/get-default-board org-data)]
+      (let [board-to (get-default-board org-data)]
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
             (oc-urls/all-posts (:slug org-data)))))))
+
   ;; Change service connection
-  (when (jwt/jwt) ; only for logged in users
+  (when (or (jwt/jwt)
+            (jwt/id-token)) ; only for logged in users
     (when-let [ws-link (utils/link-for (:links org-data) "changes")]
       (ws-cc/reconnect ws-link (jwt/user-id) (:slug org-data) (conj (map :uuid (:boards org-data)) (:uuid org-data)))))
 
@@ -135,16 +197,20 @@
 
   (dis/dispatch! [:org-loaded org-data saved? email-domain])
   (utils/after 100 maybe-show-integration-added-notification?)
-  (fullstory/track-org org-data))
+  (fullstory/track-org org-data)
+  (chat/identify) ; Intercom
 
-(defn get-org-cb [{:keys [status body success]}]
+  ;; Change page title when an org page is loaded
+  (set! (.-title js/document) (str "Carrot | " (:name org-data))))
+
+(defn get-org-cb [prevent-complete-refresh? {:keys [status body success]}]
   (let [org-data (json->cljs body)]
-    (org-loaded org-data false)))
+    (org-loaded org-data nil nil (not prevent-complete-refresh?))))
 
-(defn get-org [& [org-data]]
+(defn get-org [& [org-data prevent-complete-refresh?]]
   (let [fixed-org-data (or org-data (dis/org-data))
         org-link (utils/link-for (:links fixed-org-data) ["item" "self"] "GET")]
-    (api/get-org org-link get-org-cb)))
+    (api/get-org org-link (partial get-org-cb prevent-complete-refresh?))))
 
 ;; Org redirect
 
@@ -157,7 +223,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/sign-up-setup-sections (:slug org-data)))))
+   #(router/nav! (oc-urls/all-posts (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -216,7 +282,7 @@
       ;; rewrite history so when user come back here we load org data and patch them
       ;; instead of creating them
       (.replaceState js/history #js {} (.-title js/document) (oc-urls/sign-up-update-team (:slug org-data)))
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data nil email-domain)
       (dis/dispatch! [:org-create])
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
@@ -224,7 +290,7 @@
 (defn org-update-cb [email-domain {:keys [success status body]}]
   (if success
     (when-let [org-data (when success (json->cljs body))]
-      (org-loaded org-data false email-domain)
+      (org-loaded org-data success email-domain)
       (update-email-domains email-domain org-data))
     (org-create-check-errors status)))
 
@@ -257,12 +323,17 @@
   (dis/dispatch! [:org-edit-setup org-data]))
 
 (defn org-edit-save-cb [{:keys [success body status]}]
-  (org-loaded (json->cljs body) true))
+  (org-loaded (json->cljs body) success))
 
 (defn org-edit-save [org-data]
   (let [org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")
         with-trimmed-name (assoc org-data :name (clojure.string/trim (:name org-data)))]
-    (api/patch-org org-patch-link with-trimmed-name org-edit-save-cb)))
+    (api/patch-org org-patch-link with-trimmed-name
+      (fn [{:keys [success status] :as resp}]
+        (if success
+          (org-edit-save-cb resp)
+          (when (= status 422)
+            (dis/dispatch! [:input [:org-editing :error] true])))))))
 
 (defn org-avatar-edit-save-cb [{:keys [success body status]}]
   (if success
@@ -270,15 +341,15 @@
       (notification-actions/show-notification
         {:title "Image update succeeded"
          :description "Your image was succesfully updated."
-         :expire 5
+         :expire 3
          :dismiss true})
-      (org-loaded (json->cljs body) false))
+      (org-loaded (json->cljs body)))
     (do
       (dis/dispatch! [:org-avatar-update/failed])
       (notification-actions/show-notification
        {:title "Image upload error"
         :description "An error occurred while processing your company avatar. Please retry."
-        :expire 5
+        :expire 3
         :id :org-avatar-upload-failed
         :dismiss true}))))
 
@@ -314,18 +385,5 @@
             (when (= (:item-id change-data) (:uuid current-board-data))
               (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
 
-(defn update-org-sections [org-slug all-sections]
-  (dis/dispatch! [:input [:ap-loading] true])
-  (let [selected-sections (vec (map :name (filterv :selected all-sections)))
-        patch-payload {:boards (conj selected-sections "General")
-                       :samples true}
-        org-patch-link (utils/link-for (:links (dis/org-data)) "partial-update")]
-      (api/patch-org-sections org-patch-link patch-payload
-       (fn [{:keys [success status body]}]
-         (when success
-           (org-loaded (json->cljs body) false))
-         (utils/after 2000
-          #(router/nav! (get-ap-url org-slug)))))))
-
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/sign-up-setup-sections (:slug org-data))))
+  (router/nav! (oc-urls/all-posts (:slug org-data))))

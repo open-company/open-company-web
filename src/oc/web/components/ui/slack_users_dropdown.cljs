@@ -3,6 +3,7 @@
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
+            [oc.lib.user :as user-lib]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.actions.team :as team-actions]
@@ -79,7 +80,7 @@
     [:div.slack-users-dropdown
       {:class (if disabled "disabled" "")
        :key (str "slack-users-dropdown-" (count all-sorted-users))}
-      [:input.slack-users-dropdown
+      [:input.slack-users-dropdown.oc-input
         {:value @(::slack-user s)
          :on-focus (fn []
                       (when (fn? on-focus) (on-focus))
@@ -93,12 +94,10 @@
                          (on-intermediate-change (.. % -target -value)))
                        (reset! (::slack-user s) (.. % -target -value)))
          :disabled disabled
-         :placeholder (if (pos? (count all-sorted-users)) "Select User..." "No more members to add")}]
+         :placeholder (if (pos? (count all-sorted-users)) "Select a person to invite..." "No more members to add")}]
       (when-not disabled
-        [:i.fa
-          {:class (utils/class-set {:fa-angle-down (not @(::show-users-dropdown s))
-                                    :fa-angle-up @(::show-users-dropdown s)})
-           :on-click #(when-not disabled
+        [:div.arrows
+          {:on-click #(when-not disabled
                         (let [next-value (not @(::show-users-dropdown s))]
                           (reset! (::typing s) false)
                           (reset! (::show-users-dropdown s) next-value)
@@ -118,12 +117,12 @@
               {:key (str "slack-users-dd-" (:slack-org-id user) "-" (:slack-id user))
                :on-click #(do
                            (on-change user)
-                           (reset! (::slack-user s) (utils/name-or-email user))
+                           (reset! (::slack-user s) (user-lib/name-for user))
                            (reset! (::show-users-dropdown s) false)
                            (when (fn? on-blur)
                               (on-blur))
                            (reset! (::typing s) false))}
               (user-avatar-image user)
               [:div.user-name
-                (utils/name-or-email user)
+                (user-lib/name-for user)
                 [:span.slack-org (get slack-orgs-map (:slack-org-id user))]]])])]))

@@ -4,6 +4,7 @@ div.reactions {
 
   @include mobile() {
     float: unset;
+    height: 32px;
   }
 
   div.reactions-list {
@@ -15,14 +16,19 @@ div.reactions {
       height: 26px;
       cursor: default;
       padding: 4px 3px;
-      @include avenir_H();
-      border: 1px solid #E2E3E4;
+      @include OC_Body_Bold();
       box-shadow: none;
       font-size: 11px;
       color: $ui_grey;
       min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
+      background-color: $ultra_light_grey;
+
+      @include mobile() {
+        height: 32px;
+        font-size: 12px;
+      }
 
       &:first-child {
         margin-left: 0px;
@@ -33,6 +39,11 @@ div.reactions {
         float: left;
         font-size: 15px;
         margin-left: 2px;
+
+        @include mobile() {
+          font-size: 17px;
+          margin-left: 3px;
+        }
       }
 
       div.count {
@@ -42,26 +53,35 @@ div.reactions {
         height: 15px;
         text-align: center;
         margin-left: -1px;
+
+        @include mobile() {
+          margin-top: 3px;
+          height: 16px;
+        }
       }
 
       &.can-react {
         cursor: pointer;
 
         @include big_web() {
-          &.reacted:hover {
-            border: 1px solid #7ED8AA;
-            background-color: $feint_emerald;
+          &:hover {
+            background-color: #D6D9DC;
+            div.count {
+              color: $deep_navy;
+            }
           }
 
-          &:hover {
-            border: 1px solid $light_ui_grey;
+          &.reacted:hover {
+            background-color: #C6EBD8;
+            div.count {
+              color: $carrot_green;
+            }
           }
         }
       }
 
       &.reacted {
-        background-color: #EAFBF2;
-        border: 1px solid #7ED8AA;
+        background-color: #D9F2E5;
 
         div.count {
           color: $carrot_green;
@@ -71,36 +91,30 @@ div.reactions {
       &.reaction-picker {
         box-shadow: none;
 
-        span.reaction, div.count {
-          opacity: .5;
-        }
-
-        div.count {
-          color: $ui_grey;
-        }
-
         @include big_web() {
           &:hover {
-            background-color: transparent;
-            border: 1px solid $light_ui_grey;
-
-            div.count {
-              color: $ui_grey;
-            }
-
-            span.reaction, div.count {
+            span.reaction {
               opacity: 1;
             }
           }
         }
 
         span.reaction {
-          width: 16px;
+          margin: 0 0 0 4px;
+          opacity: 0.5;
+          display: inline-block;
+          width: 24px;
           height: 16px;
           background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
-          background-size: 16px 16px;
+          background-size: 24px 16px;
           background-position: center;
           background-repeat: no-repeat;
+
+          @include mobile() {
+            // width: 25px;
+            // height: 17px;
+            margin: 0 0 0 5px;
+          }
         }
       }
     }
@@ -123,7 +137,9 @@ div.reactions {
         position: absolute;
         top: 8px;
         right: 8px;
-        color: black;
+        color: $deep_navy;
+        @include OC_Body_Bold();
+        font-size: 16px;
       }
     }
 

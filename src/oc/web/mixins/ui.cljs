@@ -3,11 +3,23 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]))
 
 (def -no-scroll-mixin-class :no-scroll)
+
+(def refresh-tooltips-mixin
+  {:did-mount (fn [s]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+   s)
+   :did-remount (fn [_ s]
+    (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+      #(doto (js/$ %2)
+         (.tooltip "fixTitle")
+         (.tooltip "hide")))
+   s)})
 
 (def no-scroll-mixin
   "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
@@ -34,6 +46,9 @@
       state)})
 
 (def first-render-mixin
+  "This mixin will add a :first-render-done atom to your component state. It will
+   be false when the component is not mounted, and true when it is. Very useful for
+   appear or disappear animations or to track down the component state."
   {:init (fn [state]
            (assoc state :first-render-done (atom false)))
    :after-render
@@ -183,12 +198,8 @@
          mounted-kw :wrt-mixin-is-mounted
          check-item-fn (fn [s idx el]
                          ;; Check if we need to send the item read
-                         (when       ;; element is the initially visible body
-                                (and (.contains (.-classList el) "to-truncate")
-                                     ;; but item is not truncated
-                                     (not (.contains (.-classList el) "ddd-truncated"))
-                                     ;; and the element is visible in the viewport
-                                     (au/is-element-visible? el))
+                         ;; when the element is visible in the viewport
+                         (when (au/is-element-visible? el)
                             (item-read-cb s (.attr (js/$ el) "data-itemuuid"))))
          check-items-fn (fn [s & [_]]
                          (when @(get s mounted-kw)
@@ -233,3 +244,32 @@
       (events/unlistenByKey (:on-click-out-listener s))
       (dissoc s :on-click-out-listener))
     s))})
+
+(defn on-window-resize-mixin [callback]
+  {:did-mount (fn [s]
+   (let [on-resize-listener (events/listen (.getElementById js/document "app") EventType/RESIZE
+                             (fn [e]
+                              (callback s e)))]
+    (assoc s :on-resize-listener on-resize-listener)))
+   :will-unmount (fn [s]
+   (if (:on-resize-listener s)
+    (do
+      (events/unlistenByKey (:on-resize-listener s))
+      (dissoc s :on-resize-listener))
+    s))})
+
+(defn make-images-interactive!
+  "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
+  [s el-selector]
+  (let [dom-node (rum/dom-node s)
+        imgs (dommy/sel dom-node (str el-selector " img"))]
+    (doseq [img  imgs
+            :let [href (.-src img)]]
+      (dommy/add-class! img :interactive-image)
+      (dommy/listen! img :click #(dis/dispatch! [:input [:expand-image-src] href])))
+    s))
+
+(defn interactive-images-mixin [el-sel]
+  {:did-mount (fn [s] (make-images-interactive! s el-sel))
+   :did-remount (fn [_ new-state]
+                  (make-images-interactive! new-state el-sel))})

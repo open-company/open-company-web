@@ -35,18 +35,16 @@ div.site-mobile-menu {
       padding: 12px 0px;
 
       a {
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 28px;
-        color: $ui_grey;
+        color: $deep_navy;
         
         &:focus, &:active {
           text-decoration: none;
         }
 
         &.active {
-          @include avenir_H();
-          font-size: 28px;
-          color: $deep_navy;
+          color: rgba($deep_navy, 0.5);
           text-decoration: none;
         }
       }
@@ -65,7 +63,7 @@ div.site-mobile-menu {
     button.login-btn {
       background-color: white;
       border-radius: 8px;
-      @include avenir_B();
+      @include OC_Body_Bold();
       font-size: 16px;
       color: $carrot_orange;
       background-color: $coral;

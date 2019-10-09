@@ -3,8 +3,9 @@
             [taoensso.sente :as s]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.raven :as sentry]
-            [oc.web.local-settings :as ls]))
+            [oc.web.lib.sentry :as sentry]
+            [oc.web.local-settings :as ls]
+            [oc.web.lib.fullstory :as fullstory]))
 
 ;; Connection check
 
@@ -17,10 +18,8 @@
              :connection-status connection-status
              :send-fn ch-send-fn?
              :infos infos
-             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
-    (sentry/set-extra-context! ctx)
-    (sentry/capture-message message)
-    (sentry/clear-extra-context!)
+             :sessionURL (fullstory/session-url)}]
+    (sentry/capture-message-with-extra-context! ctx message)
     (timbre/error message ctx)))
 
 ;; Real send
@@ -100,10 +99,8 @@
              :connection-status connection-status
              :timestamp (.getTime (new js/Date))
              :rep rep
-             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
-    (sentry/set-extra-context! ctx)
-    (sentry/capture-message (str service-name " WS: not valid JWT"))
-    (sentry/clear-extra-context!)
+             :sessionURL (fullstory/session-url)}]
+    (sentry/capture-message-with-extra-context! ctx (str service-name " WS: not valid JWT"))
     (timbre/error service-name "WS: not valid JWT" ctx)))
 
 (defn report-connect-timeout [service-name ch-state]
@@ -112,10 +109,8 @@
                             @@ch-state)
         ctx {:timestamp (.getTime (new js/Date))
              :connection-status connection-status
-             :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
-    (sentry/set-extra-context! ctx)
-    (sentry/capture-message (str service-name " WS: handshake timeout"))
-    (sentry/clear-extra-context!)
+             :sessionURL (fullstory/session-url)}]
+    (sentry/capture-message-with-extra-context! ctx (str service-name " WS: handshake timeout"))
     (timbre/error service-name "WS: handshake timeout" ctx)))
 
 (defn auth-check [service-name ch-state chsk-send! channelsk jwt-refresh-cb reconnect-cb success-cb rep]

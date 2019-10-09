@@ -12,27 +12,27 @@ div.orgs-dropdown {
     margin: 0;
     @include org-avatar(32);
 
-    &.dropdown-toggle{
+    div.org-avatar {
+      height: 32px;
+    }
 
-      div.org-avatar {
-        margin-left: 4px;
-      }
+    &.dropdown-toggle {
 
-      &:after {
-        float: right;
-        content: "";
-        background-image: cdnUrl("/img/ML/board_settings.svg");
-        background-size: 8px 8px;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 8px;
-        height: 32px;
-        margin-left: 8px;
-        opacity: 1;
+      div.org-avatar div.org-avatar-container span.org-name {
+        padding-right: 16px;
 
-        @include mobile() {
-          opacity: 0;
-          margin-left: 0px;
+        &:after {
+          content: "";
+          background-image: cdnUrl("/img/ML/select_arrows.svg");
+          background-size: 8px 12px;
+          background-position: top 11px right 0;
+          background-repeat: no-repeat;
+          width: 8px;
+          height: 32px;
+          opacity: 1;
+          position: absolute;
+          top: 0;
+          right: 0;
         }
       }
 
@@ -45,8 +45,7 @@ div.orgs-dropdown {
   div.orgs-dropdown-container {
     position: absolute;
     top: 40px;
-    left: 50%;
-    margin-left: -76px;
+    left: 10%;
     box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(177, 184, 192, 0.5);
     border-radius: 5px;
@@ -81,6 +80,7 @@ div.orgs-dropdown {
 
         &.active {
           background-color: transparent;
+          text-decoration: underline;
         }
 
         &:hover {
@@ -97,30 +97,18 @@ div.orgs-dropdown {
           overflow: hidden;
           @include org-avatar(24);
 
+          @include mobile() {
+            @include org-avatar(24);
+          }
+
           div.org-avatar-container {
             width: 120px;
 
-            &.force-label {
-              span.org-name {
-                @include avenir_M();
-                font-size: 14px;
-                color: $deep_navy;
-                margin-left: 8px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 90px;
-                display: inline;
-                white-space: pre;
-                float: left;
-                max-width: 88px;
-                width: auto !important;
-                margin-top: 6px;
-
-                &.no-logo {
-                  margin-left: 32px !important;
-                  margin-top: 6px !important;
-                }
-              }
+            span.org-name {
+              @include OC_Body_Bold();
+              font-size: 14px;
+              color: $deep_navy;
+              max-width: 88px;
             }
           }
         }

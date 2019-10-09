@@ -13,11 +13,13 @@
   [current-slug org is-mobile?]
   [:li
     {:class (when (= (:slug org) current-slug) "active")
-     :on-click #(do
-                 (utils/event-stop %)
-                 (dis/dispatch! [:input [:orgs-dropdown-visible] false])
-                 (router/nav! (oc-urls/org (:slug org))))}
-    (org-avatar org false :always true)])
+     :on-click (fn [e]
+                 (.stopPropagation e)
+                 (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
+                 (dis/dispatch! [:input [:orgs-dropdown-visible] false]))}
+    [:a
+      {:href (oc-urls/all-posts (:slug org))}
+      (org-avatar org false :always)]])
 
 (rum/defcs orgs-dropdown < rum/static
                            rum/reactive
@@ -25,7 +27,8 @@
                            (drv/drv :org-data)
                            (drv/drv :orgs-dropdown-visible)
                            (on-window-click-mixin (fn [s e]
-                            (when-not (utils/event-inside? e (rum/dom-node s))
+                            (when (and @(drv/get-ref s :orgs-dropdown-visible)
+                                        (not (utils/event-inside? e (rum/dom-node s))))
                               (dis/dispatch! [:input [:orgs-dropdown-visible] false]))))
   [s]
   (let [orgs (drv/react s :orgs)
@@ -43,10 +46,9 @@
                                   :show-dropdown-caret orgs-dropdown-visible})
          :on-click (fn [e]
                      (utils/event-stop e)
-                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                      (when should-show-dropdown?
                        (dis/dispatch! [:input [:orgs-dropdown-visible] (not orgs-dropdown-visible)])))}
-        (org-avatar org-data (not should-show-dropdown?) :always true)]
+        (org-avatar org-data (not should-show-dropdown?) :always)]
       (when orgs-dropdown-visible
         [:div.orgs-dropdown-container
           [:div.triangle]

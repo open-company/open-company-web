@@ -128,7 +128,7 @@
                                        (na/show-notification {:title "Video is uploading."
                                                               :description (str "Progress: " (filesize a :binary false :format "%.2f") " of " (filesize b :binary false :format "%.2f") ".")
                                                               :id :ziggeo-video-upload
-                                                              :expire 5}))))
+                                                              :expire 3}))))
                                    (.on recorder-instance "recording"
                                     (fn []
                                      (timbre/debug "recording")
@@ -142,7 +142,7 @@
                                        (na/show-notification {:title "Video is processing."
                                                               :description (str "Progress: " (int (* a 100)) "%.")
                                                               :id :ziggeo-video-processing
-                                                              :expire 5}))))
+                                                              :expire 3}))))
                                    (.on recorder-instance "error"
                                     (fn []
                                      (timbre/debug "error")
@@ -152,7 +152,7 @@
                                      (na/show-notification {:title "Error processing your video."
                                                             :description "An error occurred while processing your video, please try again."
                                                             :id :ziggeo-video-error
-                                                            :expire 10})
+                                                            :expire 3})
                                      (when (fn? cancel-cb)
                                        (cancel-cb (.get recorder-instance "video")))))
                                    (.on recorder-instance "pick_cover_start"
@@ -179,7 +179,7 @@
                                      (reset! (::uploading s) false)
                                      (na/show-notification {:title "Video is processing and will be available soon"
                                                             :id :ziggeo-video-processed
-                                                            :expire 5})
+                                                            :expire 3})
                                      (when (fn? submit-cb)
                                       (submit-cb (.get recorder-instance "video") (not @(::mounted s))))))))
                                s)} 
