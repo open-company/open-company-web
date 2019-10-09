@@ -764,7 +764,8 @@ div.cmail-outer {
       button.remove-follow-up-button {
         position: absolute;
         right: 16px;
-        top: 4px;
+        top: 50%;
+        transform: translateY(-50%);
         width: auto;
         height: 24px;
         padding: 0;
