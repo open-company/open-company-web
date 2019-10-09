@@ -105,10 +105,14 @@ div.post-to-button {
     background-color: $carrot_green;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
+    padding: 0;
+    margin: 0;
 
     button.post-to-arrows {
       width: 26px;
       height: 32px;
+      padding: 0;
+      margin: 0;
       background-image: cdnUrl("/img/ML/select_arrows_white.svg");
       background-size: 8px 10px;
       background-repeat: no-repeat;
