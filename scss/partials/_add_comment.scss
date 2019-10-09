@@ -130,7 +130,6 @@ div.add-comment-box-container {
           float: right;
           width: 32px;
           height: 32px;
-          margin-left: 16px;
 
           button.emoji-button {
             width: 32px;
@@ -209,7 +208,17 @@ div.add-comment-box-container {
           color: $deep_navy;
           padding: 0 0 0 24px;
           position: relative;
-          margin-top: 5px;
+          margin: 5px 32px 0 0;
+
+          &:after {
+            content: "";
+            background-color: rgba($deep_navy, 0.15);
+            width: 1px;
+            height: 32px;
+            position: absolute;
+            top: -5px;
+            right: -16px;
+          }
 
           div.carrot-checkbox {
             position: absolute;
@@ -218,10 +227,18 @@ div.add-comment-box-container {
           }
 
           &.unselected {
-            opacity: 0.5;
+            color: rgba($deep_navy, 0.5);
+
+            div.carrot-checkbox {
+              opacity: 0.5;
+            }
 
             &:hover {
-              opacity: 1;
+              color: $deep_navy;
+
+              div.carrot-checkbox {
+                opacity: 0.5;
+              }
             }
           }
 
