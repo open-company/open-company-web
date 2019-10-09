@@ -346,10 +346,6 @@ div.cmail-outer {
               max-height: initial;
               min-height: calc(100vh - 354px);
             }
-
-            @include mobile() {
-              @include activity-body(18, 26, $deep_navy);
-            }
           }
         }
       }
