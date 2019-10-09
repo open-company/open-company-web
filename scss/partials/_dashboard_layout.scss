@@ -104,6 +104,10 @@ div.dashboard-layout {
           }
         }
 
+        &.ios button {
+          top: -4px;
+        }
+
         button {
           width: 33.3%;
           height: 24px;
@@ -112,6 +116,7 @@ div.dashboard-layout {
           background-position: center;
           background-repeat: no-repeat;
           opacity: 0.5;
+          position: relative;
 
           &.active {
             opacity: 1;

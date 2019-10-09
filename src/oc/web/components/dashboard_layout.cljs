@@ -136,7 +136,9 @@
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
-                                        :ios-tabbar no-phisical-home-button})}
+                                        :ios-tabbar no-phisical-home-button
+                                        :ios (and (not no-phisical-home-button)
+                                                  ua/ios?)})}
               [:button.mlb-reset.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
