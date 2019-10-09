@@ -43,6 +43,10 @@ div.post-to-button {
       border-top-left-radius: 4px;
       border-bottom-left-radius: 4px;
       opacity: 1;
+
+      @include mobile() {
+        max-width: 38vw;
+      }
     }
 
     &.force-show-tooltip div.post-bt-tooltip {
