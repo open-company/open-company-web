@@ -1,8 +1,25 @@
-div.org-settings div.org-settings-inner {
+div.org-settings-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 200};
+}
+
+div.org-settings-panel {
   div.org-settings-billing {
+    width: 640px;
+    margin: 100px auto;
+    background-color: white;
+    border-radius: 4px;
+    padding: 16px;
+    border: 1px solid rgba($deep_navy, 0.15);
+
     div.plan-summary {
       div.plan-summary-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         line-height: 22px;
         color: $deep_navy;
@@ -19,7 +36,7 @@ div.org-settings div.org-settings-inner {
           float: left;
           width: 149px;
           padding-right: 16px;
-          @include avenir_R();
+          @include OC_Body_Book();
           font-size: 14px;
           color: $deep_navy;
           opacity: 0.5;
@@ -30,13 +47,13 @@ div.org-settings div.org-settings-inner {
           width: calc(100% - 149px);
 
           div.plan-details-label {
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 14px;
             line-height: 19px;
             max-width: 300px;
             float: left;
             strong {
-              @include avenir_H();
+              @include OC_Body_Bold();
             }
           }
 
@@ -50,7 +67,7 @@ div.org-settings div.org-settings-inner {
               margin: 0;
               text-align: right;
               height: 19px;
-              @include avenir_R();
+              @include OC_Body_Book();
               font-size: 14px;
               line-height: 19px;
               color: $carrot_green;
@@ -59,7 +76,7 @@ div.org-settings div.org-settings-inner {
 
           div.plan-details-description {
             margin-top: 16px;
-            @include avenir_R();
+            @include OC_Body_Book();
             font-size: 14px;
             line-height: 19px;
           }
@@ -70,7 +87,7 @@ div.org-settings div.org-settings-inner {
         width: 100%;
         padding: 16px 38px;
         background-color: $opac_yellow;
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
         line-height: 19px;
@@ -79,11 +96,11 @@ div.org-settings div.org-settings-inner {
         border-radius: 4px;
 
         strong {
-          @include avenir_H();
+          @include OC_Body_Bold();
         }
 
         button.upgrade-plan-bt {
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           color: $carrot_green;
           padding: 0;
@@ -100,7 +117,7 @@ div.org-settings div.org-settings-inner {
       position: relative;
 
       div.plan-change-title {
-        @include avenir_H();
+        @include OC_Body_Bold();
         font-size: 16px;
         line-height: 22px;
         color: $deep_navy;
@@ -112,7 +129,7 @@ div.org-settings div.org-settings-inner {
         width: 100%;
         padding: 10px 13px 8px;
         height: 40px;
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
         line-height: 22px;
@@ -157,7 +174,7 @@ div.org-settings div.org-settings-inner {
               margin: 0;
 
               span.dropdown-list-item-label {
-                @include avenir_R();
+                @include OC_Body_Book();
                 font-size: 14px;
                 color: $deep_navy;
                 line-height: 22px;
@@ -179,7 +196,7 @@ div.org-settings div.org-settings-inner {
         margin-top: 16px;
 
         div.plan-change-description-title {
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 12px;
           color: $deep_navy;
         }
@@ -193,13 +210,13 @@ div.org-settings div.org-settings-inner {
             list-style-type: disc;
 
             li {
-              @include avenir_R();
+              @include OC_Body_Book();
               font-size: 14px;
               color: $deep_navy;
               padding-left: 9px;
 
               strong {
-                @include avenir_H();
+                @include OC_Body_Bold();
               }
             }
           }
@@ -210,15 +227,15 @@ div.org-settings div.org-settings-inner {
         margin-top: 24px;
         text-align: center;
         padding: 16px;
-        @include avenir_R();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
         border-radius: 4px;
         background-color: #F9F9F9;
 
-        button.change-contact-bt {
+        a.change-contact-bt {
           color: $carrot_green;
-          @include avenir_H();
+          @include OC_Body_Bold();
           font-size: 14px;
           padding: 0;
           margin: 0;

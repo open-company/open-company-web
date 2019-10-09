@@ -109,8 +109,9 @@
             [:li [:strong "Please upgrade to continue using Carrot"]]]]]
       [:div.plan-change-green-alert
         "Looking for the Enterprise plan? "
-        [:button.mlb-reset.change-contact-bt
-          {:on-click #(chat/chat-click 43235)}
+        [:a.change-contact-bt
+          {:class "intercom-chat-link"
+           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
           "Contact us"]
         " to learn more."]]))
 

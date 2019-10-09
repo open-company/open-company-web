@@ -18,6 +18,7 @@
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
@@ -40,6 +41,7 @@
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
+            [oc.web.components.ui.org-settings-billing-panel :refer (org-settings-billing-panel)]
             [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
 (defn- init-whats-new []
@@ -166,6 +168,8 @@
           ;; Activity not found
           show-login-wall
           (login-wall)
+          (= open-panel :billing)
+          (org-settings-billing-panel org-data #(nav-actions/close-all-panels))
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)
