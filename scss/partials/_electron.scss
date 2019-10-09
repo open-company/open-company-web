@@ -15,6 +15,10 @@ body.electron {
     div.fullscreen-bt-container {
       left: 108px !important;
     }
+
+    div.expanded-post div.expanded-post-header button.back-to-board {
+      margin-left: 60px;
+    }
   }
 
   &.win-electron {
