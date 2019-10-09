@@ -101,34 +101,38 @@ div.more-menu {
     }
   }
 
-  button.more-menu-create-follow-up-bt {
+  div.more-menu-create-follow-up-bt-container {
     height: 26px;
     width: 24px;
-    display: inline;
-    background-image: cdnUrl("/img/ML/follow_up_add.svg");
-    background-size: 16px 16px;
-    background-position: center;
-    padding: 0;
-    background-repeat: no-repeat;
-    opacity: 0.5;
     margin-left: 8px;
     display: inline-block;
 
-    @include mobile() {
-      width: 32px;
-      height: 32px;
-      background-color: $ultra_light_grey;
-      border-radius: 4px;
-      background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-      background-size: 13px 16px;
-      opacity: 1;
-    }
-
-    &:hover, &:active, &:focus {
-      opacity: 1;
+    button.more-menu-create-follow-up-bt {
+      height: 26px;
+      width: 24px;
+      background-image: cdnUrl("/img/ML/follow_up_add.svg");
+      background-size: 16px 16px;
+      background-position: center;
+      padding: 0;
+      background-repeat: no-repeat;
+      opacity: 0.5;
 
       @include mobile() {
-        opacity: 0.9;
+        width: 32px;
+        height: 32px;
+        background-color: $ultra_light_grey;
+        border-radius: 4px;
+        background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+        background-size: 13px 16px;
+        opacity: 1;
+      }
+
+      &:hover, &:active, &:focus {
+        opacity: 1;
+
+        @include mobile() {
+          opacity: 0.9;
+        }
       }
     }
   }
