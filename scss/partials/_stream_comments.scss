@@ -279,7 +279,7 @@ div.stream-comments {
             float: left;
             @include OC_Body_Book();
             font-size: 12px;
-            line-height: 15px;
+            line-height: 24px;
             color: $deep_navy;
 
             @include big_web() {

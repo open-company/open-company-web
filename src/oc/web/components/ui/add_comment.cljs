@@ -248,14 +248,7 @@
                               (send-clicked e s))))
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
-          [:div.add-comment-footer
-            [:button.mlb-reset.send-btn
-              {:on-click #(when-not @(::add-button-disabled s)
-                            (send-clicked % s))
-               :disabled @(::add-button-disabled s)}
-              (if edit-comment-data
-                "Save"
-                "Comment")]
+          [:div.add-comment-footer.group
             (when (and edit-comment-data
                        (fn? dismiss-reply-cb))
               [:button.mlb-reset.close-reply-bt
@@ -275,7 +268,17 @@
                               (dismiss-reply-cb true)))
                  :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
                  :data-placement "top"
+                 :data-container "body"
                  :title (if edit-comment-data "Cancel edit" "Close")}])
+            [:button.mlb-reset.send-btn
+              {:on-click #(when-not @(::add-button-disabled s)
+                            (send-clicked % s))
+               :disabled @(::add-button-disabled s)}
+              (if edit-comment-data
+                "Save"
+                (if dismiss-reply-cb
+                  "Reply"
+                  "Comment"))]
             (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
                            :width (if (responsive/is-mobile-size?) 24 32)
                            :height (if (responsive/is-mobile-size?) 24 32)

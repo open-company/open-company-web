@@ -64,9 +64,12 @@ div.add-comment-box-container {
         cursor: auto;
         margin: 0;
         height: auto;
-        min-height: 24px;
+        min-height: 48px;
         outline: none;
 
+        @include mobile(){
+          min-height: 32px;
+        }
 
         &.medium-editor-placeholder-hidden:after {
           display: none !important;
@@ -80,7 +83,8 @@ div.add-comment-box-container {
       }
 
       div.add-comment-footer {
-        margin-top: 40px;
+        height: 32px;
+        margin-top: 16px;
         width: 100%;
 
         div.upload-progress {
@@ -104,15 +108,14 @@ div.add-comment-box-container {
           width: 32px;
           height: 32px;
           opacity: 1;
-          background-image: cdnUrl("/img/ML/cmail_delete.svg");
-          background-size: 14px 16px;
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+          background-size: 12px 12px;
           background-color: rgba($deep_navy, 0.1);
           border-radius: 4px;
           background-position: center;
           background-repeat: no-repeat;
           padding: 0;
-          float: right;
-          margin-left: 12px;
+          float: left;
 
           &:hover {
             background-color: rgba($deep_navy, 0.2);
@@ -127,7 +130,7 @@ div.add-comment-box-container {
           float: right;
           width: 32px;
           height: 32px;
-          margin-left: 8px;
+          margin-left: 16px;
 
           button.emoji-button {
             width: 32px;
@@ -164,14 +167,13 @@ div.add-comment-box-container {
           float: right;
           height: 32px;
           padding: 7px 16px;
-          margin: 0 0 0 14px;
+          margin: 0 0 0 32px;
           background-color: $carrot_green;
           color: white;
           @include OC_Body_Bold();
           font-size: 14px;
           line-height: 18px;
           border-radius: 4px;
-          margin-left: 32px;
           position: relative;
 
           &:before {
