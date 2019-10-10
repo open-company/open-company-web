@@ -260,7 +260,7 @@
     (>= fixed-top-position (/ win-height 2))))
 
 (rum/defc wrt-count < rum/static
-  [{:keys [activity-data reads-data hide-label?]}]
+  [{:keys [activity-data reads-data]}]
   (let [item-id (:uuid activity-data)
         reads-count (:count reads-data)]
     [:div.wrt-count-container
@@ -270,8 +270,5 @@
          :class (when (pos? (count (:reads reads-data))) "has-read-list")}
         (if reads-count
           (str reads-count
-           (when-not hide-label?
-             (str " viewer" (when (not= reads-count 1) "s"))))
-          (if-not hide-label?
-            "0 viewers"
-            "0"))]]))
+           " viewer" (when (not= reads-count 1) "s"))
+          "0 viewers")]]))

@@ -65,25 +65,29 @@
                      (routing-actions/open-post-modal entry-data true)
                      (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
-        [:div.is-comments-authors.group
-          {:style {:width (str face-pile-width "px")}
-           :class (when (> (count faces-to-render) 1) "show-border")}
-          (for [user-data faces-to-render]
-            [:div.is-comments-author
-              {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-              (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
-        ; Comments count
-        [:div.is-comments-summary
-          {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))})}
-          (if (pos? comments-count)
-            [:div.group
-              (str comments-count
-               (when-not hide-label?
-                (str " comment" (when (not= comments-count 1) "s"))))
-              (when show-new-tag?
-                [:div.new-comments-tag
-                  "(NEW)"])]
-            [:span.add-a-comment
+        (when-not (and hide-label?
+                       (zero? comments-count))
+          [:div.is-comments-authors.group
+            {:style {:width (str face-pile-width "px")}
+             :class (when (> (count faces-to-render) 1) "show-border")}
+            (for [user-data faces-to-render]
+              [:div.is-comments-author
+                {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
+                (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])])
+        (when-not (and hide-label?
+                       (zero? comments-count))
+          ; Comments count
+          [:div.is-comments-summary
+            {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
+                                      :add-a-comment (not (pos? comments-count))})}
+            (if (pos? comments-count)
+              [:div.group
+                (str comments-count
+                 (when-not hide-label?
+                  (str " comment" (when (not= comments-count 1) "s"))))
+                (when show-new-tag?
+                  [:div.new-comments-tag
+                    "(NEW)"])]
               (when-not hide-label?
-                "Add a comment")])]])))
+                [:span.add-a-comment
+                  "Add a comment"]))])])))

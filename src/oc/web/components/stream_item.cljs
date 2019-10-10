@@ -224,7 +224,8 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              (reactions activity-data)
+              (reactions {:entity-data activity-data
+                          :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
                 [:div.stream-item-comments-summary
                   ; {:on-click #(expand s true true)}
@@ -247,15 +248,16 @@
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
-                                :reads-data read-data
-                                :hide-label? mobile-hide-labels?})])
-                (when (seq activity-attachments)
+                                :reads-data read-data})])
+                (when (and (seq activity-attachments)
+                           ;; Show attachments on FoC on mobile only if there are no reactions
+                           (or (not is-mobile?)
+                               (seq (:reactions activity-data))))
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
                     [:div.stream-item-attachments-count
                       (str (count activity-attachments)
-                       (when-not mobile-hide-labels?
-                          (str " attachment" (when (> (count activity-attachments) 1) "s"))))]
+                       " attachment" (when (> (count activity-attachments) 1) "s"))]
                     [:div.stream-item-attachments-list
                       (for [atc activity-attachments]
                         [:a.stream-item-attachments-item

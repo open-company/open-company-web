@@ -182,9 +182,9 @@
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?
       ;   [:div.expanded-post-mobile-reactions
-      ;     (reactions activity-data)])
+      ;     (reactions {:entity-data activity-data})])
       [:div.expanded-post-footer.group
-        (reactions activity-data)
+        (reactions {:entity-data activity-data})
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data})
