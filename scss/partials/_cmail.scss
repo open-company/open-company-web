@@ -703,6 +703,15 @@ div.cmail-outer {
 
         @include mobile() {
           margin-top: 0;
+          height: unset;
+          min-height: 32px;
+          position: fixed;
+          top: #{$mobile_navbar_height}px;
+          left: 0;
+          width: 100vw;
+          margin: 0;
+          border-radius: 0;
+          padding: 7px 32px;
         }
       }
     }
@@ -782,8 +791,8 @@ div.cmail-outer {
         @include mobile() {
           display: block;
           position: absolute;
-          right: 16px;
-          top: 16px;
+          right: 4px;
+          top: 4px;
 
           button.mobile-follow-ups-remove-menu {
             width: 24px;
