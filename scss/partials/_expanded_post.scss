@@ -272,7 +272,7 @@ div.expanded-post {
 
   div.expanded-post-headline {
     @include activity-title(26px, 33px);
-    margin-top: 16px;
+    margin-top: 40px;
 
     @include mobile() {
       @include activity-title(22px, 28px);
