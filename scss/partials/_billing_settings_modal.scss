@@ -281,12 +281,13 @@ div.billing-settings-modal {
 
         div.plan-change-green-alert {
           margin-top: 24px;
+          width: calc(100% + 48px);
+          margin-left: -24px;
+          padding: 16px;         
           text-align: center;
-          padding: 16px;
           @include OC_Body_Book();
           font-size: 14px;
           color: $deep_navy;
-          border-radius: 4px;
           background-color: #F9F9F9;
 
           a.change-contact-bt {
