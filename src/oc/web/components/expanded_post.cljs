@@ -72,6 +72,7 @@
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
+  (rum/local nil ::activity-uuid)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
@@ -80,7 +81,9 @@
     s)
    :did-mount (fn [s]
     (save-fixed-comment-height! s)
-    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
+    (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
+      (activity-actions/send-item-read activity-uuid)
+      (reset! (::activity-uuid s) activity-uuid))
     (load-comments s true)
     s)
    :did-remount (fn [_ s]
@@ -88,7 +91,7 @@
     (save-initial-last-read-at s)
     s)
    :will-unmount (fn [s]
-    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
+    (activity-actions/send-item-read @(::activity-uuid s))
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
