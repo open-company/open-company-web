@@ -10,6 +10,7 @@
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
             [oc.web.lib.whats-new :as whats-new]
