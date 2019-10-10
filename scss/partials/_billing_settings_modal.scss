@@ -172,43 +172,36 @@ div.billing-settings-modal {
       div.plan-change {
         position: relative;
 
-        div.plan-change-title {
-          @include OC_Body_Bold();
-          font-size: 16px;
-          line-height: 22px;
-          color: $deep_navy;
-          height: 30px;
-          padding-bottom: 8px;
-        }
-
         button.plans-dropdown-bt {
           width: 100%;
-          padding: 10px 13px 8px;
-          min-height: 40px;
+          padding: 7px 8px;
+          height: 32px;
           @include OC_Body_Book();
           font-size: 14px;
           color: $deep_navy;
           line-height: 22px;
           margin: 0;
           text-align: left;
-          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          background-color: rgba($deep_navy, 0.2);
           border-radius: 4px;
           position: relative;
+          opacity: 1;
 
           &:after {
             color: $deep_navy;
-            font-size: 23px;
-            font-family: "Material Design Icons";
-            content: "\F35D";
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            width: 8px;
+            height: 10px;
+            content: "";
             position: absolute;
-            top: 8px;
             right: 8px;
+            top: 11px;
           }
         }
 
         div.dropdown-list-container {
           width: 100%;
-          top: 20px;
+          top: 34px;
           left: 0;
 
           div.triangle {
@@ -220,6 +213,8 @@ div.billing-settings-modal {
             padding: 0;
             border: 1px solid $carrot_light_gray_1;
             border-radius: 4px;
+            margin: 0;
+            padding: 8px 0;
 
             ul.dropdown-list {
               border: none;
@@ -228,6 +223,24 @@ div.billing-settings-modal {
               li.dropdown-list-item {
                 padding: 4px 13px;
                 margin: 0;
+                border-radius: 0;
+
+                &.select {
+                  background-color: #ebf8f1;
+                  span.dropdown-list-item-label {
+                    color: $carrot_green;
+                  }
+                }
+
+                @include big_web() {
+                  &.select {
+                    background-color: #ebf8f1;
+                    span.dropdown-list-item-label {
+                      color: $carrot_green;
+                      text-decoration: none;
+                    }
+                  }
+                }
 
                 span.dropdown-list-item-label {
                   @include OC_Body_Book();
@@ -236,12 +249,7 @@ div.billing-settings-modal {
                   line-height: 22px;
                   opacity: 1;
                   padding: 0;
-
-                  @include big_web(){
-                    &:hover {
-                      text-decoration: underline;
-                    }
-                  }
+                  text-decoration: none;
                 }
               }
             }
@@ -276,26 +284,6 @@ div.billing-settings-modal {
                 }
               }
             }
-          }
-        }
-
-        div.plan-change-green-alert {
-          margin-top: 24px;
-          width: calc(100% + 48px);
-          margin-left: -24px;
-          padding: 16px;         
-          text-align: center;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: $deep_navy;
-          background-color: #F9F9F9;
-
-          a.change-contact-bt {
-            color: $carrot_green;
-            @include OC_Body_Bold();
-            font-size: 14px;
-            padding: 0;
-            margin: 0;
           }
         }
       }

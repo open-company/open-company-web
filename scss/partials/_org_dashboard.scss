@@ -34,6 +34,12 @@ div.org-dashboard {
       top: #{$navbar_height * 2}px;
       height: calc(100vh - #{($navbar_height * 2) + 1}px);
     }
+
+    @include big_web() {
+      div.org-dashboard-inner {
+        padding-top: 0;
+      }
+    }
   }
 
   &.expanded-activity div.page {

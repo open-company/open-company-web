@@ -19,9 +19,7 @@
                             (user-count team-data)
                             " currently on your team."
                             [:br]
-                            "Free plans cover up 10 users."]}
-        exceeded-users-alert (:exceeded-users team-data)
-        upgrade-plan-alert (or true (:upgrade-plan team-data))]
+                            "Free plans cover up 10 users."]}]
     [:div.plan-summary
       [:div.plan-summary-title
         "Billing summary"]
@@ -38,82 +36,37 @@
               {:on-click #(reset! (::billing-tab s) :change)}
               "Change plan"]]
           [:div.plan-details-description.group
-            (:alert plan-data)]]]
-      (cond
-        exceeded-users-alert
-        [:div.plan-summary-alert
-          "You've outgrown the Free plan. Please "
-          [:button.mlb-reset.upgrade-plan-bt
-            {:on-click #(reset! (::billing-tab s) :change)}
-            "upgrade"]
-          " to continue using Carrot."]
-        upgrade-plan-alert
-        [:div.plan-summary-alert
-          "Your free plan is missing "
-          [:a {:href "/pricing" :target "_blank"}
-            "some features"]
-          " that may be important to you."
-          [:br]
-          [:button.mlb-reset.upgrade-plan-bt
-            {:on-click #(reset! (::billing-tab s) :change)}
-            "Upgrade"]
-          " your plan for more features."])]))
+            (:alert plan-data)]]]]))
 
-(defn- plan-description [plan current-plan]
+(defn- plan-description [plan]
   (case plan
-    "free"
-    (str
-     (when (not= current-plan "free")
-       "Switch to ")
-     "Free plan (free up to 10 users, 6 months history)")
     "team-monthly"
-    (str
-     (when (not= current-plan "team-monthly")
-       "Switch to ")
-     "Team plan (billed monthly)")
-    "team-annually"
-    (str
-     (when (not= current-plan "team-annually")
-       "Switch to ")
-     "Team plan (billed annually, 20% discount)")))
+    "Monthly plan"
+    "team-annual"
+    "Annual plan (save 20%)"
+    "Trial"))
 
 (defn plan-change [s team-data]
   (let [current-plan (::billing-plan s)]
     [:div.plan-change
-      [:div.plan-change-title
-        "Change your plan"]
       [:button.mlb-reset.plans-dropdown-bt
         {:on-click #(reset! (::show-plans-dropdown s) true)}
-        (plan-description @current-plan @current-plan)]
+        (plan-description @current-plan)]
       (when @(::show-plans-dropdown s)
-        (dropdown-list {:items [{:value "free"
-                                 :label (plan-description "free" @current-plan)
-                                 :disabled false ;; Disable in case the team has more then 10 users
-                                }
-                                {:value "team-monthly"
-                                 :label (plan-description "team-monthly" @current-plan)}
-                                {:value "team-annually"
-                                 :label (plan-description "team-annually" @current-plan)}]
-                        :value (:plan team-data)
+        (dropdown-list {:items [{:value "team-monthly"
+                                 :label (plan-description "team-monthly")}
+                                {:value "team-annual"
+                                 :label (plan-description "team-annual")}]
+                        :value @current-plan
                         :on-blur #(reset! (::show-plans-dropdown s) false)
                         :on-change (fn [selected-item]
                                      (reset! (::show-plans-dropdown s) false)
                                      (reset! current-plan (:value selected-item)))}))
       [:div.plan-change-description
-        [:div.plan-change-description-title
-          "Your current plan"]
-        [:div.plan-change-description-list
-          [:ul
-            [:li [:strong "12 users"] " are currently on your team"]
-            [:li "Free plans cover up to 10 users"]
-            [:li [:strong "Please upgrade to continue using Carrot"]]]]]
-      [:div.plan-change-green-alert
-        "Looking for the Enterprise plan? "
-        [:a.change-contact-bt
-          {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-          "Contact us"]
-        " to learn more."]]))
+        (str
+         "For your team of 25 people, your plan will cost $1,200 annually "
+         "(25 people x $4 x 12 months). An annual plan saves you $300 per year.")]
+      ]))
 
 (rum/defcs billing-settings-modal <
   ;; Mixins
