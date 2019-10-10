@@ -156,7 +156,8 @@
                                 (router/current-activity-id)
                                 current-activity-data
                                 (not (:fullscreen cmail-state)))
-        show-trial-expired? false]
+        show-trial-expired? (and ls/billing-enabled
+                                 false)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
