@@ -60,7 +60,7 @@
                            (calc-video-height s)
                            s)}
   [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+  (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -90,7 +90,10 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        ]
+        ;; Hide lables on FoC on mobile if there are at least 3 reactions or if there is at least one attachment
+        mobile-hide-labels? (and is-mobile?
+                                 (or (> (count (:reactions activity-data)) 3)
+                                     (seq activity-attachments)))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -227,7 +230,8 @@
                   ; {:on-click #(expand s true true)}
                   (comments-summary {:entry-data activity-data
                                      :comments-data comments-data
-                                     :show-new-tag? has-new-comments?})]
+                                     :show-new-tag? has-new-comments?
+                                     :hide-label? mobile-hide-labels?})]
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
@@ -243,12 +247,15 @@
                     ;       {:on-click #(nux-actions/dismiss-post-added-tooltip)}
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
-                                :reads-data read-data})])
+                                :reads-data read-data
+                                :hide-label? mobile-hide-labels?})])
                 (when (seq activity-attachments)
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
                     [:div.stream-item-attachments-count
-                      (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
+                      (str (count activity-attachments)
+                       (when-not mobile-hide-labels?
+                          (str " attachment" (when (> (count activity-attachments) 1) "s"))))]
                     [:div.stream-item-attachments-list
                       (for [atc activity-attachments]
                         [:a.stream-item-attachments-item

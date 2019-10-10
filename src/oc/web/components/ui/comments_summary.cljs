@@ -35,7 +35,8 @@
 (rum/defc comments-summary < rum/static
   [{:keys [entry-data
            comments-data
-           show-new-tag?]}]
+           show-new-tag?
+           hide-label?]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -77,9 +78,12 @@
                                     :add-a-comment (not (pos? comments-count))})}
           (if (pos? comments-count)
             [:div.group
-              (str comments-count " comment" (when (not= comments-count 1) "s"))
+              (str comments-count
+               (when-not hide-label?
+                (str " comment" (when (not= comments-count 1) "s"))))
               (when show-new-tag?
                 [:div.new-comments-tag
                   "(NEW)"])]
             [:span.add-a-comment
-              "Add a comment"])]])))
+              (when-not hide-label?
+                "Add a comment")])]])))
