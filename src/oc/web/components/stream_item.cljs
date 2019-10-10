@@ -226,12 +226,14 @@
               (reactions {:entity-data activity-data
                           :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
-                [:div.stream-item-comments-summary
-                  ; {:on-click #(expand s true true)}
-                  (comments-summary {:entry-data activity-data
-                                     :comments-data comments-data
-                                     :show-new-tag? has-new-comments?
-                                     :hide-label? mobile-hide-labels?})]
+                (when-not (and mobile-hide-labels?
+                               (zero? (count (:sorted-comments comments-data))))
+                  [:div.stream-item-comments-summary
+                    ; {:on-click #(expand s true true)}
+                    (comments-summary {:entry-data activity-data
+                                       :comments-data comments-data
+                                       :show-new-tag? has-new-comments?
+                                       :hide-label? mobile-hide-labels?})])
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
