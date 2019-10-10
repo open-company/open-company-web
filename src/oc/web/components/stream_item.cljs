@@ -166,7 +166,6 @@
                     (utils/foc-date-time t)])]]
             [:div.must-see-tag]
             [:div.follow-up-tag-small.mobile-only]
-            [:div.must-see-tag]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
         (when (and is-published?
