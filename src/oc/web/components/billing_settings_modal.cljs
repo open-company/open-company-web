@@ -1,10 +1,10 @@
-(ns oc.web.components.ui.org-settings-billing-panel
+(ns oc.web.components.billing-settings-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.lib.utils :as utils]
-            [goog.object :as gobj]
-            [goog.dom :as gdom]))
+            [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.dropdown-list :refer (dropdown-list)]))
 
 (defn- user-count [team-data]
   (let [user-count (count (:users team-data))]
@@ -115,26 +115,35 @@
           "Contact us"]
         " to learn more."]]))
 
-(rum/defcs org-settings-billing-panel
-  < rum/reactive
-    (drv/drv :team-data)
-    (rum/local :summary ::billing-tab)
-    (rum/local "free" ::billing-plan)
-    (rum/local false ::show-plans-dropdown)
-  [s org-data dismiss-settings-cb]
+(rum/defcs billing-settings-modal <
+  ;; Mixins
+  rum/reactive
+  (drv/drv :team-data)
+  ui-mixins/refresh-tooltips-mixin
+  ;; Locals
+  (rum/local :summary ::billing-tab)
+  (rum/local "free" ::billing-plan)
+  (rum/local false ::show-plans-dropdown)
+  [s {:keys [org-data]}]
   (let [team-data (drv/react s :team-data)]
-    [:div.org-settings-panel
-      {:on-click dismiss-settings-cb}
-      ;; Panel rows
-      [:div.org-settings-billing
-        {:on-click #(utils/event-stop %)}
-        (case @(::billing-tab s)
-          :summary
-          (plan-summary s team-data)
-          :change
-          (plan-change s team-data)
-          [:div.error
-            "An error occurred! Please try again"])]
-      ;; Save and cancel buttons
-      ; [:div.org-settings-footer.group]
-      ]))
+    [:div.billing-settings-modal
+      [:button.mlb-reset.modal-close-bt
+        {:on-click #(nav-actions/close-all-panels)}]
+      [:div.billing-settings-modal-container
+        [:div.billing-settings-header
+          [:div.billing-settings-header-title
+            "Billing"]
+          [:button.mlb-reset.save-bt
+            {:on-click #(reset! (::billing-tab s) :change)}
+            "Change plan"]
+          [:button.mlb-reset.cancel-bt
+            {:on-click #(nav-actions/show-org-settings nil)}
+            "Back"]]
+        [:div.billing-settings-body
+          (case @(::billing-tab s)
+            :summary
+            (plan-summary s team-data)
+            :change
+            (plan-change s team-data)
+            [:div.error
+              "An error occurred! Please try again"])]]]))

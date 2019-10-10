@@ -1,0 +1,303 @@
+div.billing-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.billing-settings-modal-container {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    div.billing-settings-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      div.billing-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        margin-right: 8px;
+        float: right;
+      }
+      
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        background-color: $carrot_green;
+        border-radius: 4px;
+        color: white;
+        line-height: 18px;
+        float: right;
+      }
+    }
+
+    div.billing-settings-body {
+      margin-top: 24px;
+
+      div.plan-summary {
+        div.plan-summary-title {
+          @include OC_Body_Bold();
+          font-size: 16px;
+          line-height: 22px;
+          color: $deep_navy;
+          height: 30px;
+        }
+
+        div.plan-summary-details {
+          margin-top: 8px;
+          padding-top: 16px;
+          border-top: 1px solid $ultra_light_grey;
+          margin-bottom: 8px;
+
+          div.plan-details-left {
+            float: left;
+            width: 149px;
+            padding-right: 16px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $deep_navy;
+            opacity: 0.5;
+          }
+
+          div.plan-details-right {
+            float: right;
+            width: calc(100% - 149px);
+
+            div.plan-details-label {
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 19px;
+              max-width: 300px;
+              float: left;
+              strong {
+                @include OC_Body_Bold();
+              }
+            }
+
+            div.plan-details-plan {
+              padding-bottom: 16px;
+              border-bottom: 1px solid $ultra_light_grey;
+
+              button.change-plan-bt {
+                float: right;
+                padding: 0;
+                margin: 0;
+                text-align: right;
+                height: 19px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 19px;
+                color: $carrot_green;
+              }
+            }
+
+            div.plan-details-description {
+              margin-top: 16px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 19px;
+            }
+          }
+        }
+
+        div.plan-summary-alert {
+          width: calc(100% + 48px);
+          margin-left: -24px;
+          padding: 16px;
+          background-color: $opac_yellow;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 19px;
+          margin-top: 24px;
+          text-align: center;
+
+          strong {
+            @include OC_Body_Bold();
+          }
+
+          button.upgrade-plan-bt {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            color: $carrot_green;
+            padding: 0;
+            margin: 0;
+          }
+
+          a {
+            color: $carrot_green;
+          }
+        }
+      }
+
+      div.plan-change {
+        position: relative;
+
+        div.plan-change-title {
+          @include OC_Body_Bold();
+          font-size: 16px;
+          line-height: 22px;
+          color: $deep_navy;
+          height: 30px;
+          padding-bottom: 8px;
+        }
+
+        button.plans-dropdown-bt {
+          width: 100%;
+          padding: 10px 13px 8px;
+          min-height: 40px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 22px;
+          margin: 0;
+          text-align: left;
+          border: 1px solid rgba($carrot_light_gray_1, 0.5);
+          border-radius: 4px;
+          position: relative;
+
+          &:after {
+            color: $deep_navy;
+            font-size: 23px;
+            font-family: "Material Design Icons";
+            content: "\F35D";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+          }
+        }
+
+        div.dropdown-list-container {
+          width: 100%;
+          top: 20px;
+          left: 0;
+
+          div.triangle {
+            display: none;
+          }
+
+          div.dropdown-list-content {
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+            padding: 0;
+            border: 1px solid $carrot_light_gray_1;
+            border-radius: 4px;
+
+            ul.dropdown-list {
+              border: none;
+              border-radius: 4px;
+
+              li.dropdown-list-item {
+                padding: 4px 13px;
+                margin: 0;
+
+                span.dropdown-list-item-label {
+                  @include OC_Body_Book();
+                  font-size: 14px;
+                  color: $deep_navy;
+                  line-height: 22px;
+                  opacity: 1;
+                  padding: 0;
+
+                  @include big_web(){
+                    &:hover {
+                      text-decoration: underline;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        div.plan-change-description {
+          margin-top: 16px;
+
+          div.plan-change-description-title {
+            @include OC_Body_Bold();
+            font-size: 12px;
+            color: $deep_navy;
+          }
+
+          div.plan-change-description-list {
+            margin-top: 8px;
+
+            ul {
+              padding: 0 0 0 27px;
+              margin: 0;
+              list-style-type: disc;
+
+              li {
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: $deep_navy;
+                padding-left: 9px;
+
+                strong {
+                  @include OC_Body_Bold();
+                }
+              }
+            }
+          }
+        }
+
+        div.plan-change-green-alert {
+          margin-top: 24px;
+          text-align: center;
+          padding: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          border-radius: 4px;
+          background-color: #F9F9F9;
+
+          a.change-contact-bt {
+            color: $carrot_green;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            padding: 0;
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}

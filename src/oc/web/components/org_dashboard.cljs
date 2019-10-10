@@ -40,11 +40,11 @@
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
+            [oc.web.components.billing-settings-modal :refer (billing-settings-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
             [oc.web.components.integrations-settings-modal :refer (integrations-settings-modal)]
-            [oc.web.components.ui.org-settings-billing-panel :refer (org-settings-billing-panel)]
             [oc.web.components.push-notifications-permission-modal :refer (push-notifications-permission-modal)]))
 
 (defn- init-whats-new []
@@ -180,7 +180,7 @@
           show-login-wall
           (login-wall)
           (= open-panel :billing)
-          (org-settings-billing-panel org-data #(nav-actions/close-all-panels))
+          (billing-settings-modal {:org-data org-data})
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)
