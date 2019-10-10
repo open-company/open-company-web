@@ -121,10 +121,6 @@ div.cmail-outer {
 
         div.close-bt-container {
 
-          button.close-bt {
-            background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
-          }
-
           .tooltip {
             margin-top: 0;
           }
@@ -1016,7 +1012,7 @@ div.cmail-outer {
         button.dismiss-inline-cmail {
           width: 32px;
           height: 32px;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
