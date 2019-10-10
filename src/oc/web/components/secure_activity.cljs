@@ -135,7 +135,7 @@
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
               (comments-summary activity-data)
-              (reactions activity-data)]
+              (reactions {:entity-data activity-data})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])

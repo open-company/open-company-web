@@ -420,7 +420,7 @@
   [js-date]
   (let [hours (.getHours js-date)
         minutes (add-zero (.getMinutes js-date))
-        ampm (if (>= hours 12) " p.m." " a.m.")
+        ampm (if (>= hours 12) " PM" " AM")
         hours (mod hours 12)
         hours (if (zero? hours) 12 hours)]
     (str hours ":" minutes ampm)))

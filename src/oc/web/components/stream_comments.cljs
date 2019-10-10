@@ -331,7 +331,9 @@
                       (when (and (not is-editing?)
                                  (seq (:reactions comment-data)))
                        [:div.stream-comment-reactions-footer.group
-                          (reactions comment-data (zero? (count (:reactions comment-data))) activity-data)])]]]
+                          (reactions {:entity-data comment-data
+                                      :hide-last-reaction (zero? (count (:reactions comment-data)))
+                                      :optional-activity-data activity-data})])]]]
               (when should-show-add-comment?
                 [:div.stream-comment
                   {:class (utils/class-set {:indented-comment true})}

@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
@@ -114,7 +115,8 @@
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
-        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)]
+        no-phisical-home-button (and ua/mobile-app?
+                                     (js/isiPhoneWithoutPhysicalHomeBt))]
       ;; Entries list
       [:div.dashboard-layout.group
         [:div.dashboard-layout-container.group
@@ -126,7 +128,9 @@
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
-                                        :ios-tabbar no-phisical-home-button})}
+                                        :ios-tabbar no-phisical-home-button
+                                        :ios (and (not no-phisical-home-button)
+                                                  ua/ios?)})}
               [:button.mlb-reset.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
