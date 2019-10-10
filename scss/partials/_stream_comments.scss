@@ -28,9 +28,17 @@ div.stream-comments {
       background-color: #FFF7DD;
       padding: 0 8px;
 
+      @include mobile() {
+        padding: 0 16px;        
+      }
+
       &:first-child div.stream-comment {
         border-top: 1px solid rgba($deep_navy, 0.15);
         padding-top: 16px;
+      }
+
+      &:last-child div.stream-comment div.stream-comment-inner {
+        padding: 8px 0 0;
       }
 
       div.stream-comment.indented-comment div.stream-comment-inner {
@@ -456,7 +464,7 @@ div.stream-comments {
       }
 
       div.stream-comment div.add-comment-box-container {
-        margin-top: 8px;
+        padding-top: 8px;
         margin-bottom: 8px;
 
         div.add-comment-box div.add-comment-internal div.add-comment {
@@ -474,12 +482,10 @@ div.stream-comments {
 
       div.stream-comment.indented-comment {
         div.add-comment-box-container {
-          margin-left: 32px;
-          margin-top: 8px;
-          margin-bottom: 8px;
+          margin-left: 40px;
 
           div.add-comment-box {
-            width: calc(100% - 32px);
+            width: calc(100% - 40px);
 
             div.add-comment-footer.hide-footer {
               display: none;
