@@ -412,14 +412,7 @@ div.cmail-outer {
       @include no-user-select();
 
       @include mobile() {
-        display: block;
-        width: 100%;
-        min-height: 56px;
-        height: auto;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        padding: 12px 16px;
-        background-color: white;
+        display: none;
       }
 
       &.has-follow-ups-button {
@@ -845,6 +838,7 @@ div.cmail-outer {
 
         @include mobile() {
           border-radius: 0;
+          padding-top: 0;
         }
       }
     }
