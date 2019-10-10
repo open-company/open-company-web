@@ -275,8 +275,8 @@
                   "Reply"
                   "Comment"))]
             (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
-                           :width (if (responsive/is-mobile-size?) 24 32)
-                           :height (if (responsive/is-mobile-size?) 24 32)
+                           :width 32
+                           :height 32
                            :position "top"
                            :default-field-selector (str "div." add-comment-class)
                            :container-selector (str "div." add-comment-class)})

@@ -219,6 +219,19 @@ div.add-comment-box-container {
             right: -16px;
           }
 
+          @include mobile() {
+            margin: 5px 16px 0 0;
+
+            &:after {
+              display: none;
+            }
+          }
+
+          // Hide the complete follow-up button if the screen is too small
+          @media screen and (max-width: 390px) {
+            display: none;
+          }
+
           div.carrot-checkbox {
             position: absolute;
             top: 4px;
