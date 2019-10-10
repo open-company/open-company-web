@@ -53,7 +53,6 @@ div.billing-settings-modal {
         @include OC_Body_Book();
         font-size: 14px;
         color: $ui_grey;
-        margin-right: 8px;
         float: right;
       }
       
@@ -66,6 +65,7 @@ div.billing-settings-modal {
         border-radius: 4px;
         color: white;
         line-height: 18px;
+        margin-left: 8px;
         float: right;
       }
     }

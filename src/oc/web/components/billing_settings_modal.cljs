@@ -125,25 +125,28 @@
   (rum/local "free" ::billing-plan)
   (rum/local false ::show-plans-dropdown)
   [s {:keys [org-data]}]
-  (let [team-data (drv/react s :team-data)]
+  (let [team-data (drv/react s :team-data)
+        billing-tab (::billing-tab s)
+        is-change-tab? (= @billing-tab :change)]
     [:div.billing-settings-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
       [:div.billing-settings-modal-container
         [:div.billing-settings-header
           [:div.billing-settings-header-title
-            "Billing"]
-          [:button.mlb-reset.save-bt
-            {:on-click #(reset! (::billing-tab s) :change)}
-            "Change plan"]
+            (if is-change-tab?
+             "Change plan"
+             "Billing")]
+          (when-not is-change-tab?
+            [:button.mlb-reset.save-bt
+              {:on-click #(reset! billing-tab :change)}
+              "Change plan"])
           [:button.mlb-reset.cancel-bt
-            {:on-click #(nav-actions/show-org-settings nil)}
+            {:on-click #(if is-change-tab?
+                          (reset! billing-tab :summary)
+                          (nav-actions/show-org-settings nil))}
             "Back"]]
         [:div.billing-settings-body
-          (case @(::billing-tab s)
-            :summary
-            (plan-summary s team-data)
-            :change
+          (if is-change-tab?
             (plan-change s team-data)
-            [:div.error
-              "An error occurred! Please try again"])]]]))
+            (plan-summary s team-data))]]]))
