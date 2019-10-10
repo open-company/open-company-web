@@ -148,7 +148,7 @@
 
   .internal, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     // color: $carrot_green;
-    @include OC_Body_Book();
+    @include OC_Body_Bold();
     font-size: 14px;
     text-decoration: none;
 
@@ -163,10 +163,6 @@
 
     @include mobile() {
       color: white;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
     }
   }
 
@@ -196,15 +192,11 @@
   }
 
   div.all-posts-label, div.follow-ups-label, div.must-see-label {
-    @include OC_Body_Book();
+    @include OC_Body_Bold();
     text-decoration: none;
 
     &:active, &:focus {
       text-decoration: none;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
     }
   }
 }
