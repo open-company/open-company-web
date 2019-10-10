@@ -1,5 +1,4 @@
 (ns oc.web.components.ui.more-menu
-  (:require-macros [if-let.core :refer (when-let*)])
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
@@ -56,9 +55,7 @@
                        (rum/local false ::move-activity)
                        (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
-                          (when-let* [args (vec (:rum/args s))
-                                      opts (get args 2)
-                                      will-close (:will-close opts)]
+                          (when-let [will-close (-> s :rum/args first :will-close)]
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))

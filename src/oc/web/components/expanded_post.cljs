@@ -48,6 +48,13 @@
       (comment-actions/get-comments activity-data)
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
+(defn- save-initial-last-read-at [s]
+  (when-not @(::initial-last-read-at s)
+    (let [activity-data @(drv/get-ref s :activity-data)
+          reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
+      (when (:last-read-at reads-data)
+        (reset! (::initial-last-read-at s) (:last-read-at reads-data))))))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
@@ -64,21 +71,34 @@
   (rum/local nil ::wh)
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
+  (rum/local nil ::initial-last-read-at)
+  (rum/local nil ::activity-uuid)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
-  {:did-mount (fn [s]
+  {:will-mount (fn [s]
+    (save-initial-last-read-at s)
+    s)
+   :did-mount (fn [s]
     (save-fixed-comment-height! s)
-    (activity-actions/send-item-read (:uuid @(drv/get-ref s :activity-data)))
+    (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
+      (activity-actions/send-item-read activity-uuid)
+      (reset! (::activity-uuid s) activity-uuid))
     (load-comments s true)
     s)
    :did-remount (fn [_ s]
     (load-comments s false)
+    (save-initial-last-read-at s)
+    s)
+   :will-unmount (fn [s]
+    (activity-actions/send-item-read @(::activity-uuid s))
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
         comments-drv (drv/react s :comments-data)
         _add-comment-focus (drv/react s :add-comment-focus)
+        activities-read (drv/react s :activities-read)
+        reads-data (get activities-read (:uuid activity-data))
         editable-boards (drv/react s :editable-boards)
         comments-data (au/get-comments activity-data comments-drv)
         dom-element-id (str "expanded-post-" (:uuid activity-data))
@@ -99,12 +119,15 @@
                        {:width 638
                         :height (utils/calc-video-height 638)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
-        activities-read (drv/react s :activities-read)
-        reads-data (get activities-read (:uuid activity-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
-        add-comment-force-update (drv/react s :add-comment-force-update)]
+        add-comment-force-update (drv/react s :add-comment-force-update)
+        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
+                          (and (:new-at activity-data)
+                               ;; and that's after the user last read
+                               (< (.getTime (utils/js-date (:last-read-at reads-data)))
+                                  (.getTime (utils/js-date (:new-at activity-data)))))]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -187,12 +210,17 @@
         (reactions {:entity-data activity-data})
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
-                             :comments-data comments-data})
+                             :comments-data comments-data
+                             :show-new-tag? has-new-comments?})
           (when user-is-part-of-the-team
             [:div.expanded-post-wrt-container
               (wrt-count {:activity-data activity-data
                           :reads-data reads-data})])]]
       [:div.expanded-post-comments.group
-        (stream-comments activity-data comments-data add-comment-highlight)
+        (stream-comments {:activity-data activity-data
+                          :comments-data comments-data
+                          :new-added-comment add-comment-highlight
+                          :last-read-at @(::initial-last-read-at s)
+                          :current-user-id current-user-id})
         (when (:can-comment activity-data)
           (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]]))
