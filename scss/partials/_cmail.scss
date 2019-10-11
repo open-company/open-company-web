@@ -19,7 +19,32 @@ div.cmail-outer {
     z-index: #{$navbar_zindex + 20};
   }
 
+  div.trial-expired-alert-container {
+    display: none;
+  }
+
   &.quick-post-collapsed {
+
+    &.show-trial-expired-alert {
+      div.cmail-container, div.cmail-container div.cmail-content-outer,
+      div.cmail-container div.cmail-content-outer div.cmail-content
+      div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
+        cursor: not-allowed;
+      }
+
+      div.trial-expired-alert-container {
+        margin-left: -130px;
+      }
+
+      @include big_web() {
+        &:hover {
+          div.trial-expired-alert-container {
+            display: block;
+          }
+        }
+      }
+    }
+
     div.cmail-container {
 
       div.cmail-content-outer {

@@ -13,6 +13,7 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]
@@ -218,9 +219,12 @@
                   [:div.private])])])]
       (when can-compose
         [:div.left-navigation-sidebar-footer
-          {:ref "left-navigation-sidebar-footer"}
+          {:ref "left-navigation-sidebar-footer"
+           :class (when true "show-trial-expired-alert")}
           [:button.mlb-reset.compose-green-bt
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
             [:span.compose-green-icon]
             [:span.compose-green-label
-              "New post"]]])]))
+              "New post"]]
+          (when true
+            (trial-expired-alert {:bottom "48px" :left "0"}))])]))

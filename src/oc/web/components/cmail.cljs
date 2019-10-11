@@ -24,6 +24,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.carrot-abstract :refer (carrot-abstract)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -575,12 +576,16 @@
                              current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
-                                :quick-post-collapsed (:collapsed cmail-state)})
+                                :quick-post-collapsed (:collapsed cmail-state)
+                                :show-trial-expired-alert true})
        :on-click #(when (:collapsed cmail-state)
                     (nux-actions/dismiss-add-post-tooltip)
                     (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
+      (when (and (:collapsed cmail-state)
+                 (not (:fullscreen cmail-state)))
+        (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
         {:class (when follow-up? "has-follow-ups")}
         [:div.cmail-mobile-header

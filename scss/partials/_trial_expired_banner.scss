@@ -29,3 +29,49 @@ div.trial-expired-banner-container {
     }
   }
 }
+
+div.trial-expired-alert-container {
+  position: absolute;
+  width: 260px;
+  padding: 16px;
+  z-index: #{$navbar_zindex + 100};
+  cursor: default;
+
+  div.trial-expired-alert {
+    padding: 16px;
+    background-color: white;
+    border: 1px solid $mid_light_grey;
+    text-align: left;
+    border-radius: 4px;
+  
+    div.trial-expired-alert-title {
+      @include OC_Body_Bold();
+      font-size: 14px;
+      line-height: 18px;
+      color: $deep_navy;
+    }
+
+    div.trial-expired-alert-description {
+      margin-top: 8px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      line-height: 18px;
+      color: $deep_navy;
+    }
+
+    button.trial-expired-alert-bt {
+      width: 100%;
+      height: 32px;
+      background-color: $carrot_green;
+      border-radius: 4px;
+      text-align: center;
+      padding: 7px 16px;
+      @include OC_Body_Bold();
+      font-size: 14px;
+      line-height: 18px;
+      color: white;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+  }
+}
