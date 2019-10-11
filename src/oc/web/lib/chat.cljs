@@ -8,13 +8,15 @@
   (when (jwt/get-key :email)
     (timbre/info "Identify user to Intercom")
     (utils/after 100 #(let [user (dispatcher/current-user-data)
+                            user-id (:user-id user)
                             org (dispatcher/org-data)]
                        (.Intercom js/window "update"
                          (clj->js {; Intercom standard
-                                   :user_id (:user-id user)
+                                   :user_id user-id
                                    :created_at (:created-at user)
                                    :name (jwt/get-key :name)
                                    :email (:email user)
+                                   :org-author? (= (-> org :author :user-id) user-id)
                                    :avatar {
                                      :type :avatar
                                      :image_url (:avatar-url (:avatar-url user))
