@@ -16,7 +16,7 @@
                                    :created_at (:created-at user)
                                    :name (jwt/get-key :name)
                                    :email (:email user)
-                                   :org-author? (= (-> org :author :user-id) user-id)
+                                   :org_author (= (-> org :author :user-id) user-id)
                                    :avatar {
                                      :type :avatar
                                      :image_url (:avatar-url (:avatar-url user))
