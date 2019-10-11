@@ -42,11 +42,19 @@ div.org-dashboard {
     }
   }
 
-  &.expanded-activity div.page {
-    @include mobile() {
-      padding-top: 0;
-      nav.oc-navbar {
-        display: none;
+  &.expanded-activity {
+
+    &, &.trial-expired {
+      padding-top: #{$navbar_height}px;
+    }
+
+    div.page {
+
+      @include mobile() {
+        padding-top: 0;
+        nav.oc-navbar {
+          display: none;
+        }
       }
     }
   }
