@@ -39,7 +39,7 @@
         :queryFormClassName "giphy-picker-form"
         :queryFormInputClassName "giphy-picker-form-input"
         :queryFormSubmitClassName "mlb-reset giphy-picker-form-submit"
-        :queryFormSubmitContent "Seach"
+        :queryFormSubmitContent "Search"
         :searchResultsClassName (str "giphy-picker-results-container" (when fullscreen " fullscreen"))
         :searchResultClassName "giphy-picker-results-item"
         :suggestionsClassName "giphy-picker-suggestions"
