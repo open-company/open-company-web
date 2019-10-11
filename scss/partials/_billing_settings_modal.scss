@@ -73,98 +73,36 @@ div.billing-settings-modal {
     div.billing-settings-body {
       margin-top: 24px;
 
+      div.plan-summary-separator {
+        margin-top: 16px;
+        height: 1px;
+        width: 100%;
+        background-color: rgba($deep_navy, 0.1);
+      }      
+
       div.plan-summary {
-        div.plan-summary-title {
-          @include OC_Body_Bold();
-          font-size: 16px;
-          line-height: 22px;
-          color: $deep_navy;
-          height: 30px;
+        margin-top: 24px;
+
+        &.bottom-margin {
+          margin-bottom: 24px;
         }
 
         div.plan-summary-details {
-          margin-top: 8px;
-          padding-top: 16px;
-          border-top: 1px solid $ultra_light_grey;
-          margin-bottom: 8px;
-
-          div.plan-details-left {
-            float: left;
-            width: 149px;
-            padding-right: 16px;
-            @include OC_Body_Book();
-            font-size: 14px;
-            color: $deep_navy;
-            opacity: 0.5;
-          }
-
-          div.plan-details-right {
-            float: right;
-            width: calc(100% - 149px);
-
-            div.plan-details-label {
-              @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 19px;
-              max-width: 300px;
-              float: left;
-              strong {
-                @include OC_Body_Bold();
-              }
-            }
-
-            div.plan-details-plan {
-              padding-bottom: 16px;
-              border-bottom: 1px solid $ultra_light_grey;
-
-              button.change-plan-bt {
-                float: right;
-                padding: 0;
-                margin: 0;
-                text-align: right;
-                height: 19px;
-                @include OC_Body_Book();
-                font-size: 14px;
-                line-height: 19px;
-                color: $carrot_green;
-              }
-            }
-
-            div.plan-details-description {
-              margin-top: 16px;
-              @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 19px;
-            }
-          }
-        }
-
-        div.plan-summary-alert {
-          width: calc(100% + 48px);
-          margin-left: -24px;
-          padding: 16px;
-          background-color: $opac_yellow;
+          margin-top: 16px;
           @include OC_Body_Book();
           font-size: 14px;
+          line-height: 18px;
           color: $deep_navy;
-          line-height: 19px;
-          margin-top: 24px;
-          text-align: center;
 
-          strong {
-            @include OC_Body_Bold();
-          }
-
-          button.upgrade-plan-bt {
-            @include OC_Body_Bold();
-            font-size: 14px;
+          button, a {
             color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            text-decoration: none;
             padding: 0;
             margin: 0;
-          }
-
-          a {
-            color: $carrot_green;
+            display: block;
           }
         }
       }
@@ -258,33 +196,56 @@ div.billing-settings-modal {
 
         div.plan-change-description {
           margin-top: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
+        }
 
-          div.plan-change-description-title {
-            @include OC_Body_Bold();
-            font-size: 12px;
-            color: $deep_navy;
-          }
+        div.plan-change-details {
+          margin-top: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
 
-          div.plan-change-description-list {
-            margin-top: 8px;
+          button, a {
+            color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            text-decoration: none;
+            padding: 0;
+            margin: 0;
+            display: block;
+          }         
+        }
 
-            ul {
-              padding: 0 0 0 27px;
-              margin: 0;
-              list-style-type: disc;
+        div.plan-change-separator {
+          margin-top: 16px;
+          height: 1px;
+          width: 100%;
+          background-color: rgba($deep_navy, 0.1);
+        }
 
-              li {
-                @include OC_Body_Book();
-                font-size: 14px;
-                color: $deep_navy;
-                padding-left: 9px;
+        div.plan-change-title {
+          margin-top: 16px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy; 
+        }
 
-                strong {
-                  @include OC_Body_Bold();
-                }
-              }
-            }
-          }
+        button.payment-info-bt {
+          height: 32px;
+          background-color: $carrot_green;
+          border-radius: 4px;
+          @include OC_Body_Bold();
+          color: white;
+          padding: 7px 16px;
+          font-size: 14px;
+          line-height: 18px;
+          margin: 8px 0 24px;
         }
       }
     }

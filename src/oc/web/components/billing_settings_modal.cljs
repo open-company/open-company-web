@@ -13,30 +13,34 @@
       [:span [:strong  "1 user"] " is"])))
 
 (defn plan-summary [s team-data]
-  (let [plan-data {:name "Free"
-                   :slug "free"
-                   :alert [:div.plan-details-label
-                            (user-count team-data)
-                            " currently on your team."
-                            [:br]
-                            "Free plans cover up 10 users."]}]
-    [:div.plan-summary
-      [:div.plan-summary-title
-        "Billing summary"]
-      [:div.plan-summary-details.group
-        [:div.plan-details-left
-          "Plan type"]
-        [:div.plan-details-right
-          [:div.plan-details-plan.group
-            [:div.plan-details-label
-              "You are currently on the "
-              [:strong (str (:name plan-data) " plan")]
-              "."]
-            [:button.mlb-reset.change-plan-bt
-              {:on-click #(reset! (::billing-tab s) :change)}
-              "Change plan"]]
-          [:div.plan-details-description.group
-            (:alert plan-data)]]]]))
+  [:div.plan-summary
+    [:div.plan-summary-details
+      "Payment method:"
+      [:br]
+      "Visa ending in 8059, exp: 02/2022"
+      [:button.mlb-reset.change-pay-method-bt
+        "Change"]]
+    [:div.plan-summary-details.bottom-margin
+      "Billing period:"
+      [:br]
+      "Plan billed annually ($1,200.00)"
+      [:br]
+      "Next payment due on Sept 16, 2020"
+      [:button.mlb-reset.change-pay-method-bt
+        {:on-click #(reset! (::billing-tab s) :change)}
+        "Change"]]
+    [:div.plan-summary-separator]
+    [:div.plan-summary-details
+      [:button.mlb-reset.history-bt
+        "Lookup billing history"]]
+    (comment
+      [:div.plan-summary-separator]
+      [:div.plan-summary-details
+        "Have a team of 250+"
+        [:a.chat-with-us
+          {:class "intercom-chat-link"
+           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+          "Chat with us"]])])
 
 (defn- plan-description [plan]
   (case plan
@@ -66,7 +70,19 @@
         (str
          "For your team of 25 people, your plan will cost $1,200 annually "
          "(25 people x $4 x 12 months). An annual plan saves you $300 per year.")]
-      ]))
+      [:div.plan-change-title
+        "Due today: $1.200,00"]
+      [:button.mlb-reset.payment-info-bt
+        "Add payment information"]
+      ; (comment
+       [:div.plan-change-separator]
+       [:div.plan-change-details
+         "Have a team of 250+"
+         [:a.chat-with-us
+           {:class "intercom-chat-link"
+            :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+           "Chat with us"]];)
+  ]))
 
 (rum/defcs billing-settings-modal <
   ;; Mixins
