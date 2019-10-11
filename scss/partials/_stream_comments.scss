@@ -17,11 +17,6 @@ div.stream-comments {
     }
   }
 
-  div.stream-comments-empty {
-    border-top: 1px solid rgba($deep_navy, 0.15);
-    margin: 0 16px;
-  }
-
   div.stream-comments-list {
 
     div.stream-comment-outer {
@@ -29,7 +24,6 @@ div.stream-comments {
       padding: 0;
 
       &:first-child div.stream-comment {
-        border-top: 1px solid rgba($deep_navy, 0.15);
         padding-top: 16px;
       }
 
