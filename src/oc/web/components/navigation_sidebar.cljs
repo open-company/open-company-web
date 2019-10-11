@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -127,7 +128,8 @@
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))
         follow-ups-data (drv/react s :follow-ups-data)
-        drafts-data (drv/react s :drafts-data)]
+        drafts-data (drv/react s :drafts-data)
+        show-paywall-alert? ls/billing-enabled]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
                                 :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
@@ -220,11 +222,11 @@
       (when can-compose
         [:div.left-navigation-sidebar-footer
           {:ref "left-navigation-sidebar-footer"
-           :class (when true "show-trial-expired-alert")}
+           :class (when show-paywall-alert? "show-trial-expired-alert")}
           [:button.mlb-reset.compose-green-bt
             {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
             [:span.compose-green-icon]
             [:span.compose-green-label
               "New post"]]
-          (when true
+          (when show-paywall-alert?
             (trial-expired-alert {:bottom "48px" :left "0"}))])]))

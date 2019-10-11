@@ -573,17 +573,19 @@
                               (dismiss-action))))
         current-user-data (drv/react s :current-user-data)
         header-user-data (or (:publisher cmail-data)
-                             current-user-data)]
+                             current-user-data)
+        show-paywall-alert? ls/billing-enabled]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)
-                                :show-trial-expired-alert true})
+                                :show-trial-expired-alert show-paywall-alert?})
        :on-click #(when (:collapsed cmail-state)
                     (nux-actions/dismiss-add-post-tooltip)
                     (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
-      (when (and (:collapsed cmail-state)
+      (when (and show-paywall-alert?
+                 (:collapsed cmail-state)
                  (not (:fullscreen cmail-state)))
         (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
