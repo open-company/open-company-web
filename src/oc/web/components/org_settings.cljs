@@ -22,9 +22,9 @@
             [oc.web.components.ui.org-settings-main-panel :refer (org-settings-main-panel)]
             [oc.web.components.ui.org-settings-team-panel :refer (org-settings-team-panel)]
             [oc.web.components.ui.org-settings-invite-panel :refer (org-settings-invite-panel)]
-            [oc.web.components.ui.org-settings-billing-panel :refer (org-settings-billing-panel)]))
+            [oc.web.components.ui.org-settings-payments-panel :refer (org-settings-payments-panel)]))
 
-;; FIXME: for billing stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
+;; FIXME: for payments stuff go back at this file from this commit 43a0566e2b78c3ca97c9d5b86b5cc2519bf76005
 
 (defn show-modal [& [panel]]
   (dis/dispatch! [:input [:org-settings] (or panel :main)]))
@@ -60,14 +60,14 @@
                        (show-modal :invite))}
           "INVITE PEOPLE"]])
     (when (and (utils/is-admin? org-data)
-               ls/billing-enabled)
+               ls/payments-enabled)
       [:div.org-settings-tab
-        {:class (when (= :billing active-tab) "active")}
+        {:class (when (= :payments active-tab) "active")}
         [:a.org-settings-tab-link
           {:href "#"
            :on-click (fn [e]
                       (utils/event-stop e)
-                      (show-modal :billing))}
+                      (show-modal :payments))}
           "PAYMENTS & BILLING"]])])
 
 (defn close-clicked [s]
@@ -204,7 +204,7 @@
             (org-settings-team-panel org-data)
             :invite
             (org-settings-invite-panel org-data #(close-clicked s))
-            :billing
-            (org-settings-billing-panel org-data #(close-clicked s))
+            :payments
+            (org-settings-payments-panel org-data #(close-clicked s))
             (org-settings-main-panel org-data #(close-clicked s)))]]
       (loading {:loading true}))))

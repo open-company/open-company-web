@@ -129,7 +129,7 @@
         can-compose (pos? (count editable-boards))
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)
-        show-paywall-alert? ls/billing-enabled]
+        show-paywall-alert? ls/payments-enabled]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
                                 :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})

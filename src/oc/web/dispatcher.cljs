@@ -214,7 +214,7 @@
                                      (router/current-secure-activity-id))
                               (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
                               (:current-user-data base)))]
-   :subscription        [[:base] (fn [base] (:subscription base))]
+   :payments        [[:base] (fn [base] (:payments base))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]

@@ -29,7 +29,7 @@
 
 ;; Search location
 (def search-server-domain (str "http://" local-ip ":3007"))
-(def search-enabled? true)
+(def search-enabled? false)
 
 ;; Reminder location
 (def reminder-server-domain (str "http://" local-ip ":3011"))
@@ -67,8 +67,8 @@
 (def oc-ziggeo-profiles [])
 (def oc-enable-transcriptions false)
 
-;; Billing enabled
-(def billing-enabled true)
+;; Payments enabled
+(def payments-enabled true)
 
 ;; WS monitor
 (def ws-monitor-interval 30)

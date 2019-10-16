@@ -22,7 +22,7 @@
 ;; :integrations
 ;; :team
 ;; :invite
-;; :billing
+;; :payments
 ;; :profile
 ;; :notifications
 ;; :reminders
@@ -174,8 +174,8 @@
 
 (defn show-org-settings [panel]
   (if panel
-    (when (or (not= panel :billing)
-              ls/billing-enabled)
+    (when (or (not= panel :payments)
+              ls/payments-enabled)
       (push-panel panel))
     (pop-panel)))
 

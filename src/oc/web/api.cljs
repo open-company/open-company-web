@@ -1,4 +1,4 @@
-(ns oc.web.api
+break is (ns oc.web.api
   (:require-macros [cljs.core.async.macros :refer (go)]
                    [if-let.core :refer (when-let*)])
   (:require [goog.Uri :as guri]
@@ -273,11 +273,11 @@
      (let [body (if (:success response) (:body response) false)]
        (callback body))))))
 
-;; Subscription
+;; Payments
 
-(defn get-subscription [company-uuid callback]
-  (pay-http http/get (str "/subscriptions/" company-uuid)
-   nil
+(defn get-payments [customer-link callback]
+  (auth-http (method-for-link customer-link) (relative-href customer-link)
+   {:headers (headers-for-link customer-link)}
    callback))
 
 ;; Org
@@ -896,6 +896,8 @@
 (defn request-reads-count [item-ids]
   (when (seq item-ids)
     (ws-cc/who-read-count item-ids)))
+
+;; 
 
 ;; Change service http
 

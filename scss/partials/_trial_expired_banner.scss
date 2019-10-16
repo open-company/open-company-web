@@ -17,7 +17,7 @@ div.trial-expired-banner-container {
     line-height: 26px;
     color: white;
 
-    button.open-billing-bt, a.chat-with-us {
+    button.open-payments-bt, a.chat-with-us {
       display: inline;
       text-decoration: underline;
       @include OC_Body_Book();

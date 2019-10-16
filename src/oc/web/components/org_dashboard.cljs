@@ -40,7 +40,7 @@
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
-            [oc.web.components.billing-settings-modal :refer (billing-settings-modal)]
+            [oc.web.components.payments-settings-modal :refer (payments-settings-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
@@ -157,7 +157,7 @@
                                 (router/current-activity-id)
                                 current-activity-data
                                 (not (:fullscreen cmail-state)))
-        show-trial-expired? (and ls/billing-enabled
+        show-trial-expired? (and ls/payments-enabled
                                  true)]
     (if is-loading
       [:div.org-dashboard
@@ -179,8 +179,8 @@
           ;; Activity not found
           show-login-wall
           (login-wall)
-          (= open-panel :billing)
-          (billing-settings-modal {:org-data org-data})
+          (= open-panel :payments)
+          (payments-settings-modal {:org-data org-data})
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)

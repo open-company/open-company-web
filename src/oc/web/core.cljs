@@ -20,7 +20,7 @@
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
-            [oc.web.stores.subscription]
+            [oc.web.stores.payments]
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
@@ -154,7 +154,7 @@
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:org :team :invite :integrations :billing} (keyword (:org-settings query-params))))
+                              (#{:org :team :invite :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and (not org-settings)
                              (contains? query-params :reminders))

@@ -1,4 +1,4 @@
-(ns oc.web.components.billing-settings-modal
+(ns oc.web.components.payments-settings-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
@@ -21,13 +21,13 @@
       [:button.mlb-reset.change-pay-method-bt
         "Change"]]
     [:div.plan-summary-details.bottom-margin
-      "Billing period:"
+      "billing period:"
       [:br]
       "Plan billed annually ($1,200.00)"
       [:br]
       "Next payment due on Sept 16, 2020"
       [:button.mlb-reset.change-pay-method-bt
-        {:on-click #(reset! (::billing-tab s) :change)}
+        {:on-click #(reset! (::payments-tab s) :change)}
         "Change"]]
     [:div.plan-summary-separator]
     [:div.plan-summary-details
@@ -51,7 +51,7 @@
     "Trial"))
 
 (defn plan-change [s team-data]
-  (let [current-plan (::billing-plan s)]
+  (let [current-plan (::payments-plan s)]
     [:div.plan-change
       [:button.mlb-reset.plans-dropdown-bt
         {:on-click #(reset! (::show-plans-dropdown s) true)}
@@ -84,38 +84,38 @@
            "Chat with us"]];)
   ]))
 
-(rum/defcs billing-settings-modal <
+(rum/defcs payments-settings-modal <
   ;; Mixins
   rum/reactive
   (drv/drv :team-data)
   ui-mixins/refresh-tooltips-mixin
   ;; Locals
-  (rum/local :summary ::billing-tab)
-  (rum/local "free" ::billing-plan)
+  (rum/local :summary ::payments-tab)
+  (rum/local "free" ::payments-plan)
   (rum/local false ::show-plans-dropdown)
   [s {:keys [org-data]}]
   (let [team-data (drv/react s :team-data)
-        billing-tab (::billing-tab s)
-        is-change-tab? (= @billing-tab :change)]
-    [:div.billing-settings-modal
+        payments-tab (::payments-tab s)
+        is-change-tab? (= @payments-tab :change)]
+    [:div.payments-settings-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
-      [:div.billing-settings-modal-container
-        [:div.billing-settings-header
-          [:div.billing-settings-header-title
+      [:div.payments-settings-modal-container
+        [:div.payments-settings-header
+          [:div.payments-settings-header-title
             (if is-change-tab?
              "Change plan"
              "Billing")]
           (when-not is-change-tab?
             [:button.mlb-reset.save-bt
-              {:on-click #(reset! billing-tab :change)}
+              {:on-click #(reset! payments-tab :change)}
               "Change plan"])
           [:button.mlb-reset.cancel-bt
             {:on-click #(if is-change-tab?
-                          (reset! billing-tab :summary)
+                          (reset! payments-tab :summary)
                           (nav-actions/show-org-settings nil))}
             "Back"]]
-        [:div.billing-settings-body
+        [:div.payments-settings-body
           (if is-change-tab?
             (plan-change s team-data)
             (plan-summary s team-data))]]]))

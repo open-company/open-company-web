@@ -574,7 +574,7 @@
         current-user-data (drv/react s :current-user-data)
         header-user-data (or (:publisher cmail-data)
                              current-user-data)
-        show-paywall-alert? ls/billing-enabled]
+        show-paywall-alert? ls/payments-enabled]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)

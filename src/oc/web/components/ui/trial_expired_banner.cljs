@@ -8,8 +8,8 @@
   [:div.trial-expired-banner-container
     [:div.trial-expired-banner
       "📣 Your 14 day free trial has ended. Please "
-      [:button.mlb-reset.open-billing-bt
-        {:on-click #(nav-actions/show-org-settings :billing)}
+      [:button.mlb-reset.open-payments-bt
+        {:on-click #(nav-actions/show-org-settings :payments)}
         "select a plan"]
       " to continue using Carrot. Need more time? "
       [:a.chat-with-us
@@ -35,5 +35,5 @@
       [:button.mlb-reset.trial-expired-alert-bt
         {:on-click #(do
                       (utils/event-stop %)
-                      (nav-actions/show-org-settings :billing))}
+                      (nav-actions/show-org-settings :payments))}
         "Select a plan"]]])

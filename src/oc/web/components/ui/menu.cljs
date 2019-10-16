@@ -65,9 +65,9 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
-(defn billing-click [e]
+(defn payments-click [e]
   (.preventDefault e)
-  (nav-actions/show-org-settings :billing))
+  (nav-actions/show-org-settings :payments))
 
 (defn- detect-desktop-app
   []
@@ -164,12 +164,12 @@
             [:div.oc-menu-item.digest-settings
               "Admin settings"]])
         (when (and (not is-mobile?)
-                 ls/billing-enabled
+                 ls/payments-enabled
                  (= user-role :admin)
                  (router/current-org-slug))
-          [:a.billing
+          [:a.payments
             {:href "#"
-             :on-click billing-click}
+             :on-click payments-click}
             [:div.oc-menu-item
               "Payments & Billing"]])
         (when (and (not is-mobile?)

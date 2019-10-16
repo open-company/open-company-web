@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
 (defn- get-slack-usernames [user]
@@ -99,6 +100,9 @@
     (if success
       (let [teams (-> fixed-body :collection :items)]
         (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
+        (when-let [customer-link (utils/link-for (:links fixed-body) "customer")]
+          (js/console.log "DBG loadin customer with link:" customer-link)
+          (payments-actions/get-payments customer-link))
         (read-teams teams))
       ;; Reset the team-data-requested to restart the teams load
       (when (and (>= status 500)
