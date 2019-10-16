@@ -29,7 +29,7 @@
 
 ;; Search location
 (def search-server-domain (str "http://" local-ip ":3007"))
-(def search-enabled? false)
+(def search-enabled? true)
 
 ;; Reminder location
 (def reminder-server-domain (str "http://" local-ip ":3011"))
