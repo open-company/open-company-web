@@ -37,6 +37,9 @@
 (defn boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
 
+(defn payments-key [org-slug]
+  (vec (conj (org-key org-slug) :payments)))
+
 (defn posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
 
@@ -214,7 +217,7 @@
                                      (router/current-secure-activity-id))
                               (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
                               (:current-user-data base)))]
-   :payments        [[:base] (fn [base] (:payments base))]
+   :payments        [[:base :org-slug] (fn [base org-slug] (get-in base (payments-key org-slug)))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
@@ -458,6 +461,16 @@
 
 (defn dispatch! [payload]
   (flux/dispatch actions payload))
+
+;; Payments
+
+(defn payments-data
+  ([]
+    (payments-data @app-state (router/current-org-slug)))
+  ([org-slug]
+   (payments-data @app-state org-slug))
+  ([data org-slug]
+   (get-in data (payments-key org-slug))))
 
 ;; Data
 

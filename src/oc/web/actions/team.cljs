@@ -85,6 +85,7 @@
             :let [team-link (utils/link-for (:links team) "item")
                   channels-link (utils/link-for (:links team) "channels")
                   roster-link (utils/link-for (:links team) "roster")]]
+      (payments-actions/maybe-load-payments-data team)
       ; team link may not be present for non-admins, if so they can still get team users from the roster
       (if team-link
         (utils/maybe-after load-delay #(team-get team-link))
@@ -100,9 +101,6 @@
     (if success
       (let [teams (-> fixed-body :collection :items)]
         (dis/dispatch! [:teams-loaded (-> fixed-body :collection :items)])
-        (when-let [customer-link (utils/link-for (:links fixed-body) "customer")]
-          (js/console.log "DBG loadin customer with link:" customer-link)
-          (payments-actions/get-payments customer-link))
         (read-teams teams))
       ;; Reset the team-data-requested to restart the teams load
       (when (and (>= status 500)

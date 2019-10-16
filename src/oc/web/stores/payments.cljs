@@ -2,7 +2,6 @@
   (:require [oc.web.dispatcher :as dispatcher]))
 
 (defmethod dispatcher/action :payments
-  [db [_ {:keys [uuid] :as data}]]
-  (if uuid
-    (assoc-in db [:payments uuid] data)
-    (assoc db :payments nil)))
+  [db [_ org-slug payments-data]]
+  (let [payments-key (dispatcher/payments-key org-slug)]
+    (assoc-in db payments-key payments-data)))
