@@ -253,7 +253,6 @@
 (deftask prod-build
   "OC Production build."
   []
-  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
@@ -261,12 +260,7 @@
               :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
-                                 :externs ["public/js/externs.js"]
-                                 :preloads '[devtools.preload]
-                                 :external-config {
-                                  :devtools/config {
-                                    :print-config-overrides true
-                                    :disable-advanced-mode-check true}}})))
+                                 :externs ["public/js/externs.js"]})))
 
 (deftask check-sources!
   "Check source files with yagni, eastwood, kibit and bikeshed."
