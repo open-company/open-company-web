@@ -191,8 +191,10 @@
         (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
-          {:href "https://carrot.news/"
+          (if ua/mobile?
+            {:href "https://carrot.news/"
              :target "_blank"}
+            {:on-click (partial whats-new-click s)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
         [:a
