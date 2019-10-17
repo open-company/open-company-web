@@ -156,8 +156,10 @@ div.onboard-email-container {
       width: 100%;
     }
 
-    &.disabled {
+    &.disabled, &:disabled {
       background-color: $light_ui_grey;
+      opacity: 1 !important;
+      cursor: not-allowed;
     }
   }
 }
@@ -234,7 +236,7 @@ div.onboard-lander {
           color: $carrot_green;
           text-align: right;
 
-          &.disabled {
+          &.disabled, &:disabled {
             color: $light_ui_grey;
             opacity: 0;
           }
@@ -298,8 +300,10 @@ div.onboard-lander {
         width: 100%;
       }
 
-      &.disabled {
+      &.disabled, &:disabled {
         background-color: $light_ui_grey;
+        opacity: 1 !important;
+        cursor: not-allowed;
       }
     }
   }
@@ -574,7 +578,7 @@ div.onboard-lander {
       @include OC_Body_Book();
       font-size: 14px;
       color: $light_navy;
-      margin-top: 16px;
+      margin-top: 24px;
 
       &.email-field {
         margin-top: 24px;
@@ -855,8 +859,10 @@ div.onboard-lander {
         }
       }
 
-      &.disabled {
+      &.disabled, &:disabled {
         background-color: $light_ui_grey;
+        opacity: 1 !important;
+        cursor: not-allowed;
       }
     }
 
