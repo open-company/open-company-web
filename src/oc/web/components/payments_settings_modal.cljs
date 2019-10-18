@@ -21,7 +21,7 @@
       [:button.mlb-reset.change-pay-method-bt
         "Change"]]
     [:div.plan-summary-details.bottom-margin
-      "billing period:"
+      "Billing period:"
       [:br]
       "Plan billed annually ($1,200.00)"
       [:br]
