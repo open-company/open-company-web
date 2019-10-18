@@ -201,7 +201,7 @@
   (fullstory/track-org org-data)
   (chat/identify) ; Intercom
 
-  (payments-actions/maybe-load-payments-data (dis/team-data) complete-refresh?)
+  (payments-actions/maybe-load-payments-data org-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
   (set! (.-title js/document) (str "Carrot | " (:name org-data))))

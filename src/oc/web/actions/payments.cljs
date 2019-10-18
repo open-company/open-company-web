@@ -9,16 +9,13 @@
   (let [payments-data (when success (json->cljs body) {})]
     (dis/dispatch! [:payments org-slug payments-data])))
 
-(defn get-payments [customer-link]
-  (api/get-payments customer-link (partial get-payments-cb (router/current-org-slug))))
+(defn get-payments [payments-link]
+  (api/get-payments payments-link (partial get-payments-cb (router/current-org-slug))))
 
-(defn maybe-load-payments-data [team-data & [force-update?]]
-  (let [org-data (dis/org-data)
-        payments-data (dis/payments-data)]
-    (when (and team-data
-               org-data
-               (= (:team-id team-data) (:team-id org-data))
+(defn maybe-load-payments-data [org-data & [force-refresh?]]
+  (let [payments-data (dis/payments-data)]
+    (when (and org-data
                (or (not payments-data)
-                  force-update?))
-      (when-let [customer-link (utils/link-for (:links team-data) "customer")]
-        (get-payments customer-link)))))
+                   force-refresh?))
+      (when-let [payments-link (utils/link-for (:links org-data) "payments")]
+        (get-payments payments-link)))))

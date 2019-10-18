@@ -10,7 +10,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
             [oc.web.actions.org :as org-actions]
-            [oc.web.actions.payments :as payments-actions]
             [oc.web.lib.json :refer (json->cljs)]))
 
 (defn- get-slack-usernames [user]
@@ -85,7 +84,6 @@
             :let [team-link (utils/link-for (:links team) "item")
                   channels-link (utils/link-for (:links team) "channels")
                   roster-link (utils/link-for (:links team) "roster")]]
-      (payments-actions/maybe-load-payments-data team)
       ; team link may not be present for non-admins, if so they can still get team users from the roster
       (if team-link
         (utils/maybe-after load-delay #(team-get team-link))

@@ -275,9 +275,9 @@
 
 ;; Payments
 
-(defn get-payments [customer-link callback]
-  (auth-http (method-for-link customer-link) (relative-href customer-link)
-   {:headers (headers-for-link customer-link)}
+(defn get-payments [payments-link callback]
+  (auth-http (method-for-link payments-link) (relative-href payments-link)
+   {:headers (headers-for-link payments-link)}
    callback))
 
 ;; Org
