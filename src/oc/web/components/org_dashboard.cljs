@@ -8,6 +8,7 @@
             [oc.web.router :as router]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
             [oc.web.lib.whats-new :as whats-new]
@@ -94,7 +95,8 @@
                      ;; the org data are not loaded yet
                      (not org-data)
                      ;; Payments not yet loaded
-                     (not payments-data)
+                     (and ls/payments-enabled
+                          (not payments-data))
                      ;; No board specified
                      (and (not (router/current-board-slug))
                           ;; but there are some
