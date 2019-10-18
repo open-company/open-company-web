@@ -27,7 +27,7 @@
              :right right}}
     [:div.trial-expired-alert
       [:div.trial-expired-alert-title
-        "14 day free trial has ended"]
+        "Your 14 day free trial has ended"]
       [:div.trial-expired-alert-description
         (str
          "Hi, it looks like your free trial has ended. Pick a plan that "

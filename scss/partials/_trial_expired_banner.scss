@@ -32,7 +32,7 @@ div.trial-expired-banner-container {
 
 div.trial-expired-alert-container {
   position: absolute;
-  width: 260px;
+  width: #{$paywall_alert_width}px;
   padding: 16px;
   z-index: #{$navbar_zindex + 100};
   cursor: default;

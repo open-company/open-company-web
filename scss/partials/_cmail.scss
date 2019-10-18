@@ -33,7 +33,7 @@ div.cmail-outer {
       }
 
       div.trial-expired-alert-container {
-        margin-left: -130px;
+        margin-left: -#{$paywall_alert_width / 2}px;
       }
 
       @include big_web() {
