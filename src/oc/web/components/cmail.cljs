@@ -14,7 +14,6 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
@@ -23,6 +22,7 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
@@ -346,6 +346,7 @@
                    (drv/drv :section-editing)
                    (drv/drv :show-edit-tooltip)
                    (drv/drv :current-user-data)
+                   (drv/drv :payments)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -507,6 +508,7 @@
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
         cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
+        payments-data (drv/react s :payments)
         published? (= (:status cmail-data) "published")
         video-size (if is-mobile?
                      {:width (win-width)
@@ -574,7 +576,7 @@
         current-user-data (drv/react s :current-user-data)
         header-user-data (or (:publisher cmail-data)
                              current-user-data)
-        show-paywall-alert? ls/payments-enabled]
+        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)

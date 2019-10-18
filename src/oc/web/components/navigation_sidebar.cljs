@@ -6,7 +6,6 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -14,6 +13,7 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
@@ -62,6 +62,7 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-ups-data)
+                                (drv/drv :payments)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -102,6 +103,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
+        payments-data (drv/react s :payments)
         current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
@@ -129,7 +131,7 @@
         can-compose (pos? (count editable-boards))
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)
-        show-paywall-alert? ls/payments-enabled]
+        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
                                 :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})

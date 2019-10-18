@@ -6,11 +6,8 @@
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
-            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.search :as search]
             [oc.web.lib.whats-new :as whats-new]
@@ -23,6 +20,7 @@
             [oc.web.components.ui.navbar :refer (navbar)]
             [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.expanded-post :refer (expanded-post)]
@@ -71,7 +69,7 @@
   [s]
   (let [{:keys [orgs
                 org-data
-                jwt
+                jwt-data
                 board-data
                 initial-section-editing
                 container-data
@@ -84,7 +82,8 @@
                 wrt-read-data
                 force-login-wall
                 panel-stack
-                app-loading]} (drv/react s :org-dashboard-data)
+                app-loading
+                payments-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         search-active? (drv/react s search/search-active?)
         search-results? (pos?
@@ -94,6 +93,8 @@
                      app-loading
                      ;; the org data are not loaded yet
                      (not org-data)
+                     ;; Payments not yet loaded
+                     (not payments-data)
                      ;; No board specified
                      (and (not (router/current-board-slug))
                           ;; but there are some
@@ -119,13 +120,13 @@
                                  ;; route has wrong board slug/uuid for the current post
                                  (and (not= (:board-slug current-activity-data) (router/current-board-slug))
                                       (not= (:board-uuid current-activity-data) (router/current-board-slug)))))
-        show-login-wall (and (not jwt)
+        show-login-wall (and (not jwt-data)
                              (or force-login-wall
                                  (and (router/current-activity-id)
                                      (or org-not-found
                                          section-not-found
                                          entry-not-found))))
-        show-activity-removed (and jwt
+        show-activity-removed (and jwt-data
                                    (router/current-activity-id)
                                    (or org-not-found
                                        section-not-found
@@ -150,20 +151,20 @@
                                 is-mobile?)
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
-                                                       (jwt/jwt)
+                                                       jwt-data
                                                        (not user-responded-to-push-permission?))
         show-expanded-post (and (not show-activity-removed)
                                 (not show-login-wall)
                                 (router/current-activity-id)
                                 current-activity-data
                                 (not (:fullscreen cmail-state)))
-        show-trial-expired? (and ls/payments-enabled
-                                 true)]
+        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
+
                                   :mobile-or-tablet is-mobile?
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed

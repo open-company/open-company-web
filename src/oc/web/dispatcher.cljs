@@ -403,12 +403,13 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading]
-                              {:jwt jwt
+                                 show-sections-picker entry-editing jwt wrt-show loading payments]
+                              {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
+                               :payments-data payments
                                :container-data container-data
                                :board-data board-data
                                :initial-section-editing (:initial-section-editing base)
@@ -818,6 +819,9 @@
 (defn print-panel-stack []
   (:panel-stack @app-state))
 
+(defn print-payments-data []
+  (payments-data @app-state (router/current-org-slug)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -838,6 +842,7 @@
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
 (set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
+(set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:app_state app-state
                                     :deref cljs.core.deref
