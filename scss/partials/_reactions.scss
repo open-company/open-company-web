@@ -23,7 +23,7 @@ div.reactions {
       min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
-      background-color: $ultra_light_grey;
+      background-color: rgba($deep_navy, 0.1);
 
       @include mobile() {
         height: 32px;
@@ -65,7 +65,7 @@ div.reactions {
 
         @include big_web() {
           &:hover {
-            background-color: #D6D9DC;
+            background-color: rgba($deep_navy, 0.2);
             div.count {
               color: $deep_navy;
             }

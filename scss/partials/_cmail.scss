@@ -146,10 +146,6 @@ div.cmail-outer {
 
         div.close-bt-container {
 
-          button.close-bt {
-            background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
-          }
-
           .tooltip {
             margin-top: 0;
           }
@@ -281,7 +277,7 @@ div.cmail-outer {
 
         div.cmail-content-headline {
           min-height: 34px;
-          @include activity-title(32px, 34px);
+          @include activity-title(24px, 30px);
 
           @include mobile() {
             @include activity-title(32px, 40px);
@@ -301,10 +297,10 @@ div.cmail-outer {
           div.rich-body-editor-container {
             margin-top: 32px;
 
-            div.rich-body-editor {
-              padding-bottom: 30vh;
-              min-height: calc(100vh - 334px);
-              @include activity-body(18, 26, $deep_navy);
+          div.rich-body-editor {
+            padding-bottom: 30vh;
+            min-height: calc(100vh - 334px);
+            @include activity-body(17, 22, $deep_navy);
 
               @media screen and (min-height: 556px) {
                 max-height: initial;
@@ -441,14 +437,7 @@ div.cmail-outer {
       @include no-user-select();
 
       @include mobile() {
-        display: block;
-        width: 100%;
-        min-height: 56px;
-        height: auto;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        padding: 12px 16px;
-        background-color: white;
+        display: none;
       }
 
       &.has-follow-ups-button {
@@ -525,7 +514,7 @@ div.cmail-outer {
           button.close-bt {
             width: 32px;
             height: 32px;
-            background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+            background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
             background-size: 12px 12px;
             background-position: center;
             background-repeat: no-repeat;
@@ -732,6 +721,15 @@ div.cmail-outer {
 
         @include mobile() {
           margin-top: 0;
+          height: unset;
+          min-height: 32px;
+          position: fixed;
+          top: #{$mobile_navbar_height}px;
+          left: 0;
+          width: 100vw;
+          margin: 0;
+          border-radius: 0;
+          padding: 7px 32px;
         }
       }
     }
@@ -811,8 +809,8 @@ div.cmail-outer {
         @include mobile() {
           display: block;
           position: absolute;
-          right: 16px;
-          top: 16px;
+          right: 4px;
+          top: 4px;
 
           button.mobile-follow-ups-remove-menu {
             width: 24px;
@@ -865,6 +863,7 @@ div.cmail-outer {
 
         @include mobile() {
           border-radius: 0;
+          padding-top: 0;
         }
       }
     }
@@ -969,9 +968,9 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(18, 26, $deep_navy);
-            font-size: 18px;
-            line-height: 26px;
+            @include activity-body(17, 22, $deep_navy);
+            font-size: 17px;
+            line-height: 22px;
           }
 
           @media screen and (min-height: 556px) {
@@ -1041,7 +1040,7 @@ div.cmail-outer {
         button.dismiss-inline-cmail {
           width: 32px;
           height: 32px;
-          background-image: cdnUrl("/img/ML/cmail_fullscreen_close.svg");
+          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;

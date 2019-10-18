@@ -737,6 +737,7 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
+                               :placeholder (when (:collapsed cmail-state) "Share something with your team...")
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)

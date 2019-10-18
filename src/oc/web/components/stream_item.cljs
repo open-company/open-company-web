@@ -60,7 +60,7 @@
                            (calc-video-height s)
                            s)}
   [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
-  (let [is-mobile? (responsive/is-tablet-or-mobile?)
+  (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
@@ -90,7 +90,10 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        ]
+        ;; Hide lables on FoC on mobile if there are at least 3 reactions or if there is at least one attachment
+        mobile-hide-labels? (and is-mobile?
+                                 (or (> (count (:reactions activity-data)) 3)
+                                     (seq activity-attachments)))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -151,12 +154,18 @@
                    " (private)")
                  (when (= (:board-access activity-data) "public")
                    " (public)"))]
-              [:div.must-see-tag.mobile-only]
-              [:div.follow-up-tag-small.mobile-only]
-              [:div.new-tag.mobile-only "NEW"]
-              [:div.mobile-time-since
-                (utils/foc-date-time (or (:published-at activity-data) (:created-at activity-data)))]]
-            [:div.must-see-tag.big-web-tablet-only]
+              [:div.time-since
+                (let [t (or (:published-at activity-data) (:created-at activity-data))]
+                  [:time
+                    {:date-time t
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                     :data-title (utils/activity-date-tooltip activity-data)}
+                    (utils/foc-date-time t)])]]
+            [:div.must-see-tag]
+            [:div.follow-up-tag-small.mobile-only]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
         (when (and is-published?
@@ -214,16 +223,17 @@
                   "Delete draft"]]]
             [:div.stream-item-footer.group
               {:ref "stream-item-reactions"}
-              (when is-mobile?
-                (reactions activity-data))
+              (reactions {:entity-data activity-data
+                          :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
-                [:div.stream-item-comments-summary
-                  ; {:on-click #(expand s true true)}
-                  (comments-summary {:entry-data activity-data
-                                     :comments-data comments-data
-                                     :show-new-tag? has-new-comments?})]
-                (when-not is-mobile?
-                  (reactions activity-data))
+                (when-not (and mobile-hide-labels?
+                               (zero? (count (:sorted-comments comments-data))))
+                  [:div.stream-item-comments-summary
+                    ; {:on-click #(expand s true true)}
+                    (comments-summary {:entry-data activity-data
+                                       :comments-data comments-data
+                                       :show-new-tag? has-new-comments?
+                                       :hide-label? mobile-hide-labels?})])
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}
@@ -240,11 +250,15 @@
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
                                 :reads-data read-data})])
-                (when (seq activity-attachments)
+                (when (and (seq activity-attachments)
+                           ;; Show attachments on FoC on mobile only if there are no reactions
+                           (or (not is-mobile?)
+                               (seq (:reactions activity-data))))
                   [:div.stream-item-attachments
                     {:ref :stream-item-attachments}
                     [:div.stream-item-attachments-count
-                      (count activity-attachments) " attachment" (when (> (count activity-attachments) 1) "s")]
+                      (str (count activity-attachments)
+                       " attachment" (when (> (count activity-attachments) 1) "s"))]
                     [:div.stream-item-attachments-list
                       (for [atc activity-attachments]
                         [:a.stream-item-attachments-item
@@ -254,14 +268,4 @@
                             [:span.file-name
                               (:file-name atc)]
                             [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]
-              [:div.time-since
-                (let [t (or (:published-at activity-data) (:created-at activity-data))]
-                  [:time
-                    {:date-time t
-                     :data-toggle (when-not is-mobile? "tooltip")
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                     :data-title (utils/activity-date-tooltip activity-data)}
-                    (utils/foc-date-time t)])]])]]))
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])]]))

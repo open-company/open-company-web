@@ -5,7 +5,7 @@ nav.oc-navbar {
   width: 100%;
   background-color: $grey_num_2;
   transition: height 230ms;
-  border-bottom: 1px solid $ultra_light_grey;
+  border-bottom: 1px solid rgba($deep_navy, 0.15);
 
   -webkit-app-region: drag;
   -webkit-user-select: none;
