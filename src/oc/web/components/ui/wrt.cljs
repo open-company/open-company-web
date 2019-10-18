@@ -269,5 +269,6 @@
          :on-click #(nav-actions/show-wrt item-id)
          :class (when (pos? (count (:reads reads-data))) "has-read-list")}
         (if reads-count
-          (str reads-count " viewer" (when (not= reads-count 1) "s"))
+          (str reads-count
+           " viewer" (when (not= reads-count 1) "s"))
           "0 viewers")]]))
