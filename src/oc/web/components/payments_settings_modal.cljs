@@ -1,34 +1,37 @@
 (ns oc.web.components.payments-settings-modal
   (:require [rum.core :as rum]
+            [clojure.contrib.humanize :refer (intcomma)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]))
 
-(defn- user-count [team-data]
-  (let [user-count (count (:users team-data))]
-    (if (> user-count 1)
-      [:span [:strong (str user-count " users")] " are"]
-      [:span [:strong  "1 user"] " is"])))
-
-(defn plan-summary [s team-data]
+(defn plan-summary [s payments-data]
   [:div.plan-summary
     [:div.plan-summary-details
-      "Payment method:"
-      [:br]
-      "Visa ending in 8059, exp: 02/2022"
-      [:button.mlb-reset.change-pay-method-bt
-        "Change"]]
+      (when (:payment-method payments-data)
+        [:div
+          "Payment method:"
+          [:br]
+          "Visa ending in 8059, exp: 02/2022"
+          [:button.mlb-reset.change-pay-method-bt
+            "Change"]])]
     [:div.plan-summary-details.bottom-margin
-      "Billing period:"
-      [:br]
-      "Plan billed annually ($1,200.00)"
-      [:br]
-      "Next payment due on Sept 16, 2020"
-      [:button.mlb-reset.change-pay-method-bt
-        {:on-click #(reset! (::payments-tab s) :change)}
-        "Change"]]
+      (when (:subscription payments-data)
+        [:div
+          "Billing period:"
+          [:br]
+          (str "Plan billed "
+           (when (= (-> payments-data :subscription :interval) "annual")
+             "annually"
+             "monthly")
+          " ($...)")
+          [:br]
+          "Next payment due on ..."
+          [:button.mlb-reset.change-pay-method-bt
+            {:on-click #(reset! (::payments-tab s) :change)}
+            "Change"]])]
     [:div.plan-summary-separator]
     [:div.plan-summary-details
       [:button.mlb-reset.history-bt
@@ -42,36 +45,46 @@
            :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
           "Chat with us"]])])
 
-(defn- plan-description [plan]
-  (case plan
-    "team-monthly"
-    "Monthly plan"
-    "team-annual"
-    "Annual plan (save 20%)"
-    "Trial"))
+(def default-minimum-price 6000)
 
-(defn plan-change [s team-data]
-  (let [current-plan (::payments-plan s)]
+(defn plan-change [s team-data payments-data]
+  (let [current-plan (::payments-plan s)
+        active-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-data))
+        monthly-plan (first (filter #(= (:amount %) "monthly") (:available-plans payments-data)))
+        annual-plan (first (filter #(= (:amount %) "annual") (:available-plans payments-data)))
+        current-plan-data (first (filter #(= (:interval %) @current-plan) (:available-plans payments-data)))
+        total-plan-price* (* (:amount current-plan-data) (count active-users))
+        int-plan-price (int (/ total-plan-price* 100))
+        decimal-plan-price* (mod total-plan-price* 100)
+        decimal-plan-price (if (= (-> decimal-plan-price* str count) 1)
+                             (str "0" decimal-plan-price*)
+                             (str decimal-plan-price*))
+        total-plan-price (str int-plan-price "." decimal-plan-price)
+        available-plans (mapv #(hash-map :value (:interval %) :label (:nickname %)) (:available-plans payments-data))]
     [:div.plan-change
       [:button.mlb-reset.plans-dropdown-bt
         {:on-click #(reset! (::show-plans-dropdown s) true)}
-        (plan-description @current-plan)]
+        (or (:nickname current-plan-data) "Free")]
       (when @(::show-plans-dropdown s)
-        (dropdown-list {:items [{:value "team-monthly"
-                                 :label (plan-description "team-monthly")}
-                                {:value "team-annual"
-                                 :label (plan-description "team-annual")}]
+        (dropdown-list {:items available-plans
                         :value @current-plan
                         :on-blur #(reset! (::show-plans-dropdown s) false)
                         :on-change (fn [selected-item]
                                      (reset! (::show-plans-dropdown s) false)
                                      (reset! current-plan (:value selected-item)))}))
       [:div.plan-change-description
-        (str
-         "For your team of 25 people, your plan will cost $1,200 annually "
-         "(25 people x $4 x 12 months). An annual plan saves you $300 per year.")]
+        (if (= @current-plan "free")
+          "Free plan details here"
+          (str
+           "For your team of "
+           (count active-users) ;; Number of active/unverified users
+           " people, your plan will cost $"
+           total-plan-price
+           (if (= (:interval current-plan) "month")
+            " monthly."
+            " annually.")))]
       [:div.plan-change-title
-        "Due today: $1.200,00"]
+        (str "Due today: $" total-plan-price)]
       [:button.mlb-reset.payment-info-bt
         "Add payment information"]
       ; (comment
@@ -88,15 +101,22 @@
   ;; Mixins
   rum/reactive
   (drv/drv :team-data)
+  (drv/drv :payments)
   ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local :summary ::payments-tab)
   (rum/local "free" ::payments-plan)
   (rum/local false ::show-plans-dropdown)
+  {:will-mount (fn [s]
+    (let [payments-data @(drv/get-ref s :payments)]
+      (reset! (::payments-tab s) (if-not (:subscription payments-data) :change :summary))
+      (reset! (::payments-plan s) (if (:subscription payments-data) (-> payments-data :subscription :interval) "free")))
+    s)}
   [s {:keys [org-data]}]
   (let [team-data (drv/react s :team-data)
         payments-tab (::payments-tab s)
-        is-change-tab? (= @payments-tab :change)]
+        is-change-tab? (= @payments-tab :change)
+        payments-data (drv/react s :payments)]
     [:div.payments-settings-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -117,5 +137,5 @@
             "Back"]]
         [:div.payments-settings-body
           (if is-change-tab?
-            (plan-change s team-data)
-            (plan-summary s team-data))]]]))
+            (plan-change s team-data payments-data)
+            (plan-summary s payments-data))]]]))
