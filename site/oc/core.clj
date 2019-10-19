@@ -195,7 +195,7 @@
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href "https://intercom.help/carrot-c8000b30b176/en" :target "_blank"} "Help center"]
+          [:div.column-item [:a {:href "https://help.carrot.io/" :target "_blank"} "Help center"]
           [:div.column-item
             [:a
               {:class "intercom-chat-link"
