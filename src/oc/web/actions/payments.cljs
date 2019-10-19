@@ -31,3 +31,10 @@
                                 (dis/payments-data))]
     (and ls/payments-enabled
          (= fixed-payments-data :404))))
+
+(defn create-plan-subscription [payments-data plan-id]
+  (let [create-subscription-link (utils/link-for (:links payments-data) "update")]
+    (when create-subscription-link
+      (api/update-plan-subscription create-subscription-link plan-id
+       (fn [{:keys [status body success]}]
+        (js/console.log "DBG patch response:" (if success (json->cljs body) status)))))))

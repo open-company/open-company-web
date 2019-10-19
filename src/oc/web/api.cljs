@@ -276,9 +276,20 @@
 ;; Payments
 
 (defn get-payments [payments-link callback]
-  (auth-http (method-for-link payments-link) (relative-href payments-link)
-   {:headers (headers-for-link payments-link)}
-   callback))
+  (if payments-link
+    (auth-http (method-for-link payments-link) (relative-href payments-link)
+     {:headers (headers-for-link payments-link)}
+     callback)
+    (handle-missing-link "get-payments" payments-link callback)))
+
+(defn update-plan-subscription [update-link plan-id callback]
+  (if update-link
+    (let [update-subscription-body (cljs->json {:plan-id plan-id})]
+      (auth-http (method-for-link update-link) (relative-href update-link)
+       {:headers (headers-for-link update-link)
+        :json-params update-subscription-body}
+       callback))
+    (handle-missing-link "update-plan-subscription" update-link callback)))
 
 ;; Org
 
