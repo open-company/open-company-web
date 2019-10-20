@@ -282,13 +282,16 @@
      callback)
     (handle-missing-link "get-payments" payments-link callback)))
 
-(defn update-plan-subscription [update-link plan-id callback]
+(defn update-plan-subscription
+  "Used for PUT, PATCH and DELETE of subscriptions. Adds json-params with {:plan-id plan-id}
+   only if a plan-id is passed."
+  [update-link plan-id callback]
   (if update-link
-    (let [update-subscription-body (cljs->json {:plan-id plan-id})]
+    (let [update-subscription-body (cljs->json {:plan-id plan-id})
+          options* {:headers (headers-for-link update-link)}
+          options (if plan-id (assoc options* :json-params update-subscription-body) options*)]
       (auth-http (method-for-link update-link) (relative-href update-link)
-       {:headers (headers-for-link update-link)
-        :json-params update-subscription-body}
-       callback))
+       options callback))
     (handle-missing-link "update-plan-subscription" update-link callback)))
 
 ;; Org
