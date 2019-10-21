@@ -26,6 +26,11 @@
    "Monthly" "monthly"
    "annually"))
 
+(defn- plan-label [plan-nickname]
+  (case plan-nickname
+   "Annual" (str plan-nickname " (save 20%)")
+   plan-nickname))
+
 (defn- date-string [linux-epoch]
   (.toDateString (utils/js-date (* linux-epoch 1000))))
 
@@ -92,18 +97,18 @@
 
 (def default-minimum-price 6000)
 
-(defn- plan-change [s team-data payments-data]
+(defn- plan-change [s payments-data]
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
-        active-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-data))
+        quantity (-> payments-data :subscription :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:amount %) "monthly") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:amount %) "annual") (:available-plans payments-data)))
         current-plan-data (if @(::plan-has-changed s)
-                            (first (filter #(= (:interval %) @current-plan) (:available-plans payments-data)))
+                            (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:current-plan (:subscription payments-data)))
-        total-plan-price* (* (:amount current-plan-data) (count active-users))
+        total-plan-price* (* (:amount current-plan-data) quantity)
         total-plan-price (plan-amount-to-human total-plan-price* (:currency current-plan-data))
-        available-plans (mapv #(hash-map :value (:interval %) :label (:nickname %)) (:available-plans payments-data))]
+        available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))]
     [:div.plan-change
       [:button.mlb-reset.plans-dropdown-bt
         {:on-click #(reset! (::show-plans-dropdown s) true)}
@@ -121,12 +126,14 @@
           "Free plan details here"
           (str
            "For your team of "
-           (count active-users) ;; Number of active/unverified users
+           quantity
            " people, your plan will cost "
            total-plan-price
-           (if (= (:interval current-plan) "month")
+           (if (= (:nickname current-plan-data) "Monthly")
             " monthly."
-            " annually.")))]
+            " annually.")
+           (when (= (:nickname current-plan-data) "Annual")
+            " An annual plan saves you 20%.")))]
       [:div.plan-change-title
         (str "Due today: " total-plan-price)]
       (when (not= initial-plan @current-plan)
@@ -161,7 +168,7 @@
 (rum/defcs payments-settings-modal <
   ;; Mixins
   rum/reactive
-  (drv/drv :team-data)
+  (drv/drv :org-data)
   (drv/drv :payments)
   ui-mixins/refresh-tooltips-mixin
   ;; Locals
@@ -171,6 +178,8 @@
   (rum/local nil ::initial-plan)
   (rum/local false ::plan-has-changed)
   {:will-mount (fn [s]
+    ;; Force refresh subscription data
+    (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
     (let [payments-data @(drv/get-ref s :payments)
           initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")]
       (reset! (::payments-tab s) (if-not (:subscription payments-data) :change :summary))
@@ -178,7 +187,7 @@
       (reset! (::initial-plan s) initial-plan))
     s)}
   [s {:keys [org-data]}]
-  (let [team-data (drv/react s :team-data)
+  (let [org-data (drv/react s :org-data)
         payments-tab (::payments-tab s)
         is-change-tab? (= @payments-tab :change)
         payments-data (drv/react s :payments)]
@@ -202,5 +211,5 @@
             "Back"]]
         [:div.payments-settings-body
           (if is-change-tab?
-            (plan-change s team-data payments-data)
+            (plan-change s payments-data)
             (plan-summary s payments-data))]]]))
