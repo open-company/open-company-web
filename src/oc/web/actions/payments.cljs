@@ -8,6 +8,7 @@
 
 (def default-trial-status "trialing")
 (def default-active-status "active")
+(def default-positive-statuses #{default-trial-status default-active-status})
 
 ;; Payments data handling
 
@@ -62,24 +63,16 @@
 (defn show-paywall-alert?
   "Given the loaded payments data return true if the UI needs to show the paywall and prevent any publish.
   Condition to show the paywall, or:
-  - susbscription has not been created yet
-  - status is trialing and trial-end is less than now
-  - status is not trialing and current-period-end is less than now"
+  - status different than trialing/active"
   [payments-data]
   (let [fixed-payments-data (or payments-data
                                 (dis/payments-data))
         subscription-data (:subscription fixed-payments-data)
+        subscription-status (:status subscription-data)
         is-trial? (= (:status fixed-payments-data) default-trial-status)
         trial-expired? (> (* (:trial-end fixed-payments-data) 1000) (.getDate (js/Date.)))
         period-expired? (> (* (:current-period-end fixed-payments-data) 1000) (.getDate (js/Date.)))]
     (and ls/payments-enabled
          (or ;; No subscription available for current user... TBD
              (= fixed-payments-data :404)
-             ;; If org is on trial
-             (and is-trial?
-                  ;; and trial is expired
-                  trial-expired?)
-             ;; Org is not on trial anymore
-             (and (not is-trial?)
-                  ;; the payed period is expired
-                  period-expired?)))))
+             (not (default-positive-statuses subscription-status))))))
