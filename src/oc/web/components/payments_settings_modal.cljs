@@ -133,12 +133,12 @@
                                         :solid-button-style :green
                                         :solid-button-title "Yes, change it"
                                         :solid-button-cb #(do
-                                                           (payments-actions/create-plan-subscription payments-data (:id current-plan-data))
-                                                           (alert-modal/hide-alert)
-                                                           (fn [success]
-                                                            (if success
-                                                              (reset! (::payments-tab s) :summary)
-                                                              (show-error-alert s))))}]
+                                                           (payments-actions/patch-plan-subscription payments-data (:id current-plan-data)
+                                                            (fn [success]
+                                                              (if success
+                                                                (reset! (::payments-tab s) :summary)
+                                                                (show-error-alert s))))
+                                                           (alert-modal/hide-alert))}]
                         (alert-modal/show-alert alert-data)))}
           "Add payment information"])
       ; (comment

@@ -33,26 +33,29 @@
 
 ;; Subscription handling
 
-(defn create-plan-subscription [payments-data plan-id]
+(defn create-plan-subscription [payments-data plan-id & [callback]]
   (let [create-subscription-link (utils/link-for (:links payments-data) "update")]
     (when create-subscription-link
       (api/update-plan-subscription create-subscription-link plan-id
        (fn [{:keys [status body success]}]
-        (js/console.log "DBG put response:" (if success (json->cljs body) status)))))))
+        (js/console.log "DBG put response:" (if success (json->cljs body) status))
+        (callback success))))))
 
-(defn patch-plan-subscription [payments-data plan-id]
+(defn patch-plan-subscription [payments-data plan-id & [callback]]
   (let [update-subscription-link (utils/link-for (:links payments-data) "partial-update")]
     (when update-subscription-link
       (api/update-plan-subscription update-subscription-link plan-id
        (fn [{:keys [status body success]}]
-        (js/console.log "DBG patch response:" (if success (json->cljs body) status)))))))
+        (js/console.log "DBG patch response:" (if success (json->cljs body) status))
+        (callback success))))))
 
-(defn delete-plan-subscription [payments-data plan-id]
+(defn delete-plan-subscription [payments-data plan-id & [callback]]
   (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")]
     (when delete-subscription-link
       (api/update-plan-subscription delete-subscription-link nil
        (fn [{:keys [status body success]}]
-        (js/console.log "DBG patch response:" (if success (json->cljs body) status)))))))
+        (js/console.log "DBG patch response:" (if success (json->cljs body) status))
+        (callback success))))))
 
 ;; Paywall
 
