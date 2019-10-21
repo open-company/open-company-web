@@ -79,7 +79,7 @@
                     :title "Oops"
                     :message "An error occurred while saving your change of plan, please try again."
                     :solid-button-style :red
-                    :solid-button-title "Yes, change it"
+                    :solid-button-title "OK, got it"
                     :solid-button-cb alert-modal/hide-alert}]
     (alert-modal/show-alert alert-data)))
 
