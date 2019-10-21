@@ -33,6 +33,12 @@
   (let [subscription-data (:subscription payments-data)
         is-trial? (= (:status subscription-data) payments-actions/default-trial-status)
         trial-end-date (when is-trial? (date-string (:trial-end subscription-data)))
+        remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
+        trial-remaining-string (when is-trial?
+                                 (if (> remaining-seconds (* 60 60 24))
+                                   (let [days-left (int (/ remaining-seconds (* 60 60 24)))]
+                                    (str " (" days-left " day" (when-not (= days-left 1) "s") " left)"))
+                                   "(today)"))
         next-payment-due (date-string (:current-period-end subscription-data))
         current-plan (:current-plan subscription-data)]
     [:div.plan-summary
@@ -43,21 +49,22 @@
           "Visa ending in 8059, exp: 02/2022"
           [:button.mlb-reset.change-pay-method-bt
             "Change"]])
-      (when 
+      (when is-trial?
         [:div.plan-summary-details.bottom-margin
-          "You are on your 14 days trial that will end on: "
-          [:strong
-            next-payment-due]])
+          "Trial:"
+          [:br]
+          "Started on: " (date-string (:trial-start subscription-data))
+          [:br]
+          "Ends on: " trial-end-date trial-remaining-string])
       (when subscription-data
         [:div.plan-summary-details.bottom-margin
           "Billing period:"
           [:br]
           "Plan billed "
-          [:strong
-            (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (:amount current-plan) (:currency current-plan)) ")"]
+          (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (:amount current-plan) (:currency current-plan)) ")"
           [:br]
           "Next payment due on "
-          [:strong next-payment-due]
+          next-payment-due
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(reset! (::payments-tab s) :change)}
             "Change"]])
