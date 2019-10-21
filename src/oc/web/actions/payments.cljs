@@ -6,6 +6,11 @@
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]))
 
+(def default-trial-status "trialing")
+(def default-active-status "active")
+
+;; Payments data handling
+
 (defn get-payments-cb [org-slug {:keys [body success status]}]
   (let [payments-data (cond
                         success (json->cljs body)
@@ -26,11 +31,7 @@
         (when-let [payments-link (utils/link-for (:links org-data) "payments")]
           (get-payments payments-link))))))
 
-(defn show-paywall-alert? [payments-data]
-  (let [fixed-payments-data (or payments-data
-                                (dis/payments-data))]
-    (and ls/payments-enabled
-         (= fixed-payments-data :404))))
+;; Subscription handling
 
 (defn create-plan-subscription [payments-data plan-id]
   (let [create-subscription-link (utils/link-for (:links payments-data) "update")]
@@ -52,3 +53,17 @@
       (api/update-plan-subscription delete-subscription-link nil
        (fn [{:keys [status body success]}]
         (js/console.log "DBG patch response:" (if success (json->cljs body) status)))))))
+
+;; Paywall
+
+(defn show-paywall-alert?
+  "Given the loaded payments data return true if the UI needs to show the paywall and prevent any publish."
+  [payments-data]
+  (let [fixed-payments-data (or payments-data
+                                (dis/payments-data))
+        subscription-data (:subscription fixed-payments-data)
+        is-trial? (= (:status fixed-payments-data) default-trial-status)
+        trial-expired? (> (* (:current-period-end fixed-payments-data) 1000) (.getDate (js/Date.)))]
+    (and ls/payments-enabled
+         (or (= fixed-payments-data :404)
+             trial-expired?))))
