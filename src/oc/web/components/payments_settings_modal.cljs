@@ -9,43 +9,70 @@
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
+(defn- plan-amount-to-human [amount currency]
+  (let [int-plan-amount (int (/ amount 100))
+        decimal-plan-amount* (mod amount 100)
+        decimal-plan-amount (if (= (-> decimal-plan-amount* str count) 1)
+                             (str "0" decimal-plan-amount*)
+                             (str decimal-plan-amount*))
+        currency-symbol (case currency
+                         "usd" "$"
+                         "eur" "€"
+                         (str currency " "))]
+    (str currency-symbol int-plan-amount "." decimal-plan-amount)))
+
+(defn- plan-description [plan-nickname]
+  (case plan-nickname
+   "Monthly" "monthly"
+   "annually"))
+
+(defn- date-string [linux-epoch]
+  (.toDateString (utils/js-date (* linux-epoch 1000))))
+
 (defn- plan-summary [s payments-data]
-  [:div.plan-summary
-    [:div.plan-summary-details
+  (let [subscription-data (:subscription payments-data)
+        is-trial? (= (:status subscription-data) payments-actions/default-trial-status)
+        trial-end-date (when is-trial? (date-string (:trial-end subscription-data)))
+        next-payment-due (date-string (:current-period-end subscription-data))
+        current-plan (:current-plan subscription-data)]
+    [:div.plan-summary
       (when (:payment-method payments-data)
-        [:div
+        [:div.plan-summary-details
           "Payment method:"
           [:br]
           "Visa ending in 8059, exp: 02/2022"
           [:button.mlb-reset.change-pay-method-bt
-            "Change"]])]
-    [:div.plan-summary-details.bottom-margin
-      (when (:subscription payments-data)
-        [:div
+            "Change"]])
+      (when 
+        [:div.plan-summary-details.bottom-margin
+          "You are on your 14 days trial that will end on: "
+          [:strong
+            next-payment-due]])
+      (when subscription-data
+        [:div.plan-summary-details.bottom-margin
           "Billing period:"
           [:br]
-          (str "Plan billed "
-           (when (= (-> payments-data :subscription :interval) "annual")
-             "annually"
-             "monthly")
-          " ($...)")
+          "Plan billed "
+          [:strong
+            (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (:amount current-plan) (:currency current-plan)) ")"]
           [:br]
-          "Next payment due on ..."
+          "Next payment due on "
+          [:strong next-payment-due]
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(reset! (::payments-tab s) :change)}
-            "Change"]])]
-    [:div.plan-summary-separator]
-    [:div.plan-summary-details
-      [:button.mlb-reset.history-bt
-        "Lookup billing history"]]
-    (comment
+            "Change"]])
       [:div.plan-summary-separator]
       [:div.plan-summary-details
-        "Have a team of 250+"
-        [:a.chat-with-us
-          {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-          "Chat with us"]])])
+        [:button.mlb-reset.history-bt
+          "Lookup billing history"]]
+      (comment
+        [:div.plan-summary-separator]
+        [:div.plan-summary-details
+          "Have a team of 250+"
+          [:a.chat-with-us
+            {:class "intercom-chat-link"
+             :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+            "Chat with us"]])]))
 
 (defn- show-error-alert [s]
   (let [alert-data {:icon "/img/ML/trash.svg"
@@ -64,14 +91,11 @@
         active-users (filterv #(#{"active" "unverified"} (:status %)) (:users team-data))
         monthly-plan (first (filter #(= (:amount %) "monthly") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:amount %) "annual") (:available-plans payments-data)))
-        current-plan-data (first (filter #(= (:interval %) @current-plan) (:available-plans payments-data)))
+        current-plan-data (if @(::plan-has-changed s)
+                            (first (filter #(= (:interval %) @current-plan) (:available-plans payments-data)))
+                            (:current-plan (:subscription payments-data)))
         total-plan-price* (* (:amount current-plan-data) (count active-users))
-        int-plan-price (int (/ total-plan-price* 100))
-        decimal-plan-price* (mod total-plan-price* 100)
-        decimal-plan-price (if (= (-> decimal-plan-price* str count) 1)
-                             (str "0" decimal-plan-price*)
-                             (str decimal-plan-price*))
-        total-plan-price (str int-plan-price "." decimal-plan-price)
+        total-plan-price (plan-amount-to-human total-plan-price* (:currency current-plan-data))
         available-plans (mapv #(hash-map :value (:interval %) :label (:nickname %)) (:available-plans payments-data))]
     [:div.plan-change
       [:button.mlb-reset.plans-dropdown-bt
@@ -82,6 +106,7 @@
                         :value @current-plan
                         :on-blur #(reset! (::show-plans-dropdown s) false)
                         :on-change (fn [selected-item]
+                                     (reset! (::plan-has-changed s) true)
                                      (reset! (::show-plans-dropdown s) false)
                                      (reset! current-plan (:value selected-item)))}))
       [:div.plan-change-description
@@ -90,13 +115,13 @@
           (str
            "For your team of "
            (count active-users) ;; Number of active/unverified users
-           " people, your plan will cost $"
+           " people, your plan will cost "
            total-plan-price
            (if (= (:interval current-plan) "month")
             " monthly."
             " annually.")))]
       [:div.plan-change-title
-        (str "Due today: $" total-plan-price)]
+        (str "Due today: " total-plan-price)]
       (when (not= initial-plan @current-plan)
         [:button.mlb-reset.payment-info-bt
           {:on-click (fn []
@@ -137,9 +162,10 @@
   (rum/local nil ::payments-plan)
   (rum/local false ::show-plans-dropdown)
   (rum/local nil ::initial-plan)
+  (rum/local false ::plan-has-changed)
   {:will-mount (fn [s]
     (let [payments-data @(drv/get-ref s :payments)
-          initial-plan (if (:subscription payments-data) (-> payments-data :subscription :interval) "free")]
+          initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")]
       (reset! (::payments-tab s) (if-not (:subscription payments-data) :change :summary))
       (reset! (::payments-plan s) initial-plan)
       (reset! (::initial-plan s) initial-plan))
