@@ -10,4 +10,4 @@
 
 (defmethod dispatcher/action :payments-checkout-session-id
   [db [_ session-data]]
-  (assoc db :checkout-session-id (:sessionId session-data)))
+  (assoc db :checkout-session-data session-data))
