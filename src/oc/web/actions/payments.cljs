@@ -64,7 +64,7 @@
 (defn add-payment-method [payments-data]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         checkout-link (utils/link-for (:links fixed-payments-data) "checkout")]
-    (api/get-checkout-session-id checkout-link
+    (api/get-checkout-session-id checkout-link (router/current-org-slug)
      (fn [{:keys [success body status]}]
       (when success
        (let [session-data (json->cljs body)]
