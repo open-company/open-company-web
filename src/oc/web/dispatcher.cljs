@@ -19,6 +19,8 @@
 
 ;; Data key paths
 
+(def checkout-result-key :checkout-success-result)
+
 (def api-entry-point-key [:api-entry-point])
 
 (def auth-settings-key [:auth-settings])
@@ -201,6 +203,7 @@
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
+   checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]

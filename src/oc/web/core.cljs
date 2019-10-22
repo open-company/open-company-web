@@ -166,9 +166,13 @@
                       :else [])
         bot-access (when (contains? query-params :access)
                       (:access query-params))
+        billing-checkout-result (when (and (= org-settings :payments)
+                                            (contains? query-params :result))
+                                   (= (:result query-params) "true"))
         next-app-state {:loading loading
                         :panel-stack panel-stack
-                        :bot-access bot-access}]
+                        :bot-access bot-access
+                        dis/checkout-result-key billing-checkout-result}]
     (swap! dis/app-state merge next-app-state)))
 
 (defn- read-sort-type-from-cookie
