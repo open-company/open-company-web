@@ -197,3 +197,6 @@ OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
 OCCarrotDesktop.windowHasFocus = function() {};
 OCCarrotDesktop.getElectronAppVersion = function() {};
+// Stripe
+var Stripe = function(){};
+Stripe.redirectToCheckout = function(){};
