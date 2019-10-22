@@ -47,13 +47,17 @@
         next-payment-due (date-string (:current-period-end subscription-data))
         current-plan (:current-plan subscription-data)]
     [:div.plan-summary
-      (when (:payment-method payments-data)
+      (if (:payment-method payments-data)
         [:div.plan-summary-details
           "Payment method:"
           [:br]
           "Visa ending in 8059, exp: 02/2022"
           [:button.mlb-reset.change-pay-method-bt
-            "Change"]])
+            "Change"]]
+        [:div.plan-summary-details
+          [:button.mlb-reset.change-pay-method-bt
+            {:on-click #(payments-actions/add-payment-method payments-data)}
+            "Add a payment method"]])
       (when is-trial?
         [:div.plan-summary-details.bottom-margin
           "Trial:"
