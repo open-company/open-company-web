@@ -94,6 +94,16 @@ div.payments-settings-modal {
           line-height: 18px;
           color: $deep_navy;
 
+          &.error, &.error button, &.error a, &.error strong {
+            color: $carrot_orange;
+            background-color: transparent;
+          }
+
+          &.success, &.success button, &.success a, &.success strong {
+            color: $carrot_green;
+            background-color: transparent;
+          }
+
           button, a {
             color: $carrot_green;
             @include OC_Body_Book();

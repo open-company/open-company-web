@@ -2,12 +2,22 @@
   (:require [rum.core :as rum]
             [clojure.contrib.humanize :refer (intcomma)]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.alert-modal :as alert-modal]))
+
+(defn- change-tab [s tab]
+  ;; Reset the checkout result key so the user won't see the result message
+  ;; another anymore
+  (dis/dispatch! [:input [dis/checkout-result-key] nil])
+  ;; Remove it also from the local state
+  (reset! (::checkout-result s) nil)
+  ;; Change tab
+  (reset! (::payments-tab s) tab))
 
 (defn- plan-amount-to-human [amount currency]
   (let [int-plan-amount (int (/ amount 100))
@@ -45,15 +55,29 @@
                                     (str " (" days-left " day" (when-not (= days-left 1) "s") " left)"))
                                    "(today)"))
         next-payment-due (date-string (:current-period-end subscription-data))
-        current-plan (:current-plan subscription-data)]
+        current-plan (:current-plan subscription-data)
+        checkout-result @(::checkout-result s)]
     [:div.plan-summary
-      (if (:payment-method payments-data)
+      (when (or (true? checkout-result)
+                (false? checkout-result))
         [:div.plan-summary-details
-          "Payment method:"
-          [:br]
-          "Visa ending in 8059, exp: 02/2022"
-          [:button.mlb-reset.change-pay-method-bt
-            "Change"]]
+          {:class (if checkout-result "success" "error")}
+          (if checkout-result
+            "Payment method updated correctly!"
+            "There was an error updating your payment method, please try again!")])
+      (if (seq (:payment-methods payments-data))
+        (let [first-payment-method (first (:payment-methods payments-data))
+              first-card (:card first-payment-method)]
+          [:div.plan-summary-details
+            "Payment method:"
+            [:br]
+            (case (:brand first-card)
+              "visa" "Visa"
+              "Mastercard")
+            " ending in " (:last-4 first-card) ", exp: " (utils/add-zero (int (:exp-month first-card))) "/" (:exp-year first-card)
+            [:button.mlb-reset.change-pay-method-bt
+              {:on-click #(payments-actions/add-payment-method payments-data)}
+              "Change"]])
         [:div.plan-summary-details
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(payments-actions/add-payment-method payments-data)}
@@ -75,7 +99,7 @@
           "Next payment due on "
           next-payment-due
           [:button.mlb-reset.change-pay-method-bt
-            {:on-click #(reset! (::payments-tab s) :change)}
+            {:on-click #(change-tab s :change)}
             "Change"]])
       [:div.plan-summary-separator]
       [:div.plan-summary-details
@@ -154,7 +178,7 @@
                                                            (payments-actions/patch-plan-subscription payments-data (:id current-plan-data)
                                                             (fn [success]
                                                               (if success
-                                                                (reset! (::payments-tab s) :summary)
+                                                                (change-tab s :summary)
                                                                 (show-error-alert s))))
                                                            (alert-modal/hide-alert))}]
                         (alert-modal/show-alert alert-data)))}
@@ -174,6 +198,7 @@
   rum/reactive
   (drv/drv :org-data)
   (drv/drv :payments)
+  (drv/drv dis/checkout-result-key)
   ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local :summary ::payments-tab)
@@ -181,15 +206,21 @@
   (rum/local false ::show-plans-dropdown)
   (rum/local nil ::initial-plan)
   (rum/local false ::plan-has-changed)
+  (rum/local false ::checkout-result)
   {:will-mount (fn [s]
     ;; Force refresh subscription data
     (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
     (let [payments-data @(drv/get-ref s :payments)
-          initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")]
+          initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")
+          checkout-result @(drv/get-ref s dis/checkout-result-key)]
       (reset! (::payments-tab s) (if-not (:subscription payments-data) :change :summary))
       (reset! (::payments-plan s) initial-plan)
-      (reset! (::initial-plan s) initial-plan))
-    s)}
+      (reset! (::initial-plan s) initial-plan)
+      (reset! (::checkout-result s) checkout-result))
+    s)
+    :will-unmount (fn [s]
+     (dis/dispatch! [:input [dis/checkout-result-key] nil])
+     s)}
   [s {:keys [org-data]}]
   (let [org-data (drv/react s :org-data)
         payments-tab (::payments-tab s)
@@ -206,11 +237,11 @@
              "Billing")]
           (when-not is-change-tab?
             [:button.mlb-reset.save-bt
-              {:on-click #(reset! payments-tab :change)}
+              {:on-click #(change-tab s :change)}
               "Change plan"])
           [:button.mlb-reset.cancel-bt
             {:on-click #(if is-change-tab?
-                          (reset! payments-tab :summary)
+                          (change-tab s :summary)
                           (nav-actions/show-org-settings nil))}
             "Back"]]
         [:div.payments-settings-body
