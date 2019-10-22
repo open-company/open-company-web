@@ -8,6 +8,6 @@
   (let [payments-key (dispatcher/payments-key org-slug)]
     (assoc-in db payments-key payments-data)))
 
-(defmethod dispatcher/action :payment-checkout-session-id
-  [db [_ checkout-session-id]]
-  (assoc db :checkout-session-id checkout-session-id))
+(defmethod dispatcher/action :payments-checkout-session-id
+  [db [_ session-data]]
+  (assoc db :checkout-session-id (:sessionId session-data)))

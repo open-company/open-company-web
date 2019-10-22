@@ -12,10 +12,10 @@
     (init))
   @stripe-obj)
 
-(defn redirect-to-checkout [checkout-session-id & [callback]]
+(defn redirect-to-checkout [session-data & [callback]]
   (let [s (stripe)
         checkout-promise (.redirectToCheckout s
-                          (clj->js {:sessionId checkout-session-id}))]
+                          (clj->js session-data))]
     (.then checkout-promise
      (fn [res]
       (when (.-error res)

@@ -67,10 +67,11 @@
     (api/get-checkout-session-id checkout-link
      (fn [{:keys [success body status]}]
       (when success
-       (dis/dispatch! [:payment-checkout-session-id body])
-       (stripe-client/redirect-to-checkout body
-        (fn [res]
-         (js/console.log "DBG result of checkout:" res))))))))
+       (let [session-data (json->cljs body)]
+         (dis/dispatch! [:payments-checkout-session-id session-data])
+         (stripe-client/redirect-to-checkout session-data
+          (fn [res]
+           (js/console.log "DBG result of checkout:" res)))))))))
 
 ;; Paywall
 
