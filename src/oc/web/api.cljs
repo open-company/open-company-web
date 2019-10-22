@@ -294,6 +294,13 @@
        options callback))
     (handle-missing-link "update-plan-subscription" update-link callback)))
 
+(defn get-checkout-session-id [checkout-link callback]
+  (if checkout-link
+    (auth-http (method-for-link checkout-link) (relative-href checkout-link)
+     {:headers (headers-for-link checkout-link)}
+     callback)
+    (handle-missing-link "get-checkout-session-id" checkout-link callback)))
+
 ;; Org
 
 (defn get-org [org-link callback]

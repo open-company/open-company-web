@@ -4,7 +4,8 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.json :refer (json->cljs)]))
+            [oc.web.lib.json :refer (json->cljs)]
+            [oc.web.utils.stripe :as stripe-client]))
 
 (def default-trial-status "trialing")
 (def default-active-status "active")
@@ -57,6 +58,19 @@
        (fn [{:keys [status body success]}]
         (js/console.log "DBG patch response:" (if success (json->cljs body) status))
         (callback success))))))
+
+;; Checkout
+
+(defn add-payment-method [payments-data]
+  (let [fixed-payments-data (or payments-data (dis/payments-data))
+        checkout-link (utils/link-for (:links fixed-payments-data) "checkout")]
+    (api/get-checkout-session-id checkout-link
+     (fn [{:keys [success body status]}]
+      (when success
+       (dis/dispatch! [:payment-checkout-session-id body])
+       (stripe-client/redirect-to-checkout body
+        (fn [res]
+         (js/console.log "DBG result of checkout:" res))))))))
 
 ;; Paywall
 
