@@ -294,14 +294,13 @@
        options callback))
     (handle-missing-link "update-plan-subscription" update-link callback)))
 
-(defn get-checkout-session-id [checkout-link org-slug callback]
+(defn get-checkout-session-id [checkout-link success-url cancel-url callback]
   (if checkout-link
-    (let [base-redirect-url (str (router/get-token) "?org-settings=billing&success=")]
-      (auth-http (method-for-link checkout-link) (relative-href checkout-link)
-       {:headers (headers-for-link checkout-link)
-        :json-params (cljs->json {:success-url (str base-redirect-url "true")
-                                  :cancel-url (str base-redirect-url "false")})}
-       callback))
+    (auth-http (method-for-link checkout-link) (relative-href checkout-link)
+     {:headers (headers-for-link checkout-link)
+      :json-params (cljs->json {:success-url success-url
+                                :cancel-url cancel-url})}
+     callback)
     (handle-missing-link "get-checkout-session-id" checkout-link callback)))
 
 ;; Org
