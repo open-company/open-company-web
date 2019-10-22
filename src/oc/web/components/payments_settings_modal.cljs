@@ -73,6 +73,7 @@
             [:br]
             (case (:brand first-card)
               "visa" "Visa"
+              "amex" "American Express"
               "Mastercard")
             " ending in " (:last-4 first-card) ", exp: " (utils/add-zero (int (:exp-month first-card))) "/" (:exp-year first-card)
             [:button.mlb-reset.change-pay-method-bt
