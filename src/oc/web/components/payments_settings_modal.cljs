@@ -3,6 +3,7 @@
             [clojure.contrib.humanize :refer (intcomma)]
             [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as s]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
@@ -73,6 +74,7 @@
           (for [c (:payment-methods payments-data)
                 :let [card (:card c)]]
             [:div.plan-summary-details-card-row
+              {:key (str "pay-method-" (:id c))}
               (case (:brand card)
                "visa" "Visa"
                "amex" "American Express"
@@ -129,6 +131,13 @@
 
 (def default-minimum-price 6000)
 
+(defn- save-plan-change [s payments-data current-plan-data]
+  (payments-actions/patch-plan-subscription payments-data (:id current-plan-data)
+   (fn [success]
+     (if success
+       (change-tab s :summary)
+       (show-error-alert s)))))
+
 (defn- plan-change [s payments-data]
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
@@ -140,8 +149,13 @@
                             (:current-plan (:subscription payments-data)))
         total-plan-price* (* (:amount current-plan-data) quantity)
         total-plan-price (plan-amount-to-human total-plan-price* (:currency current-plan-data))
-        available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))]
+        available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
+        has-payment-info? (seq (:payment-methods payments-data))
+        checkout-result @(::checkout-result s)]
     [:div.plan-change
+      (when (false? checkout-result)
+        [:div.plan-change-details.error
+          "There was an error updating your payment method, please try again!"])
       [:button.mlb-reset.plans-dropdown-bt
         {:on-click #(reset! (::show-plans-dropdown s) true)}
         (or (:nickname current-plan-data) "Free")]
@@ -168,25 +182,28 @@
             " An annual plan saves you 20%.")))]
       [:div.plan-change-title
         (str "Due today: " total-plan-price)]
-      (when (not= initial-plan @current-plan)
-        [:button.mlb-reset.payment-info-bt
-          {:on-click (fn []
-                      (let [alert-data {:title "Are you sure?"
-                                        :message (str "Are you sure you want to change your current plan to " (:nickname current-plan-data) "?")
-                                        :link-button-style :red
-                                        :link-button-title "No, keep it"
-                                        :link-button-cb #(alert-modal/hide-alert)
-                                        :solid-button-style :green
-                                        :solid-button-title "Yes, change it"
-                                        :solid-button-cb #(do
-                                                           (payments-actions/patch-plan-subscription payments-data (:id current-plan-data)
-                                                            (fn [success]
-                                                              (if success
-                                                                (change-tab s :summary)
-                                                                (show-error-alert s))))
+      [:button.mlb-reset.payment-info-bt
+        {:on-click (fn []
+                    (let [alert-data {:title "Are you sure?"
+                                      :message (str "Are you sure you want to change your current plan to " (:nickname current-plan-data) "?")
+                                      :link-button-style :red
+                                      :link-button-title "No, keep it"
+                                      :link-button-cb #(alert-modal/hide-alert)
+                                      :solid-button-style :green
+                                      :solid-button-title "Yes, change it"
+                                      :solid-button-cb (fn [_]
+                                                          (if has-payment-info?
+                                                            (save-plan-change s payments-data current-plan-data)
+                                                            (payments-actions/add-payment-method payments-data
+                                                             ;; In case user changed the plan let's add it to the callback
+                                                             ;; so we save once payment method is added
+                                                             (when (not= initial-plan @current-plan)
+                                                              current-plan-data)))
                                                            (alert-modal/hide-alert))}]
-                        (alert-modal/show-alert alert-data)))}
-          "Add payment information"])
+                      (alert-modal/show-alert alert-data)))}
+        (if has-payment-info?
+          "Change plan"
+          "Add payment information")]
       ; (comment
        [:div.plan-change-separator]
        [:div.plan-change-details
@@ -216,11 +233,18 @@
     (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
     (let [payments-data @(drv/get-ref s :payments)
           initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")
-          checkout-result @(drv/get-ref s dis/checkout-result-key)]
-      (reset! (::payments-tab s) (if-not (:subscription payments-data) :change :summary))
+          checkout-result @(drv/get-ref s dis/checkout-result-key)
+          has-payment-info? (seq (:payment-methods payments-data))]
+      (reset! (::payments-tab s) (if (or (not (:subscription payments-data))
+                                         (not has-payment-info?))
+                                   :change
+                                   :summary))
       (reset! (::payments-plan s) initial-plan)
       (reset! (::initial-plan s) initial-plan)
-      (reset! (::checkout-result s) checkout-result))
+      (reset! (::checkout-result s) checkout-result)
+      ;; When the user come back from
+      (when (:update-plan (router/query-params))
+        (payments-actions/patch-plan-subscription payments-data (:update-plan (router/query-params)))))
     s)
     :will-unmount (fn [s]
      (dis/dispatch! [:input [dis/checkout-result-key] nil])
@@ -229,7 +253,8 @@
   (let [org-data (drv/react s :org-data)
         payments-tab (::payments-tab s)
         is-change-tab? (= @payments-tab :change)
-        payments-data (drv/react s :payments)]
+        payments-data (drv/react s :payments)
+        has-payment-info? (seq (:payment-methods payments-data))]
     [:div.payments-settings-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(nav-actions/close-all-panels)}]
@@ -237,17 +262,21 @@
         [:div.payments-settings-header
           [:div.payments-settings-header-title
             (if is-change-tab?
-             "Change plan"
+             (if has-payment-info?
+               "Change plan"
+               "Select a plan")
              "Billing")]
-          (when-not is-change-tab?
+          (when (or (not is-change-tab?)
+                    (nil? @(::checkout-result s)))
             [:button.mlb-reset.save-bt
               {:on-click #(change-tab s :change)}
               "Change plan"])
-          [:button.mlb-reset.cancel-bt
-            {:on-click #(if is-change-tab?
-                          (change-tab s :summary)
-                          (nav-actions/show-org-settings nil))}
-            "Back"]]
+          (when (nil? @(::checkout-result s))
+            [:button.mlb-reset.cancel-bt
+              {:on-click #(if is-change-tab?
+                            (change-tab s :summary)
+                            (nav-actions/show-org-settings nil))}
+              "Back"])]
         [:div.payments-settings-body
           (if is-change-tab?
             (plan-change s payments-data)
