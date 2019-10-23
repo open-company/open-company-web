@@ -82,7 +82,7 @@
         "Updating your plan..."
         (small-loading)]]
     (let [subscription-data (:subscription payments-data)
-          next-payment-due (date-string (:current-period-end subscription-data))
+          next-payment-due (date-string (-> subscription-data :upcoming-invoice :next-payment-attempt))
           current-plan (:current-plan subscription-data)
           checkout-result @(::checkout-result s)
           quantity (-> payments-data :subscription :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
@@ -225,8 +225,9 @@
             unit-amount " per user after."))
           (when (= (:nickname current-plan-data) "Annual")
             " An annual plan saves you 20%.")])
-      [:div.plan-change-title
-        (str "Due today: " total-plan-price)]
+      (when (<= (-> subscription-data :upcoming-invoice :next-payment-attempt) (/ (utils/js-date) 1000))
+        [:div.plan-change-title
+          (str "Due today: " total-plan-price)])
       [:button.mlb-reset.payment-info-bt
         {:disabled @(::saving-plan s)
          :on-click (fn []
