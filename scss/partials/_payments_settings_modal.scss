@@ -83,16 +83,16 @@ div.payments-settings-modal {
       div.plan-summary {
         margin-top: 24px;
 
-        &.bottom-margin {
-          margin-bottom: 24px;
-        }
-
         div.plan-summary-details {
           margin-top: 16px;
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
           color: $deep_navy;
+
+          &.bottom-margin {
+            margin-bottom: 24px;
+          }
 
           &.error, &.error button, &.error a, &.error strong {
             color: $carrot_orange;
@@ -225,6 +225,10 @@ div.payments-settings-modal {
           font-size: 14px;
           line-height: 18px;
           color: $deep_navy;
+
+          &.bottom-margin {
+            margin-bottom: 24px;
+          }
 
           &.error, &.error button, &.error a, &.error strong {
             color: $carrot_orange;

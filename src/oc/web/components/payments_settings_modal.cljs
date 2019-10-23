@@ -9,8 +9,9 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
-            [oc.web.components.ui.alert-modal :as alert-modal]))
+            [oc.web.components.ui.small-loading :refer (small-loading)]))
 
 (defn- change-tab [s tab]
   ;; Reset the checkout result key so the user won't see the result message
@@ -46,79 +47,88 @@
 (defn- date-string [linux-epoch]
   (.toDateString (utils/js-date (* linux-epoch 1000))))
 
-(defn- plan-summary [s payments-data]
-  (let [subscription-data (:subscription payments-data)
-        is-trial? (= (:status subscription-data) payments-actions/default-trial-status)
-        trial-end-date (when is-trial? (date-string (:trial-end subscription-data)))
+(defn- is-trial? [subs-data]
+  (= (:status subs-data) payments-actions/default-trial-status))
+
+(defn- trial-info-string [subscription-data]
+  (let [trial-end-date (date-string (:trial-end subscription-data))
         remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
-        trial-remaining-string (when is-trial?
-                                 (if (> remaining-seconds (* 60 60 24))
-                                   (let [days-left (int (/ remaining-seconds (* 60 60 24)))]
-                                    (str " (" days-left " day" (when-not (= days-left 1) "s") " left)"))
-                                   "(today)"))
-        next-payment-due (date-string (:current-period-end subscription-data))
-        current-plan (:current-plan subscription-data)
-        checkout-result @(::checkout-result s)]
+        trial-remaining-string (if (> remaining-seconds (* 60 60 24))
+                                 (let [days-left (int (/ remaining-seconds (* 60 60 24)))]
+                                  (str " (" days-left " day" (when-not (= days-left 1) "s") " left)"))
+                                 "(today)")]
+    (str "Ends on: " trial-end-date trial-remaining-string)))
+
+(defn- plan-summary [s payments-data]
+  (if @(::automatic-update-plan s)
     [:div.plan-summary
-      (when (or (true? checkout-result)
-                (false? checkout-result))
-        [:div.plan-summary-details
-          {:class (if checkout-result "success" "error")}
-          (if checkout-result
-            "Payment method updated correctly!"
-            "There was an error updating your payment method, please try again!")])
-      (if (seq (:payment-methods payments-data))
-        [:div.plan-summary-details
-          "Payment methods:"
-          [:br]
-          (for [c (:payment-methods payments-data)
-                :let [card (:card c)]]
-            [:div.plan-summary-details-card-row
-              {:key (str "pay-method-" (:id c))}
-              (case (:brand card)
-               "visa" "Visa"
-               "amex" "American Express"
-               "mastercard" "Mastercard"
-               (s/phrase (:brand card)))
-               (when (seq (:last-4 card))
-                 (str " ending in " (:last-4 card)))
-               ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
-              [:button.mlb-reset.change-pay-method-bt
-                {:on-click #(payments-actions/add-payment-method payments-data)}
-                "Add another payment method"]]
-        [:div.plan-summary-details
-          [:button.mlb-reset.change-pay-method-bt
-            {:on-click #(payments-actions/add-payment-method payments-data)}
-            "Add a payment method"]])
-      (when is-trial?
-        [:div.plan-summary-details.bottom-margin
-          "Trial:"
-          [:br]
-          "Ends on: " trial-end-date trial-remaining-string])
-      (when subscription-data
-        [:div.plan-summary-details.bottom-margin
-          "Billing period:"
-          [:br]
-          "Plan billed "
-          (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (:amount current-plan) (:currency current-plan)) ")"
-          [:br]
-          "Next payment due on "
-          next-payment-due
-          [:button.mlb-reset.change-pay-method-bt
-            {:on-click #(change-tab s :change)}
-            "Change"]])
-      [:div.plan-summary-separator]
-      [:div.plan-summary-details
-        [:button.mlb-reset.history-bt
-          "Lookup billing history"]]
-      (comment
+      [:div.plan-summary-deatils
+        "Updating your plan..."
+        (small-loading)]]
+    (let [subscription-data (:subscription payments-data)
+          next-payment-due (date-string (:current-period-end subscription-data))
+          current-plan (:current-plan subscription-data)
+          checkout-result @(::checkout-result s)]
+      [:div.plan-summary
+        (when (or (true? checkout-result)
+                  (false? checkout-result))
+          [:div.plan-summary-details
+            {:class (if checkout-result "success" "error")}
+            (if checkout-result
+              "Payment method updated correctly!"
+              "There was an error updating your payment method, please try again!")])
+        (if (seq (:payment-methods payments-data))
+          [:div.plan-summary-details
+            "Payment methods:"
+            [:br]
+            (for [c (:payment-methods payments-data)
+                  :let [card (:card c)]]
+              [:div.plan-summary-details-card-row
+                {:key (str "pay-method-" (:id c))}
+                (case (:brand card)
+                 "visa" "Visa"
+                 "amex" "American Express"
+                 "mastercard" "Mastercard"
+                 (s/phrase (:brand card)))
+                 (when (seq (:last-4 card))
+                   (str " ending in " (:last-4 card)))
+                 ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
+                [:button.mlb-reset.change-pay-method-bt
+                  {:on-click #(payments-actions/add-payment-method payments-data)}
+                  "Add another payment method"]]
+          [:div.plan-summary-details
+            [:button.mlb-reset.change-pay-method-bt
+              {:on-click #(payments-actions/add-payment-method payments-data)}
+              "Add a payment method"]])
+        (when (is-trial? subscription-data)
+          [:div.plan-summary-details.bottom-margin
+            "Trial:"
+            [:br]
+            (trial-info-string subscription-data)])
+        (when subscription-data
+          [:div.plan-summary-details.bottom-margin
+            "Billing period:"
+            [:br]
+            "Plan billed "
+            (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (:amount current-plan) (:currency current-plan)) ")"
+            [:br]
+            "Next payment due on "
+            next-payment-due
+            [:button.mlb-reset.change-pay-method-bt
+              {:on-click #(change-tab s :change)}
+              "Change"]])
         [:div.plan-summary-separator]
         [:div.plan-summary-details
-          "Have a team of 250+"
-          [:a.chat-with-us
-            {:class "intercom-chat-link"
-             :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-            "Chat with us"]])]))
+          [:button.mlb-reset.history-bt
+            "Lookup billing history"]]
+        (comment
+          [:div.plan-summary-separator]
+          [:div.plan-summary-details
+            "Have a team of 250+"
+            [:a.chat-with-us
+              {:class "intercom-chat-link"
+               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+              "Chat with us"]])])))
 
 (defn- show-error-alert [s]
   (let [alert-data {:icon "/img/ML/trash.svg"
@@ -134,8 +144,11 @@
 (defn- save-plan-change [s payments-data current-plan-data]
   (payments-actions/patch-plan-subscription payments-data (:id current-plan-data)
    (fn [success]
+     (reset! (::saving-plan s) false)
      (if success
-       (change-tab s :summary)
+       (do
+         (change-tab s :summary)
+         (reset! (::current-plan s) (:nickname current-plan-data)))
        (show-error-alert s)))))
 
 (defn- plan-change [s payments-data]
@@ -144,9 +157,10 @@
         quantity (-> payments-data :subscription :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:amount %) "monthly") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:amount %) "annual") (:available-plans payments-data)))
+        subscription-data (:subscription payments-data)
         current-plan-data (if @(::plan-has-changed s)
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
-                            (:current-plan (:subscription payments-data)))
+                            (:current-plan subscription-data))
         total-plan-price* (* (:amount current-plan-data) quantity)
         total-plan-price (plan-amount-to-human total-plan-price* (:currency current-plan-data))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
@@ -156,6 +170,12 @@
       (when (false? checkout-result)
         [:div.plan-change-details.error
           "There was an error updating your payment method, please try again!"])
+      (when (and (is-trial? subscription-data)
+                 (not has-payment-info?))
+        [:div.plan-change-details.bottom-margin
+          "Trial:"
+          [:br]
+          (trial-info-string subscription-data)])
       [:button.mlb-reset.plans-dropdown-bt
         {:on-click #(reset! (::show-plans-dropdown s) true)}
         (or (:nickname current-plan-data) "Free")]
@@ -183,36 +203,38 @@
       [:div.plan-change-title
         (str "Due today: " total-plan-price)]
       [:button.mlb-reset.payment-info-bt
-        {:on-click (fn []
-                    (let [alert-data {:title "Are you sure?"
-                                      :message (str "Are you sure you want to change your current plan to " (:nickname current-plan-data) "?")
-                                      :link-button-style :red
-                                      :link-button-title "No, keep it"
-                                      :link-button-cb #(alert-modal/hide-alert)
-                                      :solid-button-style :green
-                                      :solid-button-title "Yes, change it"
-                                      :solid-button-cb (fn [_]
-                                                          (if has-payment-info?
-                                                            (save-plan-change s payments-data current-plan-data)
-                                                            (payments-actions/add-payment-method payments-data
-                                                             ;; In case user changed the plan let's add it to the callback
-                                                             ;; so we save once payment method is added
-                                                             (when (not= initial-plan @current-plan)
-                                                              current-plan-data)))
-                                                           (alert-modal/hide-alert))}]
-                      (alert-modal/show-alert alert-data)))}
+        {:disabled @(::saving-plan s)
+         :on-click (fn []
+                    (if has-payment-info?
+                      (let [alert-data {:title "Are you sure?"
+                                        :message (str "Are you sure you want to change your current plan to " (:nickname current-plan-data) "?")
+                                        :link-button-style :red
+                                        :link-button-title "No, keep it"
+                                        :link-button-cb #(alert-modal/hide-alert)
+                                        :solid-button-style :green
+                                        :solid-button-title "Yes, change it"
+                                        :solid-button-cb (fn [_]
+                                                             (reset! (::saving-plan s) true)
+                                                             (save-plan-change s payments-data current-plan-data)
+                                                             (alert-modal/hide-alert))}]
+                        (alert-modal/show-alert alert-data))
+                      (payments-actions/add-payment-method payments-data
+                       ;; In case user changed the plan let's add it to the callback
+                       ;; so we save once payment method is added
+                       (when (not= initial-plan @current-plan)
+                        current-plan-data))))}
         (if has-payment-info?
           "Change plan"
           "Add payment information")]
-      ; (comment
-       [:div.plan-change-separator]
-       [:div.plan-change-details
-         "Have a team of 250+"
-         [:a.chat-with-us
-           {:class "intercom-chat-link"
-            :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-           "Chat with us"]];)
-  ]))
+      (when @(::saving-plan s)
+        (small-loading))
+     [:div.plan-change-separator]
+     [:div.plan-change-details
+       "Have a team of 250+"
+       [:a.chat-with-us
+         {:class "intercom-chat-link"
+          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+         "Chat with us"]]]))
 
 (rum/defcs payments-settings-modal <
   ;; Mixins
@@ -220,6 +242,7 @@
   (drv/drv :org-data)
   (drv/drv :payments)
   (drv/drv dis/checkout-result-key)
+  (drv/drv dis/checkout-update-plan-key)
   ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local :summary ::payments-tab)
@@ -228,13 +251,16 @@
   (rum/local nil ::initial-plan)
   (rum/local false ::plan-has-changed)
   (rum/local false ::checkout-result)
+  (rum/local false ::saving-plan)
+  (rum/local nil ::automatic-update-plan)
   {:will-mount (fn [s]
     ;; Force refresh subscription data
     (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
     (let [payments-data @(drv/get-ref s :payments)
           initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")
           checkout-result @(drv/get-ref s dis/checkout-result-key)
-          has-payment-info? (seq (:payment-methods payments-data))]
+          has-payment-info? (seq (:payment-methods payments-data))
+          updating-plan @(drv/get-ref s dis/checkout-update-plan-key)]
       (reset! (::payments-tab s) (if (or (not (:subscription payments-data))
                                          (not has-payment-info?))
                                    :change
@@ -242,9 +268,16 @@
       (reset! (::payments-plan s) initial-plan)
       (reset! (::initial-plan s) initial-plan)
       (reset! (::checkout-result s) checkout-result)
-      ;; When the user come back from
-      (when (:update-plan (router/query-params))
-        (payments-actions/patch-plan-subscription payments-data (:update-plan (router/query-params)))))
+      (reset! (::automatic-update-plan s) updating-plan)
+      ;; When the user come back from adding pay info and has a plan id set as GET parameter
+      ;; it means we need to change the plan, but only if the add info went well
+      (when (and (true? checkout-result)
+                 (seq updating-plan))
+        (payments-actions/patch-plan-subscription payments-data updating-plan
+         (fn [{:keys [success]}]
+          (reset! (::automatic-update-plan s) nil)
+          (when success
+            (dis/dispatch! [:input [dis/checkout-update-plan-key] nil]))))))
     s)
     :will-unmount (fn [s]
      (dis/dispatch! [:input [dis/checkout-result-key] nil])
@@ -271,7 +304,8 @@
             [:button.mlb-reset.save-bt
               {:on-click #(change-tab s :change)}
               "Change plan"])
-          (when (nil? @(::checkout-result s))
+          (when (and (nil? @(::checkout-result s))
+                    has-payment-info?)
             [:button.mlb-reset.cancel-bt
               {:on-click #(if is-change-tab?
                             (change-tab s :summary)
