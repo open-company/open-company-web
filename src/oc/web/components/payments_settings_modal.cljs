@@ -299,7 +299,7 @@
                "Change plan"
                "Select a plan")
              "Billing")]
-          (when (or (not is-change-tab?)
+          (when (and (not is-change-tab?)
                     (nil? @(::checkout-result s)))
             [:button.mlb-reset.save-bt
               {:on-click #(change-tab s :change)}
