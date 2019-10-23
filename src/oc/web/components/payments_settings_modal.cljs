@@ -34,6 +34,22 @@
                          (str currency " "))]
     (str currency-symbol int-plan-amount "." decimal-plan-amount)))
 
+(defn- plan-price [plan-data quantity]
+  (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
+                                  (not (:up-to %))) (:tiers plan-data)))
+        tier-price (if (:up-to tier)
+                     (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
+                     (* quantity (:unit-amount tier)))]
+    (plan-amount-to-human tier-price (:currency plan-data))))
+
+(defn- plan-minimum-price [plan-data]
+  (let [tier (first (:tiers plan-data))]
+    (plan-amount-to-human (:flat-amount tier) (:currency plan-data))))
+
+(defn- price-per-user [plan-data]
+  (let [tier (second (:tiers plan-data))]
+    (plan-amount-to-human (:unit-amount tier) (:currency plan-data))))
+
 (defn- plan-description [plan-nickname]
   (case plan-nickname
    "Monthly" "monthly"
@@ -68,7 +84,8 @@
     (let [subscription-data (:subscription payments-data)
           next-payment-due (date-string (:current-period-end subscription-data))
           current-plan (:current-plan subscription-data)
-          checkout-result @(::checkout-result s)]
+          checkout-result @(::checkout-result s)
+          quantity (-> payments-data :subscription :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
       [:div.plan-summary
         (when (true? checkout-result)
           [:div.plan-summary-details.success.bottom-margin
@@ -109,7 +126,7 @@
             "Billing period:"
             [:br]
             "Plan billed "
-            (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (:amount current-plan) (:currency current-plan)) ")"
+            (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (plan-price current-plan quantity) (:currency current-plan)) ")"
             [:br]
             "Next payment due on "
             next-payment-due
@@ -160,8 +177,8 @@
         current-plan-data (if @(::plan-has-changed s)
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:current-plan subscription-data))
-        total-plan-price* (* (:amount current-plan-data) quantity)
-        total-plan-price (plan-amount-to-human total-plan-price* (:currency current-plan-data))
+        total-plan-price (plan-price current-plan-data quantity)
+        up-to (-> current-plan-data :tiers first :up-to)
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
         has-payment-info? (seq (:payment-methods payments-data))]
     [:div.plan-change
@@ -191,8 +208,12 @@
            " people, your plan will cost "
            total-plan-price
            (if (= (:nickname current-plan-data) "Monthly")
-            " monthly."
-            " annually.")
+            " monthly"
+            " annually")
+           (str " (" quantity " user" (when (not= quantity 1) "s") " X " (price-per-user current-plan-data)
+            (if (< quantity up-to)
+              (str " with a minimum of " up-to " users)")
+              ")"))
            (when (= (:nickname current-plan-data) "Annual")
             " An annual plan saves you 20%.")))]
       [:div.plan-change-title
