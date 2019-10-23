@@ -111,7 +111,10 @@
         app-version (cond
                       ua/mobile-app? (str "Version " (expo/get-app-version))
                       ua/desktop-app? (get-desktop-version)
-                      :else "")]
+                      :else "")
+        show-billing? (and ls/payments-enabled
+                           (= user-role :admin)
+                           (router/current-org-slug))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -187,9 +190,7 @@
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
-        (when (and ls/payments-enabled
-                   (= user-role :admin)
-                   (router/current-org-slug))
+        (when show-billing?
           [:a.payments
             {:href "#"
              :on-click payments-click}
@@ -200,7 +201,8 @@
         ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
         ;     [:div.oc-menu-item
         ;       "Billing"]])
-        (when-not is-mobile?
+        (when (or (not is-mobile?)
+                  show-billing?)
           [:div.oc-menu-separator])
         [:a.whats-new-link
           (if ua/mobile?
