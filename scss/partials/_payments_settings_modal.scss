@@ -99,6 +99,10 @@ div.payments-settings-modal {
         font-size: 14px;
         color: $ui_grey;
         float: right;
+
+        @include mobile() {
+          display: none;
+        }
       }
       
       button.save-bt {
@@ -112,6 +116,10 @@ div.payments-settings-modal {
         line-height: 18px;
         margin-left: 8px;
         float: right;
+
+        @include mobile() {
+          display: none;
+        }
       }
     }
 
