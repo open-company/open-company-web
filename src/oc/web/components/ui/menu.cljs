@@ -164,15 +164,6 @@
             [:div.oc-menu-item.digest-settings
               "Admin settings"]])
         (when (and (not is-mobile?)
-                 ls/payments-enabled
-                 (= user-role :admin)
-                 (router/current-org-slug))
-          [:a.payments
-            {:href "#"
-             :on-click payments-click}
-            [:div.oc-menu-item
-              "Billing"]])
-        (when (and (not is-mobile?)
                    show-invite-people?)
           [:a
             {:href "#"
@@ -196,6 +187,15 @@
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
+        (when (and (not is-mobile?)
+                 ls/payments-enabled
+                 (= user-role :admin)
+                 (router/current-org-slug))
+          [:a.payments
+            {:href "#"
+             :on-click payments-click}
+            [:div.oc-menu-item
+              "Billing"]])
         ; (when (and org-slug
         ;            (= user-role :admin))
         ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
