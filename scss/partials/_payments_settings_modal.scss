@@ -199,6 +199,11 @@ div.payments-settings-modal {
           position: relative;
           opacity: 1;
 
+          @include mobile() {
+            height: 40px;
+            padding: 11px 8px;
+          }
+
           &:after {
             color: $deep_navy;
             background-image: cdnUrl("/img/ML/select_arrows.svg");
@@ -208,6 +213,10 @@ div.payments-settings-modal {
             position: absolute;
             right: 8px;
             top: 11px;
+
+            @include mobile() {
+              top: 15px;
+            }
           }
         }
 
@@ -215,6 +224,10 @@ div.payments-settings-modal {
           width: 100%;
           top: 34px;
           left: 0;
+
+          @include mobile() {
+            top: 42px;
+          }
 
           div.triangle {
             display: none;
