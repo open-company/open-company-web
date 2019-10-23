@@ -171,7 +171,7 @@
             {:href "#"
              :on-click payments-click}
             [:div.oc-menu-item
-              "Payments & Billing"]])
+              "Billing"]])
         (when (and (not is-mobile?)
                    show-invite-people?)
           [:a
