@@ -36,27 +36,30 @@
 ;; Subscription handling
 
 (defn create-plan-subscription [payments-data plan-id & [callback]]
-  (let [create-subscription-link (utils/link-for (:links payments-data) "update")]
+  (let [create-subscription-link (utils/link-for (:links payments-data) "update")
+        org-slug (router/current-org-slug)]
     (when create-subscription-link
       (api/update-plan-subscription create-subscription-link plan-id
-       (fn [{:keys [status body success]}]
-        (js/console.log "DBG put response:" (if success (json->cljs body) status))
+       (fn [{:keys [status body success] :as resp}]
+        (get-payments-cb org-slug resp)
         (callback success))))))
 
 (defn patch-plan-subscription [payments-data plan-id & [callback]]
-  (let [update-subscription-link (utils/link-for (:links payments-data) "partial-update")]
+  (let [update-subscription-link (utils/link-for (:links payments-data) "partial-update")
+        org-slug (router/current-org-slug)]
     (when update-subscription-link
       (api/update-plan-subscription update-subscription-link plan-id
-       (fn [{:keys [status body success]}]
-        (js/console.log "DBG patch response:" (if success (json->cljs body) status))
+       (fn [{:keys [status body success]:as resp}]
+        (get-payments-cb org-slug resp)
         (callback success))))))
 
 (defn delete-plan-subscription [payments-data plan-id & [callback]]
-  (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")]
+  (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")
+        org-slug (router/current-org-slug)]
     (when delete-subscription-link
       (api/update-plan-subscription delete-subscription-link nil
-       (fn [{:keys [status body success]}]
-        (js/console.log "DBG patch response:" (if success (json->cljs body) status))
+       (fn [{:keys [status body success] :as resp}]
+        (get-payments-cb org-slug resp)
         (callback success))))))
 
 ;; Checkout
