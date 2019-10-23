@@ -54,7 +54,7 @@
   (let [trial-end-date (date-string (:trial-end subscription-data))
         remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
         trial-remaining-string (if (> remaining-seconds (* 60 60 24))
-                                 (let [days-left (int (/ remaining-seconds (* 60 60 24)))]
+                                 (let [days-left (inc (int (/ remaining-seconds (* 60 60 24))))]
                                   (str " (" days-left " day" (when-not (= days-left 1) "s") " left)"))
                                  "(today)")]
     (str "Ends on: " trial-end-date trial-remaining-string)))
@@ -62,7 +62,7 @@
 (defn- plan-summary [s payments-data]
   (if @(::automatic-update-plan s)
     [:div.plan-summary
-      [:div.plan-summary-deatils
+      [:div.plan-summary-details
         "Updating your plan..."
         (small-loading)]]
     (let [subscription-data (:subscription payments-data)
