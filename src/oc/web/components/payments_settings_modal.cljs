@@ -201,10 +201,10 @@
                                      (reset! (::plan-has-changed s) true)
                                      (reset! (::show-plans-dropdown s) false)
                                      (reset! current-plan (:value selected-item)))}))
-      [:div.plan-change-description
-        (if (= @current-plan "free")
-          "Free plan details here"
-          (str
+      (if (= @current-plan "free")
+        [:div.plan-change-description
+          "Free plan details here"]
+        [:div.plan-change-description
            "For your team of "
            quantity
            " people, your plan will cost "
@@ -212,13 +212,13 @@
            (if (= (:nickname current-plan-data) "Monthly")
             " monthly"
             " annually")
-           (str " (" quantity " user" (when (not= quantity 1) "s") " X " (price-per-user current-plan-data) ").")
-           (when (< quantity up-to)
-             [:br])
-           (when (< quantity up-to)
-             (str " Up to " up-to " user" (when (not= up-to 1) "s") " is " flat-amount " per month; " unit-amount " per user after."))
-           (when (= (:nickname current-plan-data) "Annual")
-            " An annual plan saves you 20%.")))]
+           " (" quantity " user" (when (not= quantity 1) "s") " X " (price-per-user current-plan-data) ")."
+          (when (< quantity up-to)
+            [:br])
+          (when (< quantity up-to)
+            (str " Up to " up-to " user" (when (not= up-to 1) "s") " is " flat-amount " per month; " unit-amount " per user after."))
+          (when (= (:nickname current-plan-data) "Annual")
+            " An annual plan saves you 20%.")])
       [:div.plan-change-title
         (str "Due today: " total-plan-price)]
       [:button.mlb-reset.payment-info-bt

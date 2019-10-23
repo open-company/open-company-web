@@ -187,10 +187,9 @@
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
-        (when (and (not is-mobile?)
-                 ls/payments-enabled
-                 (= user-role :admin)
-                 (router/current-org-slug))
+        (when (and ls/payments-enabled
+                   (= user-role :admin)
+                   (router/current-org-slug))
           [:a.payments
             {:href "#"
              :on-click payments-click}

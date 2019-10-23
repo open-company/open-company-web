@@ -18,6 +18,22 @@ div.payments-settings-modal {
     position: absolute;
     right: 336px;
     top: 12px;
+
+    @include mobile() {
+      left: 16px;
+      top: 11px;
+      right: unset;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
+    }
   }
 
   div.payments-settings-modal-container {
@@ -32,12 +48,34 @@ div.payments-settings-modal {
     overflow-x: hidden;
     overflow-y: scroll;
 
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+    }
+
     div.payments-settings-header {
       width: calc(100% + 48px);
-      height: 56px;
+      height: #{navbar_height}px;
       margin-left: -24px;
       background-color: $grey_num_2;
       padding: 12px 16px;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid $divider_line_grey;
+        background-color: white;
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
+      }
 
       div.payments-settings-header-title {
         @include OC_Body_Bold();
@@ -45,6 +83,13 @@ div.payments-settings-modal {
         color: $deep_navy;
         line-height: 32px;
         float: left;
+
+        @include mobile() {
+          float: unset;
+          text-align: center;
+          font-size: 16px;
+          line-height: 24px;
+        }
       }
 
       button.cancel-bt {
