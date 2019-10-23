@@ -92,8 +92,6 @@
         [:div.plan-summary-details.bottom-margin
           "Trial:"
           [:br]
-          "Started on: " (date-string (:trial-start subscription-data))
-          [:br]
           "Ends on: " trial-end-date trial-remaining-string])
       (when subscription-data
         [:div.plan-summary-details.bottom-margin
