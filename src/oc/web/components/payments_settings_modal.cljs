@@ -100,7 +100,8 @@
             (for [c (:payment-methods payments-data)
                   :let [card (:card c)]]
               [:div.plan-summary-details-card-row
-                {:key (str "pay-method-" (:id c))}
+                {:key (str "pay-method-" (:id c))
+                 :class (when (:default? c) "default-payment-method")}
                 (case (:brand card)
                  "visa" "Visa"
                  "amex" "American Express"
@@ -108,7 +109,9 @@
                  (s/phrase (:brand card)))
                  (when (seq (:last-4 card))
                    (str " ending in " (:last-4 card)))
-                 ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
+                 ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)
+                 (when (:default? c)
+                   " (default).")])
                 [:button.mlb-reset.change-pay-method-bt
                   {:on-click #(payments-actions/add-payment-method payments-data)}
                   "Add another payment method"]]
