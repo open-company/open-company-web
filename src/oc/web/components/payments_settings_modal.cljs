@@ -70,13 +70,12 @@
           current-plan (:current-plan subscription-data)
           checkout-result @(::checkout-result s)]
       [:div.plan-summary
-        (when (or (true? checkout-result)
-                  (false? checkout-result))
-          [:div.plan-summary-details
-            {:class (if checkout-result "success" "error")}
-            (if checkout-result
-              "Payment method updated correctly!"
-              "There was an error updating your payment method, please try again!")])
+        (when (true? checkout-result)
+          [:div.plan-summary-details.success.bottom-margin
+            [:div.thumb-up "👍"]
+            (str "Your " (s/lower (:nickname current-plan)) " plan is active.")])
+        (when (true? checkout-result)
+          [:div.plan-summary-separator])
         (if (seq (:payment-methods payments-data))
           [:div.plan-summary-details
             "Payment methods:"
@@ -164,12 +163,8 @@
         total-plan-price* (* (:amount current-plan-data) quantity)
         total-plan-price (plan-amount-to-human total-plan-price* (:currency current-plan-data))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
-        has-payment-info? (seq (:payment-methods payments-data))
-        checkout-result @(::checkout-result s)]
+        has-payment-info? (seq (:payment-methods payments-data))]
     [:div.plan-change
-      (when (false? checkout-result)
-        [:div.plan-change-details.error
-          "There was an error updating your payment method, please try again!"])
       (when (and (is-trial? subscription-data)
                  (not has-payment-info?))
         [:div.plan-change-details.bottom-margin
@@ -260,7 +255,8 @@
           initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")
           checkout-result @(drv/get-ref s dis/checkout-result-key)
           has-payment-info? (seq (:payment-methods payments-data))
-          updating-plan @(drv/get-ref s dis/checkout-update-plan-key)]
+          updating-plan (when checkout-result
+                          @(drv/get-ref s dis/checkout-update-plan-key))]
       (reset! (::payments-tab s) (if (or (not (:subscription payments-data))
                                          (not has-payment-info?))
                                    :change

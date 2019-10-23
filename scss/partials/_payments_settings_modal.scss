@@ -94,14 +94,18 @@ div.payments-settings-modal {
             margin-bottom: 24px;
           }
 
-          &.error, &.error button, &.error a, &.error strong {
-            color: $carrot_orange;
+          &.success {
+            @include OC_Body_Bold();
+            text-align: center;
+            font-size: 14px;
             background-color: transparent;
-          }
 
-          &.success, &.success button, &.success a, &.success strong {
-            color: $carrot_green;
-            background-color: transparent;
+            div.thumb-up {
+              text-align: center;
+              margin: 0 auto 8px;
+              font-size: 32px;
+              line-height: 38px;
+            }
           }
 
           button, a {
@@ -228,16 +232,6 @@ div.payments-settings-modal {
 
           &.bottom-margin {
             margin-bottom: 24px;
-          }
-
-          &.error, &.error button, &.error a, &.error strong {
-            color: $carrot_orange;
-            background-color: transparent;
-          }
-
-          &.success, &.success button, &.success a, &.success strong {
-            color: $carrot_green;
-            background-color: transparent;
           }
 
           button, a {
