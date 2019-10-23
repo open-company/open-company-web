@@ -225,7 +225,7 @@
             unit-amount " per user after."))
           (when (= (:nickname current-plan-data) "Annual")
             " An annual plan saves you 20%.")])
-      (when (<= (-> subscription-data :upcoming-invoice :next-payment-attempt) (/ (utils/js-date) 1000))
+      (when-not (payments-actions/default-positive-statuses (:status subscription-data))
         [:div.plan-change-title
           (str "Due today: " total-plan-price)])
       [:button.mlb-reset.payment-info-bt
