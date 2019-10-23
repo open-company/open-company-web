@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [clojure.contrib.humanize :refer (intcomma)]
             [org.martinklepsch.derivatives :as drv]
+            [cuerdas.core :as s]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
@@ -66,19 +67,23 @@
             "Payment method updated correctly!"
             "There was an error updating your payment method, please try again!")])
       (if (seq (:payment-methods payments-data))
-        (let [first-payment-method (first (:payment-methods payments-data))
-              first-card (:card first-payment-method)]
-          [:div.plan-summary-details
-            "Payment method:"
-            [:br]
-            (case (:brand first-card)
-              "visa" "Visa"
-              "amex" "American Express"
-              "Mastercard")
-            " ending in " (:last-4 first-card) ", exp: " (utils/add-zero (int (:exp-month first-card))) "/" (:exp-year first-card)
-            [:button.mlb-reset.change-pay-method-bt
-              {:on-click #(payments-actions/add-payment-method payments-data)}
-              "Change"]])
+        [:div.plan-summary-details
+          "Payment methods:"
+          [:br]
+          (for [c (:payment-methods payments-data)
+                :let [card (:card c)]]
+            [:div.plan-summary-details-card-row
+              (case (:brand card)
+               "visa" "Visa"
+               "amex" "American Express"
+               "mastercard" "Mastercard"
+               (s/phrase (:brand card)))
+               (when (seq (:last-4 card))
+                 (str " ending in " (:last-4 card)))
+               ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
+              [:button.mlb-reset.change-pay-method-bt
+                {:on-click #(payments-actions/add-payment-method payments-data)}
+                "Add another payment method"]]
         [:div.plan-summary-details
           [:button.mlb-reset.change-pay-method-bt
             {:on-click #(payments-actions/add-payment-method payments-data)}
