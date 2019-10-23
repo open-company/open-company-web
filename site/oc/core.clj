@@ -147,7 +147,7 @@
             [:a.login
               {:id "site-header-login-item"
                :href "/login"}
-                "Login"]
+                "Log in"]
             [:span.login-signup-or "or"]
             [:a.signup
               {:id "site-header-signup-item"
