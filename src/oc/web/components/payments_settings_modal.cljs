@@ -179,6 +179,8 @@
                             (:current-plan subscription-data))
         total-plan-price (plan-price current-plan-data quantity)
         up-to (-> current-plan-data :tiers first :up-to)
+        flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
+        unit-amount (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
         has-payment-info? (seq (:payment-methods payments-data))]
     [:div.plan-change
@@ -210,10 +212,11 @@
            (if (= (:nickname current-plan-data) "Monthly")
             " monthly"
             " annually")
-           (str " (" quantity " user" (when (not= quantity 1) "s") " X " (price-per-user current-plan-data)
-            (if (< quantity up-to)
-              (str " with a minimum of " up-to " users)")
-              ")"))
+           (str " (" quantity " user" (when (not= quantity 1) "s") " X " (price-per-user current-plan-data) ").")
+           (when (< quantity up-to)
+             [:br])
+           (when (< quantity up-to)
+             (str " Up to " up-to " user" (when (not= up-to 1) "s") " is " flat-amount " per month; " unit-amount " per user after."))
            (when (= (:nickname current-plan-data) "Annual")
             " An annual plan saves you 20%.")))]
       [:div.plan-change-title
