@@ -509,6 +509,7 @@
         cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
         payments-data (drv/react s :payments)
+        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)
         published? (= (:status cmail-data) "published")
         video-size (if is-mobile?
                      {:width (win-width)
@@ -520,6 +521,7 @@
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
         post-tt-kw @(::post-tt-kw s)
         disabled? (or show-post-bt-tooltip?
+                      show-paywall-alert?
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -575,13 +577,13 @@
                               (dismiss-action))))
         current-user-data (drv/react s :current-user-data)
         header-user-data (or (:publisher cmail-data)
-                             current-user-data)
-        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)]
+                             current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (:collapsed cmail-state)
                                 :show-trial-expired-alert show-paywall-alert?})
-       :on-click #(when (:collapsed cmail-state)
+       :on-click #(when (and (:collapsed cmail-state)
+                             (not show-paywall-alert?))
                     (nux-actions/dismiss-add-post-tooltip)
                     (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
                                                                                   :fullscreen false

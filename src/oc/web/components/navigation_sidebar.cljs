@@ -226,7 +226,8 @@
           {:ref "left-navigation-sidebar-footer"
            :class (when show-paywall-alert? "show-trial-expired-alert")}
           [:button.mlb-reset.compose-green-bt
-            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+            {:on-click #(when-not show-paywall-alert?
+                          (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
             [:span.compose-green-icon]
             [:span.compose-green-label
               "New post"]]
