@@ -67,7 +67,7 @@
 (defn add-payment-method [payments-data & [change-plan-data]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         checkout-link (utils/link-for (:links fixed-payments-data) "checkout")
-        base-redirect-url (str ls/web-server-domain (router/get-token) "?org-settings=payments&success=")
+        base-redirect-url (str ls/web-server-domain (router/get-token) "?org-settings=payments&result=")
         success-redirect-url (str base-redirect-url "true"
                                (when change-plan-data
                                  (str "&update-plan=" (:id change-plan-data))))
