@@ -126,7 +126,7 @@
             "Billing period:"
             [:br]
             "Plan billed "
-            (plan-description (:nickname current-plan)) " (" (plan-amount-to-human (plan-price current-plan quantity) (:currency current-plan)) ")"
+            (plan-description (:nickname current-plan)) " (" (plan-price current-plan quantity) ")"
             [:br]
             "Next payment due on "
             next-payment-due
