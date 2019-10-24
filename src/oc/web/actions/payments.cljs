@@ -104,9 +104,9 @@
         period-expired? (> (* (:current-period-end fixed-payments-data) 1000) (.getDate (js/Date.)))]
     (and ;; payments service is enabled
          ls/payments-enabled
-         (or ;; if pay data have not been loaded yet or
-             fixed-payments-data
-             ;; the subscriptions data are not available
+         ;; Do not show paywall until payments data are loaded
+         fixed-payments-data
+         (or ;; the subscriptions data are not available
              (= fixed-payments-data :404)
              ;; or the org is on a non active plan
              (not (default-positive-statuses subscription-status))))))
