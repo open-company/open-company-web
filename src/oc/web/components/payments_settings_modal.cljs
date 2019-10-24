@@ -168,7 +168,7 @@
 (def default-minimum-price 6000)
 
 (defn- save-plan-change [s payments-data current-plan-data]
-  (payments-actions/patch-plan-subscription payments-data (:id current-plan-data)
+  (payments-actions/create-plan-subscription payments-data (:id current-plan-data)
    (fn [success]
      (reset! (::saving-plan s) false)
      (if success
