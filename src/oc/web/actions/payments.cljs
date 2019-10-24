@@ -89,6 +89,19 @@
                                :solid-button-cb alert-modal/hide-alert}]
               (alert-modal/show-alert alert-data)))))))))))
 
+;; Subscriptions data retrieve
+
+(defn has-multiple-subscriptions? [payments-data]
+  (> (count (:subscriptions payments-data)) 1))
+
+(defn get-active-subscription [payments-data]
+  (first (:subscriptions payments-data)))
+
+(defn get-next-subscription [payments-data]
+  (if (has-multiple-subscriptions? payments-data)
+    (second (:subscriptions payments-data))
+    nil))
+
 ;; Paywall
 
 (defn show-paywall-alert?
@@ -98,7 +111,7 @@
   [payments-data]
   (let [fixed-payments-data (or payments-data
                                 (dis/payments-data))
-        subscription-data (:subscription fixed-payments-data)
+        subscription-data (get-active-subscription fixed-payments-data)
         subscription-status (:status subscription-data)
         is-trial? (= (:status fixed-payments-data) default-trial-status)
         trial-expired? (> (* (:trial-end fixed-payments-data) 1000) (.getDate (js/Date.)))
@@ -107,17 +120,3 @@
          (or ;; No subscription available for current user... TBD
              (= fixed-payments-data :404)
              (not (default-positive-statuses subscription-status))))))
-
-;; Subscriptions data retrieve
-
-(defn has-multiple-subscriptions? [payments-data]
-  (> (count (:subscriptions payments-data)) 1))
-
-(defn get-active-subscription [payments-data]
-  ;(first (:subscriptins payments-data))
-  (:subscription payments-data))
-
-(defn get-next-subscription [payments-data]
-  (if (has-multiple-subscriptions? payments-data)
-    (second (:subscriptions payments-data))
-    nil))
