@@ -37,20 +37,11 @@
 ;; Subscription handling
 
 (defn create-plan-subscription [payments-data plan-id & [callback]]
-  (let [create-subscription-link (utils/link-for (:links payments-data) "update")
+  (let [create-subscription-link (utils/link-for (:links payments-data) "create")
         org-slug (router/current-org-slug)]
     (when create-subscription-link
       (api/update-plan-subscription create-subscription-link plan-id
        (fn [{:keys [status body success] :as resp}]
-        (get-payments-cb org-slug resp)
-        (callback success))))))
-
-(defn patch-plan-subscription [payments-data plan-id & [callback]]
-  (let [update-subscription-link (utils/link-for (:links payments-data) "partial-update")
-        org-slug (router/current-org-slug)]
-    (when update-subscription-link
-      (api/update-plan-subscription update-subscription-link plan-id
-       (fn [{:keys [status body success]:as resp}]
         (get-payments-cb org-slug resp)
         (callback success))))))
 
@@ -111,7 +102,11 @@
         is-trial? (= (:status fixed-payments-data) default-trial-status)
         trial-expired? (> (* (:trial-end fixed-payments-data) 1000) (.getDate (js/Date.)))
         period-expired? (> (* (:current-period-end fixed-payments-data) 1000) (.getDate (js/Date.)))]
-    (and ls/payments-enabled
-         (or ;; No subscription available for current user... TBD
+    (and ;; payments service is enabled
+         ls/payments-enabled
+         (or ;; if pay data have not been loaded yet or
+             (not fixed-payments-data)
+             ;; the subscriptions data are not available
              (= fixed-payments-data :404)
+             ;; or the org is on a non active plan
              (not (default-positive-statuses subscription-status))))))

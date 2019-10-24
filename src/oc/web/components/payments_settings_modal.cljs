@@ -304,7 +304,7 @@
       ;; it means we need to change the plan, but only if the add info went well
       (when (and (true? checkout-result)
                  (seq updating-plan))
-        (payments-actions/patch-plan-subscription payments-data updating-plan
+        (payments-actions/create-plan-subscription payments-data updating-plan
          (fn [{:keys [success]}]
           (reset! (::automatic-update-plan s) nil)
           (when success
