@@ -81,12 +81,11 @@
       [:div.plan-summary-details
         "Updating your plan..."
         (small-loading)]]
-    (let [subscription-data (payments-actions/get-next-subscription payments-data)
+    (let [subscription-data (payments-actions/get-active-subscription payments-data)
           next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
           current-plan (:plan subscription-data)
           checkout-result @(::checkout-result s)
-          quantity (-> subscription-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
-          next-subscription-data (payments-actions/get-next-subscription payments-data)]
+          quantity (-> subscription-data :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
       [:div.plan-summary
         (when (true? checkout-result)
           [:div.plan-summary-details.success.bottom-margin
@@ -130,14 +129,6 @@
             "Plan billed "
             (plan-description (:nickname current-plan)) " (" (plan-price current-plan quantity) ")"
             [:br]
-            (when next-subscription-data
-              (let [next-subs-plan (:plan next-subscription-data)]
-                (str
-                 "Starting " (date-string (:current-period-end next-subscription-data)) " "
-                 (plan-description (:nickname next-subs-plan))
-                 " (" (plan-price next-subs-plan quantity) ")")))
-            (when next-subscription-data
-              [:br])
             "Next payment due on "
             next-payment-due
             [:button.mlb-reset.change-pay-method-bt
@@ -262,7 +253,7 @@
                        (when (not= initial-plan @current-plan)
                         current-plan-data))))}
         (if has-payment-info?
-          "Change plan"
+          "Schedule plan change"
           "Add payment information")]
       (when @(::saving-plan s)
         (small-loading))

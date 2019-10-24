@@ -91,16 +91,11 @@
 
 ;; Subscriptions data retrieve
 
-(defn has-multiple-subscriptions? [payments-data]
-  (> (count (:subscriptions payments-data)) 1))
-
 (defn get-active-subscription [payments-data]
-  (first (:subscriptions payments-data)))
+  (last (:subscriptions payments-data)))
 
-(defn get-next-subscription [payments-data]
-  (if (has-multiple-subscriptions? payments-data)
-    (second (:subscriptions payments-data))
-    nil))
+(defn get-current-subscription [payments-data]
+  (first (:subscriptions payments-data)))
 
 ;; Paywall
 
@@ -111,7 +106,7 @@
   [payments-data]
   (let [fixed-payments-data (or payments-data
                                 (dis/payments-data))
-        subscription-data (get-active-subscription fixed-payments-data)
+        subscription-data (get-current-subscription fixed-payments-data)
         subscription-status (:status subscription-data)
         is-trial? (= (:status fixed-payments-data) default-trial-status)
         trial-expired? (> (* (:trial-end fixed-payments-data) 1000) (.getDate (js/Date.)))
