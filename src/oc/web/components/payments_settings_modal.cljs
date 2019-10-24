@@ -82,8 +82,8 @@
         "Updating your plan..."
         (small-loading)]]
     (let [subscription-data (payments-actions/get-active-subscription payments-data)
-          next-payment-due (date-string (-> subscription-data :upcoming-invoice :next-payment-attempt))
-          current-plan (:current-plan subscription-data)
+          next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
+          current-plan (:plan subscription-data)
           checkout-result @(::checkout-result s)
           quantity (-> subscription-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
           next-subscription-data (payments-actions/get-next-subscription payments-data)]
@@ -131,7 +131,7 @@
             (plan-description (:nickname current-plan)) " (" (plan-price current-plan quantity) ")"
             [:br]
             (when next-subscription-data
-              (let [next-subs-plan (:current-plan next-subscription-data)]
+              (let [next-subs-plan (:plan next-subscription-data)]
                 (str
                  "Starting " (date-string (:period-end next-subs-plan)) " "
                  (plan-description (:nickname next-subs-plan))
@@ -174,7 +174,7 @@
      (if success
        (do
          (change-tab s :summary)
-         (reset! (::current-plan s) (:nickname current-plan-data)))
+         (reset! (::payments-plan s) (:nickname current-plan-data)))
        (show-error-alert s)))))
 
 (defn- plan-change [s payments-data]
@@ -187,7 +187,7 @@
         
         current-plan-data (if @(::plan-has-changed s)
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
-                            (:current-plan subscription-data))
+                            (:plan subscription-data))
         total-plan-price (plan-price current-plan-data quantity)
         up-to (-> current-plan-data :tiers first :up-to)
         flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
@@ -233,8 +233,10 @@
               " per month; "
               " per year; ")
             unit-amount " per user after."))
-          (when (= (:nickname current-plan-data) "Annual")
-            " An annual plan saves you 20%.")])
+          (when-not is-monthly-plan?
+            [:br])
+          (when-not is-monthly-plan?
+            "An annual plan saves you 20%.")])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
         [:div.plan-change-title
           (str "Due today: " total-plan-price)])
@@ -294,7 +296,7 @@
     (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
     (let [payments-data @(drv/get-ref s :payments)
           subscription-data (payments-actions/get-active-subscription payments-data)
-          initial-plan (or (-> subscription-data :current-plan :nickname) "Monthly")
+          initial-plan (or (-> subscription-data :plan :nickname) "Monthly")
           checkout-result @(drv/get-ref s dis/checkout-result-key)
           has-payment-info? (seq (:payment-methods payments-data))
           updating-plan (when checkout-result
