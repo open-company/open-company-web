@@ -81,11 +81,12 @@
       [:div.plan-summary-details
         "Updating your plan..."
         (small-loading)]]
-    (let [subscription-data (:subscription payments-data)
+    (let [subscription-data (payments-actions/get-active-subscription payments-data)
           next-payment-due (date-string (-> subscription-data :upcoming-invoice :next-payment-attempt))
           current-plan (:current-plan subscription-data)
           checkout-result @(::checkout-result s)
-          quantity (-> payments-data :subscription :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
+          quantity (-> subscription-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
+          next-subscription-data (payments-actions/get-next-subscription payments-data)]
       [:div.plan-summary
         (when (true? checkout-result)
           [:div.plan-summary-details.success.bottom-margin
@@ -129,6 +130,14 @@
             "Plan billed "
             (plan-description (:nickname current-plan)) " (" (plan-price current-plan quantity) ")"
             [:br]
+            (when next-subscription-data
+              (let [next-subs-plan (:current-plan next-subscription-data)]
+                (str
+                 "Starting " (date-string (:period-end next-subs-plan)) " "
+                 (plan-description (:nickname next-subs-plan))
+                 " (" (plan-price next-subs-plan quantity) ")")))
+            (when next-subscription-data
+              [:br])
             "Next payment due on "
             next-payment-due
             [:button.mlb-reset.change-pay-method-bt
@@ -171,10 +180,11 @@
 (defn- plan-change [s payments-data]
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
-        quantity (-> payments-data :subscription :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
+        subscription-data (payments-actions/get-active-subscription payments-data)
+        quantity (-> subscription-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:amount %) "monthly") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:amount %) "annual") (:available-plans payments-data)))
-        subscription-data (:subscription payments-data)
+        
         current-plan-data (if @(::plan-has-changed s)
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:current-plan subscription-data))
@@ -283,12 +293,13 @@
     ;; Force refresh subscription data
     (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
     (let [payments-data @(drv/get-ref s :payments)
-          initial-plan (or (-> payments-data :subscription :current-plan :nickname) "free")
+          subscription-data (payments-actions/get-active-subscription payments-data)
+          initial-plan (or (-> subscription-data :current-plan :nickname) "Monthly")
           checkout-result @(drv/get-ref s dis/checkout-result-key)
           has-payment-info? (seq (:payment-methods payments-data))
           updating-plan (when checkout-result
                           @(drv/get-ref s dis/checkout-update-plan-key))]
-      (reset! (::payments-tab s) (if (or (not (:subscription payments-data))
+      (reset! (::payments-tab s) (if (or (not (payments-actions/get-active-subscription payments-data))
                                          (not has-payment-info?))
                                    :change
                                    :summary))

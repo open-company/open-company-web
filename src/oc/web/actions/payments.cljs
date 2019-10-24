@@ -5,7 +5,8 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
-            [oc.web.utils.stripe :as stripe-client]))
+            [oc.web.utils.stripe :as stripe-client]
+            [oc.web.components.ui.alert-modal :as alert-modal]))
 
 (def default-trial-status "trialing")
 (def default-active-status "active")
@@ -79,7 +80,14 @@
          (dis/dispatch! [:payments-checkout-session-id session-data])
          (stripe-client/redirect-to-checkout session-data
           (fn [res]
-           (js/console.log "DBG result of checkout:" res)))))))))
+           (when-not res
+             (let [alert-data {:icon "/img/ML/trash.svg"
+                               :title "Oops"
+                               :message "An error occurred, please try again."
+                               :solid-button-style :red
+                               :solid-button-title "OK, got it"
+                               :solid-button-cb alert-modal/hide-alert}]
+              (alert-modal/show-alert alert-data)))))))))))
 
 ;; Paywall
 
@@ -99,3 +107,17 @@
          (or ;; No subscription available for current user... TBD
              (= fixed-payments-data :404)
              (not (default-positive-statuses subscription-status))))))
+
+;; Subscriptions data retrieve
+
+(defn has-multiple-subscriptions? [payments-data]
+  (> (count (:subscriptions payments-data)) 1))
+
+(defn get-active-subscription [payments-data]
+  ;(first (:subscriptins payments-data))
+  (:subscription payments-data))
+
+(defn get-next-subscription [payments-data]
+  (if (has-multiple-subscriptions? payments-data)
+    (second (:subscriptions payments-data))
+    nil))
