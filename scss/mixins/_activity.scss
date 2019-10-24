@@ -264,7 +264,7 @@ $h2_top_margin: 24;
     min-height: $line_height;
   }
 
-  i:empty, li:empty {
+  i:empty {
     display: grid;
     min-width: 1px;
   }
@@ -331,7 +331,7 @@ $h2_top_margin: 24;
     border-left: 4px solid $ultra_light_grey;
   }
 
-  i:empty, b:empty, strong:empty, li:empty {
+  i:empty, b:empty, strong:empty {
     display: grid;
     min-width: 1px;
   }
@@ -700,7 +700,7 @@ $h2_top_margin: 24;
     width: 100% !important;
   }
 
-  i:empty, b:empty, strong:empty, li:empty {
+  i:empty, b:empty, strong:empty {
     display: grid;
     min-width: 1px;
   }
