@@ -105,7 +105,7 @@
     (and ;; payments service is enabled
          ls/payments-enabled
          (or ;; if pay data have not been loaded yet or
-             (not fixed-payments-data)
+             fixed-payments-data
              ;; the subscriptions data are not available
              (= fixed-payments-data :404)
              ;; or the org is on a non active plan

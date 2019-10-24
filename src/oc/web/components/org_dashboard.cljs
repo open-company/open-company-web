@@ -94,9 +94,6 @@
                      app-loading
                      ;; the org data are not loaded yet
                      (not org-data)
-                     ;; Payments not yet loaded
-                     (and ls/payments-enabled
-                          (not payments-data))
                      ;; No board specified
                      (and (not (router/current-board-slug))
                           ;; but there are some
