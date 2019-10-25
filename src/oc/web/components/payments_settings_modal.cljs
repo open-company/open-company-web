@@ -50,10 +50,10 @@
   (let [tier (second (:tiers plan-data))]
     (plan-amount-to-human (:unit-amount tier) (:currency plan-data))))
 
-(defn- plan-description [plan-nickname]
-  (case plan-nickname
-   "Monthly" "monthly"
-   "annually"))
+(defn- plan-description [plan-interval]
+  (case plan-interval
+   "month" "monthly"
+   "annual"))
 
 (defn- plan-label [plan-nickname]
   (case plan-nickname
@@ -125,7 +125,7 @@
             [:strong "Billing period"]
             [:br]
             "Plan billed "
-            (plan-description (:nickname current-plan)) " (" (plan-price current-plan quantity) ")"
+            (plan-description (:interval current-plan)) " (" (plan-price current-plan quantity) ")"
             [:br]
             "Next payment due on "
             next-payment-due
@@ -181,7 +181,7 @@
                        (* quantity (:unit-amount monthly-tier)))
         diff-price (- (* monthly-price 12) annual-price)]
     (when (pos? diff-price)
-      (str " An annual plans saves you " (plan-amount-to-human diff-price (:currency annual-plan-data)) " per year."))))
+      (str " An annual plan saves you " (plan-amount-to-human diff-price (:currency annual-plan-data)) " per year."))))
 
 (defn- plan-change [s payments-data]
   (let [initial-plan @(::initial-plan s)
@@ -200,7 +200,7 @@
         unit-amount (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
         has-payment-info? (seq (:payment-methods payments-data))
-        is-monthly-plan? (= (:nickname current-plan-data) "Monthly")
+        is-annual-default-plan? (= (:nickname current-plan-data) "Annual")
         is-under-up-to? (< quantity up-to)]
     [:div.plan-change
       (when (and (is-trial? subscription-data)
@@ -231,13 +231,13 @@
            (if (= up-to 1)
              " person"
              " people")
-           "are " flat-amount " per " (:interval current-plan-data) "."
+           " are " flat-amount " per " (:interval current-plan-data) "."
            " Teams larger than " up-to
            (if (= up-to 1)
              " person"
              " people")
            " are charged " unit-amount " per person per " (:interval current-plan-data) "."
-           (when-not is-monthly-plan?
+           (when is-annual-default-plan?
              different-plans-price-str))]
         [:div.plan-change-description
            (str
@@ -250,7 +250,7 @@
             total-plan-price
             " per " (:interval current-plan-data)
             " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ")."
-           (when-not is-monthly-plan?
+           (when is-annual-default-plan?
              different-plans-price-str))])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
         [:div.plan-change-title
@@ -262,7 +262,7 @@
          :on-click (fn []
                     (if has-payment-info?
                       (let [alert-data {:title "Are you sure?"
-                                        :message (str "Are you sure you want to change your current plan to " (:nickname current-plan-data) "?")
+                                        :message "Are you sure you want to change your current plan?"
                                         :link-button-style :red
                                         :link-button-title "No, keep it"
                                         :link-button-cb #(alert-modal/hide-alert)
@@ -299,7 +299,7 @@
                payments-data)
       (reset! (::initial-setup s) true)
       (let [subscription-data (payments-actions/get-active-subscription payments-data)
-            initial-plan (or (-> subscription-data :plan :nickname) "Monthly")
+            initial-plan-nickname (or (-> subscription-data :plan :nickname) "Monthly") ;; Default to the monthly default plan
             checkout-result @(drv/get-ref s dis/checkout-result-key)
             has-payment-info? (seq (:payment-methods payments-data))
             updating-plan (when checkout-result
@@ -308,8 +308,8 @@
                                            (not has-payment-info?))
                                      :change
                                      :summary))
-        (reset! (::payments-plan s) initial-plan)
-        (reset! (::initial-plan s) initial-plan)
+        (reset! (::payments-plan s) initial-plan-nickname)
+        (reset! (::initial-plan s) initial-plan-nickname)
         (reset! (::checkout-result s) checkout-result)
         (reset! (::automatic-update-plan s) updating-plan)
         ;; When the user come back from adding pay info and has a plan id set as GET parameter
