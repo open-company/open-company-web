@@ -69,15 +69,9 @@
 (defn- trial-remaining-days-string [subscription-data]
   (let [remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
         days-left (inc (int (/ remaining-seconds (* 60 60 24))))]
-    (str days-left " day" (when-not (= days-left 1) "s"))))
-
-(defn- trial-info-string [subscription-data]
-  (let [trial-end-date (date-string (:trial-end subscription-data))
-        remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
-        trial-remaining-string (if (> remaining-seconds (* 60 60 24))
-                                 (str " (" (trial-remaining-days-string subscription-data) " left)")
-                                 "(today)")]
-    (str "Ends on: " trial-end-date trial-remaining-string)))
+    (if (neg? remaining-seconds)
+      "Your trial plan has ended. Please select a plan to continue."
+      (str "Your trial plan is set to expire in " days-left " day" (when-not (= days-left 1) "s.")))))
 
 (defn- plan-summary [s payments-data]
   (if @(::automatic-update-plan s)
@@ -99,7 +93,7 @@
           [:div.plan-summary-separator])
         (if (seq (:payment-methods payments-data))
           [:div.plan-summary-details
-            "Payment methods:"
+            [:strong "Payment methods"]
             [:br]
             (for [c (:payment-methods payments-data)
                   :let [card (:card c)]]
@@ -116,19 +110,19 @@
                  ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
                 [:button.mlb-reset.change-pay-method-bt
                   {:on-click #(payments-actions/add-payment-method payments-data)}
-                  "Add another payment method"]]
+                  "Update payment information"]]
           [:div.plan-summary-details
             [:button.mlb-reset.change-pay-method-bt
               {:on-click #(payments-actions/add-payment-method payments-data)}
               "Add a payment method"]])
         (when (is-trial? subscription-data)
           [:div.plan-summary-details.bottom-margin
-            "Trial:"
+            [:strong "Trial"]
             [:br]
-            (trial-info-string subscription-data)])
+            (trial-remaining-days-string subscription-data)])
         (when subscription-data
           [:div.plan-summary-details.bottom-margin
-            "Billing period:"
+            [:strong "Billing period"]
             [:br]
             "Plan billed "
             (plan-description (:nickname current-plan)) " (" (plan-price current-plan quantity) ")"
@@ -172,30 +166,48 @@
          (reset! (::payments-plan s) (:nickname current-plan-data)))
        (show-error-alert s)))))
 
+(defn- different-plans-price [plans-data quantity]
+  (let [annual-plan-data (first (filter #(= (:interval %) "year") plans-data))
+        monthly-plan-data (first (filter #(= (:interval %) "month") plans-data))
+        annual-tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
+                                         (not (:up-to %))) (:tiers annual-plan-data)))
+        monthly-tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
+                                          (not (:up-to %))) (:tiers monthly-plan-data)))
+        annual-price (if-not (nil? (:up-to annual-tier))
+                       (+ (:flat-amount annual-tier) (* quantity (:unit-amount annual-tier)))
+                       (* (int quantity) (int (:unit-amount annual-tier))))
+        monthly-price (if-not (nil? (:up-to monthly-tier))
+                       (+ (:flat-amount monthly-tier) (* quantity (:unit-amount monthly-tier)))
+                       (* quantity (:unit-amount monthly-tier)))
+        diff-price (- (* monthly-price 12) annual-price)]
+    (when (pos? diff-price)
+      (str " An annual plans saves you " (plan-amount-to-human diff-price (:currency annual-plan-data)) " per year."))))
+
 (defn- plan-change [s payments-data]
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
         subscription-data (payments-actions/get-active-subscription payments-data)
-        quantity (-> subscription-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
-        monthly-plan (first (filter #(= (:amount %) "monthly") (:available-plans payments-data)))
-        annual-plan (first (filter #(= (:amount %) "annual") (:available-plans payments-data)))
-        
+        quantity (-> payments-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
+        monthly-plan (first (filter #(= (:interval %) "month") (:available-plans payments-data)))
+        annual-plan (first (filter #(= (:interval %) "year") (:available-plans payments-data)))
         current-plan-data (if @(::plan-has-changed s)
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:plan subscription-data))
         total-plan-price (plan-price current-plan-data quantity)
+        different-plans-price-str (different-plans-price (:available-plans payments-data) quantity)
         up-to (-> current-plan-data :tiers first :up-to)
         flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
         unit-amount (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
         has-payment-info? (seq (:payment-methods payments-data))
-        is-monthly-plan? (= (:nickname current-plan-data) "Monthly")]
+        is-monthly-plan? (= (:nickname current-plan-data) "Monthly")
+        is-under-up-to? (< quantity up-to)]
     [:div.plan-change
       (when (and (is-trial? subscription-data)
                  (not has-payment-info?))
         [:div.plan-change-details.expiration-trial.bottom-margin
           [:div.emoji-icon "🗓"]
-          (str "Your trial plan is set to expire in " (trial-remaining-days-string subscription-data) ".")])
+          (trial-remaining-days-string subscription-data)])
       (when (and (is-trial? subscription-data)
                  (not has-payment-info?))
         [:div.plan-change-separator.bottom-margin])
@@ -211,33 +223,35 @@
                                        (reset! (::plan-has-changed s) true)
                                        (reset! (::show-plans-dropdown s) false)
                                        (reset! current-plan (:value selected-item)))}))]
-      (if (= @current-plan "free")
+      (if is-under-up-to?
         [:div.plan-change-description
-          "Free plan details here"]
+          (str
+           (:nickname current-plan-data)
+           " plans up to " up-to
+           (if (= up-to 1)
+             " person"
+             " people")
+           "are " flat-amount " per " (:interval current-plan-data) "."
+           " Teams larger than " up-to
+           (if (= up-to 1)
+             " person"
+             " people")
+           " are charged " unit-amount " per person per " (:interval current-plan-data) "."
+           (when-not is-monthly-plan?
+             different-plans-price-str))]
         [:div.plan-change-description
-           "For your team of "
-           quantity
-           (if (not= quantity 1)
-            " people"
-            " person")
-           ", your plan will cost "
-           total-plan-price
-           (if is-monthly-plan?
-            " monthly"
-            " annually")
-           " (" quantity " user" (when (not= quantity 1) "s") " X " (price-per-user current-plan-data) ")."
-          (when (< quantity up-to)
-            [:br])
-          (when (< quantity up-to)
-            (str " Up to " up-to " user" (when (not= up-to 1) "s") " is " flat-amount
-            (if is-monthly-plan?
-              " per month; "
-              " per year; ")
-            unit-amount " per user after."))
-          (when-not is-monthly-plan?
-            [:br])
-          (when-not is-monthly-plan?
-            "An annual plan saves you 20%.")])
+           (str
+            "For your team of "
+            quantity
+            (if (not= quantity 1)
+             " people"
+             " person")
+            ", your plan will cost "
+            total-plan-price
+            " per " (:interval current-plan-data)
+            " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ")."
+           (when-not is-monthly-plan?
+             different-plans-price-str))])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
         [:div.plan-change-title
           (str "Due today: " total-plan-price)])
