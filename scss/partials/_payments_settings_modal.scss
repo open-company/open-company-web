@@ -131,7 +131,11 @@ div.payments-settings-modal {
         height: 1px;
         width: 100%;
         background-color: rgba($deep_navy, 0.1);
-      }      
+      }
+
+      .bottom-margin {
+        margin-bottom: 24px;
+      }
 
       div.plan-summary {
         margin-top: 24px;
@@ -143,17 +147,16 @@ div.payments-settings-modal {
           line-height: 18px;
           color: $deep_navy;
 
-          &.bottom-margin {
-            margin-bottom: 24px;
-          }
-
-          &.success {
+          &.success, &.expiration-trial {
             @include OC_Body_Bold();
             text-align: center;
             font-size: 14px;
             background-color: transparent;
+            max-width: 216px;
+            margin-left: auto;
+            margin-right: auto;
 
-            div.thumb-up {
+            div.emoji-icon {
               text-align: center;
               margin: 0 auto 8px;
               font-size: 32px;
@@ -220,61 +223,66 @@ div.payments-settings-modal {
           }
         }
 
-        div.dropdown-list-container {
+        div.plan-change-dropdown {
+          position: relative;
           width: 100%;
-          top: 34px;
-          left: 0;
 
-          @include mobile() {
-            top: 42px;
-          }
+          div.dropdown-list-container {
+            width: 100%;
+            top: 0;
+            left: 0;
 
-          div.triangle {
-            display: none;
-          }
+            @include mobile() {
+              top: 42px;
+            }
 
-          div.dropdown-list-content {
-            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
-            padding: 0;
-            border: 1px solid $carrot_light_gray_1;
-            border-radius: 4px;
-            margin: 0;
-            padding: 8px 0;
+            div.triangle {
+              display: none;
+            }
 
-            ul.dropdown-list {
-              border: none;
+            div.dropdown-list-content {
+              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+              padding: 0;
+              border: 1px solid $carrot_light_gray_1;
               border-radius: 4px;
+              margin: 0;
+              padding: 8px 0;
 
-              li.dropdown-list-item {
-                padding: 4px 13px;
-                margin: 0;
-                border-radius: 0;
+              ul.dropdown-list {
+                border: none;
+                border-radius: 4px;
 
-                &.select {
-                  background-color: #ebf8f1;
-                  span.dropdown-list-item-label {
-                    color: $carrot_green;
-                  }
-                }
+                li.dropdown-list-item {
+                  padding: 4px 13px;
+                  margin: 0;
+                  border-radius: 0;
 
-                @include big_web() {
                   &.select {
                     background-color: #ebf8f1;
                     span.dropdown-list-item-label {
                       color: $carrot_green;
-                      text-decoration: none;
                     }
                   }
-                }
 
-                span.dropdown-list-item-label {
-                  @include OC_Body_Book();
-                  font-size: 14px;
-                  color: $deep_navy;
-                  line-height: 22px;
-                  opacity: 1;
-                  padding: 0;
-                  text-decoration: none;
+                  @include big_web() {
+                    &.select {
+                      background-color: #ebf8f1;
+                      span.dropdown-list-item-label {
+                        color: $carrot_green;
+                        text-decoration: none;
+                      }
+                    }
+                  }
+
+                  span.dropdown-list-item-label {
+                    @include OC_Body_Book();
+                    font-size: 14px;
+                    color: $deep_navy;
+                    line-height: 22px;
+                    opacity: 1;
+                    padding: 0;
+                    text-decoration: none;
+                  }
                 }
               }
             }
@@ -296,8 +304,21 @@ div.payments-settings-modal {
           line-height: 18px;
           color: $deep_navy;
 
-          &.bottom-margin {
-            margin-bottom: 24px;
+          &.success, &.expiration-trial {
+            @include OC_Body_Bold();
+            text-align: center;
+            font-size: 14px;
+            background-color: transparent;
+            max-width: 216px;
+            margin-left: auto;
+            margin-right: auto;
+
+            div.emoji-icon {
+              text-align: center;
+              margin: 0 auto 8px;
+              font-size: 32px;
+              line-height: 38px;
+            }
           }
 
           button, a {
