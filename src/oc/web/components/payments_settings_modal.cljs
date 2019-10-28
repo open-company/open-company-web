@@ -227,12 +227,15 @@
         [:div.plan-change-description
           (str
            (:nickname current-plan-data)
-           " plans up to " up-to
+           " plans "
+           (when is-annual-default-plan?
+             "provide a 20% discount and ")
+           "start at " flat-amount
+           " up to " up-to
            (if (= up-to 1)
              " person"
              " people")
-           " are " flat-amount " per " (:interval current-plan-data) "."
-           " Teams larger than " up-to
+           ". Teams larger than " up-to
            (if (= up-to 1)
              " person"
              " people")
