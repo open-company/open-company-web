@@ -197,10 +197,16 @@ div.payments-settings-modal {
           line-height: 22px;
           margin: 0;
           text-align: left;
-          background-color: rgba($deep_navy, 0.2);
+          background-color: rgba($deep_navy, 0.1);
           border-radius: 4px;
           position: relative;
           opacity: 1;
+
+          @include big_web() {
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
+          }
 
           @include mobile() {
             height: 40px;
