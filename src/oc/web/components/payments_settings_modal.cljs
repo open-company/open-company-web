@@ -227,19 +227,13 @@
         [:div.plan-change-description
           (str
            (:nickname current-plan-data)
-           " plans "
+           " pricing "
            (when is-annual-default-plan?
-             "provide a 20% discount and ")
-           "start at " flat-amount
-           " up to " up-to
-           (if (= up-to 1)
-             " person"
-             " people")
-           ". Teams larger than " up-to
-           (if (= up-to 1)
-             " person"
-             " people")
-           " are charged " unit-amount " per person per " (:interval current-plan-data) "."
+             "is 20% lower than monthly. An annual plan ")
+           "starts at " flat-amount
+           ", which includes your first " up-to
+           " team members"
+           ". Then it's just " unit-amount " per person after that."
            (when is-annual-default-plan?
              different-plans-price-str))]
         [:div.plan-change-description
