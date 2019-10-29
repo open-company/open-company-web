@@ -23,6 +23,28 @@ div.stream-comments {
     div.stream-comment-outer {
       background-color: #FFF7DD;
       padding: 0;
+      position: relative;
+
+      &.left-border {
+        &:before {
+          content: "";
+          width: 2px;
+          height: 100%;
+          position: absolute;
+          left: 15px;
+          top: 0;
+          background-color: rgba($deep_navy, 0.1);
+        }
+
+        &.open-thread {
+          &:before {
+            height: calc(100% - 16px);
+            top: 16px;
+          }
+        }
+      }
+
+      &.left-border
 
       &:first-child div.stream-comment {
         padding-top: 16px;
@@ -33,8 +55,8 @@ div.stream-comments {
       }
 
       div.stream-comment.indented-comment div.stream-comment-inner {
-        margin-left: 32px;
-        width: calc(100% - 32px);
+        margin-left: 48px;
+        width: calc(100% - 48px);
 
         @include mobile() {
           display: block;
@@ -335,14 +357,14 @@ div.stream-comments {
 
         div.stream-comment-author-avatar {
           float: left;
-          width: 24px;
-          height: 24px;
+          width: 32px;
+          height: 32px;
 
-          @include user-profile(24);
+          @include user-profile(32);
         }
 
         div.stream-comment-right {
-          margin-left: 32px;
+          margin-left: 48px;
 
           @include preload_image(cdnUrl("/img/ML/comment_react_emoji.svg"));
         }
@@ -471,14 +493,14 @@ div.stream-comments {
 
       div.stream-comment.indented-comment {
         div.add-comment-box-container {
-          margin-left: 32px;
+          margin-left: 48px;
 
           @include mobile() {
             margin-left: 0;
           }
 
           div.add-comment-box {
-            width: calc(100% - 32px);
+            width: calc(100% - 48px);
 
             @include mobile() {
               width: 100%;

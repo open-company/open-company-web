@@ -15,25 +15,12 @@ div.add-comment-box-container {
     position: relative;
     width: 100%;
 
-    @include user-profile(24);
-
-    div.user-avatar-img-container {
-      float: left;
-      margin-top: 10px;
-
-      @include mobile() {
-        display: none;
-      }
-    }
-
     div.add-comment-internal {
-      margin-left: 32px;
       position: relative;
       border-radius: 4px;
       border: 1px solid $mid_light_grey;
       padding: 16px;
-      background-color: white;
-      width: calc(100% - 32px);
+      background-color: white;;
 
       &.active {
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);

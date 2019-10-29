@@ -192,6 +192,9 @@
                                                         (utils/in? @(::replying-to s) (:uuid comment-data)))
                                                    (and (not= (:parent-uuid next-comment-data) (:parent-uuid comment-data))
                                                         (utils/in? @(::replying-to s) (:parent-uuid comment-data))))
+                      needs-left-border? (or is-indented-comment?
+                                             (= (:parent-uuid next-comment-data) (:uuid comment-data))
+                                             should-show-add-comment?)
                       is-editing? (and (seq @(::editing? s))
                                        (= @(::editing? s) (:uuid comment-data)))
                       can-show-edit-bt? (and (:can-edit comment-data)
@@ -204,6 +207,8 @@
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
+                                          :left-border needs-left-border?
+                                          :open-thread (not is-indented-comment?)
                                           :closing-thread (or (not next-comment-data)
                                                               (empty? (:parent-uuid next-comment-data)))})}
                 [:div.stream-comment
@@ -217,6 +222,8 @@
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
+                                          :left-border needs-left-border?
+                                          :open-thread (not is-indented-comment?)
                                           :closing-thread (or (not next-comment-data)
                                                               (empty? (:parent-uuid next-comment-data)))})}
                 [:div.stream-comment

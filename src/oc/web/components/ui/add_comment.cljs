@@ -19,10 +19,8 @@
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.ui.giphy-picker :refer (giphy-picker)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.media-video-modal :refer (media-video-modal)]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]))
 
 ;; Add commnet handling
@@ -220,7 +218,6 @@
     [:div.add-comment-box-container
       {:class container-class}
       [:div.add-comment-box
-        (user-avatar-image current-user-data)
         [:div.add-comment-internal
           {:class (when-not should-hide-post-button "active")}
           [:div.add-comment.emoji-autocomplete.emojiable.oc-mentions.oc-mentions-hover.editing
