@@ -71,7 +71,7 @@
         days-left (inc (int (/ remaining-seconds (* 60 60 24))))]
     (if (neg? remaining-seconds)
       "Your trial plan has ended. Please select a plan to continue."
-      (str "Your trial plan is set to expire in " days-left " day" (when-not (= days-left 1) "s.")))))
+      (str "Your trial plan is set to expire in " days-left " day" (when-not (= days-left 1) "s") ". Please choose a plan below."))))
 
 (defn- plan-summary [s payments-data]
   (if @(::automatic-update-plan s)
@@ -288,11 +288,19 @@
         (small-loading))
      [:div.plan-change-separator]
      [:div.plan-change-details
-       "Have a team of 250+"
+       "Have a question about billing?"
+       [:br]
        [:a.chat-with-us
          {:class "intercom-chat-link"
           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-         "Chat with us"]]]))
+         "Chat with us"]]
+     [:div.plan-change-details
+       "Team of 250+, "
+       [:a.chat-with-us
+         {:class "intercom-chat-link"
+          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+         "contact us"]
+       " about an enterprise plan."]]))
 
 (defn- initial-setup
   "Setup the view data, need to make sure the payments data have been loaded to show it."
