@@ -36,7 +36,8 @@
   [{:keys [entry-data
            comments-data
            show-new-tag?
-           hide-label?]}]
+           hide-label?
+           hide-face-pile?]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -51,7 +52,9 @@
         comments-count (if sorted-comments
                          (count sorted-comments)
                          (:count comments-link))
-        face-pile-count (min max-face-pile (count comments-authors))
+        face-pile-count (if hide-face-pile?
+                          0
+                          (min max-face-pile (count comments-authors)))
         is-mobile? (responsive/is-mobile-size?)
         faces-to-render (take max-face-pile comments-authors)
         face-pile-width (if (pos? face-pile-count)
@@ -65,8 +68,9 @@
                      (routing-actions/open-post-modal entry-data true)
                      (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
-        (when-not (and hide-label?
-                       (zero? comments-count))
+        (when (and (not hide-face-pile?)
+                  (or (not hide-label?)
+                      (not (zero? comments-count))))
           [:div.is-comments-authors.group
             {:style {:width (str face-pile-width "px")}
              :class (when (> (count faces-to-render) 1) "show-border")}
