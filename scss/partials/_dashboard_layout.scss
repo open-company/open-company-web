@@ -7,6 +7,10 @@ div.dashboard-layout {
     div.cmail-outer:not(.fullscreen) {
       display: none;
     }
+
+    div.dashboard-layout-container div.board-container {
+      padding-top: 0;
+    }
   }
 
   @include mobile() {
