@@ -213,10 +213,10 @@
                              :show-new-tag? has-new-comments?
                              :hide-face-pile? true})]]
       [:div.expanded-post-comments.group
+        (when (:can-comment activity-data)
+          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
                           :new-added-comment add-comment-highlight
                           :last-read-at @(::initial-last-read-at s)
-                          :current-user-id current-user-id})
-        (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))]]))
+                          :current-user-id current-user-id})]]))
