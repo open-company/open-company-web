@@ -1,7 +1,8 @@
 div.expanded-post {
-  width: 640px;
+  width: #{$board_container_width}px;
   margin: 0 auto;
-  padding: #{$navbar_height}px 0 24px;
+  padding: 0 0 24px;
+  position: relative;
 
   @include mobile() {
     width: 100%;
@@ -31,11 +32,9 @@ div.expanded-post {
 
   div.expanded-post-header {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: #{$navbar_height}px;
-    padding: 12px 16px;
+    width: #{$board_container_width}px;
+    height: 72px;
+    padding: 24px 0 16px;
     border-bottom: 1px solid rgba($deep_navy, 0.15);
     background-color: $grey_num_2;
     z-index: 2;
@@ -58,10 +57,15 @@ div.expanded-post {
       border-radius: 4px;
       opacity: 1;
       background-color: rgba($deep_navy, 0.1);
-      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-      background-size: 12px 12px;
+      background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+      background-size: 14px 10px;
       background-repeat: no-repeat;
       background-position: center;
+
+      @include mobile() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-size: 12px 12px;
+      }
 
       @include big_web(){
         &:hover {
@@ -70,83 +74,39 @@ div.expanded-post {
       }
     }
 
-    div.expanded-post-header-center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 40vw;
-      height: 24px;
-      position: absolute;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
+    div.expanded-post-wrt-container {
+      float: right;
+      position: relative;
+      margin-top: 0;
+      padding: 4px 16px 4px 0;
+
+      &:after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 1px;
+        height: 32px;
+        background-color: rgba($deep_navy, 0.2);
+      }
 
       @include mobile() {
-        display: none;
+        margin-top: 0;
       }
 
-      @include user-profile(24);
+      div.wrt-count-container {
+        height: 24px;
 
-      div.user-avatar-img-container {
-        float: left;
-      }
-
-      span.header-title {
-        margin-left: 8px;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        line-height: 24px;
-        color: $deep_navy;
-        white-space: pre;
-        max-width: calc(100% - 24px - 8px - 86px - 8px);
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      @include must-see-tag();
-
-      div.must-see-tag {
-        float: left;
-        margin-left: 8px;
-        margin-top: 2px;
-
-        @include mobile() {
-          margin-left: 0;
-          margin-top: 3px;
-          margin-bottom: 8px;
-          overflow: hidden;
-          max-width: 100%;
-          text-overflow: ellipsis;
-          white-space: pre-wrap;
-          word-break: break-word;
-        }
-      }
-
-      @include follow-up-tag();
-
-      div.follow-up-tag {
-        float: left;
-        margin-left: 8px;
-        margin-top: 2px;
-
-        @include mobile() {
-          margin-left: 0;
-          margin-top: 3px;
-          margin-bottom: 8px;
-          overflow: hidden;
-          max-width: 100%;
-          text-overflow: ellipsis;
-          white-space: pre-wrap;
-          word-break: break-word;
+        div.wrt-count {
+          line-height: 24px;
+          color: $deep_navy;
+          opacity: 1;
         }
       }
     }
 
     div.more-menu {
-      float: unset;
-      position: absolute;
-      top: 12px;
-      right: 16px;
+      float: right;
       height: 32px;
 
       div.activity-move {
@@ -157,15 +117,14 @@ div.expanded-post {
       button.more-menu-bt {
         width: 32px;
         height: 32px;
-        background-color: rgba($deep_navy, 0.1);
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
+        background-color: transparent;
+        border-radius: 4px;
         padding: 0;
-        margin: 0;
+        margin: 0 7px;
         opacity: 1;
 
-        &:not(.disabled):hover {
-          background-color: rgba($deep_navy, 0.2);
+        &:not(.disabled):hover, &:not(.disabled):active {
+          background-color: transparent;
         }
       }
 
@@ -173,57 +132,42 @@ div.expanded-post {
         width: 32px;
         height: 32px;
         background-color: rgba($deep_navy, 0.1);
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-        border-left: 1px solid rgba($deep_navy, 0.1);
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
         padding: 0;
         margin: 0;
         opacity: 1;
         background-image: cdnUrl("/img/ML/more_menu_new_share.svg");
-        background-size: 14px 14px;
+        background-size: 12px 12px;
 
         &:not(.disabled):hover {
           background-color: rgba($deep_navy, 0.2);
         }
       }
 
-      div.more-menu-create-follow-up-bt-container button.more-menu-create-follow-up-bt, button.more-menu-complete-follow-up-bt {
-        &:before {
-          position: absolute;
-          content: "";
-          width: 1px;
-          height: 32px;
-          left: -16px;
-          top: 0;
-          background-color: rgba($deep_navy, 0.2);
-        }
-      }
-
       button.more-menu-complete-follow-up-bt {
-        position: relative;
-        margin-left: 32px;
-        padding: 7px 13px 7px 36px;
-        background-color: $carrot_green;
-        color: white;
-        border-radius: 4px;
-        @include OC_Body_Bold();
-        font-size: 14px;
-        line-height: 18px;
-        background-image: cdnUrl("/img/ML/carrot_checkbox_mark.svg");
-        background-size: 14px 10px;
-        background-position: left 14px top 11px;
-        background-repeat: no-repeat;
+        width: 32px;
         height: 32px;
-        width: auto;
+        position: relative;
+        background-color: rgba($deep_navy, 0.1);
+        background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
+        background-size: 10px 14px;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        border-left: 1px solid rgba($deep_navy, 0.2);
         opacity: 1;
         float: right;
+        margin-left: 0;
       }
 
       div.more-menu-create-follow-up-bt-container {
         float: right;
-        margin-left: 32px;
         width: 32px;
         height: 32px;
+        margin: 0;
+        border-left: 1px solid rgba($deep_navy, 0.2);
 
         div.tooltip {
           width: 128px;
@@ -238,7 +182,8 @@ div.expanded-post {
           background-size: 13px 16px;
           background-position: center;
           background-repeat: no-repeat;
-          border-radius: 4px;
+          border-top-right-radius: 4px;
+          border-bottom-right-radius: 4px;
           opacity: 1;
 
           &:not(.disabled):hover {
@@ -272,33 +217,32 @@ div.expanded-post {
 
   div.expanded-post-headline {
     @include activity-title(26px, 33px);
-    margin-top: 40px;
+    padding-top: #{72 + 40}px;
 
     @include mobile() {
       @include activity-title(22px, 28px);
-      margin-top: 0;
+      padding-top: 0;
     }
   }
 
   div.expanded-post-author {
-    @include user-profile(24);
-    margin-top: 16px;
-    min-height: 24px;
-
-    @include mobile() {
-      margin-top: 8px;
-    }
-
-    div.user-avatar-img-container {
-      float: left;
-      margin-right: 8px;
-    }
+    margin-top: 8px;
+    min-height: 18px;
 
     div.expanded-post-author-inner {
       @include OC_Body_Book();
       font-size: 12px;
-      color: rgba($deep_navy, 0.5);
-      line-height: 24px;
+      color: $deep_navy;
+      line-height: 18px;
+
+      div.expanded-post-author-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background-color: rgba($deep_navy, 0.2);
+        margin: 0 6px 3px;
+        display: inline-block;
+      }
 
       span.expanded-post-author-inner-label {
         @include mobile() {
@@ -309,7 +253,7 @@ div.expanded-post {
       }
 
       div.must-see-tag {
-        display: none;
+        display: inline-block;
 
         @include mobile() {
           display: inline-block;
@@ -327,7 +271,7 @@ div.expanded-post {
       @include follow-up-tag();
 
       div.follow-up-tag {
-        display: none;
+        display: inline-block;
 
         @include mobile() {
           display: inline-block;
@@ -409,6 +353,12 @@ div.expanded-post {
         height: 20px;
         margin-top: 20px;
       }
+
+      div.is-comments {
+        div.is-comments-summary {
+          color: $deep_navy;
+        }
+      }
     }
 
     div.is-comments {
@@ -437,16 +387,6 @@ div.expanded-post {
             left: unset;
           }
         }
-      }
-    }
-
-    div.expanded-post-wrt-container {
-      float: left;
-      position: relative;
-      margin-top: 4px;
-
-      @include mobile() {
-        margin-top: 0;
       }
     }
   }
