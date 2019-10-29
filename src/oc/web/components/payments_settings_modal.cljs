@@ -71,7 +71,7 @@
         days-left (inc (int (/ remaining-seconds (* 60 60 24))))]
     (if (neg? remaining-seconds)
       "Your trial plan has ended. Please select a plan to continue."
-      (str "Your trial plan is set to expire in " days-left " day" (when-not (= days-left 1) "s") ". Please choose a plan below."))))
+      (str "Your trial plan is set to expire in " days-left " day" (when-not (= days-left 1) "s") ". Please choose a plan."))))
 
 (defn- plan-summary [s payments-data]
   (if @(::automatic-update-plan s)
