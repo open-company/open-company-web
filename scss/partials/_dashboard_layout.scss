@@ -316,7 +316,7 @@ div.dashboard-layout {
 
             button.board-settings-bt {
               background-image: cdnUrl("/img/ML/section_settings_gear.svg");
-              background-size: 16px 16px;
+              background-size: 13px 14px;
               background-repeat: no-repeat;
               background-position: center;
               background-color: transparent;
@@ -326,6 +326,13 @@ div.dashboard-layout {
               margin: 3px 0 0 16px;
               position: relative;
               border-left: 1px solid $ultra_light_grey;
+              opacity: 0.5;
+
+              @include big_web() {
+                &:hover {
+                  opacity: 1;
+                }
+              }
 
               // &:before {
               //   content: "";

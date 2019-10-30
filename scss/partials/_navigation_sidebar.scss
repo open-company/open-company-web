@@ -617,6 +617,14 @@ div.left-navigation-sidebar {
 
         &.item-selected {
           @include item-selected();
+
+          div.public {
+            background-image: cdnUrl("/img/ML/board_public_white.svg"); 
+          }
+
+          div.private {
+            background-image: cdnUrl("/img/ML/board_private_white.svg"); 
+          }
         }
       }
 
