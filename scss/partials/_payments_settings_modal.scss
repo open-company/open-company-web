@@ -237,10 +237,6 @@ div.payments-settings-modal {
             top: 0;
             left: 0;
 
-            @include mobile() {
-              top: 42px;
-            }
-
             div.triangle {
               display: none;
             }
