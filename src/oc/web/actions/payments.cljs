@@ -61,7 +61,9 @@
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         checkout-link (utils/link-for (:links fixed-payments-data) "checkout")
         base-domain (if ua/mobile-app?
-                      (dis/expo-deep-link-origin)
+                      ;; Get the deep link url but strip out the last slash to avoid
+                      ;; a double slash
+                      (str (butlast (dis/expo-deep-link-origin)))
                       ls/web-server-domain)
         base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&result=")
         success-redirect-url (str base-redirect-url "true"
