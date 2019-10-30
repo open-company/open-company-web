@@ -250,6 +250,11 @@ div.left-navigation-sidebar {
   @include no-user-select();
   padding: 24px 0 0;
 
+  &.collapsed-sections {
+    overflow-y: visible;
+    overflow: visible;
+  }
+
   &.absolute-position {
     position: absolute;
     top: 0;

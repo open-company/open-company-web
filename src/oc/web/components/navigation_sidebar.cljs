@@ -16,11 +16,6 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
-(defn- toggle-collapse-sections [s]
-  (let [next-value (not @(::sections-list-collapsed s))]
-    (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
-    (reset! (::sections-list-collapsed s) next-value)))
-
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
@@ -31,6 +26,13 @@
     (let [height (.-offsetHeight navigation-sidebar)]
       (when (not= height @(::content-height s))
         (reset! (::content-height s) height)))))
+
+(defn- toggle-collapse-sections [s]
+  (let [next-value (not @(::sections-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::sections-list-collapsed s) next-value)
+    (reset! (::content-height s) nil)
+    (utils/after 100 #(save-content-height s))))
 
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
@@ -125,8 +127,8 @@
         drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
-                                :absolute-position (or @(::sections-list-collapsed s)
-                                                       (not is-tall-enough?))})
+                                :absolute-position (not is-tall-enough?)
+                                :collapsed-sections @(::sections-list-collapsed s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}

@@ -55,6 +55,7 @@ div.dashboard-layout {
     margin: 0 auto;
     width:#{$board_container_width + $left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin}px;
     transition: margin-left 180ms ease-in, width 180ms ease-in, max-width 180ms ease-in;
+    position: relative;
 
     @include mobile(){
       padding: 0px;
