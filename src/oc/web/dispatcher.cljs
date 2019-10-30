@@ -190,7 +190,6 @@
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email    [[:base] (fn [base] (:login-with-email base))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
-   :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]

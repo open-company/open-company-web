@@ -60,7 +60,6 @@
   (drv/drv :route)
   (drv/drv :activity-data)
   (drv/drv :comments-data)
-  (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
   (drv/drv :add-comment-highlight)

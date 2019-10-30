@@ -45,7 +45,6 @@
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
-                              (drv/drv :hide-left-navbar)
                               (drv/drv :sort-type)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
@@ -127,7 +126,6 @@
       [:div.dashboard-layout.group
         {:class (when show-expanded-post "expanded-post-view")}
         [:div.dashboard-layout-container.group
-          {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (navigation-sidebar)
           (when (and is-mobile?
                      (not show-expanded-post)
