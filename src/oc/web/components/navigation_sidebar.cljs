@@ -6,6 +6,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -16,7 +17,9 @@
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn- toggle-collapse-sections [s]
-  (swap! (::sections-list-collapsed s) not))
+  (let [next-value (not @(::sections-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::sections-list-collapsed s) next-value)))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
@@ -69,6 +72,7 @@
                                 {:will-mount (fn [s]
                                   (save-window-size s)
                                   (save-content-height s)
+                                  (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
