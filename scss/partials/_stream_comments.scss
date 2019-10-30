@@ -2,6 +2,7 @@ div.stream-comments {
   height: 100%;
   position: relative;
   padding-bottom: 25vh;
+  margin-top: 40px;
 
   &.editing {
     div.stream-comments-list {
@@ -37,6 +38,10 @@ div.stream-comments {
         }
 
         &.open-thread {
+          &:not(:first-child) {
+            margin-top: 16px;
+          }
+
           &:before {
             height: calc(100% - 16px);
             top: 16px;
@@ -270,7 +275,7 @@ div.stream-comments {
           }
 
           .separator-bt {
-            margin-left: 15px;
+            margin-left: 11px;
             position: relative;
 
             &:before {
@@ -280,7 +285,7 @@ div.stream-comments {
               background-color: rgba($deep_navy, 0.2);
               border-radius: 50%;
               position: absolute;
-              left: -9px;
+              left: -7px;
               top: 10px;
             }
           }
@@ -347,9 +352,9 @@ div.stream-comments {
 
           div.stream-comment-author-name {
             @include OC_Body_Bold();
-            font-size: 12px;
+            font-size: 14px;
             color: $deep_navy;
-            line-height: 15px;
+            line-height: 18px;
             float: left;
             @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
           }
@@ -386,16 +391,16 @@ div.stream-comments {
 
             div.stream-comment-author-timestamp {
               @include OC_Body_Book();
-              font-size: 12px;
+              font-size: 14px;
               color: rgba($deep_navy, 0.5);
               float: left;
-              margin-left: 8px;
+              margin-left: 6px;
               line-height: 24px;
             }
 
             div.new-comment-tag {
               float: left;
-              margin-left: 8px;
+              margin-left: 6px;
               color: $carrot_green;
               @include OC_Body_Bold();
               text-transform: uppercase;

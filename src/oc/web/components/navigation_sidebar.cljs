@@ -105,9 +105,10 @@
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
-        is-all-posts (= (router/current-board-slug) "all-posts")
-        is-follow-ups (= (router/current-board-slug) "follow-ups")
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
+        selected-slug (or (:back-to @router/path) (router/current-board-slug))
+        is-all-posts (= selected-slug "all-posts")
+        is-follow-ups (= selected-slug "follow-ups")
+        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
@@ -191,7 +192,7 @@
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= (router/current-board-slug) (:slug board))
+                        is-current-board (= selected-slug (:slug board))
                         board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected (and (not is-all-posts)

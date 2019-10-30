@@ -67,22 +67,14 @@
                           :description "Please try again"
                           :dismiss true
                           :expire 3
-                          :id (if edit-comment-data :update-comment-error :add-comment-error)})))
-        complete? @(::complete-follow-up s)]
+                          :id (if edit-comment-data :update-comment-error :add-comment-error)})))]
     (reset! (::add-button-disabled s) true)
     (set! (.-innerHTML add-comment-div) "")
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
     (when (fn? dismiss-reply-cb)
-      (dismiss-reply-cb false))
-    (when complete?
-      (let [follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
-            show-follow-up-button? (and follow-up
-                                        (not (:completed? follow-up)))
-            complete-follow-up-link (when show-follow-up-button?
-                                      (utils/link-for (:links follow-up) "mark-complete" "POST"))]
-        (activity-actions/complete-follow-up activity-data follow-up)))))
+      (dismiss-reply-cb false))))
 
 (defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
@@ -134,7 +126,6 @@
                          (rum/local "" ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
-                         (rum/local false ::complete-follow-up)
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -206,11 +197,6 @@
                                      (not is-focused?))
         is-mobile? (responsive/is-mobile-size?)
         follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
-        complete-follow-up-link (when follow-up
-                                  (utils/link-for (:links follow-up) "mark-complete" "POST"))
-        show-follow-up-button? (and follow-up
-                                    (not (:completed? follow-up))
-                                    complete-follow-up-link)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
@@ -277,19 +263,6 @@
                            :position "top"
                            :default-field-selector (str "div." add-comment-class)
                            :container-selector (str "div." add-comment-class)})
-            (when show-follow-up-button?
-              [:button.mlb-reset.complete-follow-up
-                {:class (when-not @(::complete-follow-up s) "unselected")
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :title "Complete follow-up when the comment is posted"
-                 :on-click #(do
-                             (utils/event-stop %)
-                             (reset! (::show-post-button s) true)
-                             (swap! (::complete-follow-up s) not))}
-                (carrot-checkbox {:selected @(::complete-follow-up s)})
-                "Complete follow-up"])
             (when uploading?
               [:div.upload-progress
                 (small-loading)

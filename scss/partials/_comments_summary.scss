@@ -91,7 +91,7 @@ div.is-comments {
     @include new-comments-tag();
 
     div.new-comments-tag {
-      margin-left: 8px;
+      margin-left: 6px;
       display: inline-block;
 
       @include mobile() {
