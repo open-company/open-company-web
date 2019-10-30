@@ -47,23 +47,38 @@ html, body {
 
   // Change Bootstrap tooltip style
   .tooltip-arrow {
-    display: none;
+    display: block;
+    border-top-color: $deep_navy;
   }
 
   .tooltip-inner {
-    background-color: white;
+    // background-color: white;
+    // white-space:pre-wrap;
+    // max-width: none;
+    // text-align: left;
+    // opacity: 1;
+    // @include OC_Body_Book();
+    // font-size: 14px;
+    // color: $light_navy;
+    // line-height: 18px;
+    // padding: 11px 16px;
+    // border-radius: 4px;
+    // box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
+    // border: 1px solid $mid_light_grey;
+
+    background-color: $deep_navy;
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
     opacity: 1;
     @include OC_Body_Book();
-    font-size: 14px;
-    color: $light_navy;
+    font-size: 12px;
+    color: white;
     line-height: 18px;
-    padding: 11px 16px;
+    padding: 5px 8px;
     border-radius: 4px;
-    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
-    border: 1px solid $mid_light_grey;
+    box-shadow: none;
+    border: none;
   }
 }
 
