@@ -252,7 +252,9 @@ div.left-navigation-sidebar {
 
   &.absolute-position {
     position: absolute;
+    top: 0;
     overflow-y: visible;
+    overflow: visible;
   }
 
   @media screen and (max-width: 975px) {
