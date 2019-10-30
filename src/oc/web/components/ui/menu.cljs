@@ -198,11 +198,6 @@
              :on-click payments-click}
             [:div.oc-menu-item
               "Billing"]])
-        ; (when (and org-slug
-        ;            (= user-role :admin))
-        ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
-        ;     [:div.oc-menu-item
-        ;       "Billing"]])
         (when (or (not is-mobile?)
                   show-billing?)
           [:div.oc-menu-separator])
