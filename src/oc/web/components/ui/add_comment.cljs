@@ -4,7 +4,6 @@
             [dommy.core :refer-macros (sel1)]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
-            [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
@@ -196,7 +195,6 @@
                                      (not @(::show-post-button s))
                                      (not is-focused?))
         is-mobile? (responsive/is-mobile-size?)
-        follow-up (first (filterv #(= (-> % :assignee :user-id) (jwt/user-id)) (:follow-ups activity-data)))
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
@@ -251,18 +249,13 @@
             [:button.mlb-reset.send-btn
               {:on-click #(when-not @(::add-button-disabled s)
                             (send-clicked % s))
-               :disabled @(::add-button-disabled s)}
+               :disabled @(::add-button-disabled s)
+               :class (when uploading? "separator-line")}
               (if edit-comment-data
                 "Save"
                 (if dismiss-reply-cb
                   "Reply"
                   "Comment"))]
-            (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
-                           :width 32
-                           :height 32
-                           :position "top"
-                           :default-field-selector (str "div." add-comment-class)
-                           :container-selector (str "div." add-comment-class)})
             (when uploading?
               [:div.upload-progress
                 (small-loading)

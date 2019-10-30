@@ -162,7 +162,7 @@ div.add-comment-box-container {
           border-radius: 4px;
           position: relative;
 
-          &:before {
+          &.separator-line:before {
             content: "";
             position: absolute;
             top: 0;

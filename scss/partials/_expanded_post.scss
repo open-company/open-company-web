@@ -32,12 +32,22 @@ div.expanded-post {
 
   div.expanded-post-header {
     position: fixed;
-    width: #{$board_container_width}px;
+    // Add 32 pixels to the width to account for the overflwoing comment menu
+    width: #{$board_container_width + 32}px;
     height: 72px;
-    padding: 24px 0 16px;
-    border-bottom: 1px solid rgba($deep_navy, 0.15);
+    padding: 24px 32px 16px 0;
     background-color: $grey_num_2;
     z-index: 102;
+
+    &:before {
+      content: "";
+      width: #{$board_container_width}px;
+      height: 1px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: rgba($deep_navy, 0.15);
+    }
 
     @include mobile() {
       width: 100vw;
@@ -48,6 +58,10 @@ div.expanded-post {
       left: 0;
       border-bottom: 1px solid $divider_line_grey;
       background-color: white;
+
+      &:before {
+        display: none;
+      }
     }
 
     button.back-to-board {
@@ -179,7 +193,7 @@ div.expanded-post {
           position: relative;
           background-color: rgba($deep_navy, 0.1);
           background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-          background-size: 13px 16px;
+          background-size: 10px 14px;
           background-position: center;
           background-repeat: no-repeat;
           border-top-right-radius: 4px;
@@ -232,7 +246,7 @@ div.expanded-post {
     div.expanded-post-author-inner {
       @include OC_Body_Book();
       font-size: 12px;
-      color: $deep_navy;
+      color: rgba($deep_navy, 0.5);
       line-height: 18px;
 
       div.expanded-post-author-dot {

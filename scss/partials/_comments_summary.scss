@@ -67,6 +67,10 @@ div.is-comments {
     overflow: hidden;
     text-overflow: ellipsis;
 
+    &.has-new-comments {
+      color: $deep_navy;
+    }
+
     @include big_web() {
       cursor: pointer;
 

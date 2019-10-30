@@ -3,6 +3,7 @@ div.stream-comments {
   position: relative;
   padding-bottom: 25vh;
   margin-top: 40px;
+  padding-top: 16px;
 
   &.editing {
     div.stream-comments-list {
@@ -37,22 +38,16 @@ div.stream-comments {
           background-color: rgba($deep_navy, 0.1);
         }
 
-        &.open-thread {
-          &:not(:first-child) {
-            margin-top: 16px;
-          }
-
-          &:before {
-            height: calc(100% - 16px);
-            top: 16px;
-          }
+        &.open-thread:before {
+          height: calc(100% - 16px);
+          top: 16px;
         }
       }
 
-      &.left-border
-
-      &:first-child div.stream-comment {
-        padding-top: 16px;
+      &.open-thread {
+        &:not(:first-child) {
+          margin-top: 16px;
+        }
       }
 
       &:last-child div.stream-comment div.stream-comment-inner {
@@ -80,10 +75,6 @@ div.stream-comments {
               left: unset;
             }
           }
-        }
-
-        div.stream-comment-floating-buttons {
-          top: 8px;
         }
       }
 
@@ -218,8 +209,8 @@ div.stream-comments {
 
         div.stream-comment-floating-buttons {
           position: absolute;
-          top: 0;
-          right: 0;
+          top: -8px;
+          right: -24px;
           height: 32px;
           z-index: 2;
           display: none;
@@ -295,7 +286,7 @@ div.stream-comments {
             background-repeat: no-repeat;
             padding: 0 8px;
             float: left;
-            @include OC_Body_Book();
+            @include OC_Body_Bold();
             font-size: 12px;
             line-height: 32px;
             color: white;
@@ -360,7 +351,7 @@ div.stream-comments {
             @include OC_Body_Bold();
             font-size: 14px;
             color: $deep_navy;
-            line-height: 18px;
+            line-height: 16px;
             float: left;
             @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
           }
@@ -391,9 +382,9 @@ div.stream-comments {
 
             div.stream-comment-author-name {
               @include OC_Body_Bold();
-              font-size: 12px;
+              font-size: 14px;
               color: $deep_navy;
-              line-height: 24px;
+              line-height: 16px;
               float: left;
             }
 
@@ -403,7 +394,7 @@ div.stream-comments {
               color: rgba($deep_navy, 0.5);
               float: left;
               margin-left: 6px;
-              line-height: 24px;
+              line-height: 16px;
             }
 
             div.new-comment-tag {
@@ -412,8 +403,8 @@ div.stream-comments {
               color: $carrot_green;
               @include OC_Body_Bold();
               text-transform: uppercase;
-              font-size: 12px;
-              line-height: 24px;
+              font-size: 14px;
+              line-height: 16px;
             }
           }
         }
@@ -421,7 +412,6 @@ div.stream-comments {
         div.stream-comment-content {
           text-align: left;
           position: relative;
-          margin-top: 2px;
 
           div.stream-comment-body {
             display: inline;

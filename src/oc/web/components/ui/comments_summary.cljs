@@ -83,7 +83,8 @@
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                      :add-a-comment (not (pos? comments-count))})}
+                                      :add-a-comment (not (pos? comments-count))
+                                      :has-new-comments show-new-tag?})}
             (if (pos? comments-count)
               [:div.group
                 (str comments-count
