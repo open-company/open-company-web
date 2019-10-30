@@ -174,6 +174,11 @@ div.expanded-post {
         opacity: 1;
         float: right;
         margin-left: 0;
+
+        @include mobile() {
+          border-left: none;
+          border-radius: 4px;
+        }
       }
 
       div.more-menu-create-follow-up-bt-container {
@@ -185,6 +190,10 @@ div.expanded-post {
 
         div.tooltip {
           width: 128px;
+        }
+
+        @include mobile() {
+          border-left: none;
         }
 
         button.more-menu-create-follow-up-bt {
@@ -202,6 +211,10 @@ div.expanded-post {
 
           &:not(.disabled):hover {
             background-color: rgba($deep_navy, 0.2);
+          }
+
+          @include mobile() {
+            border-radius: 4px;
           }
         }
       }
