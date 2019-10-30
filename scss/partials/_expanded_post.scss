@@ -37,7 +37,7 @@ div.expanded-post {
     padding: 24px 0 16px;
     border-bottom: 1px solid rgba($deep_navy, 0.15);
     background-color: $grey_num_2;
-    z-index: 2;
+    z-index: 102;
 
     @include mobile() {
       width: 100vw;
