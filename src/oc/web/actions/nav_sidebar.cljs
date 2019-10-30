@@ -30,30 +30,6 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 
-(defn- refresh-board-data [board-slug sort-type]
-  (when (and (not (router/current-activity-id))
-             board-slug)
-    (let [org-data (dis/org-data)
-          board-data (if (#{"all-posts" "follow-ups"} board-slug)
-                       (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
-                       (dis/board-data board-slug))]
-       (cond
-
-        (= board-slug "all-posts")
-        (activity-actions/all-posts-get org-data)
-
-        (= board-slug "follow-ups")
-        (activity-actions/follow-ups-sort-get org-data)
-
-        :default
-        (let [board-rel (if (= sort-type dis/other-sort-type)
-                          ["item" "self"]
-                          "activity")]
-          (when-let* [fixed-board-data (or board-data
-                       (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
-            (section-actions/section-get sort-type board-link)))))))
-
 (defn nav-to-url! [e board-slug url]
   (when (and e
              (.-preventDefault e))
@@ -82,7 +58,7 @@
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (utils/after 0 #(refresh-board-data board-slug sort-type)))))
+         (utils/after 0 #(activity-actions/refresh-board-data board-slug sort-type)))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
 
