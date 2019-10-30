@@ -53,16 +53,8 @@ div.dashboard-layout {
   div.dashboard-layout-container {
     padding: 0;
     margin: 0 auto;
-    width: auto;
-    width: 100%;
-    max-width: calc(100% - #{$left_navigation_sidebar_width}px);
-    margin-left: #{$left_navigation_sidebar_width}px;
+    width:#{$board_container_width + $left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin}px;
     transition: margin-left 180ms ease-in, width 180ms ease-in, max-width 180ms ease-in;
-
-    &.hide-left-navbar {
-      margin-left: 0;
-      max-width: 100vw;
-    }
 
     @include mobile(){
       padding: 0px;
@@ -189,8 +181,9 @@ div.dashboard-layout {
       width: #{$board_container_width}px;
       background-color: $grey_num_2;
       position: relative;
-      margin: 0 auto;
+      margin: 0;
       padding: 24px 0 0;
+      float: right;
 
       @include mobile() {
         width: 100%;

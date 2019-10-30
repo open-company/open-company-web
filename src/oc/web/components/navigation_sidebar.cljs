@@ -15,20 +15,19 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
+(defn- toggle-collapse-sections [s]
+  (swap! (::sections-list-collapsed s) not))
+
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
-(def sidebar-top-margin 90)
+(def sidebar-top-margin 56)
 
 (defn save-content-height [s]
-  (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
-    (let [height (+ (.height (js/$ navigation-sidebar-content)) 32)]
+  (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar)]
+    (let [height (.-offsetHeight navigation-sidebar)]
       (when (not= height @(::content-height s))
-        (reset! (::content-height s) height))))
-  (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
-    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 8)]
-      (when (not= footer-height @(::footer-height s))
-        (reset! (::footer-height s) footer-height)))))
+        (reset! (::content-height s) height)))))
 
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
@@ -54,18 +53,15 @@
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
-                                (drv/drv :editable-boards)
-                                (drv/drv :show-add-post-tooltip)
-                                (drv/drv :hide-left-navbar)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-ups-data)
                                 ;; Locals
                                 (rum/local false ::content-height)
-                                (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
+                                (rum/local false ::sections-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -119,22 +115,16 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
-        is-tall-enough? (or (not @(::content-height s))
-                            (not @(::footer-height s))
-                            (not (neg?
-                             (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        editable-boards (drv/react s :editable-boards)
-        can-compose (pos? (count editable-boards))
+        is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
-                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
+      {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
+                                :absolute-position (not is-tall-enough?)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
-                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))}
+                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+       :ref :left-navigation-sidebar}
       [:div.left-navigation-sidebar-content
-        {:ref "left-navigation-sidebar-content"
-         :class (when can-compose "can-compose")}
         (when is-mobile?
           [:div.left-navigation-sidebar-mobile-header
             [:button.mlb-reset.mobile-close-bt
@@ -181,7 +171,10 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              [:span "Sections"]
+              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                {:class (when @(::sections-list-collapsed s) "collapsed")
+                 :on-click #(toggle-collapse-sections s)}
+                [:span.sections "Sections"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
@@ -189,7 +182,8 @@
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
-        (when show-boards
+        (when (and show-boards
+                   (not @(::sections-list-collapsed s)))
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
@@ -215,12 +209,4 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]
-      (when can-compose
-        [:div.left-navigation-sidebar-footer
-          {:ref "left-navigation-sidebar-footer"}
-          [:button.mlb-reset.compose-green-bt
-            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
-            [:span.compose-green-icon]
-            [:span.compose-green-label
-              "New post"]]])]))
+                  [:div.private])])])]]))

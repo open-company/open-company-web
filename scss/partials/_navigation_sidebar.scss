@@ -1,6 +1,6 @@
 @mixin default-item(){
   background-color: transparent;
-  height: 34px;
+  height: 32px;
   padding-top: 6px;
 
   @include mobile() {
@@ -139,18 +139,16 @@
 }
 
 @mixin item-selected() {
-  background-color: $grey_num_2;
+  background-color: $carrot_green;
   outline: none;
-
-  @include mobile() {
-    background-color: $carrot_green;
-  }
+  border-radius: 4px;
 
   .internal, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     // color: $carrot_green;
     @include OC_Body_Bold();
     font-size: 14px;
     text-decoration: none;
+    color: white;
 
     @include mobile() {
       font-size: 16px;
@@ -158,7 +156,8 @@
     }
 
     span.count {
-      color: $carrot_green;
+      background-color: white;
+      color: $deep_navy;
     }
 
     @include mobile() {
@@ -166,11 +165,9 @@
     }
   }
 
-  @include mobile() {
-    span.count {
-      background-color: rgba(white, 0.1);
-      color: white;
-    }
+  span.count {
+    background-color: white;
+    color: $deep_navy;
   }
 
   div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
@@ -244,20 +241,16 @@
 div.left-navigation-sidebar {
   position: absolute;
   position: fixed;
-  max-height: calc(100vh - #{$navbar_height + 1}px);
   overflow-y: auto;
   overflow-x: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
-  left: 0;
-  height: calc(100vh - #{$navbar_height + 1}px);
+  // height: calc(100vh - #{$navbar_height + 1}px);
   @include no-user-select();
-  background-color: $ultra_light_grey;
-  float: left;
-  transition: left 180ms ease-in;
+  padding: 24px 0 0;
 
-  &.hide-left-navbar {
-    left: -216px;
+  &.absolute-position {
+    position: absolute;
   }
 
   @media screen and (max-width: 975px) {
@@ -286,17 +279,8 @@ div.left-navigation-sidebar {
 
   div.left-navigation-sidebar-content {
     width: #{$left_navigation_sidebar_width}px;
-    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-
-    &.can-compose {
-      height: calc(100% - 72px);
-
-      @include mobile() {
-        height: 100%;
-      }
-    }
 
     @include mobile() {
       position: relative;
@@ -380,24 +364,22 @@ div.left-navigation-sidebar {
       }
     }
 
-    @include mobile() {
-      &.item-selected {
+    &.item-selected {
 
-        div.all-posts-icon {
-          background-image: cdnUrl("/img/ML/digest_icon_white.svg");
-        }
+      div.all-posts-icon {
+        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
+      }
 
-        div.must-see-icon {
-          background-image: cdnUrl("/img/ML/must_see_bolt_white.svg");
-        }
+      div.must-see-icon {
+        background-image: cdnUrl("/img/ML/follow_ups_white.svg");
+      }
 
-        div.follow-ups-icon {
-          background-image: cdnUrl("/img/ML/must_see_bolt_white.svg");
-        }
+      div.follow-ups-icon {
+        background-image: cdnUrl("/img/ML/follow_ups_white.svg");
+      }
 
-        div.drafts-icon {
-          background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
-        }
+      div.drafts-icon {
+        background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
       }
     }
 
@@ -424,7 +406,7 @@ div.left-navigation-sidebar {
 
     div.all-posts-icon {
       background-image: cdnUrl("/img/ML/digest_icon_grey.svg");
-      background-size: 16px 16px;
+      background-size: 14px 13px;
       background-repeat: no-repeat;
       background-position: center;
       width: 16px;
@@ -455,7 +437,7 @@ div.left-navigation-sidebar {
     }
 
     div.must-see-icon {
-      background-image: cdnUrl("/img/ML/must_see_bolt_grey.svg");
+      background-image: cdnUrl("/img/ML/follow_ups_grey.svg");
       background-size: 14px 18px;
       background-position: center 4px;
       background-repeat: no-repeat;
@@ -507,16 +489,47 @@ div.left-navigation-sidebar {
     .left-navigation-sidebar-top-title {
       padding: 8px 16px;
       margin: 0;
-      height: 34px;
+      height: 32px;
       width: 100%;
 
-      span {
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 18px;
-        color: rgba($deep_navy, 0.5);
-        float: left;
-        cursor: default;
+      button.left-navigation-sidebar-sections-arrow {
+        position: relative;
+        height: 32px;
+        padding: 0 0 0 28px;
+
+        &.collapsed:before {
+          transform: rotate(-180deg);
+        }
+
+        &:before {
+          content: "";
+          position: absolute;
+          top: 12px;
+          left: 3px;
+          background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow.svg");
+          background-size: 12px 6px;
+          background-repeat: no-repeat;
+          background-position: center;
+          width: 12px;
+          height: 6px;
+          transition: 180ms transform;
+        }
+
+        span.sections {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 32px;
+          color: $deep_navy;
+          float: left;
+        }
+
+        @include mobile() {
+          padding: 0;
+
+          &:before {
+            display: none;
+          }
+        }
       }
 
       div.boards-icon {
@@ -663,12 +676,11 @@ div.left-navigation-sidebar {
     button.compose-green-bt {
       border-radius: 6px;
       background-color: $carrot_green;
-      margin: 16px;
       text-align: center;
       display: flex;
       justify-content: center;
       align-items: center;
-      width: calc(100% - 32px);
+      width: 100%;
       height: 40px;
       opacity: 1;
 
