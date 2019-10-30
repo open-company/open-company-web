@@ -199,10 +199,11 @@
 }
 
 @mixin item-hover(){
-  background-color: $grey_num_2;
   outline: none;
   text-decoration: none;
-  -webkit-tap-highlight-color: $grey_num_2;
+  -webkit-tap-highlight-color: rgba($deep_navy, 0.05);
+  background-color: rgba($deep_navy, 0.05);
+  border-radius: 4px;
 
   @include mobile() {
     background-color: transparent;
