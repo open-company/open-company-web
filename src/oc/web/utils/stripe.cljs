@@ -19,8 +19,9 @@
                           (clj->js session-data))]
     (.then checkout-promise
      (fn [res]
-      (when-let [error-message (oget res :?error :?message)]
-       (timbre/warn "Error during Stripe checkout:" error-message)
-       (js/alert "Error during checkout: " error-message))
+      (let [error-message (oget res "error.?message")]
+        (when (seq error-message)
+          (timbre/warn "Error during Stripe checkout:" error-message)
+          (js/alert error-message)))
       (when (fn? callback)
         (callback res))))))

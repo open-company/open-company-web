@@ -181,6 +181,10 @@ div.payments-settings-modal {
             color: $deep_navy;
           }
         }
+
+        button.change-pay-method-bt {
+          display: block;
+        }
       }
 
       div.plan-change {
