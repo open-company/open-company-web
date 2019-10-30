@@ -1,6 +1,7 @@
 (ns oc.web.utils.stripe
   (:require [taoensso.timbre :as timbre]
-            [oc.web.local-settings :as ls]))
+            [oc.web.local-settings :as ls]
+            [oops.core :refer (oget)]))
 
 (def stripe-obj (atom nil))
 
@@ -18,8 +19,8 @@
                           (clj->js session-data))]
     (.then checkout-promise
      (fn [res]
-      (when (.-error res)
-       (timbre/warn "Error during Stripe checkout:" (.. res -error -message))
-       (js/alert "Error during checkout:" (.. res -error -message)))
+      (when-let [error-message (oget res :?error :?message)]
+       (timbre/warn "Error during Stripe checkout:" error-message)
+       (js/alert "Error during checkout: " error-message))
       (when (fn? callback)
         (callback res))))))
