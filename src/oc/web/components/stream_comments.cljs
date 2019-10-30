@@ -290,43 +290,51 @@
                                          "-edit")
                                        (when can-show-delete-bt?
                                          "-delete"))}
-                                [:button.mlb-reset.floating-bt.share-bt.separator-bt
-                                  {:data-toggle "tooltip"
-                                   :data-placement "top"
-                                   :on-click #(do
-                                                (copy-comment-url (:url comment-data))
-                                                (notification-actions/show-notification {:title "Share link copied to clipboard"
-                                                                                         :dismiss true
-                                                                                         :expire 3
-                                                                                         :id (keyword (str "comment-url-copied-"
-                                                                                          (:uuid comment-data)))}))
-                                   :title "Copy link"}]
-                                ;; React container
-                                [:div.react-bt-container.separator-bt
-                                  [:button.mlb-reset.floating-bt.react-bt
+                                (if (or can-show-delete-bt?
+                                        can-show-edit-bt?)
+                                  [:div.more-bt-container.separator-bt
+                                    [:button.mlb-reset.floating-bt.more-bt.separator-bt
+                                      {:on-click #(reset! (::show-more-menu s) (:uuid comment-data))}
+                                      "More"]
+                                    (when (= @(::show-more-menu s) (:uuid comment-data))
+                                      [:div.comment-more-menu-container
+                                        [:button.mlb-reset.share-bt
+                                          {:on-click #(share-clicked comment-data)}
+                                          "Share"]
+                                        (when can-show-delete-bt?
+                                          [:button.mlb-reset.delete-bt
+                                            {:on-click (fn [_]
+                                                        (delete-clicked s activity-data comment-data))}
+                                            "Delete"])
+                                        (when can-show-edit-bt?
+                                          [:button.mlb-reset.edit-bt
+                                            {:on-click (fn [_]
+                                                        (start-editing s comment-data))}
+                                            "Edit"])])]
+                                  [:button.mlb-reset.floating-bt.share-bt.separator-bt
                                     {:data-toggle "tooltip"
                                      :data-placement "top"
-                                     :title "Add reaction"
-                                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}]
-                                  (when showing-picker?
-                                    (emoji-picker-container s comment-data))]
+                                     :on-click #(share-clicked comment-data)
+                                     :title "Copy link"}
+                                    "Share"])
                                 ;; Reply to comment
                                 (when (:reply-parent comment-data)
                                   [:button.mlb-reset.floating-bt.reply-bt.separator-bt
                                     {:data-toggle "tooltip"
                                      :data-placement "top"
                                      :on-click #(reply-to s (:reply-parent comment-data))
-                                     :title "Reply"}])
-                                (when can-show-delete-bt?
-                                  [:button.mlb-reset.floating-bt.delete-bt.separator-bt
-                                    {:on-click (fn [_]
-                                                (delete-clicked s activity-data comment-data))}
-                                    "Delete"])
-                                (when can-show-edit-bt?
-                                  [:button.mlb-reset.floating-bt.edit-bt.separator-bt
-                                    {:on-click (fn [_]
-                                                (start-editing s comment-data))}
-                                    "Edit"])]))]]
+                                     :title "Reply"}
+                                    "Reply"])
+                                ;; React container
+                                [:div.react-bt-container.separator-bt
+                                  [:button.mlb-reset.floating-bt.react-bt
+                                    {:data-toggle "tooltip"
+                                     :data-placement "top"
+                                     :title "Add reaction"
+                                     :on-click #(reset! (::show-picker s) (:uuid comment-data))}
+                                    "React"]
+                                  (when showing-picker?
+                                    (emoji-picker-container s comment-data))]]))]]
                       [:div.stream-comment-content
                         [:div.stream-comment-body.oc-mentions.oc-mentions-hover
                           {:dangerouslySetInnerHTML (utils/emojify (:body comment-data))
