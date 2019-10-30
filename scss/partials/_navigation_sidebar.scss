@@ -252,6 +252,7 @@ div.left-navigation-sidebar {
 
   &.absolute-position {
     position: absolute;
+    overflow-y: visible;
   }
 
   @media screen and (max-width: 975px) {
@@ -614,7 +615,7 @@ div.left-navigation-sidebar {
 
       div.public {
         float: right;
-        margin-right: 12px;
+        margin-right: 16px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_public.svg");
@@ -625,7 +626,7 @@ div.left-navigation-sidebar {
 
       div.private {
         float: right;
-        margin-right: 12px;
+        margin-right: 16px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
@@ -639,7 +640,7 @@ div.left-navigation-sidebar {
         float: left;
 
         &.public-board, &.private-board {
-          width: 152px;
+          width: 128px;
         }
 
         div.internal {
