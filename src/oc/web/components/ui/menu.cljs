@@ -88,6 +88,7 @@
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
+                  (drv/drv :expo-app-version)
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -105,11 +106,12 @@
         expanded-user-menu (= (last panel-stack) :menu)
         org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
+        expo-app-version (drv/react s :expo-app-version)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
         desktop-app-data (detect-desktop-app)
         app-version (cond
-                      ua/mobile-app? (str "Version " (expo/get-app-version))
+                      ua/mobile-app? (str "Version " expo-app-version)
                       ua/desktop-app? (get-desktop-version)
                       :else "")
         show-billing? (and ls/payments-enabled

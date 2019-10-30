@@ -4,7 +4,8 @@
   See https://github.com/open-company/open-company-mobile/blob/master/src/nativeWebBridge.js
   for the native side of the bridge."
   (:require [oc.web.actions.user :as user-actions]
-            [oc.web.utils.user :as user-utils]))
+            [oc.web.utils.user :as user-utils]
+            [oc.web.dispatcher :as dis]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Native/web bridge primitives
@@ -73,7 +74,8 @@
   [json-str]
   (when-let [origin (parse-bridge-data json-str)]
     (bridge-log! origin)
-    (reset! deep-link-origin origin)))
+    (reset! deep-link-origin origin)
+    (dis/dispatch! [:input dis/expo-deep-link-origin-key origin])))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -95,4 +97,5 @@
   [av]
   (when av
     (bridge-log! (str "on-app-version " av))
-    (reset! app-version av)))
+    (reset! app-version av)
+    (dis/dispatch! [:input dis/expo-app-version-key av])))

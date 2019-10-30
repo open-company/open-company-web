@@ -3,6 +3,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.shared.useragent :as ua]
             [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.stripe :as stripe-client]
@@ -59,6 +60,9 @@
 (defn add-payment-method [payments-data & [change-plan-data]]
   (let [fixed-payments-data (or payments-data (dis/payments-data))
         checkout-link (utils/link-for (:links fixed-payments-data) "checkout")
+        base-domain (if ua/mobile-app?
+                      (dis/expo-deep-link-origin)
+                      ls/web-server-domain)
         base-redirect-url (str ls/web-server-domain (router/get-token) "?org-settings=payments&result=")
         success-redirect-url (str base-redirect-url "true"
                                (when change-plan-data

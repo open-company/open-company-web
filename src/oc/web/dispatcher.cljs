@@ -22,6 +22,12 @@
 (def checkout-result-key :checkout-success-result)
 (def checkout-update-plan-key :checkout-update-plan)
 
+(def expo-key [:expo])
+
+(def expo-deep-link-origin-key (vec (conj expo-key :deep-link-origin)))
+(def expo-app-version-key (vec (conj expo-key :app-version)))
+(def expo-push-token-key (vec (conj expo-key :push-token)))
+
 (def api-entry-point-key [:api-entry-point])
 
 (def auth-settings-key [:auth-settings])
@@ -115,8 +121,6 @@
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
 
-(def expo-push-token-key [:expo-push-token])
-
 ;; Reminders
 
 (defn reminders-key [org-slug]
@@ -206,6 +210,9 @@
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    checkout-update-plan-key [[:base] (fn [base] (get base checkout-update-plan-key))]
+   :expo                [[:base] (fn [base] (get base :expo))]
+   :expo-deep-link-origin [[:expo] (fn [expo] (get expo expo-deep-link-origin-key))]
+   :expo-app-version    [[:expo] (fn [expo] (get expo expo-app-version-key))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -747,6 +754,20 @@
   ([org-slug] (reminder-edit-data org-slug @app-state))
   ([org-slug data]
     (get-in data (reminder-edit-key org-slug))))
+
+;; Expo
+
+(defn expo-deep-link-origin
+  ([] (expo-deep-link-origin @app-state))
+  ([data] (get-in data expo-deep-link-origin-key)))
+
+(defn expo-app-version
+  ([] (expo-app-version @app-state))
+  ([data] (get-in data expo-app-version-key)))
+
+(defn expo-push-token
+  ([] (expo-push-token @app-state))
+  ([data] (get-in data expo-push-token-key)))
 
 ;; Debug functions
 
