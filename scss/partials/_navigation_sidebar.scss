@@ -484,13 +484,17 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
-    margin-top: 8px;
+    margin-top: 16px;
 
     .left-navigation-sidebar-top-title {
-      padding: 8px 16px;
+      padding: 0 16px;
       margin: 0;
       height: 32px;
       width: 100%;
+
+      @include mobile() {
+        padding: 8px 16px;
+      }
 
       button.left-navigation-sidebar-sections-arrow {
         position: relative;
@@ -525,22 +529,17 @@ div.left-navigation-sidebar {
 
         @include mobile() {
           padding: 0;
+          height: 16px;
+          cursor: default;
 
           &:before {
             display: none;
           }
-        }
-      }
 
-      div.boards-icon {
-        background-size: 12px 10px;
-        background-repeat: no-repeat;
-        width: 12px;
-        height: 10px;
-        float: left;
-        margin-right: 3px;
-        margin-top: 6px;
-        background-image: cdnUrl("/img/ML/boards_icon.svg");
+          span.sections {
+            line-height: 16px;
+          }
+        }
       }
     }
 
@@ -557,6 +556,7 @@ div.left-navigation-sidebar {
       background-position: center;
       background-size: 16px 16px;
       @include OC_Body_Bold();
+      margin-top: 8px;
 
       @include mobile() {
         display: none;
