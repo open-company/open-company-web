@@ -63,7 +63,7 @@
         base-domain (if ua/mobile-app?
                       (dis/expo-deep-link-origin)
                       ls/web-server-domain)
-        base-redirect-url (str ls/web-server-domain (router/get-token) "?org-settings=payments&result=")
+        base-redirect-url (str base-domain (router/get-token) "?org-settings=payments&result=")
         success-redirect-url (str base-redirect-url "true"
                                (when change-plan-data
                                  (str "&update-plan=" (:id change-plan-data))))
