@@ -194,7 +194,7 @@
 (defn headline-on-paste
   "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
   [state e]
-  ; Prevent the normal paste behaviour
+  ; Prevent the normal paste behavior
   (utils/event-stop e)
   (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
         pasted-data   (.getData clipboardData "text/plain")]

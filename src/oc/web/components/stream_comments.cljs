@@ -81,7 +81,7 @@
     (utils/after 10 (fn []
      (swap! (::highlighting-comments s) #(conj % comment-id)
      (when scroll?
-       (.scrollIntoView comment-node #js {:behaviour "smooth" :block "center"}))
+       (.scrollIntoView comment-node #js {:behavior "smooth" :block "center"}))
      (utils/after 1000(fn []
       (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
 

@@ -71,7 +71,7 @@
     (when (and (not edit-comment-data)
                (not dismiss-reply-cb)
                scroll-after-posting?)
-      (.scrollIntoView (rum/dom-node s) (clj->js {:behaviour "smooth" :block "start"})))))
+      (.scrollIntoView (rum/dom-node s) (clj->js {:behavior "smooth"})))))
 
 (defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
