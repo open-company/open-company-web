@@ -345,24 +345,24 @@ $h2_top_margin: 24;
   }
 
   & > *:not(:last-child) {
-    margin: #{$line_height}px 0px;
+    margin: 16px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
   & > *:last-child:not(:first-child) {
-    margin: #{$line_height}px 0px 0px;
+    margin: 16px 0px 0px;
     padding-bottom: 0px;
   }
 
   & > blockquote:not(:last-child) {
-    margin: #{$line_height}px 0px;
+    margin: 16px 0px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
 
   & > blockquote:last-child:not(:first-child) {
-    margin: #{$line_height}px 0px 0px;
+    margin: 16px 0px 0px;
     padding-bottom: 10px;
   }
 
@@ -414,7 +414,7 @@ $h2_top_margin: 24;
   }
 
   & > *:not(:first-child) {
-    margin-top: #{$line_height}px;
+    margin-top: 16px;
   }
 
   h2 + p {
@@ -752,5 +752,47 @@ $h2_top_margin: 24;
 
   p, ul > li, i {
     min-height: $line-height
+  }
+
+  *:first-child {
+    margin-top: 0px;
+  }
+
+  & > *:not(:first-child) {
+    margin-top: 16px;
+  }
+
+  h2 + p {
+    margin-top: 0px !important;
+  }
+
+  & > *:first-child {
+    margin: 0px;
+  }
+
+  & > *:not(:last-child) {
+    margin: 16px 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  & > *:last-child:not(:first-child) {
+    margin: 16px 0px 0px;
+    padding-bottom: 0px;
+  }
+
+  & > blockquote:not(:last-child) {
+    margin: 16px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  & > blockquote:last-child:not(:first-child) {
+    margin: 16px 0px 0px;
+    padding-bottom: 10px;
+  }
+
+  & > img, img {
+    padding-bottom: 8px;
   }
 }

@@ -72,7 +72,7 @@ div.reactions {
           }
 
           &.reacted:hover {
-            background-color: #C6EBD8;
+            background-color: rgba($carrot_green, 0.35);
             div.count {
               color: $carrot_green;
             }
@@ -81,7 +81,7 @@ div.reactions {
       }
 
       &.reacted {
-        background-color: #D9F2E5;
+        background-color: rgba($carrot_green, 0.2);
 
         div.count {
           color: $carrot_green;

@@ -214,9 +214,10 @@
                 [:div.stream-comment
                   {:class (utils/class-set {:indented-comment is-indented-comment?})}
                   (rum/with-key
-                   (add-comment activity-data (:reply-parent comment-data)
-                    (partial finish-edit s comment-data)
-                    comment-data)
+                   (add-comment {:activity-data activity-data
+                                 :parent-comment-uuid (:reply-parent comment-data)
+                                 :dismiss-reply-cb (partial finish-edit s comment-data)
+                                 :edit-comment-data comment-data})
                    (str "add-comment-" (:reply-parent comment-data) "-" add-comment-force-update))]]
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
@@ -352,7 +353,9 @@
               (when should-show-add-comment?
                 [:div.stream-comment
                   {:class (utils/class-set {:indented-comment true})}
-                  (rum/with-key (add-comment activity-data (:reply-parent comment-data)
-                   (fn [_ _](swap! (::replying-to s) #(disj % (:reply-parent comment-data)))))
+                  (rum/with-key (add-comment {:activity-data activity-data
+                                              :parent-comment-uuid (:reply-parent comment-data)
+                                              :dismiss-reply-cb (fn [_ _]
+                                                                 (swap! (::replying-to s) #(disj % (:reply-parent comment-data))))})
                    (str "add-comment-" (:reply-parent comment-data) "-" add-comment-force-update))])]))]
         [:div.stream-comments-empty])]))

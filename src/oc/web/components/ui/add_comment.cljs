@@ -25,19 +25,16 @@
 ;; Add commnet handling
 (defn enable-add-comment? [s]
   (when-let [add-comment-div (rum/ref-node s "editor-node")]
-    (let [activity-data (first (:rum/args s))
-          parent-comment-uuid (second (:rum/args s))
+    (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
           comment-text (.-innerHTML add-comment-div)
-          next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))
-          edit-comment-data (get (vec (:rum/args s)) 3 nil)]
+          next-add-bt-disabled (or (nil? comment-text) (not (seq comment-text)))]
       (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) comment-text)
       (when (not= next-add-bt-disabled @(::add-button-disabled s))
         (reset! (::add-button-disabled s) next-add-bt-disabled)))))
 
 (defn focus-add-comment [s]
   (enable-add-comment? s)
-  (let [activity-data (first (:rum/args s))
-        parent-comment-uuid (second (:rum/args s))]
+  (let [{:keys [activity-data parent-comment-uuid]} (first (:rum/args s))]
     (if parent-comment-uuid
       (comment-actions/add-comment-focus parent-comment-uuid)
       (comment-actions/add-comment-focus (:uuid activity-data)))))
@@ -52,11 +49,8 @@
   (reset! (::add-button-disabled s) true)
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
-        args (vec (:rum/args s))
-        activity-data (first args)
-        parent-comment-uuid (second args)
-        dismiss-reply-cb (get args 2)
-        edit-comment-data (get args 3 nil)
+        {:keys [activity-data parent-comment-uuid dismiss-reply-cb
+         edit-comment-data scroll-after-posting?]} (first (:rum/args s))
         save-done-cb (fn [success]
                       (if success
                         (when add-comment-div
@@ -73,7 +67,13 @@
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
     (when (fn? dismiss-reply-cb)
-      (dismiss-reply-cb false))))
+      (dismiss-reply-cb false))
+    (js/console.log "DBG adding a comment... will scroll?" scroll-after-posting?)
+    (when (and (not edit-comment-data)
+               (not dismiss-reply-cb)
+               scroll-after-posting?)
+      (js/console.log "DBG  scrolling:" (js/$ "div.stream-comments"))
+      (.scrollIntoView (rum/dom-node s) (clj->js {:behaviour "smooth" :block "start"})))))
 
 (defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
@@ -88,10 +88,9 @@
   (enable-add-comment? s))
 
 (defn- should-focus-field? [s]
-  (let [activity-data (first (:rum/args s))
-        parent-comment-uuid (second (:rum/args s))
-        add-comment-focus @(drv/get-ref s :add-comment-focus)
-        edit-comment-data (get (vec (:rum/args s)) 3 nil)]
+  (let [{:keys [activity-data parent-comment-uuid
+         parent-comment-uuid edit-comment-data]} (first (:rum/args s))
+        add-comment-focus @(drv/get-ref s :add-comment-focus)]
     (or edit-comment-data
         (and (= (:uuid activity-data) add-comment-focus)
              (not parent-comment-uuid))
@@ -142,10 +141,8 @@
                             (reset! (:me/showing-gif-selector s) false))))
                          {:will-mount (fn [s]
                           (reset! (::add-comment-id s) (utils/activity-uuid))
-                          (let [activity-data (first (:rum/args s))
+                          (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
-                                parent-comment-uuid (second (:rum/args s))
-                                edit-comment-data (get (vec (:rum/args s)) 3 nil)
                                 add-comment-key (str (:uuid activity-data) "-" parent-comment-uuid "-" (:uuid edit-comment-data))
                                 activity-add-comment-data (get add-comment-data add-comment-key)
                                 add-comment-activity-data (get add-comment-data (:uuid activity-data))]
@@ -153,7 +150,7 @@
                             (reset! (::show-post-button s) (should-focus-field? s)))
                           s)
                           :did-mount (fn [s]
-                           (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
+                           (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))
                            (let [add-comment-node (rum/ref-node s "editor-node")]
                              (when (should-focus-field? s)
                                (.focus add-comment-node)
@@ -162,7 +159,7 @@
                            (utils/after 2500 #(js/emojiAutocomplete))
                            s)
                           :will-update (fn [s]
-                           (me-media-utils/setup-editor s add-comment-did-change (me-options (second (:rum/args s))))
+                           (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))
                            (let [data @(drv/get-ref s :media-input)
                                  video-data (:media-video data)]
                               (when (and @(:me/media-video s)
@@ -181,7 +178,7 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data]
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting?]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _team-roster (drv/react s :team-roster)

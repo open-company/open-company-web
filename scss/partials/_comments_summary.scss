@@ -79,10 +79,6 @@ div.is-comments {
 
         span.add-a-comment {
           color: $deep_navy;
-
-          &:before {
-            opacity: 1;
-          }
         }
       }
     }
@@ -104,21 +100,7 @@ div.is-comments {
     }
 
     span.add-a-comment {
-      padding-left: 6px;
       color: rgba($deep_navy, 0.5);
-
-      &:before {
-        content: "";
-        background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
-        background-size: 12px 12px;
-        background-position: center 3px;
-        background-repeat: no-repeat;
-        width: 14px;
-        height: 15px;
-        float: left;
-        display: block;
-        opacity: 0.5;
-      }
     }
   }
 }

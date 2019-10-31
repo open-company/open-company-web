@@ -142,81 +142,8 @@ div.expanded-post {
         }
       }
 
-      button.more-menu-share-bt {
-        width: 32px;
-        height: 32px;
-        background-color: rgba($deep_navy, 0.1);
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-        padding: 0;
-        margin: 0;
-        opacity: 1;
-        background-image: cdnUrl("/img/ML/more_menu_new_share.svg");
-        background-size: 12px 12px;
-
-        &:not(.disabled):hover {
-          background-color: rgba($deep_navy, 0.2);
-        }
-      }
-
-      button.more-menu-complete-follow-up-bt {
-        width: 32px;
-        height: 32px;
-        position: relative;
-        background-color: rgba($deep_navy, 0.1);
-        background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
-        background-size: 10px 14px;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-        border-left: 1px solid rgba($deep_navy, 0.2);
-        opacity: 1;
-        float: right;
-        margin-left: 0;
-
-        @include mobile() {
-          border-left: none;
-          border-radius: 4px;
-        }
-      }
-
       div.more-menu-create-follow-up-bt-container {
         float: right;
-        width: 32px;
-        height: 32px;
-        margin: 0;
-        border-left: 1px solid rgba($deep_navy, 0.2);
-
-        div.tooltip {
-          width: 128px;
-        }
-
-        @include mobile() {
-          border-left: none;
-        }
-
-        button.more-menu-create-follow-up-bt {
-          width: 32px;
-          height: 32px;
-          position: relative;
-          background-color: rgba($deep_navy, 0.1);
-          background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-          background-size: 10px 14px;
-          background-position: center;
-          background-repeat: no-repeat;
-          border-top-right-radius: 4px;
-          border-bottom-right-radius: 4px;
-          opacity: 1;
-
-          &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
-          }
-
-          @include mobile() {
-            border-radius: 4px;
-          }
-        }
       }
 
       ul.more-menu-list {
@@ -316,7 +243,7 @@ div.expanded-post {
   }
 
   div.expanded-post-abstract {
-    @include activity-abstract(16px, 20px);
+    @include activity-abstract(17px, 22px);
     margin: 16px 0 24px;
     @include OC_Body_Bold();
     white-space: pre-wrap;

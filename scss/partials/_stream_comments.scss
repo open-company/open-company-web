@@ -2,7 +2,7 @@ div.stream-comments {
   height: 100%;
   position: relative;
   padding-bottom: 25vh;
-  margin-top: 40px;
+  margin-top: 16px;
   padding-top: 16px;
 
   &.editing {
@@ -480,18 +480,6 @@ div.stream-comments {
       div.stream-comment div.add-comment-box-container {
         padding-top: 8px;
         margin-bottom: 8px;
-
-        div.add-comment-box div.add-comment-internal div.add-comment {
-          min-height: 92px;
-
-          @include mobile() {
-            min-height: 48px;
-          }
-
-          div.add-comment-footer.hide-footer {
-            display: none;
-          }
-        }
       }
 
       div.stream-comment.indented-comment {

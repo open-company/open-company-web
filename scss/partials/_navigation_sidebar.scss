@@ -1,7 +1,7 @@
 @mixin default-item(){
   background-color: transparent;
   height: 32px;
-  padding-top: 6px;
+  padding-top: 5px;
 
   @include mobile() {
     height: 40px;
@@ -263,7 +263,8 @@ div.left-navigation-sidebar {
   }
 
   @media screen and (max-width: 975px) {
-    position: absolute; 
+    position: absolute;
+    top: 0;
   }
 
   @include mobile() {
@@ -500,9 +501,14 @@ div.left-navigation-sidebar {
       margin: 0;
       height: 32px;
       width: 100%;
+      border-radius: 4px;
 
       @include mobile() {
         padding: 8px 16px;
+      }
+
+      &:hover {
+        background-color: rgba($deep_navy, 0.05);
       }
 
       button.left-navigation-sidebar-sections-arrow {
@@ -565,7 +571,7 @@ div.left-navigation-sidebar {
       background-position: center;
       background-size: 16px 16px;
       @include OC_Body_Bold();
-      margin-top: 8px;
+      margin-top: 7px;
 
       @include mobile() {
         display: none;
@@ -619,11 +625,13 @@ div.left-navigation-sidebar {
           @include item-selected();
 
           div.public {
-            background-image: cdnUrl("/img/ML/board_public_white.svg"); 
+            background-image: cdnUrl("/img/ML/board_public_white.svg");
+            opacity: 1;
           }
 
           div.private {
-            background-image: cdnUrl("/img/ML/board_private_white.svg"); 
+            background-image: cdnUrl("/img/ML/board_private_white.svg");
+            opacity: 1;
           }
         }
       }
@@ -637,6 +645,7 @@ div.left-navigation-sidebar {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
+        opacity: 0.5;
       }
 
       div.private {
@@ -648,6 +657,7 @@ div.left-navigation-sidebar {
         background-size: 10px 12px;
         background-position: center;
         background-repeat: no-repeat;
+        opacity: 0.5;
       }
 
       div.board-name {

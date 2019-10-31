@@ -213,7 +213,9 @@
                              :hide-face-pile? true})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
+          (rum/with-key (add-comment {:activity-data activity-data
+                                      :scroll-after-posting? true})
+           (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
                           :new-added-comment add-comment-highlight
