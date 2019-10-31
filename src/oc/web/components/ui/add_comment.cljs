@@ -67,6 +67,7 @@
     (if edit-comment-data
       (comment-actions/save-comment activity-data edit-comment-data comment-body save-done-cb)
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
+    (reset! (::show-post-button s) false)
     (when (fn? dismiss-reply-cb)
       (dismiss-reply-cb false))
     (when (and (not edit-comment-data)
