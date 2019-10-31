@@ -282,7 +282,7 @@
          ;; and more than the navigation bar to
          (> (.-bottom rect) responsive/navbar-height)))))
 
-(defn- is-element-top-in-viewport?
+(defn is-element-top-in-viewport?
    "Given a DOM element return true if it's actually visible in the viewport."
   [el & [offset]]
   (let [fixed-offset (or offset 0)

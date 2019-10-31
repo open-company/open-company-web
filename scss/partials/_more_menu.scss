@@ -20,8 +20,8 @@ div.more-menu {
   }
 
   button.more-menu-bt {
-    height: 26px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
     background-size: 18px 4px;
@@ -31,8 +31,6 @@ div.more-menu {
     opacity: 0.5;
 
     @include mobile() {
-      width: 32px;
-      height: 32px;
       background-color: $ultra_light_grey;
       border-radius: 4px;
       opacity: 1;

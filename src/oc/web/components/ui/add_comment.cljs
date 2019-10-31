@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
+            [oc.web.utils.activity :as au]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.mention :as mention-utils]
             [oc.web.mixins.mention :as mention-mixins]
@@ -70,8 +71,9 @@
       (dismiss-reply-cb false))
     (when (and (not edit-comment-data)
                (not dismiss-reply-cb)
-               scroll-after-posting?)
-      (.scrollIntoView (rum/dom-node s) (clj->js {:behavior "smooth"})))))
+               scroll-after-posting?
+               (not (au/is-element-top-in-viewport? (sel1 [:div.stream-comments]))))
+      (utils/after 10 #(.scrollIntoView (sel1 [:div.expanded-post-comments]) (clj->js {:behavior "smooth"}))))))
 
 (defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
