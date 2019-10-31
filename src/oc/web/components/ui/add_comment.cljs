@@ -68,11 +68,9 @@
       (comment-actions/add-comment activity-data comment-body parent-comment-uuid save-done-cb))
     (when (fn? dismiss-reply-cb)
       (dismiss-reply-cb false))
-    (js/console.log "DBG adding a comment... will scroll?" scroll-after-posting?)
     (when (and (not edit-comment-data)
                (not dismiss-reply-cb)
                scroll-after-posting?)
-      (js/console.log "DBG  scrolling:" (js/$ "div.stream-comments"))
       (.scrollIntoView (rum/dom-node s) (clj->js {:behaviour "smooth" :block "start"})))))
 
 (defn me-options [parent-uuid]
