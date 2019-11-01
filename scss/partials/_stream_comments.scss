@@ -23,9 +23,24 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment-outer {
-      background-color: #FFF7DD;
       padding: 0;
       position: relative;
+
+      @include big_web() {
+        width: calc(100% + 8px);
+        padding-left: 8px;
+        margin-left: -8px;
+
+        &.not-highlighted.open-thread:hover {
+          background-color: rgba($deep_navy, 0.05);
+          border-radius: 4px;
+        }
+
+        &.not-highlighted:not(.open-thread):hover div.stream-comment.indented-comment div.stream-comment-inner {
+          background-color: rgba($deep_navy, 0.05);
+          border-radius: 4px;
+        }
+      }
 
       &.left-border {
         &:before {
@@ -33,7 +48,7 @@ div.stream-comments {
           width: 2px;
           height: 100%;
           position: absolute;
-          left: 15px;
+          left: 23px;
           top: 0;
           background-color: rgba($deep_navy, 0.1);
         }
@@ -55,8 +70,9 @@ div.stream-comments {
       }
 
       div.stream-comment.indented-comment div.stream-comment-inner {
-        margin-left: 48px;
-        width: calc(100% - 48px);
+        margin-left: 40px;
+        width: calc(100% - 40px);
+        padding: 8px 0 8px 8px;
 
         @include mobile() {
           display: block;
@@ -86,6 +102,10 @@ div.stream-comments {
 
       &.not-highlighted {
         background-color: transparent;
+      }
+
+      &.highlighted {
+        background-color: #FFF7DD;
         transition: background-color 3s ease-in;
       }
 
@@ -210,7 +230,7 @@ div.stream-comments {
         div.stream-comment-floating-buttons {
           position: absolute;
           top: -8px;
-          right: -24px;
+          right: -16px;
           height: 32px;
           z-index: 2;
           display: none;

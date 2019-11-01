@@ -207,6 +207,7 @@
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
+                                          :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                                           :left-border needs-left-border?
                                           :open-thread (not is-indented-comment?)
                                           :closing-thread (or (not next-comment-data)
@@ -223,6 +224,7 @@
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
+                                          :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                                           :left-border needs-left-border?
                                           :open-thread (not is-indented-comment?)
                                           :closing-thread (or (not next-comment-data)

@@ -41,15 +41,11 @@
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
-        has-comments-data (and (sequential? sorted-comments) (pos? (count sorted-comments)))
-        comments-authors (if has-comments-data
-                           (vec
-                            (map
-                             first
-                             (vals
-                              (group-by :avatar-url (map :author (sort-by :created-at sorted-comments))))))
+        comments-loaded? (seq sorted-comments)
+        comments-authors (if comments-loaded?
+                           (vec (map first (vals (group-by :avatar-url (map :author (sort-by :created-at sorted-comments))))))
                            (reverse (:authors comments-link)))
-        comments-count (if sorted-comments
+        comments-count (if comments-loaded?
                          (count sorted-comments)
                          (:count comments-link))
         face-pile-count (if hide-face-pile?
@@ -86,7 +82,7 @@
                                       :add-a-comment (not (pos? comments-count))
                                       :has-new-comments show-new-tag?})}
             (if (pos? comments-count)
-              [:div.group
+              [:div.is-comments-summary-inner.group
                 (str comments-count
                  (when-not hide-label?
                   (str " comment" (when (not= comments-count 1) "s"))))

@@ -11,12 +11,8 @@ div.is-comments {
     float: left;
     margin-top: 2px;
 
-    @media screen and (max-width: 374px) {
-      display: none;
-    }
-
     @include mobile (){
-      margin-top: 1px;
+      display: none;
     }
 
     &:not(:empty){
@@ -69,6 +65,12 @@ div.is-comments {
 
     &.has-new-comments {
       color: $deep_navy;
+
+      @include mobile() {
+        &:before {
+          opacity: 1;
+        }
+      }
     }
 
     @include big_web() {
@@ -86,6 +88,24 @@ div.is-comments {
     @include mobile() {
       margin-top: 0;
       line-height: 20px;
+
+      div.is-comments-summary-inner {
+        float: left;
+        margin-left: 6px;
+      }
+
+      &:before {
+        content: "";
+        background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
+        background-size: 12px 12px;
+        background-position: center 5px;
+        background-repeat: no-repeat;
+        width: 12px;
+        height: 20px;
+        float: left;
+        display: block;
+        opacity: 0.5;
+      }
     }
 
     @include new-comments-tag();
@@ -101,6 +121,10 @@ div.is-comments {
 
     span.add-a-comment {
       color: rgba($deep_navy, 0.5);
+
+      @include mobile() {
+        display: none;
+      }
     }
   }
 }
