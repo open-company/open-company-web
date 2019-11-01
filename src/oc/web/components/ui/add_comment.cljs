@@ -74,7 +74,7 @@
                (not dismiss-reply-cb)
                scroll-after-posting?
                (not (au/is-element-top-in-viewport? (sel1 [:div.stream-comments]))))
-      (utils/after 10 #(.scrollIntoView (sel1 [:div.expanded-post-comments]) (clj->js {:behavior "smooth"}))))))
+      (utils/after 10 #(.scrollIntoView (sel1 [:div.stream-comments]) (clj->js {:behavior "smooth" :block "center"}))))))
 
 (defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
