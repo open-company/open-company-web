@@ -45,6 +45,12 @@ div.more-menu {
     }
   }
 
+  &.has-more-menu-bt {
+    button.more-menu-share-bt {
+      margin-left: 9px;
+    }
+  }
+
   button.more-menu-share-bt {
     height: 32px;
     width: 32px;
@@ -58,7 +64,7 @@ div.more-menu {
     border-right: 1px solid rgba($deep_navy, 0.15);
     padding: 0;
     background-repeat: no-repeat;
-    margin-left: 10px;
+    margin-left: 16px;
     display: inline-block;
     opacity: 1;
 

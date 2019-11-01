@@ -7,7 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
-            [oc.web.utils.activity :as au]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.mention :as mention-utils]
             [oc.web.mixins.mention :as mention-mixins]
@@ -70,11 +70,13 @@
     (reset! (::show-post-button s) false)
     (when (fn? dismiss-reply-cb)
       (dismiss-reply-cb false))
-    (when (and (not edit-comment-data)
+    (when (and (not (responsive/is-mobile-size?))
+               (not edit-comment-data)
                (not dismiss-reply-cb)
                scroll-after-posting?
-               (not (au/is-element-top-in-viewport? (sel1 [:div.stream-comments]))))
-      (utils/after 10 #(.scrollIntoView (sel1 [:div.stream-comments]) (clj->js {:behavior "smooth" :block "center"}))))))
+               (not (dom-utils/is-element-top-in-viewport? (sel1 [:div.stream-comments]) -40)))
+      (utils/after 10
+       #(.scrollTo js/window 0 (-> s (rum/dom-node) (.-offsetTop) (- 72)))))))
 
 (defn me-options [parent-uuid]
   {:media-config ["gif" "photo" "video"]
