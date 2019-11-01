@@ -275,7 +275,7 @@ div.cmail-outer {
           div.rich-body-editor {
             padding-bottom: 30vh;
             min-height: calc(100vh - 334px);
-            @include activity-body(17, 22, $deep_navy);
+            @include activity-body(17, 22, $deep_navy, 16);
 
               @media screen and (min-height: 556px) {
                 max-height: initial;
@@ -943,7 +943,7 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(17, 22, $deep_navy);
+            @include activity-body(17, 22, $deep_navy, 16);
             font-size: 17px;
             line-height: 22px;
           }
@@ -955,7 +955,7 @@ div.cmail-outer {
           @include mobile() {
             min-height: 20vh;
             max-height: initial;
-            @include activity-body(18, 24, $deep_navy);
+            @include activity-body(18, 24, $deep_navy, 16);
             font-size: 18px;
             line-height: 24px;
             overflow-y: auto;

@@ -262,12 +262,12 @@ div.expanded-post {
   }
 
   div.expanded-post-body {
-    @include activity-body(17, 22, $deep_navy);
+    @include activity-body(17, 22, $deep_navy, 16);
     margin-top: 16px;
 
     @include mobile() {
       margin-top: 8px;
-      @include activity-body(18, 24, $deep_navy);
+      @include activity-body(18, 24, $deep_navy, 16);
     }
 
     .interactive-image {

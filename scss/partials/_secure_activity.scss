@@ -189,9 +189,9 @@ div.secure-activity-container {
         outline: none;
         margin: 16px 0 0;
         cursor: text;
-        @include activity-body(17, 22, $deep_navy);
+        @include activity-body(17, 22, $deep_navy, 16);
         @include mobile() {
-          @include activity-body(18, 24, $deep_navy);
+          @include activity-body(18, 24, $deep_navy, 16);
         }
         color: $deep_navy;
         @include OC_Body_Book();

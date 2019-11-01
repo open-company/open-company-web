@@ -60,10 +60,10 @@ div.add-comment-box-container {
           @include emoji-size(13);
         }
 
-        @include activity-comment(17px, 22px);
+        @include activity-comment(17px, 22px, 16px);
 
         @include mobile() {
-          @include activity-comment();          
+          @include activity-comment(18px, 24px, 16px);
         }
       }
 
