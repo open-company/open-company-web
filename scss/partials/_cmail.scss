@@ -963,14 +963,6 @@ div.cmail-outer {
             padding-bottom: 30vh;
           }
 
-          & > *:first-child {
-            margin-top: 0px;
-          }
-
-          p:not(:last-child):not(:first-child) {
-            margin: 22px 0px;
-          }
-
           &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
             color: rgba($deep_navy, 0.5) !important;
             font-style: normal;

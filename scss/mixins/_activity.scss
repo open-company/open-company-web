@@ -754,14 +754,6 @@ $h2_top_margin: 24;
     min-height: $line-height
   }
 
-  *:first-child {
-    margin-top: 0px;
-  }
-
-  & > *:not(:first-child) {
-    margin-top: $paragraph-spacing;
-  }
-
   h2 + p {
     margin-top: 0px !important;
   }
@@ -794,5 +786,13 @@ $h2_top_margin: 24;
 
   & > img, img {
     padding-bottom: 8px;
+  }
+
+  *:first-child {
+    margin-top: 0px;
+  }
+
+  & > *:not(:first-child) {
+    margin-top: $paragraph-spacing;
   }
 }
