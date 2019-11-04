@@ -281,10 +281,10 @@ div.left-navigation-sidebar {
     display: none;
     z-index: #{$navbar_zindex + 7};
     background-color: $carrot_modal_bg;
-    overflow-y: hidden;
+    overflow-y: auto;
     overflow-x: hidden;
-    padding-bottom: 0;
     max-height: initial;
+    padding: 0;
 
     &.mobile-show-side-panel {
       display: block;
@@ -316,10 +316,11 @@ div.left-navigation-sidebar {
         position: fixed;
         top: 0;
         left: 0;
-        width: 85vw;
+        width: calc(85% - 1px);
         background-color: white;
         padding: 11px 16px;
         border-bottom: 1px solid $divider_line_grey;
+        z-index: #{$navbar_zindex};
 
         button.mobile-close-bt {
           display: block;
@@ -508,11 +509,16 @@ div.left-navigation-sidebar {
       border-radius: 4px;
 
       @include mobile() {
-        padding: 8px 16px;
+        padding: 4px 16px;
+        height: 40px;
+        position: relative;
+        z-index: 1;
       }
 
-      &:hover {
-        background-color: rgba($deep_navy, 0.05);
+      @include big_web() {
+        &:hover {
+          background-color: rgba($deep_navy, 0.05);
+        }
       }
 
       button.left-navigation-sidebar-sections-arrow {
@@ -548,15 +554,12 @@ div.left-navigation-sidebar {
 
         @include mobile() {
           padding: 0;
-          height: 16px;
+          margin: 0;
           cursor: default;
+          color: rgba($deep_navy, 0.5);
 
           &:before {
             display: none;
-          }
-
-          span.sections {
-            line-height: 16px;
           }
         }
       }
@@ -583,7 +586,11 @@ div.left-navigation-sidebar {
     }
   }
 
-  div.left-navigation-sidebar-items{
+  div.left-navigation-sidebar-items {
+    @include mobile() {
+      position: relative;
+      z-index: 1;
+    }
 
     a.left-navigation-sidebar-item {
       display: block;
@@ -592,6 +599,8 @@ div.left-navigation-sidebar {
       margin: 0;
       text-decoration: none;
       width: 100%;
+      position: relative;
+      z-index: 1;
 
       &:hover {
         text-decoration: none;
