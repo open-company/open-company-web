@@ -12,10 +12,8 @@
           "Remote teams communicate differently"]
         [:div.subheadline
           (str
-           "Carrot gives you space to share longer updates, and keeps discussions "
-           "organized so it’s easy to see what matters.")]
-        [:div.subheadline
-          "It’s how remote teams stay in sync."]
+           "Carrot keeps asynchronous communication clear and organized "
+           "so it’s less work for distributed teams to stay in sync.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action

@@ -147,7 +147,7 @@
             [:a.login
               {:id "site-header-login-item"
                :href "/login"}
-                "Login"]
+                "Log in"]
             [:span.login-signup-or "or"]
             [:a.signup
               {:id "site-header-signup-item"
@@ -195,7 +195,7 @@
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href "https://intercom.help/carrot-c8000b30b176/en" :target "_blank"} "Help center"]
+          [:div.column-item [:a {:href "https://help.carrot.io/" :target "_blank"} "Help center"]
           [:div.column-item
             [:a
               {:class "intercom-chat-link"
