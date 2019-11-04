@@ -250,16 +250,20 @@ div.left-navigation-sidebar {
   @include no-user-select();
   padding: 24px 0 0;
 
-  &.collapsed-sections {
-    overflow-y: visible;
-    overflow: visible;
+  @include big_web() {
+    &.collapsed-sections {
+      overflow-y: visible;
+      overflow: visible;
+    }
   }
 
-  &.absolute-position {
-    position: absolute;
-    top: 0;
-    overflow-y: visible;
-    overflow: visible;
+  @include big_web() {
+    &.absolute-position {
+      position: absolute;
+      top: 0;
+      overflow-y: visible;
+      overflow: visible;
+    }
   }
 
   @media screen and (max-width: 975px) {
