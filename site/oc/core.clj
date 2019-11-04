@@ -79,7 +79,7 @@
         "Login"]
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
-        "Start your free trial"]]])
+        "Try Carrot"]]])
 
 (defn nav
   "Static hiccup for the site header."
@@ -147,24 +147,23 @@
             [:a.login
               {:id "site-header-login-item"
                :href "/login"}
-                "Log in"]
-            [:span.login-signup-or "or"]
+                "Login"]
             [:a.signup
               {:id "site-header-signup-item"
                :href "/sign-up"}
-              "Sign up"]])
+              "Free trial"]])
 
         ;; Mobile
         (cond
           is-slack-lander?
           [:div.site-navbar-right.mobile-only
             [:a.signup.continue-with-slack
-              {:id "site-header-login-item"
+              {:id "site-header-login-item-mobile"
                :href (env :slack-signup-url)}]]
           :else
           [:div.site-navbar-right.mobile-only
             [:a.login
-              {:id "site-header-login-item"
+              {:id "site-header-login-item-mobile"
                :href "/login"}
                 "Login"]])
         [:div.mobile-ham-menu
