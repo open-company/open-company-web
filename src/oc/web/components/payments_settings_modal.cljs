@@ -70,8 +70,8 @@
   (let [remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
         days-left (inc (int (/ remaining-seconds (* 60 60 24))))]
     (if (neg? remaining-seconds)
-      "Your trial plan has ended. Please select a plan to continue."
-      (str "Your trial plan is set to expire in " days-left " day" (when-not (= days-left 1) "s") ". Please choose a plan."))))
+      "Your trial has ended. Please select a plan to continue."
+      (str "Your trial is set to expire in " days-left " day" (when-not (= days-left 1) "s") ". Please choose a plan."))))
 
 (defn- plan-summary [s payments-data]
   (if @(::automatic-update-plan s)
@@ -226,29 +226,35 @@
       (if is-under-up-to?
         [:div.plan-change-description
           (str
-           (:nickname current-plan-data)
-           " pricing "
-           (when is-annual-default-plan?
-             "is 20% lower than monthly. An annual plan ")
-           "starts at " flat-amount
-           ", which includes your first " up-to
-           " team members"
-           ". Then it's just " unit-amount " per person after that."
-           (when is-annual-default-plan?
-             different-plans-price-str))]
+            "The "
+            (:nickname current-plan-data)
+            " plan "
+            (when is-annual-default-plan?
+              "is 20% lower than monthly. The Annual plan ")
+            "starts at ")
+          [:strong flat-amount]
+          (str
+            ", which includes your first " up-to
+            " team members"
+            ". Then it's ")
+          [:strong unit-amount ]
+          (str " per additional person."
+            (when is-annual-default-plan?
+              different-plans-price-str))]
         [:div.plan-change-description
-           (str
+          (str
             "For your team of "
             quantity
             (if (not= quantity 1)
-             " people"
-             " person")
-            ", your plan will cost "
-            total-plan-price
+              " people"
+              " person")
+            ", your plan will cost ")
+          [:strong total-plan-price]
+          (str 
             " per " (:interval current-plan-data)
             " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ")."
-           (when is-annual-default-plan?
-             different-plans-price-str))])
+            (when is-annual-default-plan?
+              different-plans-price-str))])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
         [:div.plan-change-title
           (str "Due today: " total-plan-price)])
@@ -277,7 +283,7 @@
                         current-plan-data))))}
         (if has-payment-info?
           "Change plan"
-          "Add payment information")]
+          "Subscribe to Carrot")]
       (when @(::saving-plan s)
         (small-loading))
      [:div.plan-change-separator]
