@@ -181,7 +181,9 @@
                        (* quantity (:unit-amount monthly-tier)))
         diff-price (- (* monthly-price 12) annual-price)]
     (when (pos? diff-price)
-      (str " An annual plan saves you " (plan-amount-to-human diff-price (:currency annual-plan-data)) " per year."))))
+      [:span " An annual plan saves you "
+        [:strong (plan-amount-to-human diff-price (:currency annual-plan-data))]
+        " per year."])))
 
 (defn- plan-change [s payments-data]
   (let [initial-plan @(::initial-plan s)
@@ -194,7 +196,7 @@
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:plan subscription-data))
         total-plan-price (plan-price current-plan-data quantity)
-        different-plans-price-str (different-plans-price (:available-plans payments-data) quantity)
+        different-plans-price-span (different-plans-price (:available-plans payments-data) quantity)
         up-to (-> current-plan-data :tiers first :up-to)
         flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
         unit-amount (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
@@ -227,10 +229,10 @@
         [:div.plan-change-description
           (str
             "The "
-            (:nickname current-plan-data)
+            (s/lower (:nickname current-plan-data))
             " plan "
             (when is-annual-default-plan?
-              "is 20% lower than monthly. The Annual plan ")
+              (str "is 20% lower than monthly. The " (s/lower (:nickname current-plan-data)) " plan "))
             "starts at ")
           [:strong flat-amount]
           (str
@@ -238,9 +240,9 @@
             " team members"
             ". Then it's ")
           [:strong unit-amount ]
-          (str " per additional person."
-            (when is-annual-default-plan?
-              different-plans-price-str))]
+          " per additional person."
+          (when is-annual-default-plan?
+            different-plans-price-span)]
         [:div.plan-change-description
           (str
             "For your team of "
@@ -252,9 +254,9 @@
           [:strong total-plan-price]
           (str 
             " per " (:interval current-plan-data)
-            " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ")."
-            (when is-annual-default-plan?
-              different-plans-price-str))])
+            " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ").")
+          (when is-annual-default-plan?
+            different-plans-price-span)])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
         [:div.plan-change-title
           (str "Due today: " total-plan-price)])
