@@ -46,9 +46,28 @@ html, body {
   }
 
   // Change Bootstrap tooltip style
-  .tooltip-arrow {
+  &.top .tooltip-arrow {
     display: block;
     border-top-color: $deep_navy;
+    opacity: 1;
+  }
+
+  &.bottom .tooltip-arrow {
+    display: block;
+    border-bottom-color: $deep_navy;
+    opacity: 1;
+  }
+
+  &.left .tooltip-arrow {
+    display: block;
+    border-left-color: $deep_navy;
+    opacity: 1;
+  }
+
+  &.right .tooltip-arrow {
+    display: block;
+    border-right-color: $deep_navy;
+    opacity: 1;
   }
 
   .tooltip-inner {
