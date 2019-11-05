@@ -84,7 +84,6 @@
                     :solid-button-cb (fn [_]
                                          (reset! (::canceling-subscription s) true)
                                          (payments-actions/delete-plan-subscription payments-data
-                                          (:id (payments-actions/get-active-subscription payments-data))
                                           #(reset! (::canceling-subscription s) false))
                                          (alert-modal/hide-alert))}]
     (alert-modal/show-alert alert-data)))

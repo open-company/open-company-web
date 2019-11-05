@@ -46,11 +46,11 @@
         (get-payments-cb org-slug resp)
         (callback success))))))
 
-(defn delete-plan-subscription [payments-data plan-id & [callback]]
+(defn delete-plan-subscription [payments-data & [callback]]
   (let [delete-subscription-link (utils/link-for (:links payments-data) "delete")
         org-slug (router/current-org-slug)]
     (when delete-subscription-link
-      (api/update-plan-subscription delete-subscription-link plan-id
+      (api/update-plan-subscription delete-subscription-link nil
        (fn [{:keys [status body success] :as resp}]
         (get-payments-cb org-slug resp)
         (callback success))))))
