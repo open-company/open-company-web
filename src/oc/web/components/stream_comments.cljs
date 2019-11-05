@@ -102,7 +102,8 @@
                                            :id (keyword (str "comment-url-copied-"
                                             (:uuid comment-data)))}))
 
-(rum/defc emoji-picker < ui-mixins/no-scroll-mixin
+(rum/defc emoji-picker < (when (responsive/is-mobile-size?)
+                           ui-mixins/no-scroll-mixin)
   [{:keys [add-emoji-cb dismiss-cb]}]
   [:div.emoji-picker-container
     [:button.mlb-reset.close-bt
@@ -238,7 +239,7 @@
                    :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
                   [:div.stream-comment-inner
                     (when (and (not is-editing?)
-                               (responsive/is-tablet-or-mobile?))
+                               (responsive/is-mobile-size?))
                       [:div.stream-comment-mobile-menu
                         (more-menu {:entity-data comment-data
                                     :external-share false
@@ -271,7 +272,7 @@
                                         (.getTime (utils/js-date (:created-at comment-data)))))
                             [:div.new-comment-tag "(NEW)"])
                           (when-not is-editing?
-                            (if (responsive/is-tablet-or-mobile?)
+                            (if (responsive/is-mobile-size?)
                               [:div.stream-comment-mobile-menu
                                 (more-menu comment-data nil {:external-share false
                                                              :entity-type "comment"
