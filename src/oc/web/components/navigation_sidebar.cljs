@@ -182,7 +182,7 @@
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
                  :on-click #(when-not is-mobile? (toggle-collapse-sections s))}
-                [:span.sections "Groups"]]
+                [:span.sections "Channels"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
