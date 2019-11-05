@@ -595,7 +595,7 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-headline "Title")
+(def default-headline "Subject")
 
 (def default-abstract "Quick summary (optional)")
 

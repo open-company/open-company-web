@@ -1,50 +1,16 @@
 div.cmail-content-abstract-container {
-  margin: 16px 0 0;
-  padding: 0 0 16px;
-  border-bottom: 1px solid rgba($deep_navy, 0.15);
   position: relative;
-  display: none;
-
-  @include tablet() {
-    display: block;
-    border-bottom: none;
-    padding: 0;
-  }
 
   div.cmail-content-abstract-counter {
-    height: 26px;
-    position: absolute;
-    right: 0;
-    top: -38px;
-    @include OC_Body_Bold();
-    font-size: 12px;
-    line-height: 16px;
-    color: white;
-    background-color: $deep_navy;
-    padding: 5px 6px;
-    border-radius: 4px;
-    width: 152px;
-    text-align: center;
-    display: none;
+    margin-top: 8px;
+    @include OC_Body_Book();
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba($deep_navy, 0.5);
+    text-align: left;
 
-    &:after {
-      content: " ";
-      position: absolute;
-      transform: rotate(45deg);
-      width: 6px;
-      height: 6px;
-      background-color: $deep_navy;
-      bottom: -3px;
-      left: 50%;
-      margin-left: -3px;
-    }
-
-    &.show-counter {
-      display: block;
-    }
-
-    &.exceeds-max-length, &.exceeds-max-length:after {
-      background-color: $carrot_orange;
+    &.exceeds-max-length {
+      color: $carrot_orange;
     }
   }
 
@@ -60,6 +26,7 @@ div.cmail-content-abstract-container {
     margin: 0;
     min-height: 26px;
     border-bottom: 1px solid transparent;
+    cursor: text;
 
     @include mobile() {
       @include activity-abstract(18px, 26px);

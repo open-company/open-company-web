@@ -151,9 +151,21 @@
 
 ;; Data change handling
 
+(declare show-abstract)
+
+(def ^:private body-length-to-show-abstract 255)
+
 (defn body-on-change [state]
   (dis/dispatch! [:input [:cmail-data :has-changes] true])
-  (debounced-autosave! state))
+  (debounced-autosave! state)
+  (let [last-body-count @(::last-body-count state)]
+    (when-let [body-el (sel1 [:div.rich-body-editor])]
+      ;; If the body exceeds a certain length and the user is adding chars, not removing them
+      ;; show the abstract
+      (when (and (> (count (.-innerText body-el)) body-length-to-show-abstract)
+                 (> (count (.-innerText body-el)) @(::last-body-count state)))
+        (show-abstract state))
+      (reset! (::last-body-count state) (count (.-innerText body-el))))))
 
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
@@ -183,6 +195,19 @@
                                                      :has-changes true})])
     (check-limits state)
     (debounced-autosave! state)))
+
+;; Abstract show/hide
+
+(defn- show-abstract [s]
+  (when (compare-and-set! (::show-abstract s) false true)
+    (abstract-on-change s)))
+
+(defn- hide-abstract [s]
+  (when (compare-and-set! (::show-abstract s) true false)
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract ""
+                                                     :has-changes true})])
+    (check-limits s)
+    (debounced-autosave! s)))
 
 ;; Headline setup and paste handler
 
@@ -368,13 +393,19 @@
                    (rum/local 0 ::abstract-length)
                    (rum/local false ::show-post-tooltip)
                    (rum/local false ::mobile-follow-ups-remove-menu)
+                   (rum/local false ::show-sections-picker)
+                   (rum/local false ::show-abstract)
+                   (rum/local 0 ::last-body-count)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
                    (mixins/on-window-click-mixin (fn [s e]
                     (when (and @(::mobile-follow-ups-remove-menu s)
                                (not (utils/event-inside? e (rum/ref-node s :follow-ups-header))))
-                      (reset! (::mobile-follow-ups-remove-menu s) false))))
+                      (reset! (::mobile-follow-ups-remove-menu s) false))
+                    (when (and @(::show-sections-picker s)
+                               (not (utils/event-inside? e (rum/ref-node s :sections-picker-container))))
+                      (reset! (::show-sections-picker s) false))))
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -419,6 +450,11 @@
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
                       (when-not (:collapsed cmail-state)
                         (utils/after 1000 #(.focus (body-element)))))
+                    (let [body-el (sel1 [:div.rich-body-editor])
+                          abstract-text (.text (js/$ (str "<div>" @(::initial-abstract s) "</div>")))]
+                      (when (or (> (count (.-innerText body-el)) body-length-to-show-abstract)
+                                (seq abstract-text))
+                        (show-abstract s)))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -548,13 +584,10 @@
                                 (:follow-ups cmail-data))
         long-tooltip (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
-                            (if (seq (:board-name cmail-data))
-                              (str "Save to " (:board-name cmail-data))
-                              "Save")
-                            (if (seq (:board-name cmail-data))
-                              (str "Send to " (:board-name cmail-data))
-                              "Send"))
+                            "Save"
+                            "Post")
         did-pick-section (fn [board-data note dismiss-action]
+                           (reset! (::show-sections-picker s) false)
                            (dis/dispatch! [:input [:show-sections-picker] false])
                            (when (and board-data
                                       (seq (:name board-data)))
@@ -602,8 +635,6 @@
               (post-to-button {:on-submit #(post-clicked s)
                                :disabled disabled?
                                :title post-button-title
-                               :did-pick-section did-pick-section
-                               :current-board-slug (:board-slug cmail-data)
                                :post-tt-kw post-tt-kw
                                :force-show-tooltip @(::show-post-tooltip s)})]]]
         (when (and follow-up?
@@ -660,8 +691,6 @@
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
                                  :title post-button-title
-                                 :did-pick-section did-pick-section
-                                 :current-board-slug (:board-slug cmail-data)
                                  :post-tt-kw post-tt-kw
                                  :force-show-tooltip @(::show-post-tooltip s)})]])]
         [:div.cmail-content-outer
@@ -681,36 +710,53 @@
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
+            [:div.cmail-content-section-picker.group
+              [:div.cmail-content-section-picker-label
+                "Post in"]
+              [:div.section-picker-bt-container
+                {:rel ""}
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])]]
             ; Headline element
-            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
-              {:class utils/hide-class
-               :content-editable true
-               :key (str "cmail-headline-" (:key cmail-state))
-               :ref "headline"
-               :placeholder utils/default-headline
-               :on-paste    #(headline-on-paste s %)
-               :on-key-down (fn [e]
-                              (utils/after 10 #(headline-on-change s))
-                              (cond
-                                (and (.-metaKey e)
-                                     (= "Enter" (.-key e)))
-                                (post-clicked s)
-                                (and (= (.-key e) "Enter")
-                                     (not (.-metaKey e)))
-                                (do
-                                  (utils/event-stop e)
-                                  (utils/to-end-of-content-editable (body-element)))))
-               :dangerouslySetInnerHTML @(::initial-headline s)}]
+            [:div.cmail-content-headline-container.group
+              [:div.cmail-content-headline-label
+                {:on-click #(utils/to-end-of-content-editable (rum/ref-node s "headline"))}
+                "Subject"]
+              [:div.cmail-content-headline.emoji-autocomplete.emojiable
+                {:class utils/hide-class
+                 :content-editable true
+                 :key (str "cmail-headline-" (:key cmail-state))
+                 :ref "headline"
+                 :on-paste    #(headline-on-paste s %)
+                 :on-key-down (fn [e]
+                                (utils/after 10 #(headline-on-change s))
+                                (cond
+                                  (and (.-metaKey e)
+                                       (= "Enter" (.-key e)))
+                                  (post-clicked s)
+                                  (and (= (.-key e) "Enter")
+                                       (not (.-metaKey e)))
+                                  (do
+                                    (utils/event-stop e)
+                                    (utils/to-end-of-content-editable (body-element)))))
+                 :dangerouslySetInnerHTML @(::initial-headline s)}]]
             ;; Abstract
-            (when (or is-mobile?
-                      is-fullscreen?)
+            [:div.cmail-content-abstract-container-outer
+              {:class (when-not @(::show-abstract s) "hidden")}
+              [:button.mlb-reset.remove-abstract-bt
+                {:on-click #(hide-abstract s)}]
               (carrot-abstract {:initial-value @(::initial-abstract s)
                                 :value (:abstract cmail-data)
                                 :exceeds-limit @(::abstract-exceeds-limit s)
                                 :abstract-length @(::abstract-length s)
                                 :on-change-cb #(abstract-on-change s)
                                 :post-clicked #(post-clicked s)
-                                :cmail-key (:key cmail-state)}))
+                                :cmail-key (:key cmail-state)})]
             ; (when (and show-edit-tooltip
             ;            is-fullscreen?)
             ;   [:div.edit-tooltip-outer-container
@@ -779,8 +825,6 @@
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
                                  :title post-button-title
-                                 :did-pick-section did-pick-section
-                                 :current-board-slug (:board-slug cmail-data)
                                  :post-tt-kw post-tt-kw
                                  :force-show-tooltip @(::show-post-tooltip s)})])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
