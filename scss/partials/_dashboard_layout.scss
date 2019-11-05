@@ -4,6 +4,10 @@ div.dashboard-layout {
   overflow: visible;
 
   &.expanded-post-view {
+    @include mobile() {
+      background-color: white;
+    }
+
     div.cmail-outer:not(.fullscreen) {
       display: none;
     }
