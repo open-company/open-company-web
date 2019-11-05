@@ -517,8 +517,8 @@ div.cmail-outer {
 
           &.long-tooltip {
             .tooltip {
-              width: 122px;
-              margin-left: -24px;
+              width: 86px;
+              // margin-left: -24px;
             }
           }
         }
@@ -670,10 +670,6 @@ div.cmail-outer {
           margin-left: 8px;
 
           @include preload_image(cdnUrl("/img/ML/cmail_fullscreen_collapse.svg"));
-        }
-
-        .tooltip {
-          margin-top: -16px;
         }
       }
     }
@@ -1129,12 +1125,34 @@ div.cmail-outer {
 
         &.long-tooltip {
           .tooltip {
-            width: 122px;
+            width: 86px;
           }
         }
+      }
 
-        .tooltip {
-          margin-top: -16px;
+      div.delete-bt-container {
+        float: left;
+        margin-left: 8px;
+
+        @include mobile() {
+          display: none;
+        }
+
+        button.delete-bt {
+          height: 32px;
+          width: 32px;
+          background-image: cdnUrl("/img/ML/cmail_delete.svg");
+          background-size: 16px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-color: rgba($deep_navy, 0.1);
+          border-radius: 4px;
+          padding: 0;
+          opacity: 1;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
         }
       }
 
@@ -1163,10 +1181,6 @@ div.cmail-outer {
           &:not(.disabled):hover {
             background-color: rgba($deep_navy, 0.2);
           }
-        }
-
-        .tooltip {
-          margin-top: -16px;
         }
       }
 

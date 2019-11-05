@@ -815,9 +815,20 @@
                  :title (if long-tooltip
                           "Save & Close"
                           "Close")}]])
+          (when (and (not (:collapsed cmail-state))
+                     (not is-fullscreen?))
+            [:div.delete-bt-container
+              [:button.mlb-reset.delete-bt
+                {:on-click #(delete-clicked s % cmail-data)
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title "Delete"}]])
           [:div.fullscreen-bt-container
             [:button.mlb-reset.fullscreen-bt
-              {:on-click #(cmail-actions/cmail-toggle-fullscreen)}]]
+              {:on-click #(cmail-actions/cmail-toggle-fullscreen)
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement "auto"
+               :title "Fullscreen"}]]
           [:div.cmail-footer-right
             {:class (when-not follow-up? "has-follow-ups-button")}
             (when-not is-fullscreen?
