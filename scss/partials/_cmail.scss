@@ -259,8 +259,7 @@ div.cmail-outer {
         }
 
         div.cmail-content-headline {
-          min-height: 34px;
-          @include activity-title(14px, 18px);
+          @include activity-title(16px, 22px);
 
           @include mobile() {
             @include activity-title(32px, 40px);
@@ -274,7 +273,7 @@ div.cmail-outer {
 
         div.rich-body-editor-outer-container {
           border-top: none;
-          margin-top: 0;
+          margin-top: 24px;
           padding-top: 0;
 
           div.rich-body-editor-container {
@@ -896,8 +895,8 @@ div.cmail-outer {
         div.cmail-content-section-picker-label {
           float: left;
           @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 24px;
+          font-size: 16px;
+          line-height: 28px;
           color: rgba($deep_navy, 0.5);
         }
 
@@ -908,19 +907,19 @@ div.cmail-outer {
 
           div.sections-picker {
             position: absolute;
-            top: 26px;
+            top: 30px;
             left: 0;
             z-index: #{$navbar_zindex - 1};
           }
 
           button.section-picker-bt {
-            height: 24px;
+            height: 28px;
             padding: 3px 24px 3px 8px;
             color: white;
             background-color: $deep_navy;
             border-radius: 4px;
             @include OC_Body_Book();
-            font-size: 14px;
+            font-size: 16px;
             line-height: 18px;
             position: relative;
 
@@ -929,7 +928,7 @@ div.cmail-outer {
               width: 8px;
               height: 10px;
               position: absolute;
-              top: 7px;
+              top: 9px;
               right: 8px;
               background-image: cdnUrl("/img/ML/select_arrows_white.svg");
               background-size: 8px 10px;
@@ -944,10 +943,10 @@ div.cmail-outer {
           color: $carrot_green;
           padding: 0;
           margin: 0;
-          height: 24px;
+          height: 28px;
           @include OC_Body_Book();
           font-size: 14px;
-          line-height: 24px;
+          line-height: 28px;
 
           @include mobile() {
             display: none;
@@ -965,8 +964,8 @@ div.cmail-outer {
         div.cmail-content-headline-label {
           float: left;
           @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 18px;
+          font-size: 16px;
+          line-height: 22px;
           color: rgba($deep_navy, 0.5);
         }
 
@@ -974,22 +973,22 @@ div.cmail-outer {
           border: none;
           outline: none;
           cursor: text;
-          @include activity-title(14px, 18px);
+          @include activity-title(16px, 22px);
           color: $deep_navy;
           white-space: pre-wrap;
           word-wrap: break-word;
-          min-height: 18px;
-          line-height: 18px;
+          min-height: 22px;
+          line-height: 22px;
           float: right;
-          width: calc(100% - 48px - 8px);
+          width: calc(100% - 55px - 8px);
 
-          &:empty:before {
-            content: attr(placeholder);
-            display: inline-block;
-            color: rgba($deep_navy, 0.5) !important;
-            font-style: none;
-            height: 14px;
-          }
+          // &:empty:before {
+          //   content: attr(placeholder);
+          //   display: inline-block;
+          //   color: rgba($deep_navy, 0.5) !important;
+          //   font-style: none;
+          //   height: 17px;
+          // }
         }
       }
 
