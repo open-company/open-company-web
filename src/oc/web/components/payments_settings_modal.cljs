@@ -163,6 +163,7 @@
      (if success
        (do
          (change-tab s :summary)
+         (reset! (::initial-plan s) (:nickname current-plan-data))
          (reset! (::payments-plan s) (:nickname current-plan-data)))
        (show-error-alert s)))))
 
