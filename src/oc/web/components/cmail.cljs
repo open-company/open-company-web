@@ -1,6 +1,6 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
+            [cuerdas.core :as str]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
@@ -170,9 +170,9 @@
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
         $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
-        abstract-text (s/trim (.text $abstract))
+        abstract-text (str/trim (.text $abstract))
         exceeds-limit (> (count abstract-text) utils/max-abstract-length)
-        clean-headline (s/trim (s/replace (.-innerText headline) #"\n" ""))
+        clean-headline (str/trim (str/replace (.-innerText headline) #"\n" ""))
         post-button-title (cond
                            (not (seq clean-headline)) :title
                            exceeds-limit :abstract
@@ -202,7 +202,7 @@
   (when (not (responsive/is-mobile-size?))
     (reset! (::show-abstract-button s) true)))
 
-(defn- show-abstract [s]
+(defn- show-abstract-box [s]
   (when (compare-and-set! (::show-abstract s) false true)
     (abstract-on-change s))
   (reset! (::show-abstract-button s) false))
@@ -460,7 +460,7 @@
                           abstract-text (.text (js/$ (str "<div>" @(::initial-abstract s) "</div>")))]
                       (when (or (> (count (.-innerText body-el)) body-length-to-show-abstract)
                                 (seq abstract-text))
-                        (show-abstract s)))
+                        (show-abstract-box s)))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -480,7 +480,8 @@
                                                    (:abstract cmail-data)
                                                    "")
                                 abstract-text (.text (js/$ "<div>" initial-abstract "</div>"))
-                                abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
+                                abstract-exceeds (> (count abstract-text) utils/max-abstract-length)
+                                body-text (.text (js/$ "<div>" initial-body "</div>"))]
                             (when (and (not (seq (:uuid cmail-data)))
                                        (not (:collapsed cmail-state)))
                               (nux-actions/dismiss-add-post-tooltip))
@@ -490,6 +491,8 @@
                             (reset! (::initial-uuid s) (:uuid cmail-data))
                             (reset! (::abstract-length s) (count abstract-text))
                             (reset! (::abstract-exceeds-limit s) abstract-exceeds)
+                            (reset! (::show-abstract s) (boolean (seq abstract-text)))
+                            (reset! (::show-abstract-button s) (> (count body-text) body-length-to-show-abstract))
                             (reset! (::post-tt-kw s)
                              (cond
                               abstract-exceeds :abstract
@@ -729,7 +732,7 @@
                     (sections-picker (:board-slug cmail-data) did-pick-section)])]
               (when @(::show-abstract-button s)
                 [:button.mlb-reset.show-abstract-bt
-                  {:on-click #(show-abstract s)
+                  {:on-click #(show-abstract-box s)
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement "bottom"
                    :title (str "For longer posts, a summary makes it easy for viewers "
