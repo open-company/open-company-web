@@ -298,11 +298,11 @@
           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
          "Chat with us"]]
      [:div.plan-change-details
-       "Team of 250+, "
+       "Team of 250+? "
        [:a.chat-with-us
          {:class "intercom-chat-link"
           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-         "contact us"]
+         "Contact us"]
        " about an enterprise plan."]]))
 
 (defn- initial-setup
