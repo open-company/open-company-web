@@ -1036,6 +1036,7 @@ div.cmail-outer {
         margin-left: 16px;
         padding-left: 16px;
         border-left: 1px solid rgba($deep_navy, 0.1);
+        height: 32px;
 
         @include mobile() {
           display: none;
