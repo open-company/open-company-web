@@ -33,9 +33,10 @@ div.expanded-post {
   div.expanded-post-header {
     position: fixed;
     // Add 32 pixels to the width to account for the overflwoing comment menu
-    width: #{$board_container_width + 32}px;
+    width: #{$board_container_width + 40}px;
+    margin-left: -8px;
     height: 72px;
-    padding: 24px 32px 16px 0;
+    padding: 24px 32px 16px 8px;
     background-color: $grey_num_2;
     z-index: 102;
 
@@ -45,7 +46,7 @@ div.expanded-post {
       height: 1px;
       position: absolute;
       bottom: 0;
-      left: 0;
+      left: 8px;
       background-color: rgba($deep_navy, 0.15);
     }
 
@@ -58,6 +59,7 @@ div.expanded-post {
       left: 0;
       border-bottom: 1px solid $divider_line_grey;
       background-color: white;
+      margin-left: 0;
 
       &:before {
         display: none;
