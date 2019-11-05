@@ -73,6 +73,22 @@
       "Your trial has ended. Please select a plan to continue."
       (str "Your trial is set to expire in " days-left " day" (when-not (= days-left 1) "s") ". Please choose a plan."))))
 
+(defn- cancel-subscription [s payments-data]
+  (let [alert-data {:title "Are you sure?"
+                    :message "Are you sure you want to cancel your current plan?"
+                    :link-button-style :red
+                    :link-button-title "No, keep it"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :green
+                    :solid-button-title "Yes, cancel it"
+                    :solid-button-cb (fn [_]
+                                         (reset! (::canceling-subscription s) true)
+                                         (payments-actions/delete-plan-subscription payments-data
+                                          (:id (payments-actions/get-active-subscription payments-data))
+                                          #(reset! (::canceling-subscription s) false))
+                                         (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
+
 (defn- plan-summary [s payments-data]
   (if @(::automatic-update-plan s)
     [:div.plan-summary
@@ -132,6 +148,13 @@
             [:button.mlb-reset.change-pay-method-bt
               {:on-click #(change-tab s :change)}
               "Change"]])
+        (when subscription-data
+          [:div.plan-summary-details
+            [:button.mlb-reset.cancel-subscription-bt
+              {:on-click #(cancel-subscription s payments-data)}
+              "Cancel subscription"]
+            (when @(::canceling-subscription s)
+              (small-loading))])
         (comment
           [:div.plan-summary-separator]
           [:div.plan-summary-details
@@ -354,6 +377,7 @@
   (rum/local false ::checkout-result)
   (rum/local false ::saving-plan)
   (rum/local nil ::automatic-update-plan)
+  (rum/local false ::canceling-subscription)
   {:will-mount (fn [s]
     ;; Force refresh subscription data
     (payments-actions/maybe-load-payments-data @(drv/get-ref s :org-data) true)
