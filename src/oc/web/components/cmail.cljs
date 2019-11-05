@@ -151,7 +151,7 @@
 
 ;; Data change handling
 
-(declare show-abstract)
+(declare show-abstract-bt)
 
 (def ^:private body-length-to-show-abstract 255)
 
@@ -164,7 +164,7 @@
       ;; show the abstract
       (when (and (> (count (.-innerText body-el)) body-length-to-show-abstract)
                  (> (count (.-innerText body-el)) @(::last-body-count state)))
-        (show-abstract state))
+        (show-abstract-bt state))
       (reset! (::last-body-count state) (count (.-innerText body-el))))))
 
 (defn- check-limits [s]
@@ -198,9 +198,14 @@
 
 ;; Abstract show/hide
 
+(defn- show-abstract-bt [s]
+  (when (not (responsive/is-mobile-size?))
+    (reset! (::show-abstract-button s) true)))
+
 (defn- show-abstract [s]
   (when (compare-and-set! (::show-abstract s) false true)
-    (abstract-on-change s)))
+    (abstract-on-change s))
+  (reset! (::show-abstract-button s) false))
 
 (defn- hide-abstract [s]
   (when (compare-and-set! (::show-abstract s) true false)
@@ -395,6 +400,7 @@
                    (rum/local false ::mobile-follow-ups-remove-menu)
                    (rum/local false ::show-sections-picker)
                    (rum/local false ::show-abstract)
+                   (rum/local false ::show-abstract-button)
                    (rum/local 0 ::last-body-count)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
@@ -714,14 +720,21 @@
               [:div.cmail-content-section-picker-label
                 "Post in"]
               [:div.section-picker-bt-container
-                {:rel ""}
                 [:button.mlb-reset.section-picker-bt
                   {:on-click #(swap! (::show-sections-picker s) not)}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
-                    (sections-picker (:board-slug cmail-data) did-pick-section)])]]
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])]
+              (when @(::show-abstract-button s)
+                [:button.mlb-reset.show-abstract-bt
+                  {:on-click #(show-abstract s)
+                   :data-toggle (if is-mobile? "" "tooltip")
+                   :data-placement "bottom"
+                   :title (str "For longer posts, a summary makes it easy for viewers "
+                               "to quickly see what it's about and why it's important.")}
+                  "Add a quick summary"])]
             ; Headline element
             [:div.cmail-content-headline-container.group
               [:div.cmail-content-headline-label
