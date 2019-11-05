@@ -139,10 +139,12 @@
     (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
              (= (.getMonth past-js-date) (.getMonth now-date))
              (= (.getDate past-js-date) (.getDate now-date)))
-      (s/lower
-       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
-                                                                                  :minute "2-digit"
-                                                                                  :format "hour:minute"}))
+      (s/upper
+       (.replace
+        (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
+                                                                                   :minute "2-digit"
+                                                                                   :format "hour:minute"})
+        (js/RegExp. "^0(?:0:0?)?" "ig") ""))
       (time-since past-date (concat flags [:short])))))
 
 (defn class-set
