@@ -556,7 +556,11 @@ div.left-navigation-sidebar {
           padding: 0;
           margin: 0;
           cursor: default;
-          color: rgba($deep_navy, 0.5);
+
+          span.sections {
+            color: rgba($deep_navy, 0.5);
+            font-size: 16px;
+          }
 
           &:before {
             display: none;
