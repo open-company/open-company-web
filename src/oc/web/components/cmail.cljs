@@ -170,7 +170,7 @@
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
         $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
-        abstract-text (str/trim (.text $abstract))
+        abstract-text (if @(::show-abstract s) (str/trim (.text $abstract)) "")
         exceeds-limit (> (count abstract-text) utils/max-abstract-length)
         clean-headline (str/trim (str/replace (.-innerText headline) #"\n" ""))
         post-button-title (cond
@@ -204,8 +204,7 @@
 
 (defn- show-abstract-box [s]
   (when (compare-and-set! (::show-abstract s) false true)
-    (abstract-on-change s))
-  (reset! (::show-abstract-button s) false))
+    (abstract-on-change s)))
 
 (defn- hide-abstract [s]
   (when (compare-and-set! (::show-abstract s) true false)
@@ -701,7 +700,8 @@
                                  :disabled disabled?
                                  :title post-button-title
                                  :post-tt-kw post-tt-kw
-                                 :force-show-tooltip @(::show-post-tooltip s)})]])]
+                                 :force-show-tooltip @(::show-post-tooltip s)
+                                 :show-on-hover true})]])]
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
                                     :has-follow-ups follow-up?})}
@@ -730,7 +730,8 @@
                   [:div.sections-picker-container
                     {:ref :sections-picker-container}
                     (sections-picker (:board-slug cmail-data) did-pick-section)])]
-              (when @(::show-abstract-button s)
+              (when (and @(::show-abstract-button s)
+                         (not @(::show-abstract s)))
                 [:button.mlb-reset.show-abstract-bt
                   {:on-click #(show-abstract-box s)
                    :data-toggle (if is-mobile? "" "tooltip")
@@ -853,7 +854,8 @@
                                  :disabled disabled?
                                  :title post-button-title
                                  :post-tt-kw post-tt-kw
-                                 :force-show-tooltip @(::show-post-tooltip s)})])
+                                 :force-show-tooltip @(::show-post-tooltip s)
+                                 :show-on-hover true})])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 32
                            :height 32

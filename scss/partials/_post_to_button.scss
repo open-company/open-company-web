@@ -16,6 +16,14 @@ div.post-to-button {
   div.post-to-bt-container {
     position: relative;
 
+    @include big_web() {
+      &:hover {
+        div.post-bt-tooltip {
+          display: block;
+        }
+      }
+    }
+
     button.post-to-bt {
       padding: 7px 16px;
       background-color: $carrot_green;
