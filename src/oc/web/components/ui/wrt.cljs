@@ -157,7 +157,7 @@
                            (dis/board-data (router/current-org-slug) (:board-slug activity-data)))
                   [:button.mlb-reset.manage-section-bt
                     {:on-click #(nav-actions/show-section-editor (:board-slug activity-data))}
-                    "Manage channel members?"])]]
+                    "Manage section members?"])]]
             [:div.wrt-popup-tabs
               {:ref :wrt-pop-up-tabs}
               [:div.wrt-popup-tabs-select.oc-input

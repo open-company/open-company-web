@@ -107,7 +107,7 @@
               (if (or is-mobile?
                       (not (jwt/is-admin? (:team-id team-roster)))
                       (= (:board-slug cmail-data) utils/default-section-slug))
-                "channel members"
+                "section members"
                 [:button.mlb-reset.section-memeber-bt
                   {:on-click (fn [e]
                                (utils/event-stop e)
@@ -116,7 +116,7 @@
                    :data-placement "top"
                    :data-container "body"
                    :title (str (:board-name cmail-data) " settings")}
-                  "channel members"])]
+                  "section members"])]
             [:div.follow-ups-users-bt
               (when-not (seq @(::query s))
                 (if show-select-all?

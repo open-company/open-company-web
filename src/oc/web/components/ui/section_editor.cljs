@@ -199,8 +199,8 @@
             {:dangerouslySetInnerHTML
               (utils/emojify
                (if @(::editing-existing-section s)
-                 "Channel settings"
-                 "Create channel"))}]
+                 "Section settings"
+                 "Create section"))}]
           (let [disable-bt (or @(::saving s)
                                (< (count @(::section-name s)) section-actions/min-section-name-length)
                                @(::pre-flight-check s)
@@ -224,10 +224,10 @@
             "Back"]]
         [:div.section-editor-add
           [:div.section-editor-add-label
-            [:span.section-name "Channel name"]]
+            [:span.section-name "Section name"]]
           [:input.section-editor-add-name.oc-input
             {:value @(::section-name s)
-             :placeholder "Channel name"
+             :placeholder "Section name"
              :ref "section-name"
              :class  (utils/class-set {:preflight-ok @(::pre-flight-ok s)
                                        :preflight-error (:section-name-error section-editing)})
@@ -247,7 +247,7 @@
               (str (or (:section-name-error section-editing)
                        (:section-error section-editing)))])
           [:div.section-editor-add-label
-            "Channel security"]
+            "Section security"]
           [:div.section-editor-add-access.oc-input
             {:class (when @(::show-access-list s) "active")
              :on-click #(do
@@ -329,10 +329,10 @@
                   "Add Carrot bot"]]))
           (when (= (:access section-editing) "public")
             [:div.section-editor-access-public-description
-              "Public channels are visible to the world, including search engines."])
+              "Public sections are visible to the world, including search engines."])
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-label.top-separator
-              "Add members to this private channel"])
+              "Add members to this private section"])
           (when (= (:access section-editing) "private")
             (let [query  (::query s)
                   available-users (:mention-users roster)
@@ -381,7 +381,7 @@
                               (count (:viewers section-editing)))))
             [:div.section-editor-add-label.group
               [:span.main-label
-                "Channel members"]
+                "Section members"]
               [:span.role-header
                 "Role"]])
           (when (and (= (:access section-editing) "private")
@@ -456,14 +456,14 @@
                                 (alert-modal/show-alert
                                  {:icon "/img/ML/error_icon.png"
                                   :action "remove-self-user-from-private-section"
-                                  :message "Are you sure you want to leave this channel?"
+                                  :message "Are you sure you want to leave this section?"
                                   :link-button-title "No"
                                   :link-button-cb #(alert-modal/hide-alert)
                                   :solid-button-title "Yes"
                                   :solid-button-cb (fn []
                                    (section-actions/private-section-kick-out-self self-data)
                                    (alert-modal/hide-alert))})))}
-                            "Leave channel"]
+                            "Leave section"]
                           [:div.user-type.no-dropdown
                             "Contributor"])
                         [:div.user-type
@@ -500,7 +500,7 @@
                                            [:span "Are you sure?"]
                                            (when (-> section-data :entry-count pos?)
                                              [:span
-                                               " This will delete the channel and "
+                                               " This will delete the section and "
                                                [:strong "all"]
                                                " its posts, too."])]
                                 :link-button-title "No"
@@ -511,7 +511,7 @@
                                                    (section-actions/section-delete
                                                      (:slug section-data)
                                                      (notification-actions/show-notification
-                                                      {:title "Channel deleted"
+                                                      {:title "Section deleted"
                                                        :dismiss true
                                                        :expire 3
                                                        :id :section-deleted}))
@@ -521,7 +521,7 @@
                  :data-placement "top"
                  :data-container "body"
                  :title (if last-section-standing
-                         "You cannot delete the last remaining channel."
-                         "Delete this channel and all its posts.")
+                         "You cannot delete the last remaining section."
+                         "Delete this section and all its posts.")
                  :class (when last-section-standing "disabled")}
-                "Delete channel"])]]]]))
+                "Delete section"])]]]]))

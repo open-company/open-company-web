@@ -182,11 +182,11 @@
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
                  :on-click #(when-not is-mobile? (toggle-collapse-sections s))}
-                [:span.sections "Channels"]]
+                [:span.sections "Sections"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
-                   :title "Create a new channel"
+                   :title "Create a new section"
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])

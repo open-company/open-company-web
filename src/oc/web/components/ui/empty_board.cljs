@@ -32,4 +32,4 @@
            is-all-posts? "All posts is a stream of what’s new in Carrot."
            is-drafts-board? "Nothing in drafts"
            is-follow-ups? "You’re all caught up!"
-           :else "This channel is empty")]]]))
+           :else "This section is empty")]]]))
