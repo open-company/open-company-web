@@ -199,7 +199,7 @@
 ;; Abstract show/hide
 
 (defn- show-abstract-bt [s]
-  (when (not (responsive/is-mobile-size?))
+  (when-not (responsive/is-mobile-size?)
     (reset! (::show-abstract-button s) true)))
 
 (defn- show-abstract-box [s]
