@@ -259,7 +259,7 @@ div.cmail-outer {
         }
 
         div.cmail-content-headline {
-          @include activity-title(16px, 22px);
+          @include activity-title(14px, 18px);
 
           @include mobile() {
             @include activity-title(32px, 40px);
@@ -895,9 +895,14 @@ div.cmail-outer {
         div.cmail-content-section-picker-label {
           float: left;
           @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 28px;
+          font-size: 14px;
+          line-height: 24px;
           color: rgba($deep_navy, 0.5);
+
+          @include mobile() {
+            font-size: 16px;
+            line-height: 28px;
+          }
         }
 
         div.section-picker-bt-container {
@@ -907,28 +912,41 @@ div.cmail-outer {
 
           div.sections-picker {
             position: absolute;
-            top: 30px;
+            top: 26px;
             left: 0;
             z-index: #{$navbar_zindex - 1};
+
+            @include mobile (){
+              top: 30px;
+            }
           }
 
           button.section-picker-bt {
-            height: 28px;
+            height: 24px;
             padding: 3px 24px 3px 8px;
             color: white;
             background-color: $deep_navy;
             border-radius: 4px;
             @include OC_Body_Book();
-            font-size: 16px;
+            font-size: 14px;
             line-height: 18px;
             position: relative;
+
+            @include mobile() {
+              height: 28px;
+              font-size: 16px;
+
+              &:after {
+                top: 9px;
+              }
+            }
 
             &:after {
               content: "";
               width: 8px;
               height: 10px;
               position: absolute;
-              top: 9px;
+              top: 7px;
               right: 8px;
               background-image: cdnUrl("/img/ML/select_arrows_white.svg");
               background-size: 8px 10px;
@@ -943,10 +961,10 @@ div.cmail-outer {
           color: $carrot_green;
           padding: 0;
           margin: 0;
-          height: 28px;
+          height: 24px;
           @include OC_Body_Book();
           font-size: 14px;
-          line-height: 28px;
+          line-height: 24px;
 
           @include mobile() {
             display: none;
@@ -964,24 +982,38 @@ div.cmail-outer {
         div.cmail-content-headline-label {
           float: left;
           @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 22px;
+          font-size: 14px;
+          line-height: 18px;
           color: rgba($deep_navy, 0.5);
+
+          @include mobile() {
+            font-size: 16px;
+            line-height: 22px;
+          }
         }
 
         div.cmail-content-headline {
           border: none;
           outline: none;
           cursor: text;
-          @include activity-title(16px, 22px);
+          @include activity-title(14px, 18px);
           color: $deep_navy;
           white-space: pre-wrap;
           word-wrap: break-word;
-          min-height: 22px;
-          line-height: 22px;
+          min-height: 18px;
+          line-height: 18px;
           float: right;
-          width: calc(100% - 55px - 8px);
+          width: calc(100% - 48px - 8px);
 
+          @include mobile() {
+            @include activity-title(16px, 22px);
+            min-height: 22px;
+            line-height: 22px;
+            width: calc(100% - 55px - 8px);
+          }
+
+          // We have a label in front of headline so we don't need a placeholder
+          // let's keep it for later changes
           // &:empty:before {
           //   content: attr(placeholder);
           //   display: inline-block;
@@ -1059,6 +1091,7 @@ div.cmail-outer {
             @include activity-body(17, 22, $deep_navy);
             font-size: 17px;
             line-height: 22px;
+            min-height: 22px;
           }
 
           @media screen and (min-height: 556px) {
@@ -1074,6 +1107,10 @@ div.cmail-outer {
             overflow-y: auto;
             overflow-x: visible;
             padding-bottom: 30vh;
+
+            &:after {
+              line-height: 24px;
+            }
           }
 
           & > *:first-child {
@@ -1091,6 +1128,7 @@ div.cmail-outer {
 
           &:after {
             margin: 0;
+            line-height: 22px;
           }
         }
       }
