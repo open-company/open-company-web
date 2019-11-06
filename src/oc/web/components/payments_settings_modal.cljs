@@ -129,7 +129,7 @@
           [:div.plan-summary-details
             [:button.mlb-reset.change-pay-method-bt
               {:on-click #(payments-actions/add-payment-method payments-data)}
-              "Add a payment method"]])
+              "Subscribe to Carrot"]])
         (when (is-trial? subscription-data)
           [:div.plan-summary-details.bottom-margin
             [:strong "Trial"]
@@ -142,12 +142,14 @@
             "Plan billed "
             (plan-description (:interval current-plan)) " (" (plan-price current-plan quantity) ")"
             [:br]
-            "Next payment due on "
-            next-payment-due
+            (if (:cancel-at-period-end? subscription-data)
+              (str "Your plan is scheduled to cancel on " (date-string (:current-period-end subscription-data)))
+              (str "Next payment due on " next-payment-due))
             [:button.mlb-reset.change-pay-method-bt
               {:on-click #(change-tab s :change)}
               "Change"]])
-        (when subscription-data
+        (when (and subscription-data
+                   (not (:cancel-at-period-end? subscription-data)))
           [:div.plan-summary-details
             [:button.mlb-reset.cancel-subscription-bt
               {:on-click #(cancel-subscription s payments-data)}
@@ -286,28 +288,37 @@
       [:button.mlb-reset.payment-info-bt
         {:disabled (or @(::saving-plan s)
                        (and has-payment-info?
-                            (= @current-plan initial-plan)))
+                            (= @current-plan initial-plan)
+                            (not (:cancel-at-period-end? subscription-data))))
          :on-click (fn []
                     (if has-payment-info?
-                      (let [alert-data {:title "Are you sure?"
-                                        :message "Are you sure you want to change your current plan?"
-                                        :link-button-style :red
-                                        :link-button-title "No, keep it"
-                                        :link-button-cb #(alert-modal/hide-alert)
-                                        :solid-button-style :green
-                                        :solid-button-title "Yes, change it"
-                                        :solid-button-cb (fn [_]
-                                                             (reset! (::saving-plan s) true)
-                                                             (save-plan-change s payments-data current-plan-data)
-                                                             (alert-modal/hide-alert))}]
-                        (alert-modal/show-alert alert-data))
+                      (if (:cancel-at-period-end? subscription-data)
+                        ;; If user cancelled we don't ask for confirmation,
+                        ;; let's restart the subscription immediately
+                        (do
+                          (reset! (::saving-plan s) true)
+                          (save-plan-change s payments-data current-plan-data))
+                        (let [alert-data {:title "Are you sure?"
+                                          :message "Are you sure you want to change your current plan?"
+                                          :link-button-style :red
+                                          :link-button-title "No, keep it"
+                                          :link-button-cb #(alert-modal/hide-alert)
+                                          :solid-button-style :green
+                                          :solid-button-title "Yes, change it"
+                                          :solid-button-cb (fn [_]
+                                                               (reset! (::saving-plan s) true)
+                                                               (save-plan-change s payments-data current-plan-data)
+                                                               (alert-modal/hide-alert))}]
+                          (alert-modal/show-alert alert-data)))
                       (payments-actions/add-payment-method payments-data
                        ;; In case user changed the plan let's add it to the callback
                        ;; so we save once payment method is added
                        (when (not= initial-plan @current-plan)
                         current-plan-data))))}
         (if has-payment-info?
-          "Change plan"
+          (if (:cancel-at-period-end? subscription-data)
+            "Subscribe to Carrot"
+            "Change plan")
           "Subscribe to Carrot")]
       (when @(::saving-plan s)
         (small-loading))
