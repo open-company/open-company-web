@@ -741,6 +741,9 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
+                               ;; Block the rich-body-editor component when
+                               ;; the current editing post has been created alreaduks
+                               :paywall? show-paywall-alert?
                                :placeholder (when (:collapsed cmail-state) "Share something with your team...")
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
@@ -748,7 +751,7 @@
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
-                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)
+                               :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
             ; Attachments
