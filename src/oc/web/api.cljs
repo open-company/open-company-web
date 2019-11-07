@@ -273,12 +273,35 @@
      (let [body (if (:success response) (:body response) false)]
        (callback body))))))
 
-;; Subscription
+;; Payments
 
-(defn get-subscription [company-uuid callback]
-  (pay-http http/get (str "/subscriptions/" company-uuid)
-   nil
-   callback))
+(defn get-payments [payments-link callback]
+  (if payments-link
+    (auth-http (method-for-link payments-link) (relative-href payments-link)
+     {:headers (headers-for-link payments-link)}
+     callback)
+    (handle-missing-link "get-payments" payments-link callback)))
+
+(defn update-plan-subscription
+  "Used for PUT, PATCH and DELETE of subscriptions. Adds json-params with {:plan-id plan-id}
+   only if a plan-id is passed."
+  [update-link plan-id callback]
+  (if update-link
+    (let [update-subscription-body (cljs->json {:plan-id plan-id})
+          options* {:headers (headers-for-link update-link)}
+          options (if plan-id (assoc options* :json-params update-subscription-body) options*)]
+      (auth-http (method-for-link update-link) (relative-href update-link)
+       options callback))
+    (handle-missing-link "update-plan-subscription" update-link callback)))
+
+(defn get-checkout-session-id [checkout-link success-url cancel-url callback]
+  (if checkout-link
+    (auth-http (method-for-link checkout-link) (relative-href checkout-link)
+     {:headers (headers-for-link checkout-link)
+      :json-params (cljs->json {:success-url success-url
+                                :cancel-url cancel-url})}
+     callback)
+    (handle-missing-link "get-checkout-session-id" checkout-link callback)))
 
 ;; Org
 
@@ -896,6 +919,8 @@
 (defn request-reads-count [item-ids]
   (when (seq item-ids)
     (ws-cc/who-read-count item-ids)))
+
+;; 
 
 ;; Change service http
 

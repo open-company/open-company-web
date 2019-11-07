@@ -23,11 +23,38 @@ div.org-dashboard {
     }
   }
 
-  &.expanded-activity div.page {
-    @include mobile() {
-      padding-top: 0;
-      nav.oc-navbar {
-        display: none;
+  &.trial-expired {
+    padding-top: #{$navbar_height * 2}px;
+
+    nav.oc-navbar {
+      top: 56px;
+    }
+
+    div.left-navigation-sidebar {
+      top: #{$navbar_height * 2}px;
+      height: calc(100vh - #{($navbar_height * 2) + 1}px);
+    }
+
+    @include big_web() {
+      div.org-dashboard-inner {
+        padding-top: 0;
+      }
+    }
+  }
+
+  &.expanded-activity {
+
+    &, &.trial-expired {
+      padding-top: #{$navbar_height}px;
+    }
+
+    div.page {
+
+      @include mobile() {
+        padding-top: 0;
+        nav.oc-navbar {
+          display: none;
+        }
       }
     }
   }
