@@ -1,8 +1,6 @@
 /* Header */
 
 span.go-to-digest {
-  // height: 40px;
-  color: $carrot_green;
   position: relative;
   display: block;
   text-align: right;
@@ -47,7 +45,7 @@ nav.site-navbar {
       }
 
       div.site-navbar-right {
-        top: 16px;
+        top: 10px;
       }
 
       div.mobile-ham-menu {
@@ -129,31 +127,26 @@ nav.site-navbar {
 
     div.site-navbar-right {
       position: absolute;
-      height: 28px;
+      height: 40px;
       right: 16px;
-      top: 39px;
+      top: 33px;
       transform: top 180ms;
 
       @include mobile() {
         top: 21px;
+        height: 28px;
 
         a.go-to-digest-bt {
           display: none;
         }
       }
 
-      span.login-signup-or {
-        color: $deep_navy;
-        @include OC_Body_Book();
-        font-size: 18px;
-        margin: 0 6px;
-      }
-
       a.login, a.signup {
-        height: 28px;
+        height: 40px;
         color: $carrot_green;
         @include OC_Body_Book();
         font-size: 18px;
+        line-height: 40px;
         padding: 0;
         margin: 0;
         text-align: center;
@@ -192,6 +185,24 @@ nav.site-navbar {
         }
       }
 
+      a.signup {
+        background-color: $carrot_orange;
+        color: white;
+        heigth: 40px;
+        @include OC_Body_Bold();
+        color: white;
+        font-size: 18px;
+        line-height: 24px;
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin-left: 16px;
+
+        &.your-digest {
+          margin-left: 0;
+          color: white;
+        }
+      }
+
       a.mobile-your-digest {
         margin-top: 6px;
 
@@ -202,94 +213,6 @@ nav.site-navbar {
           border-radius: 50%;
         }
       }
-
-      // a.start {
-      //   min-width: 84px;
-      //   height: 40px;
-      //   border-radius: 8px;
-      //   @include OC_Body_Bold();
-      //   font-size: 14px;
-      //   color: #FB5E48;
-      //   background-color: $coral;
-      //   padding: 10px 24px;
-      //   text-align: center;
-      //   display: flex;
-      //   justify-content: center;
-      //   align-items: center;
-      //   margin-top: 0;
-      //   opacity: 0.8;
-
-      //   &:active, &:focus {
-      //     text-decoration: none;
-      //   }
-
-      //   @include mobile() {
-      //     height: 30px;
-      //     width: auto;
-      //     text-align: center;
-      //     padding: 4px 12px;
-      //     font-size: 13px;
-      //     letter-spacing: 0.46px;
-      //     min-width: 64px;
-
-      //     span.slack-copy {
-      //       top: 2px;
-      //       position: relative;
-      //     }
-
-      //     span.copy {
-      //       top: 2px;
-      //       position: relative; 
-      //     }
-      //   }
-
-      //   span.slack-orange-icon {
-      //     width: 16px;
-      //     height: 16px;
-      //     background-image: cdnUrl("/img/ML/slack_orange_icon_1.svg");
-      //     background-repeat: no-repeat;
-      //     background-size: 16px 16px;
-      //     margin-right: 6px;
-      //     position: relative;
-      //     margin-top: -3px;
-
-      //     @include tablet() {
-      //       display: none;
-      //     }
-      //   }
-
-      //   &:not(.your-digest).slack-get-started {
-      //     height: 40px;
-      //     background-color: $coral;
-      //     font-size: 16px;
-      //     color: #FB5E48;
-      //     text-align: left;
-      //     padding: 2px 24px 0;
-
-      //     &.slack {
-      //       padding: 5px 24px 0;
-      //     }
-
-      //     @media screen and (max-width: 320px) {
-      //       display: none;
-      //     }
-      //   }
-
-      //   &.your-digest {
-      //     height: unset;
-      //     border: none;
-      //     border-radius: 8px;
-      //     background-color: $carrot_green;
-      //     padding: 0px;
-      //     margin-top: 0;
-      //     opacity: 1;
-      //   }
-
-      //   &:hover {
-      //     text-decoration: none;
-      //     opacity: 1;
-      //   }
-      // }
     }
 
     a.navbar-brand-left {
