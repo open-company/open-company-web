@@ -262,7 +262,9 @@
           [:strong total-plan-price]
           (str 
             " per " (:interval current-plan-data)
-            " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ").")
+            (when (seq (:tiers current-plan-data))
+              (str " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ")"))
+            ".")
           (when is-annual-default-plan?
             different-plans-price-span)])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
