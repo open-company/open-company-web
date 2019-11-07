@@ -5,7 +5,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]))
 
-(def missing-title-tooltip "Please add a title")
+(def missing-title-tooltip "Please add a subject")
 (def abstract-max-length-exceeded-tooltip "Abstract too long")
 
 (rum/defcs post-to-button < rum/reactive
