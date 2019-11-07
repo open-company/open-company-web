@@ -11,6 +11,7 @@
 
 (def default-trial-status "trialing")
 (def default-active-status "active")
+(def default-trial-expired-status "past_due")
 (def default-positive-statuses #{default-trial-status default-active-status})
 
 ;; Payments data handling

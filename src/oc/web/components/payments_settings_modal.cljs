@@ -66,6 +66,9 @@
 (defn- is-trial? [subs-data]
   (= (:status subs-data) payments-actions/default-trial-status))
 
+(defn- is-trial-expired? [subs-data]
+  (= (:status subs-data) payments-actions/default-trial-expired-status))
+
 (defn- trial-remaining-days-string [subscription-data]
   (let [remaining-seconds (- (:trial-end subscription-data) (/ (.getTime (utils/js-date)) 1000))
         days-left (inc (int (/ remaining-seconds (* 60 60 24))))]
@@ -114,8 +117,9 @@
           [:div.plan-summary-details
             [:button.mlb-reset.change-pay-method-bt
               {:on-click #(payments-actions/add-payment-method payments-data)}
-              "Add a payment method"]])
-        (when (is-trial? subscription-data)
+              "Subscribe to Carrot"]])
+        (when (or (is-trial? subscription-data)
+                  (is-trial-expired? subscription-data))
           [:div.plan-summary-details.bottom-margin
             [:strong "Trial"]
             [:br]
@@ -206,7 +210,8 @@
         is-annual-default-plan? (= (:nickname current-plan-data) "Annual")
         is-under-up-to? (< quantity up-to)]
     [:div.plan-change
-      (when (and (is-trial? subscription-data)
+      (when (and (or (is-trial? subscription-data)
+                     (is-trial-expired? subscription-data))
                  (not has-payment-info?))
         [:div.plan-change-details.expiration-trial.bottom-margin
           [:div.emoji-icon "🗓"]
