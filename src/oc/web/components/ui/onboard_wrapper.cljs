@@ -310,7 +310,9 @@
             :aria-label "Continue"}
             "Continue"]]
         [:div.title.about-yourself
-          "Create your team"]]
+          (if has-org?
+           "Tell us about you"
+           "Create your team")]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -819,7 +821,7 @@
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]]
         [:div.title.about-yourself
-          "Create your team"]
+          "Tell us about you"]
         (when (:error edit-user-profile)
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]
