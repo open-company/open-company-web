@@ -88,7 +88,7 @@
           next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
           current-plan (:plan subscription-data)
           checkout-result @(::checkout-result s)
-          quantity (-> subscription-data :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
+          quantity (:quantity subscription-data)] ;; Number of active/unverified users
       [:div.plan-summary
         (when (true? checkout-result)
           [:div.plan-summary-details.success.bottom-margin
@@ -196,7 +196,7 @@
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
         subscription-data (payments-actions/get-active-subscription payments-data)
-        quantity (-> payments-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
+        quantity (:quantity subscription-data) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:interval %) "month") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:interval %) "year") (:available-plans payments-data)))
         current-plan-data (if @(::plan-has-changed s)
