@@ -20,7 +20,9 @@
 ;; :org
 ;; :integrations
 ;; :team
+;; :invite-picker
 ;; :invite
+;; :invite-link
 ;; :billing
 ;; :profile
 ;; :notifications

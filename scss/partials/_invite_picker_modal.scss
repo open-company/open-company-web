@@ -1,0 +1,96 @@
+div.invite-picker-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.invite-picker {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    div.invite-picker-header {
+      width: calc(100% + 48px);
+      height: 56px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      div.invite-picker-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+        margin-right: 8px;
+      }
+    }
+
+    div.invite-picker-body {
+      width: 272px;
+      margin: 24px auto 0;
+
+      div.invite-picker-body-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        line-height: 18px;
+        color: $deep_navy;
+      }
+
+      div.invite-picker-body-description {
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 18px;
+        margin-top: 8px;
+      }
+
+      button {
+        color: $carrot_green;
+        text-decoration: none;
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
+        margin-top: 8px;
+        padding: 0;
+        margin: 8px 0 0;
+
+        &:first-of-type {
+          margin: 16px 0 0;
+        }
+      }
+    }
+  }
+}

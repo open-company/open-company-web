@@ -35,6 +35,8 @@
             [oc.web.components.ui.follow-ups-picker :refer (follow-ups-picker)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
+            [oc.web.components.invite-link-modal :refer (invite-link-modal)]
+            [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
             [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
@@ -178,6 +180,12 @@
           ;; Integrations settings
           (= open-panel :integrations)
           (integrations-settings-modal)
+          ;; Invite picker settings
+          (= open-panel :invite-picker)
+          (invite-picker-modal)
+          ;; Invite link settings
+          (= open-panel :invite-link)
+          (invite-link-modal)
           ;; Invite settings
           (= open-panel :invite)
           (invite-settings-modal)
