@@ -206,7 +206,9 @@
         different-plans-price-span (different-plans-price (:available-plans payments-data) quantity)
         up-to (-> current-plan-data :tiers first :up-to)
         flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
-        unit-amount (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
+        unit-amount (if (seq (:tiers current-plan-data))
+                      (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
+                      (plan-amount-to-human (:amount current-plan-data) (:currency current-plan-data)))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
         has-payment-info? (seq (:payment-methods payments-data))
         is-annual-default-plan? (= (:nickname current-plan-data) "Annual")
@@ -262,9 +264,7 @@
           [:strong total-plan-price]
           (str 
             " per " (:interval current-plan-data)
-            (when (seq (:tiers current-plan-data))
-              (str " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ")"))
-            ".")
+            " (" quantity " user" (when (not= quantity 1) "s") " X " unit-amount ").")
           (when is-annual-default-plan?
             different-plans-price-span)])
       (when-not (payments-actions/default-positive-statuses (:status subscription-data))
