@@ -287,6 +287,7 @@
           (str "Due today: " total-plan-price)])
       [:button.mlb-reset.payment-info-bt
         {:disabled (or @(::saving-plan s)
+                       @(::canceling-subscription s)
                        (and has-payment-info?
                             (= @current-plan initial-plan)
                             (not (:cancel-at-period-end? subscription-data))))
@@ -421,7 +422,9 @@
                      (not is-change-tab?)
                      (nil? @(::checkout-result s)))
             [:button.mlb-reset.save-bt
-              {:on-click #(change-tab s :change)}
+              {:on-click #(change-tab s :change)
+               :disabled (or @(::saving-plan s)
+                             @(::canceling-subscription s))}
               "Change plan"])
           (when (and payments-data
                      (nil? @(::checkout-result s))
