@@ -34,16 +34,6 @@
                          (str currency " "))]
     (str currency-symbol int-plan-amount "." decimal-plan-amount)))
 
-(defn- plan-price [plan-data quantity]
-  (if-not (seq (:tiers plan-data))
-    (plan-amount-to-human (:amount plan-data) (:currency plan-data))
-    (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %))) (not (:up-to %)))
-                (:tiers plan-data)))
-          tier-price (if (:up-to tier)
-                       (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
-                       (* quantity (:unit-amount tier)))]
-      (plan-amount-to-human tier-price (:currency plan-data)))))
-
 (defn- plan-minimum-price [plan-data]
   (let [tier (first (:tiers plan-data))]
     (plan-amount-to-human (:flat-amount tier) (:currency plan-data))))
@@ -85,10 +75,11 @@
         "Updating your plan..."
         (small-loading)]]
     (let [subscription-data (payments-actions/get-active-subscription payments-data)
-          next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
+          upcoming-invoice (:upcoming-invoice payments-data)
+          next-payment-due (date-string (:next-payment-attempt upcoming-invoice))
           current-plan (:plan subscription-data)
           checkout-result @(::checkout-result s)
-          quantity (-> subscription-data :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
+          quantity (-> upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
       [:div.plan-summary
         (when (true? checkout-result)
           [:div.plan-summary-details.success.bottom-margin
@@ -131,7 +122,10 @@
             [:strong "Billing period"]
             [:br]
             "Plan billed "
-            (plan-description (:interval current-plan)) " (" (plan-price current-plan quantity) ")"
+            (plan-description (:interval current-plan))
+            " ("
+             (plan-amount-to-human (:amount-due upcoming-invoice) (:currency upcoming-invoice))
+            ")"
             [:br]
             "Next payment due on "
             next-payment-due
@@ -196,13 +190,14 @@
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
         subscription-data (payments-actions/get-active-subscription payments-data)
-        quantity (-> payments-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
+        upcoming-invoice (:upcoming-invoice payments-data)
+        quantity (-> upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:interval %) "month") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:interval %) "year") (:available-plans payments-data)))
         current-plan-data (if @(::plan-has-changed s)
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:plan subscription-data))
-        total-plan-price (plan-price current-plan-data quantity)
+        total-plan-price (plan-amount-to-human (:amount-due upcoming-invoice) (:currency upcoming-invoice))
         different-plans-price-span (different-plans-price (:available-plans payments-data) quantity)
         up-to (-> current-plan-data :tiers first :up-to)
         flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
