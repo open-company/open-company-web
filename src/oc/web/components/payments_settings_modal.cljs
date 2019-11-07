@@ -35,12 +35,14 @@
     (str currency-symbol int-plan-amount "." decimal-plan-amount)))
 
 (defn- plan-price [plan-data quantity]
-  (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
-                                  (not (:up-to %))) (:tiers plan-data)))
-        tier-price (if (:up-to tier)
-                     (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
-                     (* quantity (:unit-amount tier)))]
-    (plan-amount-to-human tier-price (:currency plan-data))))
+  (if-not (seq (:tiers plan-data))
+    (plan-amount-to-human (:amount plan-data) (:currency plan-data))
+    (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %))) (not (:up-to %)))
+                (:tiers plan-data)))
+          tier-price (if (:up-to tier)
+                       (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
+                       (* quantity (:unit-amount tier)))]
+      (plan-amount-to-human tier-price (:currency plan-data)))))
 
 (defn- plan-minimum-price [plan-data]
   (let [tier (first (:tiers plan-data))]
