@@ -105,12 +105,16 @@
           checkout-result @(::checkout-result s)
           quantity (:quantity subscription-data)] ;; Number of active/unverified users
       [:div.plan-summary
-        (when (true? checkout-result)
-          [:div.plan-summary-details.success.bottom-margin
-            [:div.emoji-icon "👍"]
-            (str "Your " (s/lower (:nickname current-plan)) " plan is active.")])
-        (when (true? checkout-result)
-          [:div.plan-summary-separator])
+        (when subscription-data
+          (if (:cancel-at-period-end? subscription-data)
+            [:div.plan-summary-details.success.bottom-margin
+              [:div.emoji-icon "🗓"]
+              (str "Your " (s/lower (:nickname current-plan)) " plan is set to cancel on " (date-string (:current-period-end subscription-data)) ".")]
+            [:div.plan-summary-details.success.bottom-margin
+              [:div.emoji-icon "👍"]
+              (str "Your " (s/lower (:nickname current-plan)) " plan is active.")]))
+        (when subscription-data
+          [:div.plan-summary-separator.bottom-margin])
         (if (seq (:payment-methods payments-data))
           [:div.plan-summary-details
             [:strong "Payment methods"]
