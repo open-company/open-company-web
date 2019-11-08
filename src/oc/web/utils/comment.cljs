@@ -114,5 +114,8 @@
      (vec (apply concat all-comments-seqs))))
   ([comments :guard sequential? parent-uuid]
    (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
-         filtered-comments (filterv check-fn comments)]
-     (vec (sort-by :created-at filtered-comments)))))
+         filtered-comments (filterv check-fn comments)
+         sorted-comments (sort-by :created-at filtered-comments)]
+     (if (nil? parent-uuid)
+      (vec (reverse sorted-comments))
+      (vec sorted-comments)))))
