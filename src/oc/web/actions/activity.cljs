@@ -944,3 +944,27 @@
                                                       :self-follow-up-created-error)})
         (follow-ups-get org-data)
         (recent-follow-ups-get org-data))))))
+
+(defn refresh-board-data [board-slug sort-type]
+  (when (and (not (router/current-activity-id))
+             board-slug)
+    (let [org-data (dis/org-data)
+          board-data (if (#{"all-posts" "follow-ups"} board-slug)
+                       (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
+                       (dis/board-data board-slug))]
+       (cond
+
+        (= board-slug "all-posts")
+        (all-posts-get org-data)
+
+        (= board-slug "follow-ups")
+        (follow-ups-sort-get org-data)
+
+        :default
+        (let [board-rel (if (= sort-type dis/other-sort-type)
+                          ["item" "self"]
+                          "activity")]
+          (when-let* [fixed-board-data (or board-data
+                       (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+            (sa/section-get sort-type board-link)))))))
