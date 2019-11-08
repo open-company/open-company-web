@@ -56,6 +56,9 @@
   ;; Google fonts Muli
   [:link {:href "https://fonts.googleapis.com/css?family=Muli|PT+Serif:700" :rel "stylesheet"}])
 
+(def stripe-js
+  [:script {:src "https://js.stripe.com/v3/"}])
+
 (defn circular-font-folder [font-file]
   (str (when (env :oc-web-cdn-url)
         (env :oc-web-cdn-url))
@@ -185,7 +188,9 @@
           ;; Intercom (Support)
           [:script {:src (shared/cdn "/js/intercom.js")}]
           ;; Headway (What's New)
-          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]]
+          [:script {:type "text/javascript" :src "//cdn.headwayapp.co/widget.js"}]
+          ;; Stripe
+          stripe-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
@@ -281,7 +286,9 @@
           [:script {:src "https://cdn.polyfill.io/v2/polyfill.min.js"}]
           ;; Ziggeo
           ziggeo-css
-          ziggeo-js]
+          ziggeo-js
+          ;; Stripe
+          stripe-js]
    :body [:body
           [:div#app
             [:div.oc-loading.active
