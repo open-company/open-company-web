@@ -65,8 +65,6 @@
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
-(def subscription-callback "/subscription-completed")
-
 (def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")

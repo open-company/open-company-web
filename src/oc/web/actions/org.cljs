@@ -20,6 +20,7 @@
             [oc.web.actions.cmail :as cmail-actions]
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -199,6 +200,8 @@
   (utils/after 100 maybe-show-integration-added-notification?)
   (fullstory/track-org org-data)
   (chat/identify) ; Intercom
+
+  (payments-actions/maybe-load-payments-data org-data complete-refresh?)
 
   ;; Change page title when an org page is loaded
   (set! (.-title js/document) (str "Carrot | " (:name org-data))))

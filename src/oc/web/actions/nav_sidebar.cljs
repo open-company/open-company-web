@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -21,7 +22,7 @@
 ;; :integrations
 ;; :team
 ;; :invite
-;; :billing
+;; :payments
 ;; :profile
 ;; :notifications
 ;; :reminders
@@ -149,7 +150,9 @@
 
 (defn show-org-settings [panel]
   (if panel
-    (push-panel panel)
+    (when (or (not= panel :payments)
+              ls/payments-enabled)
+      (push-panel panel))
     (pop-panel)))
 
 (defn show-user-settings [panel]

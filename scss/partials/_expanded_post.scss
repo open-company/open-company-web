@@ -1,14 +1,12 @@
 div.expanded-post {
   width: 640px;
   margin: 0 auto;
-  padding: #{$navbar_height}px 0 24px;
+  padding: 0 0 24px;
 
   @include mobile() {
     width: 100%;
-    padding: 16px;
-    margin-top: 56px;
     background-color: white;
-    padding: 16px;
+    padding: 24px 16px 16px;
 
     // Add some extra padding on android at the bottom
     // to make sure the add comment field is not hidden
