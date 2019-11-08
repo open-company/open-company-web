@@ -35,12 +35,14 @@
     (str currency-symbol int-plan-amount "." decimal-plan-amount)))
 
 (defn- plan-price [plan-data quantity]
-  (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %)))
-                                  (not (:up-to %))) (:tiers plan-data)))
-        tier-price (if (:up-to tier)
-                     (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
-                     (* quantity (:unit-amount tier)))]
-    (plan-amount-to-human tier-price (:currency plan-data))))
+  (if-not (seq (:tiers plan-data))
+    (plan-amount-to-human (* (:amount plan-data) quantity) (:currency plan-data))
+    (let [tier (first (filterv #(or (and (:up-to %) (<= quantity (:up-to %))) (not (:up-to %)))
+                (:tiers plan-data)))
+          tier-price (if (:up-to tier)
+                       (+ (:flat-amount tier) (* quantity (:unit-amount tier)))
+                       (* quantity (:unit-amount tier)))]
+      (plan-amount-to-human tier-price (:currency plan-data)))))
 
 (defn- plan-minimum-price [plan-data]
   (let [tier (first (:tiers plan-data))]
@@ -101,7 +103,7 @@
           next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
           current-plan (:plan subscription-data)
           checkout-result @(::checkout-result s)
-          quantity (-> subscription-data :upcoming-invoice :line-items first :quantity)] ;; Number of active/unverified users
+          quantity (:quantity subscription-data)] ;; Number of active/unverified users
       [:div.plan-summary
         (when (true? checkout-result)
           [:div.plan-summary-details.success.bottom-margin
@@ -218,7 +220,7 @@
   (let [initial-plan @(::initial-plan s)
         current-plan (::payments-plan s)
         subscription-data (payments-actions/get-active-subscription payments-data)
-        quantity (-> payments-data :upcoming-invoice :line-items first :quantity) ;; Number of active/unverified users
+        quantity (:quantity subscription-data) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:interval %) "month") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:interval %) "year") (:available-plans payments-data)))
         current-plan-data (if @(::plan-has-changed s)
@@ -228,7 +230,9 @@
         different-plans-price-span (different-plans-price (:available-plans payments-data) quantity)
         up-to (-> current-plan-data :tiers first :up-to)
         flat-amount (plan-amount-to-human (-> current-plan-data :tiers first :flat-amount) (:currency current-plan-data))
-        unit-amount (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
+        unit-amount (if (seq (:tiers current-plan-data))
+                      (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
+                      (plan-amount-to-human (:amount current-plan-data) (:currency current-plan-data)))
         available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
         has-payment-info? (seq (:payment-methods payments-data))
         is-annual-default-plan? (= (:nickname current-plan-data) "Annual")

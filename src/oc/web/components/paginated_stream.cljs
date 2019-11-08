@@ -150,6 +150,7 @@
                         mixins/first-render-mixin
                         (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
                         section-mixins/container-nav-in
+                        section-mixins/window-focus-auto-loader
 
                         {:will-mount (fn [s]
                           (check-pagination s)
