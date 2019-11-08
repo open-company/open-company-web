@@ -180,6 +180,22 @@ div.payments-settings-modal {
             line-height: 18px;
             color: $deep_navy;
           }
+
+          button.cancel-subscription-bt {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: rgba($deep_navy, 0.5);
+            line-height: 18px;
+            margin: 0;
+            padding: 0;
+            margin-right: 8px;
+
+            @include big_web() {
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
         }
 
         button.change-pay-method-bt {
