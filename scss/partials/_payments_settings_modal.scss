@@ -1,0 +1,392 @@
+div.payments-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+
+    @include mobile() {
+      left: 16px;
+      top: 11px;
+      right: unset;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: $ultra_light_grey;
+      border-radius: 4px;
+    }
+  }
+
+  div.payments-settings-modal-container {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+    }
+
+    div.payments-settings-header {
+      width: calc(100% + 48px);
+      height: #{navbar_height}px;
+      margin-left: -24px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid $divider_line_grey;
+        background-color: white;
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
+      }
+
+      div.payments-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+
+        @include mobile() {
+          float: unset;
+          text-align: center;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+      
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        background-color: $carrot_green;
+        border-radius: 4px;
+        color: white;
+        line-height: 18px;
+        margin-left: 8px;
+        float: right;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+
+    div.payments-settings-body {
+      margin-top: 24px;
+
+      div.plan-summary-separator {
+        margin-top: 16px;
+        height: 1px;
+        width: 100%;
+        background-color: rgba($deep_navy, 0.1);
+      }
+
+      .bottom-margin {
+        margin-bottom: 24px;
+      }
+
+      div.plan-summary {
+        margin-top: 24px;
+
+        div.plan-summary-details {
+          margin-top: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
+
+          &.success, &.expiration-trial {
+            @include OC_Body_Bold();
+            text-align: center;
+            font-size: 14px;
+            background-color: transparent;
+            max-width: 216px;
+            margin-left: auto;
+            margin-right: auto;
+
+            div.emoji-icon {
+              text-align: center;
+              margin: 0 auto 8px;
+              font-size: 32px;
+              line-height: 38px;
+            }
+          }
+
+          button, a {
+            color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            text-decoration: none;
+            padding: 0;
+            margin: 0;
+          }
+
+          strong {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: $deep_navy;
+          }
+
+          button.cancel-subscription-bt {
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: rgba($deep_navy, 0.5);
+            line-height: 18px;
+            margin: 0;
+            padding: 0;
+            margin-right: 8px;
+
+            @include big_web() {
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+
+        button.change-pay-method-bt {
+          display: block;
+        }
+      }
+
+      div.plan-change {
+        position: relative;
+
+        button.plans-dropdown-bt {
+          width: 100%;
+          padding: 7px 8px;
+          height: 32px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 22px;
+          margin: 0;
+          text-align: left;
+          background-color: rgba($deep_navy, 0.1);
+          border-radius: 4px;
+          position: relative;
+          opacity: 1;
+
+          @include big_web() {
+            &:not(.disabled):hover {
+              background-color: rgba($deep_navy, 0.2);
+            }
+          }
+
+          @include mobile() {
+            height: 40px;
+            padding: 11px 8px;
+          }
+
+          &:after {
+            color: $deep_navy;
+            background-image: cdnUrl("/img/ML/select_arrows.svg");
+            width: 8px;
+            height: 10px;
+            content: "";
+            position: absolute;
+            right: 8px;
+            top: 11px;
+
+            @include mobile() {
+              top: 15px;
+            }
+          }
+        }
+
+        div.plan-change-dropdown {
+          position: relative;
+          width: 100%;
+
+          div.dropdown-list-container {
+            width: 100%;
+            top: 0;
+            left: 0;
+
+            div.triangle {
+              display: none;
+            }
+
+            div.dropdown-list-content {
+              box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
+              padding: 0;
+              border: 1px solid $carrot_light_gray_1;
+              border-radius: 4px;
+              margin: 0;
+              padding: 8px 0;
+
+              ul.dropdown-list {
+                border: none;
+                border-radius: 4px;
+
+                li.dropdown-list-item {
+                  padding: 4px 13px;
+                  margin: 0;
+                  border-radius: 0;
+
+                  &.select {
+                    background-color: #ebf8f1;
+                    span.dropdown-list-item-label {
+                      color: $carrot_green;
+                    }
+                  }
+
+                  @include big_web() {
+                    &.select {
+                      background-color: #ebf8f1;
+                      span.dropdown-list-item-label {
+                        color: $carrot_green;
+                        text-decoration: none;
+                      }
+                    }
+                  }
+
+                  span.dropdown-list-item-label {
+                    @include OC_Body_Book();
+                    font-size: 14px;
+                    color: $deep_navy;
+                    line-height: 22px;
+                    opacity: 1;
+                    padding: 0;
+                    text-decoration: none;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        div.plan-change-description {
+          margin-top: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
+        }
+
+        div.plan-change-details {
+          margin-top: 16px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy;
+
+          &.success, &.expiration-trial {
+            @include OC_Body_Bold();
+            text-align: center;
+            font-size: 14px;
+            background-color: transparent;
+            max-width: 216px;
+            margin-left: auto;
+            margin-right: auto;
+
+            div.emoji-icon {
+              text-align: center;
+              margin: 0 auto 8px;
+              font-size: 32px;
+              line-height: 38px;
+            }
+          }
+
+          button, a {
+            color: $carrot_green;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            text-decoration: none;
+            padding: 0;
+            margin: 0;
+          }
+
+          strong {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+            color: $deep_navy;
+          }
+        }
+
+        div.plan-change-separator {
+          margin-top: 16px;
+          height: 1px;
+          width: 100%;
+          background-color: rgba($deep_navy, 0.1);
+        }
+
+        div.plan-change-title {
+          margin-top: 16px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 18px;
+          color: $deep_navy; 
+        }
+
+        button.payment-info-bt {
+          height: 32px;
+          background-color: $carrot_green;
+          border-radius: 4px;
+          @include OC_Body_Bold();
+          color: white;
+          padding: 7px 16px;
+          font-size: 14px;
+          line-height: 18px;
+          margin: 8px 0 24px;
+        }
+      }
+    }
+  }
+}

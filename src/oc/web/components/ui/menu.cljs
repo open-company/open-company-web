@@ -65,6 +65,10 @@
   (.preventDefault e)
   (nav-actions/show-reminders))
 
+(defn payments-click [e]
+  (.preventDefault e)
+  (nav-actions/show-org-settings :payments))
+
 (defn- detect-desktop-app
   []
   (when-not ua/desktop-app?
@@ -84,6 +88,7 @@
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
+                  (drv/drv :expo-app-version)
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -101,13 +106,17 @@
         expanded-user-menu (= (last panel-stack) :menu)
         org-slug (router/current-org-slug)
         is-admin-or-author? (#{:admin :author} user-role)
+        expo-app-version (drv/react s :expo-app-version)
         show-invite-people? (and org-slug
                                  is-admin-or-author?)
         desktop-app-data (detect-desktop-app)
         app-version (cond
-                      ua/mobile-app? (str "Version " (expo/get-app-version))
+                      ua/mobile-app? (str "Version " expo-app-version)
                       ua/desktop-app? (get-desktop-version)
-                      :else "")]
+                      :else "")
+        show-billing? (and ls/payments-enabled
+                           (= user-role :admin)
+                           (router/current-org-slug))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -183,12 +192,14 @@
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
-        ; (when (and org-slug
-        ;            (= user-role :admin))
-        ;   [:a {:href "#" :on-click #(js/alert "Coming soon")} 
-        ;     [:div.oc-menu-item
-        ;       "Billing"]])
-        (when-not is-mobile?
+        (when show-billing?
+          [:a.payments
+            {:href "#"
+             :on-click payments-click}
+            [:div.oc-menu-item
+              "Billing"]])
+        (when (or (not is-mobile?)
+                  show-billing?)
           [:div.oc-menu-separator])
         [:a.whats-new-link
           (if ua/mobile?

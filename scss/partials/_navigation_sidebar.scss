@@ -247,6 +247,7 @@ div.left-navigation-sidebar {
   max-height: calc(100vh - #{$navbar_height + 1}px);
   overflow-y: auto;
   overflow-x: visible;
+  overflow: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
   left: 0;
@@ -287,7 +288,7 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-content {
     width: #{$left_navigation_sidebar_width}px;
     height: 100%;
-    overflow-x: hidden;
+    overflow-x: visible;
     overflow-y: auto;
 
     &.can-compose {
@@ -652,6 +653,8 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-footer {
     position: relative;
     width: 100%;
+    overflow: visible;
+    padding: 16px;
 
     @include mobile() {
       button {
@@ -660,17 +663,39 @@ div.left-navigation-sidebar {
       }
     }
 
+    div.trial-expired-alert-container {
+      display: none;
+    }
+
+    &.show-trial-expired-alert {
+      &, button.compose-green-bt {
+        cursor: not-allowed;
+      }
+
+      div.trial-expired-alert-container {
+        cursor: default;
+      }
+
+      @include big_web() {
+        &:hover {
+          div.trial-expired-alert-container {
+            display: block;
+          }
+        }
+      }
+    }
+
     button.compose-green-bt {
       border-radius: 6px;
       background-color: $carrot_green;
-      margin: 16px;
       text-align: center;
       display: flex;
       justify-content: center;
       align-items: center;
-      width: calc(100% - 32px);
+      width: 100%;
       height: 40px;
       opacity: 1;
+      position: relative;
 
       @include big_web() {
         &:hover {

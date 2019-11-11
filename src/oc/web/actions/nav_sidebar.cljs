@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -23,7 +24,7 @@
 ;; :invite-picker
 ;; :invite
 ;; :invite-link
-;; :billing
+;; :payments
 ;; :profile
 ;; :notifications
 ;; :reminders
@@ -31,30 +32,6 @@
 ;; :section-add
 ;; :section-edit
 ;; :wrt-{uuid}
-
-(defn- refresh-board-data [board-slug sort-type]
-  (when (and (not (router/current-activity-id))
-             board-slug)
-    (let [org-data (dis/org-data)
-          board-data (if (#{"all-posts" "follow-ups"} board-slug)
-                       (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
-                       (dis/board-data board-slug))]
-       (cond
-
-        (= board-slug "all-posts")
-        (activity-actions/all-posts-get org-data)
-
-        (= board-slug "follow-ups")
-        (activity-actions/follow-ups-sort-get org-data)
-
-        :default
-        (let [board-rel (if (= sort-type dis/other-sort-type)
-                          ["item" "self"]
-                          "activity")]
-          (when-let* [fixed-board-data (or board-data
-                       (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
-            (section-actions/section-get sort-type board-link)))))))
 
 (defn nav-to-url! [e board-slug url]
   (when (and e
@@ -84,7 +61,7 @@
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (utils/after 0 #(refresh-board-data board-slug sort-type)))))
+         (utils/after 0 #(activity-actions/refresh-board-data board-slug sort-type)))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications))))
 
@@ -175,7 +152,9 @@
 
 (defn show-org-settings [panel]
   (if panel
-    (push-panel panel)
+    (when (or (not= panel :payments)
+              ls/payments-enabled)
+      (push-panel panel))
     (pop-panel)))
 
 (defn show-user-settings [panel]
