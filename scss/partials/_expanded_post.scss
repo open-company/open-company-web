@@ -137,8 +137,13 @@ div.expanded-post {
         margin: 0 0 0 9px;
         opacity: 1;
 
+        &:first-child {
+          border-radius: 4px;
+          border-left: none;
+        }
+
         &:not(.disabled):hover, &:not(.disabled):active {
-          background-color: transparent;
+          background-color: rgba($deep_navy, 0.2);
         }
       }
 
