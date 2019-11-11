@@ -19,6 +19,15 @@
 
 ;; Data key paths
 
+(def checkout-result-key :checkout-success-result)
+(def checkout-update-plan-key :checkout-update-plan)
+
+(def expo-key [:expo])
+
+(def expo-deep-link-origin-key (vec (conj expo-key :deep-link-origin)))
+(def expo-app-version-key (vec (conj expo-key :app-version)))
+(def expo-push-token-key (vec (conj expo-key :push-token)))
+
 (def api-entry-point-key [:api-entry-point])
 
 (def auth-settings-key [:auth-settings])
@@ -36,6 +45,9 @@
 
 (defn boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
+
+(defn payments-key [org-slug]
+  (vec (conj (org-key org-slug) :payments)))
 
 (defn posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
@@ -108,8 +120,6 @@
 
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
-
-(def expo-push-token-key [:expo-push-token])
 
 ;; Reminders
 
@@ -197,6 +207,11 @@
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
+   checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
+   checkout-update-plan-key [[:base] (fn [base] (get base checkout-update-plan-key))]
+   :expo                [[:base] (fn [base] (get-in base expo-key))]
+   :expo-deep-link-origin [[:base] (fn [base] (get-in base expo-deep-link-origin-key))]
+   :expo-app-version    [[:base] (fn [base] (get-in base expo-app-version-key))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -213,7 +228,7 @@
                                      (router/current-secure-activity-id))
                               (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
                               (:current-user-data base)))]
-   :subscription        [[:base] (fn [base] (:subscription base))]
+   :payments        [[:base :org-slug] (fn [base org-slug] (get-in base (payments-key org-slug)))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
@@ -399,12 +414,13 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading]
-                              {:jwt jwt
+                                 show-sections-picker entry-editing jwt wrt-show loading payments]
+                              {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
+                               :payments-data payments
                                :container-data container-data
                                :board-data board-data
                                :initial-section-editing (:initial-section-editing base)
@@ -457,6 +473,16 @@
 
 (defn dispatch! [payload]
   (flux/dispatch actions payload))
+
+;; Payments
+
+(defn payments-data
+  ([]
+    (payments-data @app-state (router/current-org-slug)))
+  ([org-slug]
+   (payments-data @app-state org-slug))
+  ([data org-slug]
+   (get-in data (payments-key org-slug))))
 
 ;; Data
 
@@ -728,6 +754,20 @@
   ([org-slug data]
     (get-in data (reminder-edit-key org-slug))))
 
+;; Expo
+
+(defn expo-deep-link-origin
+  ([] (expo-deep-link-origin @app-state))
+  ([data] (get-in data expo-deep-link-origin-key)))
+
+(defn expo-app-version
+  ([] (expo-app-version @app-state))
+  ([data] (get-in data expo-app-version-key)))
+
+(defn expo-push-token
+  ([] (expo-push-token @app-state))
+  ([data] (get-in data expo-push-token-key)))
+
 ;; Debug functions
 
 (defn print-app-state []
@@ -804,6 +844,9 @@
 (defn print-panel-stack []
   (:panel-stack @app-state))
 
+(defn print-payments-data []
+  (payments-data @app-state (router/current-org-slug)))
+
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
 (set! (.-OCWebPrintTeamData js/window) print-team-data)
@@ -824,6 +867,7 @@
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
 (set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
+(set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:app_state app-state
                                     :deref cljs.core.deref

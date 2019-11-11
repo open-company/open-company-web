@@ -50,8 +50,7 @@
                                   (reset! (:me/showing-gif-selector s) false))))
                                {:did-mount (fn [s]
                                  (let [props (first (:rum/args s))]
-                                   (when-not (:nux props)
-                                     (utils/after 300 #(me-media-utils/setup-editor s body-on-change (first (:rum/args s))))))
+                                   (utils/after 300 #(me-media-utils/setup-editor s body-on-change (first (:rum/args s)))))
                                  s)
                                 :did-remount (fn [o s]
                                  (me-media-utils/setup-editor s body-on-change (first (:rum/args s)))
@@ -82,7 +81,6 @@
                                    (.destroy @(:me/editor s)))
                                  s)}
   [s {:keys [initial-body
-             nux
              on-change
              classes
              show-placeholder
@@ -90,15 +88,17 @@
              dispatch-input-key
              attachment-dom-selector
              fullscreen
-             cmail-key]}]
+             cmail-key
+             paywall?]}]
   (let [_team-roster (drv/react s :team-roster)
         _media-input (drv/react s :media-input)]
     [:div.rich-body-editor-outer-container
-      {:key (str "rich-body-editor-" cmail-key)}
+      {:key (str "rich-body-editor-" cmail-key)
+       :class (when paywall? "block-edit")}
       [:div.rich-body-editor-container
         [:div.rich-body-editor.oc-mentions.oc-mentions-hover.editing
           {:ref "editor-node"
-           :content-editable (not nux)
+           :content-editable (not paywall?)
            :class (str classes
                    (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
                                      :uploading @(:me/upload-lock s)}))

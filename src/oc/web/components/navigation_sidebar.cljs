@@ -14,6 +14,7 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]

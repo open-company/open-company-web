@@ -17,7 +17,6 @@ function OCWebHelp(){
               "OCWebPrintOrgData(): to print the current org data\n" +
               "OCWebPrintPanelStack(): to print the right side panel state\n" +
               "OCWebPrintPostsData()\n"+
-              "OCWebPrintQSGData(): to print the quick state guide data\n" +
               "OCWebPrintReactionsData(): to print the current activity reactiosn data\n" +
               "OCWebPrintRemindersData()\n" +
               "OCWebPrintRemindersEditData()\n" +
@@ -25,7 +24,8 @@ function OCWebHelp(){
               "OCWebPrintSecureActivityData()\n" +
               "OCWebPrintTeamData(): to print the current team data\n" +
               "OCWebPrintTeamRoster(): to print the current team roster of users\n" +
-              "OCWebPrintUserNotifications()\n\n" +
+              "OCWebPrintUserNotifications(): to print the notifications\n" +
+              "OCWebPrintPaymentsData(): to print the payments data\n" +
               "OCWebHelp(): print this help\n")
 }
 

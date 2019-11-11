@@ -244,6 +244,7 @@ div.left-navigation-sidebar {
   position: fixed;
   overflow-y: auto;
   overflow-x: visible;
+  overflow: visible;
   width: #{$left_navigation_sidebar_width}px;
   top: #{$navbar_height}px;
   // height: calc(100vh - #{$navbar_height + 1}px);
@@ -709,11 +710,35 @@ div.left-navigation-sidebar {
   div.left-navigation-sidebar-footer {
     position: relative;
     width: 100%;
+    overflow: visible;
+    padding: 16px;
 
     @include mobile() {
       button {
         width: 100%;
         text-align: left;
+      }
+    }
+
+    div.trial-expired-alert-container {
+      display: none;
+    }
+
+    &.show-trial-expired-alert {
+      &, button.compose-green-bt {
+        cursor: not-allowed;
+      }
+
+      div.trial-expired-alert-container {
+        cursor: default;
+      }
+
+      @include big_web() {
+        &:hover {
+          div.trial-expired-alert-container {
+            display: block;
+          }
+        }
       }
     }
 
@@ -727,6 +752,7 @@ div.left-navigation-sidebar {
       width: 100%;
       height: 40px;
       opacity: 1;
+      position: relative;
 
       @include big_web() {
         &:hover {

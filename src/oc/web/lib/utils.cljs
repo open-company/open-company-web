@@ -375,8 +375,10 @@
       :else (recur (inc idx) (rest items)))))
 
 (def network-error
- {:title "Network error"
-  :description "Shoot, looks like there might be a connection issue. Please try again."
+ {:title "Network request"
+  :description (if ua/pseudo-native?
+                "Probably just a temporary issue. Please try again later if this persists."
+                "Probably just a temporary issue. Please refresh if this persists.")
   :server-error true
   :id :generic-network-error
   :dismiss true})
