@@ -27,8 +27,9 @@ div.stream-comments {
       position: relative;
 
       @include big_web() {
-        width: calc(100% + 8px);
+        width: calc(100% + 16px);
         padding-left: 8px;
+        padding-right: 8px;
         margin-left: -8px;
 
         &.not-highlighted.open-thread:hover {
