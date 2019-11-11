@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -355,7 +356,17 @@
 (defn- initial-setup
   "Setup the view data, need to make sure the payments data have been loaded to show it."
   [s]
-  (let [payments-data @(drv/get-ref s :payments)]
+  (let [payments-data @(drv/get-ref s :payments)
+        org-data @(drv/get-ref s :org-data)
+        current-user-data @(drv/get-ref s :current-user-data)
+        user-role (user-store/user-role org-data current-user-data)]
+    ;; If user is not an admin
+    (when (and org-data
+               current-user-data
+               (seq user-role)
+               (not= user-role :admin))
+      ;; Dismiss payments panel
+      (nav-actions/close-all-panels))
     (when (and (not @(::initial-setup s))
                payments-data)
       (reset! (::initial-setup s) true)
@@ -388,6 +399,7 @@
   rum/reactive
   (drv/drv :org-data)
   (drv/drv :payments)
+  (drv/drv :current-user-data)
   (drv/drv dis/checkout-result-key)
   (drv/drv dis/checkout-update-plan-key)
   ui-mixins/refresh-tooltips-mixin
