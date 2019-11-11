@@ -363,7 +363,7 @@
     ;; If user is not an admin
     (when (and org-data
                current-user-data
-               (seq user-role)
+               (seq (str user-role))
                (not= user-role :admin))
       ;; Dismiss payments panel
       (nav-actions/close-all-panels))
