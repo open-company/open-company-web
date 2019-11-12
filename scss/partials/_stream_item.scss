@@ -323,6 +323,8 @@ div.stream-item {
         @include mobile() {
           width: 95px;
           top: 0;
+          // Remove thumbnails from mobile for now
+          display: none;
 
           img.body-thumbnail {
             max-height: 72px;
@@ -363,19 +365,13 @@ div.stream-item {
         min-height: 80px;
 
         @include mobile() {
-          width: calc(100% - 106px - 16px);
+          width: 100%;
         }
       }
 
       @include tablet() {
         width: 100%;
         margin: 0;
-      }
-
-      &.has-thumbnail {
-        @include tablet() {
-          width: calc(100% - 106px - 16px);
-        }
       }
 
       &.has-video {
