@@ -44,6 +44,7 @@
                     rum/reactive
                     (drv/drv user-store/signup-with-email)
                     (drv/drv :auth-settings)
+                    (drv/drv :expo-deep-link-origin)
                     (rum/local false ::email-error)
                     (rum/local false ::password-error)
                     (rum/local "" ::email)
@@ -53,7 +54,8 @@
                       s)}
   [s]
   (let [signup-with-email (drv/react s user-store/signup-with-email)
-        auth-settings (drv/react s :auth-settings)]
+        auth-settings (drv/react s :auth-settings)
+        deep-link-origin (drv/react s :expo-deep-link-origin)]
     [:div.onboard-lander.lander
       [:div.main-cta
         [:div.mobile-header
@@ -74,7 +76,7 @@
                                              {:auth-source "slack"})]
                          (user-actions/login-with-slack auth-link
                                                         (when ua/mobile-app?
-                                                          {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                          {:redirect-origin deep-link-origin}))))}
           "Continue with Slack"
           [:div.slack-icon
             {:aria-label "slack"}]]
@@ -86,7 +88,7 @@
                                                             {:auth-source "google"})]
                          (user-actions/login-with-google auth-link
                                                          (when ua/mobile-app?
-                                                           {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                           {:redirect-origin deep-link-origin}))))}
           "Continue with Google"
           [:div.google-icon
             {:aria-label "google"}]]
@@ -155,7 +157,12 @@
           "Already have an account?"
           [:a {:href (if ua/pseudo-native?
                        oc-urls/native-login
-                       oc-urls/login)}
+                       oc-urls/login)
+               :on-click (fn [e]
+                           (utils/event-stop e)
+                           (router/nav! (if ua/pseudo-native?
+                            oc-urls/native-login
+                            oc-urls/login)))}
            "Sign in"]]]]))
 
 (defn- profile-setup-team-data
@@ -303,7 +310,9 @@
             :aria-label "Continue"}
             "Continue"]]
         [:div.title.about-yourself
-          "Tell us about you"]]
+          (if has-org?
+           "Tell us about you"
+           "Create your team")]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -394,7 +403,7 @@
                                   (check-email-domain cleaned-email-domain s))))
                  :placeholder "@domain.com"}]
             [:div.field-label.info
-              "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."]])
+              "When someone signs up with this email domain, they'll join your team."]])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -812,7 +821,7 @@
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]]
         [:div.title.about-yourself
-          "Tell us a bit about you"]
+          "Tell us about you"]
         (when (:error edit-user-profile)
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]

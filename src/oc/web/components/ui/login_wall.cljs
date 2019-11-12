@@ -18,17 +18,17 @@
 (rum/defcs login-wall < rum/reactive
                         (drv/drv :auth-settings)
                         (drv/drv :login-with-email-error)
+                        (drv/drv :expo-deep-link-origin)
                         (rum/local "" ::email)
                         (rum/local "" ::pswd)
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
+        deep-link-origin (drv/react s :expo-deep-link-origin)
         login-enabled (and auth-settings
-                           (not (nil?
-                            (utils/link-for
-                             (:links auth-settings)
-                             "authenticate"
-                             "GET"
-                             {:auth-source "email"}))))
+                           (seq (utils/link-for (:links auth-settings) "authenticate" "GET"
+                            {:auth-source "email"}))
+                           (seq @(::email s))
+                           (seq @(::pswd s)))
         login-action #(when login-enabled
                         (.preventDefault %)
                         (user-actions/maybe-save-login-redirect)
@@ -64,7 +64,7 @@
                                (user-actions/maybe-save-login-redirect)
                                (user-actions/login-with-slack auth-link
                                                               (when ua/mobile-app?
-                                                                {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                                {:redirect-origin deep-link-origin}))))}
                 [:div.signup-with-slack-content
                   [:div.slack-icon
                     {:aria-label "slack"}]
@@ -78,7 +78,7 @@
                                (user-actions/maybe-save-login-redirect)
                                (user-actions/login-with-google auth-link
                                                                (when ua/mobile-app?
-                                                                 {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                                 {:redirect-origin deep-link-origin}))))}
                [:div.signup-with-google-content
                  [:div.google-icon
                   {:aria-label "google"}]
@@ -133,11 +133,9 @@
                         "Forgot password?"]]]
                   [:button.mlb-reset.continue-btn
                     {:aria-label "Login"
-                     :class (when-not login-enabled "disabled")
-                     :on-click login-action
-                     :disabled (or (not (seq @(::email s)))
-                                   (not (seq @(::pswd s))))}
-                    "Login"]
+                     :disabled (not login-enabled)
+                     :on-click login-action}
+                    "Log in"]
                   [:div.footer-link
                     "Don't have an account yet?"
                     [:a
@@ -145,5 +143,5 @@
                        :on-click (fn [e]
                                    (utils/event-stop e)
                                    (router/nav! oc-urls/sign-up))}
-                      "Sign up here"]]
-                 ]]]]]])))
+                      "Sign up here"]]]
+               ]]]]])))

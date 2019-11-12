@@ -135,12 +135,14 @@
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
               (comments-summary activity-data)
-              (reactions activity-data)]
+              (reactions {:entity-data activity-data})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])
             (when comments-data
-              (stream-comments activity-data comments-data add-comment-highlight))
+              (stream-comments {:activity-data activity-data
+                                :comments-data comments-data
+                                :new-added-comment add-comment-highlight}))
             (when (:can-comment activity-data)
               (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
             [:div.secure-activity-footer
@@ -150,7 +152,8 @@
                   "Log in required to access all posts"]
                 [:a.sent-via-carrot
                   {:href oc-urls/home}
-                  "Learn more about Carrot"])]])
+                  [:div.sent-via-carrot-copy
+                    "Sent by Carrot"]])]])
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))

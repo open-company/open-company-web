@@ -11,6 +11,7 @@
     ;; NB: Need to change Clojure version in boot.properties in sync with this
     [org.clojure/clojure "1.10.1-RC1"] ; Lisp on the JVM http://clojure.org/documentation
     [org.clojure/clojurescript "1.10.520"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/core.rrb-vector "0.1.0"] ; Indirect dependency of many libs, >= 0.0.13 required for Java 11+ https://github.com/clojure/core.rrb-vector
 
     ;; Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes access
@@ -252,7 +253,6 @@
 (deftask prod-build
   "OC Production build."
   []
-  (set-env! :dependencies #(into % '[[binaryage/devtools "0.9.8"]]))
   (comp (from-jars)
         (sass :output-style :compressed)
         (build-prod-site)
@@ -260,12 +260,7 @@
               :optimizations :advanced
               :source-map true
               :compiler-options {:parallel-build true
-                                 :externs ["public/js/externs.js"]
-                                 :preloads '[devtools.preload]
-                                 :external-config {
-                                  :devtools/config {
-                                    :print-config-overrides true
-                                    :disable-advanced-mode-check true}}})))
+                                 :externs ["public/js/externs.js"]})))
 
 (deftask check-sources!
   "Check source files with yagni, eastwood, kibit and bikeshed."

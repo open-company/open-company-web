@@ -1,14 +1,12 @@
 div.expanded-post {
   width: 640px;
   margin: 0 auto;
-  padding: #{$navbar_height}px 0 24px;
+  padding: 0 0 24px;
 
   @include mobile() {
     width: 100%;
-    padding: 16px;
-    margin-top: 56px;
     background-color: white;
-    padding: 16px;
+    padding: 24px 16px 16px;
 
     // Add some extra padding on android at the bottom
     // to make sure the add comment field is not hidden
@@ -271,8 +269,8 @@ div.expanded-post {
   }
 
   div.expanded-post-headline {
-    @include activity-title(36px, 40px);
-    margin-top: 32px;
+    @include activity-title(26px, 33px);
+    margin-top: 40px;
 
     @include mobile() {
       @include activity-title(22px, 28px);
@@ -345,7 +343,7 @@ div.expanded-post {
   }
 
   div.expanded-post-abstract {
-    @include activity-abstract(18px, 24px);
+    @include activity-abstract(16px, 20px);
     margin: 16px 0 24px;
     @include OC_Body_Bold();
     white-space: pre-wrap;
@@ -364,11 +362,12 @@ div.expanded-post {
   }
 
   div.expanded-post-body {
-    @include activity-body(18, 24, $deep_navy);
+    @include activity-body(17, 22, $deep_navy);
     margin-top: 16px;
 
     @include mobile() {
       margin-top: 8px;
+      @include activity-body(18, 24, $deep_navy);
     }
 
     .interactive-image {
@@ -393,7 +392,7 @@ div.expanded-post {
   // }
 
   div.expanded-post-footer {
-    margin-top: 16px;
+    margin-top: 24px;
     min-height: 26px;
     position: relative;
 
@@ -413,23 +412,11 @@ div.expanded-post {
     div.is-comments {
       margin-right: 16px;
       float: left;
-
-      div.is-comments-authors.show-border {
-        div.is-comments-author {
-          background-color: $grey_num_2;
-          border: 2px solid $grey_num_2;
-
-          @include mobile(){
-            background-color: white;
-            border: 2px solid white;
-          }
-        }
-      }
     }
 
     div.reactions {
       float: left;
-      margin-right: 16px;
+      margin-right: 14px;
 
       @include mobile() {
         margin-top: 13px;
@@ -463,6 +450,7 @@ div.expanded-post {
   }
 
   div.expanded-post-comments {
+    border-top: 1px solid rgba($deep_navy, 0.15);
     padding-bottom: 0;
     margin-top: 24px;
 
@@ -470,11 +458,6 @@ div.expanded-post {
       margin-top: 16px;
       width: 100%;
       padding: 16px 0;
-    }
-
-    div.stream-comments {
-      width: calc(100% + 32px);
-      margin-left: -16px;
     }
   }
 }

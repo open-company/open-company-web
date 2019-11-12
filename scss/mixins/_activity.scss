@@ -252,20 +252,25 @@ $h2_top_margin: 24;
 
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     @include OC_Body_Bold();
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
-    color: $grey_num_1;
+    font-size: $font_size;
+    line-height: $line_height;
+    color: rgba($deep_navy, 0.5);
     opacity: 1;
-    font-style: none !important;
+    font-style: normal;
+    text-transform: none;
   }
 
   p, ul > li, i {
-    min-height: #{$line_height}px;
+    min-height: $line_height;
   }
 
-  i:empty, li:empty {
+  i:empty {
     display: grid;
     min-width: 1px;
+  }
+
+  p:only-child {
+    margin-bottom: 0;
   }
 }
 
@@ -326,7 +331,7 @@ $h2_top_margin: 24;
     border-left: 4px solid $ultra_light_grey;
   }
 
-  i:empty, b:empty, strong:empty, li:empty {
+  i:empty, b:empty, strong:empty {
     display: grid;
     min-width: 1px;
   }
@@ -609,13 +614,13 @@ $h2_top_margin: 24;
 }
 
 
-@mixin activity-comment(){
+@mixin activity-comment($font-size: 18px, $line-height: 24px){
   @include OC_Body_Book();
-  font-size: 18px;
+  font-size: $font-size;
   color: $deep_navy;
   white-space: pre-wrap;
   word-wrap: break-word;
-  line-height: 24px;
+  line-height: $line-height;
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -676,6 +681,8 @@ $h2_top_margin: 24;
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
     color: rgba($deep_navy, 0.5);
     font-style: normal;
+    font-size: $font-size;
+    line-height: $line-height;
   }
 
   img, a > img {
@@ -693,7 +700,7 @@ $h2_top_margin: 24;
     width: 100% !important;
   }
 
-  i:empty, b:empty, strong:empty, li:empty {
+  i:empty, b:empty, strong:empty {
     display: grid;
     min-width: 1px;
   }
@@ -744,6 +751,6 @@ $h2_top_margin: 24;
   }
 
   p, ul > li, i {
-    min-height: 24px;
+    min-height: $line-height
   }
 }

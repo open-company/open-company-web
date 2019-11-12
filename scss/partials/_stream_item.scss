@@ -1,3 +1,9 @@
+$foc_background_color: transparent;
+$mobile_foc_background_color: rgba($deep_navy, 0.05);
+$foc_hover_color: #F5F5F5;
+$foc_new_color: white;
+$foc_divider_line_color: rgba($deep_navy, 0.15);
+
 div.stream-item {
   display: flex;
   flex-direction: column;
@@ -5,34 +11,20 @@ div.stream-item {
   width: #{$board_container_width}px;
   height: #{$foc_height}px;
   margin: 0;
-  border-bottom: 1px solid $ultra_light_grey;
-  padding: 24px 40px;
+  border-bottom: 1px solid $foc_divider_line_color;
+  padding: 24px 32px;
+  background-color: $foc_background_color;
 
   &.expandable {
     cursor: pointer;
 
     @include big_web() {
       &:hover {
-        background-color: #F5F5F5;
+        background-color: $foc_hover_color;
 
         div.stream-item-header {
           div.more-menu button {
             display: initial;
-          }
-        }
-
-        div.stream-item-body-ext {
-          div.stream-item-footer {
-            div.stream-item-comments-summary {
-              div.is-comments {
-                div.is-comments-authors.show-border {
-                  div.is-comments-author {
-                    background-color: #F5F5F5;
-                    border: 2px solid #F5F5F5;
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -44,9 +36,10 @@ div.stream-item {
     margin: 0;
     border-radius: 0;
     border-top: none;
-    border-bottom: 1px solid $divider_line_grey;
-    background-color: $grey_num_4;
-    padding: 16px 16px 22px;
+    border-bottom: 1px solid $foc_divider_line_color;
+    background-color: $mobile_foc_background_color;
+    padding: 16px 16px 16px;
+    height: #{$mobile_foc_height}px;
   }
 
   &.draft {
@@ -54,7 +47,7 @@ div.stream-item {
   }
 
   &.unread-item {
-    background-color: white;
+    background-color: $foc_new_color;
     z-index: 1;
     position: relative;
 
@@ -64,39 +57,9 @@ div.stream-item {
 
     @include big_web(){
       &:hover {
-        background-color: white;
+        background-color: $foc_new_color;
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-
-        div.stream-item-body-ext {
-          div.stream-item-footer {
-            div.stream-item-comments-summary {
-              div.is-comments {
-                div.is-comments-authors.show-border {
-                  div.is-comments-author {
-                    background-color: white;
-                    border: 2px solid white;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      div.stream-item-body-ext {
-        div.stream-item-footer {
-          div.stream-item-comments-summary {
-            div.is-comments {
-              div.is-comments-authors.show-border {
-                div.is-comments-author {
-                  background-color: white;
-                  border: 2px solid white;
-                }
-              }
-            }
-          }
-        }
       }
     }
   }
@@ -141,10 +104,6 @@ div.stream-item {
         margin-right: 8px;
       }
 
-      @include mobile() {
-        @include activity-author(32);
-      }
-
       div.name {
         height: 24px;
         float: left;
@@ -152,42 +111,62 @@ div.stream-item {
         color: rgba($deep_navy, 0.5);
 
         @include mobile() {
-          height: 32px;
-          width: calc(100% - 48px);
+          width: calc(100% - 32px);
           max-width: unset;
         }
 
         div.mobile-name {
-          display: inline-block;
-
-          @include mobile() {
-            display: flex;
-            align-items: center;
-          }
+          display: block;
+          float: left;
+          white-space: nowrap;
 
           div.name-inner {
-            display: inline-block;
+            display: block;
             text-overflow: ellipsis;
             overflow: hidden;
             line-height: 24px;
             margin-right: 8px;
-
-            @include mobile() {
-              flex: 1;
-              min-width: 0;
-              display: block;
-              line-height: 32px;
-            }
+            float: left;
+            white-space: nowrap;
           }
 
-          div.mobile-time-since {
-            display: none;
+          div.time-since {
+            display: block;
+            float: left;
+            height: 24px;
+            line-height: 24px;
+            text-align: left;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: rgba($deep_navy, 0.5);
+            position: relative;
+            margin-right: 8px;
+            margin-left: 6px;
+            overflow: visible;
+
+            &:before {
+              content: "";
+              width: 3px;
+              height: 3px;
+              background-color: rgba($deep_navy, 0.2);
+              border-radius: 50%;
+              position: absolute;
+              top: 12px;
+              left: -8px;
+            }
 
             @include mobile() {
               display: block;
               white-space: nowrap;
+              float: left;
+              line-height: 24px;
             }
           }
+        }
+
+        div.follow-up-tag-small {
+          float: right;
+          margin-right: 0;
         }
       }
 
@@ -216,10 +195,6 @@ div.stream-item {
     }
   }
 
-  div.new-tag {
-    display: none;
-  }
-
   @include must-see-tag();
 
   @include follow-up-tag();
@@ -234,7 +209,7 @@ div.stream-item {
     }
   }
 
-  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
+  & > div.must-see-tag, & > div.follow-up-tag {
     margin-top: 16px;
   }
 
@@ -242,8 +217,15 @@ div.stream-item {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 0px;
+    padding: 0;
     border-radius: 6px;
+
+    @include mobile() {
+      display: block;
+      flex-direction: unset;
+      justify-content: unset;
+      border-radius: 0;
+    }
 
     &.expanded {
       div.thumbnail-container {
@@ -253,7 +235,7 @@ div.stream-item {
           margin-top: 24px;
           margin-bottom: 24px;
           float: unset;
-          width: 638px;
+          width: 654px;
           height: 478px;
           position: relative;
           top: unset;
@@ -277,20 +259,24 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 110px;
+      min-height: 88px;
       position: relative;
       cursor: pointer;
 
+      @include mobile() {
+        min-height: 80px;
+      }
+
       div.ziggeo-player {
-        width: 136px;
-        height: 102px;
+        width: 106px;
+        height: 80px;
         position: absolute;
         right: 0;
         top: 50%;
         transform: translateY(-50%);
 
         video {
-          max-height: 102px;
+          max-height: 80px;
         }
 
         @include tablet(){
@@ -315,9 +301,9 @@ div.stream-item {
       }
 
       div.body-thumbnail-wrapper {
-        width: 136px;
-        // height: 102px;
-        max-height: 102px;
+        width: 106px;
+        // height: 80px;
+        max-height: 80px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
@@ -329,8 +315,20 @@ div.stream-item {
         img.body-thumbnail {
           border-radius: 4px;
           object-fit: contain;
-          max-width: 136px;
-          max-height: 102px;
+          max-width: 106px;
+          max-height: 80px;
+        }
+
+        @include mobile() {
+          width: 95px;
+          top: 0;
+          // Remove thumbnails from mobile for now
+          display: none;
+
+          img.body-thumbnail {
+            max-height: 72px;
+            max-width: 95px;
+          }
         }
 
         &.video {
@@ -358,27 +356,21 @@ div.stream-item {
 
     div.stream-body-left {
       position: relative;
-      margin-top: 8px;
+      margin-top: 4px;
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 484px;
-        min-height: 98px;
+        width: 500px;
+        min-height: 80px;
 
         @include mobile() {
-          width: calc(100% - 136px - 16px);
+          width: 100%;
         }
       }
 
       @include tablet() {
         width: 100%;
-        margin: 8px 0px 0px;
-      }
-
-      &.has-thumbnail {
-        @include tablet() {
-          width: calc(100% - 136px - 16px);
-        }
+        margin: 0;
       }
 
       &.has-video {
@@ -391,40 +383,31 @@ div.stream-item {
 
       div.stream-item-headline {
         height: 28px;
-        @include activity-title(24px, 28px);
+        @include activity-title(20px, 25px);
         color: $deep_navy;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
         white-space: nowrap;
-
-        @include mobile() {
-          margin-top: 16px;
-          @include activity-title(22px, 28px);
-        }
       }
 
       div.stream-item-body {
-        margin-top: 8px;
-        @include activity-body(18, 24, $deep_navy);
+        margin-top: 3px;
+        @include activity-body(17, 22, $deep_navy);
         color: $deep_navy;
         @include OC_Body_Book();
-        line-height: 24px;
+        line-height: 22px;
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
 
-        max-height: #{24 * 2}px;
-
-        @include mobile() {
-          margin-top: 4px;
-        }
+        max-height: #{22 * 2}px;
 
         h2 {
           color: $deep_navy;
           @include OC_Body_Book();
-          font-size: 18px;
-          line-height: 24px;
+          font-size: 17px;
+          line-height: 22px;
         }
 
         b, strong, &.editing b, &.editing strong {
@@ -444,7 +427,7 @@ div.stream-item {
       @include mobile() {
         height: auto;
         overflow: hidden;
-        min-height: 32px;
+        height: 32px;
       }
 
       div.reactions {
@@ -456,8 +439,8 @@ div.stream-item {
       div.stream-item-footer-mobile-group {
         @include mobile() {
           display: inline-block;
+          padding-top: 4px;
           height: 32px;
-          padding-top: 8px;
         }
       }
 
@@ -487,25 +470,11 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
-
-        div.is-comments {
-          div.is-comments-authors.show-border {
-            div.is-comments-author {
-              background-color: $grey_num_2;
-              border: 2px solid $grey_num_2;
-
-              @include mobile() {
-                background-color: $grey_num_4;
-                border: 2px solid $grey_num_4;
-              }
-            }
-          }
-        }
       }
 
       div.reactions {
         float: left;
-        margin-right: 16px;
+        margin-right: 14px;
 
         div.reactions-picker-container {
           div.emoji-mart {
@@ -619,21 +588,6 @@ div.stream-item {
         @include mobile() {
           margin-left: 2px;
           margin-top: 0;
-        }
-      }
-
-      div.time-since {
-        float: right;
-        max-width: 30%;
-        height: 24px;
-        line-height: 24px;
-        text-align: right;
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: rgba($deep_navy, 0.5);
-
-        @include mobile() {
-          display: none;
         }
       }
     }
