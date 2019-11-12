@@ -50,7 +50,8 @@ function PlaceCaretAtEnd(el) {
     /* Use inline plus button */
     inlinePlusButtonOptions: {inlineButtons: true,
                               alwaysExpanded: false,
-                              initiallyVisible: false},
+                              initiallyVisible: false,
+                              disableButtons: false},
     initialButtonsShown: false,
     /* Selector to identify the click that needs save the caret position */
     saveSelectionClickElementId: undefined,
@@ -574,6 +575,7 @@ function PlaceCaretAtEnd(el) {
         var button = this.document.createElement('button');
         button.className = 'media';
         container.appendChild(button);
+        button.disabled = this.inlinePlusButtonOptions.disableButtons;
 
         if (opt === 'entry') {
           button.classList.add('media-entry');

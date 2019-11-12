@@ -20,7 +20,7 @@
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
-            [oc.web.stores.subscription]
+            [oc.web.stores.payments]
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
@@ -154,7 +154,7 @@
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:org :team :invite :integrations} (keyword (:org-settings query-params))))
+                              (#{:org :team :invite :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and (not org-settings)
                              (contains? query-params :reminders))
@@ -166,9 +166,14 @@
                       :else [])
         bot-access (when (contains? query-params :access)
                       (:access query-params))
-        next-app-state {:loading loading
-                        :panel-stack panel-stack
-                        :bot-access bot-access}]
+        billing-checkout-map (when (and (= org-settings :payments)
+                                        (contains? query-params :result))
+                               {dis/checkout-result-key (= (:result query-params) "true")
+                                dis/checkout-update-plan-key (:update-plan query-params)})
+        next-app-state (merge {:loading loading
+                               :panel-stack panel-stack
+                               :bot-access bot-access}
+                        billing-checkout-map)]
     (swap! dis/app-state merge next-app-state)))
 
 (defn- read-sort-type-from-cookie
