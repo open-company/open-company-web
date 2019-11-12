@@ -67,6 +67,10 @@
 (def oc-ziggeo-profiles [])
 (def oc-enable-transcriptions false)
 
+;; Payments enabled
+(def payments-enabled true)
+(def stripe-api-key "pk_test_srP6wqbAalvBWYxcdAi4NlX0")
+
 ;; WS monitor
 (def ws-monitor-interval 30)
 

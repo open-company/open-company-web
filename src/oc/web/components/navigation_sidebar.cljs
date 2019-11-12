@@ -14,6 +14,8 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.payments :as payments-actions]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]
@@ -61,6 +63,7 @@
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-ups-data)
+                                (drv/drv :payments)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local false ::footer-height)
@@ -102,6 +105,7 @@
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(-> % first (s/starts-with? "0000-0000-0000-") not) change-data))
+        payments-data (drv/react s :payments)
         current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
@@ -128,7 +132,8 @@
         editable-boards (drv/react s :editable-boards)
         can-compose (pos? (count editable-boards))
         follow-ups-data (drv/react s :follow-ups-data)
-        drafts-data (drv/react s :drafts-data)]
+        drafts-data (drv/react s :drafts-data)
+        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
                                 :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
@@ -220,9 +225,13 @@
                   [:div.private])])])]
       (when can-compose
         [:div.left-navigation-sidebar-footer
-          {:ref "left-navigation-sidebar-footer"}
+          {:ref "left-navigation-sidebar-footer"
+           :class (when show-paywall-alert? "show-trial-expired-alert")}
           [:button.mlb-reset.compose-green-bt
-            {:on-click #(ui-compose @(drv/get-ref s :show-add-post-tooltip))}
+            {:on-click #(when-not show-paywall-alert?
+                          (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
             [:span.compose-green-icon]
             [:span.compose-green-label
-              "New post"]]])]))
+              "New post"]]
+          (when show-paywall-alert?
+            (trial-expired-alert {:bottom "48px" :left "0"}))])]))
