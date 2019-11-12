@@ -143,6 +143,10 @@
   outline: none;
   border-radius: 4px;
 
+  @include mobile() {
+    border-radius: 0;
+  }
+
   .internal, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     // color: $carrot_green;
     @include OC_Body_Bold();
@@ -207,6 +211,7 @@
 
   @include mobile() {
     background-color: transparent;
+    border-radius: 0;
   }
 
   .internal {
@@ -514,6 +519,7 @@ div.left-navigation-sidebar {
         height: 40px;
         position: relative;
         z-index: 1;
+        border-radius: 0;
       }
 
       @include big_web() {
