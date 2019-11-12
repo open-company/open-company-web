@@ -153,12 +153,12 @@ div.alert-modal-container {
             padding: 7px 16px;
 
             &:hover, &:focus {
-              background-color: $carrot_orange;
+              background-color: $carrot_green;
               color: white;
             }
 
             &:active, &.active {
-              background-color: $carrot_orange;
+              background-color: $carrot_green;
               color: white;
             }
           }

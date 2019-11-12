@@ -146,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   if (jwt) {
     $("#site-header-login-item").hide();
+    $("#site-header-login-item-mobile").hide();
     $(".login-signup-or").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
@@ -205,6 +206,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     $("button.signin-with-slack").attr("onClick", "window.location = \"/sign-up\"");
     // Top right corner login button
     $("#site-header-login-item").attr("href", "/login");
+    $("#site-header-login-item-mobile").attr("href", "/login");
     // Mobile menu login button
     $("button#site-mobile-menu-login").attr("onClick", "window.location = \"/login\"");
     // If in 404 page show error message for not logged in users

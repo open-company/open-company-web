@@ -14,7 +14,6 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
@@ -23,7 +22,9 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.carrot-abstract :refer (carrot-abstract)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -374,6 +375,7 @@
                    (drv/drv :section-editing)
                    (drv/drv :show-edit-tooltip)
                    (drv/drv :current-user-data)
+                   (drv/drv :payments)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -550,6 +552,8 @@
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
         cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
+        payments-data (drv/react s :payments)
+        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)
         published? (= (:status cmail-data) "published")
         video-size (if is-mobile?
                      {:width (win-width)
@@ -561,6 +565,7 @@
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
         post-tt-kw @(::post-tt-kw s)
         disabled? (or show-post-bt-tooltip?
+                      show-paywall-alert?
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -616,12 +621,18 @@
                              current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
-                                :quick-post-collapsed (:collapsed cmail-state)})
-       :on-click #(when (:collapsed cmail-state)
+                                :quick-post-collapsed (:collapsed cmail-state)
+                                :show-trial-expired-alert show-paywall-alert?})
+       :on-click #(when (and (:collapsed cmail-state)
+                             (not show-paywall-alert?))
                     (nux-actions/dismiss-add-post-tooltip)
                     (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
                                                                                   :fullscreen false
                                                                                   :key (:key cmail-state)}))}
+      (when (and show-paywall-alert?
+                 (:collapsed cmail-state)
+                 (not (:fullscreen cmail-state)))
+        (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
         {:class (when follow-up? "has-follow-ups")}
         [:div.cmail-mobile-header
@@ -793,6 +804,9 @@
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
+                               ;; Block the rich-body-editor component when
+                               ;; the current editing post has been created alreaduks
+                               :paywall? show-paywall-alert?
                                :placeholder (when (:collapsed cmail-state) "Share something with your team...")
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
@@ -800,7 +814,7 @@
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
-                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)
+                               :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
             ; Attachments

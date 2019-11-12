@@ -44,6 +44,7 @@
                     rum/reactive
                     (drv/drv user-store/signup-with-email)
                     (drv/drv :auth-settings)
+                    (drv/drv :expo-deep-link-origin)
                     (rum/local false ::email-error)
                     (rum/local false ::password-error)
                     (rum/local "" ::email)
@@ -53,7 +54,8 @@
                       s)}
   [s]
   (let [signup-with-email (drv/react s user-store/signup-with-email)
-        auth-settings (drv/react s :auth-settings)]
+        auth-settings (drv/react s :auth-settings)
+        deep-link-origin (drv/react s :expo-deep-link-origin)]
     [:div.onboard-lander.lander
       [:div.main-cta
         [:div.mobile-header
@@ -74,7 +76,7 @@
                                              {:auth-source "slack"})]
                          (user-actions/login-with-slack auth-link
                                                         (when ua/mobile-app?
-                                                          {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                          {:redirect-origin deep-link-origin}))))}
           "Continue with Slack"
           [:div.slack-icon
             {:aria-label "slack"}]]
@@ -86,7 +88,7 @@
                                                             {:auth-source "google"})]
                          (user-actions/login-with-google auth-link
                                                          (when ua/mobile-app?
-                                                           {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                           {:redirect-origin deep-link-origin}))))}
           "Continue with Google"
           [:div.google-icon
             {:aria-label "google"}]]

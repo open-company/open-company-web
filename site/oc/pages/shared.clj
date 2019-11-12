@@ -264,7 +264,7 @@
          "12 members. Then it’s just $5 a user after that.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
-        "Start your 14 day free trial"]]])
+        "Start your 14-day free trial"]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer
