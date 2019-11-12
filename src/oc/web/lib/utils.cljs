@@ -139,10 +139,12 @@
     (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
              (= (.getMonth past-js-date) (.getMonth now-date))
              (= (.getDate past-js-date) (.getDate now-date)))
-      (s/lower
-       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
-                                                                                  :minute "2-digit"
-                                                                                  :format "hour:minute"}))
+      (s/upper
+       (.replace
+        (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
+                                                                                   :minute "2-digit"
+                                                                                   :format "hour:minute"})
+        (js/RegExp. "^0(?:0:0?)?" "ig") ""))
       (time-since past-date (concat flags [:short])))))
 
 (defn class-set
@@ -375,8 +377,10 @@
       :else (recur (inc idx) (rest items)))))
 
 (def network-error
- {:title "Network error"
-  :description "Shoot, looks like there might be a connection issue. Please try again."
+ {:title "Network request"
+  :description (if ua/pseudo-native?
+                "Probably just a temporary issue. Please try again later if this persists."
+                "Probably just a temporary issue. Please refresh if this persists.")
   :server-error true
   :id :generic-network-error
   :dismiss true})

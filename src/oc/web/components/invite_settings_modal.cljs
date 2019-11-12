@@ -144,7 +144,10 @@
                                                                            :primary-bt-inline true
                                                                            :id :invites-sent}))
                                 (reset! (::send-bt-cta s) "Send"))))))))
-                  s)}
+                  s)
+    :did-update (fn [s]
+                 (setup-initial-rows s)
+                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
         invite-users-data (drv/react s :invite-data)

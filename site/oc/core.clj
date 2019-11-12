@@ -79,7 +79,7 @@
         "Login"]
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
-        "Start your free trial"]]])
+        "Try Carrot"]]])
 
 (defn nav
   "Static hiccup for the site header."
@@ -148,23 +148,22 @@
               {:id "site-header-login-item"
                :href "/login"}
                 "Login"]
-            [:span.login-signup-or "or"]
             [:a.signup
               {:id "site-header-signup-item"
                :href "/sign-up"}
-              "Sign up"]])
+              "Free trial"]])
 
         ;; Mobile
         (cond
           is-slack-lander?
           [:div.site-navbar-right.mobile-only
             [:a.signup.continue-with-slack
-              {:id "site-header-login-item"
+              {:id "site-header-login-item-mobile"
                :href (env :slack-signup-url)}]]
           :else
           [:div.site-navbar-right.mobile-only
             [:a.login
-              {:id "site-header-login-item"
+              {:id "site-header-login-item-mobile"
                :href "/login"}
                 "Login"]])
         [:div.mobile-ham-menu
@@ -195,7 +194,7 @@
         [:div.column.column-support
           [:div.column-title
             "Resources"]
-          [:div.column-item [:a {:href "https://intercom.help/carrot-c8000b30b176/en" :target "_blank"} "Help center"]
+          [:div.column-item [:a {:href "https://help.carrot.io/" :target "_blank"} "Help center"]
           [:div.column-item
             [:a
               {:class "intercom-chat-link"
