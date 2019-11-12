@@ -117,6 +117,10 @@ div.stream-comments {
           padding: 8px 0;
         }
 
+        &.add-comment-container {
+          padding-bottom: 8px;
+        }
+
         div.stream-comment-mobile-menu {
           display: none;
           float: right;

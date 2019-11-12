@@ -355,7 +355,8 @@
                                       :optional-activity-data activity-data})])]]]
               (when should-show-add-comment?
                 [:div.stream-comment
-                  {:class (utils/class-set {:indented-comment true})}
+                  {:class (utils/class-set {:indented-comment true
+                                            :add-comment-container true})}
                   (rum/with-key (add-comment {:activity-data activity-data
                                               :parent-comment-uuid (:reply-parent comment-data)
                                               :dismiss-reply-cb (fn [_ _]
