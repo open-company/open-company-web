@@ -427,7 +427,8 @@
                           initial-abstract (if (seq (:abstract cmail-data))
                                              (:abstract cmail-data)
                                              "")
-                          abstract-text (.text (js/$ (str "<div>" initial-abstract "</div>")))
+                          body-text (.text (js/$ initial-body "<div/>"))
+                          abstract-text (.text (js/$ initial-abstract "<div/>"))
                           abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
                       (when (and (not (seq (:uuid cmail-data)))
                                  (not (:collapsed cmail-state)))
@@ -440,6 +441,8 @@
                       (reset! (::abstract-exceeds-limit s) abstract-exceeds)
                       (reset! (::saving s) (:loading cmail-data))
                       (reset! (::publishing s) (:publishing cmail-data))
+                      (reset! (::show-abstract s) (boolean (seq abstract-text)))
+                      (reset! (::show-abstract-button s) (> (count body-text) body-length-to-show-abstract))
                       (reset! (::post-tt-kw s)
                         (cond
                           abstract-exceeds :abstract
@@ -480,9 +483,9 @@
                                 initial-abstract (if (seq (:abstract cmail-data))
                                                    (:abstract cmail-data)
                                                    "")
-                                abstract-text (.text (js/$ "<div>" initial-abstract "</div>"))
+                                abstract-text (.text (js/$ initial-abstract "<div/>"))
                                 abstract-exceeds (> (count abstract-text) utils/max-abstract-length)
-                                body-text (.text (js/$ "<div>" initial-body "</div>"))]
+                                body-text (.text (js/$ initial-body "<div/>"))]
                             (when (and (not (seq (:uuid cmail-data)))
                                        (not (:collapsed cmail-state)))
                               (nux-actions/dismiss-add-post-tooltip))
