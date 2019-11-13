@@ -6,8 +6,8 @@
 
 ;; Change this with your machine ip address to test
 ;; from a device on the same network
-(def local-ip "192.168.1.97")
-; (def local-ip "localhost")
+; (def local-ip "192.168.1.97")
+(def local-ip "localhost")
 
 ;; Storage location
 (def web-server-domain (str "http://" local-ip ":3559"))
