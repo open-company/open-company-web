@@ -3,6 +3,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
@@ -33,6 +34,10 @@
                  (dommy/has-class? body -no-scroll-mixin-class))
           state
           (do ;; if no-scroll is not preset
+            (when (and (responsive/is-mobile-size?)
+                       (nil? (:back-y @router/path)))
+              (swap! router/path assoc :back-y (.. js/document -scrollingElement -scrollTop))
+              (set! (.. js/document -scrollingElement -scrollTop) 0))
             ;; add it
             (dommy/add-class! body -no-scroll-mixin-class)
             ;; remember to remove it on unmount
@@ -42,6 +47,12 @@
       (when (and (contains? state ::-no-scroll-mixin-remove-body-class)
                  (::-no-scroll-mixin-remove-body-class state))
         (dommy/remove-class! (sel1 [:body]) -no-scroll-mixin-class)
+        (when (responsive/is-mobile-size?)
+          (let [old-scroll-top (or (:back-y @router/path) 0)]
+            (swap! router/path dissoc :back-y)
+            (.setTimeout js/window
+             #(set! (.. js/document -scrollingElement -scrollTop) old-scroll-top)
+             0)))
         (dissoc state ::-no-scroll-mixin-remove-body-class))
       state)})
 
