@@ -152,7 +152,8 @@
                   "Log in required to access all posts"]
                 [:a.sent-via-carrot
                   {:href oc-urls/home}
-                  "Learn more about Carrot"])]])
+                  [:div.sent-via-carrot-copy
+                    "Sent by Carrot"]])]])
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))
