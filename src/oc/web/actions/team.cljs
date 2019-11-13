@@ -77,7 +77,7 @@
 
 (defn read-teams [teams]
   (let [current-panel (last (:panel-stack @dis/app-state))
-        load-delay (if (#{:org :integrations :team :invite} current-panel)
+        load-delay (if (#{:org :integrations :team :invite-picker :invite-email :invite-slack} current-panel)
                      0
                      2500)]
     (doseq [team teams

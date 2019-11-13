@@ -154,7 +154,7 @@
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:org :team :invite :integrations :payments} (keyword (:org-settings query-params))))
+                              (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and (not org-settings)
                              (contains? query-params :reminders))

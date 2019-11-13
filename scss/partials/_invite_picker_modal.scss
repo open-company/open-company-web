@@ -86,9 +86,21 @@ div.invite-picker-modal {
         margin-top: 8px;
         padding: 0;
         margin: 8px 0 0;
+        display: block;
 
         &:first-of-type {
           margin: 16px 0 0;
+        }
+      }
+
+      button.invite-slack-bt {
+        span.disabled {
+          color: rgba($deep_navy, 0.5);
+        }
+
+        span.enabled {
+          margin-left: 6px;
+          color: $carrot_green;
         }
       }
     }

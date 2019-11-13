@@ -1,0 +1,279 @@
+div.invite-email-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+  }
+
+  div.invite-email {
+    width: 320px;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    right: 0;
+    padding: 56px 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    div.invite-email-header {
+      width: 320px;
+      height: 56px;
+      background-color: $grey_num_2;
+      padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+
+      div.invite-email-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: $deep_navy;
+        line-height: 32px;
+        float: left;
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $ui_grey;
+        float: right;
+      }
+    }
+
+    div.invite-email-body {
+      width: 100%;
+      margin: 24px auto 0;
+
+      div.invite-token-container {
+        margin-top: 24px;
+
+        div.invite-token-title {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 18px;
+        }
+
+        div.invite-token-description {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: $deep_navy;
+          line-height: 18px;
+          margin-top: 8px;
+        }
+
+        button.generate-link-bt {
+          background-color: $carrot_green;
+          height: 32px;
+          padding: 7px 16px;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: white;
+          line-height: 18px;
+          margin-top: 16px;
+          border-radius: 4px;
+        }
+      }
+
+      div.invites-list {
+        margin-top: 24px;
+        border-top: 1px solid rgba($deep_navy, 0.15);
+        padding-top: 16px;
+
+        div.invites-list-title {
+          @include OC_Body_Bold();
+          font-size: 14px;
+          color: $light_navy;
+          letter-spacing: .1px;
+        }
+
+        div.invites-list-item {
+          margin-top: 8px;
+          position: relative;
+
+          &:not(:first-child) {
+            margin-top: 16px;
+          }
+
+          div.org-settings-field-container:focus-within, 
+          div.org-settings-field-container  input.org-settings-field:focus {
+            background-color: $mid_light_grey;
+          }
+
+          div.org-settings-field-container {
+            width: calc(100% - 24px);
+            border-radius: 4px;
+            background-color: rgba($deep_navy, 0.1);
+            border: none;
+            outline: none;
+
+            &.has-value {
+              button.clear-user {
+                background-image: none;
+              }
+            }
+
+            input.org-settings-field:focus {
+              background-color: $mid_light_grey;
+            }
+
+            input.org-settings-field {
+              width: calc(100% - 24px);
+              border-radius: 4px;
+              background-color: rgba($deep_navy, 0.1);
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: $deep_navy;
+              border: none;
+              outline: none;
+              padding: 7px 8px;
+
+              &:focus, &:active {
+                border: none;
+                outline: none;
+              }
+            }
+
+            button.clear-user {
+              float: right;
+              width: 24px;
+              height: 32px;
+              padding: 0;
+              background-image: cdnUrl("/img/ML/clear_user.svg");
+              background-size: 10px 10px;
+              background-position: center;
+              background-repeat: no-repeat;
+              background-color: rgba($deep_navy, 0.1);
+            }
+          }
+
+          button.remove-user {
+            position: absolute;
+            top: 16px;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            margin-top: 4px;
+            padding: 0;
+            background-image: cdnUrl("/img/ML/remove_user.svg");
+            background-size: 12px 14px;
+            background-position: top 5px right 0px;
+            background-repeat: no-repeat;
+            display: block;
+          }
+
+          div.user-type-dropdown {
+            width: calc(100% - 24px);
+
+            div.dropdown {
+              margin-top: 8px;
+              height: 32px;
+              text-align: left;
+              border-radius: 4px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              color: $deep_navy;
+              background-color: rgba($deep_navy, 0.1);
+
+              button.user-type-btn {
+                width: 100%;
+                text-align: left;
+                height: 32px;
+                padding: 7px 8px;
+              }
+
+              ul.user-type-dropdown-menu {
+                left: 0px;
+                top: 40px;
+                width: 100%;
+
+                li {
+                  color: $deep_navy;
+                  text-align: left;
+                  padding: 7px 12px;
+                }
+              }
+            }
+          }
+
+          button.remove-user {
+            margin-top: 8px;
+            margin-left: 0;
+            padding: 0;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: #C1C6CA;
+
+            i.mdi.mdi-delete:before {
+              font-size: 14px;
+              color: #C1C6CA;
+            }
+          }
+        }
+      }
+
+      button.add-button {
+        padding: 0 0 0 24px;
+        @include OC_Body_Bold();
+        font-size: 12px;
+        color: $deep_navy;
+        margin-top: 16px;
+        position: relative;
+        display: block;
+
+        div.add-button-plus {
+          width: 16px;
+          height: 16px;
+          background-image: cdnUrl("/img/ML/invite_add_another_plus.svg");
+          background-size: 16px 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+          position: absolute;
+          left: 0;
+          top: 1px;
+        }
+      }
+
+      button.save-bt {
+        height: 32px;
+        padding: 7px 16px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: white;
+        line-height: 18px;
+        float: right;
+        border-radius: 4px;
+        display: block;
+        margin-top: 16px;
+        float: left;
+
+        &:disabled {
+          opacity: 1 !important;
+          background-color: rgba($deep_navy, 0.1);
+          color: rgba($deep_navy, 0.5);
+        }
+      }
+    }
+  }
+}

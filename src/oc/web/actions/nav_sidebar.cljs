@@ -22,8 +22,8 @@
 ;; :integrations
 ;; :team
 ;; :invite-picker
-;; :invite
-;; :invite-link
+;; :invite-email
+;; :invite-slack
 ;; :payments
 ;; :profile
 ;; :notifications
