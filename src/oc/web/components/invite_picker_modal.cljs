@@ -1,6 +1,8 @@
 (ns oc.web.components.invite-picker-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.actions.org :as org-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
 
@@ -9,6 +11,11 @@
   rum/reactive
   (drv/drv :org-data)
   (drv/drv :team-data) 
+  {:will-mount (fn [s]
+    (let [org-data @(drv/get-ref s :org-data)]
+      (org-actions/get-org org-data true)
+      (team-actions/teams-get))
+    s)}
   [s]
   (let [team-data (drv/react s :team-data)]
     [:div.invite-picker-modal
@@ -27,13 +34,11 @@
           [:button.mlb-reset.invite-email-bt
             {:on-click #(nav-actions/show-org-settings :invite-email)}
             "Invite via email"]
-          (cond
-            (or (:can-slack-invite team-data)
-                (:can-add-bot team-data))
+          (if (or (:can-slack-invite team-data)
+                  (:can-add-bot team-data))
             [:button.mlb-reset.invite-slack-bt
               {:on-click #(nav-actions/show-org-settings :invite-slack)}
               "Invite via Slack"]
-            :else
             [:button.mlb-reset.invite-slack-bt
               {:on-click #(nav-actions/show-org-settings :invite-slack)}
               [:span.disabled "Invite via Slack"]

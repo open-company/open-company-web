@@ -568,6 +568,13 @@
       callback)
     (handle-missing-link "remove-admin" remove-admin-link callback {:user user})))
 
+(defn handle-invite-link [invite-token-link callback]
+  (if invite-token-link
+    (auth-http (method-for-link invite-token-link) (relative-href invite-token-link)
+      {:headers (headers-for-link invite-token-link)}
+      callback)
+    (handle-missing-link "handle-invite-link" invite-token-link callback)))
+
 ;; User
 
 (defn user-action [action-link payload callback]

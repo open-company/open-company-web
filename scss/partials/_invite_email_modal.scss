@@ -93,12 +93,62 @@ div.invite-email-modal {
           margin-top: 16px;
           border-radius: 4px;
         }
+
+        button.deactivate-link-bt {
+          color: $carrot_orange;
+          @include OC_Body_Book();
+          font-size: 14px;
+          padding: 0;
+          margin: 16px 0 0;
+        }
+
+        div.invite-token-field {
+          border-radius: 4px;
+          width: 100%;
+          background-color: rgba($deep_navy, 0.1);
+          padding: 0;
+          height: 32px;
+
+          input.invite-token-field-input {
+            background-color: transparent;
+            color: $deep_navy;
+            border: none;
+            padding: 7px 8px;
+            outline: none;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            float: left;
+            height: 32px;
+            width: calc(100% - 64px);
+            opacity: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          button.invite-token-field-bt {
+            background-color: $carrot_green;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            float: right;
+            height: 32px;
+            width: 64px;
+            @include OC_Body_Bold();
+            font-size: 14px;
+            color: white;
+          }
+        }
       }
 
       div.invites-list {
         margin-top: 24px;
-        border-top: 1px solid rgba($deep_navy, 0.15);
         padding-top: 16px;
+
+        &.top-border {
+          border-top: 1px solid rgba($deep_navy, 0.15);
+        }
 
         div.invites-list-title {
           @include OC_Body_Bold();

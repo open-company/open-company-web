@@ -97,14 +97,26 @@ div.invite-slack-modal {
 
       div.invites-list {
         margin-top: 16px;
-        border-top: 1px solid $ultra_light_grey;
         padding-top: 16px;
+
+        &.top-border {
+          border-top: 1px solid rgba($deep_navy, 0.15);
+        }
 
         div.invites-list-title {
           @include OC_Body_Bold();
           font-size: 14px;
           color: $light_navy;
           letter-spacing: .1px;
+        }
+
+        button.enable-carrot-bot-bt {
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: $carrot_green;
+          margin: 0;
+          padding: 0;
         }
 
         div.invites-list-item {

@@ -368,3 +368,23 @@
     (when (fn? cb)
       (cb success))
     (user-action-cb resp))))
+
+;; Invite team link handling
+
+(defn create-invite-token-link [create-token-link & [cb]]
+  (when create-token-link
+    (api/handle-invite-link create-token-link
+     (fn [{:keys [body success status]}]
+      (when success
+        (dis/dispatch! [:team-loaded (json->cljs body)])
+        (when (fn? cb)
+          (cb success)))))))
+
+(defn delete-invite-token-link [delete-invite-link & [cb]]
+  (when delete-invite-link
+    (api/handle-invite-link delete-invite-link
+     (fn [{:keys [body success status]}]
+      (when success
+        (dis/dispatch! [:team-loaded (json->cljs body)])
+        (when (fn? cb)
+          (cb success)))))))

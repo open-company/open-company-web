@@ -59,6 +59,12 @@
       (let [new-row (new-user-row s)]
         (dis/dispatch! [:input [:invite-users] (vec (repeat default-row-num new-row))])))))
 
+(defn- highlight-url
+  "Select the whole content of the share link filed."
+  [s]
+  (when-let [url-field (rum/ref-node s "invite-token-url-field")]
+    (.select url-field)))
+
 (rum/defcs invite-email-modal <  ;; Mixins
   rum/reactive
   (drv/drv :org-data)
@@ -68,6 +74,7 @@
   (rum/local "Send email invitations" ::send-bt-cta)
   (rum/local 0 ::sending)
   (rum/local 0 ::initial-sending)
+  (rum/local false ::creating-invite-link)
   {:will-mount (fn [s]
                  (setup-initial-rows s)
                  (nux-actions/dismiss-post-added-tooltip)
@@ -116,27 +123,75 @@
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
         team-roster (:team-roster invite-users-data)
-        uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))]
+        uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))
+        is-admin? (jwt/is-admin? (:team-id org-data))]
     [:div.invite-email-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-clicked s nav-actions/close-all-panels)}]
       [:div.invite-email
         [:div.invite-email-header
           [:div.invite-email-header-title
-            "Invite people"]
+            "Invite via email"]
           [:button.mlb-reset.cancel-bt
             {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
             "Back"]]
         [:div.invite-email-body
-          [:div.invite-token-container
-            [:div.invite-token-title
-              "Share an invite link via email"]
-            [:div.invite-token-description
-              "Anyone can use this link to join your Carrot team as a contributor."]
-            [:button.mlb-reset.generate-link-bt
-              "Generate invite link"]]
+          (when is-admin?
+            (if (seq (:invite-token team-data))
+              [:div.invite-token-container
+                [:div.invite-token-title
+                  "Share an invite link via email"]
+                [:div.invite-token-description
+                  "Anyone can use this link to join your Carrot team as a contributor."]
+                [:div.invite-token-description
+                  "Invite link"]
+                [:div.invite-token-field
+                  [:input.invite-token-field-input
+                    {:value (:href (utils/link-for (:links team-data) "invite-token"))
+                     :read-only true
+                     :ref "invite-token-url-field"
+                     :content-editable false
+                     :on-click #(highlight-url s)}]
+                  [:button.mlb-reset.invite-token-field-bt
+                    {:ref "invite-token-copy-btn"
+                     :on-click (fn [e]
+                                (utils/event-stop e)
+                                (let [url-input (rum/ref-node s "invite-token-url-field")]
+                                  (highlight-url s)
+                                  (let [copied? (utils/copy-to-clipboard url-input)]
+                                    (notification-actions/show-notification {:title (if copied? "Invite URL copied to clipboard" "Error copying the URL")
+                                                                             :description (when-not copied? "Please try copying the URL manually")
+                                                                             :primary-bt-title "OK"
+                                                                             :primary-bt-dismiss true
+                                                                             :primary-bt-inline copied?
+                                                                             :expire 3
+                                                                             :id (if copied? :invite-token-url-copied :invite-token-url-copy-error)}))))}
+                    "Copy"]]
+                [:button.mlb-reset.deactivate-link-bt
+                  {:on-click #(do 
+                               (reset! (::creating-invite-link s) true)
+                               (team-actions/delete-invite-token-link (utils/link-for (:links team-data) "delete-invite-link")
+                                (fn [success?]
+                                 (reset! (::creating-invite-link s) false))))
+                   :disabled @(::creating-invite-link s)}
+                  "Deactivate invite link"]]
+              [:div.invite-token-container
+                [:div.invite-token-title
+                  "Share an invite link via email"]
+                [:div.invite-token-description
+                  "Anyone can use this link to join your Carrot team as a contributor."]
+                [:button.mlb-reset.generate-link-bt
+                  {:on-click #(do 
+                               (reset! (::creating-invite-link s) true)
+                               (team-actions/create-invite-token-link
+                                (utils/link-for (:links team-data) "create-invite-link")
+                                (fn [success?]
+                                 (reset! (::creating-invite-link s) false))))
+                   :disabled @(::creating-invite-link s)}
+                  "Generate invite link"]]))
           [:div.invites-list
-            {:key "org-settings-invite-table"}
+            {:key "org-settings-invite-table"
+             :class (when is-admin? "top-border")}
             [:div.invites-list-title
               "Invite someone with a specific permission level"]
             (for [i (range (count invite-users))
@@ -162,7 +217,7 @@
                 [:div.user-type-dropdown
                   (user-type-dropdown {:user-id (utils/guid)
                                        :user-type (:role user-data)
-                                       :hide-admin (not (jwt/is-admin? (:team-id org-data)))
+                                       :hide-admin (not is-admin?)
                                        :on-change
                                         #(dis/dispatch!
                                           [:input
