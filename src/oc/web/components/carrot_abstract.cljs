@@ -118,12 +118,6 @@
   (let [_team-roster (drv/react s :team-roster)]
     [:div.cmail-content-abstract-container
       {:key (str "carrot-abstract-" cmail-key)}
-      [:div.cmail-content-abstract-counter
-        {:class (utils/class-set {:show-counter (or (and @(::focused s)
-                                                         (> abstract-length abstract-show-counter-from))
-                                                    exceeds-limit)
-                                  :exceeds-max-length exceeds-limit})}
-        (str "Character limit " abstract-length "/" utils/max-abstract-length)]
       [:div.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover.editing
         {:class utils/hide-class
          :content-editable true
@@ -142,4 +136,9 @@
                         (when (and (= (.-key e) "Enter")
                                    (.-metaKey e)
                                    (fn? post-clicked))
-                          (post-clicked)))}]]))
+                          (post-clicked)))}]
+       [:div.cmail-content-abstract-counter
+        {:class (when exceeds-limit "exceeds-max-length")}
+        (str abstract-length "/" utils/max-abstract-length
+         (when exceeds-limit
+           " (character limit exceeded)"))]]))
