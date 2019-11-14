@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="12px" viewBox="0 0 16 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="10px" height="14px" viewBox="0 0 10 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <g id="Mobile-MVP" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
-        <g id="Mobile:-Post-page-commenting" transform="translate(-335.000000, -57.000000)" fill="#34414F" stroke="#34414F">
-            <g id="Header">
-                <g id="Group-3" transform="translate(287.000000, 47.000000)">
-                    <path d="M61.218935,11.2996054 C61.6262417,10.9001315 62.2953269,10.9001315 62.7026336,11.2996054 C63.0991221,11.6884691 63.0991221,12.3115309 62.7026336,12.7003946 L54.5457709,20.7003946 C54.1384642,21.0998685 53.4693789,21.0998685 53.0620723,20.7003946 L49.2973664,17.0080869 C48.9008779,16.6192232 48.9008779,15.9961614 49.2973664,15.6072977 C49.7046731,15.2078238 50.3737583,15.2078238 50.781065,15.6072977 L53.8039216,18.5720224 L61.218935,11.2996054 Z" id="Combined-Shape"></path>
+    <g id="Expanded-post-view" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Post:-Mute-post" transform="translate(-1054.000000, -89.000000)" fill="#6187F8" fill-rule="nonzero">
+            <g id="Group-26" transform="translate(388.000000, 56.000000)">
+                <g id="Group-24" transform="translate(464.000000, 24.000000)">
+                    <g id="Group-Copy-2" transform="translate(74.000000, 0.000000)">
+                        <path d="M134.803829,14.289299 L137.348067,14.289299 C138.011915,14.289299 138.200323,14.7526888 137.766558,15.3273976 L132.371586,22.4753604 C131.722422,23.3354572 131.196171,23.1160675 131.196171,21.9782836 L131.196171,17.710701 L128.651933,17.710701 C127.988085,17.710701 127.799677,17.2473112 128.233442,16.6726024 L133.628414,9.52463958 C134.277578,8.66454284 134.803829,8.8839325 134.803829,10.0217164 L134.803829,14.289299 Z" id="Combined-Shape"></path>
+                    </g>
                 </g>
             </g>
         </g>

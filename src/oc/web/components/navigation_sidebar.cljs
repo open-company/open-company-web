@@ -7,6 +7,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.lib.cookies :as cook]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.nux :as nux-actions]
@@ -14,24 +15,26 @@
             [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.orgs-dropdown :refer (orgs-dropdown)]))
 
 (defn sort-boards [boards]
   (vec (sort-by :name boards)))
 
-(def sidebar-top-margin 90)
+(def sidebar-top-margin 56)
 
 (defn save-content-height [s]
-  (when-let [navigation-sidebar-content (rum/ref-node s "left-navigation-sidebar-content")]
-    (let [height (+ (.height (js/$ navigation-sidebar-content)) 32)]
+  (when-let [navigation-sidebar (rum/ref-node s :left-navigation-sidebar)]
+    (let [height (.-offsetHeight navigation-sidebar)]
       (when (not= height @(::content-height s))
-        (reset! (::content-height s) height))))
-  (when-let [navigation-sidebar-footer (rum/ref-node s "left-navigation-sidebar-footer")]
-    (let [footer-height (+ (.height (js/$ navigation-sidebar-footer)) 8)]
-      (when (not= footer-height @(::footer-height s))
-        (reset! (::footer-height s) footer-height)))))
+        (reset! (::content-height s) height)))))
+
+(defn- toggle-collapse-sections [s]
+  (let [next-value (not @(::sections-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-sections-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::sections-list-collapsed s) next-value)
+    (reset! (::content-height s) nil)
+    (utils/after 100 #(save-content-height s))))
 
 (defn filter-board [board-data]
   (let [self-link (utils/link-for (:links board-data) "self")]
@@ -57,19 +60,15 @@
                                 (drv/drv :board-data)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
-                                (drv/drv :editable-boards)
-                                (drv/drv :show-add-post-tooltip)
-                                (drv/drv :hide-left-navbar)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
                                 (drv/drv :follow-ups-data)
-                                (drv/drv :payments)
                                 ;; Locals
                                 (rum/local false ::content-height)
-                                (rum/local false ::footer-height)
                                 (rum/local nil ::window-height)
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
+                                (rum/local false ::sections-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -77,6 +76,7 @@
                                 {:will-mount (fn [s]
                                   (save-window-size s)
                                   (save-content-height s)
+                                  (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
@@ -105,15 +105,15 @@
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(-> % first (s/starts-with? "0000-0000-0000-") not) change-data))
-        payments-data (drv/react s :payments)
         current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
-        is-all-posts (= (router/current-board-slug) "all-posts")
-        is-follow-ups (= (router/current-board-slug) "follow-ups")
-        is-drafts-board (= (:slug board-data) utils/default-drafts-board-slug)
+        selected-slug (or (:back-to @router/path) (router/current-board-slug))
+        is-all-posts (= selected-slug "all-posts")
+        is-follow-ups (= selected-slug "follow-ups")
+        is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
@@ -125,23 +125,17 @@
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
-        is-tall-enough? (or (not @(::content-height s))
-                            (not @(::footer-height s))
-                            (not (neg?
-                             (- @(::window-height s) sidebar-top-margin @(::content-height s) @(::footer-height s)))))
-        editable-boards (drv/react s :editable-boards)
-        can-compose (pos? (count editable-boards))
+        is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         follow-ups-data (drv/react s :follow-ups-data)
-        drafts-data (drv/react s :drafts-data)
-        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)]
+        drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
-      {:class (utils/class-set {:hide-left-navbar (drv/react s :hide-left-navbar)
-                                :mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)})
+      {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
+                                :absolute-position (not is-tall-enough?)
+                                :collapsed-sections @(::sections-list-collapsed s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
-                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))}
+                    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+       :ref :left-navigation-sidebar}
       [:div.left-navigation-sidebar-content
-        {:ref "left-navigation-sidebar-content"
-         :class (when can-compose "can-compose")}
         (when is-mobile?
           [:div.left-navigation-sidebar-mobile-header
             [:button.mlb-reset.mobile-close-bt
@@ -188,7 +182,10 @@
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
-              [:span "Sections"]
+              [:button.mlb-reset.left-navigation-sidebar-sections-arrow
+                {:class (when @(::sections-list-collapsed s) "collapsed")
+                 :on-click #(when-not is-mobile? (toggle-collapse-sections s))}
+                [:span.sections "Sections"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
@@ -196,11 +193,12 @@
                    :data-placement "top"
                    :data-toggle (when-not is-mobile? "tooltip")
                    :data-container "body"}])]])
-        (when show-boards
+        (when (and show-boards
+                   (not @(::sections-list-collapsed s)))
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= (router/current-board-slug) (:slug board))
+                        is-current-board (= selected-slug (:slug board))
                         board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
                 {:class (utils/class-set {:item-selected (and (not is-all-posts)
@@ -222,16 +220,4 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]
-      (when can-compose
-        [:div.left-navigation-sidebar-footer
-          {:ref "left-navigation-sidebar-footer"
-           :class (when show-paywall-alert? "show-trial-expired-alert")}
-          [:button.mlb-reset.compose-green-bt
-            {:on-click #(when-not show-paywall-alert?
-                          (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}
-            [:span.compose-green-icon]
-            [:span.compose-green-label
-              "New post"]]
-          (when show-paywall-alert?
-            (trial-expired-alert {:bottom "48px" :left "0"}))])]))
+                  [:div.private])])])]]))

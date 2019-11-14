@@ -181,6 +181,11 @@
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
 
+(defn collapse-sections-list-cookie
+  "Cookie used to remember if the sections list was collapsed or not."
+  []
+  (str "collapse-sections-list-" (jwt/user-id)))
+
 (def login-redirect-cookie "login-redirect")
 
 (def expo-push-token-cookie "expo-push-token")

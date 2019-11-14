@@ -5,12 +5,11 @@
             [oc.web.lib.utils :as utils]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]))
 
-(def missing-title-tooltip "Please add a title")
+(def missing-title-tooltip "Please add a subject")
 (def abstract-max-length-exceeded-tooltip "Abstract too long")
 
 (rum/defcs post-to-button < rum/reactive
-                            (drv/drv :show-sections-picker)
-  [s {:keys [on-submit disabled did-pick-section title current-board-slug post-tt-kw force-show-tooltip]}]
+  [s {:keys [on-submit disabled title post-tt-kw force-show-tooltip]}]
   [:div.post-to-button
     {:class (when disabled "disabled")}
     ;; Post button
@@ -26,11 +25,4 @@
             (= post-tt-kw :title)
             missing-title-tooltip
             (= post-tt-kw :abstract)
-            abstract-max-length-exceeded-tooltip)])]
-    ;; Arrows button to open sections dropdown
-    [:div.post-to-arrows-container
-      [:button.mlb-reset.post-to-arrows
-        {:on-click #(dis/dispatch! [:update [:show-sections-picker] not])}]]
-    (when (drv/react s :show-sections-picker)
-      [:div.sections-picker-container
-        (sections-picker current-board-slug did-pick-section)])])
+            abstract-max-length-exceeded-tooltip)])]])

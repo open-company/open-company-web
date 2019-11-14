@@ -1,6 +1,6 @@
-$foc_background_color: transparent;
+$foc_background_color: rgba($deep_navy, 0.05);
 $mobile_foc_background_color: rgba($deep_navy, 0.05);
-$foc_hover_color: #F5F5F5;
+$foc_hover_color: rgba($deep_navy, 0.10);
 $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
 
@@ -14,6 +14,7 @@ div.stream-item {
   border-bottom: 1px solid $foc_divider_line_color;
   padding: 24px 32px;
   background-color: $foc_background_color;
+  overflow: visible;
 
   &.expandable {
     cursor: pointer;
@@ -264,7 +265,7 @@ div.stream-item {
       cursor: pointer;
 
       @include mobile() {
-        min-height: 80px;
+        min-height: 84px;
       }
 
       div.ziggeo-player {
@@ -383,7 +384,7 @@ div.stream-item {
 
       div.stream-item-headline {
         height: 28px;
-        @include activity-title(20px, 25px);
+        @include activity-title(20px, 28px);
         color: $deep_navy;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -392,7 +393,6 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        margin-top: 3px;
         @include activity-body(17, 22, $deep_navy);
         color: $deep_navy;
         @include OC_Body_Book();
@@ -586,8 +586,7 @@ div.stream-item {
         margin-right: 16px;
 
         @include mobile() {
-          margin-left: 2px;
-          margin-top: 0;
+          display: none;
         }
       }
     }

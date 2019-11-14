@@ -55,7 +55,15 @@ div.cmail-outer {
           height: 24px;
           min-height: 24px;
 
-          div.cmail-content-headline {
+          div.cmail-content-section-picker {
+            display: none;
+          }
+
+          div.cmail-content-headline-container {
+            display: none;
+          }
+
+          div.cmail-content-abstract-container-outer {
             display: none;
           }
 
@@ -276,32 +284,29 @@ div.cmail-outer {
         }
 
         div.cmail-content-headline {
-          min-height: 34px;
-          @include activity-title(24px, 30px);
+          @include activity-title(14px, 18px);
 
           @include mobile() {
             @include activity-title(32px, 40px);
           }
         }
 
-        div.cmail-content-abstract-container {
-          margin-top: 24px;
-          padding-bottom: 32px;
-          display: block;
+        div.cmail-content-abstract-container-outer {
+          margin-top: 40px;
+          margin-bottom: 24px;
         }
 
         div.rich-body-editor-outer-container {
           border-top: none;
-          margin-top: 0;
+          margin-top: 24px;
           padding-top: 0;
 
           div.rich-body-editor-container {
-            margin-top: 32px;
 
-          div.rich-body-editor {
-            padding-bottom: 30vh;
-            min-height: calc(100vh - 334px);
-            @include activity-body(17, 22, $deep_navy);
+            div.rich-body-editor {
+              padding-bottom: 30vh;
+              min-height: calc(100vh - 334px);
+              @include activity-body(17, 22, $deep_navy, 16);
 
               @media screen and (min-height: 556px) {
                 max-height: initial;
@@ -536,8 +541,8 @@ div.cmail-outer {
 
           &.long-tooltip {
             .tooltip {
-              width: 122px;
-              margin-left: -24px;
+              width: 86px;
+              // margin-left: -24px;
             }
           }
         }
@@ -689,10 +694,6 @@ div.cmail-outer {
           margin-left: 8px;
 
           @include preload_image(cdnUrl("/img/ML/cmail_fullscreen_collapse.svg"));
-        }
-
-        .tooltip {
-          margin-top: -16px;
         }
       }
     }
@@ -910,36 +911,179 @@ div.cmail-outer {
         }
       }
 
-      div.cmail-content-headline {
-        border: none;
-        outline: none;
-        cursor: text;
-        @include activity-title(22px, 28px);
-        color: $deep_navy;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        min-height: 28px;
-        line-height: 28px;
+      div.cmail-content-section-picker {
+        border-bottom: 1px solid rgba($deep_navy, 0.15);
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+        display: block;
 
-        @include mobile() {
-          @include activity-title();
-          min-height: 30px;
+        div.cmail-content-section-picker-label {
+          float: left;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 24px;
+          color: rgba($deep_navy, 0.5);
+
+          @include mobile() {
+            font-size: 16px;
+            line-height: 28px;
+          }
         }
 
-        &:empty:before {
-          content: attr(placeholder);
-          display: inline-block;
-          color: rgba($deep_navy, 0.5) !important;
-          font-style: none;
-          height: 28px;
+        div.section-picker-bt-container {
+          position: relative;
+          margin-left: 8px;
+          float: left;
+
+          div.sections-picker {
+            position: absolute;
+            top: 26px;
+            left: 0;
+            z-index: #{$navbar_zindex - 1};
+
+            @include mobile (){
+              top: 30px;
+            }
+          }
+
+          button.section-picker-bt {
+            height: 24px;
+            padding: 3px 24px 3px 8px;
+            color: white;
+            background-color: $deep_navy;
+            border-radius: 4px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            position: relative;
+
+            @include mobile() {
+              height: 28px;
+              font-size: 16px;
+
+              &:after {
+                top: 9px;
+              }
+            }
+
+            &:after {
+              content: "";
+              width: 8px;
+              height: 10px;
+              position: absolute;
+              top: 7px;
+              right: 8px;
+              background-image: cdnUrl("/img/ML/select_arrows_white.svg");
+              background-size: 8px 10px;
+              background-repeat: no-repeat;
+              background-position: center;
+            }
+          }
+        }
+
+        button.show-abstract-bt {
+          float: right;
+          color: $carrot_green;
+          padding: 0;
+          margin: 0;
+          height: 24px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 24px;
+
+          @include mobile() {
+            display: none;
+          }
+        }
+
+        .tooltip {
+          width: 172px;
+        }
+      }
+
+      div.cmail-content-headline-container {
+        display: block;
+
+        div.cmail-content-headline-label {
+          float: left;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 18px;
+          color: rgba($deep_navy, 0.5);
+
+          @include mobile() {
+            font-size: 16px;
+            line-height: 22px;
+          }
+        }
+
+        div.cmail-content-headline {
+          border: none;
+          outline: none;
+          cursor: text;
+          @include activity-title(14px, 18px);
+          color: $deep_navy;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          min-height: 18px;
+          line-height: 18px;
+          float: right;
+          width: calc(100% - 48px - 8px);
+
+          @include mobile() {
+            @include activity-title(16px, 22px);
+            min-height: 22px;
+            line-height: 22px;
+            width: calc(100% - 55px - 8px);
+          }
+
+          // We have a label in front of headline so we don't need a placeholder
+          // let's keep it for later changes
+          // &:empty:before {
+          //   content: attr(placeholder);
+          //   display: inline-block;
+          //   color: rgba($deep_navy, 0.5) !important;
+          //   font-style: none;
+          //   height: 17px;
+          // }
+        }
+      }
+
+      div.cmail-content-abstract-container-outer {
+        background-color: rgba($deep_navy, 0.1);
+        padding: 16px 24px;
+        position: relative;
+        margin-top: 24px;
+        margin-bottom: 16px;
+        border-radius: 4px;
+        display: block;
+
+        @include mobile() {
+          padding: 8px 16px;
+          margin-top: 40px;
+          margin-bottom: 32px;
+        }
+
+        button.remove-abstract-bt {
+          width: 24px;
+          height: 24px;
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background-image: cdnUrl("/img/ML/black_close.svg");
+          background-size: 8px 8px;
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+
+        div.cmail-content-abstract-container {
+          @include activity-abstract(17px, 22px);
         }
       }
 
       div.rich-body-editor-outer-container {
         position: relative;
         margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid rgba($deep_navy, 0.15);
 
         &.block-edit {
           &, * {
@@ -975,9 +1119,10 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(17, 22, $deep_navy);
+            @include activity-body(17, 22, $deep_navy, 16);
             font-size: 17px;
             line-height: 22px;
+            min-height: 22px;
           }
 
           @media screen and (min-height: 556px) {
@@ -987,20 +1132,16 @@ div.cmail-outer {
           @include mobile() {
             min-height: 20vh;
             max-height: initial;
-            @include activity-body(18, 24, $deep_navy);
+            @include activity-body(18, 24, $deep_navy, 16);
             font-size: 18px;
             line-height: 24px;
             overflow-y: auto;
             overflow-x: visible;
             padding-bottom: 30vh;
-          }
 
-          & > *:first-child {
-            margin-top: 0px;
-          }
-
-          p:not(:last-child):not(:first-child) {
-            margin: 22px 0px;
+            &:after {
+              line-height: 24px;
+            }
           }
 
           &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
@@ -1010,6 +1151,7 @@ div.cmail-outer {
 
           &:after {
             margin: 0;
+            line-height: 22px;
           }
         }
       }
@@ -1062,20 +1204,44 @@ div.cmail-outer {
 
         &.long-tooltip {
           .tooltip {
-            width: 122px;
+            width: 86px;
           }
         }
+      }
 
-        .tooltip {
-          margin-top: -16px;
+      div.delete-bt-container {
+        float: left;
+        margin-left: 8px;
+
+        @include mobile() {
+          display: none;
+        }
+
+        button.delete-bt {
+          height: 32px;
+          width: 32px;
+          background-image: cdnUrl("/img/ML/cmail_delete.svg");
+          background-size: 16px 14px;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-color: rgba($deep_navy, 0.1);
+          border-radius: 4px;
+          padding: 0;
+          opacity: 1;
+
+          &:not(.disabled):hover {
+            background-color: rgba($deep_navy, 0.2);
+          }
         }
       }
 
       div.fullscreen-bt-container {
         float: left;
+        height: 32px;
         margin-left: 16px;
         padding-left: 16px;
         border-left: 1px solid rgba($deep_navy, 0.1);
+        height: 32px;
 
         @include mobile() {
           display: none;
@@ -1096,10 +1262,6 @@ div.cmail-outer {
           &:not(.disabled):hover {
             background-color: rgba($deep_navy, 0.2);
           }
-        }
-
-        .tooltip {
-          margin-top: -16px;
         }
       }
 
