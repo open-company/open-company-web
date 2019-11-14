@@ -84,7 +84,8 @@ function PlaceCaretAtEnd(el) {
           this.on(element, 'click', this.togglePicker.bind(this));
           this.on(element, 'keyup', this.togglePicker.bind(this));
           this.on(element, 'focus', this.onFocus.bind(this));
-          this.on(element, 'editableInput', this.togglePicker.bind(this));
+          this.on(element, 'paste', this.togglePicker.bind(this));
+          this.subscribe('editableInput', this.togglePicker.bind(this));
         }
         // this.on(element, 'blur', this.hide.bind(this));
         this.on(this.window, 'click', this.windowClick.bind(this));
