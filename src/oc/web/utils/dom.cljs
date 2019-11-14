@@ -21,7 +21,9 @@
       (when (responsive/is-mobile-size?)
         (let [old-scroll-top (or (:back-y @router/path) 0)]
           (swap! router/path dissoc :back-y)
-          (set! (.. js/document -scrollingElement -scrollTop) old-scroll-top))))))
+          (.setTimeout js/window
+           #(set! (.. js/document -scrollingElement -scrollTop) old-scroll-top)
+           0))))))
 
 (defn is-element-top-in-viewport?
    "Given a DOM element return true if it's actually visible in the viewport."
