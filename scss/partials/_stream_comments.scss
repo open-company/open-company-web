@@ -2,6 +2,8 @@ div.stream-comments {
   height: 100%;
   position: relative;
   padding-bottom: 25vh;
+  margin-top: 16px;
+  padding-top: 16px;
 
   &.editing {
     div.stream-comments-list {
@@ -21,11 +23,47 @@ div.stream-comments {
   div.stream-comments-list {
 
     div.stream-comment-outer {
-      background-color: #FFF7DD;
       padding: 0;
+      position: relative;
 
-      &:first-child div.stream-comment {
-        padding-top: 16px;
+      @include big_web() {
+        width: calc(100% + 16px);
+        padding-left: 8px;
+        padding-right: 8px;
+        margin-left: -8px;
+
+        &.not-highlighted.open-thread:hover {
+          background-color: rgba($deep_navy, 0.05);
+          border-radius: 4px;
+        }
+
+        &.not-highlighted:not(.open-thread):hover div.stream-comment.indented-comment div.stream-comment-inner {
+          background-color: rgba($deep_navy, 0.05);
+          border-radius: 4px;
+        }
+      }
+
+      &.left-border {
+        &:before {
+          content: "";
+          width: 2px;
+          height: 100%;
+          position: absolute;
+          left: 23px;
+          top: 0;
+          background-color: rgba($deep_navy, 0.1);
+        }
+
+        &.open-thread:before {
+          height: calc(100% - 16px);
+          top: 16px;
+        }
+      }
+
+      &.open-thread {
+        &:not(:first-child) {
+          margin-top: 16px;
+        }
       }
 
       &:last-child div.stream-comment div.stream-comment-inner {
@@ -33,8 +71,9 @@ div.stream-comments {
       }
 
       div.stream-comment.indented-comment div.stream-comment-inner {
-        margin-left: 32px;
-        width: calc(100% - 32px);
+        margin-left: 40px;
+        width: calc(100% - 40px);
+        padding: 8px 0 8px 8px;
 
         @include mobile() {
           display: block;
@@ -54,14 +93,20 @@ div.stream-comments {
             }
           }
         }
+      }
 
+      &:not(.editing):hover {
         div.stream-comment-floating-buttons {
-          top: 8px;
+          display: block;
         }
       }
 
       &.not-highlighted {
         background-color: transparent;
+      }
+
+      &.highlighted {
+        background-color: #FFF7DD;
         transition: background-color 3s ease-in;
       }
 
@@ -70,6 +115,10 @@ div.stream-comments {
 
         div.stream-comment-inner {
           padding: 8px 0;
+        }
+
+        &.add-comment-container {
+          padding-bottom: 8px;
         }
 
         div.stream-comment-mobile-menu {
@@ -94,7 +143,7 @@ div.stream-comments {
               right: 0;
               height: 100vh;
               background-color: white;
-              z-index: 4;
+              z-index: 104;
               padding-top: 29px;
 
               button.close-bt {
@@ -184,13 +233,51 @@ div.stream-comments {
         }
 
         div.stream-comment-floating-buttons {
-          float: left;
-          height: 24px;
+          position: absolute;
+          top: -8px;
+          right: -24px;
+          height: 32px;
           z-index: 2;
+          display: none;
+          border-radius: 4px;
+          box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
+          background-color: $deep_navy;
+
+          div.more-bt-container {
+            height: 32px;
+            float: left;
+            position: relative;
+
+            div.comment-more-menu-container {
+              position: absolute;
+              top: 34px;
+              left: 0;
+              padding: 8px 0;
+              border-radius: 4px;
+              width: 78px;
+              outline: none;
+              z-index: 110;
+              background-color: white;
+              border: 1px solid $mid_light_grey;
+
+              button {
+                padding: 0;
+                margin: 0;
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: $deep_navy;
+                line-height: 18px;
+                cursor: pointer;
+                padding: 8px 16px;
+                background-color: white;
+                position: relative;
+              }
+            }
+          }
 
           div.react-bt-container {
             // width: 30px;
-            height: 24px;
+            height: 32px;
             float: left;
 
             div.emoji-mart {
@@ -208,73 +295,27 @@ div.stream-comments {
             }
           }
 
-          // Change Bootstrap tooltip style
-          .tooltip-arrow {
-            display: block;
-            border-top-color: $deep_navy;
-          }
-
           div.react-bt-container .tooltip {
             width: 86px;
           }
 
-          .tooltip {
-            z-index: 1500;
-
-            &.in {
-              opacity: 1;
-            }
-
-            // Change Bootstrap tooltip style
-            .tooltip-arrow {
-              display: block;
-            }
-
-            .tooltip-inner {
-              background-color: $deep_navy;
-              white-space:pre-wrap;
-              max-width: none;
-              text-align: left;
-              opacity: 1;
-              @include OC_Body_Book();
-              font-size: 12px;
-              color: white;
-              line-height: 18px;
-              padding: 5px 8px;
-              border-radius: 4px;
-              box-shadow: none;
-              border: none;
-            }
-          }
-
           .separator-bt {
-            margin-left: 15px;
-            position: relative;
-
-            &:before {
-              content: "";
-              width: 3px;
-              height: 3px;
-              background-color: rgba($deep_navy, 0.2);
-              border-radius: 50%;
-              position: absolute;
-              left: -9px;
-              top: 10px;
-            }
+            border-left: 1px solid rgba(white, 0.1);
           }
 
           button.floating-bt {
             padding: 0;
-            height: 24px;
+            height: 32px;
             min-width: 20px;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 0;
+            padding: 0 8px;
             float: left;
-            @include OC_Body_Book();
+            @include OC_Body_Bold();
             font-size: 12px;
-            line-height: 24px;
-            color: $deep_navy;
+            line-height: 32px;
+            color: white;
+            text-transform: uppercase;
 
             @include big_web() {
               opacity: 0.5;
@@ -287,24 +328,32 @@ div.stream-comments {
               }
             }
 
+            &.more-bt {
+              padding-left: 30px;
+              background-image: cdnUrl("/img/ML/comment_more.svg");
+              background-size: 18px 4px;
+              background-position: left 8px top 14px;
+            }
+
             &.share-bt {
-              // width: 30px;
+              padding-left: 24px;
               background-image: cdnUrl("/img/ML/comment_share.svg");
               background-size: 12px 12px;
-              // left: 0;
+              background-position: left 8px top 10px;
             }
 
             &.reply-bt {
-              // width: 30px;
+              padding-left: 24px;
               background-image: cdnUrl("/img/ML/comment_reply.svg");
               background-size: 12px 12px;
-              // left: 30px;
+              background-position: left 8px top 10px;
             }
 
             &.react-bt {
-              // width: 30px;
-              background-image: cdnUrl("/img/ML/comment_react_emoji.svg");
+              padding-left: 26px;
+              background-image: cdnUrl("/img/ML/comment_react.svg");
               background-size: 14px 14px;
+              background-position: left 8px top 9px;
               border-right: none;
 
               div.emoji-mart {
@@ -321,13 +370,13 @@ div.stream-comments {
           float: left;
           max-width: 80%;
 
-          @include preload_image(cdnUrl("/img/ML/comment_delete_can.svg"));
+          @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
 
           div.stream-comment-author-name {
             @include OC_Body_Bold();
-            font-size: 12px;
+            font-size: 14px;
             color: $deep_navy;
-            line-height: 15px;
+            line-height: 16px;
             float: left;
             @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
           }
@@ -335,20 +384,22 @@ div.stream-comments {
 
         div.stream-comment-author-avatar {
           float: left;
-          width: 24px;
-          height: 24px;
+          width: 32px;
+          height: 32px;
 
-          @include user-profile(24);
+          @include user-profile(32);
         }
 
         div.stream-comment-right {
-          margin-left: 32px;
+          margin-left: 48px;
 
-          @include preload_image(cdnUrl("/img/ML/comment_react_emoji.svg"));
+          @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
         }
 
         div.stream-comment-header {
           height: 24px;
+
+          @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
 
           div.stream-comment-author-right  {
             float: left;
@@ -356,29 +407,29 @@ div.stream-comments {
 
             div.stream-comment-author-name {
               @include OC_Body_Bold();
-              font-size: 12px;
+              font-size: 14px;
               color: $deep_navy;
-              line-height: 24px;
+              line-height: 16px;
               float: left;
             }
 
             div.stream-comment-author-timestamp {
               @include OC_Body_Book();
-              font-size: 12px;
+              font-size: 14px;
               color: rgba($deep_navy, 0.5);
               float: left;
-              margin-left: 8px;
-              line-height: 24px;
+              margin-left: 6px;
+              line-height: 16px;
             }
 
             div.new-comment-tag {
               float: left;
-              margin-left: 8px;
+              margin-left: 6px;
               color: $carrot_green;
               @include OC_Body_Bold();
               text-transform: uppercase;
-              font-size: 12px;
-              line-height: 24px;
+              font-size: 14px;
+              line-height: 16px;
             }
           }
         }
@@ -386,14 +437,13 @@ div.stream-comments {
         div.stream-comment-content {
           text-align: left;
           position: relative;
-          margin-top: 2px;
 
           div.stream-comment-body {
             display: inline;
-            @include activity-comment(17px, 22px);
+            @include activity-comment(17px, 22px, 16px);
 
             @include mobile() {
-              @include activity-comment();              
+              @include activity-comment(18px, 24px, 16px);
             }
 
             .interactive-image {
@@ -455,30 +505,18 @@ div.stream-comments {
       div.stream-comment div.add-comment-box-container {
         padding-top: 8px;
         margin-bottom: 8px;
-
-        div.add-comment-box div.add-comment-internal div.add-comment {
-          min-height: 92px;
-
-          @include mobile() {
-            min-height: 48px;
-          }
-
-          div.add-comment-footer.hide-footer {
-            display: none;
-          }
-        }
       }
 
       div.stream-comment.indented-comment {
         div.add-comment-box-container {
-          margin-left: 32px;
+          margin-left: 48px;
 
           @include mobile() {
             margin-left: 0;
           }
 
           div.add-comment-box {
-            width: calc(100% - 32px);
+            width: calc(100% - 48px);
 
             @include mobile() {
               width: 100%;

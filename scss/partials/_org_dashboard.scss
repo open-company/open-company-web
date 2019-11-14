@@ -48,6 +48,12 @@ div.org-dashboard {
       padding-top: #{$navbar_height}px;
     }
 
+    @include big_web() {
+      div.org-dashboard-inner {
+        padding-top: 0;
+      }
+    }
+
     div.page {
 
       @include mobile() {

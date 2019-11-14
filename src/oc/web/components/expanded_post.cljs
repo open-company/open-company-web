@@ -60,7 +60,6 @@
   (drv/drv :route)
   (drv/drv :activity-data)
   (drv/drv :comments-data)
-  (drv/drv :hide-left-navbar)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
   (drv/drv :add-comment-highlight)
@@ -137,15 +136,6 @@
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
           {:on-click close-expanded-post}]
-       [:div.expanded-post-header-center.group
-         (user-avatar-image (:publisher activity-data))
-         [:span.header-title
-           (:headline activity-data)]
-         (if (and assigned-follow-up-data
-                  (not (:completed? assigned-follow-up-data)))
-            [:div.follow-up-tag]
-            (when (:must-see activity-data)
-              [:div.must-see-tag]))]
        [:div.activity-share-container]
        (more-menu {:entity-data activity-data
                    :share-container-id dom-element-id
@@ -156,8 +146,11 @@
                    :show-delete? true
                    :show-move? (not is-mobile?)
                    :tooltip-position "bottom"
-                   :assigned-follow-up-data assigned-follow-up-data
-                   :complete-follow-up-title "Complete follow-up"})]
+                   :assigned-follow-up-data assigned-follow-up-data})
+       (when user-is-part-of-the-team
+         [:div.expanded-post-wrt-container
+           (wrt-count {:activity-data activity-data
+                       :reads-data reads-data})])]
       (when has-video
         [:div.group
           {:key (str "ziggeo-player-" (:fixed-video-id activity-data))
@@ -172,28 +165,33 @@
         {:class utils/hide-class}
         (:headline activity-data)]
       [:div.expanded-post-author.group
-        (user-avatar-image publisher)
         [:div.expanded-post-author-inner
-          {:data-toggle (when-not is-mobile? "tooltip")
-           :data-placement "top"
-           :data-container "body"
-           :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-           :data-title (utils/activity-date-tooltip activity-data)
-           :class utils/hide-class}
+          {:class utils/hide-class}
           [:span.expanded-post-author-inner-label
             (str (:name publisher) " in "
                  (:board-name activity-data)
                  (when (= (:board-access activity-data) "private")
                    " (private)")
                  (when (= (:board-access activity-data) "public")
-                   " (public)")
-                 " on "
-                 (utils/tooltip-date (:published-at activity-data)))]
+                   " (public)"))
+            [:div.expanded-post-author-dot]
+            [:time
+              {:date-time (:published-at activity-data)
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+               :data-title (utils/activity-date-tooltip activity-data)}
+              (utils/foc-date-time (:published-at activity-data))]]
+          (when (or (and assigned-follow-up-data
+                         (not (:completed? assigned-follow-up-data)))
+                    (:must-see activity-data))
+            [:div.expanded-post-author-dot])
           (if (and assigned-follow-up-data
                    (not (:completed? assigned-follow-up-data)))
-            [:div.follow-up-tag.mobile-only]
+            [:div.follow-up-tag]
             (when (:must-see activity-data)
-              [:div.must-see-tag.mobile-only]))]]
+              [:div.must-see-tag]))]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
           {:class utils/hide-class
@@ -211,14 +209,13 @@
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data
-                             :show-new-tag? has-new-comments?})
-          (when user-is-part-of-the-team
-            [:div.expanded-post-wrt-container
-              (wrt-count {:activity-data activity-data
-                          :reads-data reads-data})])]]
+                             :show-new-tag? has-new-comments?
+                             :hide-face-pile? true})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
-          (rum/with-key (add-comment activity-data) (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
+          (rum/with-key (add-comment {:activity-data activity-data
+                                      :scroll-after-posting? true})
+           (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
                           :new-added-comment add-comment-highlight

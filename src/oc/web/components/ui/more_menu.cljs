@@ -71,7 +71,14 @@
         create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
         complete-follow-up-link (when (and assigned-follow-up-data
                                            (not (:completed? assigned-follow-up-data)))
-                                  (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))]
+                                  (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))
+        should-show-more-bt (or edit-link
+                                delete-link
+                                can-comment-share?
+                                can-react?
+                                can-reply?
+                                (and (not external-share)
+                                     share-link))]
     (when (or edit-link
               share-link
               delete-link
@@ -82,16 +89,10 @@
               complete-follow-up-link)
       [:div.more-menu
         {:ref "more-menu"
-         :class (when (or @(::move-activity s)
-                          @(::showing-menu s))
-                  "menu-expanded")}
-        (when (or edit-link
-                  delete-link
-                  can-comment-share?
-                  can-react?
-                  can-reply?
-                  (and (not external-share)
-                       share-link))
+         :class (utils/class-set {:menu-expanded (or @(::move-activity s)
+                                                     @(::showing-menu s))
+                                  :has-more-menu-bt should-show-more-bt})}
+        (when should-show-more-bt
           [:button.mlb-reset.more-menu-bt
             {:type "button"
              :ref "more-menu-bt"

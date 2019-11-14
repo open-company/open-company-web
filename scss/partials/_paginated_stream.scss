@@ -29,6 +29,12 @@ div.paginated-stream {
 
     div.paginated-stream-cards-inner {
       position: relative;
+      overflow: visible !important;
+
+      .ReactVirtualized__Grid.ReactVirtualized__List,
+      .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
+        overflow: visible !important;
+      }
 
       div.activities-overlay {
         position: fixed;

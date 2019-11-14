@@ -90,10 +90,7 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        ;; Hide lables on FoC on mobile if there are at least 3 reactions or if there is at least one attachment
-        mobile-hide-labels? (and is-mobile?
-                                 (or (> (count (:reactions activity-data)) 3)
-                                     (seq activity-attachments)))]
+        ]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -226,14 +223,12 @@
               (reactions {:entity-data activity-data
                           :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
-                (when-not (and mobile-hide-labels?
-                               (zero? (count (:sorted-comments comments-data))))
-                  [:div.stream-item-comments-summary
-                    ; {:on-click #(expand s true true)}
-                    (comments-summary {:entry-data activity-data
-                                       :comments-data comments-data
-                                       :show-new-tag? has-new-comments?
-                                       :hide-label? mobile-hide-labels?})])
+                [:div.stream-item-comments-summary
+                  ; {:on-click #(expand s true true)}
+                  (comments-summary {:entry-data activity-data
+                                     :comments-data comments-data
+                                     :show-new-tag? has-new-comments?
+                                     :hide-label? is-mobile?})]
                 (when show-wrt?
                   [:div.stream-item-wrt
                     {:ref :stream-item-wrt}

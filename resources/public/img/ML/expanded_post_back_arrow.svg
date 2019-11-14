@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="10px" viewBox="0 0 16 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="14px" height="10px" viewBox="0 0 14 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
     <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
-    <g id="Post-consumption" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Full-screen-post-(long)" transform="translate(-444.000000, -91.000000)" fill="#242D42" fill-rule="nonzero">
-            <g id="Group-17" transform="translate(428.000000, 80.000000)">
-                <g id="Group-16" transform="translate(16.000000, 7.000000)">
-                    <path d="M9,4.0348565 L9,16.1606167 C9,16.6241953 8.55613518,17 8,17 C7.44771525,17 7,16.6264648 7,16.1606167 L7,4.0348565 L4.70710678,6.07298381 C4.31658249,6.42011651 3.68341751,6.42011651 3.29289322,6.07298381 C2.90236893,5.7258511 2.90236893,5.16303779 3.29289322,4.81590508 L7.29289322,1.26034953 C7.68341751,0.913216824 8.31658249,0.913216824 8.70710678,1.26034953 L12.7071068,4.81590508 C13.0976311,5.16303779 13.0976311,5.7258511 12.7071068,6.07298381 C12.3165825,6.42011651 11.6834175,6.42011651 11.2928932,6.07298381 L9,4.0348565 Z" id="Combined-Shape" transform="translate(8.000000, 9.000000) scale(-1, 1) rotate(90.000000) translate(-8.000000, -9.000000) "></path>
+    <g id="Expanded-post-view" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Post:-Mute-post" transform="translate(-397.000000, -91.000000)" fill="#242D42" fill-rule="nonzero">
+            <g id="Group-26" transform="translate(388.000000, 56.000000)">
+                <g id="Group-3" transform="translate(0.000000, 24.000000)">
+                    <path d="M17,12.0348565 L17,22.1606167 C17,22.6241953 16.5561352,23 16,23 C15.4477153,23 15,22.6264648 15,22.1606167 L15,12.0348565 L12.7071068,14.0729838 C12.3165825,14.4201165 11.6834175,14.4201165 11.2928932,14.0729838 C10.9023689,13.7258511 10.9023689,13.1630378 11.2928932,12.8159051 L15.2928932,9.26034953 C15.6834175,8.91321682 16.3165825,8.91321682 16.7071068,9.26034953 L20.7071068,12.8159051 C21.0976311,13.1630378 21.0976311,13.7258511 20.7071068,14.0729838 C20.3165825,14.4201165 19.6834175,14.4201165 19.2928932,14.0729838 L17,12.0348565 Z" id="Combined-Shape" transform="translate(16.000000, 16.000000) scale(-1, 1) rotate(90.000000) translate(-16.000000, -16.000000) "></path>
                 </g>
             </g>
         </g>
