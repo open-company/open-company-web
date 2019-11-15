@@ -122,8 +122,6 @@
         team-data (:team-data invite-users-data)
         invite-users (:invite-users invite-users-data)
         cur-user-data (:current-user-data invite-users-data)
-        team-roster (:team-roster invite-users-data)
-        uninvited-users (filterv #(= (:status %) "uninvited") (:users team-roster))
         is-admin? (jwt/is-admin? (:team-id org-data))]
     [:div.invite-email-modal
       [:button.mlb-reset.modal-close-bt

@@ -180,8 +180,7 @@
                   "Copy"]]])
           (if (:can-slack-invite team-data)
             [:div.invites-list
-              {:key "org-settings-invite-table"
-               :class (when is-admin? "top-border")}
+              {:class (when is-admin? "top-border")}
               [:div.invites-list-title
                 "Invite someone with a specific permission level"]
               (for [i (range (count invite-users))
@@ -248,8 +247,9 @@
                              (pos? @(::sending s)))}
               @(::send-bt-cta s)]]
           [:div.invites-list
+            {:class (when is-admin? "top-border")}
             [:div.invites-list-title
               "Invite someone with a specific permission level"]
             [:button.mlb-reset.enable-carrot-bot-bt
-              {:on-click #()}
+              {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=invite-slack"))}
               "Enable the Carrot bot for Slack"]])]]]))
