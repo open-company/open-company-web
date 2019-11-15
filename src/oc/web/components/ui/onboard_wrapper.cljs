@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.onboard-wrapper
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
             [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
@@ -705,8 +706,17 @@
                                  (rum/local false ::password-error)
                                  (rum/local "" ::email)
                                  (rum/local "" ::pswd)
+                                 (rum/local false ::auth-settings-loaded)
                                  {:did-mount (fn [s]
-                                  (dots-animation s)
+                                    (dots-animation s)
+                                  s)
+                                  :will-update (fn [s]
+                                    (let [auth-settings (:auth-settings @(drv/get-ref s :team-invite))]
+                                      (when (and (not @(::auth-settings-loaded s))
+                                                 auth-settings
+                                                 (not (:team auth-settings)))
+                                        (reset! (::auth-settings-loaded s) true)
+                                        (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search)))
                                   s)}
   [s]
   (let [team-invite-drv (drv/react s :team-invite)
@@ -815,11 +825,16 @@
     (when (and (:auth-settings confirm-invitation)
                (not @(::exchange-started s)))
       (reset! (::exchange-started s) true)
-      (user-actions/confirm-invitation (:token confirm-invitation)))))
+      (user-actions/confirm-invitation (:token confirm-invitation)))
+    (when (and @(::exchange-started s)
+               (not @(::exchange-ended s))
+               (:invitation-error confirm-invitation))
+      (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search))))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
                             (rum/local false ::exchange-started)
+                            (rum/local false ::exchange-ended)
                             {:will-mount (fn [s]
                               (confirm-invitation-when-ready s)
                               s)
@@ -836,13 +851,14 @@
       [:div.main-cta
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]]
-        [:div.title
-          "Join your team on Carrot"]
-        (if (:invitation-error confirm-invitation)
-          [:div.subtitle
-            "An error occurred while confirming your invitation, please try again."]
-          [:div.subtitle
-            "Please wait" [:span.dots {:ref :dots} "."]])]]))
+        [:div.invite-container
+          [:div.title
+            "Join your team on Carrot"]
+          (if (:invitation-error confirm-invitation)
+            [:div.subtitle
+              "An error occurred while confirming your invitation, please try again."]
+            [:div.subtitle.checking-invitation
+              "Checking invitation link" [:span.dots {:ref :dots} "."]])]]]))
 
 (rum/defcs invitee-lander-password < rum/reactive
                                      (drv/drv :collect-password)
