@@ -68,6 +68,7 @@ div.onboard-wrapper-container {
             height: 240px;
             background-image: cdnUrl("/img/ML/sad_search.svg");
             background-size: 240px 240px;
+            transition: all 180ms ease-in;
           }
         }
       }
