@@ -367,6 +367,11 @@
                                :auth-settings auth-settings
                                :token (:token (:query-params route))
                                :jwt jwt})]
+   :team-invite           [[:base :route :auth-settings :jwt]
+                            (fn [base route auth-settings jwt]
+                              {:auth-settings auth-settings
+                               :invite-token (:invite-token (:query-params route))
+                               :jwt jwt})]
    :collect-password      [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)

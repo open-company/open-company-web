@@ -70,12 +70,21 @@
         with-client-ids (cond-> params
                                change-client-id (assoc-in [:headers "OC-Change-Client-ID"] change-client-id)
                                interaction-client-id (assoc-in [:headers "OC-Interaction-Client-ID"] interaction-client-id)
-                               notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))]
-    (if-let [jwt (or (j/jwt)
-                     (j/id-token))]
+                               notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))
+        jwt-or-id-token (or (j/jwt)
+                            (j/id-token))
+        ; invite-token (-> @router/path :query-params :invite-token)
+        ]
+    (cond
+      jwt-or-id-token
       (-> {:with-credentials? false}
           (merge with-client-ids)
-          (update :headers merge {"Authorization" (str "Bearer " jwt)}))
+          (update :headers merge {"Authorization" (str "Bearer " jwt-or-id-token)}))
+      ; invite-token
+      ; (-> {:with-credentials? false}
+      ;     (merge with-client-ids)
+      ;     (update :headers merge {"Authorization" (str "Bearer " invite-token)}))
+      :else
       with-client-ids)))
 
 (defn headers-for-link [link]
@@ -267,11 +276,17 @@
         (callback success fixed-body)))))
 
 (defn get-auth-settings [callback]
-  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}]
-  (auth-http http/get "/" header-options
-   (fn [response]
-     (let [body (if (:success response) (:body response) false)]
-       (callback body))))))
+  (let [invite-token (-> @router/path :query-params :invite-token)
+        default-headers (headers-for-link {:access-control-allow-headers nil
+                                           :content-type "application/json"})
+        with-auth-token (if invite-token
+                          (merge default-headers {"Authorization" (str "Bearer " invite-token)})
+                          default-headers)
+        header-options {:headers with-auth-token}]
+    (auth-http http/get "/" header-options
+     (fn [{:keys [status success body] :as response}]
+       (let [body (when success body)]
+         (callback body status))))))
 
 ;; Payments
 
@@ -477,7 +492,12 @@
 ;; Signup
 
 (defn signup-with-email [auth-link first-name last-name email pswd timezone callback]
-  (let [user-map {:first-name first-name
+  (let [invite-token (-> @router/path :query-params :invite-token)
+        default-headers (headers-for-link auth-link)
+        with-auth-token (if invite-token
+                          (merge default-headers {"Authorization" (str "Bearer " invite-token)})
+                          default-headers)
+        user-map {:first-name first-name
                   :last-name last-name
                   :email email
                   :password pswd
@@ -485,7 +505,7 @@
     (if (and auth-link first-name last-name email pswd)
       (auth-http (method-for-link auth-link) (relative-href auth-link)
         {:json-params (cljs->json user-map)
-         :headers (headers-for-link auth-link)}
+         :headers with-auth-token}
         (fn [{:keys [success body status]}]
           (callback success body status)))
       (handle-missing-link "signup-with-email" auth-link callback

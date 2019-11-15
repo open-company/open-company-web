@@ -434,12 +434,16 @@
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
-      (when (empty? (:token query-params))
+      (when (and (empty? (:token query-params))
+                 (empty? (:invite-token query-params)))
         (router/redirect! urls/home))
       (when (jwt/jwt)
         (cook/remove-cookie! :jwt)
         (cook/remove-cookie! :show-login-overlay))
-      (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
+      (let [invitee-type (if (contains? query-params :invite-token)
+                          :invitee-team-lander
+                          :invitee-lander)]
+        (simple-handler #(onboard-wrapper invitee-type) "confirm-invitation" target params)))
 
     (defroute confirm-invitation-password-route urls/confirm-invitation-password {:as params}
       (timbre/info "Routing confirm-invitation-password-route" urls/confirm-invitation-password)

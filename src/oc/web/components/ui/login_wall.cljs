@@ -24,9 +24,11 @@
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
         deep-link-origin (drv/react s :expo-deep-link-origin)
+        email-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})
+        slack-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "slack"})
+        google-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "google"})
         login-enabled (and auth-settings
-                           (seq (utils/link-for (:links auth-settings) "authenticate" "GET"
-                            {:auth-source "email"}))
+                           (seq email-auth-link)
                            (seq @(::email s))
                            (seq @(::pswd s)))
         login-action #(when login-enabled
@@ -55,36 +57,41 @@
                 [:div.login-title (or title default-title)]]
               (when (seq (or desc default-desc))
                 [:div.login-description (or desc default-desc)])
-              [:button.mlb-reset.signup-with-slack
-                {:on-touch-start identity
-                 :on-click #(do
-                             (.preventDefault %)
-                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                   {:auth-source "slack"})]
-                               (user-actions/maybe-save-login-redirect)
-                               (user-actions/login-with-slack auth-link
-                                                              (when ua/mobile-app?
-                                                                {:redirect-origin deep-link-origin}))))}
-                [:div.signup-with-slack-content
-                  [:div.slack-icon
-                    {:aria-label "slack"}]
-                  "Continue with Slack"]]
-              [:button.mlb-reset.signup-with-google
-                {:on-touch-start identity
-                 :on-click #(do
-                             (.preventDefault %)
-                             (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
-                                                                  {:auth-source "google"})]
-                               (user-actions/maybe-save-login-redirect)
-                               (user-actions/login-with-google auth-link
-                                                               (when ua/mobile-app?
-                                                                 {:redirect-origin deep-link-origin}))))}
-               [:div.signup-with-google-content
-                 [:div.google-icon
-                  {:aria-label "google"}]
-                  "Continue with Google "]]
-              [:div.or-login
-                [:div.or-login-copy "Or, login with email"]]
+              (when (seq email-auth-link)
+                [:button.mlb-reset.signup-with-slack
+                  {:on-touch-start identity
+                   :on-click #(do
+                               (.preventDefault %)
+                               (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                     {:auth-source "slack"})]
+                                 (user-actions/maybe-save-login-redirect)
+                                 (user-actions/login-with-slack auth-link
+                                                                (when ua/mobile-app?
+                                                                  {:redirect-origin deep-link-origin}))))}
+                  [:div.signup-with-slack-content
+                    [:div.slack-icon
+                      {:aria-label "slack"}]
+                    "Continue with Slack"]])
+              (when (seq google-auth-link)
+                [:button.mlb-reset.signup-with-google
+                  {:on-touch-start identity
+                   :on-click #(do
+                               (.preventDefault %)
+                               (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
+                                                                    {:auth-source "google"})]
+                                 (user-actions/maybe-save-login-redirect)
+                                 (user-actions/login-with-google auth-link
+                                                                 (when ua/mobile-app?
+                                                                   {:redirect-origin deep-link-origin}))))}
+                 [:div.signup-with-google-content
+                   [:div.google-icon
+                    {:aria-label "google"}]
+                    "Continue with Google "]])
+              (when (and (seq email-auth-link)
+                         (or (seq slack-auth-link)
+                             (seq google-auth-link)))
+                [:div.or-login
+                  [:div.or-login-copy "Or, login with email"]])
               ;; Email fields
               [:div.group
                 ;; Error messages

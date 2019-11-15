@@ -849,6 +849,10 @@ div.onboard-lander {
       font-size: 18px;
       line-height: 23px;
       border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 4px 64px;
 
       &.start-using-carrot {
         background-color: $carrot_orange_2;
@@ -951,6 +955,58 @@ div.onboard-lander {
 
         @include mobile() {
           margin-top: 32px;
+        }
+      }
+    }
+  }
+
+  &.invitee-team-lander {
+    div.main-cta {
+
+      div.title-container {
+        margin-top: 64px;
+
+        div.team-logo-container {
+          width: 100%;
+          display: block;
+          margin: 0 0 24px;
+
+          @include org-avatar(72);
+
+          div.org-avatar {
+            float: none;
+
+            div.org-avatar-container:before {
+              left: 50%;
+              transform: translateX(-50%);
+            }
+          }
+        }
+
+        div.title {
+          margin-top: 0;
+        }
+      }
+
+      div.invite-token-container {
+        position: absolute;
+        left: 50%;
+        top: calc(50% - 32px);
+        transform: translate(-50%, -50%);
+
+        div.title {
+          font-size: 32px;
+        }
+
+        div.subtitle {
+          width: 379px;
+          margin: 16px auto 0;
+          font-size: 18px;
+
+          &.checking-invitation {
+            width: 264px;
+            text-align: left;
+          }
         }
       }
     }

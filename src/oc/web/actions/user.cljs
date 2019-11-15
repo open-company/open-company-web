@@ -214,15 +214,18 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
-  (api/get-auth-settings (fn [body]
-    (when body
-      ;; auth settings loaded
-      (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-        (get-user user-link))
-      (dis/dispatch! [:auth-settings body])
-      (check-user-walls)
-      ;; Start teams retrieve if we have a link
-      (team-actions/teams-get)))))
+  (api/get-auth-settings (fn [body status]
+    (if body
+      (do
+        ;; auth settings loaded
+        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+          (get-user user-link))
+        (dis/dispatch! [:auth-settings body])
+        (check-user-walls)
+        ;; Start teams retrieve if we have a link
+        (team-actions/teams-get))
+      (when (= status 401)
+        (dis/dispatch! [:auth-settings status]))))))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))

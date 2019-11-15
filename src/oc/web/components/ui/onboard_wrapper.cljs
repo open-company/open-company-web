@@ -698,6 +698,118 @@
       (set! (.-innerText dots-node) next-dots)
       (utils/after 800 #(dots-animation s)))))
 
+(rum/defcs invitee-team-lander < rum/reactive
+                                 (drv/drv :team-invite)
+                                 (drv/drv user-store/signup-with-email)
+                                 (rum/local false ::email-error)
+                                 (rum/local false ::password-error)
+                                 (rum/local "" ::email)
+                                 (rum/local "" ::pswd)
+                                 {:did-mount (fn [s]
+                                  (dots-animation s)
+                                  s)}
+  [s]
+  (let [team-invite-drv (drv/react s :team-invite)
+        auth-settings (:auth-settings team-invite-drv)
+        email-signup-link (utils/link-for (:links auth-settings) "create" "POST" {:auth-source "email"})
+        team-data (:team auth-settings)
+        signup-with-email (drv/react s user-store/signup-with-email)]
+    [:div.onboard-lander.invitee-team-lander
+      (if auth-settings
+        (if (:team auth-settings)
+          [:div
+            [:div.main-cta
+              [:div.mobile-header
+                (when-not ua/mobile-app?
+                  [:button.mlb-reset.top-back-button
+                    {:on-touch-start identity
+                     :on-click #(router/history-back!)
+                     :aria-label "Back"}])
+                [:div.mobile-logo]]
+              [:div.title-container
+                (when (seq (:logo-url team-data))
+                  [:div.team-logo-container
+                    (org-avatar team-data false :never)])
+                [:div.title.main-lander
+                  "Join " (:name team-data) " on Carrot"]]]
+            [:div.onboard-form
+              [:form
+                {:on-submit (fn [e]
+                              (.preventDefault e))}
+                [:div.field-label.email-field
+                  "Work email"
+                  (cond
+                    (= (:error signup-with-email) 409)
+                    [:span.error "Email already exists"]
+                    @(::email-error s)
+                    [:span.error "Email is not valid"])]
+                [:input.field.oc-input
+                  {:type "email"
+                   :class (utils/class-set {:error (= (:error signup-with-email) 409)
+                                            utils/hide-class true})
+                   :pattern utils/valid-email-pattern
+                   :value @(::email s)
+                   :on-change #(let [v (.. % -target -value)]
+                                 (reset! (::password-error s) false)
+                                 (reset! (::email-error s) false)
+                                 (reset! (::email s) v))}]
+                [:div.field-label
+                  "Password"
+                  (when @(::password-error s)
+                    [:span.error
+                      "Minimum 8 characters"])]
+                [:input.field.oc-input
+                  {:type "password"
+                   :pattern ".{8,}"
+                   :value @(::pswd s)
+                   :placeholder "Minimum 8 characters"
+                   :on-change #(let [v (.. % -target -value)]
+                                 (reset! (::password-error s) false)
+                                 (reset! (::email-error s) false)
+                                 (reset! (::pswd s) v))}]
+                [:div.field-description
+                  "By signing up you are agreeing to our "
+                  [:a
+                    {:href oc-urls/terms}
+                    "terms of service"]
+                  " and "
+                  [:a
+                    {:href oc-urls/privacy}
+                    "privacy policy"]
+                  "."]
+                [:button.continue
+                  {:class (when (or (not (utils/valid-email? @(::email s)))
+                                    (<= (count @(::pswd s)) 7))
+                            "disabled")
+                   :on-touch-start identity
+                   :on-click #(if (or (not (utils/valid-email? @(::email s)))
+                                      (<= (count @(::pswd s)) 7))
+                                (do
+                                  (when-not (utils/valid-email? @(::email s))
+                                    (reset! (::email-error s) true))
+                                  (when (<= (count @(::pswd s)) 7)
+                                    (reset! (::password-error s) true)))
+                                (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
+                  (str "Join " (:name team-data))]]]]
+          [:div.main-cta
+            [:div.mobile-header.mobile-only
+              [:div.mobile-logo]]
+            [:div.invite-token-container.token-error
+              [:div.title
+                "Oh shoot..."]
+              [:div.subtitle
+                (str "The invite link you’re trying to access "
+                     "has been deactivated by the account admin "
+                     "and is no longer valid.")]]])
+        [:div.main-cta
+          [:div.mobile-header.mobile-only
+            [:div.mobile-logo]]
+          [:div.invite-token-container
+            [:div.title
+              "Please wait"]
+            [:div.subtitle.checking-invitation
+              "Checking your invitation" [:span.dots {:ref :dots} "."]]]])]))
+
 (defn confirm-invitation-when-ready [s]
   (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
     (when (and (:auth-settings confirm-invitation)
@@ -980,6 +1092,7 @@
     :invitee-lander (invitee-lander)
     :invitee-lander-password (invitee-lander-password)
     :invitee-lander-profile (invitee-lander-profile)
+    :invitee-team-lander (invitee-team-lander)
     :email-wall (email-wall)
     :email-verified (email-verified)
     :password-reset-lander (password-reset-lander)
