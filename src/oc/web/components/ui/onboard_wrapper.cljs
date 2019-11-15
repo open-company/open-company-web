@@ -808,7 +808,7 @@
             [:div.title
               "Please wait"]
             [:div.subtitle.checking-invitation
-              "Checking your invitation" [:span.dots {:ref :dots} "."]]]])]))
+              "Checking invitation link" [:span.dots {:ref :dots} "."]]]])]))
 
 (defn confirm-invitation-when-ready [s]
   (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
