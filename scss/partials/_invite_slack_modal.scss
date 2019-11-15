@@ -124,10 +124,11 @@ div.invite-slack-modal {
       }
 
       div.invites-list {
-        margin-top: 16px;
+        margin-top: 24px;
         padding-top: 16px;
 
         &.top-border {
+          padding-top: 24px;
           border-top: 1px solid rgba($deep_navy, 0.15);
         }
 
