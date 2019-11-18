@@ -56,10 +56,15 @@ div.dashboard-layout {
 
   div.dashboard-layout-container {
     padding: 0;
-    margin: 0 auto;
-    width:#{$board_container_width + $left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin}px;
+    $total_dashboard_width: $board_container_width + $left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + 32;
+    width: #{$total_dashboard_width}px;
     transition: margin-left 180ms ease-in, width 180ms ease-in, max-width 180ms ease-in;
     position: relative;
+    padding: 0 16px;
+
+    @media screen and (min-width: #{$total_dashboard_width}px) {
+      left: calc((100vw - #{$total_dashboard_width}px) / 2);
+    }
 
     @include mobile(){
       padding: 0px;
@@ -69,6 +74,7 @@ div.dashboard-layout {
       max-width: initial;
       min-width: initial;
       padding-bottom: 52px;
+      left: unset;
     }
 
     div.dashboard-layout-mobile-tabbar {
@@ -332,12 +338,13 @@ div.dashboard-layout {
               padding: 0 0 0 16px;
               margin: 3px 0 0 16px;
               position: relative;
-              border-left: 1px solid $ultra_light_grey;
+              border-left: 1px solid rgba($deep_navy, 0.3);
               opacity: 0.5;
 
               @include big_web() {
                 &:hover {
                   opacity: 1;
+                  border-left: 1px solid rgba($deep_navy, 0.15);
                 }
               }
 
