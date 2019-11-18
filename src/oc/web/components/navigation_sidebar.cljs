@@ -54,6 +54,8 @@
   (reset! (::window-height s) (.-innerHeight js/window))
   (reset! (::window-width s) (.-innerWidth js/window)))
 
+(def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -104,7 +106,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
-        filtered-change-data (into {} (filter #(-> % first (s/starts-with? "0000-0000-0000-") not) change-data))
+        filtered-change-data (into {} (filter #(-> % first (s/starts-with? drafts-board-prefix) not) change-data))
         current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
