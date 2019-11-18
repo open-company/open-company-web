@@ -285,7 +285,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: $deep_navy){
+@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: $deep_navy, $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -345,24 +345,24 @@ $h2_top_margin: 24;
   }
 
   & > *:not(:last-child) {
-    margin: #{$line_height}px 0px;
+    margin: #{$paragraph_spacing}px 0px;
     padding-top: 0px;
     padding-bottom: 0px;
   }
 
   & > *:last-child:not(:first-child) {
-    margin: #{$line_height}px 0px 0px;
+    margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 0px;
   }
 
   & > blockquote:not(:last-child) {
-    margin: #{$line_height}px 0px;
+    margin: #{$paragraph_spacing}px 0px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
 
   & > blockquote:last-child:not(:first-child) {
-    margin: #{$line_height}px 0px 0px;
+    margin: #{$paragraph_spacing}px 0px 0px;
     padding-bottom: 10px;
   }
 
@@ -414,7 +414,7 @@ $h2_top_margin: 24;
   }
 
   & > *:not(:first-child) {
-    margin-top: #{$line_height}px;
+    margin-top: #{$paragraph_spacing}px;
   }
 
   h2 + p {
@@ -614,7 +614,7 @@ $h2_top_margin: 24;
 }
 
 
-@mixin activity-comment($font-size: 18px, $line-height: 24px){
+@mixin activity-comment($font-size: 18px, $line-height: 24px, $paragraph-spacing: $line-height){
   @include OC_Body_Book();
   font-size: $font-size;
   color: $deep_navy;
@@ -752,5 +752,47 @@ $h2_top_margin: 24;
 
   p, ul > li, i {
     min-height: $line-height
+  }
+
+  h2 + p {
+    margin-top: 0px !important;
+  }
+
+  & > *:first-child {
+    margin: 0px;
+  }
+
+  & > *:not(:last-child) {
+    margin: $paragraph-spacing 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  & > *:last-child:not(:first-child) {
+    margin: $paragraph-spacing 0px 0px;
+    padding-bottom: 0px;
+  }
+
+  & > blockquote:not(:last-child) {
+    margin: $paragraph-spacing 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  & > blockquote:last-child:not(:first-child) {
+    margin: $paragraph-spacing 0px 0px;
+    padding-bottom: 10px;
+  }
+
+  & > img, img {
+    padding-bottom: 8px;
+  }
+
+  *:first-child {
+    margin-top: 0px;
+  }
+
+  & > *:not(:first-child) {
+    margin-top: $paragraph-spacing;
   }
 }

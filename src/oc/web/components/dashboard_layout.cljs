@@ -45,7 +45,6 @@
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
-                              (drv/drv :hide-left-navbar)
                               (drv/drv :sort-type)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
@@ -115,14 +114,21 @@
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
         showing-mobile-user-notifications (drv/react s :mobile-user-notifications)
+        show-expanded-post (and current-activity-id
+                                activity-data
+                                (not= activity-data :404)
+                                ;; Do not show the post under the wrong board slug/uuid
+                                (or (= (:board-slug activity-data) (router/current-board-slug))
+                                    (= (:board-uuid activity-data) (router/current-board-slug))))
         no-phisical-home-button (and ua/mobile-app?
                                      (js/isiPhoneWithoutPhysicalHomeBt))]
       ;; Entries list
       [:div.dashboard-layout.group
+        {:class (when show-expanded-post "expanded-post-view")}
         [:div.dashboard-layout-container.group
-          {:class (when (drv/react s :hide-left-navbar) "hide-left-navbar")}
           (navigation-sidebar)
           (when (and is-mobile?
+                     (not show-expanded-post)
                      (or (:collapsed cmail-state)
                          (not cmail-state))
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
@@ -199,81 +205,82 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
+            (when-not show-expanded-post
             ;; Board name row: board name, settings button and say something button
-            [:div.board-name-container.group
-              {:class (when is-drafts-board "drafts-board")}
-              ;; Board name and settings button
-              [:div.board-name
-                (when (router/current-board-slug)
-                  [:div.board-name-with-icon
-                    [:div.board-name-with-icon-internal
-                      {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
-                                                              (not is-drafts-board))
-                                                :public (= (:access current-board-data) "public")})
-                       :dangerouslySetInnerHTML (utils/emojify (cond
-                                                 is-all-posts
-                                                 "All posts"
+              [:div.board-name-container.group
+                {:class (when is-drafts-board "drafts-board")}
+                ;; Board name and settings button
+                [:div.board-name
+                  (when (router/current-board-slug)
+                    [:div.board-name-with-icon
+                      [:div.board-name-with-icon-internal
+                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
+                                                                (not is-drafts-board))
+                                                  :public (= (:access current-board-data) "public")})
+                         :dangerouslySetInnerHTML (utils/emojify (cond
+                                                   is-all-posts
+                                                   "All posts"
 
-                                                 is-follow-ups
-                                                 "Follow-ups"
+                                                   is-follow-ups
+                                                   "Follow-ups"
 
-                                                 :default
-                                                 ;; Fallback to the org board data
-                                                 ;; to avoid showing an empty name while loading
-                                                 ;; the board data
-                                                 (:name current-board-data)))}]])
-                (when (and (= (:access current-board-data) "private")
-                           (not is-drafts-board))
-                  [:div.private-board
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                     :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
-                             "Only visible to you"
-                             "Only visible to invited team members")}])
-                (when (= (:access current-board-data) "public")
-                  [:div.public-board
-                    {:data-toggle "tooltip"
-                     :data-placement "top"
-                     :data-container "body"
-                     :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                     :title "Visible to the world, including search engines"}])
-                (when should-show-settings-bt
-                  [:div.board-settings-container
-                    ;; Settings button
-                    [:button.mlb-reset.board-settings-bt
-                      {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                                                   :default
+                                                   ;; Fallback to the org board data
+                                                   ;; to avoid showing an empty name while loading
+                                                   ;; the board data
+                                                   (:name current-board-data)))}]])
+                  (when (and (= (:access current-board-data) "private")
+                             (not is-drafts-board))
+                    [:div.private-board
+                      {:data-toggle "tooltip"
                        :data-placement "top"
                        :data-container "body"
-                       :title (str (:name current-board-data) " settings")
-                       :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
-              (when-not is-drafts-board
-                (let [default-sort (= board-sort dis/default-sort-type)]
-                  [:div.board-sort.group
-                    {:ref :board-sort-menu}
-                    (when is-mobile?
-                      [:button.mlb-reset.mobile-search-bt
-                        {:on-click (fn [e]
-                                     (search-actions/active)
-                                     (utils/after 500 #(.focus (js/$ "input.search"))))}])
-                    [:button.mlb-reset.board-sort-bt
-                      {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                      (if default-sort "Recent activity" "Recently posted")]
-                    [:div.board-sort-menu
-                      {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                      [:div.board-sort-menu-item
-                        {:class (when default-sort "active")
-                         :on-click #(do
-                                      (reset! (::sorting-menu-expanded s) false)
-                                      (activity-actions/change-sort-type :recent-activity))}
-                        "Recent activity"]
-                      [:div.board-sort-menu-item
-                        {:class (when-not default-sort "active")
-                         :on-click #(do
-                                      (reset! (::sorting-menu-expanded s) false)
-                                      (activity-actions/change-sort-type :recently-posted))}
-                        "Recently posted"]]]))]
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+                               "Only visible to you"
+                               "Only visible to invited team members")}])
+                  (when (= (:access current-board-data) "public")
+                    [:div.public-board
+                      {:data-toggle "tooltip"
+                       :data-placement "top"
+                       :data-container "body"
+                       :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
+                       :title "Visible to the world, including search engines"}])
+                  (when should-show-settings-bt
+                    [:div.board-settings-container
+                      ;; Settings button
+                      [:button.mlb-reset.board-settings-bt
+                        {:data-toggle (when-not is-tablet-or-mobile? "tooltip")
+                         :data-placement "top"
+                         :data-container "body"
+                         :title (str (:name current-board-data) " settings")
+                         :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
+                (when-not is-drafts-board
+                  (let [default-sort (= board-sort dis/default-sort-type)]
+                    [:div.board-sort.group
+                      {:ref :board-sort-menu}
+                      (when is-mobile?
+                        [:button.mlb-reset.mobile-search-bt
+                          {:on-click (fn [e]
+                                       (search-actions/active)
+                                       (utils/after 500 #(.focus (js/$ "input.search"))))}])
+                      [:button.mlb-reset.board-sort-bt
+                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                        (if default-sort "Recent activity" "Recently posted")]
+                      [:div.board-sort-menu
+                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                        [:div.board-sort-menu-item
+                          {:class (when default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recent-activity))}
+                          "Recent activity"]
+                        [:div.board-sort-menu-item
+                          {:class (when-not default-sort "active")
+                           :on-click #(do
+                                        (reset! (::sorting-menu-expanded s) false)
+                                        (activity-actions/change-sort-type :recently-posted))}
+                          "Recently posted"]]]))])
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond
@@ -283,6 +290,8 @@
               ;; Empty board
               empty-board?
               (empty-board)
+              show-expanded-post
+              (expanded-post)
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)

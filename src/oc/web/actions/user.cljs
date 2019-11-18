@@ -397,7 +397,8 @@
                  #(if org-editing
                     (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
-                      (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
+                      (fn[]
+                        (router/nav! (oc-urls/all-posts (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]

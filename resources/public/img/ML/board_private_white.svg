@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="12px" viewBox="0 0 10 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Inbox/unread" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Inbox:-Action-bar-states" transform="translate(-696.000000, -557.000000)" fill="#FFFFFF">
+            <path d="M697.25,560.600095 C697.25,558.611707 698.928668,557 701,557 C703.070686,557 704.75,558.612666 704.75,560.600154 L704.75,562.100001 C705.440479,562.100688 706,562.636117 706,563.301888 L706,567.798112 C706,568.461896 705.440929,569 704.748669,569 L697.251331,569 C696.56024,569 696,568.46431 696,567.798112 L696,563.301888 C696,562.638529 696.558355,562.10069 697.25,562.100001 L697.25,560.600095 Z M698.5,562.1 L703.5,562.1 L703.5,560.600154 C703.5,559.275321 702.380239,558.2 701,558.2 C699.619056,558.2 698.5,559.274418 698.5,560.600095 L698.5,562.1 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>

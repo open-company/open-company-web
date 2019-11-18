@@ -24,3 +24,18 @@
           (.setTimeout js/window
            #(set! (.. js/document -scrollingElement -scrollTop) old-scroll-top)
            0))))))
+
+(defn is-element-top-in-viewport?
+   "Given a DOM element return true if it's actually visible in the viewport."
+  [el & [offset]]
+  (let [fixed-offset (or offset 0)
+        rect (.getBoundingClientRect el)
+        zero-pos? #(or (zero? %)
+                       (pos? %))
+        doc-element (.-documentElement js/document)
+        win-height (or (.-clientHeight doc-element)
+                       (.-innerHeight js/window))]
+           ;; Item top is more then the navbar height
+      (and (>= (+ (.-top rect) fixed-offset) responsive/navbar-height)
+           ;; and less than the screen height
+           (< (- (.-top rect) fixed-offset) win-height))))
