@@ -72,6 +72,10 @@ div.invite-slack-modal {
           font-size: 14px;
           color: $deep_navy;
           line-height: 18px;
+
+          i.mdi.mdi-slack:before {
+            font-size: 18px;
+          }
         }
 
         div.invite-token-description {
@@ -83,6 +87,8 @@ div.invite-slack-modal {
 
           strong {
             @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
           }
         }
 
@@ -104,6 +110,7 @@ div.invite-slack-modal {
             border-bottom-left-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
+            line-height: 18px;
             float: left;
             height: 32px;
             width: calc(100% - 64px);
@@ -160,63 +167,26 @@ div.invite-slack-modal {
             margin-top: 16px;
           }
 
-          div.org-settings-field-container:focus-within, 
-          div.org-settings-field-container  input.org-settings-field:focus {
-            background-color: $mid_light_grey;
+          input.org-settings-field:focus {
+            background-color: rgba($deep_navy, 0.15);
           }
 
-          div.org-settings-field-container {
+          input.org-settings-field {
             width: calc(100% - 24px);
             border-radius: 4px;
             background-color: rgba($deep_navy, 0.1);
             border: none;
             outline: none;
+            @include OC_Body_Book();
+            font-size: 14px;
+            color: $deep_navy;
+            border: none;
+            outline: none;
+            padding: 7px 8px;
 
-            &.has-value {
-              button.clear-user {
-                background-image: none;
-              }
-            }
-
-            input.org-settings-field:focus {
-              background-color: $mid_light_grey;
-            }
-
-            input.org-settings-field {
-              width: calc(100% - 24px);
-              border-radius: 4px;
-              background-color: rgba($deep_navy, 0.1);
-              @include OC_Body_Book();
-              font-size: 14px;
-              color: $deep_navy;
+            &:focus, &:active {
               border: none;
               outline: none;
-              padding: 7px 8px;
-
-              &:focus, &:active {
-                border: none;
-                outline: none;
-              }
-            }
-
-            button.clear-user {
-              float: right;
-              width: 24px;
-              height: 32px;
-              padding: 0;
-              background-image: cdnUrl("/img/ML/clear_user.svg");
-              background-size: 10px 10px;
-              background-position: center;
-              background-repeat: no-repeat;
-              background-color: rgba($deep_navy, 0.1);
-            }
-          }
-
-          div.user-name-dropdown {
-            width: calc(100% - 24px);
-
-            div.slack-users-dropdown-list {
-              top: 40px;
             }
           }
 
@@ -245,14 +215,19 @@ div.invite-slack-modal {
               border-radius: 4px;
               @include OC_Body_Book();
               font-size: 14px;
+              line-height: 18px;
               color: $deep_navy;
-              background-color: $ultra_light_grey;
+              background-color: rgba($deep_navy, 0.1);
 
               button.user-type-btn {
                 width: 100%;
                 text-align: left;
                 height: 32px;
                 padding: 7px 8px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                color: $deep_navy;
+                line-height: 18px;
               }
 
               ul.user-type-dropdown-menu {
@@ -264,6 +239,9 @@ div.invite-slack-modal {
                   color: $deep_navy;
                   text-align: left;
                   padding: 7px 12px;
+                  @include OC_Body_Book();
+                  font-size: 14px;
+                  line-height: 18px;
                 }
               }
             }
@@ -287,9 +265,10 @@ div.invite-slack-modal {
 
       button.add-button {
         padding: 0 0 0 24px;
-        @include OC_Body_Bold();
+        @include OC_Body_Book();
         font-size: 14px;
         color: $deep_navy;
+        line-height: 18px;
         margin-top: 16px;
         position: relative;
         display: block;

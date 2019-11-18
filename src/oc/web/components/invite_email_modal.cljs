@@ -138,7 +138,7 @@
             (if (seq (:invite-token team-data))
               [:div.invite-token-container
                 [:div.invite-token-title
-                  "Share an invite link via email"]
+                  "Share an invite link"]
                 [:div.invite-token-description
                   "Anyone can use this link to join your Carrot team as a "
                   [:strong "contributor"]
@@ -188,7 +188,7 @@
                   "Deactivate invite link"]]
               [:div.invite-token-container
                 [:div.invite-token-title
-                  "Share an invite link via email"]
+                  "Share an invite link"]
                 [:div.invite-token-description
                   "Anyone can use this link to join your Carrot team as a "
                   [:strong "contributor"]
@@ -213,20 +213,14 @@
               [:div.invites-list-item
                 {:key key-string}
                 [:div.invites-list-item.group
-                  [:div.org-settings-field-container.group
-                    {:class (when (seq (:user user-data)) "has-value")}
-                    [:input.org-settings-field.email-field.oc-input
-                      {:type "text"
-                       :class (when (:error user-data) "error")
-                       :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
-                       :placeholder "email@example.com"
-                       :on-change #(dis/dispatch! [:input [:invite-users]
-                                     (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
-                       :value (or (:user user-data) "")}]
-                    [:button.mlb-reset.clear-user
-                      {:on-click #(when (seq (:user user-data))
-                                    (dis/dispatch! [:input [:invite-users]
-                                     (assoc invite-users i (merge user-data {:error nil :user ""}))]))}]]]
+                  [:input.org-settings-field.email-field.oc-input
+                    {:type "text"
+                     :class (when (:error user-data) "error")
+                     :pattern "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+                     :placeholder "email@example.com"
+                     :on-change #(dis/dispatch! [:input [:invite-users]
+                                   (assoc invite-users i (merge user-data {:error nil :user (.. % -target -value)}))])
+                     :value (or (:user user-data) "")}]]
                 [:div.user-type-dropdown
                   (user-type-dropdown {:user-id (utils/guid)
                                        :user-type (:role user-data)

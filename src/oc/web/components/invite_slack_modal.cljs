@@ -151,7 +151,7 @@
           (when is-admin?
             [:div.invite-token-container
               [:div.invite-token-title
-                "Share an invite link via Slack"]
+                "Share this link in Slack " [:i.mdi.mdi-slack]]
               [:div.invite-token-description
                 "Anyone on your Slack team can use this link to join Carrot as a "
                 [:strong "contributor"]
