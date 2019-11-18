@@ -9,6 +9,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.stores.user :as user-store]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.components.ui.menu :as menu]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -125,7 +126,11 @@
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         follow-ups-data (drv/react s :follow-ups-data)
-        drafts-data (drv/react s :drafts-data)]
+        drafts-data (drv/react s :drafts-data)
+        user-role (user-store/user-role org-data current-user-data)
+        is-admin-or-author? (#{:admin :author} user-role)
+        show-invite-people? (and org-slug
+                                 is-admin-or-author?)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -202,7 +207,7 @@
                 {:class (utils/class-set {:item-selected (and (not is-all-posts)
                                                               is-current-board)})
                  :data-board (name (:slug board))
-                 :key (str "board-list-" (name (:slug board)))
+                 :key (str "board-list-" (name (:slug board)) "-" (rand 100))
                  :href board-url
                  :on-click #(do
                               (nav-actions/nav-to-url! % (:slug board) board-url))}
@@ -218,4 +223,9 @@
                 (when (= (:access board) "public")
                   [:div.public])
                 (when (= (:access board) "private")
-                  [:div.private])])])]]))
+                  [:div.private])])])]
+      (when show-invite-people?
+        [:div.left-navigation-sidebar-footer
+          [:button.mlb-reset.invite-people-bt
+            {:on-click #(nav-actions/show-org-settings :invite-picker)}
+            "Invite people"]])]))
