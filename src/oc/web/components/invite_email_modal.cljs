@@ -168,11 +168,22 @@
                                                                              :id (if copied? :invite-token-url-copied :invite-token-url-copy-error)}))))}
                     "Copy"]]
                 [:button.mlb-reset.deactivate-link-bt
-                  {:on-click #(do 
-                               (reset! (::creating-invite-link s) true)
-                               (team-actions/delete-invite-token-link (utils/link-for (:links team-data) "delete-invite-link")
-                                (fn [success?]
-                                 (reset! (::creating-invite-link s) false))))
+                  {:on-click (fn [_]
+                               (let [alert-data {:icon "/img/ML/trash.svg"
+                                                 :action "deactivate-invite-email-link"
+                                                 :title "Are you sure?"
+                                                 :message "Anyone with this link won't be able to use it to access your team anymore."
+                                                 :solid-button-title "OK, got it"
+                                                 :solid-button-cb #(do
+                                                                    (alert-modal/hide-alert)
+                                                                    (reset! (::creating-invite-link s) true)
+                                                                    (team-actions/delete-invite-token-link (utils/link-for (:links team-data) "delete-invite-link")
+                                                                     (fn [success?]
+                                                                      (reset! (::creating-invite-link s) false))))
+                                                 :solid-button-style :red
+                                                 :link-button-title "No, keep it"
+                                                 :link-button-cb #(alert-modal/hide-alert)}]
+                                 (alert-modal/show-alert alert-data)))
                    :disabled @(::creating-invite-link s)}
                   "Deactivate invite link"]]
               [:div.invite-token-container
