@@ -196,8 +196,7 @@ nav.oc-navbar {
       div.navbar-right {
         margin-right: 0px;
         position: absolute;
-        left: calc(100vw - 72px - 24px);
-        top: 12px;
+        left: calc(100vw - 72px - 16px);
 
         @include mobile() {
           position: absolute;
