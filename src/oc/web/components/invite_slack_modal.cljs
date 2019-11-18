@@ -153,7 +153,9 @@
               [:div.invite-token-title
                 "Share an invite link via Slack"]
               [:div.invite-token-description
-                "Anyone on your Slack team can use this link to join Carrot as a contributor."]
+                "Anyone on your Slack team can use this link to join Carrot as a "
+                [:strong "contributor"]
+                "."]
               [:div.invite-token-description
                 "Invite link"]
               [:div.invite-token-field
@@ -182,7 +184,7 @@
             [:div.invites-list
               {:class (when is-admin? "top-border")}
               [:div.invites-list-title
-                "Invite someone with a specific permission level"]
+                "Invite someone with a specific permission level (Admin, Contributor, or Viewer)"]
               (for [i (range (count invite-users))
                     :let [user-data (get invite-users i)
                           key-string (str "invite-users-tabe-" i)]]

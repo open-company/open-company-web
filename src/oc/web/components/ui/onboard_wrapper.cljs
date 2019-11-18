@@ -806,10 +806,10 @@
               [:div.mobile-logo]]
             [:div.invite-token-container.token-error
               [:div.title
-                "Oh shoot..."]
+                "Oh oh..."]
               [:div.subtitle
                 (str "The invite link you’re trying to access "
-                     "has been deactivated by the account admin "
+                     "has been deactivated by your account admin "
                      "and is no longer valid.")]]])
         [:div.main-cta
           [:div.mobile-header.mobile-only

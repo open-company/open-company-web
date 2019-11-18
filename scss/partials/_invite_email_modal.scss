@@ -80,6 +80,10 @@ div.invite-email-modal {
           color: $deep_navy;
           line-height: 18px;
           margin-top: 8px;
+
+          strong {
+            @include OC_Body_Bold();
+          }
         }
 
         button.generate-link-bt {

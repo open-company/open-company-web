@@ -140,7 +140,9 @@
                 [:div.invite-token-title
                   "Share an invite link via email"]
                 [:div.invite-token-description
-                  "Anyone can use this link to join your Carrot team as a contributor."]
+                  "Anyone can use this link to join your Carrot team as a "
+                  [:strong "contributor"]
+                  "."]
                 [:div.invite-token-description
                   "Invite link"]
                 [:div.invite-token-field
@@ -177,7 +179,9 @@
                 [:div.invite-token-title
                   "Share an invite link via email"]
                 [:div.invite-token-description
-                  "Anyone can use this link to join your Carrot team as a contributor."]
+                  "Anyone can use this link to join your Carrot team as a "
+                  [:strong "contributor"]
+                  "."]
                 [:button.mlb-reset.generate-link-bt
                   {:on-click #(do 
                                (reset! (::creating-invite-link s) true)
@@ -191,7 +195,7 @@
             {:key "org-settings-invite-table"
              :class (when is-admin? "top-border")}
             [:div.invites-list-title
-              "Invite someone with a specific permission level"]
+              "Invite someone with a specific permission level (Admin, Contributor, or Viewer)"]
             (for [i (range (count invite-users))
                   :let [user-data (get invite-users i)
                         key-string (str "invite-users-tabe-" i)]]
