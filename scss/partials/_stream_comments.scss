@@ -37,7 +37,12 @@ div.stream-comments {
           border-radius: 4px;
         }
 
-        &.not-highlighted:not(.open-thread):hover div.stream-comment.indented-comment div.stream-comment-inner {
+        &.not-highlighted:not(.open-thread):not(.showing-add-comment):hover div.stream-comment.indented-comment div.stream-comment-inner {
+          background-color: rgba($deep_navy, 0.05);
+          border-radius: 4px;
+        }
+
+        &.not-highlighted:not(.open-thread).showing-add-comment div.stream-comment.indented-comment:hover div.stream-comment-inner {
           background-color: rgba($deep_navy, 0.05);
           border-radius: 4px;
         }
@@ -64,10 +69,6 @@ div.stream-comments {
         &:not(:first-child) {
           margin-top: 16px;
         }
-      }
-
-      &:last-child div.stream-comment div.stream-comment-inner {
-        padding: 8px 0 0;
       }
 
       div.stream-comment.indented-comment div.stream-comment-inner {
@@ -457,7 +458,7 @@ div.stream-comments {
         }
 
         div.stream-comment-reactions-footer {
-          height: 24px;
+          height: 26px;
           margin-top: 8px;
 
           @include mobile() {
@@ -504,7 +505,6 @@ div.stream-comments {
 
       div.stream-comment div.add-comment-box-container {
         padding-top: 8px;
-        margin-bottom: 8px;
       }
 
       div.stream-comment.indented-comment {
