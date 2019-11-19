@@ -194,12 +194,14 @@ nav.oc-navbar {
       }
 
       div.navbar-right {
-        float: right;
         margin-right: 0px;
+        position: absolute;
+        left: calc(100vw - 72px - 16px);
 
         @include mobile() {
           position: absolute;
           top: 11px;
+          left: unset;
           right: 16px;
           width: 32px;
           height: 32px;

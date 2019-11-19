@@ -212,7 +212,8 @@
                                           :left-border needs-left-border?
                                           :open-thread (not is-indented-comment?)
                                           :closing-thread (or (not next-comment-data)
-                                                              (empty? (:parent-uuid next-comment-data)))})}
+                                                              (empty? (:parent-uuid next-comment-data)))
+                                          :showing-add-comment should-show-add-comment?})}
                 [:div.stream-comment
                   {:class (utils/class-set {:indented-comment is-indented-comment?})}
                   (rum/with-key
@@ -229,7 +230,8 @@
                                           :left-border needs-left-border?
                                           :open-thread (not is-indented-comment?)
                                           :closing-thread (or (not next-comment-data)
-                                                              (empty? (:parent-uuid next-comment-data)))})}
+                                                              (empty? (:parent-uuid next-comment-data)))
+                                          :showing-add-comment should-show-add-comment?})}
                 [:div.stream-comment
                   {:ref (str "stream-comment-" (:uuid comment-data))
                    :class (utils/class-set {:editing is-editing?
