@@ -22,6 +22,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
+            [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
             [oc.web.components.ui.lazy-stream :refer (lazy-stream)]
