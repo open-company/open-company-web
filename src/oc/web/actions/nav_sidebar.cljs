@@ -33,7 +33,43 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 
-(defn nav-to-url! [e board-slug url]
+(defn- container-data [board-slug]
+  (if (#{"all-posts" "follow-ups"} board-slug)
+    (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
+    (dis/board-data board-slug)))
+
+(defn- refresh-board-data [board-slug sort-type]
+  (when (and (not (router/current-activity-id))
+             board-slug)
+    (let [org-data (dis/org-data)
+          board-data (container-data board-slug)]
+       (cond
+
+        (= board-slug "all-posts")
+        (do
+          (activity-actions/activity-get org-data)
+          (activity-actions/recent-activity-get org-data))
+
+        (= board-slug "follow-ups")
+        (do
+          (activity-actions/follow-ups-get org-data)
+          (activity-actions/recent-follow-ups-get org-data))
+
+        :default
+        (let [fixed-board-data (or board-data
+                                   (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+              board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")
+              activity-board-link (utils/link-for (:links fixed-board-data) "activity" "GET")]
+          (when board-link
+            (section-actions/section-get dis/other-sort-type board-link))
+          (when activity-board-link
+            (section-actions/section-get dis/default-sort-type activity-board-link)))))))
+
+(defn nav-to-url!
+  ([e board-slug url]
+  (nav-to-url! e board-slug url (or (:back-y @router/path) (utils/page-scroll-top)) true))
+
+  ([e board-slug url back-y refresh?]
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
@@ -58,12 +94,60 @@
           {:org org-slug
            :board board-slug
            :sort-type sort-type
+           :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (utils/after 0 #(activity-actions/refresh-board-data board-slug sort-type)))))
+         (when refresh?
+           (utils/after 0 #(refresh-board-data board-slug sort-type))))))
    (cmail-actions/cmail-hide)
-   (user-actions/hide-mobile-user-notifications))))
+   (user-actions/hide-mobile-user-notifications)))))
+
+(defn dismiss-post-modal [e]
+  (let [org-data (dis/org-data)
+        ;; Go back to
+        board (utils/back-to org-data)
+        to-url (oc-urls/board board)
+        board-data (container-data board)
+        should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
+                                 ; and is on recent activity sorting
+                                 (and (:refresh @router/path)
+                                      (= (router/current-sort-type) dis/default-sort-type))
+                                 (not board-data))
+        ;; Get the previous scroll top position
+        default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
+        ;; Scroll back to the previous scroll position only if the posts are
+        ;; not going to refresh, if they refresh the old scroll position won't be right anymore
+        back-y (if should-refresh-data?
+                 (utils/page-scroll-top)
+                 default-back-y)]
+    (nav-to-url! e board to-url back-y should-refresh-data?)))
+
+(defn open-post-modal [activity-data dont-scroll]
+  (let [org (router/current-org-slug)
+        old-board (router/current-board-slug)
+        board (:board-slug activity-data)
+        back-to (if (= old-board utils/default-drafts-board-slug)
+                  board
+                  old-board)
+        activity (:uuid activity-data)
+        post-url (oc-urls/entry board activity)
+        query-params (router/query-params)
+        route [org board activity "activity"]
+        scroll-y-position (.. js/document -scrollingElement -scrollTop)]
+    (router/set-route! route {:org org
+                              :board board
+                              :sort-type (router/current-sort-type)
+                              :activity activity
+                              :query-params query-params
+                              :back-to back-to
+                              :back-y scroll-y-position})
+    (cmail-actions/cmail-hide)
+    (when-not dont-scroll
+      (if ua/mobile?
+        (utils/after 10 #(utils/scroll-to-y 0 0))
+        (utils/scroll-to-y 0 0)))
+    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 ;; Push panel
 

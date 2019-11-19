@@ -63,7 +63,9 @@
         ;; If the user is not the publisher of the post and is leaving his first comment on it
         ;; let's inform them that they are now following the post
         (when success
-          (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
+          (do
+            (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
+            (swap! router/path assoc :refresh true))
           (when first-comment-from-user?
             (notification-actions/show-notification {:title "You are now following this post."
                                                      :dismiss true

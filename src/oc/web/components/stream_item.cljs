@@ -18,7 +18,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.reactions :refer (reactions)]
@@ -129,7 +129,7 @@
                                   ;; No body link was clicked
                                   (not (utils/anchor-clicked? e)))
                          (nux-actions/dismiss-post-added-tooltip)
-                         (routing-actions/open-post-modal activity-data false)))))
+                         (nav-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
       [:div.stream-item-header.group
         [:div.stream-header-head-author
