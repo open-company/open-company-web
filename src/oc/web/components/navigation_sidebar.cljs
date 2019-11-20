@@ -156,9 +156,9 @@
             [:div.inbox-icon]
             [:div.inbox-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
-              "Inbox"
-              (when (pos? (count all-unread-items))
-                [:span.count (count all-unread-items)])]])
+              "Inbox"]
+            (when (pos? (count all-unread-items))
+              [:span.count (count all-unread-items)])])
         (when show-follow-ups
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})
