@@ -101,6 +101,7 @@
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
+                               (not= (router/current-board-slug) "inbox")
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")
                                (not= (router/current-board-slug) "follow-ups")

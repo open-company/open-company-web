@@ -235,6 +235,16 @@
   (swap! reactions-atom index-posts org (-> body :collection :items))
   db)
 
+(defmethod reducer :inbox-get/finish
+  [db [_ {:keys [org year month from body]}]]
+  (swap! reactions-atom index-posts org (-> body :collection :items))
+  db)
+
+(defmethod reducer :follow-ups-get/finish
+  [db [_ {:keys [org year month from body]}]]
+  (swap! reactions-atom index-posts org (-> body :collection :items))
+  db)
+
 (defmethod reducer :section
   [db [_ _sort-type board-data]]
   (let [org (utils/section-org-slug board-data)

@@ -113,12 +113,15 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:back-to @router/path) (router/current-board-slug))
+        is-inbox (= selected-slug "inbox")
         is-all-posts (= selected-slug "all-posts")
         is-follow-ups (= selected-slug "follow-ups")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-inbox (and user-is-part-of-the-team?
+                        (utils/link-for (:links org-data) "inbox"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "activity"))
         show-follow-ups (and user-is-part-of-the-team?
@@ -143,6 +146,16 @@
             [:button.mlb-reset.mobile-close-bt
               {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
             (orgs-dropdown)])
+        ;; Inbox
+        (when show-inbox
+          [:a.inbox.hover-item.group
+            {:class (utils/class-set {:item-selected is-inbox})
+             :href (oc-urls/inbox)
+             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
+            [:div.inbox-icon]
+            [:div.inbox-label
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
+              "Inbox"]])
         ;; All posts
         (when show-all-posts
           [:a.all-posts.hover-item.group
@@ -167,7 +180,9 @@
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
-              {:class (when (and (not is-all-posts)
+              {:class (when (and (not is-inbox)
+                                 (not is-all-posts)
+                                 (not is-follow-ups)
                                  (= (router/current-board-slug) (:slug drafts-board)))
                         "item-selected")
                :data-board (name (:slug drafts-board))
@@ -200,11 +215,13 @@
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= selected-slug (:slug board))
+                        is-current-board (and (not is-inbox)
+                                              (not is-all-posts)
+                                              (not is-follow-ups)
+                                              (= selected-slug (:slug board)))
                         board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
-                {:class (utils/class-set {:item-selected (and (not is-all-posts)
-                                                              is-current-board)})
+                {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)))
                  :href board-url

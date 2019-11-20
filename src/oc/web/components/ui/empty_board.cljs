@@ -15,13 +15,15 @@
 (rum/defcs empty-board < rum/reactive
                          section-mixins/container-nav-in
   [s]
-  (let [is-all-posts? (= (router/current-board-slug) "all-posts")
+  (let [is-inbox? (= (router/current-board-slug) "inbox")
+        is-all-posts? (= (router/current-board-slug) "all-posts")
         is-follow-ups? (= (router/current-board-slug) "follow-ups")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
     [:div.empty-board.group
       [:div.empty-board-grey-box
         [:div.empty-board-illustration
-          {:class (utils/class-set {:all-posts is-all-posts?
+          {:class (utils/class-set {:inbox is-inbox?
+                                    :all-posts is-all-posts?
                                     :drafts is-drafts-board?
                                     :follow-ups is-follow-ups?
                                     :section (and (not is-all-posts?)

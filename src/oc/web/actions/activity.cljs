@@ -945,14 +945,51 @@
         (follow-ups-get org-data)
         (recent-follow-ups-get org-data))))))
 
+;; Inbox
+
+(defn inbox-get-finish [{:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          posts-data-key (dis/posts-data-key org)
+          inbox-data (when success (json->cljs body))
+          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data)]
+      (when (= (router/current-board-slug) "inbox")
+        (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-inbox-data)))
+        (watch-boards (:fixed-items fixed-inbox-data)))
+      (dis/dispatch! [:inbox-get/finish org fixed-inbox-data]))))
+
+(defn inbox-get [org-data & [finish-cb]]
+  (when-let [inbox-link (utils/link-for (:links org-data) "inbox")]
+    (api/get-all-posts inbox-link
+     (fn [resp]
+       (inbox-get-finish resp)
+       (when (fn? finish-cb)
+         (finish-cb resp))))))
+
+(defn inbox-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
+  (dis/dispatch! [:inbox-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn inbox-more [more-link direction]
+  (api/load-more-items more-link direction (partial inbox-more-finish direction))
+  (dis/dispatch! [:inbox-more (router/current-org-slug)]))
+
+;; Refresh data
+
 (defn refresh-board-data [board-slug sort-type]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
-          board-data (if (#{"all-posts" "follow-ups"} board-slug)
+          board-data (if (dis/is-container? board-slug)
                        (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
                        (dis/board-data board-slug))]
        (cond
+
+        (= board-slug "inbox")
+        (inbox-get org-data)
 
         (= board-slug "all-posts")
         (all-posts-get org-data)
@@ -968,3 +1005,16 @@
                        (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
                       board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
             (sa/section-get sort-type board-link)))))))
+
+;; FOC Layout
+
+(defn saved-foc-layout [org-slug]
+  (if-let [foc-layout-cookie (cook/get-cookie (router/last-foc-layout-cookie org-slug))]
+    (keyword foc-layout-cookie)
+    dis/default-foc-layout))
+
+(defn toggle-foc-layout []
+  (let [current-value (:foc-layout @dis/app-state)
+        next-value (if (= current-value dis/default-foc-layout) dis/other-foc-layout dis/default-foc-layout)]
+    (cook/set-cookie! (router/last-foc-layout-cookie (router/current-org-slug)) (name next-value) cook/default-cookie-expire)
+    (dis/dispatch! [:input [:foc-layout] next-value])))

@@ -88,6 +88,13 @@
   ([org-slug]
     (str "/" (name org-slug))))
 
+(defn inbox
+  "Org inbox url"
+  ([]
+    (inbox (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/inbox")))
+
 (defn all-posts
   "Org all posts url"
   ([]

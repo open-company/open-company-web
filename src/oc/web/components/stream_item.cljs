@@ -48,6 +48,7 @@
                          rum/reactive
                          ;; Derivatives
                          (drv/drv :activity-share-container)
+                         (drv/drv :foc-layout)
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
@@ -90,7 +91,7 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        ]
+        foc-layout (drv/react s :foc-layout)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -100,7 +101,8 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
-                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
+                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)
+                                :foc-collapsed (= foc-layout :collapsed)})
        :data-new-at (:new-at activity-data)
        :data-last-read-at (:last-read-at read-data)
        ;; click on the whole tile only for draft editing

@@ -16,6 +16,70 @@ div.stream-item {
   background-color: $foc_background_color;
   overflow: visible;
 
+  &.foc-collapsed {
+    height: #{$collapsed_foc_height}px;
+    overflow-y: hidden;
+    padding: 12px;
+    display: block;
+    flex-direction: unset;
+    justify-content: unset;
+
+    div.name {
+      display: none;
+    }
+
+    div.stream-item-header {
+      width: 24px;
+      height: 24px;
+      float: left;
+      margin-top: 2px;
+
+      div.more-menu {
+        display: none;
+      }
+    }
+
+    div.stream-item-body-ext {
+      float: left;
+      display: block;
+      width: calc(100% - 32px - 24px - 8px); // 16 * 2 of padding, 24px avatar, 8px left margin
+      height: 28px;
+      margin-left: 8px;
+
+      div.thumbnail-container {
+        min-height: unset;
+        height: 28px;
+
+        div.body-thumbnail-wrapper {
+          display: none;
+        }
+
+        div.stream-body-left {
+          min-height: unset;
+          height: 28px;
+          margin-top: 0;
+
+          div.stream-item-headline {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            white-space: nowrap;
+            @include activity-title(14px, 28px);
+          }
+
+          div.stream-item-body {
+            display: none;
+          }
+        }
+      }
+
+      div.stream-item-footer {
+        display: none;
+      }
+    }
+  }
+
   &.expandable {
     cursor: pointer;
 
