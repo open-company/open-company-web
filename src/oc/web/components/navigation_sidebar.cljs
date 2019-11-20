@@ -156,16 +156,6 @@
             [:div.inbox-label
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
               "Inbox"]])
-        ;; All posts
-        (when show-all-posts
-          [:a.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-all-posts})
-             :href (oc-urls/all-posts)
-             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
-            [:div.all-posts-icon]
-            [:div.all-posts-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
-              "All posts"]])
         (when show-follow-ups
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})
@@ -194,6 +184,16 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
+        ;; All posts
+        (when show-all-posts
+          [:a.all-posts.hover-item.group
+            {:class (utils/class-set {:item-selected is-all-posts})
+             :href (oc-urls/all-posts)
+             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
+            [:div.all-posts-icon]
+            [:div.all-posts-label
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
+              "All posts"]])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
