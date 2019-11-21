@@ -95,90 +95,85 @@
     (alert-modal/show-alert alert-data)))
 
 (defn- plan-summary [s payments-data]
-  (if @(::automatic-update-plan s)
+  (let [subscription-data (payments-actions/get-active-subscription payments-data)
+        next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
+        current-plan (:plan subscription-data)
+        checkout-result @(::checkout-result s)
+        quantity (:quantity subscription-data)] ;; Number of active/unverified users
     [:div.plan-summary
-      [:div.plan-summary-details
-        "Updating your plan..."
-        (small-loading)]]
-    (let [subscription-data (payments-actions/get-active-subscription payments-data)
-          next-payment-due (date-string (-> payments-data :upcoming-invoice :next-payment-attempt))
-          current-plan (:plan subscription-data)
-          checkout-result @(::checkout-result s)
-          quantity (:quantity subscription-data)] ;; Number of active/unverified users
-      [:div.plan-summary
-        (when subscription-data
+      (when subscription-data
+        (if (:cancel-at-period-end? subscription-data)
+          [:div.plan-summary-details.success.bottom-margin
+            [:div.emoji-icon "🗓"]
+            (str "Your " (s/lower (:nickname current-plan)) " plan is set to cancel on " (date-string (:current-period-end subscription-data)) ".")]
+          [:div.plan-summary-details.success.bottom-margin
+            [:div.emoji-icon "👍"]
+            (str "Your " (s/lower (:nickname current-plan)) " plan is active.")]))
+      (when subscription-data
+        [:div.plan-summary-separator.bottom-margin])
+      (if (seq (:payment-methods payments-data))
+        [:div.plan-summary-details
+          [:strong "Payment methods"]
+          [:br]
+          (for [c (:payment-methods payments-data)
+                :let [card (:card c)]]
+            [:div.plan-summary-details-card-row
+              {:key (str "pay-method-" (:id c))
+               :class (when-not (:default? c) "hidden")}
+              (case (:brand card)
+               "visa" "Visa"
+               "amex" "American Express"
+               "mastercard" "Mastercard"
+               (s/phrase (:brand card)))
+               (when (seq (:last-4 card))
+                 (str " ending in " (:last-4 card)))
+               ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
+              [:button.mlb-reset.change-pay-method-bt
+                {:on-click #(payments-actions/add-payment-method payments-data)}
+                "Update payment information"]]
+        [:div.plan-summary-details
+          [:button.mlb-reset.change-pay-method-bt
+            {:on-click #(payments-actions/add-payment-method payments-data)}
+            "Subscribe to Carrot"]])
+      (when (or (is-trial? subscription-data)
+                (is-trial-expired? subscription-data))
+        [:div.plan-summary-details.bottom-margin
+          [:strong "Trial"]
+          [:br]
+          (trial-remaining-days-string subscription-data)])
+      (when subscription-data
+        [:div.plan-summary-details.bottom-margin
+          [:strong "Billing period"]
+          [:br]
+          "Plan billed "
+          (plan-description (:interval current-plan)) " (" (plan-price current-plan quantity) ")"
+          [:br]
           (if (:cancel-at-period-end? subscription-data)
-            [:div.plan-summary-details.success.bottom-margin
-              [:div.emoji-icon "🗓"]
-              (str "Your " (s/lower (:nickname current-plan)) " plan is set to cancel on " (date-string (:current-period-end subscription-data)) ".")]
-            [:div.plan-summary-details.success.bottom-margin
-              [:div.emoji-icon "👍"]
-              (str "Your " (s/lower (:nickname current-plan)) " plan is active.")]))
-        (when subscription-data
-          [:div.plan-summary-separator.bottom-margin])
-        (if (seq (:payment-methods payments-data))
-          [:div.plan-summary-details
-            [:strong "Payment methods"]
-            [:br]
-            (for [c (:payment-methods payments-data)
-                  :let [card (:card c)]]
-              [:div.plan-summary-details-card-row
-                {:key (str "pay-method-" (:id c))
-                 :class (when-not (:default? c) "hidden")}
-                (case (:brand card)
-                 "visa" "Visa"
-                 "amex" "American Express"
-                 "mastercard" "Mastercard"
-                 (s/phrase (:brand card)))
-                 (when (seq (:last-4 card))
-                   (str " ending in " (:last-4 card)))
-                 ", exp: " (utils/add-zero (int (:exp-month card))) "/" (:exp-year card)])
-                [:button.mlb-reset.change-pay-method-bt
-                  {:on-click #(payments-actions/add-payment-method payments-data)}
-                  "Update payment information"]]
-          [:div.plan-summary-details
-            [:button.mlb-reset.change-pay-method-bt
-              {:on-click #(payments-actions/add-payment-method payments-data)}
-              "Subscribe to Carrot"]])
-        (when (or (is-trial? subscription-data)
-                  (is-trial-expired? subscription-data))
-          [:div.plan-summary-details.bottom-margin
-            [:strong "Trial"]
-            [:br]
-            (trial-remaining-days-string subscription-data)])
-        (when subscription-data
-          [:div.plan-summary-details.bottom-margin
-            [:strong "Billing period"]
-            [:br]
-            "Plan billed "
-            (plan-description (:interval current-plan)) " (" (plan-price current-plan quantity) ")"
-            [:br]
-            (if (:cancel-at-period-end? subscription-data)
-              (str "Your plan is scheduled to cancel on " (date-string (:current-period-end subscription-data)))
-              (str "Next payment due on " next-payment-due))
-            [:button.mlb-reset.change-pay-method-bt
-              {:on-click #(change-tab s :change)}
-              "Change"]])
-        (when (and subscription-data
-                   (not (:cancel-at-period-end? subscription-data)))
-          [:div.plan-summary-details
-            [:button.mlb-reset.cancel-subscription-bt
-              {:on-click #(cancel-subscription s payments-data)}
-              "Cancel subscription"]
-            (when @(::canceling-subscription s)
-              (small-loading))])
-        (comment
-          [:div.plan-summary-separator]
-          [:div.plan-summary-details
-            [:button.mlb-reset.history-bt
-              "Lookup billing history"]]
-          [:div.plan-summary-separator]
-          [:div.plan-summary-details
-            "Have a team of 250+"
-            [:a.chat-with-us
-              {:class "intercom-chat-link"
-               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
-              "Chat with us"]])])))
+            (str "Your plan is scheduled to cancel on " (date-string (:current-period-end subscription-data)))
+            (str "Next payment due on " next-payment-due))
+          [:button.mlb-reset.change-pay-method-bt
+            {:on-click #(change-tab s :change)}
+            "Change"]])
+      (when (and subscription-data
+                 (not (:cancel-at-period-end? subscription-data)))
+        [:div.plan-summary-details
+          [:button.mlb-reset.cancel-subscription-bt
+            {:on-click #(cancel-subscription s payments-data)}
+            "Cancel subscription"]
+          (when @(::canceling-subscription s)
+            (small-loading))])
+      (comment
+        [:div.plan-summary-separator]
+        [:div.plan-summary-details
+          [:button.mlb-reset.history-bt
+            "Lookup billing history"]]
+        [:div.plan-summary-separator]
+        [:div.plan-summary-details
+          "Have a team of 250+"
+          [:a.chat-with-us
+            {:class "intercom-chat-link"
+             :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+            "Chat with us"]])]))
 
 (defn- show-error-alert [s]
   (let [alert-data {:icon "/img/ML/trash.svg"
@@ -382,17 +377,7 @@
                                      :summary))
         (reset! (::payments-plan s) initial-plan-nickname)
         (reset! (::initial-plan s) initial-plan-nickname)
-        (reset! (::checkout-result s) checkout-result)
-        (reset! (::automatic-update-plan s) updating-plan)
-        ;; When the user come back from adding pay info and has a plan id set as GET parameter
-        ;; it means we need to change the plan, but only if the add info went well
-        (when (and (true? checkout-result)
-                   (seq updating-plan))
-          (payments-actions/create-plan-subscription payments-data updating-plan
-           (fn [{:keys [success]}]
-            (reset! (::automatic-update-plan s) nil)
-            (when success
-              (dis/dispatch! [:input [dis/checkout-update-plan-key] nil])))))))))
+        (reset! (::checkout-result s) checkout-result)))))
 
 (rum/defcs payments-settings-modal <
   ;; Mixins
@@ -412,7 +397,6 @@
   (rum/local false ::plan-has-changed)
   (rum/local false ::checkout-result)
   (rum/local false ::saving-plan)
-  (rum/local nil ::automatic-update-plan)
   (rum/local false ::canceling-subscription)
   {:will-mount (fn [s]
     ;; Force refresh subscription data
