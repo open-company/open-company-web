@@ -223,7 +223,8 @@
         quantity (:quantity subscription-data) ;; Number of active/unverified users
         monthly-plan (first (filter #(= (:interval %) "month") (:available-plans payments-data)))
         annual-plan (first (filter #(= (:interval %) "year") (:available-plans payments-data)))
-        current-plan-data (if @(::plan-has-changed s)
+        current-plan-data (if (and @(::plan-has-changed s)
+                                   (not= @current-plan initial-plan))
                             (first (filter #(= (:nickname %) @current-plan) (:available-plans payments-data)))
                             (:plan subscription-data))
         total-plan-price (plan-price current-plan-data quantity)
@@ -233,7 +234,13 @@
         unit-amount (if (seq (:tiers current-plan-data))
                       (plan-amount-to-human (-> current-plan-data :tiers second :unit-amount) (:currency current-plan-data))
                       (plan-amount-to-human (:amount current-plan-data) (:currency current-plan-data)))
-        available-plans (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
+        available-plans* (mapv #(hash-map :value (:nickname %) :label (plan-label (:nickname %))) (:available-plans payments-data))
+        contains-current-subscription? (some #(= (:value %) (:nickname (:plan subscription-data))) available-plans*)
+        available-plans (if contains-current-subscription?
+                          available-plans*
+                          (concat
+                           [{:value (:nickname (:plan subscription-data)) :label (plan-label (:nickname (:plan subscription-data)))}]
+                           available-plans*))
         has-payment-info? (seq (:payment-methods payments-data))
         is-annual-default-plan? (= (:nickname current-plan-data) "Annual")
         is-under-up-to? (< quantity up-to)]
