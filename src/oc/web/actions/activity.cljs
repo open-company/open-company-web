@@ -733,29 +733,6 @@
       ;; 2. item is newer than TTL
       (ws-cc/item-seen publisher-id container-id activity-id))))
 
-(def ap-seen-timeouts-list (atom {}))
-(def ap-seen-wait-interval 3)
-
-(defn ap-seen-events-gate
-  "Gate to throttle too many seen call for the same UUID.
-  Set a timeout to ap-seen-wait-interval seconds every time it's called with a new UUID,
-  if there was already a timeout for that item remove the old one.
-  Once the timeout finishes it means no other events were fired for it so we can send a seen.
-  It will send seen every 3 seconds or more."
-  [activity-id]
-  ;; Discard everything if we are not on AP
-  (when (= :all-posts (keyword (router/current-board-slug)))
-    (let [wait-interval-ms (* ap-seen-wait-interval 1000)]
-      ;; Remove the old timeout if there is
-      (when-let [uuid-timeout (get @ap-seen-timeouts-list activity-id)]
-        (.clearTimeout js/window uuid-timeout))
-      ;; Set the new timeout
-      (swap! ap-seen-timeouts-list assoc activity-id
-       (utils/after wait-interval-ms
-        (fn []
-         (swap! ap-seen-timeouts-list dissoc activity-id)
-         (send-item-seen activity-id)))))))
-
 ;; WRT read
 
 (defn send-secure-item-seen-read []

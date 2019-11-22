@@ -76,9 +76,6 @@
     (when (not= scroll-top @(::last-scroll s))
       (reset! (::last-scroll s) scroll-top))))
 
-(defn- ap-seen-mixin-cb [_ item-uuid]
-  (activity-actions/ap-seen-events-gate item-uuid))
-
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
         sorted-items @(drv/get-ref s :filtered-posts)
@@ -165,7 +162,6 @@
                         (rum/local false ::show-all-caught-up-message)
                         ;; Mixins
                         mixins/first-render-mixin
-                        (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
                         section-mixins/container-nav-in
                         section-mixins/window-focus-auto-loader
 
