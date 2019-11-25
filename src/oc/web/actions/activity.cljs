@@ -716,22 +716,14 @@
 
 ;; AP Seen
 
-(defn- send-item-seen
+(defn send-item-seen
   "Actually send the seen. Needs to get the activity data from the app-state
-  to read the published-at and make sure it's still inside the TTL."
+  to read the published-at."
   [activity-id]
   (when-let* [activity-data (dis/activity-data (router/current-org-slug) activity-id)
               publisher-id (:user-id (:publisher activity-data))
-              container-id (:board-uuid activity-data)
-              published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
-              today-ts (.getTime (utils/js-date))
-              oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
-              minimum-ttl (- today-ts oc-seen-ttl-ms)]
-    (when (> published-at-ts minimum-ttl)
-      ;; Send the seen because:
-      ;; 1. item is published
-      ;; 2. item is newer than TTL
-      (ws-cc/item-seen publisher-id container-id activity-id))))
+              container-id (:board-uuid activity-data)]
+    (ws-cc/item-seen publisher-id container-id activity-id)))
 
 ;; WRT read
 
