@@ -43,12 +43,7 @@
   (let [is-currently-shown (is-currently-shown? section)
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
     (when is-currently-shown
-
       (when user-is-part-of-the-team
-        ;; Tell the container service that we are seeing this board,
-        ;; and update change-data to reflect that we are seeing this board
-        (when-let [section-uuid (:uuid section)]
-          (utils/after 10 #(section-seen section-uuid)))
         ;; only watch the currently visible board.
         ; only for logged in users and if the board is currently shown
         (when (= (router/current-board-slug) (:slug section))
