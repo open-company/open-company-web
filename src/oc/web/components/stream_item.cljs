@@ -178,7 +178,8 @@
              :show-edit? true
              :show-delete? true
              :show-move? (not is-mobile?)
-             :assigned-follow-up-data assigned-follow-up-data}))]
+             :assigned-follow-up-data assigned-follow-up-data
+             :show-inbox-done? (:unseen activity-data)}))]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video
