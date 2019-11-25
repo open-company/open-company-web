@@ -268,7 +268,11 @@
                 [:div.board-name-right
                   (when is-inbox
                     [:button.mlb-reset.complete-all-bt
-                      {:on-click #()}])
+                      {:on-click #()
+                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :title "Dismiss all"}])
                   (when should-show-sort?
                     (let [default-sort (= board-sort dis/default-sort-type)]
                       [:div.board-sort.group
