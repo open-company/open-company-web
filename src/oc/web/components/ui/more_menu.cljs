@@ -63,7 +63,8 @@
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
-             reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title]}]
+             reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title
+             show-inbox-done?]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -114,6 +115,14 @@
                                                                    complete-follow-up-link)
                                       :has-create-follow-up (and is-mobile?
                                                                  create-follow-up-link)})}
+            (when show-inbox-done?
+              [:li.dismiss
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/send-item-seen (:uuid entity-data)))}
+                "Dismiss"])
             (when (and edit-link
                        show-edit?)
               [:li.edit
@@ -220,6 +229,7 @@
             [:button.mlb-reset.more-menu-complete-follow-up-bt
               {:type "button"
                :ref "more-menu-complete-follow-up-bt"
+               :class (when show-inbox-done? "has-inbox-done")
                :on-click #(do
                             (reset! (::showing-menu s) false)
                             (when (fn? will-close)
@@ -234,6 +244,7 @@
               [:div.more-menu-create-follow-up-bt-container
                 [:button.mlb-reset.more-menu-create-follow-up-bt
                   {:type "button"
+                   :class (when show-inbox-done? "has-inbox-done")
                    :ref "more-menu-create-follow-up-bt"
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
@@ -242,4 +253,17 @@
                                 (activity-actions/create-self-follow-up entity-data create-follow-up-link))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
-                   :title "Follow up later"}]])))])))
+                   :title "Follow up later"}]])))
+        (when show-inbox-done?
+          [:button.mlb-reset.more-menu-inbox-done-bt
+            {:type "button"
+             :ref "more-menu-inbox-done-bt"
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/send-item-seen (:uuid entity-data)))
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :title "Dismiss"}])])))

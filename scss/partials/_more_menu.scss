@@ -108,6 +108,10 @@ div.more-menu {
       border-radius: 4px;
     }
 
+    &.has-inbox-done {
+      border-radius: 4px;
+    }
+
     &:hover, &:active, &:focus {
       opacity: 1;
 
@@ -153,6 +157,47 @@ div.more-menu {
         @include mobile() {
           opacity: 0.9;
         }
+      }
+
+      &.has-inbox-done {
+        border-radius: 0;
+      }
+    }
+
+    div.tooltip {
+      width: 96px;
+    }
+  }
+
+  button.more-menu-inbox-done-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_done.svg");
+    background-size: 14px 10px;
+    background-position: center;
+    background-color: rgba($deep_navy, 0.1);
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include big_web() {
+      &:hover {
+        background-color: rgba($deep_navy, 0.2);
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
       }
     }
   }
