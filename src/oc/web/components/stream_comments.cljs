@@ -177,7 +177,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data new-added-comment current-user-id]}]
+  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
   (let [add-comment-force-update (drv/react s :add-comment-force-update)]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}
@@ -269,9 +269,10 @@
                             (:name (:author comment-data))]
                           [:div.stream-comment-author-timestamp
                             (utils/foc-date-time (:created-at comment-data))]
-                          (when (pos? (:new-comments-count activity-data))
-                            [:div.new-comment-tag
-                              (str "(" (:new-comments-count activity-data) " NEW)")])
+                          (when (and (not= (-> comment-data :author :user-id) current-user-id)
+                                     (< (.getTime (utils/js-date last-read-at))
+                                        (.getTime (utils/js-date (:created-at comment-data)))))
+                            [:div.new-comment-tag "(NEW)"])
                           (when-not is-editing?
                             (if (responsive/is-mobile-size?)
                               [:div.stream-comment-mobile-menu
