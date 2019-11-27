@@ -238,6 +238,7 @@
         last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) (jwt/user-id)) new-comments-data)))]
     (-> db
       (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-at (:created-at last-not-own-comment)})
+      (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-comments-count 0})
       (assoc-in comments-key new-comments-data))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
@@ -262,9 +263,15 @@
                         (concat [new-author] old-authors))
           with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)
           comment-from-current-user? (= (:user-id comment-data) (jwt/user-id))
+          old-comments-count (:new-comments-count activity-data)
+          new-comments-count (if comment-from-current-user?
+                               old-comments-count
+                               (inc old-comments-count))
           with-new-at (if comment-from-current-user?
                         with-authors
-                        (assoc with-authors :new-at created-at))
+                        (-> with-authors
+                          (assoc :new-at created-at)
+                          (assoc :new-comments-count new-comments-count)))
           all-old-comments-data (dispatcher/activity-comments-data activity-uuid)]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded
