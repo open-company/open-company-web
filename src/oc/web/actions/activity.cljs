@@ -987,3 +987,52 @@
         next-value (if (= current-value dis/default-foc-layout) dis/other-foc-layout dis/default-foc-layout)]
     (cook/set-cookie! (router/last-foc-layout-cookie (router/current-org-slug)) (name next-value) cook/default-cookie-expire)
     (dis/dispatch! [:input [:foc-layout] next-value])))
+
+;; Inbox actions
+
+(defn inbox-follow [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        follow-link (utils/link-for (:links activity-data) "follow")]
+    (api/inbox-follow follow-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))))))
+
+(defn inbox-unfollow [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        unfollow-link (utils/link-for (:links activity-data) "unfollow")]
+    (api/inbox-unfollow unfollow-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))))))
+
+(defn inbox-dismiss [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        dismiss-link (utils/link-for (:links activity-data) "dismiss")]
+    (api/inbox-dismiss dismiss-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))
+        (inbox-get (dis/org-data))))))
+
+(defn inbox-dismiss-all []
+  (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
+        dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
+    (api/inbox-dismiss-all dismiss-all-link
+     (fn [{:keys [status success body]}]
+       (inbox-get (dis/org-data))))))

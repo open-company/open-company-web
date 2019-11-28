@@ -128,7 +128,9 @@
         no-phisical-home-button (and ua/mobile-app?
                                      (js/isiPhoneWithoutPhysicalHomeBt))
         should-show-sort? (and (not is-drafts-board)
-                               (not is-inbox))]
+                               (not is-inbox))
+        dismiss-all-link (when is-inbox
+                           (utils/link-for (:links container-data) "dismiss-all"))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when show-expanded-post "expanded-post-view")}
@@ -266,7 +268,7 @@
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
                 [:div.board-name-right
-                  (when is-inbox
+                  (when dismiss-all-link
                     [:button.mlb-reset.complete-all-bt
                       {:on-click #()
                        :data-toggle (when-not is-mobile? "tooltip")

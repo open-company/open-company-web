@@ -65,6 +65,7 @@
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
+        is-inbox? (= (router/current-board-slug) "inbox")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
@@ -179,7 +180,7 @@
              :show-delete? true
              :show-move? (not is-mobile?)
              :assigned-follow-up-data assigned-follow-up-data
-             :show-inbox-done? (:unseen activity-data)}))]
+             :show-inbox? is-inbox?}))]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video

@@ -64,7 +64,7 @@
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
              reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title
-             show-inbox-done?]}]
+             show-inbox?]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -79,7 +79,9 @@
                                 can-react?
                                 can-reply?
                                 (and (not external-share)
-                                     share-link))]
+                                     share-link))
+        inbox-follow-link (utils/link-for (:links entity-data) "follow")
+        inbox-unfollow-link (utils/link-for (:links entity-data) "unfollow")]
     (when (or edit-link
               share-link
               delete-link
@@ -115,7 +117,23 @@
                                                                    complete-follow-up-link)
                                       :has-create-follow-up (and is-mobile?
                                                                  create-follow-up-link)})}
-            (when show-inbox-done?
+            (if inbox-follow-link
+              [:li.dismiss
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/inbox-follow (:uuid entity-data)))}
+                "Follow"]
+              (when inbox-unfollow-link
+                [:li.dismiss
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/inbox-unfollow (:uuid entity-data)))}
+                  "Unfollow"]))
+            (when show-inbox?
               [:li.dismiss
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
@@ -214,6 +232,12 @@
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
+             :class (when (or inbox-follow-link
+                              inbox-unfollow-link
+                              show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
@@ -224,12 +248,48 @@
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
+        (if inbox-follow-link
+          [:button.mlb-reset.more-menu-inbox-follow-bt
+            {:type "button"
+             :ref "more-menu-inbox-follow-bt"
+             :key "more-menu-inbox-follow-bt"
+             :class (when (or show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/inbox-follow (:uuid entity-data)))
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :title "Follow"}]
+          (when inbox-unfollow-link
+            [:button.mlb-reset.more-menu-inbox-unfollow-bt
+              {:type "button"
+               :ref "more-menu-inbox-unfollow-bt"
+               :key "more-menu-inbox-unfollow-bt"
+               :class (when (or show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
+               :on-click #(do
+                            (reset! (::showing-menu s) false)
+                            (when (fn? will-close)
+                              (will-close))
+                            (activity-actions/inbox-unfollow (:uuid entity-data)))
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement (or tooltip-position "top")
+               :data-container "body"
+               :title "Unfollow"}]))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
               {:type "button"
                :ref "more-menu-complete-follow-up-bt"
-               :class (when show-inbox-done? "has-inbox-done")
+               :class (when show-inbox? "has-next-bt")
                :on-click #(do
                             (reset! (::showing-menu s) false)
                             (when (fn? will-close)
@@ -244,7 +304,7 @@
               [:div.more-menu-create-follow-up-bt-container
                 [:button.mlb-reset.more-menu-create-follow-up-bt
                   {:type "button"
-                   :class (when show-inbox-done? "has-inbox-done")
+                   :class (when show-inbox? "has-next-bt")
                    :ref "more-menu-create-follow-up-bt"
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
@@ -254,10 +314,10 @@
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
                    :title "Follow up later"}]])))
-        (when show-inbox-done?
-          [:button.mlb-reset.more-menu-inbox-done-bt
+        (when show-inbox?
+          [:button.mlb-reset.more-menu-inbox-dismiss-bt
             {:type "button"
-             :ref "more-menu-inbox-done-bt"
+             :ref "more-menu-inbox-dismiss-bt"
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)

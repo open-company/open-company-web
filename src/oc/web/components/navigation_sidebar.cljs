@@ -133,8 +133,7 @@
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)
-        all-unread-items (mapcat :unread (vals filtered-change-data))
-        all-unseen-items (mapcat :unseen (vals filtered-change-data))]
+        all-unread-items (mapcat :unread (vals filtered-change-data))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
@@ -156,10 +155,7 @@
              :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
             [:div.inbox-icon]
             [:div.inbox-label
-              {:class (utils/class-set {:new (seq all-unseen-items)})}
-              "Inbox"]
-            (when (pos? (count all-unseen-items))
-              [:span.count (count all-unseen-items)])])
+              "Inbox"]])
         (when show-follow-ups
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})
