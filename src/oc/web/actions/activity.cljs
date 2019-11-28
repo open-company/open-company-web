@@ -144,6 +144,38 @@
   (api/load-more-items more-link direction (partial all-posts-more-finish direction (router/current-sort-type)))
   (dis/dispatch! [:all-posts-more (router/current-org-slug) (router/current-sort-type)]))
 
+;; Inbox
+
+(defn inbox-get-finish [{:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          posts-data-key (dis/posts-data-key org)
+          inbox-data (when success (json->cljs body))
+          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data)]
+      (when (= (router/current-board-slug) "inbox")
+        (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-inbox-data)))
+        (watch-boards (:fixed-items fixed-inbox-data)))
+      (dis/dispatch! [:inbox-get/finish org fixed-inbox-data]))))
+
+(defn inbox-get [org-data & [finish-cb]]
+  (when-let [inbox-link (utils/link-for (:links org-data) "inbox")]
+    (api/get-all-posts inbox-link
+     (fn [resp]
+       (inbox-get-finish resp)
+       (when (fn? finish-cb)
+         (finish-cb resp))))))
+
+(defn inbox-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
+  (dis/dispatch! [:inbox-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn inbox-more [more-link direction]
+  (api/load-more-items more-link direction (partial inbox-more-finish direction))
+  (dis/dispatch! [:inbox-more (router/current-org-slug)]))
+
 ;; Must see
 (defn must-see-get-finish
   [sort-type {:keys [success body]}]
@@ -184,9 +216,12 @@
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-follow-ups (= (router/current-board-slug) "follow-ups")
+        is-inbox (= (router/current-board-slug) "inbox")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         sort-type (router/current-sort-type)
-        board-rel (if (= sort-type :recent-activity) "activity" "self")]
+        board-rel (if (= sort-type :recent-activity) "activity" "self")
+        board-link (when (and (not is-all-posts) (not is-follow-ups) (not is-inbox))
+                     (utils/link-for (:links board-data) board-rel "GET"))]
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-all-posts
@@ -195,8 +230,10 @@
         (activity-get org-data))
       is-follow-ups
       (follow-ups-sort-get org-data)
-      :else
-      (sa/section-get sort-type (utils/link-for (:links board-data) board-rel "GET")))))
+      is-inbox
+      (inbox-get org-data)
+      (seq board-link)
+      (sa/section-get sort-type board-link))))
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
@@ -673,7 +710,11 @@
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
         (when (= (router/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data))))))
+          (all-posts-get (dis/org-data)))
+        (when (= (router/current-board-slug) "follow-ups")
+          (follow-ups-get (dis/org-data)))
+        (when (= (router/current-board-slug) "inbox")
+          (inbox-get (dis/org-data))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
@@ -702,6 +743,8 @@
             (all-posts-get org-data dispatch-unread)
             (= (router/current-board-slug) "follow-ups")
             (follow-ups-get org-data dispatch-unread)
+            (= (router/current-board-slug) "inbox")
+            (inbox-get org-data dispatch-unread)
             :else
             (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
@@ -913,38 +956,6 @@
                                                       :self-follow-up-created-error)})
         (follow-ups-get org-data)
         (recent-follow-ups-get org-data))))))
-
-;; Inbox
-
-(defn inbox-get-finish [{:keys [body success]}]
-  (when body
-    (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          posts-data-key (dis/posts-data-key org)
-          inbox-data (when success (json->cljs body))
-          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data)]
-      (when (= (router/current-board-slug) "inbox")
-        (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
-        (request-reads-count (keys (:fixed-items fixed-inbox-data)))
-        (watch-boards (:fixed-items fixed-inbox-data)))
-      (dis/dispatch! [:inbox-get/finish org fixed-inbox-data]))))
-
-(defn inbox-get [org-data & [finish-cb]]
-  (when-let [inbox-link (utils/link-for (:links org-data) "inbox")]
-    (api/get-all-posts inbox-link
-     (fn [resp]
-       (inbox-get-finish resp)
-       (when (fn? finish-cb)
-         (finish-cb resp))))))
-
-(defn inbox-more-finish [direction {:keys [success body]}]
-  (when success
-    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
-  (dis/dispatch! [:inbox-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
-
-(defn inbox-more [more-link direction]
-  (api/load-more-items more-link direction (partial inbox-more-finish direction))
-  (dis/dispatch! [:inbox-more (router/current-org-slug)]))
 
 ;; Refresh data
 
