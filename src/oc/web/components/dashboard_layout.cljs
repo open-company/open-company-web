@@ -268,7 +268,8 @@
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
                 [:div.board-name-right
-                  (when dismiss-all-link
+                  (when (and dismiss-all-link
+                             (pos? (count posts-data)))
                     [:button.mlb-reset.complete-all-bt
                       {:on-click #(activity-actions/inbox-dismiss-all)
                        :data-toggle (when-not is-mobile? "tooltip")
