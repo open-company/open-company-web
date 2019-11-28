@@ -270,7 +270,7 @@
                 [:div.board-name-right
                   (when dismiss-all-link
                     [:button.mlb-reset.complete-all-bt
-                      {:on-click #()
+                      {:on-click #(activity-actions/inbox-dismiss-all)
                        :data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "top"
                        :data-container "body"
