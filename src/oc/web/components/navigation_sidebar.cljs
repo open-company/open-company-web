@@ -156,7 +156,9 @@
              :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
             [:div.inbox-icon]
             [:div.inbox-label
-              "Inbox"]])
+              "Inbox"]
+            (when (pos? (:inbox-count org-data))
+              [:span.count (:inbox-count org-data)])])
         (when show-follow-ups
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})

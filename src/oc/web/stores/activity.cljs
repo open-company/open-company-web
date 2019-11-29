@@ -570,10 +570,12 @@
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-posts))
         container-key (dispatcher/container-key org-slug :inbox)
-        with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))]
+        with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))
+        org-data-key (dispatcher/org-data-key org-slug)]
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
-      (assoc-in posts-key merged-items))))
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts)))))
 
 (defmethod dispatcher/action :inbox-more
   [db [_ org-slug sort-type]]
@@ -585,7 +587,8 @@
 (defmethod dispatcher/action :inbox-more/finish
   [db [_ org direction posts-data]]
   (if posts-data
-    (let [org-data (dispatcher/org-data db org)
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
           container-key (dispatcher/container-key org :inbox)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
@@ -599,7 +602,8 @@
                               (dissoc :loading-more))]
       (-> db
         (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)))
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts-data))))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss
@@ -607,5 +611,8 @@
   (when-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
-          without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))]
-      (assoc-in db inbox-key without-item))))
+          without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
+          org-data-key (dispatcher/org-data-key org-slug)]
+      (-> db
+        (assoc-in inbox-key without-item)
+        (update-in (conj org-data-key :inbox-count) dec)))))
