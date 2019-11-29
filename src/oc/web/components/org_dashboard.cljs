@@ -60,7 +60,7 @@
                            (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
-                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) (utils/page-scroll-top)))
+                             (utils/after 100 #(set! (.-scrollTop (.-scrollingElement js/document)) (utils/page-scroll-top)))
                              (init-whats-new)
                              s)
                             :did-remount (fn [_ s]
