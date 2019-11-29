@@ -9,48 +9,49 @@
 
     ;; Clojure/ClojureScript
     ;; NB: Need to change Clojure version in boot.properties in sync with this
-    [org.clojure/clojure "1.10.1-RC1"] ; Lisp on the JVM http://clojure.org/documentation
-    [org.clojure/clojurescript "1.10.520"] ; ClojureScript compiler https://github.com/clojure/clojurescript
-    [org.clojure/core.rrb-vector "0.1.0"] ; Indirect dependency of many libs, >= 0.0.13 required for Java 11+ https://github.com/clojure/core.rrb-vector
+    [org.clojure/clojure "1.10.1"] ; Lisp on the JVM http://clojure.org/documentation
+    [org.clojure/clojurescript "1.10.597"] ; ClojureScript compiler https://github.com/clojure/clojurescript
+    [org.clojure/core.rrb-vector "0.1.1"] ; Indirect dependency of many libs, >= 0.0.13 required for Java 11+ https://github.com/clojure/core.rrb-vector
 
     ;; Rum React Frameworks
     ;; Didn't update to 15.5.4+ just yet since it requires some changes to oc.web.rum-utils to remove .-PropTypes access
     ;; and some change to omcljs/om to not use createClass anymore. See React docs for more info.
-    [cljsjs/react "16.2.0-3"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [cljsjs/react-dom "16.2.0-3"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
-    [rum "0.11.2" :exclusions [cljsjs/react]] ; https://github.com/tonsky/rum
+    [cljsjs/react "16.11.0-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [cljsjs/react-dom "16.11.0-0"] ; A Javascript library for building user interfaces https://github.com/cljsjs/packages
+    [rum "0.11.4" :exclusions [cljsjs/react cljsjs/react-dom]] ; https://github.com/tonsky/rum
     [org.martinklepsch/derivatives "0.3.1-alpha"] ; Chains of derived data https://github.com/martinklepsch/derivatives
     [cljs-flux "0.1.2"] ; Flux implementation for Om https://github.com/kgann/cljs-flux
 
     ;; ClojureScript libraries
-    [cljs-http "0.1.44"] ; HTTP for cljs https://github.com/r0man/cljs-http
+    [cljs-http "0.1.46"] ; HTTP for cljs https://github.com/r0man/cljs-http
     [clj-commons/secretary "1.2.5-SNAPSHOT"] ; Client-side router https://github.com/clj-commons/secretary
     [prismatic/dommy "1.1.0"] ; DOM manipulation and event library https://github.com/Prismatic/dommy
-    [com.cognitect/transit-cljs "0.8.248"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
-    [funcool/cuerdas "2.2.0"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
-    [medley "1.0.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
+    [com.cognitect/transit-cljs "0.8.256"] ; ClojureScript wrapper for JavaScript JSON https://github.com/cognitect/transit-cljs
+    [funcool/cuerdas "2.2.1"] ; String manipulation library for Clojure(Script) https://github.com/funcool/cuerdas
+    [medley "1.2.0"] ; lightweight library of useful, mostly pure functions that are "missing" from clojure.core
     [org.martinklepsch/cljsjs-medium-button "0.0.0-225390f882986a8a7aee786bde247b5b2122a40b-2"] ; https://github.com/martinklepsch/cljsjs-medium-button
     [cljs-hash "0.0.2"] ; various hash functions for cljs https://github.com/davesann/cljs-hash
     [binaryage/oops "0.7.0"]  ; ClojureScript macros for convenient native Javascript object access. https://github.com/binaryage/cljs-oops
 
     ;; CLJSJS packages http://cljsjs.github.io/
     ;; Update together with resources/public/lib/jwt_decode/
-    [cljsjs/jwt-decode "2.1.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
+    [cljsjs/jwt-decode "2.2.0-0"] ; Decode JWT tokens, mostly useful for browser applications. https://github.com/cljsjs/packages/tree/master/jwt-decode
     ;; -----------------------------------------------------
     [cljsjs/sentry-browser "5.6.2-0"] ; Sentry JS https://github.com/cljsjs/packages/tree/master/sentry-browser
     [cljsjs/medium-editor "5.23.2-0"] ; Medium editor https://clojars.org/cljsjs/medium-editor
     [cljsjs/emojione "2.2.6-1"] ; Emojione http://emojione.com
-    [cljsjs/clipboard "1.6.1-1"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
+    [cljsjs/clipboard "2.0.4-0"] ; Copy to clipboard https://github.com/zenorocha/clipboard.js
     [cljsjs/web-animations "2.1.4-0"] ; JavaScript implementation of the Web Animations API https://github.com/web-animations/web-animations-js
     [cljsjs/moment-timezone "0.5.11-1"] ; Timezone support for moment.js https://github.com/moment/moment-timezone/
     [cljsjs/filestack "0.9.9-0"] ; Filestack image manipulatino and storing https://github.com/filestack/filestack-js
+    ;; update filestack 3.5.0-0
     [cljsjs/emoji-mart "2.2.1-0"] ; EmojiMart picker for native emoji picking https://github.com/missive/emoji-mart
     [cljsjs/localforage "1.5.3-0"] ; Offline storage, improved. Wraps IndexedDB, WebSQL, or localStorage using a simple but powerful API. https://github.com/localForage/localForage
     [cljsjs/react-giphy-selector "0.0.3-0"] ;; A very customizable react search component for picking the perfect giphy. https://github.com/tshaddix/react-giphy-selector
     [cljsjs/react-virtualized "9.21.1-0" :exclusions [cljsjs/react cljsjs/react-dom]] ;; React components for efficiently rendering large lists and tabular data
 
     ;; Library for OC projects https://github.com/open-company/open-company-lib
-    [open-company/lib "0.17.18-alpha" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
+    [open-company/lib "0.17.24.1" :excludes [amazonica liberator http-kit ring/ring-codec com.stuartsierra/component clj-time]]
     ;; In addition to common functions, brings in the following common dependencies used by this project:
     ;; defun - Erlang-esque pattern matching for Clojure functions https://github.com/killme2008/defun
     ;; if-let - More than one binding for if/when macros https://github.com/LockedOn/if-let
@@ -66,9 +67,9 @@
     ;; ------- Deps for project repl ------------------
     ;; The following dependencies are from: https://github.com/adzerk-oss/boot-cljs-repl
     [adzerk/boot-cljs-repl   "0.4.0"]
-    [cider/piggieback        "0.3.9"]
+    [cider/piggieback        "0.4.2"]
     [weasel                  "0.7.0"]
-    [nrepl                   "0.4.5"]
+    [nrepl                   "0.6.0"]
     ;; ------------------------------------------------
 
 ])
@@ -76,9 +77,9 @@
 (def static-site-deps
   '[[hiccup "2.0.0-alpha1" :scope "test"]
     [perun "0.3.0" :scope "test"]
-    [compojure "1.6.0" :scope "test"]
+    [compojure "1.6.1" :scope "test"]
     [pandeiro/boot-http "0.8.3" :scope "test"]
-    [deraen/boot-sass "0.3.1" :scope "test"]
+    [deraen/boot-sass "0.5.0" :scope "test"]
     [org.slf4j/slf4j-nop "1.8.0-beta2" :scope "test"]])
 
 (set-env!
@@ -150,8 +151,8 @@
                           'test.oc.web.components.ui.user-avatar]
              :cljs-opts {:optimizations :whitespace
                          :foreign-libs [{:provides ["cljsjs.react"]
-                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/cjs/react.development.js"
-                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/16.2.0/cjs/react.development.js"}
+                                         :file "https://cdnjs.cloudflare.com/ajax/libs/react/16.11.0/cjs/react.development.js"
+                                         :file-min "https://cdnjs.cloudflare.com/ajax/libs/react/16.11.0/cjs/react.development.js"}
                                         {:provides ["cljsjs.raven"]
                                          :file "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.17.0/raven.min.js"
                                          :file-min "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.17.0/raven.min.js"}]}))

@@ -41,7 +41,7 @@
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
   [s e]
-  (let [scroll-top (.-scrollTop (.-scrollingElement js/document))
+  (let [scroll-top (.. js/document -scrollingElement -scrollTop)
         direction (if (> @(::last-scroll s) scroll-top)
                     :up
                     (if (< @(::last-scroll s) scroll-top)
@@ -156,7 +156,7 @@
                         (drv/drv :foc-layout)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
-                        (rum/local (.-scrollTop (.-scrollingElement js/document)) ::last-scroll)
+                        (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
                         (rum/local false ::has-next)
                         (rum/local nil ::bottom-loading)
                         (rum/local false ::show-all-caught-up-message)
@@ -172,7 +172,7 @@
                           (check-pagination s)
                          s)
                          :did-mount (fn [s]
-                          (reset! (::last-scroll s) (.-scrollTop (.-body js/document)))
+                          (reset! (::last-scroll s) (.. js/document -scrollingElement -scrollTop))
                           (reset! (::scroll-listener s)
                            (events/listen js/window EventType/SCROLL #(did-scroll s %)))
                           (check-pagination s)
