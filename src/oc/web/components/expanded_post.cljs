@@ -146,7 +146,8 @@
                    :show-delete? true
                    :show-move? (not is-mobile?)
                    :tooltip-position "bottom"
-                   :assigned-follow-up-data assigned-follow-up-data})
+                   :assigned-follow-up-data assigned-follow-up-data
+                   :show-inbox? (= (:back-to @router/path) "inbox")})
        (when user-is-part-of-the-team
          [:div.expanded-post-wrt-container
            (wrt-count {:activity-data activity-data
