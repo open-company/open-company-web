@@ -601,3 +601,11 @@
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)))
     db))
+
+(defmethod dispatcher/action :inbox/dismiss
+  [db [_ org-slug item-id]]
+  (when-let [activity-data (dispatcher/activity-data item-id)]
+    (let [inbox-key (dispatcher/container-key org-slug "inbox")
+          inbox-data (get-in db inbox-key)
+          without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))]
+      (assoc-in db inbox-key without-item))))

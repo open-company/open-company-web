@@ -715,6 +715,28 @@
           (follow-ups-get (dis/org-data)))
         (when (= (router/current-board-slug) "inbox")
           (inbox-get (dis/org-data))))))
+  (ws-cc/subscribe :entry/inbox-action
+    (fn [data]
+      ;; Only in case the event is from/to this user:
+      (when (= (-> data :data :user-id) (jwt/user-id))
+        (let [change-data (:data data)
+              activity-uuid (:item-id change-data)
+              change-type (:change-type change-data)
+              inbox-action (:inbox-action change-data)]
+          (cond
+            (= change-type :dismiss)
+            (do
+              (timbre/debug "Dismiss for" activity-uuid "with" (:dismiss-at inbox-action))
+              (dis/dispatch! [:inbox/dismiss (router/current-org-slug) activity-uuid])
+              (inbox-get (dis/org-data)))
+            (= change-type :follow)
+            (do
+              (timbre/debug "Follow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (inbox-get (dis/org-data)))
+            (= change-type :unfollow)
+            (do
+              (timbre/debug "Unfollow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (inbox-get (dis/org-data))))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
