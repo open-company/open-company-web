@@ -62,14 +62,18 @@
   (assoc db :add-comment-focus focus-uuid))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ activity-data comment-data parent-comment-uuid comments-key]]
-  (let [comments-data (vec (get-in db comments-key))
+  [db [_ org-slug activity-data comment-data parent-comment-uuid comments-key]]
+  (let [activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
+        comments-data (vec (get-in db comments-key))
         new-comment-data (parse-comment (dispatcher/org-data db)
                                         activity-data
                                         comment-data)
         all-comments (concat comments-data [new-comment-data])
         sorted-all-comments (comment-utils/sort-comments all-comments)]
-    (assoc-in db comments-key sorted-all-comments)))
+    (-> db
+     (assoc-in comments-key sorted-all-comments)
+     ;; Reset new comments count
+     (assoc-in (conj activity-key :new-comments-count) 0))))
 
 (defmethod dispatcher/action :comment-add/replace
   [db [_ activity-data comment-data comments-key new-comment-uuid]]

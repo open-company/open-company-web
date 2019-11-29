@@ -52,7 +52,7 @@
     ;; Reset the add comment field
     (dis/dispatch! [:add-comment-reset (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil])
     ;; Add the comment to the app-state to show it immediately
-    (dis/dispatch! [:comment-add activity-data new-comment-map parent-comment-uuid comments-key new-comment-uuid])
+    (dis/dispatch! [:comment-add org-slug activity-data new-comment-map parent-comment-uuid comments-key new-comment-uuid])
     ;; Send WRT read on comment add
     (activity-actions/send-item-read (:uuid activity-data))
     (api/add-comment add-comment-link comment-body parent-comment-uuid
