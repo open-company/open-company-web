@@ -1,6 +1,7 @@
 (ns oc.web.stores.comment
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun)]
+            [cuerdas.core :as str]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
@@ -73,7 +74,14 @@
     (-> db
      (assoc-in comments-key sorted-all-comments)
      ;; Reset new comments count
-     (assoc-in (conj activity-key :new-comments-count) 0))))
+     (assoc-in (conj activity-key :new-comments-count) 0)
+     (update-in (conj activity-key :links) (fn [links]
+                                             (mapv (fn [link]
+                                              (if (= (:rel link) "follow")
+                                                (merge link {:href (str/replace (:href link) #"/follow$" "/unfollow")
+                                                             :rel "unfollow"})
+                                                link))
+                                               links))))))
 
 (defmethod dispatcher/action :comment-add/replace
   [db [_ activity-data comment-data comments-key new-comment-uuid]]
