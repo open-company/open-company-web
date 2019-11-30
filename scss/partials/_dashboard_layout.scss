@@ -195,6 +195,7 @@ div.dashboard-layout {
       margin: 0;
       padding: 24px 0 0;
       float: right;
+      min-height: calc(100vh - #{$navbar_height}px - 20px);
 
       @include mobile() {
         width: 100%;

@@ -205,7 +205,8 @@
             (when (and (not is-mobile?)
                        can-compose?)
                (cmail))
-            (when-not show-expanded-post
+            (when (and (not show-expanded-post)
+                       (not empty-board?))
             ;; Board name row: board name, settings button and say something button
               [:div.board-name-container.group
                 {:class (when is-drafts-board "drafts-board")}

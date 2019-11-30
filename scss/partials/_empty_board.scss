@@ -1,6 +1,4 @@
 div.empty-board {
-  margin: 124px auto 0;
-  float: left;
   text-align: center;
   width: 100%;
 
@@ -12,38 +10,72 @@ div.empty-board {
   }
 
   div.empty-board-grey-box {
-    width: 100%;
-    margin: 0 auto;
+    width: 210px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -15px;
+
+    &.empty-board-box-0 {
+      width: 154px;
+    }
+
+    &.empty-board-box-1 {
+      width: 151px;
+    }
+
+    &.empty-board-box-2 {
+      width: 151px;
+    }
+
+    &.empty-board-box-3 {
+      width: 151px;
+    }
+
+    &.empty-board-box-4 {
+      width: 210px;
+    }
+
+    &.empty-board-box-5 {
+      width: 147px;
+    }
+
+    @media screen and (max-height: 650px) {
+      top: 287px;
+    }
 
     @include mobile() {
       width: 100%;
-      height: auto;
-      background-image: none;
-      border: none;
-      padding: 40px 0;
-      margin: 100px auto 0;
+      margin: 32px auto 0;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
 
     div.empty-board-illustration {
-      width: 56px;
-      height: 56px;
-      background-color: #F3F0EF;
-      border-radius: 8px;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 24px 20px;
-      margin: 0 auto;
-      background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
+      // width: 56px;
+      // height: 56px;
+      // background-color: #F3F0EF;
+      // border-radius: 8px;
+      // background-repeat: no-repeat;
+      // background-position: center;
+      // background-size: 24px 20px;
+      // margin: 0 auto;
+      // background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
 
-      &.drafts {
-        background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-        background-size: 56px 56px;
-      }
+      // &.drafts {
+      //   background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+      //   background-size: 56px 56px;
+      // }
 
-      &.follow-ups {
-        background-image: cdnUrl("/img/ML/empty_state_follow_ups_section.svg");
-        background-size: 18px 24px;
-      }
+      // &.follow-ups {
+      //   background-image: cdnUrl("/img/ML/empty_state_follow_ups_section.svg");
+      //   background-size: 18px 24px;
+      // }
+
+      font-size: 56px;
+      font-family: AppleColorEmoji;
+      marigin: 0 auto;
     }
 
     div.empty-board-title {
@@ -51,7 +83,8 @@ div.empty-board {
       font-size: 16px;
       color: $deep_navy;
       line-height: 20px;
-      margin: 16px auto 0;
+      margin: -4px auto 0;
+      text-align: center;
     }
   }
 }
