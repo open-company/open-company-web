@@ -94,8 +94,6 @@
         foc-layout (drv/react s :foc-layout)
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
-    (js/console.log "DBG stream-item comments-count:" (-> activity-data :comments count)
-                               (-> comments-data (get (:uuid activity-data)) :sorted-comments count) "->" (:headline activity-data) has-zero-comments?)
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
