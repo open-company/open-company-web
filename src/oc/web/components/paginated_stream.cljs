@@ -24,8 +24,19 @@
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
+(def scroll-card-threshold-collapsed 5)
+(def collapsed-foc-height 56)
 (def foc-height 188)
 (def mobile-foc-height 172)
+
+(defn- calc-card-height [mobile? foc-layout]
+  (cond
+    mobile?
+    mobile-foc-height
+    (= foc-layout dis/other-foc-layout)
+    collapsed-foc-height
+    :else
+    foc-height))
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -37,7 +48,9 @@
                       :down
                       :stale))
         max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))
-        card-height (if (responsive/is-mobile-size?) mobile-foc-height foc-height)]
+        card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
+        scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
+        current-board-slug (router/current-board-slug)]
     ;; scrolling down
     (when (and ;; not already loading more
                (not @(::bottom-loading s))
@@ -46,14 +59,14 @@
                ;; scroll is moving down
                (= direction :down)
                ;; and the threshold point has been reached
-               (>= scroll-top (- max-scroll (* scroll-card-threshold card-height))))
+               (>= scroll-top (- max-scroll (* scroll-threshold card-height))))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
-        (= (router/current-board-slug) "all-posts")
+        (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
-        (= (router/current-board-slug) "follow-ups")
+        (= current-board-slug "follow-ups")
         (activity-actions/follow-ups-more @(::has-next s) :down)
         :else
         (section-actions/section-more @(::has-next s) :down)))
@@ -93,7 +106,8 @@
 
 (rum/defc virtualized-stream < rum/static
   [{:keys [items
-           activities-read]
+           activities-read
+           foc-layout]
     :as derivatives}
    virtualized-props]
   (let [{:keys [height
@@ -123,11 +137,11 @@
                        :isScrolling isScrolling
                        :onScroll onChildScroll
                        :rowCount (count items)
-                       :rowHeight (if is-mobile? mobile-foc-height foc-height)
+                       :rowHeight (calc-card-height is-mobile? foc-layout)
                        :rowRenderer row-renderer
                        :scrollTop scrollTop
                        :ref registerChild
-                       :overscanRowCount 10
+                       :overscanRowCount (if (= foc-layout collapsed-foc-height) 20 10)
                        :style {:outline "none"}
                        })))
 
@@ -140,6 +154,7 @@
                         (drv/drv :activities-read)
                         (drv/drv :comments-data)
                         (drv/drv :editable-boards)
+                        (drv/drv :foc-layout)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
@@ -182,7 +197,8 @@
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
         items (drv/react s :filtered-posts)
-        activities-read (drv/react s :activities-read)]
+        activities-read (drv/react s :activities-read)
+        foc-layout (drv/react s :foc-layout)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -192,7 +208,8 @@
                                        :comments-data comments-data
                                        :items items
                                        :activities-read activities-read
-                                       :editable-boards editable-boards}))]
+                                       :editable-boards editable-boards
+                                       :foc-layout foc-layout}))]
         (when @(::bottom-loading s)
           [:div.loading-updates.bottom-loading
             "Loading more posts..."])

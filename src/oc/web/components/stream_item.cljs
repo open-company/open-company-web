@@ -48,6 +48,7 @@
                          rum/reactive
                          ;; Derivatives
                          (drv/drv :activity-share-container)
+                         (drv/drv :foc-layout)
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
@@ -90,7 +91,11 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        ]
+        foc-layout (drv/react s :foc-layout)
+        has-zero-comments? (and (-> activity-data :comments count zero?)
+                                (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
+    (js/console.log "DBG stream-item comments-count:" (-> activity-data :comments count)
+                               (-> comments-data (get (:uuid activity-data)) :sorted-comments count) "->" (:headline activity-data) has-zero-comments?)
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -100,7 +105,8 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
-                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
+                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)
+                                :foc-collapsed (= foc-layout :collapsed)})
        :data-new-at (:new-at activity-data)
        :data-last-read-at (:last-read-at read-data)
        ;; click on the whole tile only for draft editing
@@ -178,6 +184,8 @@
              :show-move? (not is-mobile?)
              :assigned-follow-up-data assigned-follow-up-data}))]
       [:div.stream-item-body-ext.group
+        {:class (utils/class-set {:has-comments (not has-zero-comments?)
+                                  :has-new-comments has-new-comments?})}
         [:div.thumbnail-container.group
           (if has-video
             [:div.group
@@ -219,7 +227,8 @@
                   {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
                   "Delete draft"]]]
             [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"}
+              {:ref "stream-item-reactions"
+               :class (utils/class-set {:no-comments has-zero-comments?})}
               (reactions {:entity-data activity-data
                           :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
@@ -263,4 +272,14 @@
                             [:span.file-name
                               (:file-name atc)]
                             [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])]]))
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])
+          [:div.collpased-time
+            (let [t (or (:published-at activity-data) (:created-at activity-data))]
+              [:time
+                {:date-time t
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
+                (utils/foc-date-time t)])]]]))

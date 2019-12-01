@@ -88,7 +88,7 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
+         (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) "dashboard" board-slug)]
           {:org org-slug
            :board board-slug
            :sort-type sort-type

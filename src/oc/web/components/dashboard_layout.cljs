@@ -51,6 +51,7 @@
                               (drv/drv :user-notifications)
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :activity-data)
+                              (drv/drv :foc-layout)
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
@@ -82,13 +83,15 @@
         board-data (drv/react s :board-data)
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
+        foc-layout (drv/react s :foc-layout)
+        current-board-slug (router/current-board-slug)
         ;; Board data used as fallback until the board is completely loaded
-        org-board-data (first (filter #(= (:slug %) (router/current-board-slug)) (:boards org-data)))
+        org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         activity-data (drv/react s :activity-data)
-        is-all-posts (utils/in? (:route route) "all-posts")
-        is-follow-ups (utils/in? (:route route) "follow-ups")
+        is-all-posts (= current-board-slug "all-posts")
+        is-follow-ups (= current-board-slug "follow-ups")
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
@@ -96,7 +99,7 @@
         board-container-data (if (or is-all-posts is-follow-ups) container-data board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
-        is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
+        is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -106,7 +109,7 @@
         show-drafts (pos? (:count drafts-link))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
-        should-show-settings-bt (and (router/current-board-slug)
+        should-show-settings-bt (and current-board-slug
                                      (not is-all-posts)
                                      (not is-follow-ups)
                                      (not (:read-only board-data)))
@@ -118,8 +121,8 @@
                                 activity-data
                                 (not= activity-data :404)
                                 ;; Do not show the post under the wrong board slug/uuid
-                                (or (= (:board-slug activity-data) (router/current-board-slug))
-                                    (= (:board-uuid activity-data) (router/current-board-slug))))
+                                (or (= (:board-slug activity-data) current-board-slug)
+                                    (= (:board-uuid activity-data) current-board-slug)))
         no-phisical-home-button (and ua/mobile-app?
                                      (js/isiPhoneWithoutPhysicalHomeBt))]
       ;; Entries list
@@ -142,15 +145,15 @@
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (= (router/current-board-slug) "all-posts"))
+                                   (= current-board-slug "all-posts"))
                           "active")}]
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (or (= (router/current-board-slug) "follow-ups")
-                                       (= (router/current-board-slug) "must-see")))
+                                   (or (= current-board-slug "follow-ups")
+                                       (= current-board-slug "must-see")))
                           "active")}]
               [:button.mlb-reset.notifications-tab
                 {:on-click #(do
@@ -211,13 +214,14 @@
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (when (router/current-board-slug)
+                  (when current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
                                                                 (not is-drafts-board))
                                                   :public (= (:access current-board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
+
                                                    is-all-posts
                                                    "All posts"
 
@@ -236,7 +240,7 @@
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+                       :title (if (= current-board-slug utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}])
                   (when (= (:access current-board-data) "public")
@@ -255,32 +259,36 @@
                          :data-container "body"
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
-                (when-not is-drafts-board
-                  (let [default-sort (= board-sort dis/default-sort-type)]
-                    [:div.board-sort.group
-                      {:ref :board-sort-menu}
-                      (when is-mobile?
-                        [:button.mlb-reset.mobile-search-bt
-                          {:on-click (fn [e]
-                                       (search-actions/active)
-                                       (utils/after 500 #(.focus (js/$ "input.search"))))}])
-                      [:button.mlb-reset.board-sort-bt
-                        {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                        (if default-sort "Recent activity" "Recently posted")]
-                      [:div.board-sort-menu
-                        {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                        [:div.board-sort-menu-item
-                          {:class (when default-sort "active")
-                           :on-click #(do
-                                        (reset! (::sorting-menu-expanded s) false)
-                                        (activity-actions/change-sort-type :recent-activity))}
-                          "Recent activity"]
-                        [:div.board-sort-menu-item
-                          {:class (when-not default-sort "active")
-                           :on-click #(do
-                                        (reset! (::sorting-menu-expanded s) false)
-                                        (activity-actions/change-sort-type :recently-posted))}
-                          "Recently posted"]]]))])
+                [:div.board-name-right
+                  (when-not is-drafts-board
+                    (let [default-sort (= board-sort dis/default-sort-type)]
+                      [:div.board-sort.group
+                        {:ref :board-sort-menu}
+                        (when is-mobile?
+                          [:button.mlb-reset.mobile-search-bt
+                            {:on-click (fn [e]
+                                         (search-actions/active)
+                                         (utils/after 500 #(.focus (js/$ "input.search"))))}])
+                        [:button.mlb-reset.board-sort-bt
+                          {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                          (if default-sort "Recent activity" "Recently posted")]
+                        [:div.board-sort-menu
+                          {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                          [:div.board-sort-menu-item
+                            {:class (when default-sort "active")
+                             :on-click #(do
+                                          (reset! (::sorting-menu-expanded s) false)
+                                          (activity-actions/change-sort-type :recent-activity))}
+                            "Recent activity"]
+                          [:div.board-sort-menu-item
+                            {:class (when-not default-sort "active")
+                             :on-click #(do
+                                          (reset! (::sorting-menu-expanded s) false)
+                                          (activity-actions/change-sort-type :recently-posted))}
+                            "Recently posted"]]]))
+                  [:button.mlb-reset.foc-layout-bt
+                    {:on-click #(activity-actions/toggle-foc-layout)
+                     :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]]])
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
             (cond

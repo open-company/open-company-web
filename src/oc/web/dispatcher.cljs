@@ -17,6 +17,9 @@
 (def default-sort-type :recent-activity)
 (def other-sort-type :recently-posted)
 
+(def default-foc-layout :expanded)
+(def other-foc-layout :collapsed)
+
 ;; Data key paths
 
 (def checkout-result-key :checkout-success-result)
@@ -451,7 +454,8 @@
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
-   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
+   :foc-layout            [[:base] (fn [base] (:foc-layout base))]})
 
 ;; Action Loop =================================================================
 
