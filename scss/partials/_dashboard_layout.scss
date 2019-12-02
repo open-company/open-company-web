@@ -431,6 +431,11 @@ div.dashboard-layout {
           height: 32px;
           position: relative;
 
+          @include mobile () {
+            float: unset;
+            height: 50px;
+          }
+
           button.complete-all-bt {
             float: left;
             height: 32px;
@@ -569,8 +574,6 @@ div.dashboard-layout {
                   -webkit-tap-highlight-color: $feint_emerald;
                 }
               }
-            }
-          }
 
           button.foc-layout-bt {
             float: left;
@@ -585,6 +588,10 @@ div.dashboard-layout {
             opacity: 0.5;
             margin-left: 9px;
 
+            @include mobile() {
+              display: none;
+            }
+          }
             &.collapsed {
               background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
               background-color: 14px 16px;

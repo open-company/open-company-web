@@ -92,7 +92,9 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        foc-layout (drv/react s :foc-layout)]
+        foc-layout (drv/react s :foc-layout)
+        has-zero-comments? (and (-> activity-data :comments count zero?)
+                                (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -182,6 +184,8 @@
              :assigned-follow-up-data assigned-follow-up-data
              :show-inbox? is-inbox?}))]
       [:div.stream-item-body-ext.group
+        {:class (utils/class-set {:has-comments (not has-zero-comments?)
+                                  :has-new-comments has-new-comments?})}
         [:div.thumbnail-container.group
           (if has-video
             [:div.group
@@ -223,7 +227,8 @@
                   {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
                   "Delete draft"]]]
             [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"}
+              {:ref "stream-item-reactions"
+               :class (utils/class-set {:no-comments has-zero-comments?})}
               (reactions {:entity-data activity-data
                           :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
@@ -267,4 +272,14 @@
                             [:span.file-name
                               (:file-name atc)]
                             [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])]]))
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])
+          [:div.collpased-time
+            (let [t (or (:published-at activity-data) (:created-at activity-data))]
+              [:time
+                {:date-time t
+                 :data-toggle (when-not is-mobile? "tooltip")
+                 :data-placement "top"
+                 :data-container "body"
+                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                 :data-title (utils/activity-date-tooltip activity-data)}
+                (utils/foc-date-time t)])]]]))

@@ -16,66 +16,232 @@ div.stream-item {
   background-color: $foc_background_color;
   overflow: visible;
 
-  &.foc-collapsed {
-    height: #{$collapsed_foc_height}px;
-    overflow-y: hidden;
-    padding: 12px;
-    display: block;
-    flex-direction: unset;
-    justify-content: unset;
+  @include mobile() {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border-top: none;
+    border-bottom: 1px solid $foc_divider_line_color;
+    background-color: $mobile_foc_background_color;
+    padding: 16px 16px 16px;
+    height: #{$mobile_foc_height}px;
+  }
 
-    div.name {
-      display: none;
-    }
-
-    div.stream-item-header {
-      width: 24px;
-      height: 24px;
-      float: left;
-      margin-top: 2px;
-
-      div.more-menu {
-        display: none;
-      }
-    }
-
-    div.stream-item-body-ext {
-      float: left;
+  @include big_web() {
+    &.foc-collapsed {
+      height: #{$collapsed_foc_height}px;
+      padding: 16px 16px 16px 20px;
       display: block;
-      width: calc(100% - 32px - 24px - 8px); // 16 * 2 of padding, 24px avatar, 8px left margin
-      height: 28px;
-      margin-left: 8px;
+      flex-direction: unset;
+      justify-content: unset;
+      position: relative;
 
-      div.thumbnail-container {
-        min-height: unset;
-        height: 28px;
+      &.unread-item div.stream-item-header div.more-menu {
+        background-color: white;
+      }
 
-        div.body-thumbnail-wrapper {
-          display: none;
-        }
+      &:hover div.stream-item-header div.more-menu {
+        display: block;
+      }
 
-        div.stream-body-left {
-          min-height: unset;
-          height: 28px;
-          margin-top: 0;
+      div.stream-item-header {
+        width: auto;
+        height: 20px;
+        float: left;
+        margin-top: 2px;
+        position: unset;
 
-          div.stream-item-headline {
-            display: inline-block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            white-space: nowrap;
-            @include activity-title(14px, 28px);
+        div.stream-header-head-author {
+          @include activity-author(20);
+
+          div.user-avatar-img-container {
+            margin-right: 0;
           }
 
-          div.stream-item-body {
+          div.name {
+            display: inline-block;
+            width: auto;
+            max-width: unset;
+
+            // Hide the follow-up/must-see labels for now
+            // display: none;
+
+            div.mobile-name {
+              display: none;
+            }
+
+            div.follow-up-tag, div.must-see-tag {
+              float: unset;
+              margin: 2px 0 0 8px;
+            }
+          }
+        }
+
+        div.more-menu {
+          position: absolute;
+          right: 16px;
+          top: 12px;
+          height: 32px;
+          z-index: 100;
+          background-color: rgb(230, 232, 232);
+          display: none;
+
+          ul.more-menu-list {
+            z-index: 102;
+          }
+        }
+      }
+
+       &.follow-up-item div.stream-item-body-ext {
+        width: calc(100% - 20px - 8px - 89px - 30px);
+      }
+
+      &.must-see-item div.stream-item-body-ext {
+        width: calc(100% - 20px - 8px - 74px - 30px);
+      }
+
+      div.stream-item-body-ext {
+        float: unset;
+        display: inline-block;
+        width: calc(100% - 20px - 8px - 30px); // 16 * 2 of padding, 24px avatar, 8px left margin, 50px for the time
+        height: 24px;
+        margin-left: 8px;
+
+        &.has-comments div.thumbnail-container {
+          max-width: calc(100% - 150px);
+        }
+
+        &.has-new-comments div.thumbnail-container {
+          max-width: calc(100% - 150px - 25px;);
+        }
+
+        div.thumbnail-container {
+          min-height: unset;
+          height: 24px;
+          display: inline-block;
+          vertical-align: top;
+          display: inline-block;
+
+          div.body-thumbnail-wrapper {
             display: none;
           }
-        }
-      }
 
-      div.stream-item-footer {
-        display: none;
+          div.stream-body-left {
+            min-height: unset;
+            height: 24px;
+            margin-top: 0;
+            // width: 100%;
+            display: flex;
+            align-items: center;
+
+            div.stream-item-headline {
+              height: 24px;
+              display: inline-block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: 50%;
+              white-space: nowrap;
+              @include activity-title(14px, 24px);
+            }
+
+            div.stream-item-body {
+              display: inline-block;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              max-width: calc(50% - 4px);
+              white-space: nowrap;
+              word-break: nowrap;
+              @include activity-body(14, 24, $deep_navy);
+              margin-left: 4px;
+              padding-left: 8px;
+              position: relative;
+              height: 24px;
+
+              * {
+                display: inline-block !important;
+                height: 24px;
+                white-space: nowrap;
+                margin: 0 !important;
+                margin: 0 !important;
+                vertical-align: top;
+              }
+
+              // p:not(:first-child) {
+              //   display: none;
+              // }
+
+              &:before {
+                content: "-";
+                width: 4px;
+                height: 24px;
+                color: $deep_navy;
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 24px;
+                position: absolute;
+                top: 0;
+                left: 0;
+              }
+            }
+          }
+        }
+
+        div.stream-item-footer {
+          display: inline-block;
+          min-height: 24px;
+          height: 24px;
+          max-width: 150px;
+
+          &.no-comments {
+            display: none;
+          }
+
+          div.reactions {
+            display: none;
+          }
+
+          div.stream-item-footer-mobile-group {
+            display: inline-block;
+            height: 24px;
+
+            div.stream-item-comments-summary {
+              display: inline-block;
+              margin-right: 0;
+              float: unset;
+              height: 24px;
+
+              div.is-comments {
+                height: 24px;
+                float: unset;
+
+                div.is-comments-authors {
+                  margin-top: 0;
+                }
+              }
+            }
+
+            div.stream-item-wrt {
+              display: none;
+            }
+
+            div.stream-item-attachments {
+              display: none;
+            }
+          }
+        }
+
+        div.collpased-time {
+          height: 24px;
+          display: inline-block;
+          @include OC_Body_Book();
+          font-size: 12px;
+          line-height: 24px;
+          color: rgba($deep_navy, 0.5);
+          margin-left: 8px;
+          max-width: 50px;
+          position: absolute;
+          top: 16px;
+        }
       }
     }
   }
@@ -94,17 +260,6 @@ div.stream-item {
         }
       }
     }
-  }
-
-  @include mobile() {
-    width: 100%;
-    margin: 0;
-    border-radius: 0;
-    border-top: none;
-    border-bottom: 1px solid $foc_divider_line_color;
-    background-color: $mobile_foc_background_color;
-    padding: 16px 16px 16px;
-    height: #{$mobile_foc_height}px;
   }
 
   &.draft {
@@ -653,6 +808,10 @@ div.stream-item {
           display: none;
         }
       }
+    }
+
+    div.collpased-time {
+      display: none;
     }
   }
 }
