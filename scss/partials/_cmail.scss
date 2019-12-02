@@ -25,6 +25,10 @@ div.cmail-outer {
 
   &.quick-post-collapsed {
 
+    @include mobile() {
+      display: none;
+    }
+
     &.show-trial-expired-alert {
       div.cmail-container, div.cmail-container div.cmail-content-outer,
       div.cmail-container div.cmail-content-outer div.cmail-content
