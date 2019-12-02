@@ -119,6 +119,7 @@
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         is-mobile? (responsive/is-mobile-size?)
+        key-prefix (if is-mobile? "mobile" foc-layout)
         row-renderer (fn [row-props]
                        (let [{:keys [key
                                      index
@@ -137,10 +138,10 @@
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry entry
                                                                   :reads-data reads-data}))
-                            (str foc-layout "-" key)))))]
+                            (str key-prefix "-" key)))))]
     [:div.virtualized-list-container
       {:ref registerChild
-       :key (str "virtualized-list-" foc-layout)}
+       :key (str "virtualized-list-" key-prefix)}
       (virtualized-list {:autoHeight true
                          :height height
                          :width (if is-mobile?

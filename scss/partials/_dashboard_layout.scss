@@ -420,6 +420,11 @@ div.dashboard-layout {
           height: 32px;
           position: relative;
 
+          @include mobile () {
+            float: unset;
+            height: 50px;
+          }
+
           div.board-sort {
             float: left;
             height: 32px;
@@ -554,6 +559,10 @@ div.dashboard-layout {
             background-repeat: no-repeat;
             opacity: 0.5;
             margin-left: 9px;
+
+            @include mobile() {
+              display: none;
+            }
 
             &.collapsed {
               background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
