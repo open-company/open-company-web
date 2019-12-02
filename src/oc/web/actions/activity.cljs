@@ -718,7 +718,8 @@
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
-      (when (= (-> data :data :user-id) (jwt/user-id))
+      (when (and (#{:dismiss :follow :unfollow} (:change-type (:data data)))
+                 (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
               change-type (:change-type change-data)
@@ -736,7 +737,17 @@
             (= change-type :unfollow)
             (do
               (timbre/debug "Unfollow for" activity-uuid "with" (:dismiss-at inbox-action))
-              (inbox-get (dis/org-data))))))))
+              (inbox-get (dis/org-data))))))
+      (when (and (utils/in? (-> data :data :users) (jwt/user-id))
+                 (= :comment-add (:change-type (:data data))))
+        (let [change-data (:data data)
+              activity-uuid (:item-id change-data)
+              change-type (:change-type change-data)
+              inbox-action (:inbox-action change-data)]
+          (timbre/debug "Comment added for" activity-uuid)
+          ;; Delay the inbox refresh to make sure follows have been added
+          ;; for al mentioned users
+          (utils/after 500 #(inbox-get (dis/org-data)))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
