@@ -574,6 +574,8 @@ div.dashboard-layout {
                   -webkit-tap-highlight-color: $feint_emerald;
                 }
               }
+            }
+          }
 
           button.foc-layout-bt {
             float: left;
@@ -591,7 +593,7 @@ div.dashboard-layout {
             @include mobile() {
               display: none;
             }
-          }
+
             &.collapsed {
               background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
               background-color: 14px 16px;
