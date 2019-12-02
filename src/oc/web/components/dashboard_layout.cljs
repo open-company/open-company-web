@@ -134,6 +134,7 @@
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when show-expanded-post "expanded-post-view")}
+        [:div.mobile-more-menu]
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
           (when (and is-mobile?

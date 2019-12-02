@@ -403,15 +403,6 @@ div.stream-item {
           display: none;
         }
       }
-
-      @include mobile() {
-        height: 32px;
-
-        ul.more-menu-list {
-          left: unset;
-          right: 0;
-        }
-      }
     }
   }
 

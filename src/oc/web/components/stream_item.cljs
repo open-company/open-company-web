@@ -1,5 +1,6 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
+            [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.images :as img]
@@ -25,7 +26,8 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [cljsjs.hammer]))
 
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
@@ -44,6 +46,21 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn swipe-left-handler [s]
+  (swap! (::force-show-menu s) not))
+
+(defn- swipe-gesture-manager [swipe-handler]
+  {:did-mount (fn [s]
+    (let [el (rum/dom-node s)
+          hr (js/Hammer. el)]
+      (.on hr "swipeleft" (partial swipe-handler s))
+      (reset! (::hammer-recognizer s) hr)
+      s))
+   :will-unmount (fn [s]
+    (when @(::hammer-recognizer s)
+      (.remove @(::hammer-recognizer s) "swipeleft"))
+    s)})
+
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
@@ -52,13 +69,18 @@
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
+                         (rum/local nil ::hammer-recognizer)
+                         (rum/local false ::force-show-menu)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
+                         (swipe-gesture-manager swipe-left-handler)
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
+                           s)
+                          :did-mount (fn [s]
                            s)}
   [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
   (let [is-mobile? (responsive/is-mobile-size?)
@@ -94,7 +116,21 @@
         ;                               (= post-added-tooltip (:uuid activity-data)))
         foc-layout (drv/react s :foc-layout)
         has-zero-comments? (and (-> activity-data :comments count zero?)
-                                (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
+                                (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))
+        more-menu-comp #(more-menu
+                          {:entity-data activity-data
+                           :share-container-id dom-element-id
+                           :editable-boards editable-boards
+                           :external-share (not is-mobile?)
+                           :external-follow-up (not is-mobile?)
+                           :show-edit? true
+                           :show-delete? true
+                           :show-move? (not is-mobile?)
+                           :assigned-follow-up-data assigned-follow-up-data
+                           :show-inbox? is-inbox?
+                           :will-close (fn [] (reset! (::force-show-menu s) false))
+                           :force-show-menu @(::force-show-menu s)
+                           :capture-clicks is-mobile?})]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -170,19 +206,11 @@
             [:div.follow-up-tag-small.mobile-only]
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
-        (when (and is-published?
-                   (not is-mobile?))
-          (more-menu
-            {:entity-data activity-data
-             :share-container-id dom-element-id
-             :editable-boards editable-boards
-             :external-share (not is-mobile?)
-             :external-follow-up (not is-mobile?)
-             :show-edit? true
-             :show-delete? true
-             :show-move? (not is-mobile?)
-             :assigned-follow-up-data assigned-follow-up-data
-             :show-inbox? is-inbox?}))]
+        (when is-published?
+          (if is-mobile?
+            (when-let [el (sel1 [:div.mobile-more-menu])]
+              (rum/portal (more-menu-comp) el))
+            (more-menu-comp)))]
       [:div.stream-item-body-ext.group
         {:class (utils/class-set {:has-comments (not has-zero-comments?)
                                   :has-new-comments has-new-comments?})}

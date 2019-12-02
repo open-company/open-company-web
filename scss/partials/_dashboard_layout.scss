@@ -3,6 +3,70 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  div.more-menu {
+    display: none;
+
+    @include mobile() {
+
+      &.menu-expanded {
+        display: block;
+        position: fixed;
+        float: unset;
+        width: 100vw;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        background-color: rgba($deep_navy, 0.2);
+        opacity: 1;
+        z-index: #{$navbar_zindex + 10};
+
+        & > * {
+          display: none;
+        }
+
+        ul.more-menu-list {
+          display: block;
+          float: unset;
+          bottom: 0;
+          top: unset;
+          left: 0;
+          right: 0;
+          width: 100%;
+          background-color: white;
+          opacity: 1;
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          padding: 32px 16px;
+
+          li {
+            padding: 12px 16px;
+            background-color: rgba($deep_navy, 0.1);
+            height: 48px;
+            margin: 0;
+            @include OC_Body_Book();
+            font-size: 17px;
+            line-height: 24px;
+            color: $deep_navy;
+
+            &.top-rounded {
+              border-top-left-radius: 4px;
+              border-top-right-radius: 4px;
+            }
+
+            &.bottom-rounded {
+              border-bottom-left-radius: 4px;
+              border-bottom-right-radius: 4px;
+            }
+
+            &.bottom-margin {
+              margin-bottom: 24px;
+            }
+          }
+        }
+      }
+    }
+  }
+
   &.expanded-post-view {
     @include mobile() {
       background-color: white;
