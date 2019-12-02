@@ -3,7 +3,7 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
-  & > div.more-menu {
+  div.mobile-more-menu > div.more-menu {
     display: none;
 
     @include mobile() {
