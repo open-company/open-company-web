@@ -153,7 +153,7 @@
                                       (let [{:keys [index]} (js->clj params :keywordize-keys true)]
                                         (if (and show-loading-more
                                                  (= index (count items)))
-                                          60
+                                          (if is-mobile? 44 60)
                                           (calc-card-height is-mobile? foc-layout))))
                          :rowRenderer row-renderer
                          :scrollTop scrollTop

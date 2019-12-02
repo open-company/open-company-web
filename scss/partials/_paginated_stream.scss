@@ -24,6 +24,11 @@ div.paginated-stream {
       font-size: 14px;
       @include OC_Body_Book();
       color: rgba($deep_navy, 0.5);
+
+      @include mobile() {
+        height: 44px;
+        padding: 16px 0 8px;
+      }
     }
 
     div.paginated-stream-cards-inner {
