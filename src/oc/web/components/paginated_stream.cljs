@@ -137,9 +137,10 @@
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry entry
                                                                   :reads-data reads-data}))
-                            key))))]
+                            (str foc-layout "-" key)))))]
     [:div.virtualized-list-container
-      {:ref registerChild}
+      {:ref registerChild
+       :key (str "virtualized-list-" foc-layout)}
       (virtualized-list {:autoHeight true
                          :height height
                          :width (if is-mobile?
