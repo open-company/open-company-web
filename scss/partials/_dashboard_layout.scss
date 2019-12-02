@@ -73,7 +73,7 @@ div.dashboard-layout {
       width: 100%;
       max-width: initial;
       min-width: initial;
-      padding-bottom: 52px;
+      padding-bottom: #{$mobile_navbar_height}px;
       left: unset;
     }
 
@@ -200,7 +200,7 @@ div.dashboard-layout {
       @include mobile() {
         width: 100%;
         padding: 0;
-        min-height: calc(100vh - 76px);
+        min-height: calc(100vh - #{$mobile_navbar_height * 2}px);
         margin: 0;
         float: unset;
       }
