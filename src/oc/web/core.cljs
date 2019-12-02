@@ -310,7 +310,7 @@
     (user-actions/lander-check-team-redirect)))
 
 (defn- default-route [org-slug]
-  (urls/all-posts org-slug))
+  (urls/inbox org-slug))
 
 ;; Routes - Do not define routes when js/document#app
 ;; is undefined because it breaks tests
