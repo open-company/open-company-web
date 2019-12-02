@@ -141,6 +141,17 @@ div.dashboard-layout {
           }
         }
 
+        button.inbox-tab {
+          background-image: cdnUrl("/img/ML/inbox_tab_icon.svg");
+          backgorund-size: 22px 19px;
+
+          @include preload_image(cdnUrl("/img/ML/inbox_tab_icon_active.svg"));
+
+          &.active {
+            background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+          }
+        }
+
         button.follow-ups-tab {
           background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
           backgorund-size: 18px 20px;

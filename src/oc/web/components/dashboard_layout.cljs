@@ -146,12 +146,12 @@
                                         :ios-tabbar no-phisical-home-button
                                         :ios (and (not no-phisical-home-button)
                                                   ua/ios?)})}
-              [:button.mlb-reset.all-posts-tab
+              [:button.mlb-reset.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
+                              (nav-actions/nav-to-url! % "inbox" (oc-urls/inbox)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (= current-board-slug "all-posts"))
+                                   (= current-board-slug "inbox"))
                           "active")}]
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
