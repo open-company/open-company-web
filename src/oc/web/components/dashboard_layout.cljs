@@ -276,7 +276,7 @@
                        :data-placement "top"
                        :data-container "body"
                        :title "Dismiss all"}])
-                  (when should-show-sort?
+                  (when-not is-drafts-board
                     (let [default-sort (= board-sort dis/default-sort-type)]
                       [:div.board-sort.group
                         {:ref :board-sort-menu}
@@ -285,23 +285,25 @@
                             {:on-click (fn [e]
                                          (search-actions/active)
                                          (utils/after 500 #(.focus (js/$ "input.search"))))}])
-                        [:button.mlb-reset.board-sort-bt
-                          {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                          (if default-sort "Recent activity" "Recently posted")]
-                        [:div.board-sort-menu
-                          {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                          [:div.board-sort-menu-item
-                            {:class (when default-sort "active")
-                             :on-click #(do
-                                          (reset! (::sorting-menu-expanded s) false)
-                                          (activity-actions/change-sort-type :recent-activity))}
-                            "Recent activity"]
-                          [:div.board-sort-menu-item
-                            {:class (when-not default-sort "active")
-                             :on-click #(do
-                                          (reset! (::sorting-menu-expanded s) false)
-                                          (activity-actions/change-sort-type :recently-posted))}
-                            "Recently posted"]]]))
+                        (when-not is-inbox
+                          [:button.mlb-reset.board-sort-bt
+                            {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                            (if default-sort "Recent activity" "Recently posted")])
+                        (when-not is-inbox
+                          [:div.board-sort-menu
+                            {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                            [:div.board-sort-menu-item
+                              {:class (when default-sort "active")
+                               :on-click #(do
+                                            (reset! (::sorting-menu-expanded s) false)
+                                            (activity-actions/change-sort-type :recent-activity))}
+                              "Recent activity"]
+                            [:div.board-sort-menu-item
+                              {:class (when-not default-sort "active")
+                               :on-click #(do
+                                            (reset! (::sorting-menu-expanded s) false)
+                                            (activity-actions/change-sort-type :recently-posted))}
+                              "Recently posted"]])]))
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]]])

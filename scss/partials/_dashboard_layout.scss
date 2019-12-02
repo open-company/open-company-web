@@ -448,6 +448,15 @@ div.dashboard-layout {
             background-repeat: no-repeat;
             opacity: 0.5;
 
+            @include mobile() {
+              float: unset;
+              position: absolute;
+              right: 16px;
+              top: 0;
+              height: 50px;
+              opacity: 1;
+            }
+
             @include big_web(){
               &:hover {
                 opacity: 1;
@@ -462,6 +471,8 @@ div.dashboard-layout {
             margin-right: 5px;
 
             @include mobile() {
+              float: unset;
+              margin: 0;
               width: 100%;
               height: 50px;
               background-color: rgba($deep_navy, 0.05);
@@ -474,14 +485,15 @@ div.dashboard-layout {
               @include mobile() {
                 display: block;
                 position: absolute;
+                padding: 0;
                 left: 16px;
-                top: 13px;
+                top: 0;
                 background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
                 background-size: 16px 16px;
                 background-position: center;
                 background-repeat: no-repeat;
                 width: 24px;
-                height: 24px;
+                height: 50px;
               }
             }
 
