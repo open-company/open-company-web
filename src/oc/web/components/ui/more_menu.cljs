@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
@@ -147,7 +148,9 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/send-item-seen (:uuid entity-data)))}
+                              (activity-actions/send-item-seen (:uuid entity-data))
+                              (when (seq (router/current-activity-id))
+                                (nav-actions/dismiss-post-modal %)))}
                 "Dismiss"])
             (when (and edit-link
                        show-edit?)
@@ -331,7 +334,9 @@
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))
-                          (activity-actions/inbox-dismiss (:uuid entity-data)))
+                          (activity-actions/inbox-dismiss (:uuid entity-data))
+                          (when (seq (router/current-activity-id))
+                            (nav-actions/dismiss-post-modal %)))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
