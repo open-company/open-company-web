@@ -5,7 +5,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (defn- close-clicked [e]
-  (nav-actions/nav-to-url! e "inbox" (oc-urls/inbox)))
+  (nav-actions/nav-to-url! e oc-urls/default-board-slug (oc-urls/default-landing)))
 
 (rum/defc activity-removed < rum/static
                              no-scroll-mixin

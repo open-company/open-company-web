@@ -73,15 +73,18 @@
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
-(def default-board "all-posts")
-
 (defn get-default-board [org-data]
-  (let [last-board-slug default-board]
+  (let [last-board-slug oc-urls/default-board-slug]
     ; Replace default-board with the following to go back to the last visited board
     ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (and (= last-board-slug "all-posts")
-             (utils/link-for (:links org-data) "activity"))
+    (cond
+      (and (= last-board-slug "all-posts")
+           (utils/link-for (:links org-data) "activity"))
       {:slug "all-posts"}
+      (and (= last-board-slug "inbox")
+           (utils/link-for (:links org-data) "inbox"))
+      {:slug "inbox"}
+      :else
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
         (or

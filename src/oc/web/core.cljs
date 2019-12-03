@@ -195,10 +195,10 @@
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
-        first-ever-cookie-name (when (= route "all-posts")
+        first-ever-cookie-name (when (= route urls/default-board-slug)
                                  (router/first-ever-landing-cookie (jwt/user-id)))
         ;; First ever landing cookie value
-        first-ever-cookie (when (= route "all-posts")
+        first-ever-cookie (when (= route urls/default-board-slug)
                             (cook/get-cookie first-ever-cookie-name))]
     (if first-ever-cookie
       ;; If first ever land cookie is set redirect user to the hello url
