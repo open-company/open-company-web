@@ -59,7 +59,15 @@
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))
-                       ui-mixins/refresh-tooltips-mixin
+                       {:did-mount (fn [s]
+                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+                       s)
+                       :did-update (fn [s]
+                        (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+                          #(doto (js/$ %2)
+                             (.tooltip "fixTitle")
+                             (.tooltip "hide")))
+                       s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
