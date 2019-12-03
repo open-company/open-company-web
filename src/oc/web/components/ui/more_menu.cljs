@@ -126,7 +126,8 @@
                                                                    complete-follow-up-link)
                                       :has-create-follow-up (and is-mobile?
                                                                  create-follow-up-link)})}
-            (if inbox-follow-link
+            (if (and is-mobile?
+                     inbox-follow-link)
               [:li.dismiss
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
@@ -134,7 +135,8 @@
                                 (will-close))
                               (activity-actions/inbox-follow (:uuid entity-data)))}
                 "Follow"]
-              (when inbox-unfollow-link
+              (when (and is-mobile?
+                         inbox-unfollow-link)
                 [:li.dismiss
                   {:on-click #(do
                                 (reset! (::showing-menu s) false)
@@ -142,7 +144,8 @@
                                   (will-close))
                                 (activity-actions/inbox-unfollow (:uuid entity-data)))}
                   "Unfollow"]))
-            (when show-inbox?
+            (when (and is-mobile?
+                       show-inbox?)
               [:li.dismiss
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
