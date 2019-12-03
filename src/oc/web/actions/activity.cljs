@@ -911,7 +911,7 @@
       (api/delete-samples delete-samples-link
        #(do
           (api/get-org org-link refresh-org-data-cb)
-          (router/nav! (oc-urls/all-posts)))))))
+          (router/nav! (oc-urls/default-landing)))))))
 
 (defn has-sample-posts? []
   (let [org-data (dis/org-data)]

@@ -52,7 +52,7 @@
                                ;; else
                                (not show-org-avatar?))
               avatar-link (when should-show-link
-                            (oc-urls/all-posts org-slug))]
+                            (oc-urls/default-landing org-slug))]
           (if should-show-link
             [:a.org-link
               {:href avatar-link}

@@ -531,8 +531,12 @@
                             (real-close)
                             (utils/after
                              180
-                             #(router/nav! (if (= (router/current-board-slug) "all-posts")
+                             #(router/nav! (cond
+                                             (= (router/current-board-slug) "all-posts")
                                              (oc-urls/all-posts)
+                                             (= (router/current-board-slug) "inbox")
+                                             (oc-urls/inbox)
+                                             :else
                                              (oc-urls/board (:board-slug cmail-data)))))))))
                     s)
                    :after-render (fn [s]

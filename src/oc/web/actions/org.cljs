@@ -27,13 +27,13 @@
 ;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
 
 (defn- get-ap-url [org-slug]
-  (let [first-ever-ap-name (router/first-ever-ap-land-cookie (jwt/user-id))
-        first-ever-ap (cook/get-cookie first-ever-ap-name)]
-    (if first-ever-ap
-      (oc-urls/all-posts org-slug)
+  (let [first-ever-landing-name (router/first-ever-landing-cookie (jwt/user-id))
+        first-ever-landing (cook/get-cookie first-ever-landing-name)]
+    (if first-ever-landing
+      (oc-urls/default-landing org-slug)
       (do
-        (cook/remove-cookie! first-ever-ap-name)
-        (oc-urls/first-ever-all-posts org-slug)))))
+        (cook/remove-cookie! first-ever-landing-name)
+        (oc-urls/first-ever-landing org-slug)))))
 
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
@@ -181,7 +181,7 @@
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
-            (oc-urls/all-posts (:slug org-data)))))))
+            (oc-urls/default-landing (:slug org-data)))))))
 
   ;; Change service connection
   (when (or (jwt/jwt)
@@ -229,7 +229,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/all-posts (:slug org-data)))))
+   #(router/nav! (oc-urls/default-landing (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -389,7 +389,7 @@
                    (= (:container-id change-data) (:uuid org-data)))
           (let [current-board-data (dis/board-data)]
             (when (= (:item-id change-data) (:uuid current-board-data))
-              (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+              (router/nav! (oc-urls/default-landing (:slug org-data))))))))))
 
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/all-posts (:slug org-data))))
+  (router/nav! (oc-urls/default-landing (:slug org-data))))
