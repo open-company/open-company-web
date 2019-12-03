@@ -228,7 +228,7 @@
                                                   :public (= (:access current-board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
                                                    is-inbox
-                                                   "New"
+                                                   "What's New"
 
                                                    is-all-posts
                                                    "All posts"
