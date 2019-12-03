@@ -204,35 +204,36 @@
       (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
 (defn- check-email-domain [domain s & [reset-email-domain]]
-  (reset! (::checking-email-domain s) (not reset-email-domain))
-  ;; If user is here it means he has only one team, if he already had one
-  ;; he was redirected to it, not here to create a new team, so use the first team
-  (let [clean-email-domain (org-utils/clean-email-domain domain)]
-    (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
-     (fn [success status]
-       ;; Discard response if the domain changed
-       (when (or reset-email-domain
-                 (= domain (:email-domain @(drv/get-ref s :org-editing))))
-         (reset! (::checking-email-domain s) false)
-         (let [domain-error (cond
-                             (= status 409)
-                             "Only company email domains are allowed."
-                             (not success)
-                             "An error occurred, please try again."
-                             :else
-                             nil)
-                next-org-editing {:valid-email-domain success
-                                  :domain-error (if reset-email-domain
-                                                  nil
-                                                  domain-error)}
-                with-email-domain (if (and reset-email-domain
-                                           success)
-                                    (assoc next-org-editing :email-domain domain)
-                                    next-org-editing)]
-           (dis/dispatch! [:update [:org-editing]
-            #(merge % with-email-domain)])))))))
+  (when (team-actions/can-add-email-domain?)
+    (reset! (::checking-email-domain s) (not reset-email-domain))
+    ;; If user is here it means he has only one team, if he already had one
+    ;; he was redirected to it, not here to create a new team, so use the first team
+    (let [clean-email-domain (org-utils/clean-email-domain domain)]
+      (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
+       (fn [success status]
+         ;; Discard response if the domain changed
+         (when (or reset-email-domain
+                   (= domain (:email-domain @(drv/get-ref s :org-editing))))
+           (reset! (::checking-email-domain s) false)
+           (let [domain-error (cond
+                               (= status 409)
+                               "Only company email domains are allowed."
+                               (not success)
+                               "An error occurred, please try again."
+                               :else
+                               nil)
+                  next-org-editing {:valid-email-domain success
+                                    :domain-error (if reset-email-domain
+                                                    nil
+                                                    domain-error)}
+                  with-email-domain (if (and reset-email-domain
+                                             success)
+                                      (assoc next-org-editing :email-domain domain)
+                                      next-org-editing)]
+             (dis/dispatch! [:update [:org-editing]
+              #(merge % with-email-domain)]))))))))
 
-(defn- precheck-user-email [s a]
+(defn- precheck-user-email [s]
   (when-not @(::user-email-checked s)
     ;; Wait for the team data to be loaded to have the email domain link
     (when (first (filter #(= (:team-id %) (first (jwt/get-key :teams))) @(drv/get-ref s :teams-data)))
@@ -262,10 +263,10 @@
                                    :did-mount (fn [s]
                                     (profile-setup-team-data s true)
                                     (delay-focus-field-with-ref s "first-name")
-                                    (precheck-user-email s "did-mount")
+                                    (precheck-user-email s)
                                    s)
                                    :did-remount (fn [_ s]
-                                    (precheck-user-email s "did-remount")
+                                    (precheck-user-email s)
                                    s)
                                    :will-update (fn [s]
                                     (profile-setup-team-data s)
@@ -275,10 +276,10 @@
                                                  (or (:error edit-user-profile)
                                                      (:error org-editing)))
                                         (reset! (::saving s) false)))
-                                    (precheck-user-email s "will-update")
+                                    (precheck-user-email s)
                                    s)
                                    :did-update (fn [s]
-                                    (precheck-user-email s "did-update")
+                                    (precheck-user-email s)
                                    s)}
   [s]
   (let [has-org? (pos? (count (drv/react s :orgs)))
@@ -300,7 +301,6 @@
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])))]
     [:div.onboard-lander.lander-profile
-      {:class "ayo"}
       [:div.main-cta
         [:div.mobile-header.mobile-only
           [:div.mobile-logo]
@@ -799,7 +799,7 @@
                                     (reset! (::email-error s) true))
                                   (when (<= (count @(::pswd s)) 7)
                                     (reset! (::password-error s) true)))
-                                (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
+                                (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
                   (str "Join " (:name team-data))]]]]
           [:div.main-cta
             [:div.mobile-header.mobile-only

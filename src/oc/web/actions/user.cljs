@@ -289,38 +289,41 @@
   (dis/dispatch! [:signup-with-email/failed status]))
 
 (defn signup-with-email-success
-  [user-email status jwt]
-  (cond
-    (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
-    (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
-    (= status 200) ;; Valid login, not signup, redirect to home
-    (if (or
-          (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
-          (empty? (:avatar-url jwt)))
+  [user-email team-token-signup? status jwt]
+  (let [signup-redirect (if team-token-signup?
+                         oc-urls/confirm-invitation-profile
+                         oc-urls/sign-up-profile)]
+    (cond
+      (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
+      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
+      (= status 200) ;; Valid login, not signup, redirect to home
+      (if (or
+            (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
+            (empty? (:avatar-url jwt)))
+        (do
+          (utils/after 200 #(router/nav! signup-redirect))
+          (api/get-entry-point (:org @router/path) entry-point-get-finished))
+        (api/get-entry-point (:org @router/path)
+         (fn [success body]
+           (entry-point-get-finished success body
+             (fn [orgs collection]
+               (when (pos? (count orgs))
+                 (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
+      :else ;; Valid signup let's collect user data
       (do
-        (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-        (api/get-entry-point (:org @router/path) entry-point-get-finished))
-      (api/get-entry-point (:org @router/path)
-       (fn [success body]
-         (entry-point-get-finished success body
-           (fn [orgs collection]
-             (when (pos? (count orgs))
-               (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
-    :else ;; Valid signup let's collect user data
-    (do
-      (jwt-actions/update-jwt-cookie jwt)
-      (nux-actions/new-user-registered "email")
-      (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-      (api/get-entry-point (:org @router/path) entry-point-get-finished)
-      (dis/dispatch! [:signup-with-email/success]))))
+        (jwt-actions/update-jwt-cookie jwt)
+        (nux-actions/new-user-registered "email")
+        (utils/after 200 #(router/nav! signup-redirect))
+        (api/get-entry-point (:org @router/path) entry-point-get-finished)
+        (dis/dispatch! [:signup-with-email/success])))))
 
 (defn signup-with-email-callback
-  [user-email success body status]
+  [user-email team-token-signup? success body status]
   (if success
-    (signup-with-email-success user-email status body)
+    (signup-with-email-success user-email team-token-signup? status body)
     (signup-with-email-failed status)))
 
-(defn signup-with-email [signup-data]
+(defn signup-with-email [signup-data & [team-token-signup?]]
   (let [email-links (:links (dis/auth-settings))
         auth-link (utils/link-for email-links "create" "POST" {:auth-source "email"})]
     (api/signup-with-email auth-link
@@ -329,7 +332,7 @@
      (:email signup-data)
      (:pswd signup-data)
      (.. js/moment -tz guess)
-     (partial signup-with-email-callback (:email signup-data)))
+     (partial signup-with-email-callback (:email signup-data) team-token-signup?))
     (dis/dispatch! [:signup-with-email])))
 
 (defn signup-with-email-reset-errors []
