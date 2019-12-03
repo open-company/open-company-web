@@ -515,19 +515,19 @@
 
 (defn entry-publish [entry-editing section-editing & [edit-key]]
   (when-not (payments-actions/show-paywall-alert? (dis/payments-data))
-    (let [fixed-entry-editing (assoc entry-editing :status "published")
+    (let [org-data (dis/org-data)
+          fixed-entry-editing (assoc entry-editing :status "published")
           fixed-edit-key (or edit-key :entry-editing)]
       (dis/dispatch! [:entry-publish fixed-edit-key])
       (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
                section-editing)
         (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
               final-board-data (assoc section-editing :entries [fixed-entry-data])
-              create-board-link (utils/link-for (:links (dis/org-data)) "create")]
+              create-board-link (utils/link-for (:links org-data) "create")]
           (api/create-board create-board-link final-board-data (:invite-note section-editing)
            (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
         (let [entry-exists? (seq (:links fixed-entry-editing))
-              org-slug (router/current-org-slug)
-              board-data (dis/board-data @dis/app-state org-slug (:board-slug fixed-entry-editing))
+              board-data (some #(when (= (:slug %) (:board-slug fixed-entry-editing)) %) (:boards org-data))
               publish-entry-link (if entry-exists?
                                   ;; If the entry already exists use the publish link in it
                                   (utils/link-for (:links fixed-entry-editing) "publish")

@@ -1,5 +1,6 @@
 (ns oc.web.components.navigation-sidebar
   (:require [rum.core :as rum]
+            [clojure.string :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
@@ -54,6 +55,8 @@
   (reset! (::window-height s) (.-innerHeight js/window))
   (reset! (::window-width s) (.-innerWidth js/window)))
 
+(def drafts-board-prefix (-> utils/default-drafts-board :uuid (str "-")))
+
 (rum/defcs navigation-sidebar < rum/reactive
                                 ;; Derivatives
                                 (drv/drv :org-data)
@@ -104,6 +107,7 @@
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
         change-data (drv/react s :change-data)
+        filtered-change-data (into {} (filter #(-> % first (s/starts-with? drafts-board-prefix) not) change-data))
         current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
@@ -152,7 +156,7 @@
              :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals change-data))))})}
+              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
               "All posts"]])
         (when show-follow-ups
           [:a.follow-ups.hover-item.group
