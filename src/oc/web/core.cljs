@@ -638,7 +638,6 @@
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
-  (sa/ws-interaction-subscribe)
   (oa/subscribe)
   (ra/subscribe)
   (ca/subscribe)
