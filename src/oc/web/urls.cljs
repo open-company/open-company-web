@@ -109,13 +109,6 @@
   ([org-slug]
     (str (org org-slug) "/follow-ups")))
 
-(defn first-ever-landing
-  "Org all posts url for the first ever land"
-  ([]
-    (first-ever-landing (router/current-org-slug)))
-  ([org-slug]
-    (str (default-landing org-slug) "/hello")))
-
 (defn must-see
   "Org must see url"
   ([]
@@ -147,6 +140,15 @@
     "all-posts"
     (all-posts org-slug)
     (board org-slug default-board-slug))))
+
+;; First ever landing
+
+(defn first-ever-landing
+  "Org all posts url for the first ever land"
+  ([]
+    (first-ever-landing (router/current-org-slug)))
+  ([org-slug]
+    (str (default-landing org-slug) "/hello")))
 
 ;; Drafts
 
