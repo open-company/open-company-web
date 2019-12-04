@@ -173,7 +173,6 @@
              :show-move? (not is-mobile?)
              :assigned-follow-up-data assigned-follow-up-data}))]
       [:div.stream-item-body-ext.group
-        {:class (utils/class-set {:has-new-comments has-new-comments?})}
         [:div.thumbnail-container.group
           (if has-video
             [:div.group
