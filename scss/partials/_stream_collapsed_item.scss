@@ -106,67 +106,6 @@ div.stream-collapsed-item {
       display: block;
     }
 
-    // Calc width: 20 avatar + 8 margin + [optional] 86 follow-up-tag | [optional] 74 must-see-tag + 150 comments + 50 time
-
-    div.stream-item-headline {
-      max-width: calc(40% - #{(20 + 8 + 150 + 50) / 2}px);
-    }
-
-    div.stream-item-body {
-      max-width: calc(60% - #{(20 + 8 + 150 + 50) / 2}px);
-    }
-
-    &.follow-up-item, &.follow-up-item.must-see-item {
-      div.stream-item-headline {
-        max-width: calc(40% - #{(20 + 8 + 86 + 8 + 150 + 50) / 2}px);
-      }
-
-      div.stream-item-body {
-        max-width: calc(60% - #{(20 + 8 + 86 + 8 + 150 + 50) / 2}px);
-      }
-    }
-
-    &:not(.follow-up-item).must-see-item {
-      div.stream-item-headline {
-        max-width: calc(40% - #{(20 + 8 + 74 + 8 + 150 + 50) / 2}px);
-      }
-
-      div.stream-item-body {
-        max-width: calc(60% - #{(20 + 8 + 74 + 8 + 150 + 50) / 2}px);
-      }
-    }
-
-    &.no-comments {
-      div.stream-item-headline {
-        max-width: calc(40% - #{(20 + 8 + 50) / 2}px);
-      }
-
-      div.stream-item-body {
-        max-width: calc(60% - #{(20 + 8 + 50) / 2}px);
-      }
-
-      &.follow-up-item, &.follow-up-item.must-see-item {
-        div.stream-item-headline {
-          max-width: calc(40% - #{(20 + 8 + 86 + 8 + 50) / 2}px);
-        }
-
-        div.stream-item-body {
-          max-width: calc(60% - #{(20 + 8 + 86 + 8 + 50) / 2}px);
-        }
-      }
-
-      &:not(.follow-up-item).must-see-item {
-        div.stream-item-headline {
-          max-width: calc(40% - #{(20 + 8 + 74 + 8 + 50) / 2}px);
-        }
-
-        div.stream-item-body {
-          max-width: calc(60% - #{(20 + 8 + 74 + 8 + 50) / 2}px);
-        }
-      }
-
-    }
-
     div.stream-item-headline {
       height: 24px;
       overflow: hidden;
@@ -196,8 +135,7 @@ div.stream-collapsed-item {
         height: 24px;
         white-space: nowrap;
         margin: 0 !important;
-        margin: 0 !important;
-        vertical-align: top;
+        padding: 0 !important;
       }
 
       &:before {
@@ -212,6 +150,67 @@ div.stream-collapsed-item {
         top: 0;
         left: 0;
       }
+    }
+
+    // Calc width: 20 avatar + 8 margin + [optional] 86 follow-up-tag | [optional] 74 must-see-tag + 150 comments + 50 time
+
+    div.stream-item-headline {
+      max-width: calc(40% - #{(20 + 8 + 150 + 50) / 2}px);
+    }
+
+    div.stream-item-body {
+      max-width: calc(60% - #{(20 + 8 + 150 + 50) / 2}px - 8px);
+    }
+
+    &.follow-up-item, &.follow-up-item.must-see-item {
+      div.stream-item-headline {
+        max-width: calc(40% - #{(20 + 8 + 86 + 8 + 150 + 50) / 2}px);
+      }
+
+      div.stream-item-body {
+        max-width: calc(60% - #{(20 + 8 + 86 + 8 + 150 + 50) / 2}px - 8px);
+      }
+    }
+
+    &:not(.follow-up-item).must-see-item {
+      div.stream-item-headline {
+        max-width: calc(40% - #{(20 + 8 + 74 + 8 + 150 + 50) / 2}px);
+      }
+
+      div.stream-item-body {
+        max-width: calc(60% - #{(20 + 8 + 74 + 8 + 150 + 50) / 2}px - 8px);
+      }
+    }
+
+    &.no-comments {
+      div.stream-item-headline {
+        max-width: calc(40% - #{(20 + 8 + 50) / 2}px);
+      }
+
+      div.stream-item-body {
+        max-width: calc(60% - #{(20 + 8 + 50) / 2}px - 8px);
+      }
+
+      &.follow-up-item, &.follow-up-item.must-see-item {
+        div.stream-item-headline {
+          max-width: calc(40% - #{(20 + 8 + 86 + 8 + 50) / 2}px);
+        }
+
+        div.stream-item-body {
+          max-width: calc(60% - #{(20 + 8 + 86 + 8 + 50) / 2}px - 8px);
+        }
+      }
+
+      &:not(.follow-up-item).must-see-item {
+        div.stream-item-headline {
+          max-width: calc(40% - #{(20 + 8 + 74 + 8 + 50) / 2}px);
+        }
+
+        div.stream-item-body {
+          max-width: calc(60% - #{(20 + 8 + 74 + 8 + 50) / 2}px - 8px);
+        }
+      }
+
     }
 
     div.collapsed-time {
