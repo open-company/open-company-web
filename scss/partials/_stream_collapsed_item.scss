@@ -131,11 +131,14 @@ div.stream-collapsed-item {
       height: 24px;
 
       * {
-        display: inline-block !important;
+        display: inline !important;
         height: 24px;
         white-space: nowrap;
         margin: 0 !important;
         padding: 0 !important;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        vertical-align: top;
       }
 
       &:before {
