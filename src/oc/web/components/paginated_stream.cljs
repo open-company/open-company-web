@@ -97,8 +97,6 @@
                        (activity-utils/is-published? entry))]
    [:div.virtualized-list-row
     {:style style}
-    (js/console.log "DBG stream-collapsed-item?" (or (= foc-layout dis/other-foc-layout) (not is-mobile))
-     "foc-layout:" foc-layout "is-mobile" is-mobile)
     (if (and (= foc-layout dis/other-foc-layout)
             (not is-mobile))
       (stream-collapsed-item {:activity-data entry
@@ -142,7 +140,6 @@
                                                 (= index (count items)))
                              entry (when-not loading-more? (nth items index))
                              reads-data (get activities-read (:uuid entry))]
-                         (js/console.log "DBG row-renderer/render foc-layout" foc-layout)
                          (if loading-more?
                            (rum/with-key
                              (load-more row-props)
@@ -154,7 +151,6 @@
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
                             (str key-prefix "-" key)))))]
-    (js/console.log "DBG virtualized-stream/render foc-layout" foc-layout)
     [:div.virtualized-list-container
       {:ref registerChild
        :key (str "virtualized-list-" key-prefix)}
@@ -228,7 +224,6 @@
         items (drv/react s :filtered-posts)
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)]
-    (js/console.log "DBG paginated-stream/foc-layout" foc-layout)
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
