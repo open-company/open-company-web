@@ -68,22 +68,23 @@ div.stream-collapsed-item {
     height: 32px;
     position: relative;
     overflow: hidden;
-
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-wrap: nowrap;
     padding: 4px 4px 4px 0;
-    // flex-direction: unset;
-    // justify-content: unset;
+    align-items: flex-start;
 
     & > * {
-      float: left;
+      text-align: left;
     }
 
     @include activity-author(20);
 
     div.user-avatar-img-container {
       margin-right: 0;
+      flex: 0 0 20px;
     }
 
     @include must-see-tag();
@@ -100,28 +101,26 @@ div.stream-collapsed-item {
 
     &.follow-up-item div.follow-up-tag {
       display: block;
+      flex: 0 0 86px;
     }
 
     &.must-see-item div.must-see-tag {
       display: block;
+      flex: 0 0 74px;
     }
 
     div.stream-item-headline {
       height: 24px;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 50%;
       white-space: nowrap;
       @include activity-title(14px, 24px);
       margin-left: 8px;
-      
     }
 
     div.stream-item-body {
-      // display: inline-block;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: calc(50% - 4px);
       white-space: nowrap;
       word-break: nowrap;
       @include activity-body(14, 24, $deep_navy);
@@ -155,75 +154,19 @@ div.stream-collapsed-item {
       }
     }
 
-    // Calc width: 20 avatar + 8 margin + [optional] 86 follow-up-tag | [optional] 74 must-see-tag + 150 comments + 50 time
-
-    div.stream-item-headline {
-      max-width: calc(40% - #{(20 + 8 + 150 + 50) / 2}px);
-    }
-
-    div.stream-item-body {
-      max-width: calc(60% - #{(20 + 8 + 150 + 50) / 2}px - 8px);
-    }
-
-    &.follow-up-item, &.follow-up-item.must-see-item {
-      div.stream-item-headline {
-        max-width: calc(40% - #{(20 + 8 + 86 + 8 + 150 + 50) / 2}px);
-      }
-
-      div.stream-item-body {
-        max-width: calc(60% - #{(20 + 8 + 86 + 8 + 150 + 50) / 2}px - 8px);
-      }
-    }
-
-    &:not(.follow-up-item).must-see-item {
-      div.stream-item-headline {
-        max-width: calc(40% - #{(20 + 8 + 74 + 8 + 150 + 50) / 2}px);
-      }
-
-      div.stream-item-body {
-        max-width: calc(60% - #{(20 + 8 + 74 + 8 + 150 + 50) / 2}px - 8px);
-      }
-    }
-
-    &.no-comments {
-      div.stream-item-headline {
-        max-width: calc(40% - #{(20 + 8 + 50) / 2}px);
-      }
-
-      div.stream-item-body {
-        max-width: calc(60% - #{(20 + 8 + 50) / 2}px - 8px);
-      }
-
-      &.follow-up-item, &.follow-up-item.must-see-item {
-        div.stream-item-headline {
-          max-width: calc(40% - #{(20 + 8 + 86 + 8 + 50) / 2}px);
-        }
-
-        div.stream-item-body {
-          max-width: calc(60% - #{(20 + 8 + 86 + 8 + 50) / 2}px - 8px);
-        }
-      }
-
-      &:not(.follow-up-item).must-see-item {
-        div.stream-item-headline {
-          max-width: calc(40% - #{(20 + 8 + 74 + 8 + 50) / 2}px);
-        }
-
-        div.stream-item-body {
-          max-width: calc(60% - #{(20 + 8 + 74 + 8 + 50) / 2}px - 8px);
-        }
-      }
-
+    div.is-comments {
+      height: 24px;
+      flex: 0 0 auto;
     }
 
     div.collapsed-time {
       height: 24px;
-      // display: inline-block;
       @include OC_Body_Book();
       font-size: 12px;
       line-height: 24px;
       color: rgba($deep_navy, 0.5);
-      margin-left: 8px;
+      margin-left: auto;
+      padding-left: 8px;
     }
   }
 
