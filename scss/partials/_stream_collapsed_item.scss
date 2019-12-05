@@ -74,7 +74,7 @@ div.stream-collapsed-item {
     align-content: flex-start;
     flex-wrap: nowrap;
     padding: 4px 4px 4px 0;
-    align-items: stretch;
+    align-items: center;
 
     & > * {
       text-align: left;
@@ -82,84 +82,95 @@ div.stream-collapsed-item {
 
     @include activity-author(20);
 
-    div.user-avatar-img-container {
+    & > div.user-avatar-img-container {
       margin-right: 0;
       flex: 0 0 20px;
     }
 
-    @include must-see-tag();
+    &.follow-up-item div.stream-collapsed-item-fill div.follow-up-tag {
+        display: block;
+      }
 
-    @include follow-up-tag();
+      &.must-see-item div.stream-collapsed-item-fill div.must-see-tag {
+        display: block;
+      }
 
-    div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
-      display: none;
-    }
-
-    div.follow-up-tag, div.must-see-tag {
-      margin: 3px 0 0 8px;
-    }
-
-    &.follow-up-item div.follow-up-tag {
-      display: block;
-      flex: 0 0 86px;
-    }
-
-    &.must-see-item div.must-see-tag {
-      display: block;
-      flex: 0 0 74px;
-    }
-
-    div.stream-item-headline {
-      height: 24px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      @include activity-title(14px, 24px);
+    div.stream-collapsed-item-fill {
+      width: auto;
+      flex: 0 1 auto;
+      display: flex;
+      flex-direction: row;
+      /* flex-wrap: nowrap; */
+      /* justify-content: flex-start; */
+      /* align-content: flex-start; */
+      /* align-items: center; */
       margin-left: 8px;
-      
-      &:not(:empty) {
-        min-width: 10%;
-      }
-    }
-
-    div.stream-item-body {
+      /* vertical-align: top; */
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
-      word-break: nowrap;
-      @include activity-body(14, 24, $deep_navy);
-      margin-left: 4px;
-      padding-left: 8px;
-      position: relative;
-      height: 24px;
-      min-width: 0;
 
-      * {
+      div.stream-item-headline {
         height: 24px;
-        white-space: nowrap;
-        margin: 0 !important;
-        padding: 0 !important;
-        text-overflow: ellipsis;
         overflow: hidden;
-        vertical-align: top;
-        display: inline !important;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        @include activity-title(14px, 24px);
+        flex: 0 0 auto;
+        margin-left: 8px;
       }
 
-      img, iframe, video {
+      @include must-see-tag();
+
+      @include follow-up-tag();
+
+      div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
         display: none;
       }
 
-      &:before {
-        content: "-";
-        width: 4px;
+      div.follow-up-tag, div.must-see-tag {
+        margin: 4px 0 0 0;
+        flex: 0 0 auto;
+      }
+
+      div.stream-item-body {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        @include activity-body(14, 24, $deep_navy);
+        margin-left: 4px;
+        padding-left: 8px;
+        position: relative;
         height: 24px;
-        color: $deep_navy;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 24px;
-        position: absolute;
-        top: 0;
-        left: 0;
+        min-width: 0;
+        flex: 0 1 auto;
+
+        * {
+          height: 24px;
+          white-space: nowrap;
+          margin: 0 !important;
+          padding: 0 !important;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          vertical-align: top;
+          display: inline !important;
+        }
+
+        img, iframe, video {
+          display: none;
+        }
+
+        &:before {
+          content: "-";
+          width: 4px;
+          height: 24px;
+          color: $deep_navy;
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 24px;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
       }
     }
 
@@ -167,6 +178,10 @@ div.stream-collapsed-item {
       height: 24px;
       margin-left: 8px;
       flex: 0 0 auto;
+
+      div.is-comments-authors {
+        margin-top: 1px;
+      }
     }
 
     div.collapsed-time {
@@ -177,7 +192,7 @@ div.stream-collapsed-item {
       color: rgba($deep_navy, 0.5);
       margin-left: auto;
       padding-left: 8px;
-      flex: 1 1 1;
+      margin-top: 1px;
     }
   }
 

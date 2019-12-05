@@ -34,7 +34,6 @@
         publisher (if is-published?
                     (:publisher activity-data)
                     (first (:author activity-data)))
-        has-video (seq (:fixed-video-id activity-data))
         ;; Add NEW tag besides comment summary
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
@@ -77,13 +76,14 @@
                                                        (not (:completed? assigned-follow-up-data)))
                                   :no-comments has-zero-comments?})}
         (user-avatar-image publisher)
-        [:div.must-see-tag]
-        [:div.follow-up-tag]
-        [:div.stream-item-headline.ap-seen-item-headline
-          {:ref "activity-headline"
-           :data-itemuuid (:uuid activity-data)
-           :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
-        (stream-item-summary activity-data)
+        [:div.stream-collapsed-item-fill
+          [:div.must-see-tag]
+          [:div.follow-up-tag]
+          [:div.stream-item-headline.ap-seen-item-headline
+            {:ref "activity-headline"
+             :data-itemuuid (:uuid activity-data)
+             :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          (stream-item-summary activity-data)]
         (when-not has-zero-comments?
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data
