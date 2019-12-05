@@ -50,6 +50,13 @@ div.stream-collapsed-item {
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
       }
     }
+
+    div.more-menu {
+      background-color: white;
+      &:before {
+        background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 100%);
+      }
+    }
   }
 
   @include mobile() {
@@ -198,6 +205,17 @@ div.stream-collapsed-item {
     z-index: 100;
     background-color: $foc_hover_color;
     display: none;
+    padding-left: 8px;
+
+    &:before {
+      width: 24px;
+      height: 32px;
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -24px;
+      background: linear-gradient(to left, rgba(230, 230, 230, 1), rgba(230, 230, 230, 0) 100%);
+    }
 
     ul.more-menu-list {
       z-index: 102;
