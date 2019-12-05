@@ -57,6 +57,7 @@
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          (mention-mixins/oc-mentions-hover)
+                         ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)}

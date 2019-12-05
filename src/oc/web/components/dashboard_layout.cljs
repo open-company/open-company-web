@@ -55,7 +55,7 @@
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              ui-mixins/refresh-tooltips-mixin
+                              ui-mixins/strict-refresh-tooltips-mixin
                               (ui-mixins/on-window-click-mixin (fn [s e]
                                (when (and @(::sorting-menu-expanded s)
                                           (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
@@ -72,11 +72,6 @@
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
                                 (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-                                s)
-                               :did-remount (fn [_ s]
-                                (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-                                  (.tooltip "hide")
-                                  (.tooltip "fixTitle"))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -306,6 +301,11 @@
                               "Recently posted"]])]))
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-offset-left "-2px"
+                     :title (if (= foc-layout dis/other-foc-layout) "Expanded view" "Compact view")
                      :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]]])
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view

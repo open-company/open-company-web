@@ -22,6 +22,17 @@
          (.tooltip "hide")))
    s)})
 
+(def strict-refresh-tooltips-mixin
+  {:did-mount (fn [s]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+   s)
+   :did-update (fn [s]
+    (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+      #(doto (js/$ %2)
+         (.tooltip "fixTitle")
+         (.tooltip "hide")))
+   s)})
+
 (def no-scroll-mixin
   "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
    If it doesn't it remember to remove it once the component is going to unmount."
