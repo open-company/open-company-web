@@ -116,7 +116,10 @@ div.stream-collapsed-item {
       white-space: nowrap;
       @include activity-title(14px, 24px);
       margin-left: 8px;
-      min-width: 0;
+      
+      &:not(:empty) {
+        min-width: 10%;
+      }
     }
 
     div.stream-item-body {
@@ -142,6 +145,10 @@ div.stream-collapsed-item {
         display: inline !important;
       }
 
+      img, iframe, video {
+        display: none;
+      }
+
       &:before {
         content: "-";
         width: 4px;
@@ -158,6 +165,7 @@ div.stream-collapsed-item {
 
     div.is-comments {
       height: 24px;
+      margin-left: 8px;
       flex: 0 0 auto;
     }
 
