@@ -279,7 +279,7 @@
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :title "Follow"}]
+             :title "Follow: Let me know when teammates reply"}]
           (when inbox-unfollow-link
             [:button.mlb-reset.more-menu-inbox-unfollow-bt
               {:type "button"
@@ -297,7 +297,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Unfollow"}]))
+               :title "Mute: Ignore future replies from my team unless I’m mentioned"}]))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
