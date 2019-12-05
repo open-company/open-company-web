@@ -1063,6 +1063,7 @@
 (defn inbox-dismiss [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
+    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid])
     (api/inbox-dismiss dismiss-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
@@ -1077,6 +1078,7 @@
 (defn inbox-dismiss-all []
   (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
+    (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
     (api/inbox-dismiss-all dismiss-all-link
      (fn [{:keys [status success body]}]
        (inbox-get (dis/org-data))))))
