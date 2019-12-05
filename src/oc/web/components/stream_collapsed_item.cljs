@@ -77,12 +77,12 @@
                                   :no-comments has-zero-comments?})}
         (user-avatar-image publisher)
         [:div.stream-collapsed-item-fill
-          [:div.must-see-tag]
-          [:div.follow-up-tag]
           [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"
              :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          [:div.must-see-tag]
+          [:div.follow-up-tag]
           (stream-item-summary activity-data)]
         (when-not has-zero-comments?
           (comments-summary {:entry-data activity-data
