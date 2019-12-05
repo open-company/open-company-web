@@ -74,7 +74,7 @@ div.stream-collapsed-item {
     align-content: flex-start;
     flex-wrap: nowrap;
     padding: 4px 4px 4px 0;
-    align-items: flex-start;
+    align-items: stretch;
 
     & > * {
       text-align: left;
@@ -116,6 +116,7 @@ div.stream-collapsed-item {
       white-space: nowrap;
       @include activity-title(14px, 24px);
       margin-left: 8px;
+      min-width: 0;
     }
 
     div.stream-item-body {
@@ -128,6 +129,7 @@ div.stream-collapsed-item {
       padding-left: 8px;
       position: relative;
       height: 24px;
+      min-width: 0;
 
       * {
         height: 24px;
@@ -166,6 +168,7 @@ div.stream-collapsed-item {
       color: rgba($deep_navy, 0.5);
       margin-left: auto;
       padding-left: 8px;
+      flex: 1 1 1;
     }
   }
 
