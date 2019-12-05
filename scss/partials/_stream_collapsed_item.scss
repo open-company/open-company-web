@@ -139,6 +139,7 @@ div.stream-collapsed-item {
         text-overflow: ellipsis;
         overflow: hidden;
         vertical-align: top;
+        display: inline !important;
       }
 
       &:before {
