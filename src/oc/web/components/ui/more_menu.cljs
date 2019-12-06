@@ -151,7 +151,7 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/send-item-seen (:uuid entity-data))
+                              (activity-actions/inbox-dismiss (:uuid entity-data))
                               (when (seq (router/current-activity-id))
                                 (nav-actions/dismiss-post-modal %)))}
                 "Dismiss"])
