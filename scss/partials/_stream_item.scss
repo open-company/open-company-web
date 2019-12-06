@@ -27,6 +27,97 @@ div.stream-item {
     height: #{$mobile_foc_height}px;
   }
 
+  // Mobile swipe buttons
+  button.mobile-more-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: $deep_navy;
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    left: 16px;
+    z-index: 4;
+    transition: width 180ms;
+    width: 0;
+    overflow: hidden;
+
+    @include big_web() {
+      display: none;
+    }
+
+    span {
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      margin-left: 26px;
+    }
+
+    &:before {
+      content: "";
+      width: 18px;
+      height: 4px;
+      background-image: cdnUrl("/img/ML/mobile_more_ellipsis_white.svg");
+      background-size: 18px 4px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 22px;
+      left: 24px;
+    }
+
+    &.visible {
+      width: 114px;
+    }
+  }
+
+  button.mobile-dismiss-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: $carrot_green;
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    right: 16px;
+    z-index: 4;
+    transition: width 180ms, margin-right 180ms;
+    width: 0;
+    margin-right: -124px;
+    overflow: hidden;
+
+    @include big_web() {
+      display: none;
+    }
+
+    span {
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      margin-left: 26px;
+    }
+
+    &:before {
+      content: "";
+      width: 14px;
+      height: 10px;
+      background-image: cdnUrl("/img/ML/mobile_dismiss_checkmark.svg");
+      background-size: 14px 10px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 19px;
+      left: 24px;
+    }
+
+    &.visible {
+      width: 124px;
+      margin-right: 0;
+    }
+  }
+
   &.expandable {
     cursor: pointer;
 

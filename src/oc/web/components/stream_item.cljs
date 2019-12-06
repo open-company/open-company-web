@@ -1,5 +1,7 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
@@ -43,19 +45,28 @@
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
 (defn swipe-left-handler [s]
-  (swap! (::force-show-menu s) not))
+  (swap! (::show-mobile-dismiss-bt s) not))
 
-(defn- swipe-gesture-manager [swipe-handler]
+(defn swipe-right-handler [s]
+  ; (swap! (::force-show-menu s) not)
+  (swap! (::show-mobile-more-bt s) not))
+
+(defn- swipe-gesture-manager [swipe-handlers]
   {:did-mount (fn [s]
     (let [el (rum/dom-node s)
           hr (js/Hammer. el)]
-      (.on hr "swipeleft" (partial swipe-handler s))
+      (.on hr "swipeleft" (partial (:swipe-left swipe-handlers) s))
+      (.on hr "swiperight" (partial (:swipe-right swipe-handlers) s))
       (reset! (::hammer-recognizer s) hr)
       s))
    :will-unmount (fn [s]
     (when @(::hammer-recognizer s)
       (.remove @(::hammer-recognizer s) "swipeleft"))
     s)})
+
+(defn- on-scroll [s]
+  (reset! (::show-mobile-dismiss-bt s) false)
+  (reset! (::show-mobile-more-bt s) false))
 
 (rum/defcs stream-item < rum/static
                          rum/reactive
@@ -66,15 +77,25 @@
                          (rum/local 0 ::mobile-video-height)
                          (rum/local nil ::hammer-recognizer)
                          (rum/local false ::force-show-menu)
+                         (rum/local false ::show-mobile-dismiss-bt)
+                         (rum/local false ::show-mobile-more-bt)
+                         (rum/local false ::on-scroll)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (swipe-gesture-manager swipe-left-handler)
+                         (swipe-gesture-manager {:swipe-left swipe-left-handler
+                                                 :swipe-right swipe-right-handler})
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          {:will-mount (fn [s]
                            (calc-video-height s)
+                           (when ua/mobile?
+                             (reset! (::on-scroll s)
+                              (events/listen js/window EventType/SCROLL (partial on-scroll s))))
                            s)
-                          :did-mount (fn [s]
+                          :will-unmount (fn [s]
+                           (when @(::on-scroll s)
+                             (events/unlistenByKey @(::on-scroll s))
+                             (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
   (let [is-mobile? (responsive/is-mobile-size?)
@@ -131,6 +152,8 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
+                                :show-mobile-more-bt true
+                                :show-mobile-dismiss-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
        :data-last-read-at (:last-read-at read-data)
@@ -162,6 +185,18 @@
                          (nux-actions/dismiss-post-added-tooltip)
                          (nav-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
+      [:button.mlb-reset.mobile-more-bt
+        {:class (when @(::show-mobile-more-bt s) "visible")
+         :on-click #(do
+                      (reset! (::show-mobile-more-bt s) false)
+                      (reset! (::force-show-menu s) true))}
+        [:span "More"]]
+      [:button.mlb-reset.mobile-dismiss-bt
+        {:class (when @(::show-mobile-dismiss-bt s) "visible")
+         :on-click #(do
+                      (activity-actions/inbox-dismiss (:uuid activity-data))
+                      (reset! (::show-mobile-dismiss-bt s) false))}
+        [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image publisher)

@@ -183,7 +183,7 @@
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
                     "Follow-up later"])))
             (if inbox-follow-link
-              [:li.dismiss.bottom-rounded.bottom-margin
+              [:li.follow.bottom-rounded.bottom-margin
                 {:on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
@@ -191,7 +191,7 @@
                               (activity-actions/inbox-follow (:uuid entity-data)))}
                 "Follow"]
               (when inbox-unfollow-link
-                [:li.dismiss.bottom-rounded.bottom-margin
+                [:li.unfollow.bottom-rounded.bottom-margin
                   {:on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
