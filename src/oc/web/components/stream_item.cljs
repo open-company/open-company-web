@@ -9,16 +9,12 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.org :as org-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.mention :as mention-mixins]
-            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
@@ -31,10 +27,10 @@
 
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
-    [:div.stream-item-body.oc-mentions.oc-mentions-hover
+    [:div.stream-item-body.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
-    [:div.stream-item-body.no-abstract.oc-mentions.oc-mentions-hover
+    [:div.stream-item-body.no-abstract.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
@@ -65,7 +61,6 @@
                          rum/reactive
                          ;; Derivatives
                          (drv/drv :activity-share-container)
-                         (drv/drv :foc-layout)
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
@@ -76,7 +71,6 @@
                          (swipe-gesture-manager swipe-left-handler)
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
-                         (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)
@@ -114,9 +108,6 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        foc-layout (drv/react s :foc-layout)
-        has-zero-comments? (and (-> activity-data :comments count zero?)
-                                (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))
         more-menu-comp #(more-menu
                           {:entity-data activity-data
                            :share-container-id dom-element-id
@@ -140,8 +131,7 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
-                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)
-                                :foc-collapsed (= foc-layout :collapsed)})
+                                :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
        :data-last-read-at (:last-read-at read-data)
        ;; click on the whole tile only for draft editing
@@ -212,8 +202,6 @@
               (rum/portal (more-menu-comp) el))
             (more-menu-comp)))]
       [:div.stream-item-body-ext.group
-        {:class (utils/class-set {:has-comments (not has-zero-comments?)
-                                  :has-new-comments has-new-comments?})}
         [:div.thumbnail-container.group
           (if has-video
             [:div.group
@@ -255,8 +243,7 @@
                   {:on-click #(draft-utils/delete-draft-clicked activity-data %)}
                   "Delete draft"]]]
             [:div.stream-item-footer.group
-              {:ref "stream-item-reactions"
-               :class (utils/class-set {:no-comments has-zero-comments?})}
+              {:ref "stream-item-reactions"}
               (reactions {:entity-data activity-data
                           :max-reactions (when is-mobile? 3)})
               [:div.stream-item-footer-mobile-group
@@ -300,14 +287,4 @@
                             [:span.file-name
                               (:file-name atc)]
                             [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])
-          [:div.collpased-time
-            (let [t (or (:published-at activity-data) (:created-at activity-data))]
-              [:time
-                {:date-time t
-                 :data-toggle (when-not is-mobile? "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
-                 :data-title (utils/activity-date-tooltip activity-data)}
-                (utils/foc-date-time t)])]]]))
+                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])]]))

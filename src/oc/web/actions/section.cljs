@@ -191,18 +191,6 @@
           (utils/after 0 #(router/nav! redirect-url))
           (dispatcher/dispatch! [:private-section-kick-out-self/finish success])))))))
 
-(defn ws-comment-add
-  [interaction-data]
-  (let [org-slug   (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        activity-uuid (:resource-uuid interaction-data)
-        entry-data (dispatcher/activity-data org-slug activity-uuid)]
-    (when-not entry-data
-      (let [board-data (dispatcher/board-data)
-            sort-type (router/current-sort-type)
-            link-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
-        (section-get sort-type (utils/link-for (:links board-data) link-rel "GET"))))))
-
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/status
     (fn [data]
@@ -244,10 +232,6 @@
         (when (= change-type :move)
           (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data])
           (section-change section-uuid))))))
-
-(defn ws-interaction-subscribe []
-  (ws-ic/subscribe :interaction-comment/add
-                   #(ws-comment-add (:data %))))
 
 ;; Section editing
 
