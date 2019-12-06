@@ -145,7 +145,7 @@
                                     :assigned-follow-up-data assigned-follow-up-data
                                     :show-inbox? (= (:back-to @router/path) "inbox")
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
-                                    :capture-clicks show-mobile-menu?
+                                    :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
                                                   (fn [] (reset! (::force-show-menu s) false)))})]
     [:div.expanded-post

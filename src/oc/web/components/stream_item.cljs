@@ -44,10 +44,12 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn swipe-left-handler [s]
+(defn- swipe-left-handler [s]
+  (reset! (::show-mobile-more-bt s) false)
   (swap! (::show-mobile-dismiss-bt s) not))
 
-(defn swipe-right-handler [s]
+(defn- swipe-right-handler [s]
+  (reset! (::show-mobile-dismiss-bt s) false)
   (swap! (::show-mobile-more-bt s) not))
 
 (defn- swipe-gesture-manager [swipe-handlers]
@@ -148,7 +150,7 @@
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
-                           :capture-clicks show-mobile-menu?})]
+                           :mobile-tray-menu show-mobile-menu?})]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)

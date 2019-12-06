@@ -74,7 +74,7 @@
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
              reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title
-             show-inbox? force-show-menu capture-clicks external-follow]}]
+             show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -105,8 +105,9 @@
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded (or @(::move-activity s)
                                                      show-menu)
-                                  :has-more-menu-bt should-show-more-bt})
-         :on-click (when capture-clicks
+                                  :has-more-menu-bt should-show-more-bt
+                                  :mobile-tray-menu mobile-tray-menu})
+         :on-click (when mobile-tray-menu
                      #(when show-menu
                         (.stopPropagation %)
                         (show-hide-menu s will-open will-close)))}
@@ -170,6 +171,22 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
+            (if inbox-follow-link
+              [:li.follow
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/inbox-follow (:uuid entity-data)))}
+                "Follow"]
+              (when inbox-unfollow-link
+                [:li.unfollow
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/inbox-unfollow (:uuid entity-data)))}
+                  "Unfollow"]))
             (when (and is-mobile?
                        (not external-follow-up))
               (if complete-follow-up-link
@@ -182,7 +199,7 @@
                                 (activity-actions/complete-follow-up entity-data assigned-follow-up-data))}
                   "Complete follow-up"]
                 (when create-follow-up-link
-                  [:li.create-follow-up
+                  [:li.create-follow-up.bottom-rounded.bottom-margin
                     {:ref "more-menu-create-follow-up-bt"
                      :data-container "body"
                      :on-click #(do
@@ -191,22 +208,6 @@
                                     (will-close))
                                   (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
                     "Follow-up later"])))
-            (if inbox-follow-link
-              [:li.follow.bottom-rounded.bottom-margin
-                {:on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
-                              (activity-actions/inbox-follow (:uuid entity-data)))}
-                "Follow"]
-              (when inbox-unfollow-link
-                [:li.unfollow.bottom-rounded.bottom-margin
-                  {:on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (activity-actions/inbox-unfollow (:uuid entity-data)))}
-                  "Unfollow"]))
             (when can-react?
               [:li.react.top-rounded
                 {:on-click #(do
