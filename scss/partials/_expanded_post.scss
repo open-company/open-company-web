@@ -119,6 +119,30 @@ div.expanded-post {
       }
     }
 
+    button.mobile-more-bt {
+      display: none;
+
+      @include mobile() {
+        float: right;
+        height: 32px;
+        width: 32px;
+        display: inline;
+        background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
+        background-size: 18px 4px;
+        background-position: center;
+        padding: 0;
+        background-repeat: no-repeat;
+        opacity: 1;
+        background-color: transparent;
+        border-radius: 4px;
+        margin: 0 0 0 9px;
+
+        &:active, &:focus {
+          opacity: 0.9;
+        }
+      }
+    }
+
     div.more-menu {
       float: right;
       height: 32px;

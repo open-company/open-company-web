@@ -74,7 +74,7 @@
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
              reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title
-             show-inbox? force-show-menu capture-clicks]}]
+             show-inbox? force-show-menu capture-clicks external-follow]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -265,42 +265,43 @@
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
-        (if inbox-follow-link
-          [:button.mlb-reset.more-menu-inbox-follow-bt
-            {:type "button"
-             :ref "more-menu-inbox-follow-bt"
-             :key "more-menu-inbox-follow-bt"
-             :class (when (or show-inbox?
-                              (and external-follow-up
-                                   (or complete-follow-up-link
-                                       create-follow-up-link))) "has-next-bt")
-             :on-click #(do
-                          (reset! (::showing-menu s) false)
-                          (when (fn? will-close)
-                            (will-close))
-                          (activity-actions/inbox-follow (:uuid entity-data)))
-             :data-toggle (if is-mobile? "" "tooltip")
-             :data-placement (or tooltip-position "top")
-             :data-container "body"
-             :title "Follow: Let me know when teammates reply"}]
-          (when inbox-unfollow-link
-            [:button.mlb-reset.more-menu-inbox-unfollow-bt
+        (when external-follow
+          (if inbox-follow-link
+            [:button.mlb-reset.more-menu-inbox-follow-bt
               {:type "button"
-               :ref "more-menu-inbox-unfollow-bt"
-               :key "more-menu-inbox-unfollow-bt"
+               :ref "more-menu-inbox-follow-bt"
+               :key "more-menu-inbox-follow-bt"
                :class (when (or show-inbox?
-                              (and external-follow-up
-                                   (or complete-follow-up-link
-                                       create-follow-up-link))) "has-next-bt")
+                                (and external-follow-up
+                                     (or complete-follow-up-link
+                                         create-follow-up-link))) "has-next-bt")
                :on-click #(do
                             (reset! (::showing-menu s) false)
                             (when (fn? will-close)
                               (will-close))
-                            (activity-actions/inbox-unfollow (:uuid entity-data)))
+                            (activity-actions/inbox-follow (:uuid entity-data)))
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Mute: Ignore future replies from my team unless I’m mentioned"}]))
+               :title "Follow: Let me know when teammates reply"}]
+            (when inbox-unfollow-link
+              [:button.mlb-reset.more-menu-inbox-unfollow-bt
+                {:type "button"
+                 :ref "more-menu-inbox-unfollow-bt"
+                 :key "more-menu-inbox-unfollow-bt"
+                 :class (when (or show-inbox?
+                                (and external-follow-up
+                                     (or complete-follow-up-link
+                                         create-follow-up-link))) "has-next-bt")
+                 :on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/inbox-unfollow (:uuid entity-data)))
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement (or tooltip-position "top")
+                 :data-container "body"
+                 :title "Mute: Ignore future replies from my team unless I’m mentioned"}])))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt

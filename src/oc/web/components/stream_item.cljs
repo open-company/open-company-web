@@ -48,7 +48,6 @@
   (swap! (::show-mobile-dismiss-bt s) not))
 
 (defn swipe-right-handler [s]
-  ; (swap! (::force-show-menu s) not)
   (swap! (::show-mobile-more-bt s) not))
 
 (defn- swipe-gesture-manager [swipe-handlers]
@@ -133,6 +132,9 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
+        mobile-more-menu-el (sel1 [:div.mobile-more-menu])
+        show-mobile-menu? (and is-mobile?
+                               mobile-more-menu-el)
         more-menu-comp #(more-menu
                           {:entity-data activity-data
                            :share-container-id dom-element-id
@@ -146,7 +148,7 @@
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
-                           :capture-clicks is-mobile?})]
+                           :capture-clicks show-mobile-menu?})]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -236,9 +238,9 @@
             [:div.follow-up-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
         (when is-published?
-          (if is-mobile?
-            (when-let [el (sel1 [:div.mobile-more-menu])]
-              (rum/portal (more-menu-comp) el))
+          (if (and is-mobile?
+                   mobile-more-menu-el)
+            (rum/portal (more-menu-comp) mobile-more-menu-el)
             (more-menu-comp)))]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
