@@ -55,13 +55,16 @@
   {:did-mount (fn [s]
     (let [el (rum/dom-node s)
           hr (js/Hammer. el)]
-      (.on hr "swipeleft" (partial (:swipe-left swipe-handlers) s))
+      (when (= (router/current-board-slug) "inbox")
+        (.on hr "swipeleft" (partial (:swipe-left swipe-handlers) s)))
       (.on hr "swiperight" (partial (:swipe-right swipe-handlers) s))
       (reset! (::hammer-recognizer s) hr)
       s))
    :will-unmount (fn [s]
     (when @(::hammer-recognizer s)
-      (.remove @(::hammer-recognizer s) "swipeleft"))
+      (.remove @(::hammer-recognizer s) "swipeleft")
+      (.remove @(::hammer-recognizer s) "swiperight")
+      (.destroy @(::hammer-recognizer s)))
     s)})
 
 (defn- on-scroll [s]
