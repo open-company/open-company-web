@@ -206,7 +206,7 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
-                 :on-click #(when-not is-mobile? (toggle-collapse-sections s))}
+                 :on-click #(toggle-collapse-sections s)}
                 [:span.sections "Sections"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset

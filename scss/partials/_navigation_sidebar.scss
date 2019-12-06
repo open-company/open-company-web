@@ -7,6 +7,10 @@
     height: 40px;
     margin: 2px 0;
     padding: 7px 16px;
+
+    &.all-posts {
+      margin-top: 16px;
+    }
   }
 
   .internal {
@@ -545,17 +549,10 @@ div.left-navigation-sidebar {
         }
 
         @include mobile() {
-          padding: 0;
-          margin: 0;
           cursor: default;
 
           span.sections {
-            color: rgba($deep_navy, 0.5);
             font-size: 16px;
-          }
-
-          &:before {
-            display: none;
           }
         }
       }
