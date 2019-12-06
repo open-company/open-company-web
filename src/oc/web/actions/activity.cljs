@@ -1075,10 +1075,21 @@
           nil]))
         (inbox-get (dis/org-data))))))
 
-(defn inbox-dismiss-all []
+(defn- inbox-real-dismiss-all []
   (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
     (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
     (api/inbox-dismiss-all dismiss-all-link
      (fn [{:keys [status success body]}]
        (inbox-get (dis/org-data))))))
+
+(defn inbox-dismiss-all []
+  (let [alert-data {:action "dismiss-all"
+                    :message "Are you sure you want to dismiss all?"
+                    :link-button-title "Keep"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-title "Yes"
+                    :solid-button-cb (fn []
+                                      (inbox-real-dismiss-all)
+                                      (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
