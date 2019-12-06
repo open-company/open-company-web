@@ -718,7 +718,8 @@
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
-      (when (= (-> data :data :user-id) (jwt/user-id))
+      (when (and (#{:dismiss :follow :unfollow} (:change-type (:data data)))
+                 (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
               change-type (:change-type change-data)
@@ -736,7 +737,17 @@
             (= change-type :unfollow)
             (do
               (timbre/debug "Unfollow for" activity-uuid "with" (:dismiss-at inbox-action))
-              (inbox-get (dis/org-data))))))))
+              (inbox-get (dis/org-data))))))
+      (when (and (utils/in? (-> data :data :users) (jwt/user-id))
+                 (= :comment-add (:change-type (:data data))))
+        (let [change-data (:data data)
+              activity-uuid (:item-id change-data)
+              change-type (:change-type change-data)
+              inbox-action (:inbox-action change-data)]
+          (timbre/debug "Comment added for" activity-uuid)
+          ;; Delay the inbox refresh to make sure follows have been added
+          ;; for al mentioned users
+          (utils/after 500 #(inbox-get (dis/org-data)))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
@@ -900,7 +911,7 @@
       (api/delete-samples delete-samples-link
        #(do
           (api/get-org org-link refresh-org-data-cb)
-          (router/nav! (oc-urls/all-posts)))))))
+          (router/nav! (oc-urls/default-landing)))))))
 
 (defn has-sample-posts? []
   (let [org-data (dis/org-data)]
@@ -1052,6 +1063,7 @@
 (defn inbox-dismiss [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
+    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid])
     (api/inbox-dismiss dismiss-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
@@ -1066,6 +1078,7 @@
 (defn inbox-dismiss-all []
   (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
+    (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
     (api/inbox-dismiss-all dismiss-all-link
      (fn [{:keys [status success body]}]
        (inbox-get (dis/org-data))))))

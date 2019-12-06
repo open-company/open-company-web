@@ -21,17 +21,13 @@
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
     [:div.empty-board.group
       [:div.empty-board-grey-box
-        [:div.empty-board-illustration
-          {:class (utils/class-set {:inbox is-inbox?
-                                    :all-posts is-all-posts?
-                                    :drafts is-drafts-board?
-                                    :follow-ups is-follow-ups?
-                                    :section (and (not is-all-posts?)
-                                                  (not is-drafts-board?)
-                                                  (not is-follow-ups?))})}]
+        [:div.empty-board-illustration-container
+          [:div.empty-board-illustration
+            {:class (utils/class-set {:inbox is-inbox?
+                                      :all-posts is-all-posts?
+                                      :drafts is-drafts-board?
+                                      :follow-ups is-follow-ups?})}]]
         [:div.empty-board-title
-          (cond
-           is-all-posts? "All posts is a stream of what’s new in Carrot."
-           is-drafts-board? "Nothing in drafts"
-           is-follow-ups? "You’re all caught up!"
-           :else "This section is empty")]]]))
+          (if (or is-inbox? is-all-posts? is-drafts-board? is-follow-ups?)
+           "You’re all caught up!"
+           "This section is empty")]]]))

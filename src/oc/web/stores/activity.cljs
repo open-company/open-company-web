@@ -608,11 +608,22 @@
 
 (defmethod dispatcher/action :inbox/dismiss
   [db [_ org-slug item-id]]
-  (when-let [activity-data (dispatcher/activity-data item-id)]
+  (if-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
           without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
           org-data-key (dispatcher/org-data-key org-slug)]
       (-> db
         (assoc-in inbox-key without-item)
-        (update-in (conj org-data-key :inbox-count) dec)))))
+        (update-in (conj org-data-key :inbox-count) dec)))
+    db))
+
+(defmethod dispatcher/action :inbox/dismiss-all
+  [db [_ org-slug]]
+  (let [inbox-key (dispatcher/container-key org-slug "inbox")
+        inbox-data (get-in db inbox-key)
+        without-items (assoc-in inbox-data [:posts-list] [])
+        org-data-key (dispatcher/org-data-key org-slug)]
+    (-> db
+      (assoc-in inbox-key without-items)
+      (assoc-in (conj org-data-key :inbox-count) 0))))

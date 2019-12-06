@@ -112,7 +112,7 @@
            (callback section-slug))
           (if (= section-slug (router/current-board-slug))
             (do
-              (router/nav! (oc-urls/all-posts org-slug))
+              (router/nav! (oc-urls/default-landing org-slug))
               (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
                 (api/get-org org-link
                   (fn [{:keys [status body success]}]

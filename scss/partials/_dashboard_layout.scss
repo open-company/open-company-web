@@ -534,6 +534,10 @@ div.dashboard-layout {
             margin-left: 19px;
             margin-right: 5px;
 
+            &:empty {
+              display: none;
+            }
+
             @include mobile() {
               float: unset;
               margin: 0;

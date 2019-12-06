@@ -48,7 +48,9 @@
                                   :avatar-url (:avatar-url user-data)
                                   :user-id (:user-id user-data)}}
         first-comment-from-user? (when-not is-publisher?
-                                   (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))]
+                                   (not (seq (filter #(= (-> % :author :user-id) current-user-id) comments-data))))
+        should-show-follow-notification? (and first-comment-from-user?
+                                              (utils/link-for (:links activity-data) "follow"))]
     ;; Reset the add comment field
     (dis/dispatch! [:add-comment-reset (router/current-org-slug) (:uuid activity-data) parent-comment-uuid nil])
     ;; Add the comment to the app-state to show it immediately
@@ -66,7 +68,7 @@
           (do
             (dis/dispatch! [:comment-add/replace activity-data (json->cljs body) comments-key new-comment-uuid])
             (swap! router/path assoc :refresh true))
-          (when first-comment-from-user?
+          (when should-show-follow-notification?
             (notification-actions/show-notification {:title "You are now following this post."
                                                      :dismiss true
                                                      :expire 3

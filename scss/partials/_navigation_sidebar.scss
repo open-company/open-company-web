@@ -32,13 +32,14 @@
     line-height: 16px;
     text-align: center;
     color: $deep_navy;
-    width: 16px;
+    min-width: 16px;
     height: 16px;
     display: inline-block;
     background-color: rgba($light_navy, 0.1);
     border-radius: 4px;
     margin-top: 4px;
     margin-right: 16px;
+    padding: 0 4px;
 
     @include mobile() {
       float: left;
@@ -677,7 +678,7 @@ div.left-navigation-sidebar {
         }
 
         div.internal {
-          padding: 1px 0px 0px;
+          padding: 1px 0px 0px 28px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;

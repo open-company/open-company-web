@@ -86,6 +86,7 @@
                                                  :swipe-right swipe-right-handler})
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
+                         ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            (when ua/mobile?

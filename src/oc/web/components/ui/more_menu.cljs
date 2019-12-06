@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
@@ -60,7 +61,15 @@
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))
-                       ui-mixins/refresh-tooltips-mixin
+                       {:did-mount (fn [s]
+                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+                       s)
+                       :did-update (fn [s]
+                        (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+                          #(doto (js/$ %2)
+                             (.tooltip "fixTitle")
+                             (.tooltip "hide")))
+                       s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
@@ -231,7 +240,9 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/send-item-seen (:uuid entity-data)))}
+                              (activity-actions/inbox-dismiss (:uuid entity-data))
+                              (when (seq (router/current-activity-id))
+                                (nav-actions/dismiss-post-modal %)))}
                 "Dismiss"])])
         (when (and external-share
                    share-link)
@@ -271,7 +282,7 @@
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :title "Follow"}]
+             :title "Follow: Let me know when teammates reply"}]
           (when inbox-unfollow-link
             [:button.mlb-reset.more-menu-inbox-unfollow-bt
               {:type "button"
@@ -289,7 +300,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Unfollow"}]))
+               :title "Mute: Ignore future replies from my team unless I’m mentioned"}]))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
@@ -329,7 +340,9 @@
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
                             (will-close))
-                          (activity-actions/inbox-dismiss (:uuid entity-data)))
+                          (activity-actions/inbox-dismiss (:uuid entity-data))
+                          (when (seq (router/current-activity-id))
+                            (nav-actions/dismiss-post-modal %)))
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
