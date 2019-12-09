@@ -200,17 +200,17 @@ div.stream-item {
   
   @include bookmark-tag();
 
-  div.must-see-tag, div.bookmark-tag {
+  div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small {
     display: none;
   }
 
-  div.must-see-tag, div.bookmark-tag {
+  div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small {
     @include mobile() {
       margin-top: 8px;
     }
   }
 
-  & > div.must-see-tag, & > div.bookmark-tag {
+  & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small {
     margin-top: 16px;
   }
 
