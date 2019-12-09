@@ -79,7 +79,7 @@
     (bookmarks-real-get bookmarks-link :recently-posted (:slug org-data) finish-cb)))
 
 (defn recent-bookmarks-get [org-data & [finish-cb]]
-  (when-let [recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
+  (when-let [recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")]
     (bookmarks-real-get recent-bookmarks-link :recent-activity (:slug org-data) finish-cb)))
 
 (defn bookmarks-sort-get [org-data & [finish-cb]]
