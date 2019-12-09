@@ -238,7 +238,7 @@
         (utils/to-end-of-content-editable headline-el)))))
 
 (defn add-emoji-cb [s]
-  (utils/after 0
+  (utils/after 180
    #(do
      (headline-on-change s)
      (abstract-on-change s)
