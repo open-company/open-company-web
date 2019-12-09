@@ -279,13 +279,13 @@
 (defmethod dispatcher/action :bookmark-toggle
   [db [_ org-slug activity-uuid bookmark?]]
   (let [activity-key (dispatcher/activity-key org-slug activity-uuid)
-        post-activity-data (get-in db activity-key)
-        next-activity-data (when post-activity-data
-                             (assoc post-activity-data :bookmarked bookmark?))
-        with-updated-activity-data (if post-activity-data
-                                     (assoc-in db activity-key next-activity-data)
-                                     db)]
-      (add-remove-item-from-bookmarks with-updated-activity-data org-slug next-activity-data)))
+        activity-data (get-in db activity-key)
+        next-activity-data (when activity-data
+                             (assoc activity-data :bookmarked bookmark?))
+        next-db (if activity-data
+                  (assoc-in db activity-key next-activity-data)
+                  db)]
+      (add-remove-item-from-bookmarks next-db org-slug next-activity-data)))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug sort-type fixed-board-data]]
