@@ -891,6 +891,7 @@
 
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link
+    (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) true])
     (api/toggle-bookmark add-bookmark-link
      (fn [{:keys [status success body]}]
       (let [new-activity-data (if success (json->cljs body) {})]
@@ -898,6 +899,7 @@
 
 (defn remove-bookmark [activity-data remove-bookmark-link]
   (when remove-bookmark-link
+    (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) false])
     (api/toggle-bookmark remove-bookmark-link
      (fn [{:keys [status success body]}]
       (let [new-activity-data (if success (json->cljs body) {})]

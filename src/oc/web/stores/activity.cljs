@@ -277,17 +277,14 @@
     (assoc-in db activity-key fixed-activity-data)))
 
 (defmethod dispatcher/action :bookmark-toggle
-  [db [_ org-slug activity-data bookmark?]]
-  (let [should-update-post? (:uuid activity-data)
-        activity-key (when should-update-post?
-                      (dispatcher/activity-key org-slug (:uuid activity-data)))
-        post-activity-data (when should-update-post?
-                             (get-in db activity-key))
-        next-activity-data (when should-update-post?
+  [db [_ org-slug activity-uuid bookmark?]]
+  (let [activity-key (dispatcher/activity-key org-slug activity-uuid)
+        post-activity-data (get-in db activity-key)
+        next-activity-data (when post-activity-data
                              (assoc post-activity-data :bookmarked bookmark?))
-        with-updated-activity-data (if should-update-post?
-                                    (assoc-in db activity-key next-activity-data)
-                                    db)]
+        with-updated-activity-data (if post-activity-data
+                                     (assoc-in db activity-key next-activity-data)
+                                     db)]
       (add-remove-item-from-bookmarks with-updated-activity-data org-slug next-activity-data)))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
@@ -344,14 +341,16 @@
 
 (defmethod dispatcher/action :bookmarks-get/finish
   [db [_ org-slug sort-type fixed-posts]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+  (let [org-key (dispatcher/org-data-key org-slug)
+        posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-posts))
         container-key (dispatcher/container-key org-slug :bookmarks sort-type)
         with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))]
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
-      (assoc-in posts-key merged-items))))
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-key :bookmarks-count) (:total-count fixed-posts)))))
 
 (defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug sort-type]]
@@ -363,7 +362,8 @@
 (defmethod dispatcher/action :bookmarks-more/finish
   [db [_ org direction sort-type posts-data]]
   (if posts-data
-    (let [org-data (dispatcher/org-data db org)
+    (let [org-key (dispatcher/org-data-key org)
+          org-data (get-in db org-key)
           container-key (dispatcher/container-key org :bookmarks sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
@@ -377,7 +377,8 @@
                               (dissoc :loading-more))]
       (-> db
         (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)))
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-key :bookmarks-count) (:total-count posts-data))))
     db))
 
 (defmethod dispatcher/action :remove-bookmark
