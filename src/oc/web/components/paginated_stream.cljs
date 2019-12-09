@@ -14,6 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
+            [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             cljsjs.react-virtualized))
@@ -88,16 +89,25 @@
            reads-data
            org-data
            comments-data
-           editable-boards] :as props}]
+           editable-boards
+           foc-layout
+           is-mobile] :as props}]
   (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
                        (activity-utils/is-published? entry))]
    [:div.virtualized-list-row
     {:style style}
-    (stream-item {:activity-data entry
-                  :comments-data comments-data
-                  :read-data reads-data
-                  :show-wrt? show-wrt?
-                  :editable-boards editable-boards})]))
+    (if (and (= foc-layout dis/other-foc-layout)
+            (not is-mobile))
+      (stream-collapsed-item {:activity-data entry
+                              :comments-data comments-data
+                              :read-data reads-data
+                              :show-wrt? show-wrt?
+                              :editable-boards editable-boards})
+      (stream-item {:activity-data entry
+                    :comments-data comments-data
+                    :read-data reads-data
+                    :show-wrt? show-wrt?
+                    :editable-boards editable-boards}))]))
 
 (rum/defc load-more < rum/static
   [{:keys [style]}]
@@ -136,7 +146,9 @@
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry entry
-                                                                  :reads-data reads-data}))
+                                                                  :reads-data reads-data
+                                                                  :foc-layout foc-layout
+                                                                  :is-mobile is-mobile?}))
                             (str key-prefix "-" key)))))]
     [:div.virtualized-list-container
       {:ref registerChild
