@@ -895,7 +895,7 @@
     (api/toggle-bookmark add-bookmark-link
      (fn [{:keys [status success body]}]
       (let [new-activity-data (if success (json->cljs body) {})]
-        (activity-get-finish status activity-data nil))))))
+        (activity-get-finish status new-activity-data nil))))))
 
 (defn remove-bookmark [activity-data remove-bookmark-link]
   (when remove-bookmark-link
@@ -903,7 +903,7 @@
     (api/toggle-bookmark remove-bookmark-link
      (fn [{:keys [status success body]}]
       (let [new-activity-data (if success (json->cljs body) {})]
-        (activity-get-finish status activity-data nil))))))
+        (activity-get-finish status new-activity-data nil))))))
 
 (defn refresh-board-data [board-slug sort-type]
   (when (and (not (router/current-activity-id))
