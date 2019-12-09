@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="13px" height="16px" viewBox="0 0 13 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="10px" height="14px" viewBox="0 0 10 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+    <title>Rectangle 1143</title>
     <desc>Created with Sketch.</desc>
-    <g id="Mobile-MVP" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Mobile:-Post-page" transform="translate(-337.000000, -55.000000)" fill="#34414F" fill-rule="nonzero">
-            <g id="Group-3" transform="translate(287.000000, 47.000000)">
-                <path d="M58.8449778,14.0449131 L62.1524876,14.0449131 C63.0154895,14.0449131 63.2604202,14.5745015 62.6965254,15.2313115 L55.6830615,23.4004119 C54.8391487,24.3833796 54.1550222,24.1326486 54.1550222,22.8323241 L54.1550222,17.9550869 L50.8475124,17.9550869 C49.9845105,17.9550869 49.7395798,17.4254985 50.3034746,16.7686885 L57.3169385,8.59958809 C58.1608513,7.61662039 58.8449778,7.86735143 58.8449778,9.16767594 L58.8449778,14.0449131 Z" id="Combined-Shape"></path>
+    <g id="New" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Inbox:-Action-bar-states" transform="translate(-231.000000, -250.000000)" fill="#34414F" fill-rule="nonzero">
+            <g id="Group" transform="translate(137.000000, 179.000000)">
+                <path d="M95.2761425,82.9307632 L98.0722098,80.8923594 C98.6241734,80.4899639 99.3759347,80.4900428 99.9277902,80.8923594 L102.75,82.9534521 L102.75,72.4580599 L95.2513305,72.4580506 L95.2761425,82.9307632 Z M95.2513305,71 L102.748669,71 C103.43976,71 104,71.6548196 104,72.4580599 L104,84.1224462 C104,84.9277105 103.525104,85.2342952 102.939629,84.8074686 L99.2652915,82.1287838 C99.118775,82.0219696 98.8813354,82.0218891 98.7347085,82.1287838 L95.0603714,84.8074686 C94.4747444,85.2344054 94,84.9256866 94,84.1224462 L94,72.4580599 C94,71.6527957 94.5590711,71 95.2513305,71 Z" id="Rectangle-1143"></path>
             </g>
         </g>
     </g>
