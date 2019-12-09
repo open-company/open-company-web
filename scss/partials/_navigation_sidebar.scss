@@ -62,7 +62,7 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.bookmarks-label, div.must-see-label, div.drafts-label {
+    div.all-posts-label, div.bookmarks-label, div.drafts-label {
       text-decoration: none;
     }
   }
@@ -113,29 +113,6 @@
       @include OC_Body_Bold();
     }
   }
-
-  div.must-see-label {
-    @include OC_Body_Book();
-    font-size: 14px;
-    color: $deep_navy;
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @include mobile() {
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    &:active, &:focus {
-      text-decoration: none;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
-    }
-  }
 }
 
 @mixin item-selected() {
@@ -147,7 +124,7 @@
     border-radius: 0;
   }
 
-  .internal, div.all-posts-label, div.bookmarks-label, div.drafts-label, div.must-see-label {
+  .internal, div.all-posts-label, div.bookmarks-label, div.drafts-label {
     // color: $carrot_green;
     @include OC_Body_Book();
     font-size: 14px;
@@ -178,7 +155,7 @@
     color: $deep_navy;
   }
 
-  div.all-posts-label, div.bookmarks-label, div.drafts-label, div.must-see-label {
+  div.all-posts-label, div.bookmarks-label, div.drafts-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -191,12 +168,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.bookmarks-label, div.must-see-label, div.drafts-label {
+    div.all-posts-label, div.bookmarks-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
-  div.all-posts-label, div.bookmarks-label, div.must-see-label {
+  div.all-posts-label, div.bookmarks-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -238,7 +215,7 @@
     }
   }
 
-  div.all-posts-label, div.bookmarks-label, div.drafts-label, div.must-see-label {
+  div.all-posts-label, div.bookmarks-label, div.drafts-label {
     color: $deep_navy;
     text-decoration: none;
 
@@ -364,7 +341,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts, a.bookmarks, a.drafts, a.must-see {
+  a.all-posts, a.bookmarks, a.drafts {
     display: block;
     background-color: transparent;
     border: none;
@@ -399,10 +376,6 @@ div.left-navigation-sidebar {
         background-image: cdnUrl("/img/ML/digest_icon_white.svg");
       }
 
-      div.must-see-icon {
-        background-image: cdnUrl("/img/ML/bookmarks_white.svg");
-      }
-
       div.bookmarks-icon {
         background-image: cdnUrl("/img/ML/bookmarks_white.svg");
       }
@@ -412,7 +385,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label, div.bookmarks-label, div.drafts-label, div.must-see-label {
+    div.all-posts-label, div.bookmarks-label, div.drafts-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -422,14 +395,6 @@ div.left-navigation-sidebar {
       @include mobile() {
         padding: 0px;
         line-height: 18px;
-      }
-    }
-
-    div.must-see-label {
-      padding: 2px 0px 0px 14px;
-
-      @include mobile() {
-        padding: 0;
       }
     }
 
@@ -460,23 +425,8 @@ div.left-navigation-sidebar {
       @include mobile() {
         margin-left: 0px;
         margin-top: 0px;
-        background-position: center 4px;
+        background-position: center 5px;
         opacity: 1;
-      }
-    }
-
-    div.must-see-icon {
-      background-image: cdnUrl("/img/ML/bookmarks_icon_grey.svg");
-      background-size: 14px 18px;
-      background-position: center 4px;
-      background-repeat: no-repeat;
-      width: 18px;
-      height: 23px;
-      float: left;
-
-      @include mobile() {
-        opacity: 1;
-        height: 24px;
       }
     }
 
