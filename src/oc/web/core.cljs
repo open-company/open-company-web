@@ -541,11 +541,11 @@
 
     (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
       (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
-      (router/redirect! (urls/bookmarks)))
+      (router/redirect! (urls/bookmarks (:org params))))
 
     (defroute follow-ups-slash-route (str (urls/follow-ups ":org") "/") {:as params}
       (timbre/info "Routing follow-ups-slash-route" (str (urls/follow-ups ":org") "/"))
-      (router/redirect! (urls/bookmarks)))
+      (router/redirect! (urls/bookmarks (:org params))))
 
     (defroute bookmarks-route (urls/bookmarks ":org") {:as params}
       (timbre/info "Routing bookmarks-route" (urls/bookmarks ":org"))
