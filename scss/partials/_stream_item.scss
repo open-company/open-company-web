@@ -204,12 +204,6 @@ div.stream-item {
     display: none;
   }
 
-  div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small {
-    @include mobile() {
-      margin-top: 8px;
-    }
-  }
-
   & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small {
     margin-top: 16px;
   }
