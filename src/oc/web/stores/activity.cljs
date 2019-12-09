@@ -280,8 +280,14 @@
   [db [_ org-slug activity-uuid bookmark?]]
   (let [activity-key (dispatcher/activity-key org-slug activity-uuid)
         activity-data (get-in db activity-key)
-        next-activity-data (when activity-data
+        bookmark-link-index (when activity-data
+                              (utils/index-of (:links activity-data) #(= (:rel %) "bookmark")))
+        next-activity-data* (when activity-data
                              (assoc activity-data :bookmarked bookmark?))
+        next-activity-data (when (and activity-data
+                                      bookmark-link-index)
+                             (assoc-in next-activity-data* [:links bookmark-link-index :method]
+                              (if bookmark? "DELETE" "POST")))
         next-db (if activity-data
                   (assoc-in db activity-key next-activity-data)
                   db)]
