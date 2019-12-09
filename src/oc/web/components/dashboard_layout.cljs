@@ -82,9 +82,9 @@
         board-data (drv/react s :board-data)
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
-        board-slug (router/current-board-slug)
+        current-board-slug (router/current-board-slug)
         ;; Board data used as fallback until the board is completely loaded
-        org-board-data (first (filter #(= (:slug %) board-slug) (:boards org-data)))
+        org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         activity-data (drv/react s :activity-data)
@@ -97,7 +97,7 @@
         board-container-data (if (or is-all-posts is-bookmarks) container-data board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
-        is-drafts-board (= board-slug utils/default-drafts-board-slug)
+        is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
         all-boards (drv/react s :editable-boards)
         can-compose? (pos? (count all-boards))
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
@@ -107,8 +107,8 @@
         show-drafts (pos? (:count drafts-link))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
-        should-show-settings-bt (and board-slug
-                                     (not (dis/is-container? board-slug))
+        should-show-settings-bt (and current-board-slug
+                                     (not (dis/is-container? current-board-slug))
                                      (not (:read-only board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
@@ -118,8 +118,8 @@
                                 activity-data
                                 (not= activity-data :404)
                                 ;; Do not show the post under the wrong board slug/uuid
-                                (or (= (:board-slug activity-data) board-slug)
-                                    (= (:board-uuid activity-data) board-slug)))
+                                (or (= (:board-slug activity-data) current-board-slug)
+                                    (= (:board-uuid activity-data) current-board-slug)))
         no-phisical-home-button (and ua/mobile-app?
                                      (js/isiPhoneWithoutPhysicalHomeBt))]
       ;; Entries list
@@ -142,15 +142,15 @@
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (= board-slug "all-posts"))
+                                   (= current-board-slug "all-posts"))
                           "active")}]
               [:button.mlb-reset.bookmarks-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (or (= board-slug "bookmarks")
-                                       (= board-slug "must-see")))
+                                   (or (= current-board-slug "bookmarks")
+                                       (= current-board-slug "must-see")))
                           "active")}]
               [:button.mlb-reset.notifications-tab
                 {:on-click #(do
@@ -211,7 +211,7 @@
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (when board-slug
+                  (when current-board-slug
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
@@ -236,7 +236,7 @@
                        :data-placement "top"
                        :data-container "body"
                        :data-delay "{\"show\":\"500\", \"hide\":\"0\"}"
-                       :title (if (= board-slug utils/default-drafts-board-slug)
+                       :title (if (= current-board-slug utils/default-drafts-board-slug)
                                "Only visible to you"
                                "Only visible to invited team members")}])
                   (when (= (:access current-board-data) "public")
