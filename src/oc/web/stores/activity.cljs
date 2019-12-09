@@ -277,7 +277,9 @@
 
 (defmethod dispatcher/action :bookmark-toggle
   [db [_ org-slug activity-uuid bookmark?]]
-  (let [activity-key (dispatcher/activity-key org-slug activity-uuid)
+  (let [bookmarks-count-key (conj (dispatcher/org-data-key org-slug) :bookmarks-count)
+        current-bookmarks-count (get-in db bookmarks-count-key)
+        activity-key (dispatcher/activity-key org-slug activity-uuid)
         activity-data (get-in db activity-key)
         bookmark-link-index (when activity-data
                               (utils/index-of (:links activity-data) #(= (:rel %) "bookmark")))
@@ -289,8 +291,19 @@
                               (if bookmark? "DELETE" "POST")))
         next-db (if activity-data
                   (assoc-in db activity-key next-activity-data)
-                  db)]
-      (add-remove-item-from-bookmarks next-db org-slug next-activity-data)))
+                  db)
+        next-bookmarks-count (cond
+                               (and bookmark?
+                                    (not (:bookmarked activity-data)))
+                               (inc current-bookmarks-count)
+                               (and (not bookmark?)
+                                    (:bookmarked activity-data))
+                               (dec current-bookmarks-count)
+                               :else
+                               current-bookmarks-count)]
+      (-> next-db
+       (add-remove-item-from-bookmarks org-slug next-activity-data)
+       (assoc-in bookmarks-count-key next-bookmarks-count))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug sort-type fixed-board-data]]
