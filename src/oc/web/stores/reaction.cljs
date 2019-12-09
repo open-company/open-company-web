@@ -240,7 +240,7 @@
   (swap! reactions-atom index-posts org (-> body :collection :items))
   db)
 
-(defmethod reducer :follow-ups-get/finish
+(defmethod reducer :bookmarks-get/finish
   [db [_ {:keys [org year month from body]}]]
   (swap! reactions-atom index-posts org (-> body :collection :items))
   db)

@@ -94,7 +94,7 @@ div.stream-collapsed-item {
       flex: 0 0 20px;
     }
 
-    &.follow-up-item div.stream-collapsed-item-fill div.follow-up-tag {
+    &.bookmark-item div.stream-collapsed-item-fill div.bookmark-tag {
         display: block;
       }
 
@@ -122,13 +122,13 @@ div.stream-collapsed-item {
 
       @include must-see-tag();
 
-      @include follow-up-tag();
+      @include bookmark-tag();
 
-      div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
+      div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
         display: none;
       }
 
-      div.follow-up-tag, div.must-see-tag {
+      div.bookmark-tag, div.must-see-tag {
         margin: 4px 0 0 8px;
         flex: 0 0 auto;
       }

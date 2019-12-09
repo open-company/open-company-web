@@ -484,14 +484,14 @@ div.more-menu {
             }
           }
 
-          &.create-follow-up {
+          &.add-bookmark {
             padding-left: 56px;
 
             &:before {
               content: "";
               width: 14px;
               height: 18px;
-              background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+              background-image: cdnUrl("/img/ML/mobile_add_bookmark.svg");
               background-size: 14px 18px;
               background-position: center;
               background-repeat: no-repeat;
@@ -501,14 +501,14 @@ div.more-menu {
             }
           }
 
-          &.complete-follow-up {
+          &.remove-bookmark {
             padding-left: 56px;
 
             &:before {
               content: "";
               width: 14px;
               height: 18px;
-              background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
+              background-image: cdnUrl("/img/ML/mobile_remove-bookmark.svg");
               background-size: 14px 18px;
               background-position: center;
               background-repeat: no-repeat;

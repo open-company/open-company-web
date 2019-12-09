@@ -181,7 +181,7 @@
 ;; Container helpers
 
 (defn is-container? [container-slug]
-  (#{"inbox" "all-posts" "follow-ups"} container-slug))
+  (#{"inbox" "all-posts" "bookmarks"} container-slug))
 
 ;; Derived Data ================================================================
 
