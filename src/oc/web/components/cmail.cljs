@@ -238,9 +238,11 @@
         (utils/to-end-of-content-editable headline-el)))))
 
 (defn add-emoji-cb [s]
-  (headline-on-change s)
-  (abstract-on-change s)
-  (body-on-change s))
+  (utils/after 180
+   #(do
+     (headline-on-change s)
+     (abstract-on-change s)
+     (body-on-change s))))
 
 (defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
