@@ -1,6 +1,7 @@
 (ns oc.web.components.expanded-post
   (:require [rum.core :as rum]
             [dommy.core :as dom]
+            [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -72,6 +73,7 @@
   (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
   (rum/local nil ::activity-uuid)
+  (rum/local false ::force-show-menu)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
@@ -125,7 +127,25 @@
                           (and (:new-at activity-data)
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at reads-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))]
+                                  (.getTime (utils/js-date (:new-at activity-data)))))
+        mobile-more-menu-el (sel1 [:div.mobile-more-menu])
+        show-mobile-menu? (and is-mobile?
+                                      mobile-more-menu-el)
+        more-menu-comp #(more-menu {:entity-data activity-data
+                                    :share-container-id dom-element-id
+                                    :editable-boards editable-boards
+                                    :external-share (not is-mobile?)
+                                    :external-bookmark (not is-mobile?)
+                                    :external-follow (not is-mobile?)
+                                    :show-edit? true
+                                    :show-delete? true
+                                    :show-move? (not is-mobile?)
+                                    :tooltip-position "bottom"
+                                    :show-inbox? (= (:back-to @router/path) "inbox")
+                                    :force-show-menu (and is-mobile? @(::force-show-menu s))
+                                    :mobile-tray-menu show-mobile-menu?
+                                    :will-close (when show-mobile-menu?
+                                                  (fn [] (reset! (::force-show-menu s) false)))})]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -136,15 +156,11 @@
         [:button.mlb-reset.back-to-board
           {:on-click close-expanded-post}]
        [:div.activity-share-container]
-       (more-menu {:entity-data activity-data
-                   :share-container-id dom-element-id
-                   :editable-boards editable-boards
-                   :external-share (not is-mobile?)
-                   :external-bookmark true
-                   :show-edit? true
-                   :show-delete? true
-                   :show-move? (not is-mobile?)
-                   :tooltip-position "bottom"})
+       (if show-mobile-menu?
+         (rum/portal (more-menu-comp) mobile-more-menu-el)
+         (more-menu-comp))
+       [:button.mlb-reset.mobile-more-bt
+         {:on-click #(swap! (::force-show-menu s) not)}]
        (when user-is-part-of-the-team
          [:div.expanded-post-wrt-container
            (wrt-count {:activity-data activity-data
@@ -206,8 +222,7 @@
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data
-                             :show-new-tag? has-new-comments?
-                             :hide-face-pile? true})]]
+                             :show-new-tag? has-new-comments?})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
           (rum/with-key (add-comment {:activity-data activity-data

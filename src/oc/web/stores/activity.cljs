@@ -4,7 +4,6 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
-
 (defn add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
    status"
@@ -558,3 +557,69 @@
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
       (update-in activity-read-key merge {:last-read-at (utils/as-of-now)})
       (assoc-in activity-key next-activity-data))))
+
+;; Inbox
+
+(defmethod dispatcher/action :inbox-get/finish
+  [db [_ org-slug fixed-posts]]
+  (let [posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        merged-items (merge old-posts (:fixed-items fixed-posts))
+        container-key (dispatcher/container-key org-slug :inbox)
+        with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))
+        org-data-key (dispatcher/org-data-key org-slug)]
+    (-> db
+      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts)))))
+
+(defmethod dispatcher/action :inbox-more
+  [db [_ org-slug sort-type]]
+  (let [container-key (dispatcher/container-key org-slug :inbox)
+        container-data (get-in db container-key)
+        next-posts-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-posts-data)))
+
+(defmethod dispatcher/action :inbox-more/finish
+  [db [_ org direction posts-data]]
+  (if posts-data
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
+          container-key (dispatcher/container-key org :inbox)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (-> db
+        (assoc-in container-key new-container-data)
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts-data))))
+    db))
+
+(defmethod dispatcher/action :inbox/dismiss
+  [db [_ org-slug item-id]]
+  (if-let [activity-data (dispatcher/activity-data item-id)]
+    (let [inbox-key (dispatcher/container-key org-slug "inbox")
+          inbox-data (get-in db inbox-key)
+          without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
+          org-data-key (dispatcher/org-data-key org-slug)]
+      (-> db
+        (assoc-in inbox-key without-item)
+        (update-in (conj org-data-key :inbox-count) dec)))
+    db))
+
+(defmethod dispatcher/action :inbox/dismiss-all
+  [db [_ org-slug]]
+  (let [inbox-key (dispatcher/container-key org-slug "inbox")
+        inbox-data (get-in db inbox-key)
+        without-items (assoc-in inbox-data [:posts-list] [])
+        org-data-key (dispatcher/org-data-key org-slug)]
+    (-> db
+      (assoc-in inbox-key without-items)
+      (assoc-in (conj org-data-key :inbox-count) 0))))

@@ -2,6 +2,7 @@
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]))
 
 (rum/defcs lazy-stream < rum/static
@@ -16,16 +17,15 @@
   (let [board-data (drv/react s :board-data)
         container-data (drv/react s :container-data)
         activity-data (drv/react s :activity-data)
+        is-container? (dis/is-container? (router/current-board-slug))
         loading? (or ;; Board specified
                      (and (not (router/current-activity-id))
-                          (not= (router/current-board-slug) "all-posts")
-                          (not= (router/current-board-slug) "bookmarks")
+                          (not is-container?)
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
                      (and (not (router/current-activity-id))
-                          (or (= (router/current-board-slug) "all-posts")
-                              (= (router/current-board-slug) "bookmarks"))
+                          is-container?
                           ;; But no all-posts data yet
                          (not container-data))
                      ;; Activity loaded

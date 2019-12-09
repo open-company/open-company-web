@@ -32,7 +32,7 @@
 ;; :wrt-{uuid}
 
 (defn- container-data [board-slug]
-  (if (#{"all-posts" "bookmarks"} board-slug)
+  (if (dis/is-container? board-slug)
     (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
     (dis/board-data board-slug)))
 
@@ -42,6 +42,9 @@
     (let [org-data (dis/org-data)
           board-data (container-data board-slug)]
        (cond
+
+        (= board-slug "inbox")
+        (activity-actions/inbox-get org-data)
 
         (= board-slug "all-posts")
         (do
@@ -88,7 +91,7 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if (#{"all-posts" "bookmarks"} board-slug) board-slug "dashboard")]
+         (router/set-route! [org-slug board-slug (if (dis/is-container? board-slug) "dashboard" board-slug)]
           {:org org-slug
            :board board-slug
            :sort-type sort-type

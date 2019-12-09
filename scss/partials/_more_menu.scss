@@ -66,14 +66,6 @@ div.more-menu {
     display: inline-block;
     opacity: 1;
 
-    &.has-bookmark {
-      border-right: 1px solid rgba($deep_navy, 0.15);
-      border-top-left-radius: 4px;
-      border-bottom-left-radius: 4px;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
     @include big_web() {
       &:hover {
         background-color: rgba($deep_navy, 0.2);
@@ -90,6 +82,17 @@ div.more-menu {
     }
   }
 
+  button:not(.has-next-bt) {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  button.has-next-bt {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid rgba($deep_navy, 0.15);
+  }
+
   button.more-menu-remove-bookmark-bt {
     height: 32px;
     width: 32px;
@@ -97,8 +100,6 @@ div.more-menu {
     background-size: 10px 14px;
     background-position: center;
     background-color: rgba($deep_navy, 0.1);
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
     padding: 0;
     background-repeat: no-repeat;
     opacity: 1;
@@ -135,8 +136,6 @@ div.more-menu {
       background-size: 10px 14px;
       background-position: center;
       background-color: rgba($deep_navy, 0.1);
-      border-top-right-radius: 4px;
-      border-bottom-right-radius: 4px;
       padding: 0;
       background-repeat: no-repeat;
       opacity: 1;
@@ -160,6 +159,107 @@ div.more-menu {
           opacity: 0.9;
         }
       }
+
+      &.has-inbox-dismiss {
+        border-radius: 0;
+      }
+    }
+
+    div.tooltip {
+      width: 96px;
+    }
+  }
+
+  button.more-menu-inbox-dismiss-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_done.svg");
+    background-size: 14px 10px;
+    background-position: center;
+    background-color: rgba($deep_navy, 0.1);
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include big_web() {
+      &:hover {
+        background-color: rgba($deep_navy, 0.2);
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-inbox-follow-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
+    background-size: 16px 12px;
+    background-position: center;
+    background-color: rgba($deep_navy, 0.1);
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include big_web() {
+      &:hover {
+        background-color: rgba($deep_navy, 0.2);
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-inbox-unfollow-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+    background-size: 16px 14.5px;
+    background-position: center;
+    background-color: rgba($deep_navy, 0.1);;
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include big_web() {
+      &:hover {
+        background-color: rgba($deep_navy, 0.2);
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
     }
   }
 
@@ -167,7 +267,7 @@ div.more-menu {
     position: absolute;
     top: 26px;
     left: calc(100% - 108px);
-    width: 74px;
+    width: 94px;
     outline: none;
     z-index: 110;
     background-color: white;
@@ -237,6 +337,203 @@ div.more-menu {
 
         &:hover {
           background-color: transparent;
+        }
+      }
+    }
+  }
+
+  &.mobile-tray-menu.menu-expanded {
+    @include mobile() {
+      display: block;
+      position: fixed;
+      float: unset;
+      width: 100vw;
+      height: 100vh;
+      left: 0;
+      top: 0;
+      background-color: rgba($deep_navy, 0.2);
+      opacity: 1;
+      z-index: #{$navbar_zindex + 10};
+
+      & > * {
+        display: none;
+      }
+
+      ul.more-menu-list {
+        display: block;
+        float: unset;
+        bottom: 0;
+        top: unset;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background-color: white;
+        opacity: 1;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        padding: 32px 16px;
+
+        li {
+          padding: 12px 16px;
+          background-color: rgba($deep_navy, 0.1);
+          height: 48px;
+          margin: 0;
+          @include OC_Body_Book();
+          font-size: 17px;
+          line-height: 24px;
+          color: $deep_navy;
+          position: relative;
+          margin-top: 1px;
+
+          &.top-rounded {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+          }
+
+          &.bottom-rounded {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+          }
+
+          &.bottom-margin {
+            margin-bottom: 24px;
+          }
+
+          &.edit {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_edit.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 16px;
+            }
+          }
+
+          &.delete {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_delete.svg");
+              background-size: 14px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 17px;
+            }
+          }
+
+          &.share {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_share.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 16px;
+            }
+          }
+
+          &.follow {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 20px;
+              height: 15px;
+              background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+              background-size: 20px 15px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 17px;
+              left: 14px;
+            }
+          }
+
+          &.unfollow {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 20px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_more_unfollow.svg");
+              background-size: 20px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 14px;
+            }
+          }
+
+          &.create-follow-up {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+              background-size: 14px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 17px;
+            }
+          }
+
+          &.complete-follow-up {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
+              background-size: 14px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 17px;
+            }
+          }
+
+          &.dismiss {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_dismiss.svg");
+              background-size: 16px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 16px;
+            }
+          }
         }
       }
     }

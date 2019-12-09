@@ -17,6 +17,9 @@
 (def default-sort-type :recent-activity)
 (def other-sort-type :recently-posted)
 
+(def default-foc-layout :expanded)
+(def other-foc-layout :collapsed)
+
 ;; Data key paths
 
 (def checkout-result-key :checkout-success-result)
@@ -67,7 +70,10 @@
 
 (defn container-key
   ([org-slug posts-filter sort-type]
-  (container-key org-slug (keyword (str (name posts-filter) "-" (name (or sort-type default-sort-type))))))
+  (if (= posts-filter "inbox")
+    ;; Inbox has no sort filter
+    (container-key org-slug (keyword (str (name posts-filter))))
+    (container-key org-slug (keyword (str (name posts-filter) "-" (name (or sort-type default-sort-type)))))))
   ([org-slug posts-filter-with-sort]
   (vec (conj (containers-key org-slug) (keyword posts-filter-with-sort)))))
 
@@ -152,10 +158,10 @@
     (filter (comp filter-fn last) posts-data)))
 
 (defn- get-container-posts [base posts-data is-board? org-slug container-slug sort-type]
-  (let [container-key (if is-board?
+  (let [cnt-key (if is-board?
                         (board-data-key org-slug container-slug sort-type)
                         (container-key org-slug container-slug sort-type))
-        container-data (get-in base container-key)
+        container-data (get-in base cnt-key)
         items-list (:posts-list container-data)
         container-posts (map #(when (contains? posts-data %) (get posts-data %)) items-list)]
     (if (= container-slug utils/default-drafts-board-slug)
@@ -175,7 +181,7 @@
 ;; Container helpers
 
 (defn is-container? [container-slug]
-  (#{"all-posts" "must-see" "bookmarks"} container-slug))
+  (#{"inbox" "all-posts" "follow-ups"} container-slug))
 
 ;; Derived Data ================================================================
 
@@ -442,7 +448,8 @@
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
-   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
+   :foc-layout            [[:base] (fn [base] (:foc-layout base))]})
 
 ;; Action Loop =================================================================
 

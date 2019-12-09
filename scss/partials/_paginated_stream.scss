@@ -18,13 +18,17 @@ div.paginated-stream {
     }
 
     div.loading-updates {
-      width: 100%;
       text-align: center;
-      margin-bottom: 16px;
+      height: 60px;
+      padding: 24px 0 16px;
       font-size: 14px;
-      margin-top: 24px;
       @include OC_Body_Book();
       color: rgba($deep_navy, 0.5);
+
+      @include mobile() {
+        height: 44px;
+        padding: 16px 0 8px;
+      }
     }
 
     div.paginated-stream-cards-inner {

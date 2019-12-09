@@ -1,6 +1,7 @@
 (ns oc.web.stores.comment
   (:require [taoensso.timbre :as timbre]
             [defun.core :refer (defun)]
+            [cuerdas.core :as str]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
             [oc.web.lib.utils :as utils]
@@ -62,14 +63,25 @@
   (assoc db :add-comment-focus focus-uuid))
 
 (defmethod dispatcher/action :comment-add
-  [db [_ activity-data comment-data parent-comment-uuid comments-key]]
-  (let [comments-data (vec (get-in db comments-key))
+  [db [_ org-slug activity-data comment-data parent-comment-uuid comments-key]]
+  (let [activity-key (dispatcher/activity-key org-slug (:uuid activity-data))
+        comments-data (vec (get-in db comments-key))
         new-comment-data (parse-comment (dispatcher/org-data db)
                                         activity-data
                                         comment-data)
         all-comments (concat comments-data [new-comment-data])
         sorted-all-comments (comment-utils/sort-comments all-comments)]
-    (assoc-in db comments-key sorted-all-comments)))
+    (-> db
+     (assoc-in comments-key sorted-all-comments)
+     ;; Reset new comments count
+     (assoc-in (conj activity-key :new-comments-count) 0)
+     (update-in (conj activity-key :links) (fn [links]
+                                             (mapv (fn [link]
+                                              (if (= (:rel link) "follow")
+                                                (merge link {:href (str/replace (:href link) #"/follow$" "/unfollow")
+                                                             :rel "unfollow"})
+                                                link))
+                                               links))))))
 
 (defmethod dispatcher/action :comment-add/replace
   [db [_ activity-data comment-data comments-key new-comment-uuid]]
@@ -238,6 +250,7 @@
         last-not-own-comment (last (sort-by :created-at (filterv #(not= (:user-id %) (jwt/user-id)) new-comments-data)))]
     (-> db
       (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-at (:created-at last-not-own-comment)})
+      (update-in (dispatcher/activity-key org-slug activity-uuid) merge {:new-comments-count 0})
       (assoc-in comments-key new-comments-data))))
 
 (defmethod dispatcher/action :ws-interaction/comment-add
@@ -262,9 +275,15 @@
                         (concat [new-author] old-authors))
           with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)
           comment-from-current-user? (= (:user-id comment-data) (jwt/user-id))
+          old-comments-count (:new-comments-count activity-data)
+          new-comments-count (if comment-from-current-user?
+                               old-comments-count
+                               (inc old-comments-count))
           with-new-at (if comment-from-current-user?
                         with-authors
-                        (assoc with-authors :new-at created-at))
+                        (-> with-authors
+                          (assoc :new-at created-at)
+                          (assoc :new-comments-count new-comments-count)))
           all-old-comments-data (dispatcher/activity-comments-data activity-uuid)]
       (if all-old-comments-data
         (let [;; If we have the previous comments already loaded

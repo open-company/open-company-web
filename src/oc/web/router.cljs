@@ -161,12 +161,17 @@
   [org-slug]
   (str "last-sort-" (jwt/user-id) "-" (name org-slug)))
 
+(defn last-foc-layout-cookie
+  "Cookie to save the last FOC layout used"
+  [org-slug]
+  (str "last-foc-layout-" (jwt/user-id) "-" (name org-slug)))
+
 (defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
   (str "nux-" user-id))
 
-(defn first-ever-ap-land-cookie
+(defn first-ever-landing-cookie
   "Cookie used to land the user to a special URL only the first time."
   [user-id]
   (str "first-ever-ap-land-" user-id))

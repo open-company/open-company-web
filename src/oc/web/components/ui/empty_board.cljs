@@ -15,18 +15,18 @@
 (rum/defcs empty-board < rum/reactive
                          section-mixins/container-nav-in
   [s]
-  (let [is-all-posts? (= (router/current-board-slug) "all-posts")
+  (let [is-inbox? (= (router/current-board-slug) "inbox")
+        is-all-posts? (= (router/current-board-slug) "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
     [:div.empty-board.group
       [:div.empty-board-grey-box
-        [:div.empty-board-illustration
-          {:class (utils/class-set {:all-posts is-all-posts?
-                                    :drafts is-drafts-board?
-                                    :bookmarks is-bookmarks?
-                                    :section (and (not is-all-posts?)
-                                                  (not is-drafts-board?)
-                                                  (not is-bookmarks?))})}]
+        [:div.empty-board-illustration-container
+          [:div.empty-board-illustration
+            {:class (utils/class-set {:inbox is-inbox?
+                                      :all-posts is-all-posts?
+                                      :drafts is-drafts-board?
+                                      :bookmarks is-bookmarks?})}]]
         [:div.empty-board-title
           (cond
            is-all-posts? "All posts is a stream of what’s new in Carrot"

@@ -894,6 +894,38 @@
      callback)
     (handle-missing-link "toggle-bookmark" bookmark-link callback)))
 
+;; Inbox
+
+(defn inbox-dismiss [dismiss-link callback]
+  (if dismiss-link
+    (storage-http (method-for-link dismiss-link) (relative-href dismiss-link)
+     {:headers (headers-for-link dismiss-link)
+      :body (utils/as-of-now)}
+     callback)
+    (handle-missing-link "inbox-dismiss" dismiss-link callback)))
+
+(defn inbox-follow [follow-link callback]
+  (if follow-link
+    (storage-http (method-for-link follow-link) (relative-href follow-link)
+     {:headers (headers-for-link follow-link)}
+     callback)
+    (handle-missing-link "inbox-follow" follow-link callback)))
+
+(defn inbox-unfollow [unfollow-link callback]
+  (if unfollow-link
+    (storage-http (method-for-link unfollow-link) (relative-href unfollow-link)
+     {:headers (headers-for-link unfollow-link)}
+     callback)
+    (handle-missing-link "inbox-unfollow" unfollow-link callback)))
+
+(defn inbox-dismiss-all [dismiss-all-link callback]
+  (if dismiss-all-link
+    (storage-http (method-for-link dismiss-all-link) (relative-href dismiss-all-link)
+     {:headers (headers-for-link dismiss-all-link)
+      :body (utils/as-of-now)}
+     callback)
+    (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback)))
+
 ;; WRT
 
 (defn request-reads-data [item-id]

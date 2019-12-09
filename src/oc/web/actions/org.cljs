@@ -27,13 +27,13 @@
 ;; FIXME: these functions shouldn't be here but calling oc.web.actions.user from here is causing a circular dep
 
 (defn- get-ap-url [org-slug]
-  (let [first-ever-ap-name (router/first-ever-ap-land-cookie (jwt/user-id))
-        first-ever-ap (cook/get-cookie first-ever-ap-name)]
-    (if first-ever-ap
-      (oc-urls/all-posts org-slug)
+  (let [first-ever-landing-name (router/first-ever-landing-cookie (jwt/user-id))
+        first-ever-landing (cook/get-cookie first-ever-landing-name)]
+    (if first-ever-landing
+      (oc-urls/default-landing org-slug)
       (do
-        (cook/remove-cookie! first-ever-ap-name)
-        (oc-urls/first-ever-all-posts org-slug)))))
+        (cook/remove-cookie! first-ever-landing-name)
+        (oc-urls/first-ever-landing org-slug)))))
 
 (defn bot-auth [team-data user-data & [redirect-to]]
   (let [redirect (or redirect-to (router/get-token))
@@ -73,15 +73,18 @@
       (cook/remove-cookie! (router/last-org-cookie)))
     (routing-actions/maybe-404)))
 
-(def default-board "all-posts")
-
 (defn get-default-board [org-data]
-  (let [last-board-slug default-board]
+  (let [last-board-slug oc-urls/default-board-slug]
     ; Replace default-board with the following to go back to the last visited board
     ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
-    (if (and (= last-board-slug "all-posts")
-             (utils/link-for (:links org-data) "activity"))
+    (cond
+      (and (= last-board-slug "all-posts")
+           (utils/link-for (:links org-data) "activity"))
       {:slug "all-posts"}
+      (and (= last-board-slug "inbox")
+           (utils/link-for (:links org-data) "inbox"))
+      {:slug "inbox"}
+      :else
       (let [boards (:boards org-data)
             board (first (filter #(= (:slug %) last-board-slug) boards))]
         (or
@@ -104,11 +107,14 @@
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [boards (:boards org-data)
+        current-board-slug (router/current-board-slug)
+        inbox-link (utils/link-for (:links org-data) "inbox")
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
-        is-all-posts? (= (router/current-board-slug) "all-posts")
+        is-inbox? (= current-board-slug "inbox")
+        is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")]
     (when complete-refresh?
       ;; Load secure activity
@@ -117,8 +123,12 @@
         (do
           ;; Load the current activity
           (when (router/current-activity-id)
-            (cmail-actions/get-entry-with-uuid (router/current-board-slug) (router/current-activity-id)))
-          ;; Preload all posts data
+            (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
+          ;; Load inbox data
+          (when (and inbox-link
+                     is-inbox?)
+            (aa/inbox-get org-data))
+          ;; Load all posts data
           (when (and activity-link
                      is-all-posts?)
             (aa/activity-get org-data))
@@ -134,26 +144,30 @@
             (aa/recent-bookmarks-get org-data)))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
-      (or (= (router/current-board-slug) "all-posts")
-          (= (router/current-board-slug) "bookmarks"))
-      (when-not activity-link
+      (dis/is-container? current-board-slug)
+      (when (or (and is-inbox?
+                      (not inbox-link))
+                 (and is-all-posts?
+                      (not activity-link))
+                 (and is-bookmarks?
+                      (not bookmarks-link)))
         (check-org-404))
-
+      
       ; If there is a board slug let's load the board data
-      (router/current-board-slug)
-      (if-let [board-data (first (filter #(or (= (:slug %) (router/current-board-slug))
-                                              (= (:uuid %) (router/current-board-slug))) boards))]
+      current-board-slug
+      (if-let [board-data (first (filter #(or (= (:slug %) current-board-slug)
+                                              (= (:uuid %) current-board-slug)) boards))]
         ; Load the board data since there is a link to the board in the org data
         (do
           ;; Rewrite the URL in case it's using the board UUID instead of the slug
-          (when (= (:uuid board-data) (router/current-board-slug))
-            (router/rewrite-board-uuid-as-slug (router/current-board-slug) (:slug board-data)))
+          (when (= (:uuid board-data) current-board-slug)
+            (router/rewrite-board-uuid-as-slug current-board-slug (:slug board-data)))
           (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
             (sa/section-get :recently-posted board-link))
           (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
             (sa/section-get :recent-activity recent-board-link)))
         ; The board wasn't found, showing a 404 page
-        (if (= (router/current-board-slug) utils/default-drafts-board-slug)
+        (if (= current-board-slug utils/default-drafts-board-slug)
           (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
           (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
@@ -171,7 +185,7 @@
         (router/nav!
           (if board-to
             (oc-urls/board (:slug org-data) (:slug board-to))
-            (oc-urls/all-posts (:slug org-data)))))))
+            (oc-urls/default-landing (:slug org-data)))))))
 
   ;; Change service connection
   (when (or (jwt/jwt)
@@ -219,7 +233,7 @@
 
 (defn- org-created [org-data]
   (utils/after 0
-   #(router/nav! (oc-urls/all-posts (:slug org-data)))))
+   #(router/nav! (oc-urls/default-landing (:slug org-data)))))
 
 (defn team-patch-cb [org-data {:keys [success body status]}]
   (when success
@@ -379,7 +393,7 @@
                    (= (:container-id change-data) (:uuid org-data)))
           (let [current-board-data (dis/board-data)]
             (when (= (:item-id change-data) (:uuid current-board-data))
-              (router/nav! (oc-urls/all-posts (:slug org-data))))))))))
+              (router/nav! (oc-urls/default-landing (:slug org-data))))))))))
 
 (defn signup-invite-completed [org-data]
-  (router/nav! (oc-urls/all-posts (:slug org-data))))
+  (router/nav! (oc-urls/default-landing (:slug org-data))))

@@ -43,12 +43,7 @@
   (let [is-currently-shown (is-currently-shown? section)
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
     (when is-currently-shown
-
       (when user-is-part-of-the-team
-        ;; Tell the container service that we are seeing this board,
-        ;; and update change-data to reflect that we are seeing this board
-        (when-let [section-uuid (:uuid section)]
-          (utils/after 10 #(section-seen section-uuid)))
         ;; only watch the currently visible board.
         ; only for logged in users and if the board is currently shown
         (when (= (router/current-board-slug) (:slug section))
@@ -117,7 +112,7 @@
            (callback section-slug))
           (if (= section-slug (router/current-board-slug))
             (do
-              (router/nav! (oc-urls/all-posts org-slug))
+              (router/nav! (oc-urls/default-landing org-slug))
               (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
                 (api/get-org org-link
                   (fn [{:keys [status body success]}]

@@ -7,6 +7,10 @@
     height: 40px;
     margin: 2px 0;
     padding: 7px 16px;
+
+    &.all-posts {
+      margin-top: 16px;
+    }
   }
 
   .internal {
@@ -32,13 +36,14 @@
     line-height: 16px;
     text-align: center;
     color: $deep_navy;
-    width: 16px;
+    min-width: 16px;
     height: 16px;
     display: inline-block;
     background-color: rgba($light_navy, 0.1);
     border-radius: 4px;
     margin-top: 4px;
     margin-right: 16px;
+    padding: 0 4px;
 
     @include mobile() {
       float: left;
@@ -62,12 +67,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.bookmarks-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
-  div.all-posts-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: $deep_navy;
@@ -90,29 +95,6 @@
       color: $deep_navy;
     }
   }
-
-  div.bookmarks-label {
-    @include OC_Body_Book();
-    font-size: 14px;
-    color: $deep_navy;
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @include mobile() {
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    &:active, &:focus {
-      text-decoration: none;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
-    }
-  }
 }
 
 @mixin item-selected() {
@@ -124,7 +106,7 @@
     border-radius: 0;
   }
 
-  .internal, div.all-posts-label, div.bookmarks-label, div.drafts-label {
+  .internal, div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
     // color: $carrot_green;
     @include OC_Body_Book();
     font-size: 14px;
@@ -155,7 +137,7 @@
     color: $deep_navy;
   }
 
-  div.all-posts-label, div.bookmarks-label, div.drafts-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -168,12 +150,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.bookmarks-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
-  div.all-posts-label, div.bookmarks-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -215,7 +197,7 @@
     }
   }
 
-  div.all-posts-label, div.bookmarks-label, div.drafts-label {
+  div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
     color: $deep_navy;
     text-decoration: none;
 
@@ -341,7 +323,11 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts, a.bookmarks, a.drafts {
+  a.all-posts {
+    margin-top: 16px;
+  }
+
+  a.inbox, a.all-posts, a.bookmarks, a.drafts {
     display: block;
     background-color: transparent;
     border: none;
@@ -372,6 +358,10 @@ div.left-navigation-sidebar {
 
     &.item-selected {
 
+      div.inbox-icon {
+        background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
+      }
+
       div.all-posts-icon {
         background-image: cdnUrl("/img/ML/digest_icon_white.svg");
       }
@@ -385,7 +375,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label, div.bookmarks-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.bookmarks-label, div.drafts-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -395,6 +385,21 @@ div.left-navigation-sidebar {
       @include mobile() {
         padding: 0px;
         line-height: 18px;
+      }
+    }
+
+    div.inbox-icon {
+      background-image: cdnUrl("/img/ML/inbox_icon_grey.svg");
+      background-size: 14px 13px;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 16px;
+      height: 23px;
+      float: left;
+
+      @include mobile() {
+        opacity: 1;
+        height: 24px;
       }
     }
 
@@ -463,7 +468,6 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
-    margin-top: 16px;
 
     .left-navigation-sidebar-top-title {
       padding: 0 16px;
@@ -518,17 +522,10 @@ div.left-navigation-sidebar {
         }
 
         @include mobile() {
-          padding: 0;
-          margin: 0;
           cursor: default;
 
           span.sections {
-            color: rgba($deep_navy, 0.5);
             font-size: 16px;
-          }
-
-          &:before {
-            display: none;
           }
         }
       }
@@ -651,7 +648,7 @@ div.left-navigation-sidebar {
         }
 
         div.internal {
-          padding: 1px 0px 0px;
+          padding: 1px 0px 0px 28px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;

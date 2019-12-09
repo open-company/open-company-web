@@ -1,5 +1,8 @@
 (ns oc.web.components.stream-item
   (:require [rum.core :as rum]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [dommy.core :refer-macros (sel1)]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.images :as img]
@@ -8,16 +11,12 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.org :as org-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.mention :as mention-mixins]
-            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
@@ -25,14 +24,15 @@
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
-            [oc.web.components.ui.comments-summary :refer (comments-summary)]))
+            [oc.web.components.ui.comments-summary :refer (comments-summary)]
+            [cljsjs.hammer]))
 
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
-    [:div.stream-item-body.oc-mentions.oc-mentions-hover
+    [:div.stream-item-body.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
-    [:div.stream-item-body.no-abstract.oc-mentions.oc-mentions-hover
+    [:div.stream-item-body.no-abstract.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
@@ -44,6 +44,34 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- swipe-left-handler [s]
+  (reset! (::show-mobile-more-bt s) false)
+  (swap! (::show-mobile-dismiss-bt s) not))
+
+(defn- swipe-right-handler [s]
+  (reset! (::show-mobile-dismiss-bt s) false)
+  (swap! (::show-mobile-more-bt s) not))
+
+(defn- swipe-gesture-manager [swipe-handlers]
+  {:did-mount (fn [s]
+    (let [el (rum/dom-node s)
+          hr (js/Hammer. el)]
+      (when (= (router/current-board-slug) "inbox")
+        (.on hr "swipeleft" (partial (:swipe-left swipe-handlers) s)))
+      (.on hr "swiperight" (partial (:swipe-right swipe-handlers) s))
+      (reset! (::hammer-recognizer s) hr)
+      s))
+   :will-unmount (fn [s]
+    (when @(::hammer-recognizer s)
+      (.remove @(::hammer-recognizer s) "swipeleft")
+      (.remove @(::hammer-recognizer s) "swiperight")
+      (.destroy @(::hammer-recognizer s)))
+    s)})
+
+(defn- on-scroll [s]
+  (reset! (::show-mobile-dismiss-bt s) false)
+  (reset! (::show-mobile-more-bt s) false))
+
 (rum/defcs stream-item < rum/static
                          rum/reactive
                          ;; Derivatives
@@ -51,19 +79,35 @@
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
+                         (rum/local nil ::hammer-recognizer)
+                         (rum/local false ::force-show-menu)
+                         (rum/local false ::show-mobile-dismiss-bt)
+                         (rum/local false ::show-mobile-more-bt)
+                         (rum/local false ::on-scroll)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
+                         (swipe-gesture-manager {:swipe-left swipe-left-handler
+                                                 :swipe-right swipe-right-handler})
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
-                         (mention-mixins/oc-mentions-hover)
+                         ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
+                           (when ua/mobile?
+                             (reset! (::on-scroll s)
+                              (events/listen js/window EventType/SCROLL (partial on-scroll s))))
+                           s)
+                          :will-unmount (fn [s]
+                           (when @(::on-scroll s)
+                             (events/unlistenByKey @(::on-scroll s))
+                             (reset! (::on-scroll s) nil))
                            s)}
   [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
+        is-inbox? (= (router/current-board-slug) "inbox")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
@@ -89,7 +133,23 @@
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
-        ]
+        mobile-more-menu-el (sel1 [:div.mobile-more-menu])
+        show-mobile-menu? (and is-mobile?
+                               mobile-more-menu-el)
+        more-menu-comp #(more-menu
+                          {:entity-data activity-data
+                           :share-container-id dom-element-id
+                           :editable-boards editable-boards
+                           :external-share (not is-mobile?)
+                           :external-bookmark (not is-mobile?)
+                           :external-follow (not is-mobile?)
+                           :show-edit? true
+                           :show-delete? true
+                           :show-move? (not is-mobile?)
+                           :show-inbox? is-inbox?
+                           :will-close (fn [] (reset! (::force-show-menu s) false))
+                           :force-show-menu @(::force-show-menu s)
+                           :mobile-tray-menu show-mobile-menu?})]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -98,6 +158,8 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (:unread activity-data)
                                 :expandable is-published?
+                                :show-mobile-more-bt true
+                                :show-mobile-dismiss-bt true
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
        :data-last-read-at (:last-read-at read-data)
@@ -129,6 +191,18 @@
                          (nux-actions/dismiss-post-added-tooltip)
                          (nav-actions/open-post-modal activity-data false)))))
        :id dom-element-id}
+      [:button.mlb-reset.mobile-more-bt
+        {:class (when @(::show-mobile-more-bt s) "visible")
+         :on-click #(do
+                      (reset! (::show-mobile-more-bt s) false)
+                      (reset! (::force-show-menu s) true))}
+        [:span "More"]]
+      [:button.mlb-reset.mobile-dismiss-bt
+        {:class (when @(::show-mobile-dismiss-bt s) "visible")
+         :on-click #(do
+                      (activity-actions/inbox-dismiss (:uuid activity-data))
+                      (reset! (::show-mobile-dismiss-bt s) false))}
+        [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
           (user-avatar-image publisher)
@@ -163,17 +237,11 @@
             [:div.bookmark-tag-small.mobile-only]
             [:div.bookmark-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
-        (when (and is-published?
-                   (not is-mobile?))
-          (more-menu
-            {:entity-data activity-data
-             :share-container-id dom-element-id
-             :editable-boards editable-boards
-             :external-share (not is-mobile?)
-             :external-bookmark (not is-mobile?)
-             :show-edit? true
-             :show-delete? true
-             :show-move? (not is-mobile?)}))]
+        (when is-published?
+          (if (and is-mobile?
+                   mobile-more-menu-el)
+            (rum/portal (more-menu-comp) mobile-more-menu-el)
+            (more-menu-comp)))]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video

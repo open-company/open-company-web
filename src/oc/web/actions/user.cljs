@@ -126,7 +126,7 @@
     (cook/remove-cookie! router/login-redirect-cookie)
     (if redirect-url
       (router/redirect! redirect-url)
-      (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))
+      (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs)))))))
 
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point (:org @router/path)
@@ -253,7 +253,7 @@
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/sign-up-profile)))))))
+          (router/redirect! (if to-org (oc-urls/default-landing (:slug to-org)) oc-urls/sign-up-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
@@ -302,7 +302,7 @@
          (entry-point-get-finished success body
            (fn [orgs collection]
              (when (pos? (count orgs))
-               (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
+               (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))))
     :else ;; Valid signup let's collect user data
     (do
       (jwt-actions/update-jwt-cookie jwt)
@@ -395,7 +395,7 @@
                     (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
                       (fn[]
-                        (router/nav! (oc-urls/all-posts (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
+                        (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]

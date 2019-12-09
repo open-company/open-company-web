@@ -134,6 +134,11 @@
   (timbre/debug "Change event :item/status" body)
   (go (>! ch-pub { :topic :item/status :data body })))
 
+(defmethod event-handler :entry/inbox-action
+  [_ body]
+  (timbre/debug "Change event :entry/inbox-action" body)
+  (go (>! ch-pub { :topic :entry/inbox-action :data body })))
+
 ;; ----- Sente event handlers -----
 
 (defmulti -event-msg-handler
