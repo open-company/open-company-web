@@ -268,7 +268,7 @@
    :container-data      [[:base :org-slug :board-slug :sort-type]
                          (fn [base org-slug board-slug sort-type]
                            (when (and org-slug board-slug)
-                             (let [container-key (if (is-container? (router/current-board-slug))
+                             (let [container-key (if (is-container? board-slug)
                                                    (container-key org-slug board-slug sort-type)
                                                    (board-data-key org-slug board-slug sort-type))]
                                (get-in base container-key))))]
