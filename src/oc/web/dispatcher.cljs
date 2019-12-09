@@ -174,7 +174,7 @@
 
 ;; Container helpers
 
-(defn- is-container? [container-slug]
+(defn is-container? [container-slug]
   (#{"all-posts" "must-see" "bookmarks"} container-slug))
 
 ;; Derived Data ================================================================
