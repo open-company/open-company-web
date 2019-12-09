@@ -63,15 +63,14 @@
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
-             reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title]}]
+             reply-cb external-bookmark remove-bookmark-title]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
         is-mobile? (responsive/is-tablet-or-mobile?)
-        create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
-        complete-follow-up-link (when (and assigned-follow-up-data
-                                           (not (:completed? assigned-follow-up-data)))
-                                  (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))
+        add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
+        remove-bookmark-link (when (:bookmarked entity-data)
+                               (utils/link-for (:links entity-data) "bookmark" "DELETE"))
         should-show-more-bt (or edit-link
                                 delete-link
                                 can-comment-share?
@@ -85,8 +84,8 @@
               can-comment-share?
               can-react?
               can-reply?
-              create-follow-up-link
-              complete-follow-up-link)
+              add-bookmark-link
+              remove-bookmark-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded (or @(::move-activity s)
@@ -110,10 +109,10 @@
                           :dismiss-cb #(reset! (::move-activity s) false)})
           @(::showing-menu s)
           [:ul.more-menu-list
-            {:class (utils/class-set {:has-complete-follow-up (and is-mobile?
-                                                                   complete-follow-up-link)
-                                      :has-create-follow-up (and is-mobile?
-                                                                 create-follow-up-link)})}
+            {:class (utils/class-set {:has-remove-bookmark (and is-mobile?
+                                                                add-bookmark-link)
+                                      :has-add-bookmark (and is-mobile?
+                                                              remove-bookmark-link)})}
             (when (and edit-link
                        show-edit?)
               [:li.edit
@@ -153,26 +152,26 @@
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
             (when (and is-mobile?
-                       (not external-follow-up))
-              (if complete-follow-up-link
-                [:li.complete-follow-up
-                  {:ref "more-menu-complete-follow-up-bt"
+                       (not external-bookmark))
+              (if remove-bookmark-link
+                [:li.remove-bookmark
+                  {:ref "more-menu-remove-bookmark-bt"
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/complete-follow-up entity-data assigned-follow-up-data))}
-                  "Complete follow-up"]
-                (when create-follow-up-link
-                  [:li.create-follow-up
-                    {:ref "more-menu-create-follow-up-bt"
+                                (activity-actions/remove-bookmark entity-data remove-bookmark-link))}
+                  "Remove bookmark"]
+                (when add-bookmark-link
+                  [:li.add-bookmark
+                    {:ref "more-menu-add-bookmark-bt"
                      :data-container "body"
                      :on-click #(do
                                   (reset! (::showing-menu s) false)
                                   (when (fn? will-close)
                                     (will-close))
-                                  (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Follow-up later"])))
+                                  (activity-actions/add-bookmark entity-data add-bookmark-link))}
+                    "Bookmark"])))
             (when can-react?
               [:li.react
                 {:on-click #(do
@@ -205,6 +204,7 @@
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
+             :class (when external-bookmark "has-bookmark")
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
@@ -215,31 +215,31 @@
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
-        (when external-follow-up
-          (if complete-follow-up-link
-            [:button.mlb-reset.more-menu-complete-follow-up-bt
+        (when external-bookmark
+          (if remove-bookmark-link
+            [:button.mlb-reset.more-menu-remove-bookmark-bt
               {:type "button"
-               :ref "more-menu-complete-follow-up-bt"
+               :ref "more-menu-remove-bookmark-bt"
                :on-click #(do
                             (reset! (::showing-menu s) false)
                             (when (fn? will-close)
                               (will-close))
-                            (activity-actions/complete-follow-up entity-data assigned-follow-up-data))
+                            (activity-actions/remove-bookmark entity-data remove-bookmark-link))
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Complete follow-up"}
-              complete-follow-up-title]
-            (when create-follow-up-link
-              [:div.more-menu-create-follow-up-bt-container
-                [:button.mlb-reset.more-menu-create-follow-up-bt
+               :title "Remove bookmark"}
+              remove-bookmark-title]
+            (when add-bookmark-link
+              [:div.more-menu-add-bookmark-bt-container
+                [:button.mlb-reset.more-menu-add-bookmark-bt
                   {:type "button"
-                   :ref "more-menu-create-follow-up-bt"
+                   :ref "more-menu-add-bookmark-bt"
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/create-self-follow-up entity-data create-follow-up-link))
+                                (activity-actions/add-bookmark entity-data add-bookmark-link))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
-                   :title "Follow up later"}]])))])))
+                   :title "Bookmark"}]])))])))

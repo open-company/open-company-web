@@ -59,14 +59,20 @@ div.more-menu {
     background-size: 14px 14px;
     background-position: center;
     background-color: rgba($deep_navy, 0.1);
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-    border-right: 1px solid rgba($deep_navy, 0.15);
+    border-radius: 4px;
     padding: 0;
     background-repeat: no-repeat;
     margin-left: 16px;
     display: inline-block;
     opacity: 1;
+
+    &.has-bookmark {
+      border-right: 1px solid rgba($deep_navy, 0.15);
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 
     @include big_web() {
       &:hover {
@@ -84,10 +90,10 @@ div.more-menu {
     }
   }
 
-  button.more-menu-complete-follow-up-bt {
+  button.more-menu-remove-bookmark-bt {
     height: 32px;
     width: 32px;
-    background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
+    background-image: cdnUrl("/img/ML/mobile_remove_bookmark.svg");
     background-size: 10px 14px;
     background-position: center;
     background-color: rgba($deep_navy, 0.1);
@@ -117,15 +123,15 @@ div.more-menu {
     }
   }
 
-  div.more-menu-create-follow-up-bt-container {
+  div.more-menu-add-bookmark-bt-container {
     height: 32px;
     width: 32px;
     display: inline-block;
 
-    button.more-menu-create-follow-up-bt {
+    button.more-menu-add-bookmark-bt {
       height: 32px;
       width: 32px;
-      background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+      background-image: cdnUrl("/img/ML/mobile_add_bookmark.svg");
       background-size: 10px 14px;
       background-position: center;
       background-color: rgba($deep_navy, 0.1);
@@ -172,7 +178,7 @@ div.more-menu {
     padding: 8px 0;
     list-style-type: none;
 
-    &.has-create-follow-up {
+    &.has-add-bookmark {
       left: unset;
       right: 0;
       width: 144px;
@@ -184,7 +190,7 @@ div.more-menu {
       }
     }
 
-    &.has-complete-follow-up {
+    &.has-remove-bookmark {
       left: unset;
       right: 0;
       width: 162px;

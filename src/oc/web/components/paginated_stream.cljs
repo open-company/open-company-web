@@ -53,8 +53,8 @@
       (cond
         (= (router/current-board-slug) "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
-        (= (router/current-board-slug) "follow-ups")
-        (activity-actions/follow-ups-more @(::has-next s) :down)
+        (= (router/current-board-slug) "bookmarks")
+        (activity-actions/bookmarks-more @(::has-next s) :down)
         :else
         (section-actions/section-more @(::has-next s) :down)))
     ;; Save the last scrollTop value

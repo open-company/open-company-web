@@ -49,8 +49,8 @@
                        "Notifications"
                        (= (router/current-board-slug) "all-posts")
                        "All Posts"
-                       (= (router/current-board-slug) "follow-ups")
-                       "Follow-ups"
+                       (= (router/current-board-slug) "bookmarks")
+                       "Bookmarks"
                        :else
                        (:name board-data))]
     [:nav.oc-navbar.group

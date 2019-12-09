@@ -52,51 +52,51 @@
     (when (seq cleaned-ids)
       (api/request-reads-count cleaned-ids))))
 
-;; Follow-ups stream
+;; bookmarks stream
 
-(defn follow-ups-get-finish [sort-type {:keys [body success]}]
+(defn bookmarks-get-finish [sort-type {:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
           posts-data-key (dis/posts-data-key org)
-          follow-ups-data (when success (json->cljs body))
-          fixed-follow-ups (au/fix-container (:collection follow-ups-data) (dis/change-data) org-data)]
-      (when (= (router/current-board-slug) "follow-ups")
-        (cook/set-cookie! (router/last-board-cookie org) "follow-ups" (* 60 60 24 365))
-        (request-reads-count (keys (:fixed-items fixed-follow-ups)))
-        (watch-boards (:fixed-items fixed-follow-ups)))
-      (dis/dispatch! [:follow-ups-get/finish org sort-type fixed-follow-ups]))))
+          bookmarks-data (when success (json->cljs body))
+          fixed-bookmarks (au/fix-container (:collection bookmarks-data) (dis/change-data) org-data)]
+      (when (= (router/current-board-slug) "bookmarks")
+        (cook/set-cookie! (router/last-board-cookie org) "bookmarks" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-bookmarks)))
+        (watch-boards (:fixed-items fixed-bookmarks)))
+      (dis/dispatch! [:bookmarks-get/finish org sort-type fixed-bookmarks]))))
 
-(defn- follow-ups-real-get [follow-ups-link sort-type org-slug finish-cb]
-  (api/get-all-posts follow-ups-link
+(defn- bookmarks-real-get [bookmarks-link sort-type org-slug finish-cb]
+  (api/get-all-posts bookmarks-link
    (fn [resp]
-     (follow-ups-get-finish sort-type resp)
+     (bookmarks-get-finish sort-type resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
-(defn follow-ups-get [org-data & [finish-cb]]
-  (when-let [follow-ups-link (utils/link-for (:links org-data) "follow-ups")]
-    (follow-ups-real-get follow-ups-link :recently-posted (:slug org-data) finish-cb)))
+(defn bookmarks-get [org-data & [finish-cb]]
+  (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
+    (bookmarks-real-get bookmarks-link :recently-posted (:slug org-data) finish-cb)))
 
-(defn recent-follow-ups-get [org-data & [finish-cb]]
-  (when-let [recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups")]
-    (follow-ups-real-get recent-follow-ups-link :recent-activity (:slug org-data) finish-cb)))
+(defn recent-bookmarks-get [org-data & [finish-cb]]
+  (when-let [recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
+    (bookmarks-real-get recent-bookmarks-link :recent-activity (:slug org-data) finish-cb)))
 
-(defn follow-ups-sort-get [org-data & [finish-cb]]
+(defn bookmarks-sort-get [org-data & [finish-cb]]
   (let [sort-type (router/current-sort-type)
-        follow-ups-link-rel (if (= sort-type dis/default-sort-type) "follow-ups-activity" "follow-ups")
-        follow-ups-link (utils/link-for (:links org-data) follow-ups-link-rel)]
-    (when follow-ups-link
-      (follow-ups-real-get follow-ups-link sort-type (:slug org-data) finish-cb))))
+        bookmarks-link-rel (if (= sort-type dis/default-sort-type) "bookmarks-activity" "bookmarks")
+        bookmarks-link (utils/link-for (:links org-data) bookmarks-link-rel)]
+    (when bookmarks-link
+      (bookmarks-real-get bookmarks-link sort-type (:slug org-data) finish-cb))))
 
-(defn follow-ups-more-finish [direction sort-type {:keys [success body]}]
+(defn bookmarks-more-finish [direction sort-type {:keys [success body]}]
   (when success
     (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
-  (dis/dispatch! [:follow-ups-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
+  (dis/dispatch! [:bookmarks-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
 
-(defn follow-ups-more [more-link direction]
-  (api/load-more-items more-link direction (partial follow-ups-more-finish direction (router/current-sort-type)))
-  (dis/dispatch! [:follow-ups-more (router/current-org-slug) (router/current-sort-type)]))
+(defn bookmarks-more [more-link direction]
+  (api/load-more-items more-link direction (partial bookmarks-more-finish direction (router/current-sort-type)))
+  (dis/dispatch! [:bookmarks-more (router/current-org-slug) (router/current-sort-type)]))
 
 ;; All Posts
 
@@ -183,7 +183,7 @@
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
-        is-follow-ups (= (router/current-board-slug) "follow-ups")
+        is-bookmarks (= (router/current-board-slug) "bookmarks")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         sort-type (router/current-sort-type)
         board-rel (if (= sort-type :recent-activity) "activity" "self")]
@@ -193,8 +193,8 @@
       (if (= sort-type :recent-activity)
         (recent-activity-get org-data)
         (activity-get org-data))
-      is-follow-ups
-      (follow-ups-sort-get org-data)
+      is-bookmarks
+      (bookmarks-sort-get org-data)
       :else
       (sa/section-get sort-type (utils/link-for (:links board-data) board-rel "GET")))))
 
@@ -462,28 +462,7 @@
   (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
         drafts-link (utils/link-for (:links drafts-board) "self")]
     (when drafts-link
-      (sa/section-get dis/other-sort-type drafts-link)))
-  ;; Show follow-ups notifications if needed
-  (when (pos? (count (:follow-ups activity-data)))
-    (let [follow-ups (:follow-ups activity-data)
-          activity-follow-ups (cmail-actions/follow-ups-for-activity activity-data (dis/team-roster))
-          available-users-set (set (map #(-> % :assignee :user-id) activity-follow-ups))
-          actual-follow-ups-set (set (map #(-> % :assignee :user-id) follow-ups))
-          notification-message (if (or (= (count actual-follow-ups-set) (count available-users-set))
-                                       (and (= (dec (count actual-follow-ups-set)) (count available-users-set))
-                                            (not (utils/in? actual-follow-ups-set (jwt/user-id)))))
-                                (str "You requested a follow-up from everyone in " (:board-name activity-data) ".")
-                                (str "You've requested a follow-up from " (count actual-follow-ups-set)
-                                 (if (= (count actual-follow-ups-set) 1)
-                                  " person."
-                                  " people.")))]
-      (notification-actions/show-notification {:title "Follow-up requested"
-                                               :description notification-message
-                                               :primary-bt-dismiss true
-                                               :primary-bt-title "OK"
-                                               :primary-bt-inline true
-                                               :expire 3
-                                               :id :publish-follow-ups}))))
+      (sa/section-get dis/other-sort-type drafts-link))))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -694,14 +673,14 @@
         ;; Refresh the AP in case of items added or removed
         (when (or (= change-type :add)
                   (= change-type :delete))
-          ;; Refresh the count of drafts and follow-ups
+          ;; Refresh the count of drafts and bookmarks
           (api/get-org (utils/link-for (:links org-data) "self") refresh-org-data-cb)
           ;; Refresh specific containers/sections
           (cond
             (= (router/current-board-slug) "all-posts")
             (all-posts-get org-data dispatch-unread)
-            (= (router/current-board-slug) "follow-ups")
-            (follow-ups-get org-data dispatch-unread)
+            (= (router/current-board-slug) "bookmarks")
+            (bookmarks-get org-data dispatch-unread)
             :else
             (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
@@ -910,46 +889,25 @@
   (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
   (swap! router/path merge {:sort-type type}))
 
-(defn complete-follow-up [entry-data assigned-follow-up]
-  (let [self-follow-up-index (utils/index-of (:follow-ups entry-data) #(= (-> % :assignee :user-id) (jwt/user-id)))
-        with-completed-follow-up (update-in entry-data [:follow-ups self-follow-up-index] merge
-                                  {:completed? true
-                                   :completed-at (utils/as-of-now)})
-        complete-follow-up-link (utils/link-for (:links assigned-follow-up) "mark-complete" "POST")]
-    (dis/dispatch! [:follow-up-complete (router/current-org-slug) with-completed-follow-up])
-    (api/complete-follow-up complete-follow-up-link
-     (fn [{:keys [success status body]}]
-       (when success
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-       (notification-actions/show-notification {:title (if success "Follow-up completed" "An error occurred")
-                                               :description (when-not success "Please try again")
-                                               :dismiss true
-                                               :expire 3
-                                               :id (if success :self-follow-up-completed
-                                                    :self-follow-up-completed-error)})))))
+(defn add-bookmark [activity-data add-bookmark-link]
+  (when add-bookmark-link
+    (api/toggle-bookmark add-bookmark-link
+     (fn [{:keys [status success body]}]
+      (let [new-activity-data (if success (json->cljs body) {})]
+        (activity-get-finish status activity-data nil))))))
 
-(defn create-self-follow-up [entry-data create-follow-up-link]
-  (let [org-data (dis/org-data)]
-    (dis/dispatch! [:follow-up-create-self (:slug org-data) entry-data])
-    (when create-follow-up-link
-      (api/create-follow-ups create-follow-up-link {:self true}
-       (fn [{:keys [status body success]}]
-        (when success
-          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-        (notification-actions/show-notification {:title (if success "Follow-up created" "An error occurred")
-                                                 :description (when-not success "Please try again")
-                                                 :dismiss true
-                                                 :expire 3
-                                                 :id (if success :self-follow-up-created
-                                                      :self-follow-up-created-error)})
-        (follow-ups-get org-data)
-        (recent-follow-ups-get org-data))))))
+(defn remove-bookmark [activity-data remove-bookmark-link]
+  (when remove-bookmark-link
+    (api/toggle-bookmark remove-bookmark-link
+     (fn [{:keys [status success body]}]
+      (let [new-activity-data (if success (json->cljs body) {})]
+        (activity-get-finish status activity-data nil))))))
 
 (defn refresh-board-data [board-slug sort-type]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
-          board-data (if (#{"all-posts" "follow-ups"} board-slug)
+          board-data (if (#{"all-posts" "bookmarks"} board-slug)
                        (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
                        (dis/board-data board-slug))]
        (cond
@@ -957,8 +915,8 @@
         (= board-slug "all-posts")
         (all-posts-get org-data)
 
-        (= board-slug "follow-ups")
-        (follow-ups-sort-get org-data)
+        (= board-slug "bookmarks")
+        (bookmarks-sort-get org-data)
 
         :default
         (let [board-rel (if (= sort-type dis/other-sort-type)

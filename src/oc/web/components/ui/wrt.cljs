@@ -190,11 +190,7 @@
               (for [u sorted-filtered-users
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
                           is-self-user?       (= (:user-id current-user-data) (:user-id u))
-                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))
-                          follow-up           (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) (:follow-ups activity-data)))
-                          follow-up-string    (when (and follow-up
-                                                         (not (:completed? follow-up)))
-                                                ", marked for follow-up")]]
+                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                    :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
@@ -214,8 +210,7 @@
                         (if (= user-sending-notice :loading)
                           "Sending..."
                           user-sending-notice)
-                        "Unopened"))
-                    follow-up-string]
+                        "Unopened"))]
                   ;; Send reminder button
                   (when (and (not (:seen u))
                              (not is-self-user?)

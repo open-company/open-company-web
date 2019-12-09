@@ -65,19 +65,19 @@ div.stream-item {
     }
   }
 
-  &:not(.follow-up-item).must-see-item {
+  &:not(.bookmark-item).must-see-item {
 
     div.must-see-tag {
       display: inline-block;
     }
   }
 
-  &.follow-up-item, &.follow-up-item.must-see-item {
+  &.bookmark-item, &.bookmark-item.must-see-item {
     div.must-see-tag {
       display: none;
     }
 
-    div.follow-up-tag, div.follow-up-tag-small {
+    div.bookmark-tag-small, div.bookmark-tag-small {
       display: inline-block;
     }
   }
@@ -165,13 +165,13 @@ div.stream-item {
           }
         }
 
-        div.follow-up-tag-small {
+        div.bookmark-tag-small {
           float: right;
           margin-right: 0;
         }
       }
 
-      div.follow-up-tag, div.must-see-tag {
+      div.bookmark-tag, div.must-see-tag {
         margin-top: 2px;
       }
     }
@@ -197,20 +197,20 @@ div.stream-item {
   }
 
   @include must-see-tag();
+  
+  @include bookmark-tag();
 
-  @include follow-up-tag();
-
-  div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
+  div.must-see-tag, div.bookmark-tag {
     display: none;
   }
 
-  div.follow-up-tag, div.must-see-tag {
+  div.must-see-tag, div.bookmark-tag {
     @include mobile() {
       margin-top: 8px;
     }
   }
 
-  & > div.must-see-tag, & > div.follow-up-tag {
+  & > div.must-see-tag, & > div.bookmark-tag {
     margin-top: 16px;
   }
 

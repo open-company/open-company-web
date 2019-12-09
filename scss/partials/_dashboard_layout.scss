@@ -141,14 +141,14 @@ div.dashboard-layout {
           }
         }
 
-        button.follow-ups-tab {
-          background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
+        button.bookmarks-tab {
+          background-image: cdnUrl("/img/ML/bookmarks_tab_icon.svg");
           backgorund-size: 18px 20px;
 
-          @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
+          @include preload_image(cdnUrl("/img/ML/bookmarks_tab_icon_active.svg"));
 
           &.active {
-            background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
+            background-image: cdnUrl("/img/ML/bookmarks_tab_icon_active.svg");
           }
         }
 

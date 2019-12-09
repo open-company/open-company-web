@@ -19,13 +19,13 @@
         loading? (or ;; Board specified
                      (and (not (router/current-activity-id))
                           (not= (router/current-board-slug) "all-posts")
-                          (not= (router/current-board-slug) "follow-ups")
+                          (not= (router/current-board-slug) "bookmarks")
                           ;; But no board data yet
                           (not board-data))
                      ;; Another container
                      (and (not (router/current-activity-id))
                           (or (= (router/current-board-slug) "all-posts")
-                              (= (router/current-board-slug) "follow-ups"))
+                              (= (router/current-board-slug) "bookmarks"))
                           ;; But no all-posts data yet
                          (not container-data))
                      ;; Activity loaded

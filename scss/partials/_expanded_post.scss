@@ -147,7 +147,7 @@ div.expanded-post {
         }
       }
 
-      div.more-menu-create-follow-up-bt-container {
+      div.more-menu-add-bookmark-bt-container {
         float: right;
       }
 
@@ -227,9 +227,9 @@ div.expanded-post {
         }
       }
 
-      @include follow-up-tag();
+      @include bookmark-tag();
 
-      div.follow-up-tag {
+      div.bookmark-tag {
         display: inline-block;
 
         @include mobile() {

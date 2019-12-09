@@ -64,7 +64,7 @@
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
                                 (drv/drv :drafts-data)
-                                (drv/drv :follow-ups-data)
+                                (drv/drv :bookmarks-data)
                                 ;; Locals
                                 (rum/local false ::content-height)
                                 (rum/local nil ::window-height)
@@ -115,21 +115,21 @@
         sorted-boards (sort-boards boards)
         selected-slug (or (:back-to @router/path) (router/current-board-slug))
         is-all-posts (= selected-slug "all-posts")
-        is-follow-ups (= selected-slug "follow-ups")
+        is-bookmarks (= selected-slug "bookmarks")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "activity"))
-        show-follow-ups (and user-is-part-of-the-team?
-                             (utils/link-for (:links org-data) "follow-ups"))
+        show-bookmarks (and user-is-part-of-the-team?
+                            (utils/link-for (:links org-data) "bookmarks"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
         drafts-link (utils/link-for (:links drafts-board) "self")
         org-slug (router/current-org-slug)
         is-mobile? (responsive/is-mobile-size?)
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
-        follow-ups-data (drv/react s :follow-ups-data)
+        bookmarks-data (drv/react s :bookmarks-data)
         drafts-data (drv/react s :drafts-data)]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
@@ -154,16 +154,16 @@
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
               "All posts"]])
-        (when show-follow-ups
-          [:a.follow-ups.hover-item.group
-            {:class (utils/class-set {:item-selected is-follow-ups})
-             :href (oc-urls/follow-ups)
-             :on-click #(nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups))}
-            [:div.follow-ups-icon]
-            [:div.follow-ups-label
-              "Follow-ups"]
-            (when (pos? (:follow-ups-count org-data))
-              [:span.count (:follow-ups-count org-data)])])
+        (when show-bookmarks
+          [:a.bookmarks.hover-item.group
+            {:class (utils/class-set {:item-selected is-bookmarks})
+             :href (oc-urls/bookmarks)
+             :on-click #(nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks))}
+            [:div.bookmarks-icon]
+            [:div.bookmarks-label
+              "Bookmarks"]
+            (when (pos? (:bookmarks-count org-data))
+              [:span.count (:bookmarks-count org-data)])])
         (when drafts-link
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]

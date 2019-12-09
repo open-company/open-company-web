@@ -73,28 +73,28 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin follow-up-tag() {
-  div.follow-up-tag {
-    @include image-2x("/img/ML/follow_up_tag");
-    background-size: 77px 10px;
+@mixin bookmark-tag() {
+  div.bookmark-tag {
+    @include image-2x("/img/ML/bookmark_tag");
+    background-size: 89px 10px;
     background-position: center;
     background-repeat: no-repeat;
     background-color: rgba($sea_blue, 0.2);
     height: 18px;
-    width: 86px;
+    width: 100px;
     margin-right: 8px;
     position: relative;
     vertical-align: top;
     border-radius: 4px;
 
     &.white-bg {
-      @include image-2x("/img/ML/follow_up_tag_white");
-      background-color: rgba(white, 0.2);
+      // @include image-2x("/img/ML/bookmark_tag_white");
+      background-color: white;
     }
   }
 
 
-  div.follow-up-tag-small {
+  div.bookmark-tag-small {
     height: 18px;
     width: 18px;
     margin-right: 8px;
@@ -102,22 +102,14 @@ $h2_top_margin: 24;
     vertical-align: top;
     border-radius: 4px;
     background-color: rgba($sea_blue, 0.2);
+    @include image-2x("/img/ML/bookmark_icon");
+    background-size: 6px 8px;
+    background-repeat: no-repeat;
+    background-position: center;
 
     &.white-bg {
-      @include image-2x("/img/ML/follow_up_tag_white");
+      // @include image-2x("/img/ML/bookmark_icon_white");
       background-color: rgba(white, 0.2);
-    }
-
-    &::before {
-      @include image-2x("/img/ML/follow_up_tag");
-      background-size: 86px 12px;
-      background-position: 5px 3px;
-      background-repeat: no-repeat;
-      position: absolute;
-      content: '';
-      z-index: 1;
-      width: 15px;
-      height: 15px;
     }
   }
 }

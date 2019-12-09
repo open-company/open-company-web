@@ -120,7 +120,6 @@
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update (drv/react s :add-comment-force-update)
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
@@ -141,12 +140,11 @@
                    :share-container-id dom-element-id
                    :editable-boards editable-boards
                    :external-share (not is-mobile?)
-                   :external-follow-up true
+                   :external-bookmark true
                    :show-edit? true
                    :show-delete? true
                    :show-move? (not is-mobile?)
-                   :tooltip-position "bottom"
-                   :assigned-follow-up-data assigned-follow-up-data})
+                   :tooltip-position "bottom"})
        (when user-is-part-of-the-team
          [:div.expanded-post-wrt-container
            (wrt-count {:activity-data activity-data
@@ -183,15 +181,14 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :data-title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]]
-          (when (or (and assigned-follow-up-data
-                         (not (:completed? assigned-follow-up-data)))
-                    (:must-see activity-data))
+          (when (or (:must-see activity-data)
+                    (:bookmarked activity-data))
             [:div.expanded-post-author-dot])
-          (if (and assigned-follow-up-data
-                   (not (:completed? assigned-follow-up-data)))
-            [:div.follow-up-tag]
-            (when (:must-see activity-data)
-              [:div.must-see-tag]))]]
+          (cond
+            (:bookmarked activity-data)
+            [:div.bookmark-tag]
+            (:must-see activity-data)
+            [:div.must-see-tag])]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
           {:class utils/hide-class

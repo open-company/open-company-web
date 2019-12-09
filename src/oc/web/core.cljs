@@ -541,11 +541,19 @@
 
     (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
       (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
-      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+      (router/redirect! (urls/bookmarks)))
 
     (defroute follow-ups-slash-route (str (urls/follow-ups ":org") "/") {:as params}
       (timbre/info "Routing follow-ups-slash-route" (str (urls/follow-ups ":org") "/"))
-      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+      (router/redirect! (urls/bookmarks)))
+
+    (defroute bookmarks-route (urls/bookmarks ":org") {:as params}
+      (timbre/info "Routing bookmarks-route" (urls/bookmarks ":org"))
+      (org-handler "bookmarks" target org-dashboard (assoc params :board "bookmarks")))
+
+    (defroute bookmarks-slash-route (str (urls/bookmarks ":org") "/") {:as params}
+      (timbre/info "Routing bookmarks-slash-route" (str (urls/bookmarks ":org") "/"))
+      (org-handler "bookmarks" target org-dashboard (assoc params :board "bookmarks")))
 
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))

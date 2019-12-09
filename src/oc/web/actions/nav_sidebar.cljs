@@ -32,7 +32,7 @@
 ;; :wrt-{uuid}
 
 (defn- container-data [board-slug]
-  (if (#{"all-posts" "follow-ups"} board-slug)
+  (if (#{"all-posts" "bookmarks"} board-slug)
     (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
     (dis/board-data board-slug)))
 
@@ -48,10 +48,10 @@
           (activity-actions/activity-get org-data)
           (activity-actions/recent-activity-get org-data))
 
-        (= board-slug "follow-ups")
+        (= board-slug "bookmarks")
         (do
-          (activity-actions/follow-ups-get org-data)
-          (activity-actions/recent-follow-ups-get org-data))
+          (activity-actions/bookmarks-get org-data)
+          (activity-actions/recent-bookmarks-get org-data))
 
         :default
         (let [fixed-board-data (or board-data
@@ -88,7 +88,7 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
+         (router/set-route! [org-slug board-slug (if (#{"all-posts" "bookmarks"} board-slug) board-slug "dashboard")]
           {:org org-slug
            :board board-slug
            :sort-type sort-type
@@ -251,15 +251,6 @@
 
 (defn hide-wrt []
   (pop-panel))
-
-;; Follow-ups users picker
-
-(defn show-follow-ups-picker [activity-uuid callback]
-  (dis/dispatch! [:input [:follow-ups-picker-callback] (fn [users-list]
-   (when (fn? callback)
-     (callback users-list))
-   (dis/dispatch! [:input [:follow-ups-picker-callback] nil]))])
-  (push-panel (keyword (str "follow-ups-picker-" (or activity-uuid "")))))
 
 ;; Integrations
 

@@ -175,7 +175,7 @@
 ;; Container helpers
 
 (defn- is-container? [container-slug]
-  (#{"all-posts" "must-see" "follow-ups"} container-slug))
+  (#{"all-posts" "must-see" "bookmarks"} container-slug))
 
 ;; Derived Data ================================================================
 
@@ -236,9 +236,9 @@
    :drafts-data         [[:base :org-slug]
                           (fn [base org-slug]
                             (get-in base (board-data-key org-slug :drafts other-sort-type)))]
-   :follow-ups-data     [[:base :org-slug]
+   :bookmarks-data     [[:base :org-slug]
                           (fn [base org-slug]
-                            (get-in base (container-key org-slug :follow-ups default-sort-type)))]
+                            (get-in base (container-key org-slug :bookmarks default-sort-type)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -251,15 +251,6 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :follow-ups-picker-callback [[:base] (fn [base] (:follow-ups-picker-callback base))]
-   :follow-ups-activity-data [[:base :org-slug :current-panel]
-                              (fn [base org-slug current-panel]
-                                (when current-panel
-                                  (let [panel-name (name current-panel)
-                                        activity-uuid (subs panel-name (count "follow-ups-picker-") (count panel-name))]
-                                    (if (seq activity-uuid)
-                                      (get-in base (activity-key org-slug activity-uuid))
-                                      (get base :cmail-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
                           (fn [base team-data current-user-data team-roster invite-users]

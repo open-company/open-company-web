@@ -106,10 +106,10 @@
   (let [boards (:boards org-data)
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
-        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
-        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
+        bookmarks-link (utils/link-for (:links org-data) "bookmarks")
+        recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
         is-all-posts? (= (router/current-board-slug) "all-posts")
-        is-follow-ups? (= (router/current-board-slug) "follow-ups")]
+        is-bookmarks? (= (router/current-board-slug) "bookmarks")]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
@@ -125,17 +125,17 @@
           (when (and recent-activity-link
                      is-all-posts?)
             (aa/recent-activity-get org-data))
-          ;; Preload follow-ups data
-          (when (and follow-ups-link
-                     is-follow-ups?)
-            (aa/follow-ups-get org-data))
-          (when (and recent-follow-ups-link
-                     is-follow-ups?)
-            (aa/recent-follow-ups-get org-data)))))
+          ;; Preload bookmarks data
+          (when (and bookmarks-link
+                     is-bookmarks?)
+            (aa/bookmarks-get org-data))
+          (when (and recent-bookmarks-link
+                     is-bookmarks?)
+            (aa/recent-bookmarks-get org-data)))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (or (= (router/current-board-slug) "all-posts")
-          (= (router/current-board-slug) "follow-ups"))
+          (= (router/current-board-slug) "bookmarks"))
       (when-not activity-link
         (check-org-404))
 

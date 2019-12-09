@@ -35,36 +35,34 @@
        (assoc-in recent-ap-key next-recent-ap-data)))
     db))
 
-(defn add-remove-item-from-follow-ups
-  "Given an activity map adds or remove it from the follow-ups list of posts depending on the activity
-   status and if the user assigned follow-up is not completed."
+(defn add-remove-item-from-bookmarks
+  "Given an activity map adds or remove it from the bookmarks list of posts."
   [db org-slug activity-data]
   (if (:uuid activity-data)
     (let [;; Add/remove item from MS
-          user-follow-up (first (filterv #(= (-> % :assignee :user-id) (j/user-id)) (:follow-ups activity-data)))
-          is-follow-ups? (and (not= (:status activity-data) "draft")
-                              (not (:completed? user-follow-up)))
-          fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
-          recent-fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-          old-fu-data (get-in db fu-key)
-          old-recent-fu-data (get-in db recent-fu-key)
-          old-fu-data-posts (get old-fu-data :posts-list)
-          old-recent-fu-data-posts (get old-recent-fu-data :posts-list)
-          fu-without-uuid (utils/vec-dissoc old-fu-data-posts (:uuid activity-data))
-          recent-fu-without-uuid (utils/vec-dissoc old-recent-fu-data-posts (:uuid activity-data))
-          new-fu-data-posts (vec
-                             (if is-follow-ups?
-                               (conj fu-without-uuid (:uuid activity-data))
-                               fu-without-uuid))
-          new-recent-fu-data-posts (vec
-                                    (if is-follow-ups?
-                                      (conj recent-fu-without-uuid (:uuid activity-data))
-                                      recent-fu-without-uuid))
-          next-fu-data (assoc old-fu-data :posts-list new-fu-data-posts)
-          next-recent-fu-data (assoc old-recent-fu-data :posts-list new-recent-fu-data-posts)]
+          is-bookmark? (and (not= (:status activity-data) "draft")
+                            (:bookmarked activity-data))
+          bm-key (dispatcher/container-key org-slug :bookmarks dispatcher/other-sort-type)
+          recent-bm-key (dispatcher/container-key org-slug :bookmarks dispatcher/default-sort-type)
+          old-bm-data (get-in db bm-key)
+          old-recent-bm-data (get-in db recent-bm-key)
+          old-bm-data-posts (get old-bm-data :posts-list)
+          old-recent-bm-data-posts (get old-recent-bm-data :posts-list)
+          bm-without-uuid (utils/vec-dissoc old-bm-data-posts (:uuid activity-data))
+          recent-bm-without-uuid (utils/vec-dissoc old-recent-bm-data-posts (:uuid activity-data))
+          new-bm-data-posts (vec
+                             (if is-bookmark?
+                               (conj bm-without-uuid (:uuid activity-data))
+                               bm-without-uuid))
+          new-recent-bm-data-posts (vec
+                                    (if is-bookmark?
+                                      (conj recent-bm-without-uuid (:uuid activity-data))
+                                      recent-bm-without-uuid))
+          next-bm-data (assoc old-bm-data :posts-list new-bm-data-posts)
+          next-recent-bm-data (assoc old-recent-bm-data :posts-list new-recent-bm-data-posts)]
       (-> db
-        (assoc-in fu-key next-fu-data)
-        (assoc-in recent-fu-key next-recent-fu-data)))
+        (assoc-in bm-key next-bm-data)
+        (assoc-in recent-bm-key next-recent-bm-data)))
     db))
 
 (defmethod dispatcher/action :entry-edit/dismiss
@@ -175,7 +173,7 @@
     (-> db
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
       (add-remove-item-from-all-posts org-slug fixed-activity-data)
-      (add-remove-item-from-follow-ups org-slug fixed-activity-data)
+      (add-remove-item-from-bookmarks org-slug fixed-activity-data)
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
@@ -278,28 +276,19 @@
                              (dispatcher/change-data db))]
     (assoc-in db activity-key fixed-activity-data)))
 
-(defmethod dispatcher/action :follow-up-toggle
-  [db [_ org-slug activity-data follow-ups]]
+(defmethod dispatcher/action :bookmark-toggle
+  [db [_ org-slug activity-data bookmark?]]
   (let [should-update-post? (:uuid activity-data)
         activity-key (when should-update-post?
                       (dispatcher/activity-key org-slug (:uuid activity-data)))
         post-activity-data (when should-update-post?
                              (get-in db activity-key))
         next-activity-data (when should-update-post?
-                             (if (seq follow-ups)
-                               (assoc post-activity-data :follow-ups follow-ups)
-                               (dissoc post-activity-data :follow-ups)))
+                             (assoc post-activity-data :bookmarked bookmark?))
         with-updated-activity-data (if should-update-post?
                                     (assoc-in db activity-key next-activity-data)
-                                    db)
-        cmail-data (get db :cmail-data)
-        next-cmail-data* (assoc cmail-data :has-changes true)
-        next-cmail-data (if (seq follow-ups)
-                           (assoc next-cmail-data* :follow-ups follow-ups)
-                           (dissoc next-cmail-data* :follow-ups))]
-      (-> with-updated-activity-data
-        (assoc :cmail-data next-cmail-data)
-        (add-remove-item-from-follow-ups org-slug next-activity-data))))
+                                    db)]
+      (add-remove-item-from-bookmarks with-updated-activity-data org-slug next-activity-data)))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
   [db [_ org-slug sort-type fixed-board-data]]
@@ -351,31 +340,31 @@
         (assoc-in posts-data-key new-items-map)))
     db))
 
-;; Follow-ups
+;; Bookmarks
 
-(defmethod dispatcher/action :follow-ups-get/finish
+(defmethod dispatcher/action :bookmarks-get/finish
   [db [_ org-slug sort-type fixed-posts]]
   (let [posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-posts))
-        container-key (dispatcher/container-key org-slug :follow-ups sort-type)
+        container-key (dispatcher/container-key org-slug :bookmarks sort-type)
         with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))]
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
       (assoc-in posts-key merged-items))))
 
-(defmethod dispatcher/action :follow-ups-more
+(defmethod dispatcher/action :bookmarks-more
   [db [_ org-slug sort-type]]
-  (let [container-key (dispatcher/container-key org-slug :follow-ups sort-type)
+  (let [container-key (dispatcher/container-key org-slug :bookmarks sort-type)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-posts-data)))
 
-(defmethod dispatcher/action :follow-ups-more/finish
+(defmethod dispatcher/action :bookmarks-more/finish
   [db [_ org direction sort-type posts-data]]
   (if posts-data
     (let [org-data (dispatcher/org-data db org)
-          container-key (dispatcher/container-key org :follow-ups sort-type)
+          container-key (dispatcher/container-key org :bookmarks sort-type)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
@@ -391,23 +380,23 @@
         (assoc-in posts-data-key new-items-map)))
     db))
 
-(defmethod dispatcher/action :follow-up-complete
+(defmethod dispatcher/action :remove-bookmark
   [db [_ org-slug entry-data]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid entry-data))
-        follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
-        follow-up-data (get-in db follow-up-key)
-        recent-follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-        recent-follow-up-data (get-in db recent-follow-up-key)
+        bookmarks-key (dispatcher/container-key org-slug :bookmarks dispatcher/other-sort-type)
+        bookmarks-data (get-in db bookmarks-key)
+        recent-bookmarks-key (dispatcher/container-key org-slug :bookmarks dispatcher/default-sort-type)
+        recent-bookmarks-data (get-in db recent-bookmarks-key)
         org-key (dispatcher/org-data-key org-slug)]
     (-> db
-      (update-in (conj org-key :follow-ups-count) dec)
+      (update-in (conj org-key :bookmarks-count) dec)
       (assoc-in activity-key entry-data)
-      (add-remove-item-from-follow-ups org-slug entry-data))))
+      (add-remove-item-from-bookmarks org-slug entry-data))))
 
-(defmethod dispatcher/action :follow-up-create-self
+(defmethod dispatcher/action :add-bookmark
   [db [_ org-slug activity-data]]
   (let [org-key (dispatcher/org-data-key org-slug)]
-    (update-in db (conj org-key :follow-ups-count) inc)))
+    (update-in db (conj org-key :bookmarks-count) inc)))
 
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]

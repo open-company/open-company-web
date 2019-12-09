@@ -16,20 +16,20 @@
                          section-mixins/container-nav-in
   [s]
   (let [is-all-posts? (= (router/current-board-slug) "all-posts")
-        is-follow-ups? (= (router/current-board-slug) "follow-ups")
+        is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts-board? (= (router/current-board-slug) utils/default-drafts-board-slug)]
     [:div.empty-board.group
       [:div.empty-board-grey-box
         [:div.empty-board-illustration
           {:class (utils/class-set {:all-posts is-all-posts?
                                     :drafts is-drafts-board?
-                                    :follow-ups is-follow-ups?
+                                    :bookmarks is-bookmarks?
                                     :section (and (not is-all-posts?)
                                                   (not is-drafts-board?)
-                                                  (not is-follow-ups?))})}]
+                                                  (not is-bookmarks?))})}]
         [:div.empty-board-title
           (cond
            is-all-posts? "All posts is a stream of what’s new in Carrot."
            is-drafts-board? "Nothing in drafts"
-           is-follow-ups? "You’re all caught up!"
+           is-bookmarks? "You’re all caught up!"
            :else "This section is empty")]]]))

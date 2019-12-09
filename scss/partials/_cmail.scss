@@ -256,16 +256,6 @@ div.cmail-outer {
         border: none;
         box-shadow: none;
         background-color: transparent;
-
-        &.has-follow-ups {
-          padding: 96px 0 0;
-        }
-
-        div.follow-ups-header {
-          position: fixed;
-          top: 56px;
-          z-index: 2;
-        }
       }
 
       div.cmail-content {
@@ -347,12 +337,6 @@ div.cmail-outer {
     border-radius: 4px;
     background-color: white;
 
-    &.has-follow-ups {
-      @include mobile() {
-        padding-top: #{$mobile_navbar_height + $mobile_navbar_height}px;
-      }
-    }
-
     @include mobile() {
       width: 100vw;
       height: auto;
@@ -408,26 +392,6 @@ div.cmail-outer {
             background-color: rgba($deep_navy, 0.1);
             border-radius: 4px;
           }
-
-          button.follow-up-button {
-            width: 32px;
-            height: 32px;
-            background-color: rgba($deep_navy, 0.1);
-            border-radius: 4px;
-            background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-            background-size: 12px 14px;
-            background-position: center;
-            background-repeat: no-repeat;
-            padding: 0;
-            float: left;
-            margin-left: 8px;
-            opacity: 1;
-
-            &.disabled {
-              cursor: not-allowed;
-            }
-          }
-
         }
       }
     }
@@ -444,28 +408,6 @@ div.cmail-outer {
 
       @include mobile() {
         display: none;
-      }
-
-      &.has-follow-ups-button {
-        div.cmail-header-right-buttons {
-          button.follow-up-button {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-          }
-
-          button.attachment-button {
-            border-radius: 0;
-            border-left: 1px solid rgba($deep_navy, 0.2);
-            border-right: 1px solid rgba($deep_navy, 0.2);
-          }
-
-          div.emoji-picker {
-            button.emoji-button {
-              border-top-right-radius: 0;
-              border-bottom-right-radius: 0;
-            }
-          }
-        }
       }
 
       div.cmail-header-center {
@@ -584,32 +526,6 @@ div.cmail-outer {
           display: none;
         }
 
-        button.follow-up-button {
-          width: 32px;
-          height: 32px;
-          background-color: rgba($deep_navy, 0.1);
-          border-radius: 4px;
-          background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-          background-size: 12px 14px;
-          background-position: center;
-          background-repeat: no-repeat;
-          padding: 0;
-          float: left;
-          opacity: 1;
-
-          &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
-          }
-
-          &.disabled {
-            cursor: not-allowed;
-          }
-
-          @include mobile() {
-            display: none;
-          }
-        }
-
         button.attachment-button {
           @include OC_Body_Book();
           font-size: 14px;
@@ -706,143 +622,6 @@ div.cmail-outer {
       float: right;
     }
 
-    &:not(.fullscreen) > {
-      div.follow-ups-header {
-        margin-top: -1px;
-        width: calc(100% - 32px);
-        margin: 0 16px;
-        height: 32px;
-        background-color: $sea_blue;
-        padding: 7px 16px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        position: relative;
-        border-radius: 4px;
-
-        @include mobile() {
-          margin-top: 0;
-          height: unset;
-          min-height: 32px;
-          position: fixed;
-          top: #{$mobile_navbar_height}px;
-          left: 0;
-          width: 100vw;
-          margin: 0;
-          border-radius: 0;
-          padding: 7px 32px;
-        }
-      }
-    }
-
-    div.follow-ups-header {
-      width: 100%;
-      height: 40px;
-      background-color: $sea_blue;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-
-      @include follow-up-tag();
-
-      div.follow-up-icon {
-        width: 10px;
-        height: 12px;
-        background-image: cdnUrl("/img/ML/follow_up_icon_white.svg");
-        background-size: 10px 12px;
-        background-repeat: no-repeat;
-        background-position: center;
-        margin-right: 8px;
-        margin-top: 1px;
-      }
-
-      @include mobile() {
-        text-align: center;
-        width: 100%;
-        height: #{$mobile_navbar_height}px;
-        padding: 8px 48px;
-        position: fixed;
-        top: #{$mobile_navbar_height}px;
-        z-index: 2;
-
-        div.follow-up-tag {
-          display: none;
-        }
-      }
-
-      div.follow-ups-label {
-        color: white;
-        @include OC_Body_Book();
-        font-size: 14px;
-
-        span.follow-ups-label-count {
-          color: white;
-          text-decoration: underline;
-
-        }
-      }
-
-      button.remove-follow-up-button {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: auto;
-        height: 24px;
-        padding: 0;
-        @include OC_Body_Book();
-        font-size: 14px;
-        line-height: 24px;
-        color: white;
-        opacity: 0.5;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-
-      div.mobile-follow-ups-remove-menu-container {
-        display: none;
-
-        @include mobile() {
-          display: block;
-          position: absolute;
-          right: 4px;
-          top: 4px;
-
-          button.mobile-follow-ups-remove-menu {
-            width: 24px;
-            height: 24px;
-            background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_white.svg");
-            background-size: 18px 4px;
-            background-position: center;
-            padding: 0;
-            background-repeat: no-repeat;
-          }
-
-          button.mobile-follow-ups-remove {
-            background-color: white;
-            border-radius: 4px;
-            padding: 16px;
-            @include OC_Body_Book();
-            font-size: 14px;
-            line-height: 18px;
-            color: $light_navy;
-            position: absolute;
-            right: 0;
-            top: 20px;
-            border: 1px solid $mid_light_grey;
-            box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
-            z-index: 2;
-          }
-        }
-      }
-    }
-
     div.cmail-content-outer {
       padding: 24px;
       background-color: white;
@@ -855,18 +634,6 @@ div.cmail-outer {
         border: none;
         box-shadow: none;
         border-radius: 0;
-      }
-
-      &.has-follow-ups {
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-
-        @include mobile() {
-          border-radius: 0;
-          padding-top: 0;
-        }
       }
     }
 
@@ -1268,42 +1035,6 @@ div.cmail-outer {
       div.cmail-footer-right {
         float: right;
         position: relative;
-
-        &.has-follow-ups-button {
-          button.attachment-button {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-right: 1px solid rgba($deep_navy, 0.2);
-          }
-        }
-
-        button.follow-up-button {
-          width: 32px;
-          height: 32px;
-          background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-          background-size: 12px 14px;
-          background-position: center;
-          background-repeat: no-repeat;
-          background-color: rgba($deep_navy, 0.1);
-          opacity: 1;
-          padding: 0;
-          float: right;
-          border-top-right-radius: 4px;
-          border-bottom-right-radius: 4px;
-
-          &:not(.disabled):hover {
-            opacity: 1;
-            background-color: rgba($deep_navy, 0.2);
-          }
-
-          &.disabled {
-            cursor: not-allowed;
-          }
-
-          @include mobile() {
-            display: none;
-          }
-        }
 
         button.attachment-button {
           @include OC_Body_Book();
