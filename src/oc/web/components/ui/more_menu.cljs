@@ -176,7 +176,7 @@
                 "Share"])
             (if inbox-follow-link
               [:li.follow
-                {:class (when (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
+                {:class (when-not (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
                  :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
@@ -185,7 +185,7 @@
                 "Follow"]
               (when inbox-unfollow-link
                 [:li.unfollow
-                  {:class (when (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
+                  {:class (when-not (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
