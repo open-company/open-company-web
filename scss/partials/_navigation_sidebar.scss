@@ -616,8 +616,7 @@ div.left-navigation-sidebar {
       }
 
       div.public {
-        float: right;
-        margin-right: 16px;
+        margin-left: 1px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_public.svg");
@@ -625,11 +624,16 @@ div.left-navigation-sidebar {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
       }
 
       div.private {
-        float: right;
-        margin-right: 16px;
+        margin-left: 1px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
@@ -637,15 +641,17 @@ div.left-navigation-sidebar {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
       }
 
       div.board-name {
         width: 168px;
         float: left;
-
-        &.public-board, &.private-board {
-          width: 128px;
-        }
 
         div.internal {
           padding: 1px 0px 0px 28px;
