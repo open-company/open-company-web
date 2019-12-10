@@ -737,7 +737,7 @@
                                 :video-processed (:video-processed cmail-data)})))
             [:div.cmail-content-section-picker.group
               [:div.cmail-content-section-picker-label
-                "Post in"]
+                "Post to"]
               [:div.section-picker-bt-container
                 [:button.mlb-reset.section-picker-bt
                   {:on-click #(swap! (::show-sections-picker s) not)}
