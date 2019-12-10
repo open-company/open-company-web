@@ -4,6 +4,7 @@
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
+            [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
@@ -106,7 +107,9 @@
          :class (utils/class-set {:menu-expanded (or @(::move-activity s)
                                                      show-menu)
                                   :has-more-menu-bt should-show-more-bt
-                                  :mobile-tray-menu mobile-tray-menu})
+                                  :mobile-tray-menu mobile-tray-menu
+                                  :safari-mobile (and ua/ios?
+                                                      (not ua/mobile-app?))})
          :on-click (when mobile-tray-menu
                      #(when show-menu
                         (.stopPropagation %)
@@ -173,7 +176,8 @@
                 "Share"])
             (if inbox-follow-link
               [:li.follow
-                {:on-click #(do
+                {:class (when (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
+                 :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
@@ -181,13 +185,14 @@
                 "Follow"]
               (when inbox-unfollow-link
                 [:li.unfollow
-                  {:on-click #(do
+                  {:class (when (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
+                   :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
                                 (activity-actions/inbox-unfollow (:uuid entity-data)))}
                   "Unfollow"]))
-            (when (and is-mobile?
+            (when (or is-mobile?
                        (not external-follow-up))
               (if complete-follow-up-link
                 [:li.complete-follow-up.bottom-rounded.bottom-margin
