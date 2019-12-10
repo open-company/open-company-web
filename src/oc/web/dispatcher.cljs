@@ -213,6 +213,7 @@
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
    :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
+   :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    checkout-update-plan-key [[:base] (fn [base] (get base checkout-update-plan-key))]
    :expo                [[:base] (fn [base] (get-in base expo-key))]

@@ -44,18 +44,39 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- show-swipe-button [s ref-kw]
+  (dis/dispatch! [:input [:mobile-swipe-menu] (-> s :rum/args first :activity-data :uuid)])
+  (if (= ref-kw ::show-mobile-dismiss-bt)
+    (do
+      (compare-and-set! (::show-mobile-more-bt s) true false)
+      (swap! (::show-mobile-dismiss-bt s) not))
+    (do
+      (compare-and-set! (::show-mobile-dismiss-bt s) true false)
+      (swap! (::show-mobile-more-bt s) not))))
+
 (defn- swipe-left-handler [s]
-  (reset! (::show-mobile-more-bt s) false)
-  (swap! (::show-mobile-dismiss-bt s) not))
+  (show-swipe-button s ::show-mobile-dismiss-bt))
 
 (defn- swipe-right-handler [s]
-  (reset! (::show-mobile-dismiss-bt s) false)
-  (swap! (::show-mobile-more-bt s) not))
+  (show-swipe-button s ::show-mobile-more-bt))
+
+(defn- dismiss-swipe-button [s & [e ref-kw]]
+  (when e
+    (utils/event-stop e))
+  (when (or (not ref-kw)
+            (= ref-kw ::show-mobile-more-bt))
+    (reset! (::show-mobile-more-bt s) false))
+  (when (or (not ref-kw)
+            (= ref-kw ::show-mobile-dismiss-bt))
+    (reset! (::show-mobile-dismiss-bt s) false))
+  (reset! (::last-mobile-swipe-menu s) nil)
+  (dis/dispatch! [:input [:mobile-swipe-menu] nil]))
 
 (defn- swipe-gesture-manager [swipe-handlers]
   {:did-mount (fn [s]
     (let [el (rum/dom-node s)
           hr (js/Hammer. el)]
+      ;; Only in inbox show the dismiss button
       (when (= (router/current-board-slug) "inbox")
         (.on hr "swipeleft" (partial (:swipe-left swipe-handlers) s)))
       (.on hr "swiperight" (partial (:swipe-right swipe-handlers) s))
@@ -76,6 +97,7 @@
                          rum/reactive
                          ;; Derivatives
                          (drv/drv :activity-share-container)
+                         (drv/drv :mobile-swipe-menu)
                          ; (drv/drv :show-post-added-tooltip)
                          ;; Locals
                          (rum/local 0 ::mobile-video-height)
@@ -84,10 +106,12 @@
                          (rum/local false ::show-mobile-dismiss-bt)
                          (rum/local false ::show-mobile-more-bt)
                          (rum/local false ::on-scroll)
+                         (rum/local nil ::last-mobile-swipe-menu)
                          ;; Mixins
                          (ui-mixins/render-on-resize calc-video-height)
-                         (swipe-gesture-manager {:swipe-left swipe-left-handler
-                                                 :swipe-right swipe-right-handler})
+                         (when ua/mobile?
+                           (swipe-gesture-manager {:swipe-left swipe-left-handler
+                                                   :swipe-right swipe-right-handler}))
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          ui-mixins/strict-refresh-tooltips-mixin
@@ -96,6 +120,16 @@
                            (when ua/mobile?
                              (reset! (::on-scroll s)
                               (events/listen js/window EventType/SCROLL (partial on-scroll s))))
+                           s)
+                          :did-update (fn [s]
+                           (when ua/mobile?
+                             (let [mobile-swipe-menu @(drv/get-ref s :mobile-swipe-menu)
+                                   activity-uuid (-> s :rum/args first :activity-data :uuid)]
+                               (when (not= @(::last-mobile-swipe-menu s) mobile-swipe-menu)
+                                 (reset! (::last-mobile-swipe-menu s) mobile-swipe-menu)
+                                 (when (not= activity-uuid mobile-swipe-menu)
+                                   (compare-and-set! (::show-mobile-dismiss-bt s) true false)
+                                   (compare-and-set! (::show-mobile-more-bt s) true false)))))
                            s)
                           :will-unmount (fn [s]
                            (when @(::on-scroll s)
@@ -106,7 +140,6 @@
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
-        is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-inbox? (= (router/current-board-slug) "inbox")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
@@ -149,7 +182,8 @@
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
-                           :mobile-tray-menu show-mobile-menu?})]
+                           :mobile-tray-menu show-mobile-menu?})
+        mobile-swipe-menu-uuid (drv/react s :mobile-swipe-menu)]
     [:div.stream-item
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
@@ -165,43 +199,45 @@
        :data-last-read-at (:last-read-at read-data)
        ;; click on the whole tile only for draft editing
        :on-click (fn [e]
-                   (if is-drafts-board
-                     (activity-actions/activity-edit activity-data)
-                     (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
-                           comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)
-                           stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
-                           emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
-                           attachments-el (rum/ref-node s :stream-item-attachments)]
-                       (when (and ;; More menu wasn't clicked
-                                  (not (utils/event-inside? e more-menu-el))
-                                  ;; Comments summary wasn't clicked
-                                  (not (utils/event-inside? e comments-summary-el))
-                                  ;; WRT wasn't clicked 
-                                  (not (utils/event-inside? e stream-item-wrt-el))
-                                  ;; Attachments wasn't clicked
-                                  (not (utils/event-inside? e attachments-el))
-                                  ;; Emoji picker wasn't clicked
-                                  (not (utils/event-inside? e emoji-picker))
-                                  ;; a button wasn't clicked
-                                  (not (utils/button-clicked? e))
-                                  ;; No input field clicked
-                                  (not (utils/input-clicked? e))
-                                  ;; No body link was clicked
-                                  (not (utils/anchor-clicked? e)))
-                         (nux-actions/dismiss-post-added-tooltip)
-                         (nav-actions/open-post-modal activity-data false)))))
+                   (if-not (nil? mobile-swipe-menu-uuid)
+                     (dismiss-swipe-button s e)
+                     (if-not is-published?
+                       (activity-actions/activity-edit activity-data)
+                       (let [more-menu-el (.get (js/$ (str "#" dom-element-id " div.more-menu")) 0)
+                             comments-summary-el (.get (js/$ (str "#" dom-element-id " div.is-comments")) 0)
+                             stream-item-wrt-el (rum/ref-node s :stream-item-wrt)
+                             emoji-picker (.get (js/$ (str "#" dom-element-id " div.emoji-mart")) 0)
+                             attachments-el (rum/ref-node s :stream-item-attachments)]
+                         (when (and ;; More menu wasn't clicked
+                                    (not (utils/event-inside? e more-menu-el))
+                                    ;; Comments summary wasn't clicked
+                                    (not (utils/event-inside? e comments-summary-el))
+                                    ;; WRT wasn't clicked
+                                    (not (utils/event-inside? e stream-item-wrt-el))
+                                    ;; Attachments wasn't clicked
+                                    (not (utils/event-inside? e attachments-el))
+                                    ;; Emoji picker wasn't clicked
+                                    (not (utils/event-inside? e emoji-picker))
+                                    ;; a button wasn't clicked
+                                    (not (utils/button-clicked? e))
+                                    ;; No input field clicked
+                                    (not (utils/input-clicked? e))
+                                    ;; No body link was clicked
+                                    (not (utils/anchor-clicked? e)))
+                           (nux-actions/dismiss-post-added-tooltip)
+                           (nav-actions/open-post-modal activity-data false))))))
        :id dom-element-id}
       [:button.mlb-reset.mobile-more-bt
         {:class (when @(::show-mobile-more-bt s) "visible")
-         :on-click #(do
-                      (reset! (::show-mobile-more-bt s) false)
-                      (reset! (::force-show-menu s) true))}
+         :on-click (fn [e]
+                    (dismiss-swipe-button s e ::show-mobile-more-bt)
+                    (reset! (::force-show-menu s) true))}
         [:span "More"]]
       [:button.mlb-reset.mobile-dismiss-bt
         {:class (when @(::show-mobile-dismiss-bt s) "visible")
-         :on-click #(do
-                      (activity-actions/inbox-dismiss (:uuid activity-data))
-                      (reset! (::show-mobile-dismiss-bt s) false))}
+         :on-click (fn [e]
+                    (dismiss-swipe-button s e ::show-mobile-dismiss-bt)
+                    (activity-actions/inbox-dismiss (:uuid activity-data)))}
         [:span "Dismiss"]]
       [:div.stream-item-header.group
         [:div.stream-header-head-author
@@ -273,7 +309,7 @@
                :data-itemuuid (:uuid activity-data)
                :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
             (stream-item-summary activity-data)]]
-          (if is-drafts-board
+          (if-not is-published?
             [:div.stream-item-footer.group
               [:div.stream-body-draft-edit
                 [:button.mlb-reset.edit-draft-bt
