@@ -72,16 +72,18 @@
   (reset! (::last-mobile-swipe-menu s) nil)
   (dis/dispatch! [:input [:mobile-swipe-menu] nil]))
 
-(defn- swipe-gesture-manager [swipe-handlers]
+(defn- swipe-gesture-manager [options]
   {:did-mount (fn [s]
-    (let [el (rum/dom-node s)
-          hr (js/Hammer. el)]
-      ;; Only in inbox show the dismiss button
-      (when (= (router/current-board-slug) "inbox")
-        (.on hr "swipeleft" (partial (:swipe-left swipe-handlers) s)))
-      (.on hr "swiperight" (partial (:swipe-right swipe-handlers) s))
-      (reset! (::hammer-recognizer s) hr)
-      s))
+    (when (and (fn? (:attach-swipe-handlers? options))
+               ((:attach-swipe-handlers? options) s))
+      (let [el (rum/dom-node s)
+            hr (js/Hammer. el)]
+        ;; Only in inbox show the dismiss button
+        (when (= (router/current-board-slug) "inbox")
+          (.on hr "swipeleft" (partial (:swipe-left options) s)))
+        (.on hr "swiperight" (partial (:swipe-right options) s))
+        (reset! (::hammer-recognizer s) hr)
+        s)))
    :will-unmount (fn [s]
     (when @(::hammer-recognizer s)
       (.remove @(::hammer-recognizer s) "swipeleft")
@@ -111,7 +113,8 @@
                          (ui-mixins/render-on-resize calc-video-height)
                          (when ua/mobile?
                            (swipe-gesture-manager {:swipe-left swipe-left-handler
-                                                   :swipe-right swipe-right-handler}))
+                                                   :swipe-right swipe-right-handler
+                                                   :attach-swipe-handlers? #(au/is-published? (-> % :rum/args first :activity-data))}))
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          ui-mixins/strict-refresh-tooltips-mixin

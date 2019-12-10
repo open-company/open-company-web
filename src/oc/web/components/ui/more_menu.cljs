@@ -173,24 +173,26 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (if inbox-follow-link
-              [:li.follow
-                {:class (when (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
-                 :on-click #(do
-                              (reset! (::showing-menu s) false)
-                              (when (fn? will-close)
-                                (will-close))
-                              (activity-actions/inbox-follow (:uuid entity-data)))}
-                "Follow"]
-              (when inbox-unfollow-link
-                [:li.unfollow
-                  {:class (when (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
+            (when (or is-mobile?
+                      (not external-follow))
+              (if inbox-follow-link
+                [:li.follow
+                  {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/inbox-unfollow (:uuid entity-data)))}
-                  "Unfollow"]))
+                                (activity-actions/inbox-follow (:uuid entity-data)))}
+                  "Follow"]
+                (when inbox-unfollow-link
+                  [:li.unfollow
+                    {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
+                     :on-click #(do
+                                  (reset! (::showing-menu s) false)
+                                  (when (fn? will-close)
+                                    (will-close))
+                                  (activity-actions/inbox-unfollow (:uuid entity-data)))}
+                    "Unfollow"])))
             (when (or is-mobile?
                       (not external-bookmark))
               (if remove-bookmark-link
