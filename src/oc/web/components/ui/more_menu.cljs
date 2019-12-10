@@ -160,14 +160,26 @@
             (when (and edit-link
                        show-move?)
               [:li.move.top-rounded
-               {:on-click #(do
+               {:class (when (and (not (and (not external-share)
+                                            share-link))
+                                  (not (or is-mobile?
+                                            (not external-follow)))
+                                   (not (or is-mobile?
+                                            (not external-bookmark))))
+                          "bottom-rounded bottom-margin")
+                :on-click #(do
                              (reset! (::showing-menu s) false)
                              (reset! (::move-activity s) true))}
                "Move"])
             (when (and (not external-share)
                        share-link)
               [:li.share
-                {:on-click #(do
+                {:class (when (and (not (or is-mobile?
+                                            (not external-follow)))
+                                   (not (or is-mobile?
+                                            (not external-bookmark))))
+                          "bottom-rounded bottom-margin")
+                 :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
