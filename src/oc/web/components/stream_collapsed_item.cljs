@@ -12,14 +12,20 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]))
 
+(defn- prefixed-html
+  "Safari is showing the full body in a tooltip as a feature when text-overflow is ellipsis.
+   To prevent it we need to add an empty div as first element of the body."
+  [html-string]
+  (str "<div class=\"hide-tooltip\"></div>" html-string))
+
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
     [:div.stream-item-body.oc-mentions
       {:data-itemuuid (:uuid activity-data)
-       :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
+       :dangerouslySetInnerHTML {:__html (prefixed-html (:abstract activity-data))}}]
     [:div.stream-item-body.no-abstract.oc-mentions
       {:data-itemuuid (:uuid activity-data)
-       :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
+       :dangerouslySetInnerHTML {:__html (prefixed-html (:body activity-data))}}]))
 
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive

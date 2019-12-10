@@ -57,7 +57,8 @@
                ;; has a link to load more that can be used
                @(::has-next s)
                ;; scroll is moving down
-               (= direction :down)
+               (or (= direction :down)
+                   (= direction :stale))
                ;; and the threshold point has been reached
                (>= scroll-top (- max-scroll (* scroll-threshold card-height))))
       ;; Show a spinner at the bottom

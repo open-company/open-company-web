@@ -1085,10 +1085,13 @@
 
 (defn inbox-dismiss-all []
   (let [alert-data {:action "dismiss-all"
-                    :message "Are you sure you want to dismiss all?"
-                    :link-button-title "Keep"
+                    :title "Dismiss all posts?"
+                    :message " This action cannot be undone."
+                    :link-button-title "No, keep them"
+                    :link-button-style :green
                     :link-button-cb #(alert-modal/hide-alert)
-                    :solid-button-title "Yes"
+                    :solid-button-title "Yes, dismiss them"
+                    :solid-button-style :red
                     :solid-button-cb (fn []
                                       (inbox-real-dismiss-all)
                                       (alert-modal/hide-alert))}]

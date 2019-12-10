@@ -27,7 +27,7 @@ div.stream-collapsed-item {
           display: initial;
 
           button {
-            display: initial;            
+            display: initial;
           }
         }
       }
@@ -144,6 +144,11 @@ div.stream-collapsed-item {
         height: 24px;
         min-width: 0;
         flex: 0 1 auto;
+
+        & > div.hide-tooltip:first-child:before {
+          content: '';
+          display: block;
+        }
 
         * {
           height: 24px;
