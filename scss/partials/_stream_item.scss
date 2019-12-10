@@ -190,6 +190,10 @@ div.stream-item {
     div.stream-header-head-author {
       width: 100%;
 
+      @include mobile() {
+        min-height: 24px;
+      }
+
       @include activity-author(24);
 
       div.user-avatar-img-container {
@@ -259,6 +263,12 @@ div.stream-item {
         div.bookmark-tag-small {
           float: right;
           margin-right: 0;
+        }
+
+        @include mobile() {
+          div.bookmark-tag-small {
+            margin-top: 3px;
+          }
         }
       }
 
