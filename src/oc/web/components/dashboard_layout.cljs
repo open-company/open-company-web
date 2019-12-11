@@ -259,6 +259,13 @@
                        :data-placement "top"
                        :data-container "body"
                        :title "Dismiss all"}])
+                  (when (and (not is-drafts-board)
+                             is-mobile?)
+                    [:button.mlb-reset.mobile-search-bt
+                      {:on-click (fn [e]
+                                   (search-actions/active)
+                                   (utils/after 500 #(.focus (js/$ "input.search"))))}
+                      "Search"])
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :data-toggle (when-not is-mobile? "tooltip")
