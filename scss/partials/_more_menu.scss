@@ -358,9 +358,9 @@ div.more-menu {
       & > * {
         display: none;
       }
-      // Add some extra padding at the bottom of safari mobile to avoid
-      // the browser bottom navbar cover the menu
-      &.safari-mobile ul.more-menu-list {
+      // Add some extra padding at the bottom of mobile browsers
+      //  to avoid having the bottom part of the menu hidden
+      &.mobile-browser ul.more-menu-list {
         // bottom: #{$mobile_navbar_height}px;
         padding: 32px 16px #{32 + 104}px 16px;
       }
