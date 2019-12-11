@@ -108,8 +108,8 @@
                                                      show-menu)
                                   :has-more-menu-bt should-show-more-bt
                                   :mobile-tray-menu mobile-tray-menu
-                                  :safari-mobile (and ua/ios?
-                                                      (not ua/mobile-app?))})
+                                  :mobile-browser (and ua/mobile?
+                                                       (not ua/mobile-app?))})
          :on-click (when mobile-tray-menu
                      #(when show-menu
                         (.stopPropagation %)
