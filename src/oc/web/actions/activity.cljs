@@ -54,7 +54,7 @@
 
 ;; bookmarks stream
 
-(defn bookmarks-get-finish [sort-type {:keys [body success]}]
+(defn bookmarks-get-finish [{:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
@@ -65,42 +65,31 @@
         (cook/set-cookie! (router/last-board-cookie org) "bookmarks" (* 60 60 24 365))
         (request-reads-count (keys (:fixed-items fixed-bookmarks)))
         (watch-boards (:fixed-items fixed-bookmarks)))
-      (dis/dispatch! [:bookmarks-get/finish org sort-type fixed-bookmarks]))))
+      (dis/dispatch! [:bookmarks-get/finish org fixed-bookmarks]))))
 
-(defn- bookmarks-real-get [bookmarks-link sort-type org-slug finish-cb]
+(defn- bookmarks-real-get [bookmarks-link org-slug finish-cb]
   (api/get-all-posts bookmarks-link
    (fn [resp]
-     (bookmarks-get-finish sort-type resp)
+     (bookmarks-get-finish resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn bookmarks-get [org-data & [finish-cb]]
-  (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
-    (bookmarks-real-get bookmarks-link :recently-posted (:slug org-data) finish-cb)))
+  (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")]
+    (bookmarks-real-get bookmarks-link (:slug org-data) finish-cb)))
 
-(defn recent-bookmarks-get [org-data & [finish-cb]]
-  (when-let [recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")]
-    (bookmarks-real-get recent-bookmarks-link :recent-activity (:slug org-data) finish-cb)))
-
-(defn bookmarks-sort-get [org-data & [finish-cb]]
-  (let [sort-type (router/current-sort-type)
-        bookmarks-link-rel (if (= sort-type dis/default-sort-type) "bookmarks-activity" "bookmarks")
-        bookmarks-link (utils/link-for (:links org-data) bookmarks-link-rel)]
-    (when bookmarks-link
-      (bookmarks-real-get bookmarks-link sort-type (:slug org-data) finish-cb))))
-
-(defn bookmarks-more-finish [direction sort-type {:keys [success body]}]
+(defn bookmarks-more-finish [direction {:keys [success body]}]
   (when success
     (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
-  (dis/dispatch! [:bookmarks-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
+  (dis/dispatch! [:bookmarks-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn bookmarks-more [more-link direction]
-  (api/load-more-items more-link direction (partial bookmarks-more-finish direction (router/current-sort-type)))
-  (dis/dispatch! [:bookmarks-more (router/current-org-slug) (router/current-sort-type)]))
+  (api/load-more-items more-link direction (partial bookmarks-more-finish direction))
+  (dis/dispatch! [:bookmarks-more (router/current-org-slug)]))
 
 ;; All Posts
 
-(defn all-posts-get-finish [sort-type {:keys [body success]}]
+(defn all-posts-get-finish [{:keys [body success]}]
   (when body
     (let [org-data (dis/org-data)
           org (router/current-org-slug)
@@ -111,38 +100,32 @@
         (cook/set-cookie! (router/last-board-cookie org) "all-posts" (* 60 60 24 365))
         (request-reads-count (keys (:fixed-items fixed-all-posts)))
         (watch-boards (:fixed-items fixed-all-posts)))
-      (dis/dispatch! [:all-posts-get/finish org sort-type fixed-all-posts]))))
+      (dis/dispatch! [:all-posts-get/finish org fixed-all-posts]))))
 
-(defn- activity-real-get [activity-link sort-type org-slug finish-cb]
+(defn- activity-real-get [activity-link org-slug finish-cb]
   (api/get-all-posts activity-link
    (fn [resp]
-     (all-posts-get-finish sort-type resp)
+     (all-posts-get-finish resp)
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
 (defn activity-get [org-data & [finish-cb]]
-  (when-let [activity-link (utils/link-for (:links org-data) "entries")]
-    (activity-real-get activity-link :recently-posted (:slug org-data) finish-cb)))
-
-(defn recent-activity-get [org-data & [finish-cb]]
-  (when-let [recent-activity-link (utils/link-for (:links org-data) "activity")]
-    (activity-real-get recent-activity-link :recent-activity (:slug org-data) finish-cb)))
+  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
+    (activity-real-get activity-link (:slug org-data) finish-cb)))
 
 (defn all-posts-get [org-data & [finish-cb]]
-  (let [sort-type (router/current-sort-type)
-        activity-link-rel (if (= sort-type dis/default-sort-type) "activity" "entries")
-        activity-link (utils/link-for (:links org-data) activity-link-rel)]
+  (let [activity-link (utils/link-for (:links org-data) "activity")]
     (when activity-link
-      (activity-real-get activity-link sort-type (:slug org-data) finish-cb))))
+      (activity-real-get activity-link (:slug org-data) finish-cb))))
 
-(defn all-posts-more-finish [direction sort-type {:keys [success body]}]
+(defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
     (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
-  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
+  (dis/dispatch! [:all-posts-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
 
 (defn all-posts-more [more-link direction]
-  (api/load-more-items more-link direction (partial all-posts-more-finish direction (router/current-sort-type)))
-  (dis/dispatch! [:all-posts-more (router/current-org-slug) (router/current-sort-type)]))
+  (api/load-more-items more-link direction (partial all-posts-more-finish direction))
+  (dis/dispatch! [:all-posts-more (router/current-org-slug)]))
 
 ;; Inbox
 
@@ -176,67 +159,30 @@
   (api/load-more-items more-link direction (partial inbox-more-finish direction))
   (dis/dispatch! [:inbox-more (router/current-org-slug)]))
 
-;; Must see
-(defn must-see-get-finish
-  [sort-type {:keys [success body]}]
-    (when body
-    (let [org-data (dis/org-data)
-          org (router/current-org-slug)
-          must-see-data (when success (json->cljs body))
-          must-see-posts (au/fix-container (:collection must-see-data) (dis/change-data) org-data)]
-      (when (= (router/current-board-slug) "must-see")
-        (cook/set-cookie! (router/last-board-cookie org) "all-posts" cook/default-cookie-expire)
-        (watch-boards (:fixed-items must-see-posts)))
-      (dis/dispatch! [:must-see-get/finish org sort-type must-see-posts]))))
-
-(defn must-see-get [org-data]
-  (let [current-sort-type (router/current-sort-type)
-        link-rel (if (= current-sort-type dis/default-sort-type) "activity" "entries")]
-    (when-let [activity-link (utils/link-for (:links org-data) link-rel)]
-      (let [activity-href (:href activity-link)
-            must-see-filter (str activity-href "?must-see=true")
-            must-see-link (assoc activity-link :href must-see-filter)]
-        (api/get-all-posts must-see-link (partial must-see-get-finish current-sort-type))))))
-
-(defn must-see-more-finish [direction sort-type {:keys [success body]}]
-  (when success
-    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
-  (dis/dispatch! [:must-see-more/finish (router/current-org-slug) direction sort-type (when success (json->cljs body))]))
-
-(defn must-see-more [more-link direction]
-  (let [more-href (:href more-link)
-        more-must-see-filter (str more-href "&must-see=true")
-        more-must-see-link (assoc more-link :href more-must-see-filter)
-        current-sort-type (router/current-sort-type)]
-    (api/load-more-items more-must-see-link direction (partial must-see-more-finish direction current-sort-type))
-    (dis/dispatch! [:must-see-more (router/current-org-slug) current-sort-type])))
-
 ;; Referesh org when needed
 (defn refresh-org-data-cb [{:keys [status body success]}]
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-bookmarks (= (router/current-board-slug) "bookmarks")
         is-inbox (= (router/current-board-slug) "inbox")
+        is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
-        sort-type (router/current-sort-type)
-        board-rel (if (= sort-type :recent-activity) "activity" "self")
+        board-link-rel (if is-drafts ["item" "self"] "activity")
         board-link (when (and (not is-all-posts) (not is-bookmarks) (not is-inbox))
-                     (utils/link-for (:links board-data) board-rel "GET"))]
+                     (utils/link-for (:links board-data) board-link-rel "GET"))]
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-inbox
       (inbox-get org-data
 
       is-all-posts
-      (if (= sort-type :recent-activity)
-        (recent-activity-get org-data)
-        (activity-get org-data))
+      (activity-get org-data)
 
       is-bookmarks
-      (bookmarks-sort-get org-data))
+      (bookmarks-get org-data))
 
       (seq board-link)
-      (sa/section-get sort-type board-link))))
+      (sa/section-get board-link))))
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
@@ -320,8 +266,7 @@
                      (swap! initial-revision assoc (:uuid entry-saved)
                             (or (:revision-id entry-map) -1)))
                    (when board-data
-                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug)
-                      (router/current-sort-type) board-data]))
+                     (dis/dispatch! [:entry-save-with-board/finish (router/current-org-slug) board-data]))
                    ;; add or update the entry in the app-state list of posts
                    ;; also move the updated data to the entry editing
                    (dis/dispatch! [:entry-auto-save/finish entry-saved edit-key entry-map])))))
@@ -375,7 +320,7 @@
     (when-not (= (:slug fixed-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid fixed-board-data)))
-    (dis/dispatch! [:entry-save-with-board/finish org-slug (router/current-sort-type) fixed-board-data])
+    (dis/dispatch! [:entry-save-with-board/finish org-slug fixed-board-data])
     (when (= (:status saved-activity-data) "published")
       (send-item-read (:uuid saved-activity-data)))))
 
@@ -502,7 +447,7 @@
   (let [drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards (dis/org-data))))
         drafts-link (utils/link-for (:links drafts-board) "self")]
     (when drafts-link
-      (sa/section-get dis/other-sort-type drafts-link))))
+      (sa/section-get drafts-link))))
 
 (defn entry-publish-cb [entry-uuid posted-to-board-slug edit-key {:keys [status success body]}]
   (if success
@@ -521,7 +466,7 @@
     (when-not (= (:slug new-board-data) (router/current-board-slug))
       ;; If creating a new board, start watching changes
       (ws-cc/container-watch (:uuid new-board-data)))
-    (dis/dispatch! [:entry-publish-with-board/finish (router/current-sort-type) new-board-data edit-key])
+    (dis/dispatch! [:entry-publish-with-board/finish new-board-data edit-key])
     ;; Send item read
     (send-item-read (:uuid saved-activity-data))
     (nux-actions/show-post-added-tooltip (:uuid saved-activity-data))))
@@ -928,15 +873,6 @@
                                                :expire 3
                                                :id (if success :mark-unread-success :mark-unread-error)})))))
 
-(defn saved-sort-type [org-slug]
-  (if-let [sort-type-cookie (cook/get-cookie (router/last-sort-cookie org-slug))]
-    (keyword sort-type-cookie)
-    dis/default-sort-type))
-
-(defn change-sort-type [type]
-  (cook/set-cookie! (router/last-sort-cookie (router/current-org-slug)) (name type) cook/default-cookie-expire)
-  (swap! router/path merge {:sort-type type}))
-
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link
     (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) true])
@@ -955,7 +891,7 @@
 
 ;; Refresh data
 
-(defn refresh-board-data [board-slug sort-type]
+(defn refresh-board-data [board-slug]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
@@ -971,16 +907,14 @@
         (all-posts-get org-data)
 
         (= board-slug "bookmarks")
-        (bookmarks-sort-get org-data)
+        (bookmarks-get org-data)
 
         :default
-        (let [board-rel (if (= sort-type dis/other-sort-type)
-                          ["item" "self"]
-                          "activity")]
-          (when-let* [fixed-board-data (or board-data
-                       (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
-            (sa/section-get sort-type board-link)))))))
+        (when-let* [board-rel (if (= board-slug utils/default-drafts-board-slug) ["item" "self"] "activity")
+                    fixed-board-data (or board-data
+                     (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+                    board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+          (sa/section-get board-link))))))
 
 ;; FOC Layout
 

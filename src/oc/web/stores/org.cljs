@@ -21,9 +21,7 @@
         old-boards (get-in db boards-key)
         ;; No need to add a spacial case for drafts board here since
         ;; we are only excluding keys that already exists in the app-state
-        board-slugs (set (mapcat #(vec [(keyword (str (:slug %) "-recent-activity"))
-                                        (keyword (str (:slug %) "-recently-posted"))])
-                          (:boards org-data)))
+        board-slugs (set (mapv #(keyword (str (:slug %))) (:boards org-data)))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))

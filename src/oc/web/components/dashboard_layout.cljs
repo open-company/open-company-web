@@ -45,21 +45,14 @@
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
-                              (drv/drv :sort-type)
                               (drv/drv :cmail-state)
                               (drv/drv :cmail-data)
                               (drv/drv :user-notifications)
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
-                              ;; Locals
-                              (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
-                              (ui-mixins/on-window-click-mixin (fn [s e]
-                               (when (and @(::sorting-menu-expanded s)
-                                          (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
-                                (reset! (::sorting-menu-expanded s) false))))
                               {:before-render (fn [s]
                                 ;; Check if it needs any NUX stuff
                                 (nux-actions/check-nux)
@@ -101,7 +94,6 @@
         board-view-cookie (router/last-board-view-cookie (router/current-org-slug))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) (:boards org-data)))
         drafts-link (utils/link-for (:links drafts-board) "self")
-        board-sort (drv/react s :sort-type)
         show-drafts (pos? (:count drafts-link))
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
@@ -120,8 +112,6 @@
                                     (= (:board-uuid activity-data) current-board-slug)))
         no-phisical-home-button (and ua/mobile-app?
                                      (js/isiPhoneWithoutPhysicalHomeBt))
-        should-show-sort? (and (not is-drafts-board)
-                               (not is-inbox))
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))]
       ;; Entries list
@@ -269,34 +259,6 @@
                        :data-placement "top"
                        :data-container "body"
                        :title "Dismiss all"}])
-                  (when-not is-drafts-board
-                    (let [default-sort (= board-sort dis/default-sort-type)]
-                      [:div.board-sort.group
-                        {:ref :board-sort-menu}
-                        (when is-mobile?
-                          [:button.mlb-reset.mobile-search-bt
-                            {:on-click (fn [e]
-                                         (search-actions/active)
-                                         (utils/after 500 #(.focus (js/$ "input.search"))))}])
-                        (when-not is-inbox
-                          [:button.mlb-reset.board-sort-bt
-                            {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                            (if default-sort "Recent activity" "Recently posted")])
-                        (when-not is-inbox
-                          [:div.board-sort-menu
-                            {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                            [:div.board-sort-menu-item
-                              {:class (when default-sort "active")
-                               :on-click #(do
-                                            (reset! (::sorting-menu-expanded s) false)
-                                            (activity-actions/change-sort-type :recent-activity))}
-                              "Recent activity"]
-                            [:div.board-sort-menu-item
-                              {:class (when-not default-sort "active")
-                               :on-click #(do
-                                            (reset! (::sorting-menu-expanded s) false)
-                                            (activity-actions/change-sort-type :recently-posted))}
-                              "Recently posted"]])]))
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :data-toggle (when-not is-mobile? "tooltip")
@@ -319,5 +281,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" :else (:slug current-board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" :else (:slug current-board-data))))
               )]]]))

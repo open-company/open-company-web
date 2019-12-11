@@ -20,14 +20,14 @@
      (swap! dispatcher/app-state reducer payload))))
 
 (defmethod dispatcher/action :section
-  [db [_ sort-type section-data]]
+  [db [_ section-data]]
   (let [db-loading (if (:is-loaded section-data)
                      (dissoc db :loading)
                      db)
         with-entries (:entries section-data)
         org-slug (utils/section-org-slug section-data)
         fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
-        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data) sort-type))
+        old-section-data (get-in db (dispatcher/board-data-key org-slug (:slug section-data)))
         with-current-edit (if (and (:is-loaded section-data)
                                    (:entry-editing db))
                             old-section-data
@@ -39,7 +39,7 @@
                             (assoc-in db-loading posts-key merged-items)
                             db-loading)]
     (assoc-in with-merged-items
-              (dispatcher/board-data-key org-slug (:slug section-data) sort-type)
+              (dispatcher/board-data-key org-slug (:slug section-data))
               (dissoc with-current-edit :fixed-items))))
 
 (defn fix-org-section-data
@@ -64,25 +64,19 @@
   db)
 
 (defmethod dispatcher/action :section-edit-save/finish
-  [db [_ sort-type section-data]]
+  [db [_ section-data]]
   (let [org-slug (utils/section-org-slug section-data)
         section-slug (:slug section-data)
-        board-key (dispatcher/board-data-key org-slug section-slug :recently-posted)
-        recent-board-key (dispatcher/board-data-key org-slug section-slug :recent-activity)
+        board-key (dispatcher/board-data-key org-slug section-slug)
         ;; Parse the new section data
         fixed-section-data (au/fix-board section-data (dispatcher/change-data db))
         old-board-data (get-in db board-key)
-        ;; Replace the old section data for :recently-posted sort
+        ;; Replace the old section data
         ;; w/o overriding the posts and links to avoid breaking pagination
         next-board-data (merge fixed-section-data
-                         (select-keys old-board-data [:posts-list :fixed-items :links]))
-        old-recent-board-data (get-in db recent-board-key)
-        ;; Same for the :recent-activity sort
-        next-recent-board-data (merge fixed-section-data
-                                (select-keys old-recent-board-data [:posts-list :fixed-items :links]))]
+                         (select-keys old-board-data [:posts-list :fixed-items :links]))]
     (-> db
         (assoc-in board-key next-board-data)
-        (assoc-in recent-board-key next-recent-board-data)
         (dissoc :section-editing))))
 
 (defmethod dispatcher/action :section-edit/dismiss
@@ -220,16 +214,16 @@
   (fix-org-section-data db org-data (dispatcher/change-data db)))
 
 (defmethod dispatcher/action :section-more
-  [db [_ org-slug board-slug sort-type]]
-  (let [container-key (dispatcher/board-data-key org-slug board-slug sort-type)
+  [db [_ org-slug board-slug]]
+  (let [container-key (dispatcher/board-data-key org-slug board-slug)
         container-data (get-in db container-key)
         next-container-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-container-data)))
 
 (defmethod dispatcher/action :section-more/finish
-  [db [_ org board direction sort-type next-board-data]]
+  [db [_ org board direction next-board-data]]
   (if next-board-data
-    (let [container-key (dispatcher/board-data-key org board sort-type)
+    (let [container-key (dispatcher/board-data-key org board)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)

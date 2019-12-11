@@ -36,7 +36,7 @@
     (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
     (dis/board-data board-slug)))
 
-(defn- refresh-board-data [board-slug sort-type]
+(defn- refresh-board-data [board-slug]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
@@ -47,24 +47,18 @@
         (activity-actions/inbox-get org-data)
 
         (= board-slug "all-posts")
-        (do
-          (activity-actions/activity-get org-data)
-          (activity-actions/recent-activity-get org-data))
+        (activity-actions/activity-get org-data)
 
         (= board-slug "bookmarks")
-        (do
-          (activity-actions/bookmarks-get org-data)
-          (activity-actions/recent-bookmarks-get org-data))
+        (activity-actions/bookmarks-get org-data)
 
         :default
         (let [fixed-board-data (or board-data
                                    (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-              board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")
-              activity-board-link (utils/link-for (:links fixed-board-data) "activity" "GET")]
+              board-rel (if (= board-slug utils/default-drafts-board-slug) ["item" "self"] "activity")
+              board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
           (when board-link
-            (section-actions/section-get dis/other-sort-type board-link))
-          (when activity-board-link
-            (section-actions/section-get dis/default-sort-type activity-board-link)))))))
+            (section-actions/section-get board-link)))))))
 
 (defn nav-to-url!
   ([e board-slug url]
@@ -79,10 +73,7 @@
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
-         org-slug (router/current-org-slug)
-         sort-type (if is-drafts-board?
-                     dis/other-sort-type
-                     (activity-actions/saved-sort-type org-slug))]
+         org-slug (router/current-org-slug)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -94,13 +85,12 @@
          (router/set-route! [org-slug board-slug (if (dis/is-container? board-slug) "dashboard" board-slug)]
           {:org org-slug
            :board board-slug
-           :sort-type sort-type
            :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
          (when refresh?
-           (utils/after 0 #(refresh-board-data board-slug sort-type))))))
+           (utils/after 0 #(refresh-board-data board-slug))))))
    (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications)))))
 
@@ -111,9 +101,7 @@
         to-url (oc-urls/board board)
         board-data (container-data board)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
-                                 ; and is on recent activity sorting
-                                 (and (:refresh @router/path)
-                                      (= (router/current-sort-type) dis/default-sort-type))
+                                 (:refresh @router/path)
                                  (not board-data))
         ;; Get the previous scroll top position
         default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
@@ -138,7 +126,6 @@
         scroll-y-position (.. js/document -scrollingElement -scrollTop)]
     (router/set-route! route {:org org
                               :board board
-                              :sort-type (router/current-sort-type)
                               :activity activity
                               :query-params query-params
                               :back-to back-to

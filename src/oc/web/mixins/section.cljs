@@ -11,10 +11,9 @@
 
 (defn focus-reload
   []
-  (let [slug      (router/current-board-slug)
-        sort-type (router/current-sort-type)]
-    (timbre/info "Reloading board" slug "with sort type" sort-type)
-   (activity-actions/refresh-board-data slug sort-type)))
+  (let [slug      (router/current-board-slug)]
+    (timbre/info "Reloading board" slug)
+   (activity-actions/refresh-board-data slug)))
 
 (def window-focus-auto-loader
   {:did-mount
