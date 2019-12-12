@@ -160,8 +160,32 @@ div.dashboard-layout {
               width: 18px;
               height: 16px;
               background-image: cdnUrl("/img/ML/inbox_tab_icon.svg");
+              position: relative;
 
               @include preload_image(cdnUrl("/img/ML/inbox_tab_icon_active.svg"));
+
+              span.count-badge {
+                padding: 2px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 14px;
+                padding: 2px;
+                text-align: center;
+                color: white;
+                display: block;
+                background-color: $carrot_green;
+                vertical-align: top;
+                border-radius: 4px;
+                position: absolute;
+                top: -9px;
+                left: 12px;
+                border: 2px solid white;
+              }
+            }
+
+            &.active span.tab-icon span.count-badge {
+              background-color: $ui_grey; //rgb(130, 130, 130);
+              color: white;
             }
 
             &.active span.tab-icon {

@@ -154,7 +154,10 @@
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= current-board-slug "inbox"))
                           "active")}
-                [:span.tab-icon]
+                [:span.tab-icon
+                  (when (-> org-data :inbox-count count pos?)
+                    [:span.count-badge
+                      (:inbox-count org-data)])]
                 [:span.tab-label "New"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
