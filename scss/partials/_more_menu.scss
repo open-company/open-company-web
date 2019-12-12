@@ -343,18 +343,31 @@ div.more-menu {
     }
   }
 
-  &.mobile-tray-menu.menu-expanded {
+  &.mobile-tray-menu {
     @include mobile() {
       display: block;
       position: fixed;
       float: unset;
       width: 100vw;
-      height: 100vh;
+      height: 0;
       left: 0;
-      top: 0;
+      top: 100vh;
       background-color: rgba($deep_navy, 0.2);
-      opacity: 1;
+      opacity: 0;
       z-index: #{$navbar_zindex + 10};
+      visibility: hidden;
+      transition: opacity 180ms ease-out, top 180ms ease-out, height 180ms ease-out, visibility 0s;
+
+      &.menu-expanded {
+        visibility: visible;
+        opacity: 1;
+        top: 0;
+        height: 100vh;
+
+        & > * {
+          display: none;
+        }
+      }
 
       & > * {
         display: none;

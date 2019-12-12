@@ -77,7 +77,7 @@
 
 (defn- long-press-handler [s _]
   (dismiss-swipe-button s)
-  (utils/after 100 #(show-mobile-menu s)))
+  (utils/after 180 #(show-mobile-menu s)))
 
 (defn- swipe-gesture-manager [{:keys [swipe-left swipe-right long-press disabled] :as options}]
   {:did-mount (fn [s]
