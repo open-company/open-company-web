@@ -141,7 +141,7 @@
               [:button.mlb-reset.tab-button.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/inbox)))
+                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= current-board-slug "all-posts"))
                           "active")}
