@@ -56,6 +56,7 @@
                        rum/static
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
+                       (rum/local false ::can-unmount)
                        (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
                           (when-let [will-close (-> s :rum/args first :will-close)]
@@ -63,6 +64,7 @@
                               (will-close)))
                          (reset! (::showing-menu s) false))))
                        {:did-mount (fn [s]
+                        (utils/after 1000 #(reset! (::can-unmount s) true))
                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
                        s)
                        :did-update (fn [s]
@@ -112,7 +114,8 @@
                                   :ios-browser (and ua/ios?
                                                     (not ua/mobile-app?))})
          :on-click (when mobile-tray-menu
-                     #(when show-menu
+                     #(when (and show-menu
+                                 @(::can-unmount s))
                         (.stopPropagation %)
                         (show-hide-menu s will-open will-close)))}
         (when should-show-more-bt
