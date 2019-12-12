@@ -44,6 +44,9 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- show-mobile-menu [s]
+  (reset! (::force-show-menu s) true))
+
 (defn- show-swipe-button [s ref-kw]
   (dis/dispatch! [:input [:mobile-swipe-menu] (-> s :rum/args first :activity-data :uuid)])
   (if (= ref-kw ::show-mobile-dismiss-bt)
@@ -53,12 +56,6 @@
     (do
       (compare-and-set! (::show-mobile-dismiss-bt s) true false)
       (swap! (::show-mobile-more-bt s) not))))
-
-(defn- swipe-left-handler [s]
-  (show-swipe-button s ::show-mobile-dismiss-bt))
-
-(defn- swipe-right-handler [s]
-  (show-swipe-button s ::show-mobile-more-bt))
 
 (defn- dismiss-swipe-button [s & [e ref-kw]]
   (when e
@@ -72,22 +69,36 @@
   (reset! (::last-mobile-swipe-menu s) nil)
   (dis/dispatch! [:input [:mobile-swipe-menu] nil]))
 
-(defn- swipe-gesture-manager [options]
+(defn- swipe-left-handler [s _]
+  (show-swipe-button s ::show-mobile-dismiss-bt))
+
+(defn- swipe-right-handler [s _]
+  (show-swipe-button s ::show-mobile-more-bt))
+
+(defn- long-press-handler [s _]
+  (dismiss-swipe-button s)
+  (utils/after 100 #(show-mobile-menu s)))
+
+(defn- swipe-gesture-manager [{:keys [swipe-left swipe-right long-press disabled] :as options}]
   {:did-mount (fn [s]
-    (when (and (fn? (:attach-swipe-handlers? options))
-               ((:attach-swipe-handlers? options) s))
+    (when (and (fn? disabled)
+               (not (disabled s)))
       (let [el (rum/dom-node s)
             hr (js/Hammer. el)]
-        ;; Only in inbox show the dismiss button
-        (when (= (router/current-board-slug) "inbox")
-          (.on hr "swipeleft" (partial (:swipe-left options) s)))
-        (.on hr "swiperight" (partial (:swipe-right options) s))
+        (when (and (fn? swipe-left)
+                   (= (router/current-board-slug) "inbox"))
+          (.on hr "swipeleft" (partial swipe-left s)))
+        (when (fn? swipe-right)
+          (.on hr "swiperight" (partial swipe-right s)))
+        (when (fn? long-press)
+          (.on hr "press" (partial long-press s)))
         (reset! (::hammer-recognizer s) hr)
         s)))
    :will-unmount (fn [s]
     (when @(::hammer-recognizer s)
       (.remove @(::hammer-recognizer s) "swipeleft")
       (.remove @(::hammer-recognizer s) "swiperight")
+      (.remove @(::hammer-recognizer s) "pressup")
       (.destroy @(::hammer-recognizer s)))
     s)})
 
@@ -114,7 +125,8 @@
                          (when ua/mobile?
                            (swipe-gesture-manager {:swipe-left swipe-left-handler
                                                    :swipe-right swipe-right-handler
-                                                   :attach-swipe-handlers? #(au/is-published? (-> % :rum/args first :activity-data))}))
+                                                   :long-press long-press-handler
+                                                   :disabled #(not (au/is-published? (-> % :rum/args first :activity-data)))}))
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
                          ui-mixins/strict-refresh-tooltips-mixin
@@ -237,7 +249,7 @@
         {:class (when @(::show-mobile-more-bt s) "visible")
          :on-click (fn [e]
                     (dismiss-swipe-button s e ::show-mobile-more-bt)
-                    (reset! (::force-show-menu s) true))}
+                    (show-mobile-menu s))}
         [:span "More"]]
       [:button.mlb-reset.mobile-dismiss-bt
         {:class (when @(::show-mobile-dismiss-bt s) "visible")
