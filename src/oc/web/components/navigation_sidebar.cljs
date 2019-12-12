@@ -198,8 +198,9 @@
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
               "All posts"]
-            (when (pos? (count all-unread-items))
-              [:span.count (count all-unread-items)])])
+            ; (when (pos? (count all-unread-items))
+            ;   [:span.count (count all-unread-items)])
+            ])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
