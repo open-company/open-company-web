@@ -165,7 +165,7 @@
                  :class (when showing-mobile-user-notifications
                           "active")}
                 [:span.tab-icon
-                  (when true ;(user-notifications/has-new-content? user-notifications-data)
+                  (when (user-notifications/has-new-content? user-notifications-data)
                     [:span.unread-dot])]
                 [:span.tab-label "Alerts"]]
               (when can-compose?
