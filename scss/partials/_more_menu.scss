@@ -356,7 +356,7 @@ div.more-menu {
       opacity: 0;
       z-index: #{$navbar_zindex + 10};
       visibility: hidden;
-      transition: opacity 180ms ease-out, top 180ms ease-out, height 180ms ease-out, visibility 0s;
+      transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
 
       &.menu-expanded {
         visibility: visible;
@@ -366,6 +366,10 @@ div.more-menu {
 
         & > * {
           display: none;
+        }
+
+        ul.more-menu-list {
+          height: auto;
         }
       }
 
@@ -392,6 +396,8 @@ div.more-menu {
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         padding: 32px 16px;
+        height: 0;
+        transition: height 100ms ease-in;
 
         @include no-user-select();
 
