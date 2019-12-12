@@ -378,9 +378,14 @@ div.more-menu {
       }
       // Add some extra padding at the bottom of mobile browsers
       //  to avoid having the bottom part of the menu hidden
-      &.mobile-browser ul.more-menu-list {
+      &.ios-browser ul.more-menu-list {
         // bottom: #{$mobile_navbar_height}px;
         padding: 32px 16px #{32 + 104}px 16px;
+      }
+
+      &.android-browser ul.more-menu-list {
+        // bottom: #{$mobile_navbar_height}px;
+        padding: 32px 16px #{32 + 52}px 16px;
       }
 
       ul.more-menu-list {
