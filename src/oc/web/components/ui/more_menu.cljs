@@ -7,7 +7,6 @@
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -24,8 +23,6 @@
         (will-open))
       (when (fn? will-close)
         (will-close)))
-    (when @(::last-force-show-menu s)
-      (dom-utils/unlock-page-scroll))
     (reset! (::showing-menu s) next-showing-menu)))
 
 ;; Delete handling
@@ -77,8 +74,7 @@
                             (when next-force-show-menu
                              ;; avoid automatic dismiss of the menu on iOS
                              (reset! (::can-unmount s) false)
-                             (utils/after 1000 #(reset! (::can-unmount s) true))
-                             (dom-utils/lock-page-scroll))))
+                             (utils/after 1000 #(reset! (::can-unmount s) true)))))
                         s)
                        :did-update (fn [s]
                         (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
