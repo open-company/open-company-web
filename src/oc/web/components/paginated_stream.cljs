@@ -47,7 +47,7 @@
                     (if (< @(::last-scroll s) scroll-top)
                       :down
                       :stale))
-        max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))
+        max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
         card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
         scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
         current-board-slug (router/current-board-slug)]
@@ -188,12 +188,14 @@
                         (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
                         (rum/local false ::has-next)
                         (rum/local nil ::bottom-loading)
+                        (rum/local nil ::last-foc-layout)
                         ;; Mixins
                         mixins/first-render-mixin
                         section-mixins/container-nav-in
                         section-mixins/window-focus-auto-loader
 
                         {:will-mount (fn [s]
+                          (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
                           (check-pagination s)
                           s)
                          :did-remount (fn [_ s]
@@ -210,6 +212,12 @@
                             (when (and (not (:loading-more container-data))
                                        @(::bottom-loading s))
                               (reset! (::bottom-loading s) false)
+                              (check-pagination s)))
+                          s)
+                         :after-render (fn [s]
+                          (let [foc-layout @(drv/get-ref s :foc-layout)]
+                            (when (not= @(::last-foc-layout s) foc-layout)
+                              (reset! (::last-foc-layout s) foc-layout)
                               (check-pagination s)))
                           s)
                          :will-unmount (fn [s]

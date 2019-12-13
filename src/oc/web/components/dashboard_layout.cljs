@@ -110,8 +110,7 @@
                                 ;; Do not show the post under the wrong board slug/uuid
                                 (or (= (:board-slug activity-data) current-board-slug)
                                     (= (:board-uuid activity-data) current-board-slug)))
-        no-phisical-home-button (and ua/mobile-app?
-                                     (js/isiPhoneWithoutPhysicalHomeBt))
+        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))]
       ;; Entries list
@@ -127,37 +126,49 @@
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
-                                        :ios-tabbar no-phisical-home-button
-                                        :ios (and (not no-phisical-home-button)
-                                                  ua/ios?)})}
-              [:button.mlb-reset.inbox-tab
+                                        :ios-app-tabbar (and ua/mobile-app?
+                                                             no-phisical-home-button)
+                                        :ios-web-tabbar (and (not ua/mobile-app?)
+                                                             no-phisical-home-button)})}
+              [:button.mlb-reset.tab-button.all-posts-tab
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
+                 :class (when (and (not showing-mobile-user-notifications)
+                                   (= current-board-slug "all-posts"))
+                          "active")}
+                [:span.tab-icon]
+                [:span.tab-label "All"]]
+              [:button.mlb-reset.tab-button.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (nav-actions/nav-to-url! % "inbox" (oc-urls/inbox)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= current-board-slug "inbox"))
-                          "active")}]
-              [:button.mlb-reset.bookmarks-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)))
-                 :class (when (and (not showing-mobile-user-notifications)
-                                   (= current-board-slug "bookmarks"))
-                          "active")}]
-              [:button.mlb-reset.notifications-tab
+                          "active")}
+                [:span.tab-icon
+                  (when (-> org-data :inbox-count pos?)
+                    [:span.count-badge
+                      (:inbox-count org-data)])]
+                [:span.tab-label "New"]]
+              [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
                               (user-actions/show-mobile-user-notifications))
                  :class (when showing-mobile-user-notifications
-                          "active")}]
-              (when (user-notifications/has-new-content? user-notifications-data)
-                [:span.unread-notifications-dot])
+                          "active")}
+                [:span.tab-icon
+                  (when (user-notifications/has-new-content? user-notifications-data)
+                    [:span.unread-dot])]
+                [:span.tab-label "Alerts"]]
               (when can-compose?
-                [:button.mlb-reset.new-post-tab
+                [:button.mlb-reset.tab-button.new-post-tab
                   {:on-click #(do
                                 (.stopPropagation %)
                                 (ui-compose @(drv/get-ref s :show-add-post-tooltip))
-                                (user-actions/hide-mobile-user-notifications))}])])
+                                (user-actions/hide-mobile-user-notifications))}
+                  [:span.tab-icon]
+                  [:span.tab-label "Add"]])])
           ;; Mobile notifications
           (when (and is-mobile?
                      showing-mobile-user-notifications)

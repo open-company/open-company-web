@@ -342,27 +342,49 @@ div.more-menu {
     }
   }
 
-  &.mobile-tray-menu.menu-expanded {
+  &.mobile-tray-menu {
     @include mobile() {
       display: block;
       position: fixed;
       float: unset;
       width: 100vw;
-      height: 100vh;
+      height: 0;
       left: 0;
-      top: 0;
+      top: 100vh;
       background-color: rgba($deep_navy, 0.2);
-      opacity: 1;
+      opacity: 0;
       z-index: #{$navbar_zindex + 10};
+      visibility: hidden;
+      transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
+
+      &.menu-expanded {
+        visibility: visible;
+        opacity: 1;
+        top: 0;
+        height: 100vh;
+
+        & > * {
+          display: none;
+        }
+
+        ul.more-menu-list {
+          height: auto;
+        }
+      }
 
       & > * {
         display: none;
       }
-      // Add some extra padding at the bottom of safari mobile to avoid
-      // the browser bottom navbar cover the menu
-      &.safari-mobile ul.more-menu-list {
+      // Add some extra padding at the bottom of mobile browsers
+      //  to avoid having the bottom part of the menu hidden
+      &.ios-browser ul.more-menu-list {
         // bottom: #{$mobile_navbar_height}px;
         padding: 32px 16px #{32 + 104}px 16px;
+      }
+
+      &.android-browser ul.more-menu-list {
+        // bottom: #{$mobile_navbar_height}px;
+        padding: 32px 16px #{32 + 52}px 16px;
       }
 
       ul.more-menu-list {
@@ -378,6 +400,10 @@ div.more-menu {
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         padding: 32px 16px;
+        height: 0;
+        transition: height 100ms ease-in;
+
+        @include no-user-select();
 
         li {
           padding: 12px 16px;
