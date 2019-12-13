@@ -91,7 +91,7 @@
                   (str " comment" (when (not= comments-count 1) "s"))))
                 (when show-new-tag?
                   [:div.new-comments-tag
-                    (str "(" (:new-comments-count entry-data) " NEW)")])]
+                    (str "(" (:new-comments-count entry-data) " UNREAD NEW)")])]
               (when-not hide-label?
                 [:span.add-a-comment
                   "Add a comment"]))])])))
