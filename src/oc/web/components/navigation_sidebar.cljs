@@ -157,7 +157,7 @@
              :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
             [:div.inbox-icon]
             [:div.inbox-label
-              "New"]
+              "Unread"]
             (when (pos? (:inbox-count org-data))
               [:span.count (:inbox-count org-data)])])
         ;; Bookmarks
