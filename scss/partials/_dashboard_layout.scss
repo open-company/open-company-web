@@ -97,9 +97,14 @@ div.dashboard-layout {
         width: 100vw;
         z-index: #{$navbar_zindex + 5};
 
-        &.ios-tabbar {
+        &.ios-app-tabbar {
           height: #{$mobile_navbar_height + 24}px;
           padding-bottom: 24px;
+        }
+
+        &.ios-web-tabbar {
+          height: #{$mobile_navbar_height + 8}px;
+          padding-bottom: 8px;
         }
 
         &.can-compose {

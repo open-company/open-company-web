@@ -118,8 +118,7 @@
                                 ;; Do not show the post under the wrong board slug/uuid
                                 (or (= (:board-slug activity-data) current-board-slug)
                                     (= (:board-uuid activity-data) current-board-slug)))
-        no-phisical-home-button (and ua/mobile-app?
-                                     (js/isiPhoneWithoutPhysicalHomeBt))
+        no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         should-show-sort? (and (not is-drafts-board)
                                (not is-inbox))
         dismiss-all-link (when is-inbox
@@ -137,7 +136,10 @@
                      (jwt/user-is-part-of-the-team (:team-id org-data)))
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
-                                        :ios-tabbar no-phisical-home-button})}
+                                        :ios-app-tabbar (and ua/mobile-app?
+                                                             no-phisical-home-button)
+                                        :ios-web-tabbar (and (not ua/mobile-app?)
+                                                             no-phisical-home-button)})}
               [:button.mlb-reset.tab-button.all-posts-tab
                 {:on-click #(do
                               (.stopPropagation %)
