@@ -84,7 +84,8 @@
     (save-fixed-comment-height! s)
     (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
       (activity-actions/send-item-read activity-uuid)
-      (activity-actions/inbox-dismiss activity-uuid)
+      (when (= (:back-to @router/path) "inbox")
+        (activity-actions/inbox-dismiss activity-uuid))
       (reset! (::activity-uuid s) activity-uuid))
     (load-comments s true)
     s)
@@ -93,9 +94,7 @@
     (save-initial-last-read-at s)
     s)
    :will-unmount (fn [s]
-    (let [activity-uuid @(::activity-uuid s)]
-      (activity-actions/send-item-read activity-uuid)
-      (activity-actions/inbox-dismiss activity-uuid))
+    (activity-actions/send-item-read @(::activity-uuid s))
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
