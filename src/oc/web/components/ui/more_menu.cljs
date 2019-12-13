@@ -7,6 +7,7 @@
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
@@ -23,6 +24,8 @@
         (will-open))
       (when (fn? will-close)
         (will-close)))
+    (when @(::last-force-show-menu s)
+      (dom-utils/unlock-page-scroll))
     (reset! (::showing-menu s) next-showing-menu)))
 
 ;; Delete handling
@@ -57,6 +60,7 @@
                        (rum/local false ::showing-menu)
                        (rum/local false ::move-activity)
                        (rum/local false ::can-unmount)
+                       (rum/local false ::last-force-show-menu)
                        (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/ref-node s "more-menu"))
                           (when-let [will-close (-> s :rum/args first :will-close)]
@@ -64,9 +68,18 @@
                               (will-close)))
                          (reset! (::showing-menu s) false))))
                        {:did-mount (fn [s]
-                        (utils/after 1000 #(reset! (::can-unmount s) true))
                         (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
                        s)
+                       :will-update (fn [s]
+                        (let [next-force-show-menu (-> s :rum/args first :force-show-menu)]
+                          (when (not= @(::last-force-show-menu s) next-force-show-menu)
+                            (reset! (::last-force-show-menu s) next-force-show-menu)
+                            (when next-force-show-menu
+                             ;; avoid automatic dismiss of the menu on iOS
+                             (reset! (::can-unmount s) false)
+                             (utils/after 1000 #(reset! (::can-unmount s) true))
+                             (dom-utils/lock-page-scroll))))
+                        s)
                        :did-update (fn [s]
                         (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
                           #(doto (js/$ %2)
