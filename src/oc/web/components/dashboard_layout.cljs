@@ -150,7 +150,7 @@
                   (when (-> org-data :inbox-count pos?)
                     [:span.count-badge
                       (:inbox-count org-data)])]
-                [:span.tab-label "New"]]
+                [:span.tab-label "Unread"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
