@@ -108,13 +108,11 @@ div.fullscreen-page {
   min-height: 100vh;
 }
 
-.no-scroll {
+html.no-scroll {
   overflow-y: hidden;
 
-  @include mobile() {
-    div#app {
-      max-height: 100vh;
-    }
+  body {
+    overflow-y: hidden;
   }
 }
 
