@@ -192,14 +192,14 @@
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
-        (when show-billing?
+        (when (and (not is-mobile?)
+                   show-billing?)
           [:a.payments
             {:href "#"
              :on-click payments-click}
             [:div.oc-menu-item
               "Billing"]])
-        (when (or (not is-mobile?)
-                  show-billing?)
+        (when (not is-mobile?)
           [:div.oc-menu-separator])
         [:a.whats-new-link
           (if ua/mobile?
@@ -213,6 +213,13 @@
            :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
           [:div.oc-menu-item.support
             "Get support"]]
+        (when (and is-mobile?
+                   show-billing?)
+          [:a.payments
+            {:href "#"
+             :on-click payments-click}
+            [:div.oc-menu-item
+              "Billing"]])
         (when desktop-app-data
           [:a
             {:href (:href desktop-app-data)
