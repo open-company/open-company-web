@@ -199,7 +199,7 @@
              :on-click payments-click}
             [:div.oc-menu-item
               "Billing"]])
-        (when (not is-mobile?)
+        (when-not is-mobile?
           [:div.oc-menu-separator])
         [:a.whats-new-link
           (if ua/mobile?
