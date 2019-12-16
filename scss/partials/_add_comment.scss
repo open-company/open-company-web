@@ -6,9 +6,10 @@ div.add-comment-box-container {
     div.add-comment-box div.add-comment-internal {
       height: 48px;
       cursor: text;
+      padding: 12px 16px;
 
-      div.add-comment:after {
-        cursor: text;
+      @include mobile() {
+        padding: 11px 14px;
       }
 
       div.add-comment-footer {
@@ -32,7 +33,7 @@ div.add-comment-box-container {
       border-radius: 4px;
       border: 1px solid $mid_light_grey;
       padding: 13px 16px;
-      background-color: white;;
+      background-color: white;
 
       &.active {
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
@@ -50,7 +51,7 @@ div.add-comment-box-container {
         left: unset;
         position: relative;
         bottom: unset;
-        padding: 9px 14px;
+        padding: 11px 14px;
         margin-left: 0;
       }
 
