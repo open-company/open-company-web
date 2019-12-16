@@ -38,6 +38,7 @@ function OCStaticCookieName(name){
   var prefix = "";
   switch(h) {
     case "localhost":
+    case "192":
       prefix = "localhost-";
       break;
     case "staging":
