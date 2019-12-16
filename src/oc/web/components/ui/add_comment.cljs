@@ -256,6 +256,12 @@
                 (if dismiss-reply-cb
                   "Reply"
                   "Comment"))]
+            (emoji-picker {:add-emoji-cb #(add-comment-did-change s)
+                           :width 32
+                           :height 32
+                           :position "top"
+                           :default-field-selector (str "div." add-comment-class)
+                           :container-selector (str "div." add-comment-class)})
             (when uploading?
               [:div.upload-progress
                 (small-loading)
