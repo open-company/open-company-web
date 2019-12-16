@@ -193,7 +193,8 @@
                                      ;; for the reply to comments
                                      (not parent-comment-uuid)
                                      (not @(::show-post-button s))
-                                     (not is-focused?))
+                                     (not is-focused?)
+                                     (not (seq @(::initial-add-comment s))))
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
