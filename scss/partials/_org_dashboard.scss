@@ -40,6 +40,12 @@ div.org-dashboard {
         padding-top: 0;
       }
     }
+
+    @include mobile() {
+      div.page {
+        padding-top: 0;
+      }
+    }
   }
 
   &.expanded-activity {
@@ -48,16 +54,20 @@ div.org-dashboard {
       padding-top: #{$navbar_height}px;
     }
 
-    @include big_web() {
-      div.org-dashboard-inner {
-        padding-top: 0;
+    div.org-dashboard-inner {
+      padding-top: #{$navbar_height}px;
+
+      @include mobile() {
+        div.dashboard-layout div.dashboard-layout-container div.board-container div.expanded-post div.expanded-post-header {
+          top: #{$mobile_navbar_height}px;
+        }
       }
     }
 
-    div.page {
-
-      @include mobile() {
+    @include mobile() {
+      div.page {
         padding-top: 0;
+
         nav.oc-navbar {
           display: none;
         }
