@@ -42,7 +42,7 @@
         comments-link (utils/link-for (:links entry-data) "comments")
         comments-loaded? (seq sorted-comments)
         comments-authors (if comments-loaded?
-                           (vec (map first (vals (group-by :avatar-url (map :author (sort-by :created-at sorted-comments))))))
+                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at sorted-comments))))))
                            (reverse (:authors comments-link)))
         comments-count (if comments-loaded?
                          (count sorted-comments)
