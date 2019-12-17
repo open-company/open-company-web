@@ -4,7 +4,7 @@ div.medium-editor-toolbar {
   background: none;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   border: none;
-  background-color: $deep_navy;
+  background-color: var(--color);
 
   &:after {
     display: none;
@@ -21,12 +21,12 @@ div.medium-editor-toolbar {
       button.medium-editor-action {
         width: 24px;
         height: 24px;
-        color: white;
+        color: var(--overlay-background-color);
         opacity: 0.5;
         border: none;
         box-shadow: none;
         background: none;
-        background-color: $deep_navy;
+        background-color: var(--color);
         border-radius: 0px;
         background-size: 24px 24px;
         background-position: center;
@@ -46,14 +46,26 @@ div.medium-editor-toolbar {
         &.medium-editor-action-bold {
           background-image: cdnUrl("/img/ML/context_menu_bold.svg");
           margin-left: 0px;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/context_menu_bold@dark.svg");
+          }
         }
 
         &.medium-editor-action-italic {
           background-image: cdnUrl("/img/ML/context_menu_italic.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/context_menu_italic@dark.svg");
+          }
         }
 
         &.medium-editor-action-unorderedlist {
           background-image: cdnUrl("/img/ML/context_menu_list.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/context_menu_list@dark.svg");
+          }
         }
 
         &.medium-editor-action-h2 {
@@ -61,11 +73,19 @@ div.medium-editor-toolbar {
           margin-left: 9px;
           padding-left: 9px;
           width: 32px;
-          border-left: 1px solid rgba(255, 255, 255, 0.3);
+          border-left: 1px solid var(--cmail-me-separator);
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/context_menu_h2@dark.svg");
+          }
         }
 
         &.medium-editor-action-anchor {
           background-image: cdnUrl("/img/ML/context_menu_anchor.svg"); 
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/context_menu_anchor@dark.svg"); 
+          }
         }
 
         &.medium-editor-action-quote {

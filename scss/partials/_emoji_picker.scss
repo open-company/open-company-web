@@ -16,6 +16,10 @@ div.emoji-picker {
     background-repeat: no-repeat;
     opacity: 0.4;
 
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/new_post_emoji_button@dark.svg");
+    }
+
     &:hover {
       opacity: 1;
     }
@@ -45,11 +49,11 @@ div.emoji-picker {
       left: 0;
       right: 0;
       height: 100vh;
-      background-color: white;
+      background-color: var(--mobile-background-color);
       z-index: 105;
 
       button.mobile-cancel-bt {
-        color: $deep_navy;
+        color: var(--color);
         padding: 0;
         margin: 0;
         @include OC_Body_Bold();

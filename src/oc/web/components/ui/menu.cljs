@@ -225,7 +225,8 @@
             {:href (:href desktop-app-data)
              :target "_blank"}
             [:div.oc-menu-item.native-app
-              (:title desktop-app-data)]])
+              (:title desktop-app-data)
+              [:span.beta "BETA"]]])
         [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out

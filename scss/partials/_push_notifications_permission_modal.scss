@@ -32,6 +32,10 @@ div.push-notifications-permission-modal {
       position: absolute;
       left: 16px;
       top: 11px;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      }
     }
 
     .modal-title {

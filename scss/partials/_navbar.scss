@@ -3,9 +3,9 @@ nav.oc-navbar {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
   transition: height 230ms;
-  border-bottom: 1px solid rgba($deep_navy, 0.15);
+  border-bottom: 1px solid var(--divider-line);
 
   -webkit-app-region: drag;
   -webkit-user-select: none;
@@ -23,8 +23,8 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
     padding-bottom: 1px;
-    border-bottom: 1px solid $divider_line_grey;
-    background-color: white;
+    border-bottom: 1px solid var(--divider-line);
+    background-color: var(--mobile-background-color);
     overflow: visible;
 
     &.show-login-overlay {
@@ -83,7 +83,7 @@ nav.oc-navbar {
           div.navbar-mobile-title {
             @include OC_Body_Bold();
             font-size: 18px;
-            color: $deep_navy;
+            color: var(--color);
             line-height: 24px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -121,12 +121,16 @@ nav.oc-navbar {
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: $ultra_light_grey;
+            background-color: var(--ultralight-color);
             border-radius: 4px;
             position: absolute;
             padding: 0;
             top: 11px;
             left: 16px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
+            }
           }
         }
 
@@ -236,7 +240,7 @@ nav.oc-navbar {
               position: absolute;
               top: 0;
               right: 0;
-              border: 2px solid $grey_num_2;
+              border: 2px solid var(--background-color);
             }
           }
         }

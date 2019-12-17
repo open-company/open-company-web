@@ -24,7 +24,7 @@ div.paginated-stream {
       font-size: 14px;
       margin-top: 24px;
       @include OC_Body_Book();
-      color: rgba($deep_navy, 0.5);
+      color: var(--light-color);
     }
 
     div.paginated-stream-cards-inner {
@@ -44,12 +44,12 @@ div.paginated-stream {
         height: calc(100vh - 50px);
         width: #{$board_container_width}px;
         margin-left: -244px;
-        background-color: $grey_num_2;
+        background-color: var(--background-color);
         text-align: center;
 
         @include mobile() {
           width: 100%;
-          background-color: white;
+          background-color: var(--mobile-background-color);
         }
 
         div.oc-loading {
@@ -65,7 +65,7 @@ div.paginated-stream {
           top: 300px;
           position: absolute;
           width: 100%;
-          color: rgba($oc_gray_7, 0.5);
+          color: var(--light-color);
           font-size: 16px;
           @include OC_Body_Bold();
           text-align: center;

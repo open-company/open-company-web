@@ -241,6 +241,10 @@ div.fsp-picker {
             span.fsp-button.fsp-button--primary {
               @include carrot_button();
             }
+
+            span.fsp-badge {
+              display: none;
+            }
           }
         }
       }

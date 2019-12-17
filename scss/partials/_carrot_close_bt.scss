@@ -8,6 +8,10 @@ button.settings-modal-close {
   opacity: 0.7;
   position: absolute;
 
+  @include dark_mode() {
+    background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
+  }
+
   &:hover {
     opacity: 1;
   }
@@ -20,4 +24,8 @@ button.modal-close-bt {
   background-position: center;
   background-repeat: no-repeat;
   background-size: 32px 32px;
+
+  @include dark_mode() {
+    background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
+  }
 }

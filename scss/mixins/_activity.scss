@@ -1,4 +1,4 @@
-@import "../modules/_colors";
+@import "../modules/_theme";
 @import "../modules/_fonts";
 
 $bottom_margin: 16;
@@ -16,7 +16,7 @@ $h2_top_margin: 24;
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
-    color: $ui_grey;
+    color: var(--light-color);
     font-size: 12px;
     line-height: 20px;
     white-space: nowrap;
@@ -26,7 +26,7 @@ $h2_top_margin: 24;
     overflow: hidden;
     text-overflow: ellipsis;
     @include OC_Body_Book();
-    color: rgba($ui_grey, 0.5);
+    color: var(--ultralight-color);
     font-size: 12px;
     white-space: nowrap;
 
@@ -150,83 +150,10 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin section-tag($max_width: null) {
-  div.section-tag {
-    float: right;
-    margin-right: 8px;
-    background-color: #E7E6E1;
-    border-radius: 100px;
-    height: 26px;
-    color: $ui_grey;
-    @include OC_Body_Bold();
-    font-size: 12px;
-    padding: 5px 12px 6px 12px;
-    border: 1px solid #E7E6E1;
-    margin-top: 3px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @if $max_width {
-      max-width: #{$max_width - 8 - 24}px;
-
-      &.has-new {
-        max-width: #{$max_width - 46 - 8 - 8 - 24}px;
-      }
-    }
-  }
-}
-
-@mixin activity-tag(){
-  div.activity-tag {
-    display: inline-block;
-    height: 26px;
-    border-radius: 100px;
-    @include OC_Body_Bold();
-    font-size: 12px;
-    color: $carrot_light_gray_3;
-    background-color: $carrot_light_gray_7;
-    line-height: 14px;
-    text-align: center;
-    padding: 7px 11px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    margin-left: 3px;
-
-    &.on-gray {
-      &:hover, &:active, &:focus, &.active {
-        background-color: $carrot_purple;
-        color: white;
-        cursor: pointer;
-
-        &.board-tag {
-          background-color: $carrot_text_blue_3;
-          color: white;
-          cursor: pointer;
-        }
-      }
-    }
-
-    &:hover, &:active, &:focus, &.active {
-      background-color: $carrot_light_purple;
-      color: $carrot_purple;
-      cursor: pointer;
-
-      &.board-tag {
-        color: $carrot_text_blue_3;
-        background-color: $carrot_light_blue_2;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
 @mixin activity-title($font_size: 26px, $line_height: 30px){
   @include OC_Title();
   font-size: $font_size;
-  color: $deep_navy;
+  color: var(--color);
   line-height: $line_height;
 
   .emojione {
@@ -237,7 +164,7 @@ $h2_top_margin: 24;
 @mixin activity-abstract($font_size: 14px, $line_height: 18px){
   @include OC_Body_Bold();
   font-size: $font_size;
-  color: $deep_navy;
+  color: var(--color);
   line-height: $line_height;
 
   i {
@@ -254,7 +181,7 @@ $h2_top_margin: 24;
     @include OC_Body_Bold();
     font-size: $font_size;
     line-height: $line_height;
-    color: rgba($deep_navy, 0.5);
+    color: var(--light-color);
     opacity: 1;
     font-style: normal;
     text-transform: none;
@@ -277,7 +204,7 @@ $h2_top_margin: 24;
 @mixin activity-headline(){
   @include OC_Title();
   font-size: 22px;
-  color: $deep_navy;
+  color: var(--color);
   line-height: 28px;
 
   .emojione {
@@ -285,7 +212,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: $deep_navy, $paragraph_spacing: $line_height){
+@mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -309,7 +236,7 @@ $h2_top_margin: 24;
     @include OC_Body_Book();
     font-size: #{$font_size}px;
     line-height: #{$line_height}px;
-    color: $grey_num_1;
+    color: var(--light-color);
     opacity: 1;
     font-style: none !important;
   }
@@ -496,7 +423,7 @@ $h2_top_margin: 24;
     width: 100%;
     height: 56px;
     padding: 13px 16px;
-    background-color: #F0EFEA;
+    background-color: #F0EFEA; // FIXME
     border-radius: 4px;
     margin-top: 4px;
 
@@ -523,9 +450,9 @@ $h2_top_margin: 24;
     i.file-mimetype {
       width: 30px;
       height: 30px;
-      background-color: white;
+      background-color: var(--background-color);
       border-radius: 15px;
-      color: $oc_gray_5;
+      color: var(--color);
       float: left;
       font-size: 16px;
       padding: 7px 9px;
@@ -544,14 +471,14 @@ $h2_top_margin: 24;
     label.media-attachment-title {
       font-size: 13px;
       @include OC_Body_Bold();
-      color: $carrot_dark_gray;
+      color: var(--color);
       margin-left: 8px;
     }
 
     label.media-attachment-subtitle {
       font-size: 12px;
       @include OC_Body_Book();
-      color: rgba($oc_gray_7, 0.5);
+      color: var(--light-color);
       margin-left: 8px;
     }
 
@@ -561,7 +488,7 @@ $h2_top_margin: 24;
       height: 25px;
       margin: -35px 0 0 0;
       padding: 0;
-      color: $oc_gray_5;
+      color: var(--color);
       display: none;
     }
   }
@@ -591,7 +518,7 @@ $h2_top_margin: 24;
       position: absolute;
       font-family: FontAwesome;
       font-size: 20px;
-      color: white;
+      color: var(--background-color);
       opacity: 0.5;
       top: 50%;
       left: 50%;
@@ -617,7 +544,7 @@ $h2_top_margin: 24;
 @mixin activity-comment($font-size: 18px, $line-height: 24px, $paragraph-spacing: $line-height){
   @include OC_Body_Book();
   font-size: $font-size;
-  color: $deep_navy;
+  color: var(--color);
   white-space: pre-wrap;
   word-wrap: break-word;
   line-height: $line-height;
@@ -649,7 +576,7 @@ $h2_top_margin: 24;
   a.read-more {
     @include OC_Body_Book();
     font-size: 12px;
-    color: $deep_navy;
+    color: var(--color);
   }
 
   margin-bottom: 0px;
@@ -679,7 +606,7 @@ $h2_top_margin: 24;
   }
 
   &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-    color: rgba($deep_navy, 0.5);
+    color: var(--light-color);
     font-style: normal;
     font-size: $font-size;
     line-height: $line-height;

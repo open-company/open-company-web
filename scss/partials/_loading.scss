@@ -5,11 +5,11 @@ div.oc-loading {
   width: 100%;
   height: 100%;
   display: none;
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
   z-index: #{$navbar_zindex + 3001};
 
   @include mobile() {
-    background-color: white;
+    background-color: var(--mobile-background-color);
   }
 
   &.active {
@@ -37,6 +37,10 @@ div.oc-loading {
       position: absolute;
       top: 22px;
       left: 0px;
+
+      @include dark_mode() {
+        opacity: 0.4;
+      }
     }
 
     div.oc-loading-heart {
@@ -47,6 +51,10 @@ div.oc-loading {
       position: absolute;
       top: 0px;
       left: 0px;
+
+      @include dark_mode() {
+        opacity: 0.4;
+      }
     }
   }
 

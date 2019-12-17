@@ -33,17 +33,17 @@ div.stream-comments {
         margin-left: -8px;
 
         &.not-highlighted.open-thread:hover {
-          background-color: rgba($deep_navy, 0.05);
+          background-color: var(--opac-background-color-05);
           border-radius: 4px;
         }
 
         &.not-highlighted:not(.open-thread):not(.showing-add-comment):hover div.stream-comment.indented-comment div.stream-comment-inner {
-          background-color: rgba($deep_navy, 0.05);
+          background-color: var(--opac-background-color-05);
           border-radius: 4px;
         }
 
         &.not-highlighted:not(.open-thread).showing-add-comment div.stream-comment.indented-comment:hover div.stream-comment-inner {
-          background-color: rgba($deep_navy, 0.05);
+          background-color: var(--opac-background-color-05);
           border-radius: 4px;
         }
       }
@@ -56,7 +56,7 @@ div.stream-comments {
           position: absolute;
           left: 23px;
           top: 0;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
         }
 
         &.open-thread:before {
@@ -109,6 +109,10 @@ div.stream-comments {
       &.highlighted {
         background-color: #FFF7DD;
         transition: background-color 3s ease-in;
+
+        @include dark_mode() {
+          background-color: rgba(0, 0, 0, 0.15);
+        }
       }
 
       div.stream-comment {
@@ -148,7 +152,7 @@ div.stream-comments {
               padding-top: 29px;
 
               button.close-bt {
-                color: $deep_navy;
+                color: var(--color);
                 padding: 0;
                 margin: 0;
                 @include OC_Body_Bold();
@@ -197,7 +201,7 @@ div.stream-comments {
 
         &.showing-picker {
           div.stream-comment-floating-buttons {
-            background-color: rgba($ultra_light_grey, 0.3);
+            background-color: var(--comments-floating-bt-background);
             display: block;
           }
         }
@@ -219,8 +223,8 @@ div.stream-comments {
               display: block;
               margin-top: 0;
               border-radius: 4px;
-              border: 1px solid $mid_light_grey;
-              background-color: white;
+              border: 1px solid var(--divider-line);
+              background-color: var(--overlay-background-color);
               outline: none;
               padding: 4px;
               box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
@@ -242,7 +246,7 @@ div.stream-comments {
           display: none;
           border-radius: 4px;
           box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.16);
-          background-color: $deep_navy;
+          background-color: var(--color);
 
           div.more-bt-container {
             height: 32px;
@@ -258,19 +262,19 @@ div.stream-comments {
               width: 78px;
               outline: none;
               z-index: 110;
-              background-color: white;
-              border: 1px solid $mid_light_grey;
+              background-color: var(--overlay-background-color);
+              border: 1px solid var(--divider-line);
 
               button {
                 padding: 0;
                 margin: 0;
                 @include OC_Body_Book();
                 font-size: 14px;
-                color: $deep_navy;
+                color: var(--color);
                 line-height: 18px;
                 cursor: pointer;
                 padding: 8px 16px;
-                background-color: white;
+                background-color: var(--overlay-background-color);
                 position: relative;
               }
             }
@@ -315,7 +319,7 @@ div.stream-comments {
             @include OC_Body_Bold();
             font-size: 12px;
             line-height: 32px;
-            color: white;
+            color: var(--overlay-background-color);
             text-transform: uppercase;
 
             @include big_web() {
@@ -334,6 +338,10 @@ div.stream-comments {
               background-image: cdnUrl("/img/ML/comment_more.svg");
               background-size: 18px 4px;
               background-position: left 8px top 14px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/comment_more@dark.svg");
+              }
             }
 
             &.share-bt {
@@ -341,6 +349,10 @@ div.stream-comments {
               background-image: cdnUrl("/img/ML/comment_share.svg");
               background-size: 12px 12px;
               background-position: left 8px top 10px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+              }
             }
 
             &.reply-bt {
@@ -348,6 +360,10 @@ div.stream-comments {
               background-image: cdnUrl("/img/ML/comment_reply.svg");
               background-size: 12px 12px;
               background-position: left 8px top 10px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+              }
             }
 
             &.react-bt {
@@ -356,6 +372,10 @@ div.stream-comments {
               background-size: 14px 14px;
               background-position: left 8px top 9px;
               border-right: none;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+              }
 
               div.emoji-mart {
                 right: 0;
@@ -379,6 +399,10 @@ div.stream-comments {
           margin-left: 48px;
 
           @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
+
+          @include dark_mode() {
+            @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));            
+          }
         }
 
         div.stream-comment-header {
@@ -386,18 +410,30 @@ div.stream-comments {
 
           @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
 
+          @include dark_mode() {
+            @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));            
+          }
+
           div.stream-comment-author-right {
             float: left;
 
             @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
 
+            @include dark_mode() {
+              @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
+            }
+
             div.stream-comment-author-name {
               @include OC_Body_Bold();
               font-size: 14px;
-              color: $deep_navy;
+              color: var(--color);
               line-height: 16px;
               float: left;
               @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
+
+              @include dark_mode() {
+                @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
+              }
             }
 
             @include mobile() {
@@ -428,7 +464,7 @@ div.stream-comments {
             div.stream-comment-author-name {
               @include OC_Body_Bold();
               font-size: 14px;
-              color: $deep_navy;
+              color: var(--color);
               line-height: 16px;
               float: left;
               overflow: hidden;
@@ -439,7 +475,7 @@ div.stream-comments {
             div.stream-comment-author-timestamp {
               @include OC_Body_Book();
               font-size: 14px;
-              color: rgba($deep_navy, 0.5);
+              color: var(--light-color);
               float: left;
               margin-left: 6px;
               line-height: 16px;
@@ -514,7 +550,7 @@ div.stream-comments {
             line-height: 18px;
 
             &.cancel-bt {
-              color: rgba($deep_navy, 0.5);
+              color: var(--light-color);
               margin-right: 16px;
             }
 
