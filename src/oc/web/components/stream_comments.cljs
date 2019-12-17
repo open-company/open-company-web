@@ -202,7 +202,10 @@
                                                  (not (:is-emoji comment-data)))
                       can-show-delete-bt? (:can-delete comment-data)
                       showing-picker? (and (seq @(::show-picker s))
-                                           (= @(::show-picker s) (:uuid comment-data)))]]
+                                           (= @(::show-picker s) (:uuid comment-data)))
+                      new-comment? (and (not= (-> comment-data :author :user-id) current-user-id)
+                                        (< (.getTime (utils/js-date last-read-at))
+                                           (.getTime (utils/js-date (:created-at comment-data)))))]]
             (if is-editing?
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
@@ -265,13 +268,13 @@
                       [:div.stream-comment-header.group
                         {:class utils/hide-class}
                         [:div.stream-comment-author-right
-                          [:div.stream-comment-author-name
-                            (:name (:author comment-data))]
-                          [:div.stream-comment-author-timestamp
-                            (utils/foc-date-time (:created-at comment-data))]
-                          (when (and (not= (-> comment-data :author :user-id) current-user-id)
-                                     (< (.getTime (utils/js-date last-read-at))
-                                        (.getTime (utils/js-date (:created-at comment-data)))))
+                          [:div.stream-comment-author-right-group
+                            {:class (when new-comment? "new-comment")}
+                            [:div.stream-comment-author-name
+                              (:name (:author comment-data))]
+                            [:div.stream-comment-author-timestamp
+                              (utils/foc-date-time (:created-at comment-data))]]
+                          (when new-comment?
                             [:div.new-comment-tag "(NEW)"])
                           (when-not is-editing?
                             (if (responsive/is-mobile-size?)

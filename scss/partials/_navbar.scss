@@ -197,8 +197,10 @@ nav.oc-navbar {
         margin-right: 0px;
         position: absolute;
         left: calc(100vw - 72px - 16px);
+        min-width: 72px;
 
         @include mobile() {
+          min-width: unset;
           position: absolute;
           top: 11px;
           left: unset;

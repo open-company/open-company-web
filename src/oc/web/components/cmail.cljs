@@ -238,9 +238,11 @@
         (utils/to-end-of-content-editable headline-el)))))
 
 (defn add-emoji-cb [s]
-  (headline-on-change s)
-  (abstract-on-change s)
-  (body-on-change s))
+  (utils/after 180
+   #(do
+     (headline-on-change s)
+     (abstract-on-change s)
+     (body-on-change s))))
 
 (defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
@@ -427,8 +429,8 @@
                           initial-abstract (if (seq (:abstract cmail-data))
                                              (:abstract cmail-data)
                                              "")
-                          body-text (.text (js/$ initial-body "<div/>"))
-                          abstract-text (.text (js/$ initial-abstract "<div/>"))
+                          body-text (.text (.html (js/$ "<div/>") initial-body))
+                          abstract-text (.text (.html (js/$ "<div/>") initial-abstract))
                           abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
                       (when (and (not (seq (:uuid cmail-data)))
                                  (not (:collapsed cmail-state)))
@@ -461,7 +463,7 @@
                       (when-not (:collapsed cmail-state)
                         (utils/after 1000 #(.focus (body-element)))))
                     (let [body-el (sel1 [:div.rich-body-editor])
-                          abstract-text (.text (js/$ (str "<div>" @(::initial-abstract s) "</div>")))]
+                          abstract-text (.text (.html (js/$ "<div/>") @(::initial-abstract s)))]
                       (when (or (> (count (.-innerText body-el)) body-length-to-show-abstract)
                                 (seq abstract-text))
                         (show-abstract-box s)))
@@ -483,9 +485,9 @@
                                 initial-abstract (if (seq (:abstract cmail-data))
                                                    (:abstract cmail-data)
                                                    "")
-                                abstract-text (.text (js/$ initial-abstract "<div/>"))
+                                abstract-text (.text (.html (js/$ "<div/>") initial-abstract))
                                 abstract-exceeds (> (count abstract-text) utils/max-abstract-length)
-                                body-text (.text (js/$ initial-body "<div/>"))]
+                                body-text (.text (.html (js/$ "<div/>") initial-body))]
                             (when (and (not (seq (:uuid cmail-data)))
                                        (not (:collapsed cmail-state)))
                               (nux-actions/dismiss-add-post-tooltip))
@@ -735,7 +737,7 @@
                                 :video-processed (:video-processed cmail-data)})))
             [:div.cmail-content-section-picker.group
               [:div.cmail-content-section-picker-label
-                "Post in"]
+                "Post to"]
               [:div.section-picker-bt-container
                 [:button.mlb-reset.section-picker-bt
                   {:on-click #(swap! (::show-sections-picker s) not)}
