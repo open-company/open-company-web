@@ -2,7 +2,7 @@ $picker_height: 421;
 $picker_width: 338;
 
 div.emoji-picker {
-  z-index: 100;
+  z-index: #{$navbar_zindex - 1};
   position: relative;
 
   button.emoji-button{
@@ -46,8 +46,7 @@ div.emoji-picker {
       right: 0;
       height: 100vh;
       background-color: white;
-      z-index: 4;
-      padding-top: 29px;
+      z-index: 105;
 
       button.mobile-cancel-bt {
         color: $deep_navy;
@@ -64,14 +63,15 @@ div.emoji-picker {
       div.emoji-mart {
         position: relative;
         width: 100% !important;
-        height: calc(100vh - 29px);
+        height: calc(100% - #{$mobile_navbar_height}px);
+        margin-top: #{$mobile_navbar_height}px;
         bottom: unset;
         box-shadow: none;
         border-radius: none;
         border: none;
 
         div.emoji-mart-scroll {
-          height: calc(100vh - 29px - 46px - 29px);
+          height: calc(100vh - #{$mobile_navbar_height}px - 46px - 29px);
         }
 
         div.emoji-mart-bar:last-child {
