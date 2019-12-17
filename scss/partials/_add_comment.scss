@@ -2,6 +2,22 @@ div.add-comment-box-container {
   position: relative;
   width: 100%;
 
+  &.collapsed-box {
+    div.add-comment-box div.add-comment-internal {
+      height: 48px;
+      cursor: text;
+      padding: 12px 16px;
+
+      @include mobile() {
+        padding: 11px 14px;
+      }
+
+      div.add-comment-footer {
+        display: none;
+      }
+    }
+  }
+
   @include tablet() {
     padding: 0;
     width: 100%;
@@ -16,8 +32,8 @@ div.add-comment-box-container {
       position: relative;
       border-radius: 4px;
       border: 1px solid $mid_light_grey;
-      padding: 16px;
-      background-color: white;;
+      padding: 13px 16px;
+      background-color: white;
 
       &.active {
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
@@ -35,7 +51,7 @@ div.add-comment-box-container {
         left: unset;
         position: relative;
         bottom: unset;
-        padding: 9px 14px;
+        padding: 11px 14px;
         margin-left: 0;
       }
 
@@ -104,10 +120,6 @@ div.add-comment-box-container {
 
           &:hover {
             background-color: rgba($deep_navy, 0.2);
-          }
-
-          @include mobile() {
-            display: none;
           }
         }
 

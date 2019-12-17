@@ -193,14 +193,16 @@
                                      ;; for the reply to comments
                                      (not parent-comment-uuid)
                                      (not @(::show-post-button s))
-                                     (not is-focused?))
+                                     (not is-focused?)
+                                     (not (seq @(::initial-add-comment s))))
         is-mobile? (responsive/is-mobile-size?)
         attachment-uploading (drv/react s :attachment-uploading)
         uploading? (and attachment-uploading
                         (= (:comment-parent-uuid attachment-uploading) parent-comment-uuid))
         add-comment-class (str "add-comment-" @(::add-comment-id s))]
     [:div.add-comment-box-container
-      {:class container-class}
+      {:class (utils/class-set {container-class true
+                                :collapsed-box should-hide-post-button})}
       [:div.add-comment-box
         [:div.add-comment-internal
           {:class (when-not should-hide-post-button "active")}
@@ -208,6 +210,7 @@
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden @(::did-change s)
+                                     :medium-editor-placeholder (not @(::did-change s))
                                      utils/hide-class true})
             :on-focus #(focus-add-comment s)
             :on-blur #(disable-add-comment-if-needed s)
@@ -226,9 +229,16 @@
             :content-editable true
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
-            (when (fn? dismiss-reply-cb)
-              [:button.mlb-reset.close-reply-bt
-                {:on-click (fn [_]
+            [:button.mlb-reset.close-reply-bt
+              {:on-click (fn [_]
+                          (let [dismiss-fn (if (fn? dismiss-reply-cb)
+                                             #(dismiss-reply-cb true)
+                                             (fn []
+                                                (set! (.-innerHTML (rum/ref-node s "editor-node")) @(::initial-add-comment s))
+                                                (disable-add-comment-if-needed s)
+                                                (reset! (::did-change s) false)
+                                                (reset! (::show-post-button s) false)
+                                                (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) "")))]
                             (if @(::did-change s)
                               (let [alert-data {:icon "/img/ML/trash.svg"
                                                 :action "cancel-comment-edit"
@@ -238,14 +248,14 @@
                                                 :solid-button-style :red
                                                 :solid-button-title "Yes"
                                                 :solid-button-cb (fn []
-                                                                  (dismiss-reply-cb true)
+                                                                  (dismiss-fn)
                                                                   (alert-modal/hide-alert))}]
                                 (alert-modal/show-alert alert-data))
-                              (dismiss-reply-cb true)))
-                 :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
-                 :data-placement "top"
-                 :data-container "body"
-                 :title (if edit-comment-data "Cancel edit" "Close")}])
+                              (dismiss-fn))))
+               :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
+               :data-placement "top"
+               :data-container "body"
+               :title (if edit-comment-data "Cancel edit" "Close")}]
             [:button.mlb-reset.send-btn
               {:on-click #(when-not @(::add-button-disabled s)
                             (send-clicked % s))
