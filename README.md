@@ -88,6 +88,19 @@ If you've done it right, you'll now have 4 terminal sessions running: Storage, A
 
 Open your browser to [http://localhost:3559/](http://localhost:3559/).
 
+If you want to use your local ip address instead of localhost to tests on a different device you just need to create a file
+named `resources/public/js/local-env.js` with the following content:
+
+```
+var OCEnv = {
+  "web-hostname": "192.168.1.2",
+  "port": "3559"
+}
+```
+and now you can connect to [http://192.168.1:3559](http://192.168.1:3559). The file or any of its keys are optional.
+
+NB: if you want to change the port you have to change it also in the build.boot file under the dev task.
+
 To create a **production** build run:
 
 ```console
