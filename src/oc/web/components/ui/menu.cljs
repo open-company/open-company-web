@@ -18,6 +18,8 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.dark-mode :as dark-mode-actions]
+            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn menu-close [& [s]]
@@ -89,6 +91,7 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
+                  (drv/drv :dark-mode)
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -116,7 +119,8 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           (router/current-org-slug))]
+                           (router/current-org-slug))
+        dark-mode (drv/react s :dark-mode)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -149,8 +153,19 @@
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
-        (when-not is-mobile?
-          [:div.oc-menu-separator])
+        [:div.oc-menu-separator]
+        [:div.dark-mode-switch
+          [:span.dark-mode-icon.light
+            {:class (when (= dark-mode :light) "active")
+             :on-click #(dark-mode-actions/set-dark-mode :light)}]
+          (carrot-switch {:selected (= dark-mode :dark)
+                          :did-change-cb (fn [v]
+                                           (js/console.log "DBG dark-mode switch clicked:" (if v :dark :light))
+                                           (dark-mode-actions/set-dark-mode (if v :dark :light)))})
+          [:span.dark-mode-icon.dark
+            {:class (when (= dark-mode :dark) "active")
+             :on-click #(dark-mode-actions/set-dark-mode :dark)}]]
+        [:div.oc-menu-separator]
         (when (and show-reminders?
                    (not is-mobile?))
           [:a

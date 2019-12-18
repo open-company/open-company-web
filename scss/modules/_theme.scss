@@ -64,59 +64,57 @@ $dark_mode: "dark";
   --cmail-me-separator: rgba(255, 255, 255, 0.3);
 }
 
-@media screen and (prefers-color-scheme: $dark_mode) {
-  :root {
-    --background-color: #1B202A;
-    --color: white;
-    --light-color: #{rgba(white,0.5)};
-    --ultralight-color: #{rgba(white,0.25)};
-    --tooltip-background-color: white;
-    --tooltip-color: #1B202A;
-    --selection-color: #{$carrot_orange};
-    --divider-line: #{rgba(white, 0.16)};
-    --overlay-background-color: #1B202A;
+html.theme-mode-dark {
+  --background-color: #1B202A;
+  --color: white;
+  --light-color: #{rgba(white,0.5)};
+  --ultralight-color: #{rgba(white,0.25)};
+  --tooltip-background-color: white;
+  --tooltip-color: #1B202A;
+  --selection-color: #{$carrot_orange};
+  --divider-line: #{rgba(white, 0.16)};
+  --overlay-background-color: #1B202A;
 
-    --opac-background-color-05: #{rgba(white, 0.05)};
-    --opac-background-color-1: #{rgba(white, 0.1)};
-    --opac-background-color-15: #{rgba(white, 0.15)};
-    --opac-background-color-2: #{rgba(white, 0.2)};
+  --opac-background-color-05: #{rgba(white, 0.05)};
+  --opac-background-color-1: #{rgba(white, 0.1)};
+  --opac-background-color-15: #{rgba(white, 0.15)};
+  --opac-background-color-2: #{rgba(white, 0.2)};
 
-    --mobile-background-color: #1B202A;
-    --mobile-color: white;
-    --mobile-tabbar-color: white;
+  --mobile-background-color: #1B202A;
+  --mobile-color: white;
+  --mobile-tabbar-color: white;
 
-    --panel-header-background: #{rgba(white, 0.04)};
+  --panel-header-background: #{rgba(white, 0.04)};
 
-    // Ractions
-    --reaction-bt-background: #{rgba(white, 0.12)};
+  // Ractions
+  --reaction-bt-background: #{rgba(white, 0.12)};
 
-    // Stream-item
-    --foc-background-color: #{rgba(white, 0.09)};
-    --mobile-foc-background-color: #1B202A;
-    --foc-hover-color: #{rgba(white, 0.04)};
-    --foc-new-color: #{$deep_navy};
-    --foc-divider-line-color: #{rgba(white, 0.16)};
+  // Stream-item
+  --foc-background-color: #{rgba(white, 0.09)};
+  --mobile-foc-background-color: #1B202A;
+  --foc-hover-color: #{rgba(white, 0.04)};
+  --foc-new-color: #{$deep_navy};
+  --foc-divider-line-color: #{rgba(white, 0.16)};
 
-    //Navigation item
-    --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
-    --navigation-sidebar-hover-bg: #{rgba(white, 0.03)};
+  //Navigation item
+  --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
+  --navigation-sidebar-hover-bg: #{rgba(white, 0.03)};
 
-    // Notifications tray
-    --notifications-item-background: #1B202A;
-    --notifications-border: #{rgba(white, 0.5)};
+  // Notifications tray
+  --notifications-item-background: #1B202A;
+  --notifications-border: #{rgba(white, 0.5)};
 
-    // Search
-    --search-background-color: #{rgba(white, 0.09)};
+  // Search
+  --search-background-color: #{rgba(white, 0.09)};
 
-    // Comments
-    --comments-floating-bt-background: #{rgba(white, 0.3)};
-    --add-comment-background: #{rgba(white, 0.24)};
-    --mobile-add-comment-background: #1B202A;
+  // Comments
+  --comments-floating-bt-background: #{rgba(white, 0.3)};
+  --add-comment-background: #{rgba(white, 0.24)};
+  --mobile-add-comment-background: #1B202A;
 
-    // Cmail
-    --cmail-fullscreen-bt-bg: #{rgba($deep_navy, 0.2)};
-    --cmail-section-bt-background: #{rgba(white, 0.12)};
-    --cmail-section-bt-color: white;
-    --cmail-me-separator: #{rgba($deep_navy, 0.3)};
-  }
+  // Cmail
+  --cmail-fullscreen-bt-bg: #{rgba($deep_navy, 0.2)};
+  --cmail-section-bt-background: #{rgba(white, 0.12)};
+  --cmail-section-bt-color: white;
+  --cmail-me-separator: #{rgba($deep_navy, 0.3)};
 }

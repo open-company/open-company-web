@@ -27,6 +27,7 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.dark-mode]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
