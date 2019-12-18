@@ -120,7 +120,8 @@
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
                            (router/current-org-slug))
-        dark-mode (drv/react s :dark-mode)]
+        dark-mode-setting (drv/react s :dark-mode)
+        current-mode (dark-mode-actions/computed-value dark-mode-setting)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -156,15 +157,18 @@
         [:div.oc-menu-separator]
         [:div.dark-mode-switch
           [:span.dark-mode-icon.light
-            {:class (when (= dark-mode :light) "active")
+            {:class (when (not= current-mode :dark) "active")
              :on-click #(dark-mode-actions/set-dark-mode :light)}]
-          (carrot-switch {:selected (= dark-mode :dark)
-                          :did-change-cb (fn [v]
-                                           (js/console.log "DBG dark-mode switch clicked:" (if v :dark :light))
-                                           (dark-mode-actions/set-dark-mode (if v :dark :light)))})
+          (carrot-switch {:selected (= current-mode :dark)
+                          :did-change-cb #(dark-mode-actions/set-dark-mode (if % :dark :light))})
           [:span.dark-mode-icon.dark
-            {:class (when (= dark-mode :dark) "active")
-             :on-click #(dark-mode-actions/set-dark-mode :dark)}]]
+            {:class (when (= current-mode :dark) "active")
+             :on-click #(dark-mode-actions/set-dark-mode :dark)}]
+          (when (and (not= dark-mode-setting :auto)
+                     (dark-mode-actions/support-system-dark-mode?))
+            [:a.dark-mode-auto
+              {:on-click #(dark-mode-actions/set-dark-mode :auto)}
+              "Auto"])]
         [:div.oc-menu-separator]
         (when (and show-reminders?
                    (not is-mobile?))

@@ -233,6 +233,15 @@ div.menu {
     }
 
     div.dark-mode-switch {
+      a.dark-mode-auto {
+        color: $carrot_green;
+        display: inline-block;
+        cursor: pointer;
+        margin: 0 0 0 16px;
+        padding: 0;
+        line-height: 16px;
+      }
+
       span.dark-mode-icon {
         width: 16px;
         height: 16px;

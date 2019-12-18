@@ -32,25 +32,33 @@
     (dommy/remove-class! (sel1 [:html]) (str (name dark-mode-class-name-prefix) "-light"))
     (dommy/add-class! (sel1 [:html]) (str (name dark-mode-class-name-prefix) "-" (name mode)))))
 
+(defn support-system-dark-mode? []
+  (and (exists? js/window.matchMedia)
+       (or (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))
+           (.-matches (.matchMedia js/window "(prefers-color-scheme: light)")))))
+
+(defn computed-value [v]
+  (if (= v :auto)
+    (if (support-system-dark-mode?)
+      :dark
+      dark-mode-default-value)
+    v))
+
 (defn get-dark-mode-setting []
   (let [current-mode (read-dark-mode-cookie)]
-    (if (= current-mode :auto)
-      (if (and (exists? js/window.matchMedia)
-               (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)")))
-        :dark
-        :light)
-      (or current-mode :light))))
+    (or current-mode dark-mode-default-value)))
 
 (defn set-dark-mode [v]
   (timbre/debug "Saving theme:" (name v))
   (save-dark-mode-cookie v)
-  (set-dark-mode-class v)
+  (set-dark-mode-class (computed-value v))
   (dis/dispatch! [:input dis/dark-mode-key v]))
 
 (defn setup-dark-mode []
-  (let [cur-val (get-dark-mode-setting)]
-    (timbre/info "Theme:" (name cur-val))
-    (set-dark-mode-class cur-val)
+  (let [cur-val (get-dark-mode-setting)
+        computed-val (computed-value cur-val)]
+    (timbre/info "Theme:" (name cur-val) "->" (name computed-val))
+    (set-dark-mode-class computed-val)
     ;; FIXME: use swap! instead of dis/dispatch! since the multimethod have not been intialized yet
     ;; at this point.
     (swap! dis/app-state #(assoc-in % dis/dark-mode-key cur-val))))
