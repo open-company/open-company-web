@@ -8,12 +8,14 @@ button.settings-modal-close {
   opacity: 0.7;
   position: absolute;
 
-  @include dark_mode() {
-    background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
-  }
-
   &:hover {
     opacity: 1;
+  }
+}
+
+@include dark_mode() {
+  button.settings-modal-close {
+    background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
   }
 }
 
@@ -24,8 +26,10 @@ button.modal-close-bt {
   background-position: center;
   background-repeat: no-repeat;
   background-size: 32px 32px;
+}
 
-  @include dark_mode() {
+@include dark_mode() {
+  button.modal-close-bt {
     background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
   }
 }

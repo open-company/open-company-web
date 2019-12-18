@@ -37,10 +37,6 @@ div.oc-loading {
       position: absolute;
       top: 22px;
       left: 0px;
-
-      @include dark_mode() {
-        opacity: 0.4;
-      }
     }
 
     div.oc-loading-heart {
@@ -51,10 +47,6 @@ div.oc-loading {
       position: absolute;
       top: 0px;
       left: 0px;
-
-      @include dark_mode() {
-        opacity: 0.4;
-      }
     }
   }
 
@@ -115,5 +107,12 @@ div.oc-loading {
   }
   40%{
     transform:scale(1) rotate(0deg);
+  }
+}
+
+@include dark_mode() {
+  div.oc-loading div.oc-loading-inner div.oc-loading-body,
+  div.oc-loading div.oc-loading-inner div.oc-loading-header {   
+    opacity: 0.4;
   }
 }

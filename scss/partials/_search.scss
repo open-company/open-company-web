@@ -101,10 +101,6 @@ div.search-box {
         position: absolute;
         left: 16px;
         top: 11px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
       }
 
       div.mobile-header-title {
@@ -127,10 +123,6 @@ div.search-box {
     position: absolute;
     left: 126px;
     top: 8px;
-
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/spyglass@dark.svg");
-    }
 
     @include mobile() {
       display: none;
@@ -402,6 +394,22 @@ div.search-results {
       @include OC_Body_Book();
       font-size: 14px;
       color: var(--color);
+    }
+  }
+}
+
+@include dark_mode() {
+  div.search-box {
+    div.mobile-header {
+      @include mobile() {
+        button.search-close-bt {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+    }
+
+    div.spyglass-icon {
+      background-image: cdnUrl("/img/ML/spyglass@dark.svg");
     }
   }
 }

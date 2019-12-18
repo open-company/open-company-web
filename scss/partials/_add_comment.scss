@@ -119,10 +119,6 @@ div.add-comment-box-container {
           padding: 0;
           float: left;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
-
           &:hover {
             background-color: var(--opac-background-color-2);
           }
@@ -206,5 +202,12 @@ div.add-comment-box-container {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.add-comment-box-container div.add-comment-box
+  div.add-comment-internal div.add-comment-footer  button.close-reply-bt {
+    background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
   }
 }

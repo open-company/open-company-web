@@ -4,7 +4,7 @@
 $dark_mode: "dark";
 
 @mixin dark_mode() {
-  @media screen and (prefers-color-scheme: $dark_mode) {
+  html.theme-mode-dark {
     @content
   }
 }
@@ -64,7 +64,7 @@ $dark_mode: "dark";
   --cmail-me-separator: rgba(255, 255, 255, 0.3);
 }
 
-html.theme-mode-dark {
+@include dark_mode() {
   --background-color: #1B202A;
   --color: white;
   --light-color: #{rgba(white,0.5)};

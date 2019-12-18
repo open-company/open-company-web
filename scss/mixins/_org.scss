@@ -50,10 +50,6 @@
       @if $show_border == true {
         border: 1px solid var(--divider-line);
         padding: #{$max_logo_height / 10}px; // Let's use a padding of 1/10
-
-        @include dark_mode() {
-          border: 1px solid transparent;
-        }
       }
 
       width: #{$max_logo_height}px;

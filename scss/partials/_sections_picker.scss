@@ -68,10 +68,6 @@ div.sections-picker {
         background-size: 10px 12px;
         background-position: center;
         background-repeat: no-repeat;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/board_private_white.svg");
-        }
       }
 
       div.public-icon {
@@ -82,11 +78,19 @@ div.sections-picker {
         background-size: 12px 12px;
         background-position: center;
         background-repeat: no-repeat;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/board_public_white.svg");
-        }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.sections-picker div.sections-picker-content div.sections-picker-section {
+    div.private-icon {
+      background-image: cdnUrl("/img/ML/board_private_white.svg");  
+    }
+
+    div.public-icon {
+      background-image: cdnUrl("/img/ML/board_public_white.svg");
     }
   }
 }

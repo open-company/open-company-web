@@ -320,10 +320,6 @@ div.dashboard-layout {
               border-left: 1px solid var(--divider-line);
               opacity: 0.5;
 
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
-              }
-
               @include big_web() {
                 &:hover {
                   opacity: 1;
@@ -520,5 +516,12 @@ div.dashboard-layout {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.dashboard-layout div.dashboard-layout-container div.board-container
+  div.board-name-container div.board-name div.board-settings-container button.board-settings-bt {
+    background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
   }
 }

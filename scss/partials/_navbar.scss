@@ -127,10 +127,6 @@ nav.oc-navbar {
             padding: 0;
             top: 11px;
             left: 16px;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
-            }
           }
         }
 
@@ -244,6 +240,16 @@ nav.oc-navbar {
             }
           }
         }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  nav.oc-navbar div.oc-navbar-header div.oc-navbar-header-container div.navbar-left {
+    button.mobile-ham-menu {
+      @include mobile() {
+        background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
       }
     }
   }

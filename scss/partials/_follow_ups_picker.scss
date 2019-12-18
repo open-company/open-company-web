@@ -32,10 +32,6 @@ div.follow-ups-picker {
       padding: 0;
       display: block;
       z-index: 3;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-      }
     }
   }
 
@@ -241,5 +237,11 @@ div.follow-ups-picker {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.follow-ups-picker button.modal-close-bt {
+    background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
   }
 }

@@ -30,10 +30,6 @@ div.more-menu {
     background-repeat: no-repeat;
     opacity: 0.5;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
-    }
-
     @include mobile() {
       background-color: var(--divider-line);
       border-radius: 4px;
@@ -72,10 +68,6 @@ div.more-menu {
     display: inline-block;
     opacity: 1;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");
-    }
-
     @include big_web() {
       &:hover {
         background-color: var(--opac-background-color-2);
@@ -105,10 +97,6 @@ div.more-menu {
     background-repeat: no-repeat;
     opacity: 1;
     display: inline-block;
-
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/mobile_complete_follow_up@dark.svg");
-    }
 
     @include big_web() {
       &:hover {
@@ -146,10 +134,6 @@ div.more-menu {
       padding: 0;
       background-repeat: no-repeat;
       opacity: 1;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
-      }
 
       @include big_web() {
         &:hover {
@@ -249,6 +233,27 @@ div.more-menu {
           background-color: transparent;
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.more-menu {
+    button.more-menu-bt {
+      
+      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
+    }
+
+    button.more-menu-share-bt {
+      background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");
+    }
+
+    button.more-menu-complete-follow-up-bt {
+      background-image: cdnUrl("/img/ML/mobile_complete_follow_up@dark.svg");
+    }
+
+    div.more-menu-create-follow-up-bt-container button.more-menu-create-follow-up-bt {
+      background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
     }
   }
 }

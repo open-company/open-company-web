@@ -16,10 +16,6 @@ div.emoji-picker {
     background-repeat: no-repeat;
     opacity: 0.4;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/new_post_emoji_button@dark.svg");
-    }
-
     &:hover {
       opacity: 1;
     }
@@ -106,5 +102,11 @@ div.emoji-mart {
     div.emoji-mart-preview-data span.emoji-mart-title-label {
       display: none;
     }
+  }
+}
+
+@include dark_mode() {
+  div.emoji-picker button.emoji-button {
+    background-image: cdnUrl("/img/ML/new_post_emoji_button@dark.svg");
   }
 }

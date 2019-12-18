@@ -168,10 +168,6 @@ div.cmail-outer {
           button.fullscreen-bt {
             background-color: var(--opac-background-color-1);
             background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse.svg");
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse@dark.svg");
-            }
           }
 
           .tooltip {
@@ -203,10 +199,6 @@ div.cmail-outer {
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
             border-left: 1px solid var(--divider-line);
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-            }
 
             &:not(.disabled):hover {
               background-color: var(--opac-background-color-2);
@@ -396,10 +388,6 @@ div.cmail-outer {
           left: 16px;
           background-color: var(--opac-background-color-1);
           border-radius: 4px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
         }
 
         div.cmail-mobile-header-right {
@@ -419,10 +407,6 @@ div.cmail-outer {
             opacity: 1;
             background-color: var(--opac-background-color-1);
             border-radius: 4px;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-            }
           }
 
           button.follow-up-button {
@@ -438,10 +422,6 @@ div.cmail-outer {
             float: left;
             margin-left: 8px;
             opacity: 1;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
-            }
 
             &.disabled {
               cursor: not-allowed;
@@ -549,10 +529,6 @@ div.cmail-outer {
             padding: 0;
             opacity: 1;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-            }
-
             &:not(.disabled):hover {
               background-color: var(--opac-background-color-2);
             }
@@ -590,10 +566,6 @@ div.cmail-outer {
             display: block;
             opacity: 1;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
-            }
-
             &:not(.disabled):hover {
               background-color: var(--opac-background-color-1);
             }
@@ -625,10 +597,6 @@ div.cmail-outer {
           float: left;
           opacity: 1;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
-          }
-
           &:not(.disabled):hover {
             background-color: var(--opac-background-color-2);
           }
@@ -659,10 +627,6 @@ div.cmail-outer {
           border-top-right-radius: 4px;
           border-bottom-right-radius: 4px;
           opacity: 1;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
 
           &:not(.disabled):hover {
             background-color: var(--opac-background-color-2);
@@ -729,10 +693,6 @@ div.cmail-outer {
           border-radius: 4px;
           margin-left: 8px;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
-          }
-
           @include preload_image(cdnUrl("/img/ML/cmail_fullscreen_collapse.svg"));
         }
       }
@@ -798,10 +758,6 @@ div.cmail-outer {
         background-position: center;
         margin-right: 8px;
         margin-top: 1px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/follow_up_icon_white@dark.svg");
-        }
       }
 
       @include mobile() {
@@ -866,10 +822,6 @@ div.cmail-outer {
             background-position: center;
             padding: 0;
             background-repeat: no-repeat;
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_white@dark.svg");
-            }
           }
 
           button.mobile-follow-ups-remove {
@@ -1026,10 +978,6 @@ div.cmail-outer {
               background-size: 8px 10px;
               background-repeat: no-repeat;
               background-position: center;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/select_arrows_white.svg");
-              }
             }
           }
         }
@@ -1127,10 +1075,6 @@ div.cmail-outer {
           background-size: 8px 8px;
           background-repeat: no-repeat;
           background-position: center;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/black_close@dark.svg");
-          }
         }
 
         div.cmail-content-abstract-container {
@@ -1254,10 +1198,6 @@ div.cmail-outer {
           opacity: 1;
           border-radius: 4px;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
-
           &:not(.disabled):hover {
             background-color: var(--opac-background-color-2);
           }
@@ -1290,10 +1230,6 @@ div.cmail-outer {
           padding: 0;
           opacity: 1;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
-          }
-
           &:not(.disabled):hover {
             background-color: var(--opac-background-color-2);
           }
@@ -1323,10 +1259,6 @@ div.cmail-outer {
           border-radius: 4px;
           padding: 0;
           opacity: 1;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
-          }
 
           &:not(.disabled):hover {
             background-color: var(--opac-background-color-2);
@@ -1360,10 +1292,6 @@ div.cmail-outer {
           border-top-right-radius: 4px;
           border-bottom-right-radius: 4px;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
-          }
-
           &:not(.disabled):hover {
             opacity: 1;
             background-color: var(--opac-background-color-2);
@@ -1396,10 +1324,6 @@ div.cmail-outer {
           border-left: 1px solid var(--divider-line);
           border-top-right-radius: 4px;
           border-bottom-right-radius: 4px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
-          }
 
           &:not(.disabled):hover {
             background-color: var(--opac-background-color-2);
@@ -1469,10 +1393,6 @@ div.cmail-outer {
           border-radius: 4px;
           margin-left: 16px;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-          }
-
           @include big_web() {
             &:hover, &.active {
               background-color: var(--opac-background-color-2);
@@ -1488,18 +1408,121 @@ div.cmail-outer {
 
           @include mobile() {
             width: calc(100% - 16px - 32px);
-            background-image: cdnUrl("/img/ML/select_arrows.svg");
             background-color: var(--opac-background-color-1);
             color: var(--color);
-
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-            }
 
             &:hover, &.open {
               background-color: var(--opac-background-color-2);
             }
           }
+        }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.cmail-outer {
+    div.cmail-container {
+      div.cmail-footer {
+        div.cmail-footer-right {
+          div.board-name {
+            background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
+          }
+
+          button.attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+
+          button.follow-up-button {
+            background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
+          }
+        }
+
+        div.fullscreen-bt-container button.fullscreen-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
+        }
+
+        div.delete-bt-container button.delete-bt {
+          background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
+        }
+
+        div.dismiss-inline-cmail-container button.dismiss-inline-cmail {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+
+        div.cmail-content-abstract-container-outer button.remove-abstract-bt {
+          background-image: cdnUrl("/img/ML/black_close@dark.svg");
+        }
+      }
+
+      div.cmail-content div.cmail-content-section-picker div.section-picker-bt-container button.section-picker-bt:after {
+        background-image: cdnUrl("/img/ML/select_arrows_white.svg");
+      }
+
+      div.cmail-header {
+        div.follow-ups-header div.mobile-follow-ups-remove-menu-container {
+          @include mobile() {
+            button.mobile-follow-ups-remove-menu {
+              background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis_white@dark.svg");
+            }
+          }
+        }
+
+        div.follow-ups-header div.follow-up-icon {
+          background-image: cdnUrl("/img/ML/follow_up_icon_white@dark.svg");
+        }
+
+        div.fullscreen-bt-container button.fullscreen-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
+        }
+
+        div.cmail-header-right-buttons {
+          button.attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+
+          button.follow-up-button { 
+            background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
+          }
+        }
+
+        div.cmail-header-left-buttons {
+          div.delete-button-container button.delete-button {
+            background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
+          }
+
+          div.close-bt-container button.close-bt {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
+        }
+      }
+
+      div.cmail-mobile-header {
+        @include mobile() {
+          div.cmail-mobile-header-right button.mobile-attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+
+          div.cmail-mobile-header-right button.follow-up-button {
+            background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
+          }
+
+          button.mobile-close-bt {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
+        }
+      }
+    }
+
+    &.fullscreen {
+      div.cmail-container {
+        div.cmail-header div.cmail-header-right-buttons button.attachment-button {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+        }
+
+        div.cmail-header div.fullscreen-bt-container button.fullscreen-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse@dark.svg");
         }
       }
     }

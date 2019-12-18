@@ -31,10 +31,6 @@ div.user-notifications {
     padding: 0;
     margin: 0;
 
-    @include dark_mode() {
-      background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
-    }
-
     // &.active {
     //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
     // }
@@ -279,5 +275,11 @@ div.user-notifications {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.user-notifications button.notifications-bell-bt {
+    background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
   }
 }

@@ -17,10 +17,6 @@ div.lazy-stream {
     background-repeat: repeat-y;
     background-position: 0 0;
 
-    @include dark_mode(){
-      opacity: 0.2;
-    }
-
     @include mobile() {
       background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
       min-height: casl(100vh - #{$mobile_navbar_height}px - 8px);
@@ -33,5 +29,11 @@ div.preload-interstitial {
   @include preload_image(cdnUrl("/img/ML/interstitial.svg"));
   @include mobile() {
     @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
+  }
+}
+
+@include dark_mode(){
+  div.lazy-stream div.lazy-stream-interstitial {
+    opacity: 0.2;
   }
 }

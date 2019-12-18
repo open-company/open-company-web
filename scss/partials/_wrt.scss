@@ -149,10 +149,6 @@ div.wrt-popup-container {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
         } 
       }
     }
@@ -383,6 +379,14 @@ div.wrt-popup-container {
           }
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.wrt-popup-container div.wrt-popup div.wrt-popup-header button.mobile-close-bt {
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
     }
   }
 }

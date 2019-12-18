@@ -46,26 +46,14 @@ div.medium-editor-toolbar {
         &.medium-editor-action-bold {
           background-image: cdnUrl("/img/ML/context_menu_bold.svg");
           margin-left: 0px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/context_menu_bold@dark.svg");
-          }
         }
 
         &.medium-editor-action-italic {
           background-image: cdnUrl("/img/ML/context_menu_italic.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/context_menu_italic@dark.svg");
-          }
         }
 
         &.medium-editor-action-unorderedlist {
           background-image: cdnUrl("/img/ML/context_menu_list.svg");
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/context_menu_list@dark.svg");
-          }
         }
 
         &.medium-editor-action-h2 {
@@ -74,18 +62,10 @@ div.medium-editor-toolbar {
           padding-left: 9px;
           width: 32px;
           border-left: 1px solid var(--cmail-me-separator);
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/context_menu_h2@dark.svg");
-          }
         }
 
         &.medium-editor-action-anchor {
           background-image: cdnUrl("/img/ML/context_menu_anchor.svg"); 
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/context_menu_anchor@dark.svg"); 
-          }
         }
 
         &.medium-editor-action-quote {
@@ -94,6 +74,30 @@ div.medium-editor-toolbar {
           }
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.medium-editor-toolbar ul.medium-editor-toolbar-actions li button.medium-editor-action {
+    &.medium-editor-action-bold {
+      background-image: cdnUrl("/img/ML/context_menu_bold@dark.svg");
+    }
+
+    &.medium-editor-action-italic {
+      background-image: cdnUrl("/img/ML/context_menu_italic@dark.svg");
+    }
+
+    &.medium-editor-action-unorderedlist {
+      background-image: cdnUrl("/img/ML/context_menu_list@dark.svg");
+    }
+
+    &.medium-editor-action-h2 {
+      background-image: cdnUrl("/img/ML/context_menu_h2@dark.svg");
+    }
+
+    &.medium-editor-action-anchor {
+      background-image: cdnUrl("/img/ML/context_menu_anchor@dark.svg"); 
     }
   }
 }

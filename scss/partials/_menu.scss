@@ -110,10 +110,6 @@ div.menu {
           background-repeat: no-repeat;
           background-color: var(--divider-line);
           border-radius: 4px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
         }
       }
 
@@ -254,20 +250,30 @@ div.menu {
         &.light {
           background-image: cdnUrl("/img/ML/dark_mode_light.svg");
           margin-right: 8px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg")
-          }
         }
 
         &.dark {
           background-image: cdnUrl("/img/ML/dark_mode_dark.svg");
           margin-left: 8px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/dark_mode_dark@dark.svg")
-          }
         }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.menu div.menu-container {
+    div.menu-header button.mobile-close-bt { 
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+    }
+
+    div.dark-mode-switch span.dark-mode-icon {
+      &.light {
+        background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg")
+      }
+
+      &.dark {
+        background-image: cdnUrl("/img/ML/dark_mode_dark@dark.svg")
       }
     }
   }

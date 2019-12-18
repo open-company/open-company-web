@@ -220,10 +220,6 @@ div.onboard-lander {
           position: absolute;
           top: 16px;
           left: 16px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
         }
 
         button.top-continue {

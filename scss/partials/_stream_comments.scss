@@ -109,10 +109,6 @@ div.stream-comments {
       &.highlighted {
         background-color: #FFF7DD;
         transition: background-color 3s ease-in;
-
-        @include dark_mode() {
-          background-color: rgba(0, 0, 0, 0.15);
-        }
       }
 
       div.stream-comment {
@@ -338,10 +334,6 @@ div.stream-comments {
               background-image: cdnUrl("/img/ML/comment_more.svg");
               background-size: 18px 4px;
               background-position: left 8px top 14px;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/comment_more@dark.svg");
-              }
             }
 
             &.share-bt {
@@ -349,10 +341,6 @@ div.stream-comments {
               background-image: cdnUrl("/img/ML/comment_share.svg");
               background-size: 12px 12px;
               background-position: left 8px top 10px;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/comment_share@dark.svg");
-              }
             }
 
             &.reply-bt {
@@ -360,10 +348,6 @@ div.stream-comments {
               background-image: cdnUrl("/img/ML/comment_reply.svg");
               background-size: 12px 12px;
               background-position: left 8px top 10px;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
-              }
             }
 
             &.react-bt {
@@ -372,10 +356,6 @@ div.stream-comments {
               background-size: 14px 14px;
               background-position: left 8px top 9px;
               border-right: none;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/comment_react@dark.svg");
-              }
 
               div.emoji-mart {
                 right: 0;
@@ -399,10 +379,6 @@ div.stream-comments {
           margin-left: 48px;
 
           @include preload_image(cdnUrl("/img/ML/comment_react.svg"));
-
-          @include dark_mode() {
-            @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));            
-          }
         }
 
         div.stream-comment-header {
@@ -410,18 +386,10 @@ div.stream-comments {
 
           @include preload_image(cdnUrl("/img/ML/comment_more.svg"));
 
-          @include dark_mode() {
-            @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));            
-          }
-
           div.stream-comment-author-right {
             float: left;
 
             @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
-
-            @include dark_mode() {
-              @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
-            }
 
             div.stream-comment-author-name {
               @include OC_Body_Bold();
@@ -430,10 +398,6 @@ div.stream-comments {
               line-height: 16px;
               float: left;
               @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
-
-              @include dark_mode() {
-                @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
-              }
             }
 
             @include mobile() {
@@ -608,6 +572,49 @@ div.stream-comments {
       &.expanded {
         span.collapse-expand-list {
           background-image: cdnUrl("/img/ML/collapse_comments.svg");
+        }
+      }
+    }
+  }
+}
+
+
+@include dark_mode() {
+  div.stream-comments {
+    div.stream-commetns-list div.stream-commet-outer {
+      &.highlighted {
+        background-color: rgba(0, 0, 0, 0.15);
+      }
+
+      div.stream-comment {
+        div.stream-comment-floating-buttons button.floating-bt{
+          &.more-bt {
+            background-image: cdnUrl("/img/ML/comment_more@dark.svg");
+          }
+
+          &.share-bt {
+            background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+          }
+
+          &.reply-bt {
+            background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+          }
+
+          &.react-bt {
+            background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+          }
+        }
+
+        div.stream-comment-header {
+          @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
+
+          div.stream-comment-author-right {
+            @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
+          }
+
+          div.stream-comment-author-name {
+            @include preload_image(cdnUrl("/img/ML/comment_share@dark.svg"));
+          }
         }
       }
     }

@@ -111,11 +111,6 @@ div.reactions {
           background-position: center;
           background-repeat: no-repeat;
 
-          @include dark_mode() {
-            opacity: 1;
-            background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");
-          }
-
           @include mobile() {
             // width: 25px;
             // height: 17px;
@@ -171,5 +166,12 @@ div.reactions {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.reactions div.reactions-list button.reaction-btn.reaction-picker span.reaction {
+    opacity: 1;
+    background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");  
   }
 }

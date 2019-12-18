@@ -76,17 +76,9 @@ div.expanded-post {
       background-repeat: no-repeat;
       background-position: center;
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/expanded_post_back_arrow@dark.svg");
-      }
-
       @include mobile() {
         background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
         background-size: 12px 12px;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
       }
 
       @include big_web(){
@@ -366,6 +358,17 @@ div.expanded-post {
       margin-top: 16px;
       width: 100%;
       padding: 16px 0;
+    }
+  }
+}
+
+
+@include dark_mode() {
+  div.expanded-post div.expanded-post-header button.back-to-board {
+    background-image: cdnUrl("/img/ML/expanded_post_back_arrow@dark.svg");
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
     }
   }
 }

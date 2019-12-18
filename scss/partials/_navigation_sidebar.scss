@@ -350,10 +350,6 @@ div.left-navigation-sidebar {
           background-repeat: no-repeat;
           background-color: var(--ultralight-color);
           border-radius: 4px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-          }
         }
 
         div.orgs-dropdown  {
@@ -445,10 +441,6 @@ div.left-navigation-sidebar {
       height: 23px;
       float: left;
 
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
-      }
-
       @include mobile() {
         opacity: 1;
         height: 24px;
@@ -463,10 +455,6 @@ div.left-navigation-sidebar {
       width: 16px;
       height: 23px;
       float: left;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/follow_ups_icon_white.svg");
-      }
 
       @include mobile() {
         margin-left: 0px;
@@ -485,11 +473,6 @@ div.left-navigation-sidebar {
       height: 23px;
       float: left;
 
-      @include dark_mode(){
-        background-image: cdnUrl("/img/ML/follow_ups_white.svg");
-      }
-
-
       @include mobile() {
         opacity: 1;
         height: 24px;
@@ -504,10 +487,6 @@ div.left-navigation-sidebar {
       width: 16px;
       height: 23px;
       float: left;
-
-      @include dark_mode(){
-        background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
-      }
 
       @include mobile() {
         background-position: center;
@@ -577,10 +556,6 @@ div.left-navigation-sidebar {
           width: 12px;
           height: 6px;
           transition: 180ms transform;
-
-          @include dark_mode(){
-            background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow@dark.svg");
-          }
         }
 
         span.sections {
@@ -622,10 +597,6 @@ div.left-navigation-sidebar {
       background-size: 16px 16px;
       @include OC_Body_Bold();
       margin-top: 7px;
-
-      @include dark_mode(){
-        background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
-      }
 
       @include mobile() {
         display: none;
@@ -706,10 +677,6 @@ div.left-navigation-sidebar {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/board_public_white.svg");
-        }
       }
 
       div.private {
@@ -722,10 +689,6 @@ div.left-navigation-sidebar {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/board_private_white.svg");
-        }
       }
 
       div.board-name {
@@ -789,6 +752,56 @@ div.left-navigation-sidebar {
             display: block;
           }
         }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.left-navigation-sidebar {
+    div.left-navigation-sidebar-content div.left-navigation-sidebar-mobile-header {
+      @include mobile() {
+        button.mobile-close-bt {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+    }
+
+    a.all-posts, a.follow-ups, a.drafts, a.must-see {
+      div.all-posts-icon {
+        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
+      }
+
+      div.follow-ups-icon {
+        background-image: cdnUrl("/img/ML/follow_ups_icon_white.svg");
+      }
+
+      div.must-see-icon {
+        background-image: cdnUrl("/img/ML/follow_ups_white.svg");
+      }
+
+      div.drafts-icon {
+        background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
+      }
+    }
+
+    div.left-navigation-sidebar-top {
+      .left-navigation-sidebar-top-title button.left-navigation-sidebar-sections-arrow:before {
+        background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow@dark.svg");
+      }
+
+      button.left-navigation-sidebar-top-title-button {
+        background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+      }
+    }
+
+    div.left-navigation-sidebar-items div.left-navigation-sidebar-item {
+      div.public {
+        background-image: cdnUrl("/img/ML/board_public_white.svg");
+      }
+
+      div.private {
+        background-image: cdnUrl("/img/ML/board_private_white.svg");
       }
     }
   }

@@ -33,10 +33,6 @@ div.payments-settings-modal {
       background-repeat: no-repeat;
       background-color: var(--mobile-background-color);
       border-radius: 4px;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-      }
     }
   }
 
@@ -246,10 +242,6 @@ div.payments-settings-modal {
             right: 8px;
             top: 11px;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-            }
-
             @include mobile() {
               top: 15px;
             }
@@ -395,6 +387,21 @@ div.payments-settings-modal {
           margin: 8px 0 24px;
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.payments-settings-modal {
+    button.modal-close-bt {
+      @include mobile() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      }
+    }
+
+    div.payments-settings-modal-container div.payments-settings-body
+    div.plan-change button.plans-dropdown-bt:after {
+      background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
   }
 }
