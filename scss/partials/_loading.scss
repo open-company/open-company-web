@@ -112,7 +112,7 @@ div.oc-loading {
 
 @include dark_mode() {
   div.oc-loading div.oc-loading-inner div.oc-loading-body,
-  div.oc-loading div.oc-loading-inner div.oc-loading-header {   
+  div.oc-loading div.oc-loading-inner div.oc-loading-heart {
     opacity: 0.4;
   }
 }
