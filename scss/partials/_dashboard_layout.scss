@@ -406,8 +406,8 @@ div.dashboard-layout {
           @include mobile() {
             width: 100%;
             height: 50px;
-            background-color: var(--opac-background-color-05);
-            border-bottom: 1px solid --opac-background-color-15;
+            background-color: var(--mobile-foc-background-color);
+            border-bottom: 1px solid var(--opac-background-color-15);
           }
 
           button.mobile-search-bt {

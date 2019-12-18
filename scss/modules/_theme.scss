@@ -54,6 +54,7 @@ $dark_mode: "dark";
 
   // Comments
   --comments-floating-bt-background: #{rgba($ultra_light_grey, 0.3)};
+  -add-comment-background: white;
 
   // Cmail
   --cmail-fullscreen-bt-bg: #{rgba(white, 0.2)};
@@ -108,6 +109,8 @@ $dark_mode: "dark";
 
     // Comments
     --comments-floating-bt-background: #{rgba(white, 0.3)};
+    --add-comment-background: #{rgba(white, 0.24)};
+    --mobile-add-comment-background-color: 
 
     // Cmail
     --cmail-fullscreen-bt-bg: #{rgba($deep_navy, 0.2)};

@@ -33,7 +33,7 @@ div.add-comment-box-container {
       border-radius: 4px;
       border: 1px solid var(--divider-line);
       padding: 13px 16px;
-      background-color: var(--overlay-background-color);
+      background-color: var(--add-comment-background);
 
       &.active {
         box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
@@ -53,6 +53,7 @@ div.add-comment-box-container {
         bottom: unset;
         padding: 11px 14px;
         margin-left: 0;
+        background-color: var(--mobile-add-comment-background);
       }
 
       div.add-comment {
