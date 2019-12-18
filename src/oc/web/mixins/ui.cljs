@@ -10,8 +10,6 @@
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]))
 
-(def -no-scroll-mixin-class :no-scroll)
-
 (def refresh-tooltips-mixin
   {:did-mount (fn [s]
     (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
