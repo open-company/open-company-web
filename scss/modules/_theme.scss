@@ -27,6 +27,7 @@ $dark_mode: "dark";
 
   --mobile-background-color: white;
   --mobile-color: #{$deep_navy};
+  --mobile-tabbar-color: #07C176;
 
   --panel-header-background: #{$ultra_light_grey};
 
@@ -78,8 +79,9 @@ $dark_mode: "dark";
     --opac-background-color-15: #{rgba(white, 0.15)};
     --opac-background-color-2: #{rgba(white, 0.2)};
 
-    --mobile-background-color: #{$deep_navy};
+    --mobile-background-color: #1B202A;
     --mobile-color: white;
+    --mobile-tabbar-color: white;
 
     --panel-header-background: #{rgba(white, 0.04)};
 
@@ -90,7 +92,7 @@ $dark_mode: "dark";
     --foc-background-color: #{rgba(white, 0.09)};
     --mobile-foc-background-color: #1B202A;
     --foc-hover-color: #{rgba(white, 0.04)};
-    --foc-new-color: #1B202A;
+    --foc-new-color: #{$deep_navy};
     --foc-divider-line-color: #{rgba(white, 0.16)};
 
     //Navigation item
