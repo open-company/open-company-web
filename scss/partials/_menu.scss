@@ -233,6 +233,10 @@ div.menu {
     }
 
     div.dark-mode-switch {
+      @include mobile() {
+        margin-top: 30px;
+      }
+
       a.dark-mode-auto {
         color: $carrot_green;
         display: inline-block;
