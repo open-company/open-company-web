@@ -40,7 +40,9 @@
 (defn computed-value [v]
   (if (= v :auto)
     (if (support-system-dark-mode?)
-      :dark
+      (if (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))
+        :dark
+        :light)
       dark-mode-default-value)
     v))
 
@@ -61,6 +63,11 @@
     (set-dark-mode-class computed-val)
     ;; FIXME: use swap! instead of dis/dispatch! since the multimethod have not been intialized yet
     ;; at this point.
-    (swap! dis/app-state #(assoc-in % dis/dark-mode-key cur-val))))
+    (swap! dis/app-state #(assoc-in % dis/dark-mode-key cur-val))
+    (when (support-system-dark-mode?)
+      (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
+       #(when (= (get-dark-mode-setting) :auto)
+          (set-dark-mode :auto))))))
 
 (setup-dark-mode)
+
