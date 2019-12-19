@@ -14,10 +14,10 @@
 (defn unlock-page-scroll
   "Remove no-scroll class from the page body tag to unlock the scroll"
   []
-  (when (pos? @_lock-counter)
-    (swap! _lock-counter dec)
-    (when (zero? @_lock-counter)
-      (dommy/remove-class! (sel1 [:html]) :no-scroll))))
+  (swap! _lock-counter dec)
+  (when-not (pos? @_lock-counter)
+    (reset! _lock-counter 0)
+    (dommy/remove-class! (sel1 [:html]) :no-scroll)))
 
 (defn is-element-top-in-viewport?
    "Given a DOM element return true if it's actually visible in the viewport."
