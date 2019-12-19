@@ -297,7 +297,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Mute: Ignore future replies from my team unless I’m mentioned"}]))
+               :title "Mute: Ignore future replies unless I’m mentioned"}]))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
