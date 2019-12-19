@@ -334,7 +334,7 @@
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
-                 :title "Mute: Ignore future replies from my team unless I’m mentioned"}])))
+                 :title "Mute: Ignore future replies unless I’m mentioned"}])))
         (when external-bookmark
           (if remove-bookmark-link
             [:button.mlb-reset.more-menu-remove-bookmark-bt
