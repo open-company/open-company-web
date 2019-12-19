@@ -172,7 +172,7 @@
                                (let [alert-data {:icon "/img/ML/trash.svg"
                                                  :action "deactivate-invite-email-link"
                                                  :title "Are you sure?"
-                                                 :message "Anyone with this link won't be able to use it to access your team anymore."
+                                                 :message "Anyone that has this link already won't be able to use it to access your team."
                                                  :solid-button-title "OK, got it"
                                                  :solid-button-cb #(do
                                                                     (alert-modal/hide-alert)
@@ -206,7 +206,7 @@
             {:key "org-settings-invite-table"
              :class (when is-admin? "top-border")}
             [:div.invites-list-title
-              "Invite someone with a specific permission level (Admin, Contributor, or Viewer)"]
+              "Invite someone as an admin, contributor, or viewer"]
             (for [i (range (count invite-users))
                   :let [user-data (get invite-users i)
                         key-string (str "invite-users-tabe-" i)]]
