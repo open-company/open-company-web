@@ -14,7 +14,7 @@
 (def ^:private dark-mode-default-value :auto)
 
 (defn dark-mode-cookie-name []
-  (str (jwt/user-id) "-" (name dark-mode-cookie-name-suffix)))
+  (str (name dark-mode-cookie-name-suffix)))
 
 (defn save-dark-mode-cookie [v]
   (cook/set-cookie! (dark-mode-cookie-name) (name v) (* 60 60 24 365)))

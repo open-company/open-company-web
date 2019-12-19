@@ -37,8 +37,10 @@ function OCStaticCookieName(name){
   var h = window.location.hostname.split(".")[0];
   var prefix = "";
   switch(h) {
-    case "localhost":
     case "192":
+      prefix = "192.168.1.48-";
+      break;
+    case "localhost":
       prefix = "localhost-";
       break;
     case "staging":
@@ -339,6 +341,16 @@ function isiPhoneWithoutPhysicalHomeBt(){
   return false;
 }
 
+function OCDarkModeEarlySetup(){
+  var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("dark-mode"));
+  if (darkModeCookie === "dark" ||
+      (darkModeCookie === "auto" &&
+       window.matchMedia &&
+       window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+    $("html").addClass("theme-mode-dark");
+  }
+}
+
 (function(){
   $(document).ready(function(){
     
@@ -354,3 +366,5 @@ function isiPhoneWithoutPhysicalHomeBt(){
     }
   });
 })();
+
+OCDarkModeEarlySetup();
