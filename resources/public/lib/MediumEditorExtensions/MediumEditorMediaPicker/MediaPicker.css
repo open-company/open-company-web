@@ -101,10 +101,8 @@ div.medium-editor-media-picker div.media-picker-container button.media-photo {
   background-size: 16px 14px;
 }
 
-html.theme-mode-dark {
-  div.medium-editor-media-picker div.media-picker-container button.media-photo {
-    background-image: url("/img/ML/media_photo@dark.svg");
-  }
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-photo {
+  background-image: url("/img/ML/media_photo@dark.svg");
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded button.media-photo:hover {

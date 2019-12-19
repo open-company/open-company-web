@@ -1,4 +1,4 @@
-div.dropdown{
+div.dropdown {
   position: relative;
 
   button.user-type-btn {
@@ -44,7 +44,7 @@ div.dropdown{
       padding: 4px 16px;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $ui_grey;
+      color: rgba($deep_navy, 0.5);
       background-color: transparent;
 
       &.selected {
@@ -60,8 +60,16 @@ div.dropdown{
       &.remove-li {
         color: $carrot_orange;
         background-color: transparent;
-        border-top: 1px solid rgba($carrot_light_gray_1, 0.2);
+        border-top: 1px solid $divider_line_grey;
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.dropdown {
+    button.user-type-btn:after {
+      background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
   }
 }

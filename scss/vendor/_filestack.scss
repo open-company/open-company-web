@@ -45,7 +45,7 @@ div.fsp-picker {
   @include OC_Body_Book();
 
   div.fsp-modal {
-    background-color: white;
+    background-color: var(--overlay-background-color);
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.05);
     border-radius: 8px;
 
@@ -54,12 +54,12 @@ div.fsp-picker {
     }
 
     div.fst-sidebar {
-      background-color: white;
+      background-color: var(--overlay-background-color);
     }
 
     div.fsp-modal__sidebar {
       transition: all 0s cubic-bezier(.84,.02,.37,.74) !important;
-      background-color: white;
+      background-color: var(--overlay-background-color);
       box-shadow: none;
 
       @include big_web() {
@@ -72,7 +72,7 @@ div.fsp-picker {
 
       div.fsp-source-list {
         .fsp-source-list__item--active {
-          background-color: white;
+          background-color: var(--overlay-background-color);
         }
 
         .fsp-source-list__item.active {
@@ -96,7 +96,7 @@ div.fsp-picker {
             top: 10px;
             left: 10px;
             border-radius: 20px;
-            background-color: rgba($oc_gray_7,0.4);
+            background-color: var(--opac-background-color-1);
             position: absolute;
           }
         }
@@ -163,10 +163,10 @@ div.fsp-picker {
     }
 
     div.fsp-modal__body {
-      background-color: white;
+      background-color: var(--overlay-background-color);
 
       div.fsp-header {
-        background-color: white;
+        background-color: var(--overlay-background-color);
         border: none;
 
         .fsp-picker__close-button, .fsp-picker__close-button:hover {
@@ -175,7 +175,7 @@ div.fsp-picker {
 
         .fsp-header-text--visible {
           position: relative;
-          color: white;
+          color: var(--overlay-background-color);
           margin-top: 12px;
 
           &:after {
@@ -186,7 +186,7 @@ div.fsp-picker {
             top: 0;
             left: 0;
             height: 18px;
-            color: $oc_gray_7;
+            color: var(--color);
           }
         }
 
@@ -210,7 +210,7 @@ div.fsp-picker {
       }
 
       div.fsp-footer {
-        background-color: white;
+        background-color: var(--overlay-background-color);
         border-top: none;
 
         div.fsp-nav {
@@ -223,7 +223,7 @@ div.fsp-picker {
               border-width: 0;
               opacity: 0.9;
               background-color: transparent;
-              color: $carrot_dark_gray;
+              color: var(--color);
               @include OC_Body_Bold();
 
               &:disabled {
@@ -250,7 +250,7 @@ div.fsp-picker {
       }
 
       div.fsp-content {
-        background-color: white;
+        background-color: var(--overlay-background-color);
 
         div.fsp-cloud {
           div.fsp-source-auth__wrapper {
@@ -269,13 +269,13 @@ div.fsp-picker {
                 display: block;
                 font-size: 32px;
                 line-height: 44px;
-                color: #333333;
+                color: var(--light-color);
               }
             }
             div.fsp-source-auth__el {
               font-size: 16px;
               line-height: 24px;
-              color: $oc_gray_7;
+              color: var(--color);
               width: 100%;
               text-align: center;
               margin-top: 20px;
@@ -312,14 +312,14 @@ div.fsp-picker {
                 display: block;
                 font-size: 32px;
                 line-height: 44px;
-                color: #333333;
+                color: var(--light-color);
               }
             }
 
             div.fsp-drop-area__subtitle.fsp-text__subheader {
               font-size: 16px;
               line-height: 24px;
-              color: $oc_gray_7;
+              color: var(--color);
               width: 100%;
               text-align: center;
               margin-top: 20px;
@@ -334,5 +334,11 @@ div.fsp-picker {
 
   div.fsp-picker__footer {
     display: none;
+  }
+}
+
+@include dark_mode() {
+  div.fsp-picker div.fsp-modal {
+    box-shadow: 0 4px 10px 0 rgba(255,255,255,0.03);
   }
 }
