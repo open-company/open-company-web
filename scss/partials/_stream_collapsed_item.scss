@@ -162,7 +162,7 @@ div.stream-collapsed-item {
         }
 
         img, iframe, video {
-          display: none;
+          display: none !important;
         }
 
         &:before {
