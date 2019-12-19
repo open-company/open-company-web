@@ -82,7 +82,7 @@
     (let [current-section-data (dispatcher/board-data)
           is-drafts-board? (= section-uuid (:uuid utils/default-drafts-board))
           sort-type (router/current-sort-type)
-          link-rel (if (or is-drafts-board? (= sort-type :recent-activity)) "activity" "self")]
+          link-rel (if (and (not is-drafts-board?) (= sort-type :recent-activity)) "activity" "self")]
       (when is-drafts-board?
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
