@@ -227,6 +227,10 @@ div.left-navigation-sidebar {
     &.collapsed-sections {
       overflow-y: visible;
       overflow: visible;
+
+      div.left-navigation-sidebar-content {
+        overflow-y: visible;
+      }
     }
   }
 
