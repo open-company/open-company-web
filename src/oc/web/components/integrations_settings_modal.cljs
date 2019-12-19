@@ -50,7 +50,7 @@
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-              {:on-click #(team-actions/slack-team-add cur-user-data (str (router/get-token) "?org-settings=integrations"))}
+              {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
               [:div.slack-icon]
               "Add to Slack"])
           (when-not (zero? slack-teams-count)
