@@ -154,7 +154,8 @@
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
-        [:div.oc-menu-separator]
+        (when-not is-mobile?
+          [:div.oc-menu-separator])
         [:div.dark-mode-switch
           [:span.dark-mode-icon.light
             {:class (when (not= current-mode :dark) "active")
