@@ -810,7 +810,7 @@
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
                                ;; Block the rich-body-editor component when
-                               ;; the current editing post has been created alreaduks
+                               ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
                                :placeholder (when (:collapsed cmail-state) "Share something with your team...")
                                :fullscreen is-fullscreen?
