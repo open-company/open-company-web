@@ -520,8 +520,43 @@ div.dashboard-layout {
 }
 
 @include dark_mode() {
-  div.dashboard-layout div.dashboard-layout-container div.board-container
-  div.board-name-container div.board-name div.board-settings-container button.board-settings-bt {
-    background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
+  div.dashboard-layout div.dashboard-layout-container {
+    div.board-container div.board-name-container div.board-name
+    div.board-settings-container button.board-settings-bt {
+      background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
+    }
+
+    div.dashboard-layout-mobile-tabbar {
+      @include mobile (){
+
+        button.all-posts-tab {
+          background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+          }
+        }
+
+        button.follow-ups-tab {
+          background-image: cdnUrl("/img/ML/follow_ups_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
+          }
+        }
+
+        button.notifications-tab {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+          }
+        }
+
+        button.new-post-tab {
+          background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+          }
+        }
+      }
+    }
   }
 }
