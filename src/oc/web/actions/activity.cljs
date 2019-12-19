@@ -515,26 +515,28 @@
 
 (defn entry-publish [entry-editing section-editing & [edit-key]]
   (when-not (payments-actions/show-paywall-alert? (dis/payments-data))
-    (let [org-data (dis/org-data)
-          fixed-entry-editing (assoc entry-editing :status "published")
-          fixed-edit-key (or edit-key :entry-editing)]
-      (dis/dispatch! [:entry-publish fixed-edit-key])
-      (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
-               section-editing)
-        (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
-              final-board-data (assoc section-editing :entries [fixed-entry-data])
-              create-board-link (utils/link-for (:links org-data) "create")]
-          (api/create-board create-board-link final-board-data (:invite-note section-editing)
-           (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
-        (let [entry-exists? (seq (:links fixed-entry-editing))
-              board-data (some #(when (= (:slug %) (:board-slug fixed-entry-editing)) %) (:boards org-data))
-              publish-entry-link (if entry-exists?
-                                  ;; If the entry already exists use the publish link in it
-                                  (utils/link-for (:links fixed-entry-editing) "publish")
-                                  ;; If the entry is new, use
-                                  (utils/link-for (:links board-data) "create"))]
-          (api/publish-entry publish-entry-link fixed-entry-editing
-           (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key)))))))
+    (let [fixed-edit-key (or edit-key :entry-editing)]
+      (if (get-in dis/app-state [:auto-saving edit-key])
+        (utils/after 1000 #(entry-publish entry-editing section-editing edit-key))
+        (let [org-data (dis/org-data)
+              fixed-entry-editing (assoc entry-editing :status "published")]
+          (dis/dispatch! [:entry-publish fixed-edit-key])
+          (if (and (= (:board-slug fixed-entry-editing) utils/default-section-slug)
+                   section-editing)
+            (let [fixed-entry-data (dissoc fixed-entry-editing :board-slug :board-name :invite-note)
+                  final-board-data (assoc section-editing :entries [fixed-entry-data])
+                  create-board-link (utils/link-for (:links org-data) "create")]
+              (api/create-board create-board-link final-board-data (:invite-note section-editing)
+               (partial entry-publish-with-board-cb (:uuid fixed-entry-editing) fixed-edit-key)))
+            (let [entry-exists? (seq (:links fixed-entry-editing))
+                  board-data (some #(when (= (:slug %) (:board-slug fixed-entry-editing)) %) (:boards org-data))
+                  publish-entry-link (if entry-exists?
+                                      ;; If the entry already exists use the publish link in it
+                                      (utils/link-for (:links fixed-entry-editing) "publish")
+                                      ;; If the entry is new, use
+                                      (utils/link-for (:links board-data) "create"))]
+              (api/publish-entry publish-entry-link fixed-entry-editing
+               (partial entry-publish-cb (:uuid fixed-entry-editing) (:board-slug fixed-entry-editing) fixed-edit-key)))))))))
 
 (defn activity-delete-finish []
   ;; Reload the org to update the number of drafts in the navigation
