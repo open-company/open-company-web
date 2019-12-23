@@ -162,7 +162,7 @@
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
 
-(def dark-mode-key [:dark-mode])
+(def dark-mode-key [:computed-dark-mode])
 
 ;; Functions needed by derivatives
 
@@ -454,7 +454,7 @@
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
    :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
-   :dark-mode             [[:base] (fn [base] (get-in base dark-mode-key))]})
+   :computed-dark-mode    [[:base] (fn [base] (get-in base dark-mode-key))]})
 
 ;; Action Loop =================================================================
 
