@@ -24,6 +24,7 @@
 (def electron (js/require "electron"))
 
 (def app (.-app electron))
+(def systemPreferences (.-systemPreferences electron))
 (def ipc-main (.-ipcMain electron))
 (def session (.-session electron))
 (def shell (.-shell electron))
@@ -110,7 +111,7 @@
                 (let [parsed-url    (URL. navigation-url)
                       target-origin (.-origin parsed-url)]
                   (timbre/info "Attempting to navigate to origin: " target-origin)
-                  (when (not (allowed-origin? target-origin))
+                  (when-not (allowed-origin? target-origin)
                     (timbre/info "Navigation prevented")
                     (.preventDefault event)))))
          (.on contents "new-window"
@@ -118,7 +119,7 @@
                 (let [parsed-url    (URL. navigation-url)
                       target-origin (.-origin parsed-url)]
                   (timbre/info "Attempting to open new window at: " target-origin)
-                  (when (not (allowed-origin? target-origin))
+                  (when-not (allowed-origin? target-origin)
                     (timbre/info "New window not whitelisted, opening in external browser")
                     (.preventDefault event)
                     (.openExternal shell navigation-url))))))))
@@ -138,7 +139,11 @@
         (.on @main-window "close" #(if (or @quitting? (win32?))
                                      (reset! main-window nil)
                                      (do (.preventDefault %)
-                                         (.hide @main-window)))))))
+                                         (.hide @main-window))))
+        (let [dark-mode-changed #(.send (.-webContents @main-window) "dark-mode-changed" (.isDarkMode systemPreferences))]
+          (.on systemPreferences "accent-color-changed" dark-mode-changed)
+          (.subscribeNotification systemPreferences "AppleInterfaceThemeChangedNotification" dark-mode-changed)
+          (.on systemPreferences "color-changed" dark-mode-changed)))))
 
 (defn init
   []
@@ -151,7 +156,7 @@
     (.setAppUserModelId app "io.carrot.desktop"))
 
   ;; -- App event handlers --
-  (.on app "window-all-closed" #(when (not (mac?))
+  (.on app "window-all-closed" #(when-not (mac?)
                                   (.quit app)))
   (.on app "activate" #(when-let [w @main-window]
                          (.show w)))
@@ -166,4 +171,6 @@
   (.on ipc-main "window-has-focus?" (fn [event]
                                       (let [ret-value (boolean (.getFocusedWindow BrowserWindow))]
                                         (set! (.-returnValue event) ret-value))))
-  )
+  (.on ipc-main "dark-mode-enabled?" (fn [event]
+                                      (let [ret-value (boolean (.isDarkMode systemPreferences))]
+                                        (set! (.-returnValue event) ret-value)))))
