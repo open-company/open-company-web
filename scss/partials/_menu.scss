@@ -233,6 +233,8 @@ div.menu {
     }
 
     div.dark-mode-switch {
+      height: 16px;
+
       @include mobile() {
         margin-top: 30px;
       }
