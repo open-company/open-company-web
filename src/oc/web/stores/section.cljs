@@ -159,7 +159,6 @@
           new-change-data (merge old-change-data change-data)
           next-db (fix-org-section-data db org-data new-change-data)]
       (timbre/debug "Change status data:" new-change-data)
-      (js/console.log "DBG change-data:" change-data)
       (-> next-db
         (fix-posts-new-label new-change-data)
         (assoc-in (dispatcher/change-data-key (:slug org-data)) new-change-data)))
