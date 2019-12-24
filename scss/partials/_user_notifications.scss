@@ -279,7 +279,7 @@ div.user-notifications {
 }
 
 @include dark_mode() {
-  div.user-notifications button.notifications-bell-bt {
+  div.user-notifications button.notification-bell-bt {
     background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
   }
 }
