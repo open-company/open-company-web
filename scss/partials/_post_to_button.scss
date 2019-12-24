@@ -59,14 +59,14 @@ div.post-to-button {
     }
 
     div.post-bt-tooltip {
-      background-color: var(--overlay-background-color);
+      background-color: var(--tooltip-background-color);
       white-space:pre-wrap;
       max-width: none;
       text-align: left;
       opacity: 1;
       @include OC_Body_Book();
       font-size: 14px;
-      color: var(--color);
+      color: var(--tooltip-color);
       line-height: 18px;
       padding: 11px 16px;
       border-radius: 4px;

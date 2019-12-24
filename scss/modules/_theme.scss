@@ -62,6 +62,8 @@ $dark_mode: "dark";
   --cmail-section-bt-background: #{$deep_navy};
   --cmail-section-bt-color: white;
   --cmail-me-separator: rgba(255, 255, 255, 0.3);
+  --cmail-collapsed-background-color: white;
+  --cmail-box-shadow: rgba(0, 0, 0, 0.07);
 
   html, body {
     scrollbar-color: light;
@@ -121,6 +123,8 @@ $dark_mode: "dark";
   --cmail-section-bt-background: #{rgba(white, 0.12)};
   --cmail-section-bt-color: white;
   --cmail-me-separator: #{rgba($deep_navy, 0.3)};
+  --cmail-collapsed-background-color: #{rgba(white, 0.09)};
+  --cmail-box-shadow: rgba(0, 0, 0, 0.24);
 
   &, body {
     scrollbar-color: dark;

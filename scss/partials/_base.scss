@@ -47,25 +47,25 @@ html, body {
   // Change Bootstrap tooltip style
   &.top .tooltip-arrow {
     display: block;
-    border-top-color: var(--color);
+    border-top-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
   &.bottom .tooltip-arrow {
     display: block;
-    border-bottom-color: var(--color);
+    border-bottom-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
   &.left .tooltip-arrow {
     display: block;
-    border-left-color: var(--color);
+    border-left-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
   &.right .tooltip-arrow {
     display: block;
-    border-right-color: var(--color);
+    border-right-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
@@ -84,14 +84,14 @@ html, body {
     // box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
     // border: 1px solid $mid_light_grey;
 
-    background-color: var(--color);
+    background-color: var(--tooltip-background-color);
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
     opacity: 1;
     @include OC_Body_Book();
     font-size: 12px;
-    color: var(--background-color);
+    color: var(--tooltip-color);
     line-height: 18px;
     padding: 5px 8px;
     border-radius: 4px;

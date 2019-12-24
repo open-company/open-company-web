@@ -2,6 +2,8 @@ div.cmail-outer {
   position: relative;
   width: 100%;
   margin-bottom: 24px;
+  background-color: var(--cmail-collapsed-background-color);
+  box-shadow: 0 2px 8px 0 var(--cmail-box-shadow);
 
   @include mobile() {
     position: fixed;
@@ -103,10 +105,10 @@ div.cmail-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: $carrot_modal_bg;
+    background-color: var(--overlay-background-color);
     border-radius: 0;
     z-index: #{$navbar_zindex + 116};
-    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: none;
 
     @include mobile() {
       position: relative;
@@ -126,7 +128,6 @@ div.cmail-outer {
       height: 100vh;
       top: 0;
       left: 0;
-      background-color: var(--background-color);
       position: absolute;
       box-shadow: none;
       border: none;
@@ -139,11 +140,10 @@ div.cmail-outer {
         height: initial;
         top: unset;
         border-radius: 0;
-        background-color: var(--mobile-background-color);
       }
 
       div.cmail-header {
-        background-color: var(--background-color);
+        background-color: var(--overlay-background-color);
         border-bottom: 1px solid var(--divider-line);
         position: absolute;
         top: 0;
@@ -345,7 +345,6 @@ div.cmail-outer {
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
     border: 1px solid var(--divider-line);
     border-radius: 4px;
-    background-color: var(--overlay-background-color);
 
     &.has-follow-ups {
       @include mobile() {
@@ -356,7 +355,6 @@ div.cmail-outer {
     @include mobile() {
       width: 100vw;
       height: auto;
-      background-color: var(--mobile-background-color);
       padding-top: #{$mobile_navbar_height}px;
     }
 
@@ -845,7 +843,6 @@ div.cmail-outer {
 
     div.cmail-content-outer {
       padding: 24px;
-      background-color: var(--overlay-background-color);
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
 
@@ -1162,7 +1159,6 @@ div.cmail-outer {
       height: 64px;
       width: 100%;
       padding: 16px;
-      background-color: var(--overlay-background-color);
       border-bottom-left-radius: 4px;
       border-bottom-right-radius: 4px;
 
