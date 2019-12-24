@@ -109,7 +109,7 @@ div.stream-item {
         height: 24px;
         float: left;
         max-width: 70%;
-        color: var(--color);
+        color: var(--light-color);
 
         @include mobile() {
           width: calc(100% - 32px);
