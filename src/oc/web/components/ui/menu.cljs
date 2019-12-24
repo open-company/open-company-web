@@ -18,7 +18,7 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.dark-mode :as dark-mode-actions]
+            [oc.web.actions.ui-theme :as ui-theme-actions]
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -91,7 +91,7 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
-                  (drv/drv :computed-dark-mode)
+                  (drv/drv :ui-theme)
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -120,7 +120,7 @@
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
                            (router/current-org-slug))
-        computed-dark-mode (drv/react s :computed-dark-mode)]
+        ui-theme-data (drv/react s :ui-theme)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -155,19 +155,19 @@
               "Notifications"]])
         (when-not is-mobile?
           [:div.oc-menu-separator])
-        [:div.dark-mode-switch
-          [:span.dark-mode-icon.light
-            {:class (when (not= computed-dark-mode :dark) "active")
-             :on-click #(dark-mode-actions/set-dark-mode :light)}]
-          (carrot-switch {:selected (= computed-dark-mode :dark)
-                          :did-change-cb #(dark-mode-actions/set-dark-mode (if % :dark :light))})
-          [:span.dark-mode-icon.dark
-            {:class (when (= computed-dark-mode :dark) "active")
-             :on-click #(dark-mode-actions/set-dark-mode :dark)}]
-          (when (and (not= (dark-mode-actions/get-dark-mode-setting) :auto)
-                     (dark-mode-actions/support-system-dark-mode?))
-            [:a.dark-mode-auto
-              {:on-click #(dark-mode-actions/set-dark-mode :auto)}
+        [:div.ui-theme-switch
+          [:span.ui-theme-icon.light
+            {:class (when (not= (:computed-value ui-theme-data) :dark) "active")
+             :on-click #(ui-theme-actions/set-ui-theme :light)}]
+          (carrot-switch {:selected (= (:computed-value ui-theme-data) :dark)
+                          :did-change-cb #(ui-theme-actions/set-ui-theme (if % :dark :light))})
+          [:span.ui-theme-icon.dark
+            {:class (when (= (:computed-value ui-theme-data) :dark) "active")
+             :on-click #(ui-theme-actions/set-ui-theme :dark)}]
+          (when (and (not= (:setting-value ui-theme-data) :auto)
+                     (ui-theme-actions/support-system-dark-mode?))
+            [:a.ui-theme-auto
+              {:on-click #(ui-theme-actions/set-ui-theme :auto)}
               "Auto"])]
         [:div.oc-menu-separator]
         (when (and show-reminders?

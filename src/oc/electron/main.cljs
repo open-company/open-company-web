@@ -140,10 +140,10 @@
                                      (reset! main-window nil)
                                      (do (.preventDefault %)
                                          (.hide @main-window))))
-        (let [dark-mode-changed #(.send (.-webContents @main-window) "dark-mode-changed" (.isDarkMode systemPreferences))]
-          (.on systemPreferences "accent-color-changed" dark-mode-changed)
-          (.subscribeNotification systemPreferences "AppleInterfaceThemeChangedNotification" dark-mode-changed)
-          (.on systemPreferences "color-changed" dark-mode-changed)))))
+        (let [ui-theme-changed #(.send (.-webContents @main-window) "ui-theme-changed" (.isDarkMode systemPreferences))]
+          (.on systemPreferences "accent-color-changed" ui-theme-changed)
+          (.subscribeNotification systemPreferences "AppleInterfaceThemeChangedNotification" ui-theme-changed)
+          (.on systemPreferences "color-changed" ui-theme-changed)))))
 
 (defn init
   []
@@ -171,6 +171,6 @@
   (.on ipc-main "window-has-focus?" (fn [event]
                                       (let [ret-value (boolean (.getFocusedWindow BrowserWindow))]
                                         (set! (.-returnValue event) ret-value))))
-  (.on ipc-main "dark-mode-enabled?" (fn [event]
+  (.on ipc-main "ui-theme-enabled?" (fn [event]
                                       (let [ret-value (boolean (.isDarkMode systemPreferences))]
                                         (set! (.-returnValue event) ret-value)))))

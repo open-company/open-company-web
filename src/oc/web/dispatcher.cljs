@@ -162,7 +162,7 @@
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
 
-(def dark-mode-key [:computed-dark-mode])
+(def ui-theme-key [:ui-theme])
 
 ;; Functions needed by derivatives
 
@@ -454,7 +454,8 @@
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
    :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
-   :computed-dark-mode    [[:base] (fn [base] (get-in base dark-mode-key))]})
+   :foc-layout            [[:base] (fn [base] (:foc-layout base))]
+   :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]})
 
 ;; Action Loop =================================================================
 

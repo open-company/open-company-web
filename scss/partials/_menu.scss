@@ -232,14 +232,14 @@ div.menu {
       }
     }
 
-    div.dark-mode-switch {
+    div.ui-theme-switch {
       height: 16px;
 
       @include mobile() {
         margin-top: 30px;
       }
 
-      a.dark-mode-auto {
+      a.ui-theme-auto {
         color: $carrot_green;
         display: inline-block;
         cursor: pointer;
@@ -248,7 +248,7 @@ div.menu {
         line-height: 16px;
       }
 
-      span.dark-mode-icon {
+      span.ui-theme-icon {
         width: 16px;
         height: 16px;
         display: inline-block;
@@ -282,7 +282,7 @@ div.menu {
       background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
     }
 
-    div.dark-mode-switch span.dark-mode-icon {
+    div.ui-theme-switch span.ui-theme-icon {
       &.light {
         background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg")
       }

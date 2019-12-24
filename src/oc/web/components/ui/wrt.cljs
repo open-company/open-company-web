@@ -12,7 +12,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.actions.dark-mode :as dark-mode]
+            [oc.web.actions.ui-theme :as ui-theme]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -127,7 +127,7 @@
                      :cy "58px"
                      :r "50px"
                      :fill "transparent"
-                     :stroke (if (= (dark-mode/computed-value (dark-mode/get-dark-mode-setting)) :dark) "#DDDDDD" "#ECECEC")
+                     :stroke (if (= (ui-theme/computed-value (ui-theme/get-ui-theme-setting)) :dark) "#DDDDDD" "#ECECEC")
                      :stroke-width "16px"}]
                   [:circle.wrt-donut-segment
                     {:cx "58"

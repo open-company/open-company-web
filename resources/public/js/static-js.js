@@ -342,7 +342,7 @@ function isiPhoneWithoutPhysicalHomeBt(){
 }
 
 function OCDarkModeEarlySetup(){
-  var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("dark-mode"));
+  var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("ui-theme"));
   if (darkModeCookie === "dark" ||
       (darkModeCookie === "auto" &&
        window.matchMedia &&
