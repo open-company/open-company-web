@@ -27,7 +27,7 @@ div.user-profile-modal-container {
     top: 0;
     height: 100vh;
     right: 0;
-    padding: 0 24px 16px;
+    padding: 0 24px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -72,7 +72,7 @@ div.user-profile-modal-container {
 
     div.user-profile-body {
       width: 272px;
-      margin: 24px auto 0;
+      margin: 24px auto 32px;
       position: relative;
       color: var(--color);
 
@@ -189,7 +189,8 @@ div.user-profile-modal-container {
           option {
             @include OC_Body_Book();
             font-size: 14px;
-            color: var(--color);
+            color: $deep_navy;
+            background-color: rgba($deep_navy, 0.1);
           }
         }
       }
