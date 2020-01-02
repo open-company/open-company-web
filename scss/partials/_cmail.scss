@@ -343,7 +343,7 @@ div.cmail-outer {
     height: 100%;
     position: relative;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
-    border: 1px solid var(--divider-line);
+    border: 1px solid var(--cmail-qp-outer-border);
     border-radius: 4px;
 
     &.has-follow-ups {
