@@ -266,11 +266,10 @@ div.left-navigation-sidebar {
 
   @include big_web() {
     &.collapsed-sections {
-      overflow-y: visible;
-      overflow: visible;
+      overflow-y: hidden;
 
       div.left-navigation-sidebar-content {
-        overflow-y: visible;
+        overflow-y: hidden;
       }
     }
   }
