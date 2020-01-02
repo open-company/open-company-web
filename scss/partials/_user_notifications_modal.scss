@@ -136,7 +136,7 @@ div.user-notifications-modal-container {
           display: block;
           appearance: none;
           -webkit-appearance: none;
-          background-color: var(--ultralight-color);
+          background-color: var(--opac-background-color-1);
           position: relative;
           background-image: cdnUrl("/img/ML/select_arrows.svg");
           background-size: 8px 10px;
@@ -160,7 +160,8 @@ div.user-notifications-modal-container {
           option {
             @include OC_Body_Book();
             font-size: 14px;
-            color: var(--color);
+            color: $deep_navy;
+            background-color: rgba($deep_navy, 0.1);
           }
         }
 
