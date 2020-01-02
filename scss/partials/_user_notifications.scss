@@ -31,10 +31,6 @@ div.user-notifications {
     padding: 0;
     margin: 0;
 
-    // &.active {
-    //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
-    // }
-
     &.new:after {
       position: absolute;
       content: "";
