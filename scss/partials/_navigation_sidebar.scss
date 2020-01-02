@@ -323,10 +323,6 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts {
-    margin-top: 16px;
-  }
-
   a.inbox, a.all-posts, a.follow-ups, a.drafts, a.must-see {
     display: block;
     background-color: transparent;
@@ -495,6 +491,7 @@ div.left-navigation-sidebar {
   }
 
   div.left-navigation-sidebar-top{
+    margin-top: 16px;
 
     .left-navigation-sidebar-top-title {
       padding: 0 16px;

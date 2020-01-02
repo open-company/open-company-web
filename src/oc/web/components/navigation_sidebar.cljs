@@ -148,6 +148,19 @@
             [:button.mlb-reset.mobile-close-bt
               {:on-click #(dis/dispatch! [:input [:mobile-navigation-sidebar] false])}]
             (orgs-dropdown)])
+        ;; All posts
+        (when show-all-posts
+          [:a.all-posts.hover-item.group
+            {:class (utils/class-set {:item-selected is-all-posts})
+             :href (oc-urls/all-posts)
+             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
+            [:div.all-posts-icon]
+            [:div.all-posts-label
+              {:class (utils/class-set {:new (seq all-unread-items)})}
+              "All posts"]
+            ; (when (pos? (count all-unread-items))
+            ;   [:span.count (count all-unread-items)])
+            ])
         ;; Inbox
         (when show-inbox
           [:a.inbox.hover-item.group
@@ -187,19 +200,6 @@
                 "Drafts "]
               (when (pos? draft-count)
                 [:span.count draft-count])]))
-        ;; All posts
-        (when show-all-posts
-          [:a.all-posts.hover-item.group
-            {:class (utils/class-set {:item-selected is-all-posts})
-             :href (oc-urls/all-posts)
-             :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
-            [:div.all-posts-icon]
-            [:div.all-posts-label
-              {:class (utils/class-set {:new (seq all-unread-items)})}
-              "All posts"]
-            ; (when (pos? (count all-unread-items))
-            ;   [:span.count (count all-unread-items)])
-            ])
         ;; Boards list
         (when show-boards
           [:div.left-navigation-sidebar-top.group
