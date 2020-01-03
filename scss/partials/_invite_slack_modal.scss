@@ -167,6 +167,10 @@ div.invite-slack-modal {
             margin-top: 16px;
           }
 
+          div.invites-list-item-inner {
+            width: calc(100% - 24px);
+          }
+
           input.org-settings-field:focus {
             background-color: rgba($deep_navy, 0.15);
           }

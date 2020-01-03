@@ -190,7 +190,7 @@
                           key-string (str "invite-users-tabe-" i)]]
                 [:div.invites-list-item
                   {:key key-string}
-                  [:div.invites-list-item.group
+                  [:div.invites-list-item-inner.group
                     [:div.user-name-dropdown
                       {:class (when (:error user-data) "error")}
                       (rum/with-key
