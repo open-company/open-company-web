@@ -30,10 +30,26 @@ div.paginated-stream {
     div.paginated-stream-cards-inner {
       position: relative;
       overflow: visible !important;
+      padding-bottom: 48px;
 
       .ReactVirtualized__Grid.ReactVirtualized__List,
       .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
         overflow: visible !important;
+      }
+
+      &.closing-carrot:after {
+        content: "";
+        background-image: cdnUrl("/img/ML/closing_carrot.svg");
+        background-size: 14px 24px;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 24px;
+        margin-top: 24px;
+        opacity: 0.2;
+        position: absolute;
+        bottom: 0;
+        left: 0;
       }
 
       div.activities-overlay {
@@ -86,5 +102,11 @@ div.paginated-stream {
         @include OC_Body_Bold();
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.paginated-stream div.paginated-stream-cards div.paginated-stream-cards-inner.closing-carrot:after {
+    background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
   }
 }
