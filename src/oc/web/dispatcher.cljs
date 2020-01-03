@@ -212,6 +212,7 @@
    :expo                [[:base] (fn [base] (get-in base expo-key))]
    :expo-deep-link-origin [[:base] (fn [base] (get-in base expo-deep-link-origin-key))]
    :expo-app-version    [[:base] (fn [base] (get-in base expo-app-version-key))]
+   :invite-add-slack-checked [[:base] (fn [base] (:invite-add-slack-checked base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
