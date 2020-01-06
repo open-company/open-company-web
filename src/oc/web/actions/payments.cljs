@@ -113,7 +113,11 @@
          ls/payments-enabled
          ;; Do not show paywall until payments data are loaded
          fixed-payments-data
-         (or ;; the subscriptions data are not available
+         (or ;; the payments data are not available yet
              (= fixed-payments-data :404)
-             ;; or the org is on a non active plan
-             (not (default-positive-statuses subscription-status))))))
+             ;; If customer has no subscription yet
+             ;; FIXME: added to fix a race condition where users were seeing the
+             ;; paywall after signup until refresh (Sean on FF with Slack signup)
+             (and (map? subscription-data)
+                  ;; or the org is on a non active plan
+                  (not (default-positive-statuses subscription-status)))))))

@@ -212,6 +212,7 @@
    :expo                [[:base] (fn [base] (get-in base expo-key))]
    :expo-deep-link-origin [[:base] (fn [base] (get-in base expo-deep-link-origin-key))]
    :expo-app-version    [[:base] (fn [base] (get-in base expo-app-version-key))]
+   :invite-add-slack-checked [[:base] (fn [base] (:invite-add-slack-checked base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -365,6 +366,11 @@
                                                       (not (:email-confirmed base)))
                                :auth-settings auth-settings
                                :token (:token (:query-params route))
+                               :jwt jwt})]
+   :team-invite           [[:base :route :auth-settings :jwt]
+                            (fn [base route auth-settings jwt]
+                              {:auth-settings auth-settings
+                               :invite-token (:invite-token (:query-params route))
                                :jwt jwt})]
    :collect-password      [[:base :jwt]
                             (fn [base jwt]
