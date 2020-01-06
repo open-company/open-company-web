@@ -17,7 +17,7 @@
     "appId": "io.carrot.desktop",
     "productName": "Carrot",
     "artifactName": "${productName}.${ext}",
-    "copyright": "Copyright © 2019 Open Company LLC",
+    "copyright": "Copyright © 2019-2020 Open Company LLC",
     "mac": {
       "target": [
         "dmg",
