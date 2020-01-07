@@ -19,7 +19,13 @@
     db))
 
 (defn parse-team-data [team-data]
-  (assoc team-data :can-slack-invite (j/team-has-bot? (:team-id team-data))))
+  (let [team-has-bot? (j/team-has-bot? (:team-id team-data))
+        slack-orgs (:slack-orgs team-data)
+        slack-users (j/get-key :slack-users)
+        can-add-bot? (some #(->> % :slack-org-id keyword (get slack-users)) slack-orgs)]
+    (-> team-data
+     (assoc :can-slack-invite team-has-bot?)
+     (assoc :can-add-bot (and (not team-has-bot?) can-add-bot?)))))
 
 (defmethod dispatcher/action :team-loaded
   [db [_ team-data]]

@@ -48,7 +48,7 @@
 
 (defn invite-team-click [s e]
   (.preventDefault e)
-  (nav-actions/show-org-settings :invite))
+  (nav-actions/show-org-settings :invite-picker))
 
 (defn integrations-click [s e]
   (.preventDefault e)
