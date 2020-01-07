@@ -153,21 +153,3 @@ div.org-dashboard {
     }
   }
 }
-
-div.add-more-tooltip {
-  margin-left: -15px;
-}
-
-div.org-dashboard div.org-dashboard-inner {
-  padding-bottom: 20px;
-  background-color: var(--background-color);
-
-  @include big_web(){
-    min-height: 100vh;
-    padding-top: #{$navbar_height}px;
-  }
-  @include mobile(){
-    background-color: var(--mobile-background-color);
-    min-height: calc(100vh - #{$mobile_navbar_height}px);
-  }
-}
