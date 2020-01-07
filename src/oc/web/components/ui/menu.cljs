@@ -92,6 +92,7 @@
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
                   (drv/drv :ui-theme)
+  mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -167,7 +168,11 @@
           (when (and (not= (:setting-value ui-theme-data) :auto)
                      (ui-theme-actions/support-system-dark-mode?))
             [:a.ui-theme-auto
-              {:on-click #(ui-theme-actions/set-ui-theme :auto)}
+              {:on-click #(ui-theme-actions/set-ui-theme :auto)
+               :title "Use system preference"
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"}
               "Auto"])]
         [:div.oc-menu-separator]
         (when (and show-reminders?

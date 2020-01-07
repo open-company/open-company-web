@@ -243,9 +243,11 @@ div.menu {
         color: $carrot_green;
         display: inline-block;
         cursor: pointer;
-        margin: 0 0 0 16px;
+        margin: 1px 0 0 16px;
         padding: 0;
         line-height: 16px;
+        height: 16px;
+        vertical-align: top;
       }
 
       span.ui-theme-icon {
