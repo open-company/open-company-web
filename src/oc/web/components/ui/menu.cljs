@@ -169,7 +169,7 @@
                      (ui-theme-actions/support-system-dark-mode?))
             [:a.ui-theme-auto
               {:on-click #(ui-theme-actions/set-ui-theme :auto)
-               :title "Use system preference"
+               :title "Uses system preference"
                :data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
                :data-container "body"}
