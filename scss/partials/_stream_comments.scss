@@ -393,6 +393,7 @@ div.stream-comments {
             flex-direction: row;
             align-items: flex-start;
             flex-wrap: nowrap;
+            height: 18px;
 
             @include preload_image(cdnUrl("/img/ML/comment_reply.svg"));
 
@@ -423,7 +424,11 @@ div.stream-comments {
               }
 
               div.stream-comment-author-name {
-                flex: 1 1 auto;
+                flex: 1 0 auto;
+
+                @include mobile() {
+                  flex: 1 1 auto;
+                }
               }
 
               div.stream-comment-author-timestamp {
@@ -435,11 +440,12 @@ div.stream-comments {
               @include OC_Body_Bold();
               font-size: 14px;
               color: $deep_navy;
-              line-height: 16px;
+              line-height: 18px;
               float: left;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
+              height: 18px;
             }
 
             div.stream-comment-author-timestamp {
@@ -448,18 +454,19 @@ div.stream-comments {
               color: rgba($deep_navy, 0.5);
               float: left;
               margin-left: 6px;
-              line-height: 16px;
+              line-height: 18px;
+              height: 18px;
             }
 
             div.new-comment-tag {
-              flex: 0 0 43px;
-              margin-left: 6px;
-              width: 43px;
-              color: $carrot_green;
-              @include OC_Body_Bold();
-              text-transform: uppercase;
-              font-size: 14px;
-              line-height: 16px;
+              flex: 0 0 34px;
+              margin-left: 8px;
+              width: 34px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/new_comment_tag.svg");
+              background-size: 34px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
             }
           }
         }
