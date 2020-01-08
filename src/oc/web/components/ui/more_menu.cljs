@@ -279,7 +279,7 @@
              :data-toggle (if is-mobile? "" "tooltip")
              :data-placement (or tooltip-position "top")
              :data-container "body"
-             :title "Let me know when teammates reply"}]
+             :title "Get notified about new post activity"}]
           (when inbox-unfollow-link
             [:button.mlb-reset.more-menu-inbox-unfollow-bt
               {:type "button"
@@ -297,7 +297,7 @@
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Ignore future replies unless I’m mentioned"}]))
+               :title "Ignore future activity unless mentioned"}]))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
