@@ -208,7 +208,8 @@
                                 :follow-up-item (and (map? assigned-follow-up-data)
                                                      (not (:completed? assigned-follow-up-data)))
                                 :unseen-item (:unseen activity-data)
-                                :unread-item (:unread activity-data)
+                                :unread-item (or (pos? (:new-comments-count activity-data))
+                                                 (:unread activity-data))
                                 :expandable is-published?
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
