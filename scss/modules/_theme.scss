@@ -40,6 +40,7 @@ $dark_mode: "dark";
   --foc-hover-color: #{rgba($deep_navy, 0.1)};
   --foc-new-color: white;
   --foc-divider-line-color: #{rgba($deep_navy, 0.15)};
+  --foc-new-border-color: #{rgba($deep_navy, 0.24)}; 
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
@@ -102,6 +103,7 @@ $dark_mode: "dark";
   --foc-hover-color: #{rgba(white, 0.04)};
   --foc-new-color: #{$deep_navy};
   --foc-divider-line-color: #{rgba(white, 0.16)};
+  --foc-new-border-color: #{rgba(white, 0.22)};
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
