@@ -218,7 +218,7 @@
                                   (when (fn? will-close)
                                     (will-close))
                                   (activity-actions/inbox-unfollow (:uuid entity-data)))}
-                    "Unfollow"])))
+                    "Mute"])))
             (when (or is-mobile?
                       (not external-bookmark))
               (if remove-bookmark-link
