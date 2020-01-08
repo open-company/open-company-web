@@ -205,7 +205,7 @@
                                 (when (fn? will-close)
                                   (will-close))
                                 (activity-actions/inbox-unfollow (:uuid entity-data)))}
-                  "Unfollow"]))
+                  "Mute"]))
             (when (or is-mobile?
                        (not external-follow-up))
               (if complete-follow-up-link
