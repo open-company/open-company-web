@@ -86,12 +86,14 @@
                                       :has-new-comments show-new-tag?})}
             (if (pos? comments-count)
               [:div.is-comments-summary-inner.group
-                (str comments-count
+                (str
+                 (if show-new-tag?
+                   (:new-comments-count entry-data)
+                   comments-count)
                  (when-not hide-label?
-                  (str " comment" (when (not= comments-count 1) "s"))))
-                (when show-new-tag?
-                  [:div.new-comments-tag
-                    (str "(" (:new-comments-count entry-data) " Unread)")])]
+                   (if show-new-tag?
+                     (str " new comment" (when (not= (:new-comments-count entry-data) 1) "s"))
+                     (str " comment" (when (not= comments-count 1) "s")))))]
               (when-not hide-label?
                 [:span.add-a-comment
                   "Add a comment"]))])])))
