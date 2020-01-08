@@ -17,6 +17,13 @@ div.trial-expired-banner-container {
     line-height: 26px;
     color: white;
 
+    @include mobile() {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
     button.open-payments-bt, a.chat-with-us {
       display: inline;
       text-decoration: underline;
