@@ -178,6 +178,8 @@
             {:type "text/css"
              :rel "stylesheet"
              :href "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.css"}]
+          ;; Local env
+          [:script {:type "text/javascript" :src "/js/local-env.js"}]
           [:script {:type "text/javascript" :src "/lib/print_ascii.js"}]
           ;; Automatically load the needed polyfill depending on
           ;; the browser user agent and the available features
