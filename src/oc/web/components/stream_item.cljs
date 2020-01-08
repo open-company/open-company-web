@@ -205,7 +205,8 @@
                                 :must-see-item (:must-see activity-data)
                                 :bookmark-item (:bookmarked activity-data)
                                 :unseen-item (:unseen activity-data)
-                                :unread-item (:unread activity-data)
+                                :unread-item (or (pos? (:new-comments-count activity-data))
+                                                 (:unread activity-data))
                                 :expandable is-published?
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
