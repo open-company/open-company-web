@@ -97,7 +97,7 @@
               "View team")]
           (when is-admin-or-author?
             [:button.mlb-reset.save-bt
-              {:on-click #(nav-actions/show-org-settings :invite)}
+              {:on-click #(nav-actions/show-org-settings :invite-picker)}
               "Invite"])
           [:button.mlb-reset.cancel-bt
             {:on-click #(nav-actions/show-org-settings nil)}
