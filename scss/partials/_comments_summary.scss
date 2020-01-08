@@ -64,7 +64,8 @@ div.is-comments {
     text-overflow: ellipsis;
 
     &.has-new-comments {
-      color: $deep_navy;
+      color: $carrot_green;
+      @include OC_Body_Bold();
 
       @include mobile() {
         &:before {
@@ -105,17 +106,6 @@ div.is-comments {
         float: left;
         display: block;
         opacity: 0.5;
-      }
-    }
-
-    @include new-comments-tag();
-
-    div.new-comments-tag {
-      margin-left: 6px;
-      display: inline-block;
-
-      @include mobile() {
-        margin-left: 4px;
       }
     }
 

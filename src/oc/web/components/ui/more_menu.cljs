@@ -288,22 +288,22 @@
         (when external-follow
           (if inbox-follow-link
             [:button.mlb-reset.more-menu-inbox-follow-bt
-              {:type "button"
-               :ref "more-menu-inbox-follow-bt"
-               :key "more-menu-inbox-follow-bt"
-               :class (when (or show-inbox?
-                                (and external-follow-up
-                                     (or complete-follow-up-link
-                                         create-follow-up-link))) "has-next-bt")
-               :on-click #(do
-                            (reset! (::showing-menu s) false)
-                            (when (fn? will-close)
-                              (will-close))
-                            (activity-actions/inbox-follow (:uuid entity-data)))
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement (or tooltip-position "top")
-               :data-container "body"
-               :title "Let me know when teammates reply"}]
+            {:type "button"
+             :ref "more-menu-inbox-follow-bt"
+             :key "more-menu-inbox-follow-bt"
+             :class (when (or show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/inbox-follow (:uuid entity-data)))
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :title "Get notified about new post activity"}]
             (when inbox-unfollow-link
               [:button.mlb-reset.more-menu-inbox-unfollow-bt
                 {:type "button"
@@ -321,7 +321,7 @@
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
-                 :title "Ignore future replies unless I’m mentioned"}])))
+                 :title "Ignore future activity unless mentioned"}])))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
