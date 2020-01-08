@@ -35,7 +35,9 @@
             [oc.web.components.ui.follow-ups-picker :refer (follow-ups-picker)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
-            [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
+            [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
+            [oc.web.components.invite-email-modal :refer (invite-email-modal)]
+            [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
             [oc.web.components.payments-settings-modal :refer (payments-settings-modal)]
@@ -182,9 +184,15 @@
           ;; Integrations settings
           (= open-panel :integrations)
           (integrations-settings-modal)
-          ;; Invite settings
-          (= open-panel :invite)
-          (invite-settings-modal)
+          ;; Invite picker settings
+          (= open-panel :invite-picker)
+          (invite-picker-modal)
+          ;; Invite via email
+          (= open-panel :invite-email)
+          (invite-email-modal)
+          ;; Invite via Slack
+          (= open-panel :invite-slack)
+          (invite-slack-modal)
           ;; Team management
           (= open-panel :team)
           (team-management-modal)

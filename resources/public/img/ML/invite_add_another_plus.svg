@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
-    <title>Combined Shape</title>
+    <title>Rectangle 13 Copy</title>
     <desc>Created with Sketch.</desc>
-    <g id="Settings" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Invite-guests" transform="translate(-984.000000, -389.000000)" fill="#C2C3C6">
-            <g id="Group-17" transform="translate(984.000000, 233.000000)">
-                <g id="Group-12" transform="translate(0.000000, 154.000000)">
-                    <g id="Group-26">
-                        <path d="M2,2 L10,2 C11.1045695,2 12,2.8954305 12,4 L12,12 C12,13.1045695 11.1045695,14 10,14 L2,14 C0.8954305,14 1.3527075e-16,13.1045695 0,12 L0,4 C-1.3527075e-16,2.8954305 0.8954305,2 2,2 Z M5.4,7.4 L3.59723854,7.4 C3.26946371,7.4 3,7.66862915 3,8 C3,8.33368111 3.2673928,8.6 3.59723854,8.6 L5.4,8.6 L5.4,10.4027615 C5.4,10.7305363 5.66862915,11 6,11 C6.33368111,11 6.6,10.7326072 6.6,10.4027615 L6.6,8.6 L8.40276146,8.6 C8.73053629,8.6 9,8.33137085 9,8 C9,7.66631889 8.7326072,7.4 8.40276146,7.4 L6.6,7.4 L6.6,5.59723854 C6.6,5.26946371 6.33137085,5 6,5 C5.66631889,5 5.4,5.2673928 5.4,5.59723854 L5.4,7.4 Z" id="Combined-Shape"></path>
+    <g id="Invite-via-URL" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Invite-people-(email)" transform="translate(-985.000000, -380.000000)" fill="#242D42">
+            <g id="Group-8" transform="translate(984.000000, 214.000000)">
+                <g id="Group-7" transform="translate(0.000000, 25.000000)">
+                    <g id="Group-9" transform="translate(0.000000, 52.000000)">
+                        <g id="Group-2" transform="translate(1.000000, 88.000000)">
+                            <g id="Rectangle-13-Copy" transform="translate(0.000000, 1.000000)">
+                                <rect opacity="0.100000001" x="0" y="0" width="16" height="16" rx="4"></rect>
+                                <path d="M7.4,7.4 L7.4,4.59723854 C7.4,4.2673928 7.66631889,4 8,4 C8.33137085,4 8.6,4.26946371 8.6,4.59723854 L8.6,7.4 L11.4027615,7.4 C11.7326072,7.4 12,7.66631889 12,8 C12,8.33137085 11.7305363,8.6 11.4027615,8.6 L8.6,8.6 L8.6,11.4027615 C8.6,11.7326072 8.33368111,12 8,12 C7.66862915,12 7.4,11.7305363 7.4,11.4027615 L7.4,8.6 L4.59723854,8.6 C4.2673928,8.6 4,8.33368111 4,8 C4,7.66862915 4.26946371,7.4 4.59723854,7.4 L7.4,7.4 Z" id="Combined-Shape"></path>
+                            </g>
+                        </g>
                     </g>
                 </g>
             </g>

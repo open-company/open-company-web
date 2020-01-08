@@ -214,7 +214,7 @@
           [:a {:href "/terms"}
            "Terms"]]
         [:div.copyright
-          "© 2019 Carrot"]]]])
+          "© 2020 Carrot"]]]])
 
 
 (defn read-edn [entry]
