@@ -53,7 +53,8 @@
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :unseen-item (:unseen activity-data)
-                                :unread-item (:unread activity-data)
+                                :unread-item (or (pos? (:new-comments-count activity-data))
+                                                 (:unread activity-data))
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
