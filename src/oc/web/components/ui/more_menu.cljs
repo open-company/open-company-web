@@ -143,7 +143,7 @@
                                 (when (fn? will-close)
                                   (will-close))
                                 (activity-actions/inbox-unfollow (:uuid entity-data)))}
-                  "Unfollow"]))
+                  "Mute"]))
             (when (and is-mobile?
                        show-inbox?)
               [:li.dismiss
