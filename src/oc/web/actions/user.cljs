@@ -308,7 +308,7 @@
            (entry-point-get-finished success body
              (fn [orgs collection]
                (when (pos? (count orgs))
-                 (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
+                 (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))))
       :else ;; Valid signup let's collect user data
       (do
         (jwt-actions/update-jwt-cookie jwt)
