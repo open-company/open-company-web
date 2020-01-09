@@ -210,7 +210,7 @@
             "What’s new"]]
         [:a
           {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+           :href "mailto:hello@carrot.io"}
           [:div.oc-menu-item.support
             "Get support"]]
         (when (and is-mobile?
