@@ -112,6 +112,7 @@ div.dashboard-layout {
         button.all-posts-tab {
           background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
           backgorund-size: 22px 18px;
+          background-repeat: no-repeat;
 
           @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
 
@@ -123,6 +124,7 @@ div.dashboard-layout {
         button.follow-ups-tab {
           background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
           backgorund-size: 18px 20px;
+          background-repeat: no-repeat;
 
           @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
 
@@ -134,6 +136,7 @@ div.dashboard-layout {
         button.notifications-tab {
           background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
           backgorund-size: 18px 20px;
+          background-repeat: no-repeat;
           position: relative;
 
           @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
@@ -157,6 +160,7 @@ div.dashboard-layout {
         button.new-post-tab {
           background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
           backgorund-size: 20px 20px;
+          background-repeat: no-repeat;
 
           @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
 
