@@ -141,6 +141,7 @@
                                     :external-follow (not is-mobile?)
                                     :show-edit? true
                                     :show-delete? true
+                                    :show-unread true
                                     :show-move? (not is-mobile?)
                                     :tooltip-position "bottom"
                                     :show-inbox? (= (:back-to @router/path) "inbox")

@@ -83,13 +83,14 @@
                              (.tooltip "hide")))
                        s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
-             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
+             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
              reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
+        mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
         is-mobile? (responsive/is-tablet-or-mobile?)
         add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
         remove-bookmark-link (when (:bookmarked entity-data)
@@ -106,6 +107,7 @@
         show-menu (or @(::showing-menu s) force-show-menu)]
     (when (or edit-link
               share-link
+              mark-unread-link
               delete-link
               can-comment-share?
               can-react?
@@ -188,7 +190,8 @@
             (when (and (not external-share)
                        share-link)
               [:li.share
-                {:class (when (and (not (or is-mobile?
+                {:class (when (and (not mark-unread-link)
+                                   (not (or is-mobile?
                                             (not external-follow)))
                                    (not (or is-mobile?
                                             (not external-bookmark))))
@@ -199,6 +202,32 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
+            (when mark-unread-link
+              (if show-unread
+                [:li.unread
+                  {:class (when (and (not (or is-mobile?
+                                              (not external-follow)))
+                                     (not (or is-mobile?
+                                              (not external-bookmark))))
+                            "bottom-rounded bottom-margin")
+                   :on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/mark-unread entity-data))}
+                  "Mark unread"]
+                [:li.read
+                  {:class (when (and (not (or is-mobile?
+                                              (not external-follow)))
+                                     (not (or is-mobile?
+                                              (not external-bookmark))))
+                            "bottom-rounded bottom-margin")
+                   :on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/mark-read entity-data))}
+                  "Mark as read"]))
             (when (or is-mobile?
                       (not external-follow))
               (if inbox-follow-link

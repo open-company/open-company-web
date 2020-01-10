@@ -193,6 +193,8 @@
                            :external-follow (not is-mobile?)
                            :show-edit? true
                            :show-delete? true
+                           :show-unread (or (not (:unread activity-data))
+                                            (pos? (:new-comments-count activity-data)))
                            :show-move? (not is-mobile?)
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))

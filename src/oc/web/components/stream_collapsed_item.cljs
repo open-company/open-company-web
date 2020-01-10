@@ -111,4 +111,6 @@
                   :external-bookmark (not is-mobile?)
                   :show-edit? true
                   :show-delete? true
+                  :show-unread (or (not (:unread activity-data))
+                                   (pos? (:new-comments-count activity-data)))
                   :show-move? (not is-mobile?)})]))

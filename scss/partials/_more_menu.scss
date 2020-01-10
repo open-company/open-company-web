@@ -482,6 +482,40 @@ div.more-menu {
             }
           }
 
+          &.read {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_read.svg");
+              background-size: 12px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 18px;
+            }
+          }
+
+          &.unread {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_unread.svg");
+              background-size: 12px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 18px;
+            }
+          }
+
           &.follow {
             padding-left: 56px;
 
