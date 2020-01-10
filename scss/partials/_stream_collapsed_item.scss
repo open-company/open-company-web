@@ -3,6 +3,7 @@ $mobile_foc_background_color: rgba($deep_navy, 0.05);
 $foc_hover_color: rgb(230, 230, 230); //rgba($deep_navy, 0.10);
 $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
+$foc_hover_extra_padding: 4;
 
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
@@ -28,10 +29,10 @@ div.stream-collapsed-item {
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
-        padding: 20px 20px 20px 28px;
-        margin: -8px 0 0 -8px;
-        width: #{$board_container_width + 16}px;
-        height: #{$collapsed_foc_height + 16}px;
+        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
 
         div.more-menu {
           display: initial;
@@ -63,10 +64,10 @@ div.stream-collapsed-item {
         border-right: 1px solid rgba($deep_navy, 0.24);
         border-left: 1px solid rgba($deep_navy, 0.24);
         border-bottom: 1px solid rgba($deep_navy, 0.24);
-        padding: 20px 20px 20px 28px;
-        margin: -8px 0 0 -8px;
-        width: #{$board_container_width + 16}px;
-        height: #{$collapsed_foc_height + 16}px;
+        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
       }
     }
 
@@ -224,8 +225,8 @@ div.stream-collapsed-item {
 
   div.more-menu {
     position: absolute;
-    right: 20px;
-    top: 20px;
+    right: 16px;
+    top: 16px;
     height: 32px;
     z-index: 100;
     background-color: $foc_hover_color;
