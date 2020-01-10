@@ -150,7 +150,9 @@
             {:class (utils/class-set {:has-remove-bookmark (and is-mobile?
                                                                 add-bookmark-link)
                                       :has-add-bookmark (and is-mobile?
-                                                              remove-bookmark-link)})}
+                                                              remove-bookmark-link)
+                                      :has-mark-read-unread (and is-mobile?
+                                                                 mark-unread-link)})}
             (when (and edit-link
                        show-edit?)
               [:li.edit.top-rounded
@@ -215,7 +217,7 @@
                                 (when (fn? will-close)
                                   (will-close))
                                 (activity-actions/mark-unread entity-data))}
-                  "Mark unread"]
+                  "Mark as unread"]
                 [:li.read
                   {:class (when (and (not (or is-mobile?
                                               (not external-follow)))
