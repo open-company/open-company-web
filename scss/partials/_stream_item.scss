@@ -5,13 +5,22 @@ $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
-@include big_web() {
-  div.virtualized-list-row {
+div.virtualized-list-row {
+  background-color: $grey_num_2;
+
+  @include big_web() {
     z-index: 1;
+
+    &:hover {
+      z-index: 2;
+      width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
+      margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+    }
   }
 
-  div.virtualized-list-row:hover {
-    z-index: 2;
+  @include mobile() {
+    background-color: white;
   }
 }
 
@@ -144,7 +153,6 @@ div.stream-item {
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
         padding: #{24 + ($foc_hover_extra_padding * 2)}px #{32 + ($foc_hover_extra_padding * 2)}px;
-        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
 
@@ -181,7 +189,6 @@ div.stream-item {
         border-left: 1px solid rgba($deep_navy, 0.24);
         border-bottom: 1px solid rgba($deep_navy, 0.24);
         padding: #{24 + ($foc_hover_extra_padding * 2)}px #{32 + ($foc_hover_extra_padding * 2)}px;
-        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
       }

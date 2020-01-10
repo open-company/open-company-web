@@ -5,6 +5,25 @@ $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
+div.virtualized-list-row {
+  background-color: $grey_num_2;
+
+  @include big_web() {
+    z-index: 1;
+
+    &:hover {
+      z-index: 2;
+      width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
+      margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+    }
+  }
+
+  @include mobile() {
+    background-color: white;
+  }
+}
+
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
   margin: 0;
@@ -30,7 +49,6 @@ div.stream-collapsed-item {
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
         padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
 
