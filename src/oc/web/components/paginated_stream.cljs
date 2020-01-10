@@ -83,7 +83,7 @@
            editable-boards] :as props}]
   (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
                        (activity-utils/is-published? entry))]
-   [:div
+   [:div.virtualized-list-row
     {:style style}
     (stream-item {:activity-data entry
                   :comments-data comments-data

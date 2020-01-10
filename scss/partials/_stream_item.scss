@@ -4,6 +4,14 @@
 // --foc-new-color: white;
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 
+div.virtualized-list-row {
+  background-color: var(--background-color);
+
+  @include mobile(){
+    background-color: var(--mobile-background-color);
+  }
+}
+
 div.stream-item {
   display: flex;
   flex-direction: column;
