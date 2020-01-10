@@ -4,6 +4,16 @@ $foc_hover_color: rgba($deep_navy, 0.10);
 $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
 
+@include big_web() {
+  div.virtualized-list-row {
+    z-index: 1;
+  }
+
+  div.virtualized-list-row:hover {
+    z-index: 2;
+  }
+}
+
 div.stream-item {
   display: flex;
   flex-direction: column;
@@ -38,6 +48,13 @@ div.stream-item {
     @include big_web() {
       &:hover {
         background-color: $foc_hover_color;
+        z-index: 2;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        padding: 32px 40px;
+        margin: -8px 0 0 -8px;
+        width: #{$board_container_width + 16}px;
+        height: #{$foc_height + 16}px;
 
         div.stream-item-header {
           div.more-menu button {
@@ -71,6 +88,10 @@ div.stream-item {
         border-right: 1px solid rgba($deep_navy, 0.24);
         border-left: 1px solid rgba($deep_navy, 0.24);
         border-bottom: 1px solid rgba($deep_navy, 0.24);
+        padding: 32px 40px;
+        margin: -8px 0 0 -8px;
+        width: #{$board_container_width + 16}px;
+        height: #{$foc_height + 16}px;
       }
     }
   }
@@ -190,6 +211,8 @@ div.stream-item {
       height: 24px;
 
       @include big_web() {
+        height: 32px;
+
         &:not(.menu-expanded) button {
           display: none;
         }
