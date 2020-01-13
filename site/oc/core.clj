@@ -198,7 +198,7 @@
           [:div.column-item
             [:a
               {:class "intercom-chat-link"
-               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+               :href "mailto:hello@carrot.io"}
               "Contact us"]]]]]
       [:div.left-column.group
         [:img.logo
