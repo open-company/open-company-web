@@ -127,7 +127,10 @@
                                                                            :primary-bt-inline true
                                                                            :id :invites-sent}))
                                 (reset! (::send-bt-cta s) "Send Slack invitations"))))))))
-                  s)}
+                  s)
+   :will-unmount (fn [s]
+                   (dis/dispatch! [:input [:invite-users] nil])
+                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         invite-users-data (drv/react s :invite-data)

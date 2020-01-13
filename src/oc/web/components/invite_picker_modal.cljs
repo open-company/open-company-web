@@ -21,7 +21,8 @@
           invite-add-slack-checked @(drv/get-ref s :invite-add-slack-checked)]
       (when-not invite-add-slack-checked
         (dis/dispatch! [:input [:invite-add-slack-checked] true])
-        (when-not (false? (:access query-params))
+        (when (and (= (:org-settings query-params) "invite-picker")
+                   (#{"bot" "team"} (:access query-params)))
           (nav-actions/show-org-settings :invite-slack))))
     (let [org-data @(drv/get-ref s :org-data)]
       (org-actions/get-org org-data true)
