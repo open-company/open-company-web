@@ -5,10 +5,6 @@ $foc_new_color: white;
 $foc_divider_line_color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
-div.virtualized-list-row:has(> div.stream-item.more-menu-visible) {
-  z-index: 2;
-}
-
 div.virtualized-list-row {
   background-color: $grey_num_2;
 
