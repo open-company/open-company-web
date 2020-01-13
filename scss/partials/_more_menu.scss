@@ -491,14 +491,14 @@ div.more-menu {
             &:before {
               content: "";
               width: 16px;
-              height: 16px;
+              height: 18px;
               background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
-              background-size: 16px 16px;
+              background-size: 16px 18px;
               background-position: center;
               background-repeat: no-repeat;
               position: absolute;
-              top: 16px;
-              left: 16px;
+              top: 15px;
+              left: 15px;
             }
           }
 
@@ -508,14 +508,14 @@ div.more-menu {
             &:before {
               content: "";
               width: 16px;
-              height: 16px;
+              height: 18px;
               background-image: cdnUrl("/img/ML/mobile_more_unfollow.svg");
-              background-size: 16px 16px;
+              background-size: 16px 18px;
               background-position: center;
               background-repeat: no-repeat;
               position: absolute;
-              top: 16px;
-              left: 16px;
+              top: 15px;
+              left: 15px;
             }
           }
 
