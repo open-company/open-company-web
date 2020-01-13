@@ -1,5 +1,6 @@
 (ns oc.web.stores.activity
-  (:require [taoensso.timbre :as timbre]
+  (:require [cuerdas.core :as str]
+            [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
@@ -560,10 +561,11 @@
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
           without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
-          org-data-key (dispatcher/org-data-key org-slug)]
+          org-data-key (dispatcher/org-data-key org-slug)
+          update-count? (not= (-> inbox-data :posts-list count) (-> without-item :posts-list count))]
       (-> db
         (assoc-in inbox-key without-item)
-        (update-in (conj org-data-key :inbox-count) dec)))
+        (update-in (conj org-data-key :inbox-count) (if update-count? dec identity))))
     db))
 
 (defmethod dispatcher/action :inbox/unread
@@ -571,12 +573,22 @@
   (if-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
-          without-item (update inbox-data :posts-list (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
+          with-item (update inbox-data :posts-list (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
+          activity-key (dispatcher/activity-key org-slug item-id)
+          activity-data (get-in db activity-key)
+          fixed-activity-data (update activity-data :links (fn [links]
+                               (mapv (fn [link]
+                                (if (= (:rel link) "follow")
+                                  (merge link {:href (str/replace (:href link) #"/follow$" "/unfollow")
+                                               :rel "unfollow"})
+                                  link))
+                                 links)))
           org-data-key (dispatcher/org-data-key org-slug)
-          count-fn (if (= current-board-slug "inbox") inc identity)]
+          update-count? (not= (-> inbox-data :posts-list count) (-> with-item :posts-list count))]
       (-> db
-       (assoc-in inbox-key without-item)
-       (update-in (conj org-data-key :inbox-count) count-fn)))
+       (assoc-in inbox-key with-item)
+       (update-in (conj org-data-key :inbox-count) (if update-count? inc identity))
+       (update-in activity-key fixed-activity-data)))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss-all

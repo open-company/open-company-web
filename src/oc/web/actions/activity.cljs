@@ -976,18 +976,17 @@
     (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
     (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
+       (notification-actions/show-notification {:title (if success "Post moved to Unread" "An error occurred")
+                                                :description (when-not success "Please try again")
+                                                :dismiss true
+                                                :expire 3
+                                                :id (if success :inbox-unread-success :inbox-unread-error)})
        (if (and (= status 404)
                 (= (:uuid activity-data) (router/current-activity-id)))
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (do
-          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])
-          (notification-actions/show-notification {:title (if success "Post moved to Unread" "An error occurred")
-                                                   :description (when-not success "Please try again")
-                                                   :dismiss true
-                                                   :expire 3
-                                                   :id (if success :mark-unread-success :mark-unread-error)})))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
         (inbox-get (dis/org-data))))))
 
 (defn- inbox-real-dismiss-all []
