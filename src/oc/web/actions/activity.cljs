@@ -872,20 +872,6 @@
           cmail-state {:fullscreen true :key (utils/activity-uuid)}]
       (cmail-actions/cmail-show fixed-activity-data cmail-state))))
 
-(declare inbox-unread)
-
-(defn mark-unread [activity-data]
-  (inbox-unread activity-data)
-  (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
-    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
-    (api/mark-unread mark-unread-link (:board-uuid activity-data)
-     (fn [{:keys [success]}]
-      (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
-                                               :description (when-not success "Please try again")
-                                               :dismiss true
-                                               :expire 3
-                                               :id (if success :mark-unread-success :mark-unread-error)})))))
-
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link
     (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) true])
@@ -995,8 +981,13 @@
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))
+         (do
+          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])
+          (notification-actions/show-notification {:title (if success "Post moved to Unread" "An error occurred")
+                                                   :description (when-not success "Please try again")
+                                                   :dismiss true
+                                                   :expire 3
+                                                   :id (if success :mark-unread-success :mark-unread-error)})))
         (inbox-get (dis/org-data))))))
 
 (defn- inbox-real-dismiss-all []

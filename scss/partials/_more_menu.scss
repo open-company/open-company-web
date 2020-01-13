@@ -298,13 +298,13 @@ div.more-menu {
       }
     }
 
-    &.has-mark-read-unread {
-      width: 134px;
+    &.has-mark-unread {
+      width: 138px;
 
       @include mobile() {
         left: unset;
         right: 0;
-        width: 134px;
+        width: 138px;
       } 
     }
 

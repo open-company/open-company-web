@@ -153,7 +153,7 @@
                                       :has-add-bookmark (and remove-bookmark-link
                                                              (or is-mobile?
                                                                  (not external-bookmark)))
-                                      :has-mark-read-unread mark-unread-link})}
+                                      :has-mark-unread mark-unread-link})}
             (when (and edit-link
                        show-edit?)
               [:li.edit.top-rounded
@@ -205,32 +205,20 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (when mark-unread-link
-              (if show-unread
-                [:li.unread
-                  {:class (when (and (not (or is-mobile?
-                                              (not external-follow)))
-                                     (not (or is-mobile?
-                                              (not external-bookmark))))
-                            "bottom-rounded bottom-margin")
-                   :on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (activity-actions/mark-unread entity-data))}
-                  "Mark as unread"]
-                [:li.read
-                  {:class (when (and (not (or is-mobile?
-                                              (not external-follow)))
-                                     (not (or is-mobile?
-                                              (not external-bookmark))))
-                            "bottom-rounded bottom-margin")
-                   :on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (activity-actions/mark-read entity-data))}
-                  "Mark as read"]))
+            (when (and mark-unread-link
+                       show-unread)
+              [:li.unread
+                {:class (when (and (not (or is-mobile?
+                                            (not external-follow)))
+                                   (not (or is-mobile?
+                                            (not external-bookmark))))
+                          "bottom-rounded bottom-margin")
+                 :on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/inbox-unread entity-data))}
+                "Move to Unread"])
             (when (or is-mobile?
                       (not external-follow))
               (if inbox-follow-link
