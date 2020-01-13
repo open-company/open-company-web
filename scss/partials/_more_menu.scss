@@ -205,7 +205,7 @@ div.more-menu {
   button.more-menu-inbox-follow-bt {
     height: 32px;
     width: 32px;
-    background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
+    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
     background-size: 12px 14px;
     background-position: center;
     background-color: rgba($deep_navy, 0.1);
@@ -217,6 +217,7 @@ div.more-menu {
     @include big_web() {
       &:hover {
         background-color: rgba($deep_navy, 0.2);
+        background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
       }
     }
 
@@ -236,7 +237,7 @@ div.more-menu {
   button.more-menu-inbox-unfollow-bt {
     height: 32px;
     width: 32px;
-    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+    background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
     background-size: 12px 14px;
     background-position: center;
     background-color: rgba($deep_navy, 0.1);;
@@ -248,6 +249,7 @@ div.more-menu {
     @include big_web() {
       &:hover {
         background-color: rgba($deep_navy, 0.2);
+        background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
       }
     }
 
