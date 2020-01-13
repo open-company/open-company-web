@@ -931,6 +931,13 @@
      callback)
     (handle-missing-link "inbox-dismiss" dismiss-link callback)))
 
+(defn inbox-unread [unread-link callback]
+  (if unread-link
+    (storage-http (method-for-link unread-link) (relative-href unread-link)
+     {:headers (headers-for-link unread-link)}
+     callback)
+    (handle-missing-link "inbox-unread" unread-link callback)))
+
 (defn inbox-follow [follow-link callback]
   (if follow-link
     (storage-http (method-for-link follow-link) (relative-href follow-link)

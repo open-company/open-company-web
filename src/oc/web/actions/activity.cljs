@@ -645,7 +645,7 @@
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
-      (when (and (#{:dismiss :follow :unfollow} (:change-type (:data data)))
+      (when (and (#{:dismiss :unread :follow :unfollow} (:change-type (:data data)))
                  (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
@@ -656,6 +656,11 @@
             (do
               (timbre/debug "Dismiss for" activity-uuid "with" (:dismiss-at inbox-action))
               (dis/dispatch! [:inbox/dismiss (router/current-org-slug) activity-uuid])
+              (inbox-get (dis/org-data)))
+            (= change-type :unread)
+            (do
+              (timbre/debug "Unread for" activity-uuid "with" (:dismiss-at inbox-action))
+              (dis/dispatch! [:inbox/unread (router/current-org-slug) activity-uuid])
               (inbox-get (dis/org-data)))
             (= change-type :follow)
             (do
@@ -867,9 +872,12 @@
           cmail-state {:fullscreen true :key (utils/activity-uuid)}]
       (cmail-actions/cmail-show fixed-activity-data cmail-state))))
 
+(declare inbox-unread)
+
 (defn mark-unread [activity-data]
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
     (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
+    (inbox-unread (:uuid activity-data))
     (api/mark-unread mark-unread-link (:board-uuid activity-data)
      (fn [{:keys [success]}]
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
@@ -967,6 +975,21 @@
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
     (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid])
     (api/inbox-dismiss dismiss-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))
+        (inbox-get (dis/org-data))))))
+
+(defn inbox-unread [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        unread-link (utils/link-for (:links activity-data) "unread")]
+    (dis/dispatch! [:inbox/unread (router/current-org-slug) entry-uuid])
+    (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
                 (= (:uuid activity-data) (router/current-activity-id)))
