@@ -567,15 +567,16 @@
     db))
 
 (defmethod dispatcher/action :inbox/unread
-  [db [_ org-slug item-id]]
+  [db [_ org-slug current-board-slug item-id]]
   (if-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
           without-item (update inbox-data :posts-list (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
-          org-data-key (dispatcher/org-data-key org-slug)]
+          org-data-key (dispatcher/org-data-key org-slug)
+          count-fn (if (= current-board-slug "inbox") inc identity)]
       (-> db
-        (assoc-in inbox-key without-item)
-        (update-in (conj org-data-key :inbox-count) inc)))
+       (assoc-in inbox-key without-item)
+       (update-in (conj org-data-key :inbox-count) count-fn)))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss-all

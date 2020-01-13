@@ -654,21 +654,21 @@
           (cond
             (= change-type :dismiss)
             (do
-              (timbre/debug "Dismiss for" activity-uuid "with" (:dismiss-at inbox-action))
+              (timbre/debug "Dismiss for" activity-uuid)
               (dis/dispatch! [:inbox/dismiss (router/current-org-slug) activity-uuid])
               (inbox-get (dis/org-data)))
             (= change-type :unread)
             (do
-              (timbre/debug "Unread for" activity-uuid "with" (:dismiss-at inbox-action))
-              (dis/dispatch! [:inbox/unread (router/current-org-slug) activity-uuid])
+              (timbre/debug "Unread for" activity-uuid)
+              (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) activity-uuid])
               (inbox-get (dis/org-data)))
             (= change-type :follow)
             (do
-              (timbre/debug "Follow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (timbre/debug "Follow for" activity-uuid)
               (inbox-get (dis/org-data)))
             (= change-type :unfollow)
             (do
-              (timbre/debug "Unfollow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (timbre/debug "Unfollow for" activity-uuid)
               (inbox-get (dis/org-data))))))
       (when (and (utils/in? (-> data :data :users) (jwt/user-id))
                  (= :comment-add (:change-type (:data data))))
@@ -875,9 +875,9 @@
 (declare inbox-unread)
 
 (defn mark-unread [activity-data]
+  (inbox-unread activity-data)
   (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
     (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
-    (inbox-unread (:uuid activity-data))
     (api/mark-unread mark-unread-link (:board-uuid activity-data)
      (fn [{:keys [success]}]
       (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
@@ -985,10 +985,9 @@
           nil]))
         (inbox-get (dis/org-data))))))
 
-(defn inbox-unread [entry-uuid]
-  (let [activity-data (dis/activity-data entry-uuid)
-        unread-link (utils/link-for (:links activity-data) "unread")]
-    (dis/dispatch! [:inbox/unread (router/current-org-slug) entry-uuid])
+(defn inbox-unread [activity-data]
+  (when-let [unread-link (utils/link-for (:links activity-data) "unread")]
+    (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
     (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
