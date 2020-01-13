@@ -266,7 +266,7 @@ div.more-menu {
   ul.more-menu-list {
     position: absolute;
     top: 26px;
-    left: calc(100% - 108px);
+    left: 0;
     width: 94px;
     outline: none;
     z-index: 110;
@@ -279,8 +279,6 @@ div.more-menu {
     list-style-type: none;
 
     &.has-add-bookmark {
-      left: unset;
-      right: 0;
       width: 144px;
 
       @include mobile() {
@@ -291,8 +289,6 @@ div.more-menu {
     }
 
     &.has-remove-bookmark {
-      left: unset;
-      right: 0;
       width: 162px;
 
       @include mobile() {
@@ -303,14 +299,12 @@ div.more-menu {
     }
 
     &.has-mark-read-unread {
-      left: unset;
-      right: 0;
-      width: 162px;
+      width: 134px;
 
       @include mobile() {
         left: unset;
         right: 0;
-        width: 162px;
+        width: 134px;
       } 
     }
 

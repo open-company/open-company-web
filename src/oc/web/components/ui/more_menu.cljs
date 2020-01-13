@@ -90,7 +90,7 @@
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
-        mark-unread-link (utils/link-for (:links entity-data) "mark-unread")
+        mark-unread-link (utils/link-for (:links entity-data) "unread")
         is-mobile? (responsive/is-tablet-or-mobile?)
         add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
         remove-bookmark-link (when (:bookmarked entity-data)
@@ -147,12 +147,13 @@
                           :dismiss-cb #(reset! (::move-activity s) false)})
           show-menu
           [:ul.more-menu-list
-            {:class (utils/class-set {:has-remove-bookmark (and is-mobile?
-                                                                add-bookmark-link)
-                                      :has-add-bookmark (and is-mobile?
-                                                              remove-bookmark-link)
-                                      :has-mark-read-unread (and is-mobile?
-                                                                 mark-unread-link)})}
+            {:class (utils/class-set {:has-remove-bookmark (and add-bookmark-link
+                                                                (or is-mobile?
+                                                                    (not external-bookmark)))
+                                      :has-add-bookmark (and remove-bookmark-link
+                                                             (or is-mobile?
+                                                                 (not external-bookmark)))
+                                      :has-mark-read-unread mark-unread-link})}
             (when (and edit-link
                        show-edit?)
               [:li.edit.top-rounded
