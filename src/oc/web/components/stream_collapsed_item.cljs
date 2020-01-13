@@ -33,6 +33,7 @@
   [s {:keys [activity-data read-data comments-data editable-boards]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
+        is-inbox? (= (router/current-board-slug) "inbox")
         dom-element-id (str "stream-collapsed-item-" (:uuid activity-data))
         dom-node-class (str "stream-collapsed-item-" (:uuid activity-data))
         current-user-id (jwt/user-id)
@@ -112,4 +113,5 @@
                   :external-follow (not is-mobile?)
                   :show-edit? true
                   :show-delete? true
-                  :show-move? (not is-mobile?)})]))
+                  :show-move? (not is-mobile?)
+                  :show-inbox? is-inbox?})]))
