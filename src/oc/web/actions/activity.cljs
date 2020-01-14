@@ -370,8 +370,7 @@
             (do
               (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid entry-data) nil])
               (routing-actions/maybe-404))
-            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-             nil])))))))
+            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])))))))
 
 (declare entry-revert)
 
@@ -940,8 +939,7 @@
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))))))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-unfollow [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
@@ -953,8 +951,7 @@
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))))))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-dismiss [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
@@ -967,8 +964,7 @@
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
         (inbox-get (dis/org-data))))))
 
 (defn inbox-unread [activity-data]
@@ -987,7 +983,7 @@
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
-        (inbox-get (dis/org-data))))))
+       (inbox-get (dis/org-data))))))
 
 (defn- inbox-real-dismiss-all []
   (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
