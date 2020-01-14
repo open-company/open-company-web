@@ -5,6 +5,7 @@
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
+
 (defn add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
    status"
@@ -572,23 +573,26 @@
   [db [_ org-slug current-board-slug item-id]]
   (if-let [activity-data (dispatcher/activity-data item-id)]
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
+          posts-list-key (conj inbox-key :posts-list)
           inbox-data (get-in db inbox-key)
-          with-item (update inbox-data :posts-list (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
+          next-db (if inbox-data
+                    (update-in db posts-list-key (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
+                    db)
           activity-key (dispatcher/activity-key org-slug item-id)
           activity-data (get-in db activity-key)
           fixed-activity-data (update activity-data :links (fn [links]
                                (mapv (fn [link]
                                 (if (= (:rel link) "follow")
-                                  (merge link {:href (str/replace (:href link) #"/follow$" "/unfollow")
+                                  (merge link {:href (str/replace (:href link) #"/follow/?$" "/unfollow/")
                                                :rel "unfollow"})
                                   link))
                                  links)))
           org-data-key (dispatcher/org-data-key org-slug)
-          update-count? (not= (-> inbox-data :posts-list count) (-> with-item :posts-list count))]
-      (-> db
-       (assoc-in inbox-key with-item)
+          update-count? (and inbox-data
+                             (not= (count (get-in db posts-list-key)) (count (get-in next-db posts-list-key))))]
+      (-> next-db
        (update-in (conj org-data-key :inbox-count) (if update-count? inc identity))
-       (update-in activity-key fixed-activity-data)))
+       (assoc-in activity-key fixed-activity-data)))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss-all

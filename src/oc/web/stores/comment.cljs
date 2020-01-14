@@ -78,7 +78,7 @@
      (update-in (conj activity-key :links) (fn [links]
                                              (mapv (fn [link]
                                               (if (= (:rel link) "follow")
-                                                (merge link {:href (str/replace (:href link) #"/follow$" "/unfollow")
+                                                (merge link {:href (str/replace (:href link) #"/follow/?$" "/unfollow/")
                                                              :rel "unfollow"})
                                                 link))
                                                links))))))
