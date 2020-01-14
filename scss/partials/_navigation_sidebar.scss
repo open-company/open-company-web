@@ -748,12 +748,12 @@ div.left-navigation-sidebar {
       background-repeat: no-repeat;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--color);
       line-height: 18px;
 
       @include big_web(){
         &:hover {
-          background-color: rgba($deep_navy, 0.05);
+          background-color: var(--light-color);
         }
       }
     }
@@ -805,6 +805,12 @@ div.left-navigation-sidebar {
 
       div.private {
         background-image: cdnUrl("/img/ML/board_private_white.svg");
+      }
+    }
+
+    div.left-navigation-sidebar-footer {
+      button.invite-people-bt {
+        background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
       }
     }
   }

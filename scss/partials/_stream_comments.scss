@@ -402,6 +402,10 @@ div.stream-comments {
               color: var(--color);
               line-height: 16px;
               float: left;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+
               @include preload_image(cdnUrl("/img/ML/comment_share.svg"));
             }
 
@@ -429,17 +433,6 @@ div.stream-comments {
               div.stream-comment-author-timestamp {
                 flex: 0 0 auto;
               }
-            }
-
-            div.stream-comment-author-name {
-              @include OC_Body_Bold();
-              font-size: 14px;
-              color: var(--color);
-              line-height: 16px;
-              float: left;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
             }
 
             div.stream-comment-author-timestamp {
@@ -588,13 +581,13 @@ div.stream-comments {
 
 @include dark_mode() {
   div.stream-comments {
-    div.stream-commetns-list div.stream-commet-outer {
+    div.stream-comments-list div.stream-comment-outer {
       &.highlighted {
         background-color: rgba(0, 0, 0, 0.15);
       }
 
       div.stream-comment {
-        div.stream-comment-floating-buttons button.floating-bt{
+        div.stream-comment-floating-buttons button.floating-bt {
           &.more-bt {
             background-image: cdnUrl("/img/ML/comment_more@dark.svg");
           }
@@ -612,8 +605,12 @@ div.stream-comments {
           }
         }
 
-        div.stream-comment-header {
+        div.stream-comment-right {
           @include preload_image(cdnUrl("/img/ML/comment_react@dark.svg"));
+        }
+
+        div.stream-comment-header {
+          @include preload_image(cdnUrl("/img/ML/comment_more@dark.svg"));
 
           div.stream-comment-author-right {
             @include preload_image(cdnUrl("/img/ML/comment_reply@dark.svg"));
