@@ -534,11 +534,11 @@
 
     (defroute first-ever-landing-route (urls/first-ever-landing ":org") {:as params}
       (timbre/info "Routing first-ever-landing-route" (urls/first-ever-landing ":org"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
+      (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))
 
     (defroute first-ever-landing-slash-route (str (urls/first-ever-landing ":org") "/") {:as params}
       (timbre/info "Routing first-ever-landing-slash-route" (str (urls/first-ever-landing ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
+      (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))
 
     (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
       (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
