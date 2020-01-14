@@ -47,8 +47,7 @@
           [:button.mlb-reset.invite-email-bt
             {:on-click #(nav-actions/show-org-settings :invite-email)}
             "Invite via email"]
-          (if (or (:can-slack-invite team-data)
-                  (:can-add-bot team-data))
+          (if (-> team-data :slack-orgs count pos?)
             [:button.mlb-reset.invite-slack-bt
               {:on-click #(nav-actions/show-org-settings :invite-slack)}
               "Invite via Slack"]
