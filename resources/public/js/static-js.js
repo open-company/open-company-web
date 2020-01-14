@@ -149,7 +149,9 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   if (jwt) {
     $("#site-header-login-item").hide();
+    $("#site-header-signup-item").hide();
     $("#site-header-login-item-mobile").hide();
+    $("#site-header-signup-item-mobile").hide();
     $(".login-signup-or").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
