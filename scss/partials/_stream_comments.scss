@@ -587,21 +587,30 @@ div.stream-comments {
       }
 
       div.stream-comment {
-        div.stream-comment-floating-buttons button.floating-bt {
-          &.more-bt {
-            background-image: cdnUrl("/img/ML/comment_more@dark.svg");
-          }
 
-          &.share-bt {
-            background-image: cdnUrl("/img/ML/comment_share@dark.svg");
-          }
+        &.editing div.stream-comment-content div.stream-comment-body, div.stream-comment-body.medium-editor-element {
+          box-shadow: 0 2px 8px 0 rgba(255, 255, 255, 0.24);
+        }
 
-          &.reply-bt {
-            background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
-          }
+        div.stream-comment-floating-buttons {
+          box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.24);
 
-          &.react-bt {
-            background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+          button.floating-bt {
+            &.more-bt {
+              background-image: cdnUrl("/img/ML/comment_more@dark.svg");
+            }
+
+            &.share-bt {
+              background-image: cdnUrl("/img/ML/comment_share@dark.svg");
+            }
+
+            &.reply-bt {
+              background-image: cdnUrl("/img/ML/comment_reply@dark.svg");
+            }
+
+            &.react-bt {
+              background-image: cdnUrl("/img/ML/comment_react@dark.svg");
+            }
           }
         }
 

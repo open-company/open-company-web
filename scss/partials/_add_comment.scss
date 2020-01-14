@@ -206,8 +206,13 @@ div.add-comment-box-container {
 }
 
 @include dark_mode() {
-  div.add-comment-box-container div.add-comment-box
-  div.add-comment-internal div.add-comment-footer  button.close-reply-bt {
-    background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+  div.add-comment-box-container div.add-comment-box div.add-comment-internal {
+    &.active {
+      box-shadow: 0 2px 8px 0 rgba(255, 255, 255, 0.07);
+    }
+
+    div.add-comment-footer  button.close-reply-bt {
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+    }
   }
 }
