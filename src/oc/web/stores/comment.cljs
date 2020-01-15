@@ -265,10 +265,10 @@
           created-at (:created-at comment-data)
           ;; update the comments link of the entry
           comments-link-idx (utils/index-of
-                             (:links entry-data)
+                             (:links activity-data)
                              #(and (= (:rel %) "comments") (= (:method %) "GET")))
-          with-increased-count (update-in entry-data [:links comments-link-idx :count] inc)
-          old-authors (or (:authors (get (:links entry-data) comments-link-idx)) [])
+          with-increased-count (update-in activity-data [:links comments-link-idx :count] inc)
+          old-authors (or (:authors (get (:links activity-data) comments-link-idx)) [])
           new-author (:author comment-data)
           new-authors (if (and old-authors (first (filter #(= (:user-id %) (:user-id new-author)) old-authors)))
                         old-authors
@@ -276,9 +276,12 @@
           with-authors (assoc-in with-increased-count [:links comments-link-idx :authors] new-authors)
           comment-from-current-user? (= (:user-id comment-data) (jwt/user-id))
           old-comments-count (:new-comments-count activity-data)
-          new-comments-count (if comment-from-current-user?
-                               old-comments-count
-                               (inc old-comments-count))
+          new-comments-count (if (and ;; comment is not from current user
+                                      (not comment-from-current-user?)
+                                      ;; and the activity we have is old (new-at is the created-at of the last comment)
+                                      (-> comment-data :created-at (compare (:new-at activity-data)) pos?))
+                               (inc old-comments-count)
+                               old-comments-count)
           with-new-at (if comment-from-current-user?
                         with-authors
                         (-> with-authors
