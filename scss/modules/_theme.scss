@@ -4,7 +4,7 @@
 $dark_mode: "dark";
 
 @mixin dark_mode() {
-  html.theme-mode-dark {
+  @at-root html.theme-mode-dark #{&} {
     @content
   }
 }
