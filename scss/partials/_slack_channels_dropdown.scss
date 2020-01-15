@@ -11,10 +11,10 @@ div.slack-channels-dropdown {
     width: 100%;
     height: 32px;
     border-radius: 4px;
-    background-color: $ultra_light_grey;
+    background-color: var(--opac-background-color-1);
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     padding: 7px 8px;
     background-image: cdnUrl("/img/ML/select_arrows.svg");
     background-size: 8px 10px;
@@ -25,11 +25,11 @@ div.slack-channels-dropdown {
 
     &[disabled], &.disabled, &:disabled {
       cursor: not-allowed;
-      color: $ui_grey;
+      opacity: 0.4;
     }
 
     @include placeholder() {
-      color: $light_ui_grey;
+      color: var(--light-color);
     }
   }
 
@@ -38,8 +38,8 @@ div.slack-channels-dropdown {
     z-index: #{$navbar_zindex + 103};
     width: 100%;
     max-height: 184px;
-    border: 1px solid rgba($carrot_light_gray_1, 0.5);
-    background-color: white;
+    border: 1px solid var(--divider-line); //rgba($carrot_light_gray_1, 0.5);
+    background-color: var(--overlay-background-color);
     top: 32px;
     left: 0;
     overflow-y: auto;
@@ -56,26 +56,26 @@ div.slack-channels-dropdown {
       div.slack-team-name {
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_light_gray;
+        color: var(--light-color);
         padding: 0.4rem 0.8rem;
       }
 
       div.channel {
         width: 100%;
         padding: 8px 16px;
-        color: $carrot_dark_gray;
+        color: var(--color);
         @include OC_Body_Book();
         font-size: 14px;
         cursor: pointer;
 
         &:hover {
-          background-color: rgba($carrot_light_gray_4, 0.2);
+          background-color: var(--opac-background-color-2);
         }
 
         span.ch-prefix {
           @include OC_Body_Book()
           font-size: 16px;
-          color: $carrot_light_gray_1;
+          color: var(--light-colro);
           margin-right: 4px;
         }
       }

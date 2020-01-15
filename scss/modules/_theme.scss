@@ -1,4 +1,4 @@
-// Theme
+// Theme 
 @import "../modules/_colors";
 
 $dark_mode: "dark";
@@ -96,7 +96,7 @@ $dark_mode: "dark";
   --mobile-color: white;
   --mobile-tabbar-color: white;
 
-  --panel-header-background: #{rgba(white, 0.04)};
+  --panel-header-background: rgb(35, 38 ,46);
 
   // Ractions
   --reaction-bt-background: #{rgba(white, 0.12)};

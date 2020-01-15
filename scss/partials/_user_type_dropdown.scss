@@ -44,7 +44,7 @@ div.dropdown {
       padding: 4px 16px;
       @include OC_Body_Book();
       font-size: 14px;
-      color: var(--light-grey);
+      color: var(--light-color);
       background-color: transparent;
 
       &.selected {
