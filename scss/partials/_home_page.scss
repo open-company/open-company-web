@@ -13,7 +13,7 @@ div.home-wrap {
     }
 
     section.cta {
-      padding-top: 138px;
+      padding-top: 143px;
       padding-bottom: 73px;
       padding-left: 24px !important;
       padding-right: 24px !important;
@@ -45,7 +45,7 @@ div.home-wrap {
         width: calc(100% - 32px);
         height: 50%;
         transform: translateX(-50%);
-        background-color: $another_ui_grey;
+        background-color: rgba($deep_navy, 0.1);
         border-radius: 20px 200px 20px 20px;
         display: block;
         content: "";
@@ -84,11 +84,11 @@ div.home-wrap {
         font-size: 60px;
         @include OC_Body_Bold()
         color: $deep_navy;
-        line-height: 60px;
+        line-height: 66px;
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 720px;
+        max-width: 662px;
 
         @include mobile(){
           font-size: 36px;
@@ -104,19 +104,15 @@ div.home-wrap {
       div.subheadline {
         color: $deep_navy;
         font-size: 28px;
-        line-height: 38px;
+        line-height: 36px;
         @include OC_Body_Book();
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 820px;
+        max-width: 810px;
 
         &:first-of-type {
-          margin-top: 9px;
-
-          @include tablet() {
-            margin-top: 16px;
-          }
+          margin-top: 16px;
         }
 
         @include tablet(){
@@ -140,7 +136,8 @@ div.home-wrap {
 
       div.get-started-button-container {
         margin: 0 auto 80px;
-        width: 320px;
+        width: 180px;
+        text-align: center;
 
         @include mobile() {
           width: 100%;

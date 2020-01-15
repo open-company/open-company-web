@@ -7,13 +7,14 @@
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
     [:div.homepage-testimonials-copy
-      "Remote teams around the world ❤️ Carrot"]
+      "Growing and distributed teams around the world ❤️ Carrot"]
     [:div.homepage-testimonials-logos
       [:div.homepage-testimonials-logo.logo-ifttt]
       [:div.homepage-testimonials-logo.logo-hopper]
       [:div.homepage-testimonials-logo.logo-primary]
       [:div.homepage-testimonials-logo.logo-hinge]
       [:div.homepage-testimonials-logo.logo-resy]
+      [:div.homepage-testimonials-logo.logo-flyt]
       [:div.homepage-testimonials-logo.logo-weblify]
       [:div.homepage-testimonials-logo.logo-novo]
       [:div.homepage-testimonials-logo.logo-gamercraft]]])
@@ -26,9 +27,9 @@
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
-                          "\"Carrot helps us communicate efficiently across time zones. "
+                          "“Carrot helps us communicate efficiently across time zones. "
                           "It minimizes FOMO from missed Slack conversations, and cuts out "
-                          "the \"Did you see my message?\" nagging.\"")
+                          "the \"Did you see my message?\" nagging.”")
                          (= slug :blend-labs)
                          (str
                           "“Carrot is a perfect compliment for Slack. We use it for longer-form "
@@ -53,9 +54,9 @@
                              "https://banknovo.com/")
         testimonial-company (cond
                              (= slug :ifttt)
-                             "IFTTT"
+                             "IFTTT.com"
                              (= slug :blend-labs)
-                             "Bl3NDlabs"
+                             "Bl3NDlabs.com"
                              (= slug :bank-novo)
                              "Banknovo.com")]
     [:div.testimonials-block.group
@@ -76,11 +77,11 @@
                 (= block :thoughtful-communication)
                 "Thoughtful communication"
                 (= block :conversation)
+                "What’s new"
+                (= block :threads)
                 "Clear, organized discussions"
                 (= block :analytics)
                 "Know who saw your update"
-                (= block :follow-ups)
-                "Request a follow-up"
                 (= block :stay-in-sync)
                 "Daily digest to stay in sync"
                 (= block :stay-in-sync-slack)
@@ -92,14 +93,17 @@
                  "Space to write longer updates that convey more information"
                  (= block :conversation)
                  (str
-                  "Threaded comments make it easy for your team to stay engaged "
-                  "asynchronously. Ideal for remote teams.")
-                 (= block :analytics)
-                 "Carrot works in the background to make sure everyone sees what matters."
-                 (= block :follow-ups)
+                  "Get caught up - fast - and let Carrot help you filter "
+                  "out the discussions you don't want to follow.")
+                 (= block :threads)
                  (str
-                  "When you’re looking for a reply, or want to guarantee nobody misses your post, "
-                  "request a follow-up. Carrot reminds anyone that misses it to improve engagement.")
+                  "Threaded comments make it easy for your "
+                  "team to stay engaged asynchronously. Ideal "
+                  "for remote teams.")
+                 (= block :analytics)
+                 (str
+                  "Carrot works in the background to make sure "
+                  "everyone sees what matters")
                  (= block :stay-in-sync)
                  "Everyone gets a daily, personalized summary of what's important."
                  (= block :stay-in-sync-slack)
@@ -111,9 +115,9 @@
                         1
                         (= block :conversation)
                         2
-                        (= block :analytics)
+                        (= block :threads)
                         3
-                        (= block :follow-ups)
+                        (= block :analytics)
                         4
                         (= block :stay-in-sync)
                         5
@@ -165,29 +169,38 @@
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_1.png")
-           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_1@2x.png") " 2x")}]
+           :srcSet (str
+                    (cdn "/img/ML/testimonials_floated_screenshot_1@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_1@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_1@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
-            "Clear, organized discussions"]
+            "What’s new"]
           [:div.testimonials-floated-subheader
-            "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal for remote teams."]]]
+            "Get caught up - fast - and let Carrot help you filter out the discussions you don't want to follow."]]]
 
       [:div.testimonials-floated-block-inner.right-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_2.png")
-           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_2@2x.png") " 2x")}]
+           :srcSet (str
+                    (cdn "/img/ML/testimonials_floated_screenshot_2@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_2@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_2@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
-            "Request a follow-up"]
+            "Clear, organized discussions"]
           [:div.testimonials-floated-subheader
             (str
-             "When you’re looking for a reply, or want to guarantee nobody misses your post, "
-             "request a follow-up. Carrot reminds anyone that misses it to improve engagement.")]]]
+             "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal "
+             "for remote teams.")]]]
 
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_3.png")
-           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_3@2x.png") " 2x")}]
+           :srcSet (str
+                    (cdn "/img/ML/testimonials_floated_screenshot_3@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_3@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_3@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
             "Know who saw your update"]
@@ -195,7 +208,7 @@
             "Carrot works in the background to make sure everyone sees what matters."]]]]
     (if (= page :slack)
       (testimonials-screenshot-block :conversation "mobile-only")
-      (testimonials-screenshot-block :analytics "mobile-only"))
+      (testimonials-screenshot-block :threads "mobile-only"))
 
     (dashed-string 5)
 
@@ -212,7 +225,9 @@
                :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x")}]
             [:img.testimonials-commgaps-column-screenshot
               {:src (cdn "/img/ML/testimonials_commgaps_email.png")
-               :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x")}])
+               :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x, "
+                            (cdn "/img/ML/testimonials_commgaps_email@3x.png") " 3x, "
+                            (cdn "/img/ML/testimonials_commgaps_email@4x.png") " 4x")}])
           [:div.testimonials-commgaps-column-header
             "Daily digest to stay in sync"]
           [:div.testimonials-commgaps-column-subheader
@@ -220,7 +235,9 @@
         [:div.testimonials-commgaps-column.right-column
           [:img.testimonials-commgaps-column-screenshot
             {:src (cdn "/img/ML/testimonials_commgaps_slack.png")
-             :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x")}]
+             :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x, "
+                          (cdn "/img/ML/testimonials_commgaps_slack@3x.png") " 3x, "
+                          (cdn "/img/ML/testimonials_commgaps_slack@4x.png") " 4x")}]
           [:div.testimonials-commgaps-column-header
             "Auto-share posts to Slack"]
           [:div.testimonials-commgaps-column-subheader
@@ -234,13 +251,13 @@
     (dashed-string 1 "big-web-tablet-only")
 
     (if (= page :slack)
-      (testimonials-screenshot-block :analytics "mobile-only")
-      (testimonials-screenshot-block :follow-ups "mobile-only"))
+      (testimonials-screenshot-block :threads "mobile-only")
+      (testimonials-screenshot-block :analytics "mobile-only"))
 
     (dashed-string 5 "mobile-only")
 
     (if (= page :slack)
-      (testimonials-screenshot-block :follow-ups "mobile-only")
+      (testimonials-screenshot-block :analytics "mobile-only")
       (testimonials-screenshot-block :stay-in-sync "mobile-only"))
 
     (dashed-string 2 "mobile-only")
