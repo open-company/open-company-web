@@ -760,14 +760,11 @@
 
 (declare inbox-dismiss)
 
-(defn mark-read [activity-data]
-  (send-item-read (:uuid activity-data))
-  (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
-  (inbox-dismiss (:uuid activity-data))
-  (notification-actions/show-notification {:title "Post marked as read"
-                                           :dismiss true
-                                           :expire 3
-                                           :id :mark-read-success}))
+(defn mark-read [activity-uuid]
+  (let [activity-data (dis/activity-data activity-uuid)]
+    (send-item-read activity-uuid)
+    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
+    (inbox-dismiss activity-uuid)))
 
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
@@ -954,10 +951,11 @@
          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-dismiss [entry-uuid]
-  (let [activity-data (dis/activity-data entry-uuid)
+  (let [dismiss-at (utils/as-of-now)
+        activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
-    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid])
-    (api/inbox-dismiss dismiss-link
+    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid dismiss-at])
+    (api/inbox-dismiss dismiss-link dismiss-at
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
                 (= (:uuid activity-data) (router/current-activity-id)))
@@ -986,10 +984,11 @@
        (inbox-get (dis/org-data))))))
 
 (defn- inbox-real-dismiss-all []
-  (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
+  (let [dismiss-at (utils/as-of-now)
+        inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
     (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
-    (api/inbox-dismiss-all dismiss-all-link
+    (api/inbox-dismiss-all dismiss-all-link dismiss-at
      (fn [{:keys [status success body]}]
        (inbox-get (dis/org-data))))))
 

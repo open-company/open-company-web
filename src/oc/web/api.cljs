@@ -923,13 +923,13 @@
 
 ;; Inbox
 
-(defn inbox-dismiss [dismiss-link callback]
+(defn inbox-dismiss [dismiss-link dismiss-at callback]
   (if dismiss-link
     (storage-http (method-for-link dismiss-link) (relative-href dismiss-link)
      {:headers (headers-for-link dismiss-link)
-      :body (utils/as-of-now)}
+      :body dismiss-at}
      callback)
-    (handle-missing-link "inbox-dismiss" dismiss-link callback)))
+    (handle-missing-link "inbox-dismiss" dismiss-link callback {:dismiss-at dismiss-at})))
 
 (defn inbox-unread [unread-link callback]
   (if unread-link
@@ -952,13 +952,13 @@
      callback)
     (handle-missing-link "inbox-unfollow" unfollow-link callback)))
 
-(defn inbox-dismiss-all [dismiss-all-link callback]
+(defn inbox-dismiss-all [dismiss-all-link dismiss-at callback]
   (if dismiss-all-link
     (storage-http (method-for-link dismiss-all-link) (relative-href dismiss-all-link)
      {:headers (headers-for-link dismiss-all-link)
-      :body (utils/as-of-now)}
+      :body dismiss-at}
      callback)
-    (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback)))
+    (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
 
 ;; WRT
 
