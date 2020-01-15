@@ -49,12 +49,15 @@
       (comment-actions/get-comments activity-data)
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
-(defn- save-initial-last-read-at [s]
-  (when-not @(::initial-last-read-at s)
-    (let [activity-data @(drv/get-ref s :activity-data)
-          reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
-      (when (:last-read-at reads-data)
-        (reset! (::initial-last-read-at s) (:last-read-at reads-data))))))
+(defn- save-initial-read-data [s]
+  (let [activity-data @(drv/get-ref s :activity-data)
+        reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
+    (when (and (not @(::initial-last-read-at s))
+               (:last-read-at reads-data))
+      (reset! (::initial-last-read-at s) (:last-read-at reads-data)))
+    (when (and (not @(::initial-new-at s))
+               (:new-at activity-data))
+      (reset! (::initial-new-at s) (:new-at activity-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -72,29 +75,28 @@
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
+  (rum/local nil ::initial-new-at)
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
-    (save-initial-last-read-at s)
+    (save-initial-read-data s)
     s)
    :did-mount (fn [s]
     (save-fixed-comment-height! s)
     (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
-      (activity-actions/send-item-read activity-uuid)
-      (activity-actions/inbox-dismiss activity-uuid)
+      (activity-actions/mark-read activity-uuid)
       (reset! (::activity-uuid s) activity-uuid))
     (load-comments s true)
     s)
    :did-remount (fn [_ s]
     (load-comments s false)
-    (save-initial-last-read-at s)
+    (save-initial-read-data s)
     s)
    :will-unmount (fn [s]
-    (activity-actions/send-item-read @(::activity-uuid s))
-    (activity-actions/inbox-dismiss @(::activity-uuid s))
+    (activity-actions/mark-read @(::activity-uuid s))
     (reset! (::activity-uuid s) nil)
     s)}
   [s]
@@ -127,10 +129,10 @@
         expand-image-src (drv/react s :expand-image-src)
         add-comment-force-update (drv/react s :add-comment-force-update)
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and (:new-at activity-data)
+                          (and @(::initial-new-at s)
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at reads-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))
+                                  (.getTime (utils/js-date @(::initial-new-at s)))))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
                                       mobile-more-menu-el)
