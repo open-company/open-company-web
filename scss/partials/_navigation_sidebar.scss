@@ -730,10 +730,7 @@ div.left-navigation-sidebar {
     padding: 16px 0;
 
     @include mobile() {
-      button {
-        width: 100%;
-        text-align: left;
-      }
+      display: none;
     }
 
     button.invite-people-bt {
