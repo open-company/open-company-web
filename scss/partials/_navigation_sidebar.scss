@@ -747,7 +747,11 @@ div.left-navigation-sidebar {
       }
     }
 
-    a.all-posts, a.follow-ups, a.drafts, a.must-see {
+    a.inbox, a.all-posts, a.follow-ups, a.drafts, a.must-see {
+      div.inbox-icon {
+        background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
+      }
+
       div.all-posts-icon {
         background-image: cdnUrl("/img/ML/digest_icon_white.svg");
       }
