@@ -18,6 +18,8 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
+            [oc.web.actions.ui-theme :as ui-theme-actions]
+            [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn menu-close [& [s]]
@@ -89,6 +91,8 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
+                  (drv/drv :ui-theme)
+  mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
      (whats-new/check-whats-new-badge))
@@ -116,7 +120,8 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           (router/current-org-slug))]
+                           (router/current-org-slug))
+        ui-theme-data (drv/react s :ui-theme)]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -151,6 +156,25 @@
               "Notifications"]])
         (when-not is-mobile?
           [:div.oc-menu-separator])
+        [:div.ui-theme-switch
+          [:span.ui-theme-icon.light
+            {:class (when (not= (:computed-value ui-theme-data) :dark) "active")
+             :on-click #(ui-theme-actions/set-ui-theme :light)}]
+          (carrot-switch {:selected (= (:computed-value ui-theme-data) :dark)
+                          :did-change-cb #(ui-theme-actions/set-ui-theme (if % :dark :light))})
+          [:span.ui-theme-icon.dark
+            {:class (when (= (:computed-value ui-theme-data) :dark) "active")
+             :on-click #(ui-theme-actions/set-ui-theme :dark)}]
+          (when (and (not= (:setting-value ui-theme-data) :auto)
+                     (ui-theme-actions/support-system-dark-mode?))
+            [:a.ui-theme-auto
+              {:on-click #(ui-theme-actions/set-ui-theme :auto)
+               :title "Uses system preference"
+               :data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :data-container "body"}
+              "Auto"])]
+        [:div.oc-menu-separator]
         (when (and show-reminders?
                    (not is-mobile?))
           [:a
@@ -210,7 +234,7 @@
             "What’s new"]]
         [:a
           {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+           :href "mailto:hello@carrot.io"}
           [:div.oc-menu-item.support
             "Get support"]]
         (when (and is-mobile?
@@ -225,7 +249,8 @@
             {:href (:href desktop-app-data)
              :target "_blank"}
             [:div.oc-menu-item.native-app
-              (:title desktop-app-data)]])
+              (:title desktop-app-data)
+              [:span.beta "BETA"]]])
         [:div.oc-menu-separator]
         (if (jwt/jwt)
           [:a.sign-out

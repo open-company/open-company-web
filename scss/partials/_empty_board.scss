@@ -27,7 +27,7 @@ div.empty-board {
     div.empty-board-illustration-container {
       width: 56px;
       height: 56px;
-      background-color: rgba($deep_navy, 0.1);
+      background-color: var(--opac-background-color-1);
       border-radius: 8px;
       margin: 0 auto;
 
@@ -54,13 +54,29 @@ div.empty-board {
           background-image: cdnUrl("/img/ML/empty_state_follow_ups_section.svg");
           background-size: 18px 24px;
         }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
+
+          &.inbox {
+            background-image: cdnUrl("/img/ML/empty_state_inbox_section@dark.svg");
+          }
+
+          &.drafts {
+            background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+          }
+
+          &.follow-ups {
+            background-image: cdnUrl("/img/ML/empty_state_follow_ups_section@dark.svg");
+          }
+        }
       }
     }
 
     div.empty-board-title {
       @include OC_Body_Bold();
       font-size: 16px;
-      color: $deep_navy;
+      color: var(--color);
       line-height: 20px;
       margin: 16px auto 0;
     }
