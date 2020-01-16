@@ -1,0 +1,42 @@
+div.not-found, div.server-error{
+  div.error-page {
+    text-align: center;
+    min-height: calc(100vh - 336px);
+    padding: 100px 0;
+
+    h1 {
+      color: $oc_gray_6;
+      font-size: 150px;
+      @include OC_Body_Bold();
+    }
+
+    a.login {
+      text-decoration: underline;
+      color: $carrot_orange;
+    }
+
+    @media screen and (max-width: 768px) {
+      padding: 50px 16px;
+      img {
+        max-width: 100%;
+      }
+
+      h2 {
+        font-size: 32px;
+      }
+    }
+
+    @media screen and (min-width: 769px){
+      h2{
+        font-size: 40px;
+      }
+    }
+
+    h2 {
+      margin: 50px auto;
+      color: $carrot_orange;
+      text-align: center;
+      @include OC_Body_Bold();
+    }
+  }
+}

@@ -24,9 +24,9 @@
   [s {:keys [title desc]}]
   (let [auth-settings (drv/react s :auth-settings)
         deep-link-origin (drv/react s :expo-deep-link-origin)
+        email-auth-link (utils/link-for (:links auth-settings) "authenticate" "GET" {:auth-source "email"})
         login-enabled (and auth-settings
-                           (seq (utils/link-for (:links auth-settings) "authenticate" "GET"
-                            {:auth-source "email"}))
+                           (seq email-auth-link)
                            (seq @(::email s))
                            (seq @(::pswd s)))
         login-action #(when login-enabled

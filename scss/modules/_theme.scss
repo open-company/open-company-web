@@ -1,0 +1,144 @@
+// Theme 
+@import "../modules/_colors";
+
+$dark_mode: "dark";
+
+@mixin dark_mode() {
+  @at-root html.theme-mode-dark #{&} {
+    @content
+  }
+}
+
+:root {
+  --background-color: #{$grey_num_2};
+  --color: #{$deep_navy};
+  --light-color: #{rgba($deep_navy,0.5)};
+  --ultralight-color: #{rgba($deep_navy,0.25)};
+  --tooltip-background-color: #{$deep_navy};
+  --tooltip-color: white;
+  --selection-color: rgba(250,100,82, 0.5);
+  --divider-line: #{$divider_line_grey};
+  --overlay-background-color: white;
+
+  --opac-background-color-05: #{rgba($deep_navy, 0.05)};
+  --opac-background-color-1: #{rgba($deep_navy, 0.1)};
+  --opac-background-color-15: #{rgba($deep_navy, 0.15)};
+  --opac-background-color-2: #{rgba($deep_navy, 0.2)};
+
+  --mobile-background-color: white;
+  --mobile-color: #{$deep_navy};
+  --mobile-tabbar-color: #07C176;
+
+  --panel-header-background: #{$ultra_light_grey};
+
+  // Ractions
+  --reaction-bt-background: #{rgba($deep_navy, 0.1)};
+
+  // Stream-item
+  --foc-background-color: #{rgba($deep_navy, 0.05)};
+  --mobile-foc-background-color: #{rgba($deep_navy, 0.05)};
+  --foc-hover-color: #{rgba($deep_navy, 0.1)};
+  --foc-new-color: white;
+  --foc-divider-line-color: #{rgba($deep_navy, 0.15)};
+  --foc-new-border-color: #{rgba($deep_navy, 0.24)}; 
+
+  //Navigation item
+  --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
+  --navigation-sidebar-hover-bg: #{rgba($deep_navy, 0.05)};
+
+  // Notifications tray
+  --notifications-item-background: #848D95;
+  --notifications-border: #{$deep_tan};
+
+  // Search
+  --search-background-color: #{rgba($light_ui_grey, 0.2)};
+
+  // Comments
+  --comments-floating-bt-background: #{rgba($ultra_light_grey, 0.3)};
+  --add-comment-background: white;
+  --mobile-add-comment-background: white;
+
+  // Cmail
+  --cmail-fullscreen-bt-bg: #{rgba(white, 0.2)};
+  --cmail-section-bt-background: #{$deep_navy};
+  --cmail-section-bt-color: white;
+  --cmail-me-separator: rgba(255, 255, 255, 0.3);
+  --cmail-collapsed-background-color: white;
+  --cmail-box-shadow: rgba(0, 0, 0, 0.07);
+  --cmail-qp-outer-border: #{rgba($deep_navy, 0.2)};
+
+  // User dropdown
+  --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
+  --user-dropdown-shadow-start: rgba(0, 0, 0, 0.1);
+
+  html, body {
+    scrollbar-color: light;
+  }
+}
+
+@include dark_mode() {
+  --background-color: #1B202A;
+  --color: white;
+  --light-color: #{rgba(white,0.5)};
+  --ultralight-color: #{rgba(white,0.25)};
+  --tooltip-background-color: white;
+  --tooltip-color: #1B202A;
+  --selection-color: #{$carrot_orange};
+  --divider-line: #{rgba(white, 0.16)};
+  --overlay-background-color: #1B202A;
+
+  --opac-background-color-05: #{rgba(white, 0.05)};
+  --opac-background-color-1: #{rgba(white, 0.1)};
+  --opac-background-color-15: #{rgba(white, 0.15)};
+  --opac-background-color-2: #{rgba(white, 0.2)};
+
+  --mobile-background-color: #1B202A;
+  --mobile-color: white;
+  --mobile-tabbar-color: white;
+
+  --panel-header-background: rgb(35, 38 ,46);
+
+  // Ractions
+  --reaction-bt-background: #{rgba(white, 0.12)};
+
+  // Stream-item
+  --foc-background-color: #{rgba(black, 0.16)};
+  --mobile-foc-background-color: #1B202A;
+  --foc-hover-color: #{rgba(white, 0.04)};
+  --foc-new-color: #{rgba(white, 0.08)};
+  --foc-divider-line-color: #{rgba(white, 0.16)};
+  --foc-new-border-color: #{rgba(white, 0.22)};
+
+  //Navigation item
+  --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
+  --navigation-sidebar-hover-bg: #{rgba(white, 0.03)};
+
+  // Notifications tray
+  --notifications-item-background: #1B202A;
+  --notifications-border: #{rgba(white, 0.5)};
+
+  // Search
+  --search-background-color: #{rgba(white, 0.09)};
+
+  // Comments
+  --comments-floating-bt-background: #{rgba(white, 0.3)};
+  --add-comment-background: rgb(81, 83, 89);
+  --mobile-add-comment-background: #1B202A;
+
+  // Cmail
+  --cmail-fullscreen-bt-bg: #{rgba($deep_navy, 0.2)};
+  --cmail-section-bt-background: #{rgba(white, 0.12)};
+  --cmail-section-bt-color: white;
+  --cmail-me-separator: #{rgba($deep_navy, 0.3)};
+  --cmail-collapsed-background-color: #{rgba(white, 0.09)};
+  --cmail-box-shadow: rgba(0, 0, 0, 0.24);
+  --cmail-qp-outer-border: #{rgba(white, 0.16)};
+
+  // User dropdown
+  --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
+  --user-dropdown-shadow-start: rgba(255, 255, 255, 0.1);
+
+  &, body {
+    scrollbar-color: dark;
+  }
+}
