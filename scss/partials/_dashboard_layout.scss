@@ -324,6 +324,10 @@ div.dashboard-layout {
                     left: 0px;
                     width: 10px;
                     height: 12px;
+
+                    @include dark_mode() {
+                      background-image: cdnUrl("/img/ML/board_private_dark.svg");
+                    }
                   }
                 }
                 &.public {
@@ -339,6 +343,10 @@ div.dashboard-layout {
                     left: 0px;
                     width: 12px;
                     height: 12px;
+
+                    @include dark_mode() {
+                      background-image: cdnUrl("/img/ML/board_public_dark.svg");
+                    }
                   }
                 }
               }
@@ -414,6 +422,10 @@ div.dashboard-layout {
             float: left;
             margin-left: 6px;
 
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/board_private_dark@dark.svg");
+            }
+
             @include mobile(){
               left: unset;
               height: 12px;
@@ -432,6 +444,10 @@ div.dashboard-layout {
             background-position: left 0 bottom 1px;
             float: left;
             margin-left: 6px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/board_public_dark@dark.svg");
+            }
 
             @include mobile(){
               left: unset;
@@ -457,6 +473,10 @@ div.dashboard-layout {
             height: 32px;
             margin-left: 19px;
             margin-right: 5px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/inbox_complete_all@dark.svg");
+            }
 
             @include mobile() {
               width: 100%;
