@@ -454,6 +454,10 @@ div.dashboard-layout {
             float: left;
             margin-left: 6px;
 
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/board_private_dark@dark.svg");
+            }
+
             @include mobile(){
               left: unset;
               height: 12px;
@@ -472,6 +476,10 @@ div.dashboard-layout {
             background-position: left 0 bottom 1px;
             float: left;
             margin-left: 6px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/board_public_dark@dark.svg");
+            }
 
             @include mobile(){
               left: unset;
