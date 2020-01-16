@@ -240,10 +240,4 @@
                 [:option
                   {:key (str "timezone-" t)
                    :value t}
-                  t])]]
-          ;; Delete account - hide for the moment since we don't have an API for it
-          ; [:div.delete-account-container.hidden
-          ;   [:button.mlb-reset.delete-account-bt
-          ;     {:on-click #()}
-          ;     "Delete my account"]]
-          ]]]))
+                  t])]]]]]))

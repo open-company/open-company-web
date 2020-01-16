@@ -83,7 +83,7 @@
            editable-boards] :as props}]
   (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
                        (activity-utils/is-published? entry))]
-   [:div
+   [:div.virtualized-list-row
     {:style style}
     (stream-item {:activity-data entry
                   :comments-data comments-data
@@ -186,6 +186,7 @@
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
+         {:class (when-not @(::has-next s) "closing-carrot")}
          (window-scroller
           {}
           (partial virtualized-stream {:org-data org-data

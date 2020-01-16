@@ -27,6 +27,7 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.ui-theme]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
@@ -141,14 +142,6 @@
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
-        loading (or (and ;; if is board page
-                         (not (contains? query-params :ap))
-                         ;; if the board data are not present
-                         (not (dis/posts-data)))
-                         ;; if the all-posts data are not preset
-                    (and (contains? query-params :ap)
-                         ;; this latter is used when displaying modal over AP
-                         (not (dis/posts-data))))
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
@@ -170,8 +163,7 @@
                                         (contains? query-params :result))
                                {dis/checkout-result-key (= (:result query-params) "true")
                                 dis/checkout-update-plan-key (:update-plan query-params)})
-        next-app-state (merge {:loading loading
-                               :panel-stack panel-stack
+        next-app-state (merge {:panel-stack panel-stack
                                :bot-access bot-access}
                         billing-checkout-map)]
     (swap! dis/app-state merge next-app-state)))
