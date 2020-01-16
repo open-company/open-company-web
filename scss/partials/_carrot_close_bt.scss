@@ -13,6 +13,12 @@ button.settings-modal-close {
   }
 }
 
+@include dark_mode() {
+  button.settings-modal-close {
+    background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
+  }
+}
+
 button.modal-close-bt {
   width: 32px;
   height: 32px;
@@ -20,4 +26,10 @@ button.modal-close-bt {
   background-position: center;
   background-repeat: no-repeat;
   background-size: 32px 32px;
+}
+
+@include dark_mode() {
+  button.modal-close-bt {
+    background-image: cdnUrl("/img/ML/carrot_2_modal_close@dark.svg");
+  }
 }

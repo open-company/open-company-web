@@ -31,3 +31,9 @@ div.preload-interstitial {
     @include preload_image(cdnUrl("/img/ML/interstitial_mobile.svg"));
   }
 }
+
+@include dark_mode(){
+  div.lazy-stream div.lazy-stream-interstitial {
+    opacity: 0.2;
+  }
+}

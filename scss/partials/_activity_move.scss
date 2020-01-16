@@ -4,8 +4,8 @@ div.activity-move {
   z-index: 110;
 
   div.move-post-inner {
-    background-color: white;
-    border: 1px solid $mid_light_grey;
+    background-color: var(--overlay-background-color);
+    border: 1px solid var(--divider-line);
     box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
     border-radius: 4px;
     padding: 16px;
@@ -16,7 +16,7 @@ div.activity-move {
     div.move-post-title {
       @include OC_Body_Book();
       font-size: 14px;
-      color: $light_navy;
+      color: var(--color);
       line-height: 18px;
     }
 
@@ -25,10 +25,10 @@ div.activity-move {
       width: 100%;
       height: 32px;
       border-radius: 4px;
-      background-color: $ultra_light_grey;
+      background-color: var(--opac-background-color-1);
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--color);
       padding: 7px 8px;
       background-image: cdnUrl("/img/ML/select_arrows.svg");
       background-size: 8px 10px;
@@ -38,7 +38,7 @@ div.activity-move {
       text-overflow: ellipsis;
 
       &.placeholder{
-        color: rgba($deep_navy, 0.4);
+        color: var(--light-color);
       }
     }
 
@@ -47,9 +47,9 @@ div.activity-move {
       left: 16px;
       top: 80px;
       width: 160px;
-      border: 1px solid $ultra_light_grey;
+      border: 1px solid var(--divider-line);
       border-radius: 4px;
-      background-color: white;
+      background-color: var(--overlay-background-color);
       padding: 8px 0;
       z-index: 112;
       overflow-x: hidden;
@@ -60,10 +60,10 @@ div.activity-move {
         height: 32px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         cursor: pointer;
         padding: 7px 8px;
-        background-color: white;
+        background-color: var(--overlay-background-color);
         overflow: hidden;
         max-width: 100%;
         text-overflow: ellipsis;
@@ -88,5 +88,11 @@ div.activity-move {
       font-size: 14px;
       width: 100%;
     }
+  }
+}
+
+@include dark_mode() {
+  div.activity-move div.move-post-inner div.select-new-board {
+    background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
   }
 }

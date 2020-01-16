@@ -162,25 +162,26 @@ nav.site-navbar {
         }
 
         &.continue-with-slack {
-          padding-left: 32px;
           position: relative;
 
-          &:before {
-            content: "";
-            position: absolute;
-            top: 2px;
-            left: 0;
-            width: 24px;
-            height: 24px;
-            background-image: cdnUrl("/img/ML/slack_green_logo.svg");
-            background-position: center;
-            background-size: 24px 24px;
-            background-repeat: no-repeat;
-          }
-
           @include mobile() {
-            padding-left: 0;
             width: 24px;
+            background-color: transparent;
+            padding: 0;
+            margin: 0;
+
+            &:before {
+              content: "";
+              position: absolute;
+              top: 2px;
+              left: 0;
+              width: 24px;
+              height: 24px;
+              background-image: cdnUrl("/img/ML/slack_green_logo.svg");
+              background-position: center;
+              background-size: 24px 24px;
+              background-repeat: no-repeat;
+            }
           }
         }
       }

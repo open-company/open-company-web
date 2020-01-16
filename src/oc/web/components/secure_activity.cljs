@@ -144,16 +144,16 @@
                                 :comments-data comments-data
                                 :new-added-comment add-comment-highlight}))
             (when (:can-comment activity-data)
-              (rum/with-key (add-comment {:activity-data activity-data}) (str "add-comment-" (:uuid activity-data))))]
-            [:div.secure-activity-footer
-              (if id-token
-                [:button.mlb-reset.secure-activity-footer-bt
-                  {:on-click #(user-actions/show-login :login-with-email)}
-                  "Log in required to access all posts"]
-                [:a.sent-via-carrot
-                  {:href oc-urls/home}
-                  [:div.sent-via-carrot-copy
-                    "Sent by Carrot"]])]])
+              (rum/with-key (add-comment {:activity-data activity-data}) (str "add-comment-" (:uuid activity-data))))]])
+      [:div.secure-activity-footer
+        (if id-token
+          [:button.mlb-reset.secure-activity-footer-bt
+            {:on-click #(user-actions/show-login :login-with-email)}
+            "Log in required to access all posts"]
+          [:a.sent-via-carrot
+            {:href oc-urls/home}
+            [:div.sent-via-carrot-copy
+              "Sent by Carrot"]])]
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))

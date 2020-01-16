@@ -1,5 +1,4 @@
 div.carrot-option-button {
-  display: block-inline;
   width: 14px;
   height: 14px;
   cursor: pointer;
@@ -16,5 +15,15 @@ div.carrot-option-button {
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
+  }
+}
+
+@include dark_mode() {
+  div.carrot-option-button {
+    background-image: cdnUrl("/img/ML/carrot_option_button@dark.svg");
+
+    &.selected {
+      background-image: cdnUrl("/img/ML/carrot_option_button_selected@dark.svg");
+    }
   }
 }

@@ -31,14 +31,14 @@ div.payments-settings-modal {
       background-size: 12px 12px;
       background-position: center;
       background-repeat: no-repeat;
-      background-color: $ultra_light_grey;
+      background-color: var(--mobile-background-color);
       border-radius: 4px;
     }
   }
 
   div.payments-settings-modal-container {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -59,9 +59,9 @@ div.payments-settings-modal {
 
     div.payments-settings-header {
       width: calc(100% + 48px);
-      height: #{navbar_height}px;
+      height: #{$navbar_height}px;
       margin-left: -24px;
-      background-color: $grey_num_2;
+      background-color: var(--panel-header-background);
       padding: 12px 16px;
 
       @include mobile() {
@@ -70,8 +70,8 @@ div.payments-settings-modal {
         top: 0;
         left: 0;
         width: 100%;
-        border-bottom: 1px solid $divider_line_grey;
-        background-color: white;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
         padding: 15px 16px 15px 24px;
         margin: 0;
         z-index: 2;
@@ -80,7 +80,7 @@ div.payments-settings-modal {
       div.payments-settings-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
 
@@ -97,7 +97,7 @@ div.payments-settings-modal {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
 
         @include mobile() {
@@ -130,7 +130,7 @@ div.payments-settings-modal {
         margin-top: 16px;
         height: 1px;
         width: 100%;
-        background-color: rgba($deep_navy, 0.1);
+        background-color: var(--divider-line);
       }
 
       .bottom-margin {
@@ -145,7 +145,7 @@ div.payments-settings-modal {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: $deep_navy;
+          color: var(--color);
 
           &.success, &.expiration-trial {
             @include OC_Body_Bold();
@@ -178,13 +178,13 @@ div.payments-settings-modal {
             @include OC_Body_Bold();
             font-size: 14px;
             line-height: 18px;
-            color: $deep_navy;
+            color: var(--color);
           }
 
           button.cancel-subscription-bt {
             @include OC_Body_Book();
             font-size: 14px;
-            color: rgba($deep_navy, 0.5);
+            color: var(--light-color);
             line-height: 18px;
             margin: 0;
             padding: 0;
@@ -212,18 +212,18 @@ div.payments-settings-modal {
           height: 32px;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           line-height: 22px;
           margin: 0;
           text-align: left;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           border-radius: 4px;
           position: relative;
           opacity: 1;
 
           @include big_web() {
             &:not(.disabled):hover {
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--opac-background-color-2);
             }
           }
 
@@ -233,7 +233,7 @@ div.payments-settings-modal {
           }
 
           &:after {
-            color: $deep_navy;
+            color: var(--color);
             background-image: cdnUrl("/img/ML/select_arrows.svg");
             width: 8px;
             height: 10px;
@@ -264,7 +264,7 @@ div.payments-settings-modal {
             div.dropdown-list-content {
               box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
               padding: 0;
-              border: 1px solid $carrot_light_gray_1;
+              border: 1px solid var(--divider-line);
               border-radius: 4px;
               margin: 0;
               padding: 8px 0;
@@ -298,7 +298,7 @@ div.payments-settings-modal {
                   span.dropdown-list-item-label {
                     @include OC_Body_Book();
                     font-size: 14px;
-                    color: $deep_navy;
+                    color: var(--color);
                     line-height: 22px;
                     opacity: 1;
                     padding: 0;
@@ -315,7 +315,7 @@ div.payments-settings-modal {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: $deep_navy;
+          color: var(--color);
         }
 
         div.plan-change-details {
@@ -323,7 +323,7 @@ div.payments-settings-modal {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: $deep_navy;
+          color: var(--color);
 
           &.success, &.expiration-trial {
             @include OC_Body_Bold();
@@ -356,7 +356,7 @@ div.payments-settings-modal {
             @include OC_Body_Bold();
             font-size: 14px;
             line-height: 18px;
-            color: $deep_navy;
+            color: var(--color);
           }
         }
 
@@ -364,7 +364,7 @@ div.payments-settings-modal {
           margin-top: 16px;
           height: 1px;
           width: 100%;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
         }
 
         div.plan-change-title {
@@ -372,7 +372,7 @@ div.payments-settings-modal {
           @include OC_Body_Bold();
           font-size: 14px;
           line-height: 18px;
-          color: $deep_navy; 
+          color: var(--color);
         }
 
         button.payment-info-bt {
@@ -387,6 +387,21 @@ div.payments-settings-modal {
           margin: 8px 0 24px;
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.payments-settings-modal {
+    button.modal-close-bt {
+      @include mobile() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      }
+    }
+
+    div.payments-settings-modal-container div.payments-settings-body
+    div.plan-change button.plans-dropdown-bt:after {
+      background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
   }
 }
