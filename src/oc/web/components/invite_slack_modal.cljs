@@ -127,7 +127,10 @@
                                                                            :primary-bt-inline true
                                                                            :id :invites-sent}))
                                 (reset! (::send-bt-cta s) "Send Slack invitations"))))))))
-                  s)}
+                  s)
+   :will-unmount (fn [s]
+                   (dis/dispatch! [:input [:invite-users] nil])
+                   s)}
   [s]
   (let [org-data (drv/react s :org-data)
         invite-users-data (drv/react s :invite-data)
@@ -228,30 +231,32 @@
                                                               [(assoc default-user-row :type (:type user-data))]
                                                               next-invite-users)]
                                   (dis/dispatch! [:input [:invite-users] fixed-next-invite-users]))}]])
-            [:button.mlb-reset.add-button
-              {:on-click
-                #(dis/dispatch!
-                  [:input
-                   [:invite-users]
-                   (conj
-                    invite-users
-                    (assoc default-user-row :type "slack"))])}
-              [:div.add-button-plus]
-              "Add another"]
-            [:button.mlb-reset.save-bt
-              {:on-click #(let [valid-count (count (filterv valid-user? invite-users))]
-                            (reset! (::sending s) valid-count)
-                            (reset! (::initial-sending s) valid-count)
-                            (reset! (::send-bt-cta s) "Sending Slack invitations")
-                            (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
-               :class (when (= "Slack invitations sent!" @(::send-bt-cta s)) "no-disable")
-               :disabled (or (not (has-valid-user? invite-users))
-                             (pos? @(::sending s)))}
-              @(::send-bt-cta s)]]
-          [:div.invites-list
-            {:class (when is-admin? "top-border")}
-            [:div.invites-list-title
-              "Invite someone with a specific permission level"]
-            [:button.mlb-reset.enable-carrot-bot-bt
-              {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=invite-slack"))}
-              "Enable the Carrot bot for Slack"]])]]]))
+              [:button.mlb-reset.add-button
+                {:on-click
+                  #(dis/dispatch!
+                    [:input
+                     [:invite-users]
+                     (conj
+                      invite-users
+                      (assoc default-user-row :type "slack"))])}
+                [:div.add-button-plus]
+                "Add another"]
+              [:button.mlb-reset.save-bt
+                {:on-click #(let [valid-count (count (filterv valid-user? invite-users))]
+                              (reset! (::sending s) valid-count)
+                              (reset! (::initial-sending s) valid-count)
+                              (reset! (::send-bt-cta s) "Sending Slack invitations")
+                              (team-actions/invite-users (:invite-users @(drv/get-ref s :invite-data))))
+                 :class (when (= "Slack invitations sent!" @(::send-bt-cta s)) "no-disable")
+                 :disabled (or (not (has-valid-user? invite-users))
+                               (pos? @(::sending s)))}
+                @(::send-bt-cta s)]]
+            ;; Only admins can add the bot
+            (when is-admin?
+              [:div.invites-list
+                {:class (when is-admin? "top-border")}
+                [:div.invites-list-title
+                  "Invite someone with a specific permission level"]
+                [:button.mlb-reset.enable-carrot-bot-bt
+                  {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=invite-slack"))}
+                  "Enable the Carrot bot for Slack"]]))]]]))

@@ -1,9 +1,9 @@
 div.search-box {
   width: 320px;
   height: 32px;
-  background-color: rgba($light_ui_grey, 0.2);
+  background-color: var(--search-background-color);
   border-radius: 4px;
-  color: $ui_grey;
+  color: var(--light-color);
   position: relative;
   transition: width 320ms ease-in, background-color 320ms ease-in;
 
@@ -21,7 +21,7 @@ div.search-box {
     left: 0px;
     width: 100vw;
     height: 100vh;
-    background-color: white;
+    background-color: var(--mobile-background-color);
     border-radius: unset;
     z-index: #{$navbar_zindex + 16};
     padding: #{$mobile_navbar_height}px 16px 0px;
@@ -36,14 +36,14 @@ div.search-box {
   }
 
   &.active {
-    background-color: white;
-    border: 1px solid $light_ui_grey;
+    background-color: var(--search-background-color);
+    border: 1px solid var(--divider-line);
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07);
     width: 430px;
 
     @include mobile() {
-      background-color: white;
-      border: 0px solid white;
+      background-color: var(--mobile-background-color);
+      border: 0px solid var(--mobile-background-color);
       box-shadow: none;
       width: 100vw;
     }
@@ -67,7 +67,7 @@ div.search-box {
       }
 
       &::placeholder {
-        color: $deep_navy;
+        color: var(--light-color);
       }
     }
   }
@@ -78,14 +78,14 @@ div.search-box {
     @include mobile() {
       height: #{$mobile_navbar_height}px;
       width: 100vw;
-      background-color: white;
+      background-color: var(--mobile-background-color);
       padding: 15px 16px;
       display: block;
       position: fixed;
       top: 0;
       left: 0;
       text-align: center;
-      border-bottom: 1px solid $divider_line_grey;
+      border-bottom: 1px solid var(--divider-line);
       z-index: 2;
 
       button.search-close-bt {
@@ -96,7 +96,7 @@ div.search-box {
         background-position: center;
         background-repeat: no-repeat;
         background-size: 12px 12px;
-        background-color: $ultra_light_grey;
+        background-color: var(--divider-line);
         border-radius: 4px;
         position: absolute;
         left: 16px;
@@ -106,7 +106,7 @@ div.search-box {
       div.mobile-header-title {
         @include OC_Body_Bold();
         font-size: 18px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 24px;
         height: 24px;
       }
@@ -142,12 +142,12 @@ div.search-box {
     padding: 0 0 0 24px;
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     width: 68px;
     height: 24px;
 
     &:placeholder, &::placeholder {
-      color: $ui_grey;
+      color: var(--light-color);
     }
 
     @include mobile() {
@@ -156,16 +156,16 @@ div.search-box {
       top: unset;
       width: 100%; //calc(100% - 28px);
       height: 38px;
-      background-color: $ultra_light_grey;
+      background-color: transparent;
       padding: 10px 14px;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--color);
       margin: 16px 0 4px;
       border-radius: 4px;
 
       @include placeholder() {
-        color: rgba($deep_navy, 0.5);
+        color: var(--light-color);
       }
     }
   }
@@ -223,7 +223,7 @@ div.search-history {
       background-repeat: no-repeat;
       @include OC_Body_Book();
       font-size: 16px;
-      color: $light_navy;
+      color: var(--color);
       line-height: 18px;
     }
   }  
@@ -234,13 +234,13 @@ div.search-results.inactive {
 }
 
 div.search-results {
-  border: 1px solid $light_ui_grey;
+  border: 1px solid var(--divider-line);
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
   border-radius: 5px;
   margin: 48px 0px 0px 0px;
   width: 430px;
   text-align: left;
-  background-color: white;
+  background-color: var(--overlay-background-color);
   max-height: calc(100vh - 108px);
 
   @include mobile() {
@@ -257,7 +257,7 @@ div.search-results {
 
   div.header {
     padding: 16px 16px 6px 16px;
-    color: $deep_navy;
+    color: var(--color);
 
     @include mobile() {
       padding: 16px 0 6px;
@@ -269,7 +269,7 @@ div.search-results {
       line-height: 12px;
       text-transform: uppercase;
       float: left;
-      color: $light_ui_grey;
+      color: var(--light-color);
     }
 
     span.count {
@@ -315,7 +315,7 @@ div.search-results {
         div.title {
           overflow: hidden;
           text-overflow: ellipsis;
-          color: $deep_navy;
+          color: var(--color);
           @include OC_Body_Bold();
           font-size: 14px;
           max-width: 100%;
@@ -325,7 +325,7 @@ div.search-results {
         div.time-since {
           overflow: hidden;
           text-overflow: ellipsis;
-          color: $ui_grey;
+          color: var(--light-color);
           @include OC_Body_Book();
           font-size: 12px;
         }
@@ -393,7 +393,23 @@ div.search-results {
       width: 100%;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--color);
+    }
+  }
+}
+
+@include dark_mode() {
+  div.search-box {
+    div.mobile-header {
+      @include mobile() {
+        button.search-close-bt {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+    }
+
+    div.spyglass-icon {
+      background-image: cdnUrl("/img/ML/spyglass@dark.svg");
     }
   }
 }

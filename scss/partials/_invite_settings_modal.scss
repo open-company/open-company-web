@@ -22,7 +22,7 @@ div.invite-settings-modal {
 
   div.invite-settings {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -35,7 +35,7 @@ div.invite-settings-modal {
     div.invite-settings-header {
       width: 320px;
       height: 56px;
-      background-color: $grey_num_2;
+      background-color: var(--panel-header-background);
       padding: 12px 16px;
       position: fixed;
       top: 0;
@@ -45,7 +45,7 @@ div.invite-settings-modal {
       div.invite-settings-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -55,7 +55,7 @@ div.invite-settings-modal {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
         margin-right: 8px;
       }
@@ -82,7 +82,7 @@ div.invite-settings-modal {
         div.invite-via-label {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $light_navy;
+          color: var(--color);
         }
 
         select.invite-via-select {
@@ -92,7 +92,7 @@ div.invite-settings-modal {
           padding: 7px 8px;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           margin-top: 8px;
           display: block;
           border: none;
@@ -100,7 +100,7 @@ div.invite-settings-modal {
           display: block;
           appearance: none;
           -webkit-appearance: none;
-          background-color: $ultra_light_grey;
+          background-color: var(--opac-background-color-1);
           position: relative;
           background-image: cdnUrl("/img/ML/select_arrows.svg");
           background-size: 8px 10px;
@@ -124,20 +124,20 @@ div.invite-settings-modal {
           option {
             @include OC_Body_Book();
             font-size: 14px;
-            color: $deep_navy;
+            color: var(--color);
           }
         }
       }
 
       div.invites-list {
         margin-top: 16px;
-        border-top: 1px solid $ultra_light_grey;
+        border-top: 1px solid var(--divider-line);
         padding-top: 16px;
 
         div.invites-list-title {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $light_navy;
+          color: var(--color);
         }
 
         div.invites-list-item {
@@ -151,7 +151,7 @@ div.invite-settings-modal {
           div.org-settings-field-container {
             width: calc(100% - 24px);
             border-radius: 4px;
-            background-color: $ultra_light_grey;
+            background-color: var(--opac-background-color-1);
             border: none;
             outline: none;
 
@@ -161,21 +161,21 @@ div.invite-settings-modal {
               }
             }
 
-            &.focus {
-              background-color: $mid_light_grey;
+            // &.focus {
+            //   background-color: $mid_light_grey;
 
-              input.org-settings-field {
-                background-color: $mid_light_grey;
-              }
-            }
+            //   input.org-settings-field {
+            //     background-color: $mid_light_grey;
+            //   }
+            // }
 
             input.org-settings-field {
               width: calc(100% - 24px);
               border-radius: 4px;
-              background-color: $ultra_light_grey;
+              background-color: transparent;
               @include OC_Body_Book();
               font-size: 14px;
-              color: $deep_navy;
+              color: var(--color);
               border: none;
               outline: none;
               padding: 7px 8px;
@@ -233,8 +233,8 @@ div.invite-settings-modal {
               border-radius: 4px;
               @include OC_Body_Book();
               font-size: 14px;
-              color: $deep_navy;
-              background-color: $ultra_light_grey;
+              color: var(--color);
+              background-color: var(--opac-background-color-1);
 
               button.user-type-btn {
                 width: 100%;
@@ -263,11 +263,9 @@ div.invite-settings-modal {
             padding: 0;
             @include OC_Body_Book();
             font-size: 12px;
-            color: #C1C6CA;
 
             i.mdi.mdi-delete:before {
               font-size: 14px;
-              color: #C1C6CA;
             }
           }
         }
@@ -277,7 +275,7 @@ div.invite-settings-modal {
         padding: 0 0 0 20px;
         @include OC_Body_Book();
         font-size: 12px;
-        color: #C1C6CA;
+        color: var(--light-color);
         margin-top: 16px;
         position: relative;
 
@@ -293,6 +291,28 @@ div.invite-settings-modal {
           top: 2px;
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.invite-settings-modal div.invite-settings div.invite-settings-body {
+    div.invite-via select.invite-via-select {
+      background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
+    }
+
+    div.invites-list div.invites-list-item {
+      div.org-settings-field-container button.clear-user {
+        background-image: cdnUrl("/img/ML/clear_user@dark.svg");
+      }
+
+      button.remove-user {
+        background-image: cdnUrl("/img/ML/remove_user@dark.svg");
+      }
+    }
+
+    button.add-button div.add-button-plus {
+      background-image: cdnUrl("/img/ML/invite_add_another_plus@dark.svg");
     }
   }
 }

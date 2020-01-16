@@ -273,7 +273,7 @@
       "Have a team of 250+? "
       [:a.chat-with-us
         {:class "intercom-chat-link"
-         :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+         :href "mailto:hello@carrot.io"}
         "Let’s chat about our Enterprise plan."]]])
 
 (def pricing-footer
@@ -286,7 +286,7 @@
       "Questions? "
       [:a.chat-with-us
         {:class "intercom-chat-link"
-         :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+         :href "mailto:hello@carrot.io"}
         "Let's chat"]]
 
     pricing-table

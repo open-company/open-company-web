@@ -6,7 +6,7 @@ div.expanded-post {
 
   @include mobile() {
     width: 100%;
-    background-color: white;
+    background-color: var(--mobile-background-color);
     padding: 24px 16px 16px;
 
     // Add some extra padding on android at the bottom
@@ -35,7 +35,7 @@ div.expanded-post {
     margin-left: -8px;
     height: 72px;
     padding: 24px 32px 16px 8px;
-    background-color: $grey_num_2;
+    background-color: var(--background-color);
     z-index: 102;
 
     &:before {
@@ -45,7 +45,7 @@ div.expanded-post {
       position: absolute;
       bottom: 0;
       left: 8px;
-      background-color: rgba($deep_navy, 0.15);
+      background-color: var(--opac-background-color-15);
     }
 
     @include mobile() {
@@ -55,8 +55,8 @@ div.expanded-post {
       position: fixed;
       top: 0;
       left: 0;
-      border-bottom: 1px solid $divider_line_grey;
-      background-color: white;
+      border-bottom: 1px solid var(--divider-line);
+      background-color: var(--mobile-background-color);
       margin-left: 0;
 
       &:before {
@@ -70,7 +70,7 @@ div.expanded-post {
       width: 32px;
       border-radius: 4px;
       opacity: 1;
-      background-color: rgba($deep_navy, 0.1);
+      background-color: var(--opac-background-color-1);
       background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
       background-size: 14px 10px;
       background-repeat: no-repeat;
@@ -83,7 +83,7 @@ div.expanded-post {
 
       @include big_web(){
         &:hover {
-          background-color: rgba($deep_navy, 0.2);
+          background-color: var(--opac-background-color-2);
         }
       }
     }
@@ -101,7 +101,7 @@ div.expanded-post {
         top: 0;
         width: 1px;
         height: 32px;
-        background-color: rgba($deep_navy, 0.2);
+        background-color: var(--opac-background-color-2);
       }
 
       @include mobile() {
@@ -113,7 +113,7 @@ div.expanded-post {
 
         div.wrt-count {
           line-height: 24px;
-          color: $deep_navy;
+          color: var(--color);
           opacity: 1;
         }
       }
@@ -143,7 +143,7 @@ div.expanded-post {
         }
 
         &:not(.disabled):hover, &:not(.disabled):active {
-          background-color: rgba($deep_navy, 0.2);
+          background-color: var(--opac-background-color-2);
         }
       }
 
@@ -187,14 +187,14 @@ div.expanded-post {
     div.expanded-post-author-inner {
       @include OC_Body_Book();
       font-size: 12px;
-      color: rgba($deep_navy, 0.5);
+      color: var(--light-color);
       line-height: 18px;
 
       div.expanded-post-author-dot {
         width: 3px;
         height: 3px;
         border-radius: 50%;
-        background-color: rgba($deep_navy, 0.2);
+        background-color: var(--opac-background-color-2);
         margin: 0 6px 3px;
         display: inline-block;
       }
@@ -263,12 +263,12 @@ div.expanded-post {
   }
 
   div.expanded-post-body {
-    @include activity-body(17, 22, $deep_navy, 16);
+    @include activity-body(17, 22, var(--color), 16);
     margin-top: 16px;
 
     @include mobile() {
       margin-top: 8px;
-      @include activity-body(18, 24, $deep_navy, 16);
+      @include activity-body(18, 24, var(--color), 16);
     }
 
     .interactive-image {
@@ -311,7 +311,7 @@ div.expanded-post {
 
       div.is-comments {
         div.is-comments-summary {
-          color: $deep_navy;
+          color: var(--color);
         }
       }
     }
@@ -354,6 +354,17 @@ div.expanded-post {
       margin-top: 16px;
       width: 100%;
       padding: 16px 0;
+    }
+  }
+}
+
+
+@include dark_mode() {
+  div.expanded-post div.expanded-post-header button.back-to-board {
+    background-image: cdnUrl("/img/ML/expanded_post_back_arrow@dark.svg");
+
+    @include mobile() {
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
     }
   }
 }
