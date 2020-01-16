@@ -69,7 +69,12 @@ div.is-comments {
 
       @include mobile() {
         &:before {
+          background-image: cdnUrl("/img/ML/tile_new_comments_icon.svg");
           opacity: 1;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/tile_new_comments_icon.svg");
+          }
         }
       }
     }
