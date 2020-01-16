@@ -1,12 +1,12 @@
-$foc_background_color: rgba($deep_navy, 0.05);
-$mobile_foc_background_color: rgba($deep_navy, 0.05);
-$foc_hover_color: rgba($deep_navy, 0.10);
-$foc_new_color: white;
-$foc_divider_line_color: rgba($deep_navy, 0.15);
+// --foc-background-color: rgba($deep_navy, 0.05);
+// --mobile-foc-background-color: rgba($deep_navy, 0.05);
+// --foc-hover-color: rgba($deep_navy, 0.10);
+// --foc-new-color: white;
+// --foc-divider-line-color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
 div.virtualized-list-row {
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
 
   @include big_web() {
     z-index: 1;
@@ -20,7 +20,7 @@ div.virtualized-list-row {
   }
 
   @include mobile() {
-    background-color: white;
+    background-color: var(--mobile-background-color);
   }
 }
 
@@ -34,9 +34,9 @@ div.stream-item {
   border-top: 1px solid transparent;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
-  border-bottom: 1px solid $foc_divider_line_color;
+  border-bottom: 1px solid var(--foc-divider-line-color);
   padding: 24px 32px;
-  background-color: $foc_background_color;
+  background-color: var(--foc-background-color);
   overflow: visible;
 
   @include mobile() {
@@ -46,8 +46,8 @@ div.stream-item {
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid $foc_divider_line_color;
-    background-color: $mobile_foc_background_color;
+    border-bottom: 1px solid var(--foc-divider-line-color);
+    background-color: var(--mobile-foc-background-color);
     padding: 16px 16px 16px;
     height: #{$mobile_foc_height}px;
   }
@@ -145,24 +145,35 @@ div.stream-item {
 
   &.expandable {
     cursor: pointer;
+  }
 
-    @include big_web() {
-      &:hover {
-        background-color: $foc_hover_color;
-        z-index: 2;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        padding: #{24 + ($foc_hover_extra_padding * 2)}px #{32 + ($foc_hover_extra_padding * 2)}px;
-        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+  @include big_web() {
+    &:hover {
+      background-color: var(--foc-hover-color);
+      z-index: 2;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
+      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
 
-        div.stream-item-header {
-          div.more-menu button {
-            display: initial;
-          }
+      div.stream-item-header {
+        div.more-menu button {
+          display: initial;
         }
       }
     }
+  }
+
+  @include mobile() {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border-top: none;
+    border-bottom: 1px solid var(--foc-divider-line-color);
+    background-color: var(--mobile-foc-background-color);
+    padding: 16px 16px 16px;
+    height: #{$mobile_foc_height}px;
   }
 
   &.draft {
@@ -170,7 +181,7 @@ div.stream-item {
   }
 
   &.unread-item {
-    background-color: $foc_new_color;
+    background-color: var(--foc-new-color);
     z-index: 1;
     position: relative;
 
@@ -180,15 +191,15 @@ div.stream-item {
 
     @include big_web(){
       &:hover {
-        background-color: $foc_new_color;
+        background-color: var(--foc-new-color);
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
-        border-top: 1px solid rgba($deep_navy, 0.24);
-        border-right: 1px solid rgba($deep_navy, 0.24);
-        border-left: 1px solid rgba($deep_navy, 0.24);
-        border-bottom: 1px solid rgba($deep_navy, 0.24);
-        padding: #{24 + ($foc_hover_extra_padding * 2)}px #{32 + ($foc_hover_extra_padding * 2)}px;
+        border-top: 1px solid var(--foc-new-border-color);
+        border-right: 1px solid var(--foc-new-border-color);
+        border-left: 1px solid var(--foc-new-border-color);
+        border-bottom: 1px solid var(--foc-new-border-color);
+        padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
       }
@@ -243,7 +254,7 @@ div.stream-item {
         height: 24px;
         float: left;
         max-width: 70%;
-        color: rgba($deep_navy, 0.5);
+        color: var(--light-color);
 
         @include mobile() {
           width: calc(100% - 32px);
@@ -273,7 +284,7 @@ div.stream-item {
             text-align: left;
             @include OC_Body_Book();
             font-size: 12px;
-            color: rgba($deep_navy, 0.5);
+            color: var(--light-color);
             position: relative;
             margin-right: 8px;
             margin-left: 6px;
@@ -283,7 +294,7 @@ div.stream-item {
               content: "";
               width: 3px;
               height: 3px;
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--ultralight-color);
               border-radius: 50%;
               position: absolute;
               top: 12px;
@@ -511,7 +522,7 @@ div.stream-item {
       div.stream-item-headline {
         height: 28px;
         @include activity-title(20px, 28px);
-        color: $deep_navy;
+        color: var(--color);
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
@@ -519,8 +530,8 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body(17, 22, $deep_navy);
-        color: $deep_navy;
+        @include activity-body(17, 22, var(--color));
+        color: var(--color);
         @include OC_Body_Book();
         line-height: 22px;
         overflow: hidden;
@@ -530,7 +541,7 @@ div.stream-item {
         max-height: #{22 * 2}px;
 
         h2 {
-          color: $deep_navy;
+          color: var(--color);
           @include OC_Body_Book();
           font-size: 17px;
           line-height: 22px;
@@ -589,7 +600,7 @@ div.stream-item {
           padding: 0px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $ui_grey;
+          color: var(--light-color);
         }
       }
 
@@ -642,7 +653,7 @@ div.stream-item {
           position: relative;
           @include OC_Body_Book();
           font-size: 12px;
-          color: $deep_navy;
+          color: var(--color);
           opacity: 0.5;
           margin-top: 4px;
 
@@ -659,9 +670,9 @@ div.stream-item {
           left: calc(50% - 120px);
           width: 240px;
           max-height: 200px;
-          background-color: white;
+          background-color: var(--overlay-background-color);
           border-radius: 4px;
-          border: 1px solid $mid_light_grey;
+          border: 1px solid var(--light-color);
           padding: 8px 0;
           display: none;
           z-index: 2;
@@ -681,7 +692,7 @@ div.stream-item {
             div.stream-item-attachments-item-desc {
               @include OC_Body_Book();
               font-size: 14px;
-              color: rgba($light_navy, 0.5);
+              color: var(--ultralight-color);
               white-space: nowrap;
               max-width: 100%;
 

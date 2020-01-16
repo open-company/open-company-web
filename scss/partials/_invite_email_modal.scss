@@ -22,7 +22,7 @@ div.invite-email-modal {
 
   div.invite-email {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -35,7 +35,7 @@ div.invite-email-modal {
     div.invite-email-header {
       width: 320px;
       height: 56px;
-      background-color: $grey_num_2;
+      background-color: var(--panel-header-background);
       padding: 12px 16px;
       position: fixed;
       top: 0;
@@ -45,7 +45,7 @@ div.invite-email-modal {
       div.invite-email-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -55,7 +55,7 @@ div.invite-email-modal {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
       }
     }
@@ -70,14 +70,14 @@ div.invite-email-modal {
         div.invite-token-title {
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           line-height: 18px;
         }
 
         div.invite-token-description {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           line-height: 18px;
           margin-top: 8px;
 
@@ -111,14 +111,14 @@ div.invite-email-modal {
         div.invite-token-field {
           border-radius: 4px;
           width: 100%;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           padding: 0;
           height: 32px;
           margin-top: 8px;
 
           input.invite-token-field-input {
             background-color: transparent;
-            color: $deep_navy;
+            color: var(--color);
             border: none;
             padding: 7px 8px;
             outline: none;
@@ -161,7 +161,7 @@ div.invite-email-modal {
         div.invites-list-title {
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $light_navy;
+          color: var(--light-color);
           letter-spacing: .1px;
         }
 
@@ -174,18 +174,18 @@ div.invite-email-modal {
           }
 
           input.org-settings-field:focus {
-            background-color: rgba($deep_navy, 0.15);
+            background-color: var(--opac-background-color-15);
           }
 
           input.org-settings-field {
             width: calc(100% - 24px);
             border-radius: 4px;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             border: none;
             outline: none;
             @include OC_Body_Book();
             font-size: 14px;
-            color: $deep_navy;
+            color: var(--color);
             border: none;
             outline: none;
             padding: 7px 8px;
@@ -222,8 +222,8 @@ div.invite-email-modal {
               @include OC_Body_Book();
               font-size: 14px;
               line-height: 18px;
-              color: $deep_navy;
-              background-color: rgba($deep_navy, 0.1);
+              color: var(--color);
+              background-color: var(--opac-background-color-1);
 
               button.user-type-btn {
                 width: 100%;
@@ -232,7 +232,7 @@ div.invite-email-modal {
                 padding: 7px 8px;
                 @include OC_Body_Book();
                 font-size: 14px;
-                color: $deep_navy;
+                color: var(--color);
                 line-height: 18px;
               }
 
@@ -242,7 +242,7 @@ div.invite-email-modal {
                 width: 100%;
 
                 li {
-                  color: $deep_navy;
+                  color: var(--color);
                   text-align: left;
                   padding: 7px 12px;
                   @include OC_Body_Book();
@@ -259,12 +259,7 @@ div.invite-email-modal {
             padding: 0;
             @include OC_Body_Book();
             font-size: 12px;
-            color: #C1C6CA;
-
-            i.mdi.mdi-delete:before {
-              font-size: 14px;
-              color: #C1C6CA;
-            }
+            color: var(--light-color);
           }
         }
       }
@@ -273,7 +268,7 @@ div.invite-email-modal {
         padding: 0 0 0 24px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 18px;
         margin-top: 16px;
         position: relative;
@@ -308,10 +303,22 @@ div.invite-email-modal {
 
         &:disabled {
           opacity: 1 !important;
-          background-color: rgba($deep_navy, 0.1);
-          color: rgba($deep_navy, 0.5);
+          background-color: var(--opac-background-color-1);
+          color: var(--light-color);
         }
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.invite-email-modal div.invite-email div.invite-email-body {
+    button.add-button div.add-button-plus {
+      background-image: cdnUrl("/img/ML/invite_add_another_plus@dark.svg");
+    }
+
+    div.invites-list div.invites-list-item button.remove-user {
+      background-image: cdnUrl("/img/ML/remove_user@dark.svg");     
     }
   }
 }

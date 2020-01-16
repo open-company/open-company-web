@@ -1,8 +1,8 @@
 div.org-dashboard {
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
 
   @include mobile() {
-    background-color: white;
+    background-color: var(--mobile-background-color);
   }
 
   div.login-required {
@@ -49,6 +49,7 @@ div.org-dashboard {
   }
 
   &.expanded-activity {
+
     div.page {
       padding-top: 0;
     }
@@ -96,13 +97,13 @@ div.org-dashboard {
     min-height: calc(100vh - #{$footer_height}px);
 
     @include mobile(){
-      background-color: white;
+      background-color: var(--mobile-background-color);
       padding-top: #{$mobile_navbar_height}px;
       min-height: calc(100vh - #{$mobile_navbar_height}px);
     }
 
     div.org-dashboard-container {
-      background-color: $grey_num_2;
+      background-color: var(--background-color);
 
       @include big_web() {
         min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
@@ -111,7 +112,7 @@ div.org-dashboard {
       @include mobile() {
         margin: 0px;
         min-width: initial;
-        background-color: white;
+        background-color: var(--mobile-background-color);
       }
 
       div.empty-dashboard {
@@ -133,14 +134,15 @@ div.org-dashboard {
 
       div.org-dashboard-inner {
         padding-bottom: 20px;
-        background-color: $grey_num_2;
+        background-color: var(--background-color);
 
         @include big_web(){
           min-height: 100vh;
           padding-top: #{$navbar_height}px;
         }
+
         @include mobile(){
-          background-color: white;
+          background-color: var(--mobile-background-color);
           min-height: calc(100vh - #{$mobile_navbar_height}px);
         }
       }

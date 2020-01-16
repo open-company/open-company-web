@@ -37,8 +37,10 @@ function OCStaticCookieName(name){
   var h = window.location.hostname.split(".")[0];
   var prefix = "";
   switch(h) {
-    case "localhost":
     case "192":
+      prefix = "192.168.1.48-";
+      break;
+    case "localhost":
       prefix = "localhost-";
       break;
     case "staging":
@@ -147,7 +149,9 @@ document.addEventListener("DOMContentLoaded", function(_) {
 
   if (jwt) {
     $("#site-header-login-item").hide();
+    $("#site-header-signup-item").hide();
     $("#site-header-login-item-mobile").hide();
+    $("#site-header-signup-item-mobile").hide();
     $(".login-signup-or").hide();
     // Move the red guy up
     $("div.home-page").addClass("no-get-started-button");
@@ -339,6 +343,16 @@ function isiPhoneWithoutPhysicalHomeBt(){
   return false;
 }
 
+function OCDarkModeEarlySetup(){
+  var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("ui-theme"));
+  if (darkModeCookie === "dark" ||
+      (darkModeCookie === "auto" &&
+       window.matchMedia &&
+       window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+    $("html").addClass("theme-mode-dark");
+  }
+}
+
 (function(){
   $(document).ready(function(){
     
@@ -354,3 +368,5 @@ function isiPhoneWithoutPhysicalHomeBt(){
     }
   });
 })();
+
+OCDarkModeEarlySetup();

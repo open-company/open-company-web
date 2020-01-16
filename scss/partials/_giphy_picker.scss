@@ -3,10 +3,11 @@ div.giphy-picker {
   top: 0;
   right: 0;
   border-radius: 4px;
-  border: 1px solid $ultra_light_grey;
+  border: 1px solid var(--opac-background-color-05);
   padding: 16px 8px;
-  background-color: white;
+  background-color: var(--overlay-background-color);
   z-index: #{$navbar_zindex + 126};
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
 
   div.giphy-picker-container {
 
@@ -14,12 +15,12 @@ div.giphy-picker {
 
       input.giphy-picker-form-input {
         border-radius: 4px;
-        background-color: $ultra_light_grey;
+        background-color: var(--opac-background-color-1);
         outline: none;
         border: none;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         margin-right: 16px;
         height: 32px;
         padding: 7px 8px;
@@ -56,7 +57,13 @@ div.giphy-picker {
     .giphy-picker-loader {
       @include OC_Body_Book();
       font-size: 12px;
-      color: $deep_navy;
+      color: var(--color);
     }
+  }
+}
+
+@include dark_mode() {
+  div.giphy-picker {
+    box-shadow: 0 2px 8px 0 rgba(255, 255, 255, 0.05);
   }
 }

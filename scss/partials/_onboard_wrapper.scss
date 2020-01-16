@@ -82,11 +82,13 @@ div.onboard-wrapper-container {
       bottom: 0px;
       right: 0px;
       width: 50%;
+      background-color: $grey_num_2;
 
       @include mobile(){
         flex: unset;
         width: 100%;
         position: unset;
+        background-color: white;
       }
     }
   }
