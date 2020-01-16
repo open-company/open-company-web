@@ -117,7 +117,7 @@
             [:div.pricing-faq-answer
               [:a.chat-with-us
                 {:class "intercom-chat-link"
-                 :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+                 :href "mailto:hello@carrot.io"}
                 "Chat with us about Carrot"]]]]]
 
       (shared/dashed-string 4)

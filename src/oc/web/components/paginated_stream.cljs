@@ -237,6 +237,7 @@
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
+         {:class (when-not @(::has-next s) "closing-carrot")}
          (window-scroller
           {}
           (partial virtualized-stream {:org-data org-data

@@ -3,11 +3,11 @@ div.secure-activity-container {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
   min-height: 100vh;
 
   @include mobile() {
-    background-color: white;
+    background-color: var(--mobile-background-color);
   }
 
   div.activity-header {
@@ -16,7 +16,7 @@ div.secure-activity-container {
     top: 0px;
     width: 100%;
     padding: 12px 16px;
-    border-bottom: 1px solid $ultra_light_grey;
+    border-bottom: 1px solid var(--divider-line);
     background-color: inherit;
     text-align: center;
     z-index: 10;
@@ -25,8 +25,7 @@ div.secure-activity-container {
       position: absolute;
       height: 72px;
       padding: 16px;
-      background-color: white;
-      border-bottom: 1px solid $divider_line_grey;
+      background-color: var(--mobile-background-color);
     }
 
     div.org-avatar {
@@ -88,7 +87,7 @@ div.secure-activity-container {
         float: right;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         height: 32px;
         display: block;
         line-height: 32px;
@@ -147,7 +146,7 @@ div.secure-activity-container {
 
       div.activity-title {
         @include activity-title(26px, 33px);
-        color: $deep_navy;
+        color: var(--color);
 
         @include mobile() {
           @include activity-title(36px, 40px);
@@ -168,7 +167,7 @@ div.secure-activity-container {
         div.name {
           @include OC_Body_Book();
           font-size: 12px;
-          color: rgba($light_navy, 0.5);
+          color: var(--light-color);
           line-height: 24px;
         }
       }
@@ -189,11 +188,11 @@ div.secure-activity-container {
         outline: none;
         margin: 16px 0 0;
         cursor: text;
-        @include activity-body(17, 22, $deep_navy, 16);
+        @include activity-body(17, 22, var(--color), 16);
         @include mobile() {
-          @include activity-body(18, 24, $deep_navy, 16);
+          @include activity-body(18, 24, var(--color), 16);
         }
-        color: $deep_navy;
+        color: var(--color);
         @include OC_Body_Book();
         font-size: 17px;
         line-height: 22px;
@@ -212,10 +211,6 @@ div.secure-activity-container {
 
         div.carrot-no-preview, a.carrot-no-preview {
           display: none;
-        }
-
-        &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-          color: $deep_navy !important;
         }
 
         &:after {
@@ -246,7 +241,7 @@ div.secure-activity-container {
         margin: 24px 0;
         width: 100%;
         height: 1px;
-        background-color: $ultra_light_grey;
+        background-color: var(--divider-line);
       }
 
       div.stream-comments {
@@ -254,59 +249,65 @@ div.secure-activity-container {
         float: unset;
       }
     }
+  }
 
-    div.secure-activity-footer {
-      text-align: center;
-      margin-top: 32px;
-      border-top: 1px solid $ultra_light_grey;
+  div.secure-activity-footer {
+    text-align: center;
+    margin-top: 32px;
+    border-top: 1px solid var(--divider-line);
 
-      a.sent-via-carrot {
-        height: 72px;
-        padding-top: 24px;
-        padding-bottom: 30px;
-        display: block;
+    a.sent-via-carrot {
+      height: 72px;
+      padding-top: 24px;
+      padding-bottom: 30px;
+      display: block;
 
-        @include big_web() {
-          &:hover div.sent-via-carrot-copy {
-            opacity: 1;
-          }
-        }
-
-        div.sent-via-carrot-copy {
-          height: 18px;
-          @include OC_Body_Book();
-          font-size: 14px;
-          line-height: 18px;
-          color: $deep_navy;
-          padding-left: 18px;
-          position: relative;
-          opacity: 0.5;
-          width: 110px;
-          margin: 0 auto;
-
-          &:before {
-            content: "";
-            height: 18px;
-            width: 10px;
-            background-image: cdnUrl("/img/ML/carrot_grey.svg");
-            background-size: 10px 18px;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-color: transparent;
-            position: absolute;
-            top: 0;
-            left: 0;
-          }
+      @include big_web() {
+        &:hover div.sent-via-carrot-copy {
+          opacity: 1;
         }
       }
 
-      button.secure-activity-footer-bt {
+      div.sent-via-carrot-copy {
         height: 18px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_green;
-        padding: 0;
+        line-height: 18px;
+        color: var(--color);
+        padding-left: 18px;
+        position: relative;
+        opacity: 0.5;
+        width: 110px;
+        margin: 0 auto;
+
+        &:before {
+          content: "";
+          height: 18px;
+          width: 10px;
+          background-image: cdnUrl("/img/ML/carrot_grey.svg");
+          background-size: 10px 18px;
+          background-repeat: no-repeat;
+          background-position: center;
+          background-color: transparent;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
       }
     }
+
+    button.secure-activity-footer-bt {
+      height: 18px;
+      @include OC_Body_Book();
+      font-size: 14px;
+      color: $carrot_green;
+      padding: 0;
+    }
+  }
+}
+
+@include dark_mode() {
+  div.secure-activity-container div.secure-activity-footer a.sent-via-carrot div.sent-via-carrot-copy:before {
+    background-image: cdnUrl("/img/ML/carrot_logo_white.svg");
   }
 }
