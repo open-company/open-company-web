@@ -2,6 +2,8 @@ div.cmail-outer {
   position: relative;
   width: 100%;
   margin-bottom: 24px;
+  background-color: var(--cmail-collapsed-background-color);
+  box-shadow: 0 2px 8px 0 var(--cmail-box-shadow);
 
   @include mobile() {
     position: fixed;
@@ -14,7 +16,7 @@ div.cmail-outer {
     box-shadow: none;
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: white;
+    background-color: var(--mobile-background-color);
     margin-bottom: 0;
     z-index: #{$navbar_zindex + 20};
   }
@@ -107,10 +109,10 @@ div.cmail-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: $carrot_modal_bg;
+    background-color: var(--overlay-background-color);
     border-radius: 0;
     z-index: #{$navbar_zindex + 116};
-    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: none;
 
     @include mobile() {
       position: relative;
@@ -119,7 +121,7 @@ div.cmail-outer {
       display: block;
       top: unset;
       left: unset;
-      background-color: white;
+      background-color: var(--mobile-background-color);
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       box-shadow: none;
@@ -130,7 +132,6 @@ div.cmail-outer {
       height: 100vh;
       top: 0;
       left: 0;
-      background-color: $grey_num_2;
       position: absolute;
       box-shadow: none;
       border: none;
@@ -143,12 +144,11 @@ div.cmail-outer {
         height: initial;
         top: unset;
         border-radius: 0;
-        background-color: white;
       }
 
       div.cmail-header {
-        background-color: $grey_num_2;
-        border-bottom: 1px solid rgba($deep_navy, 0.1);
+        background-color: var(--overlay-background-color);
+        border-bottom: 1px solid var(--divider-line);
         position: absolute;
         top: 0;
         left: 0;
@@ -170,7 +170,7 @@ div.cmail-outer {
           float: unset;
 
           button.fullscreen-bt {
-            background-color: $ultra_light_grey;
+            background-color: var(--opac-background-color-1);
             background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse.svg");
           }
 
@@ -188,7 +188,7 @@ div.cmail-outer {
           button.attachment-button {
             @include OC_Body_Book();
             font-size: 14px;
-            color: $deep_navy;
+            color: var(--color);
             position: relative;
             float: left;
             padding: 0;
@@ -199,13 +199,13 @@ div.cmail-outer {
             background-size: 14px 16px;
             background-repeat: no-repeat;
             background-position: center;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             border-top-right-radius: 4px;
             border-bottom-right-radius: 4px;
-            border-left: 1px solid rgba($deep_navy, 0.2);
+            border-left: 1px solid var(--divider-line);
 
             &:not(.disabled):hover {
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--opac-background-color-2);
             }
           }
 
@@ -219,7 +219,7 @@ div.cmail-outer {
               height: 32px;
               background-position: center;
               background-size: 16px 16px;
-              background-color: rgba($deep_navy, 0.1);
+              background-color: var(--opac-background-color-1);
               border-top-left-radius: 4px;
               border-bottom-left-radius: 4px;
               padding: 0;
@@ -230,7 +230,7 @@ div.cmail-outer {
               opacity: 1;
 
               &:not(.disabled):hover {
-                background-color: rgba($deep_navy, 0.2);
+                background-color: var(--opac-background-color-2);
               }
             }
 
@@ -300,7 +300,7 @@ div.cmail-outer {
             div.rich-body-editor {
               padding-bottom: 30vh;
               min-height: calc(100vh - 334px);
-              @include activity-body(17, 22, $deep_navy, 16);
+              @include activity-body(17, 22, var(--color), 16);
 
               @media screen and (min-height: 556px) {
                 max-height: initial;
@@ -337,14 +337,12 @@ div.cmail-outer {
     height: 100%;
     position: relative;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
-    border: 1px solid $mid_light_grey;
+    border: 1px solid var(--cmail-qp-outer-border);
     border-radius: 4px;
-    background-color: white;
 
     @include mobile() {
       width: 100vw;
       height: auto;
-      background-color: white;
       padding-top: #{$mobile_navbar_height}px;
     }
 
@@ -359,8 +357,8 @@ div.cmail-outer {
         position: fixed;
         top: 0;
         left: 0;
-        border-bottom: 1px solid $divider_line_grey;
-        background-color: white;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
         z-index: 2;
 
         button.mobile-close-bt {
@@ -374,7 +372,7 @@ div.cmail-outer {
           position: absolute;
           top: 11px;
           left: 16px;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           border-radius: 4px;
         }
 
@@ -393,7 +391,7 @@ div.cmail-outer {
             padding: 0;
             float: left;
             opacity: 1;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             border-radius: 4px;
           }
         }
@@ -401,7 +399,7 @@ div.cmail-outer {
     }
 
     div.cmail-header {
-      background-color: $deep_navy;
+      background-color: var(--color);
       height: 56px;
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
@@ -439,7 +437,7 @@ div.cmail-outer {
           margin-top: 3px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           line-height: 18px;
           float: left;
           max-width: 25vw;
@@ -470,13 +468,13 @@ div.cmail-outer {
             background-size: 12px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             border-radius: 4px;
             padding: 0;
             opacity: 1;
 
             &:not(.disabled):hover {
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--opac-background-color-2);
             }
 
             @include mobile() {
@@ -496,13 +494,13 @@ div.cmail-outer {
         div.delete-button-container {
           float: left;
           margin-left: 16px;
-          border-left: 1px solid rgba($deep_navy, 0.1);
+          border-left: 1px solid var(--opac-background-color-1);
           padding-left: 16px;
 
           button.delete-button {
             width: 32px;
             height: 32px;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             border-radius: 4px;
             background-image: cdnUrl("/img/ML/cmail_delete.svg");
             background-size: 14px 16px;
@@ -513,7 +511,7 @@ div.cmail-outer {
             opacity: 1;
 
             &:not(.disabled):hover {
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--opac-background-color-1);
             }
           }
         }
@@ -533,13 +531,13 @@ div.cmail-outer {
         button.attachment-button {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           position: relative;
           float: left;
           padding: 0;
           width: 32px;
           height: 32px;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
           background-size: 14px 16px;
           background-repeat: no-repeat;
@@ -549,7 +547,7 @@ div.cmail-outer {
           opacity: 1;
 
           &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
+            background-color: var(--opac-background-color-2);
           }
         }
 
@@ -562,7 +560,7 @@ div.cmail-outer {
           button.emoji-button {
             width: 32px;
             height: 32px;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
             background-position: center;
@@ -575,7 +573,7 @@ div.cmail-outer {
             opacity: 1;
 
             &:not(.disabled):hover {
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--opac-background-color-2);
             }
           }
 
@@ -609,7 +607,7 @@ div.cmail-outer {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: rgba(white, 0.2);
+          background-color: var(--cmail-fullscreen-bt-bg);
           border-radius: 4px;
           margin-left: 8px;
 
@@ -622,13 +620,12 @@ div.cmail-outer {
       position: relative;
       margin-left: 16px;
       padding-left: 16px;
-      border-left: 1px solid rgba($deep_navy, 0.1);
+      border-left: 1px solid var(--divider-line);
       float: right;
     }
 
     div.cmail-content-outer {
       padding: 24px;
-      background-color: white;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
 
@@ -683,7 +680,7 @@ div.cmail-outer {
       }
 
       div.cmail-content-section-picker {
-        border-bottom: 1px solid rgba($deep_navy, 0.15);
+        border-bottom: 1px solid var(--divider-line);
         padding-bottom: 12px;
         margin-bottom: 16px;
         display: block;
@@ -693,7 +690,7 @@ div.cmail-outer {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 24px;
-          color: rgba($deep_navy, 0.5);
+          color: var(--light-color);
 
           @include mobile() {
             font-size: 16px;
@@ -721,11 +718,12 @@ div.cmail-outer {
             height: 24px;
             padding: 3px 24px 3px 8px;
             color: white;
-            background-color: $deep_navy;
+            background-color: var(--cmail-section-bt-background);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
+            color: var(--cmail-section-bt-color);
             position: relative;
 
             @include mobile() {
@@ -780,7 +778,7 @@ div.cmail-outer {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: rgba($deep_navy, 0.5);
+          color: var(--light-color);
 
           @include mobile() {
             font-size: 16px;
@@ -793,7 +791,7 @@ div.cmail-outer {
           outline: none;
           cursor: text;
           @include activity-title(14px, 18px);
-          color: $deep_navy;
+          color: var(--color);
           white-space: pre-wrap;
           word-wrap: break-word;
           min-height: 18px;
@@ -813,7 +811,7 @@ div.cmail-outer {
           // &:empty:before {
           //   content: attr(placeholder);
           //   display: inline-block;
-          //   color: rgba($deep_navy, 0.5) !important;
+          //   color: var(--light-color) !important;
           //   font-style: none;
           //   height: 17px;
           // }
@@ -821,7 +819,7 @@ div.cmail-outer {
       }
 
       div.cmail-content-abstract-container-outer {
-        background-color: rgba($deep_navy, 0.1);
+        background-color: var(--opac-background-color-1);
         padding: 16px 24px;
         position: relative;
         margin-top: 24px;
@@ -885,12 +883,12 @@ div.cmail-outer {
           outline: none;
           margin: 0;
           cursor: text;
-          color: $deep_navy;
+          color: var(--color);
           @include OC_Body_Book();
           height: auto;
 
           @include big_web() {
-            @include activity-body(17, 22, $deep_navy, 16);
+            @include activity-body(17, 22, var(--color), 16);
             font-size: 17px;
             line-height: 22px;
             min-height: 22px;
@@ -903,7 +901,7 @@ div.cmail-outer {
           @include mobile() {
             min-height: 20vh;
             max-height: initial;
-            @include activity-body(18, 24, $deep_navy, 16);
+            @include activity-body(18, 24, var(--color), 16);
             font-size: 18px;
             line-height: 24px;
             overflow-y: auto;
@@ -916,7 +914,7 @@ div.cmail-outer {
           }
 
           &.medium-editor-placeholder:after, &.medium-editor-placeholder-relative:after {
-            color: rgba($deep_navy, 0.5) !important;
+            color: var(--light-color) !important;
             font-style: normal;
           }
 
@@ -932,7 +930,6 @@ div.cmail-outer {
       height: 64px;
       width: 100%;
       padding: 16px;
-      background-color: white;
       border-bottom-left-radius: 4px;
       border-bottom-right-radius: 4px;
 
@@ -943,7 +940,7 @@ div.cmail-outer {
       div.saving-saved {
         height: 35px;
         @include OC_Body_Book();
-        color: rgba($deep_navy, 0.5);
+        color: var(--light-color);
         font-size: 14px;
         line-height: 35px;
         margin: 0px 0px 0px 16px;
@@ -964,12 +961,12 @@ div.cmail-outer {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           opacity: 1;
           border-radius: 4px;
 
           &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
+            background-color: var(--opac-background-color-2);
           }
         }
 
@@ -995,13 +992,13 @@ div.cmail-outer {
           background-size: 16px 14px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           border-radius: 4px;
           padding: 0;
           opacity: 1;
 
           &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
+            background-color: var(--opac-background-color-2);
           }
         }
       }
@@ -1011,7 +1008,7 @@ div.cmail-outer {
         height: 32px;
         margin-left: 16px;
         padding-left: 16px;
-        border-left: 1px solid rgba($deep_navy, 0.1);
+        border-left: 1px solid var(--divider-line);
         height: 32px;
 
         @include mobile() {
@@ -1025,13 +1022,13 @@ div.cmail-outer {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           border-radius: 4px;
           padding: 0;
           opacity: 1;
 
           &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
+            background-color: var(--opac-background-color-2);
           }
         }
       }
@@ -1043,24 +1040,24 @@ div.cmail-outer {
         button.attachment-button {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           position: relative;
           float: left;
           padding: 0;
           width: 32px;
           height: 32px;
           background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
-          background-color: rgba($deep_navy, 0.1);
+          background-color: var(--opac-background-color-1);
           background-size: 14px 16px;
           background-repeat: no-repeat;
           background-position: center;
           opacity: 1;
-          border-left: 1px solid rgba($deep_navy, 0.2);
+          border-left: 1px solid var(--divider-line);
           border-top-right-radius: 4px;
           border-bottom-right-radius: 4px;
 
           &:not(.disabled):hover {
-            background-color: rgba($deep_navy, 0.2);
+            background-color: var(--opac-background-color-2);
           }
         }
 
@@ -1079,13 +1076,13 @@ div.cmail-outer {
             top: 0px;
             left: 0px;
             cursor: pointer;
-            background-color: rgba($deep_navy, 0.1);
+            background-color: var(--opac-background-color-1);
             opacity: 1;
             border-top-left-radius: 4px;
             border-bottom-left-radius: 4px;
 
             &:not(.disabled):hover {
-              background-color: rgba($deep_navy, 0.2);
+              background-color: var(--opac-background-color-2);
             }
           }
 
@@ -1116,20 +1113,20 @@ div.cmail-outer {
           float: right;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           line-height: 16px;
           padding: 7px 8px;
           background-image: cdnUrl("/img/ML/select_arrows.svg");
           background-size: 8px 10px;
           background-position: top 11px right 8px;
           background-repeat: no-repeat;
-          background-color: $ultra_light_grey;
+          background-color: var(--opac-background-color-1);
           border-radius: 4px;
           margin-left: 16px;
 
           @include big_web() {
             &:hover, &.active {
-              background-color: $more_ultra_light_grey;
+              background-color: var(--opac-background-color-2);
             }
           }
 
@@ -1142,14 +1139,97 @@ div.cmail-outer {
 
           @include mobile() {
             width: calc(100% - 16px - 32px);
-            background-image: cdnUrl("/img/ML/select_arrows.svg");
-            background-color: $ultra_light_grey;
-            color: $deep_navy;
+            background-color: var(--opac-background-color-1);
+            color: var(--color);
 
             &:hover, &.open {
-              background-color: $more_ultra_light_grey;
+              background-color: var(--opac-background-color-2);
             }
           }
+        }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.cmail-outer {
+    div.cmail-container {
+      div.cmail-footer {
+        div.cmail-footer-right {
+          div.board-name {
+            background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
+          }
+
+          button.attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+        }
+
+        div.fullscreen-bt-container button.fullscreen-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand.svg");
+        }
+
+        div.delete-bt-container button.delete-bt {
+          background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
+        }
+
+        div.dismiss-inline-cmail-container button.dismiss-inline-cmail {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+
+        div.cmail-content-abstract-container-outer button.remove-abstract-bt {
+          background-image: cdnUrl("/img/ML/black_close@dark.svg");
+        }
+      }
+
+      div.cmail-content div.cmail-content-section-picker div.section-picker-bt-container button.section-picker-bt:after {
+        background-image: cdnUrl("/img/ML/select_arrows_white.svg");
+      }
+
+      div.cmail-header {
+        div.fullscreen-bt-container button.fullscreen-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
+        }
+
+        div.cmail-header-right-buttons {
+          button.attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+        }
+
+        div.cmail-header-left-buttons {
+          div.delete-button-container button.delete-button {
+            background-image: cdnUrl("/img/ML/cmail_delete@dark.svg");
+          }
+
+          div.close-bt-container button.close-bt {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
+        }
+      }
+
+      div.cmail-mobile-header {
+        @include mobile() {
+          div.cmail-mobile-header-right button.mobile-attachment-button {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
+
+          button.mobile-close-bt {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
+        }
+      }
+    }
+
+    &.fullscreen {
+      div.cmail-container {
+        div.cmail-header div.cmail-header-right-buttons button.attachment-button {
+          background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+        }
+
+        div.cmail-header div.fullscreen-bt-container button.fullscreen-bt {
+          background-image: cdnUrl("/img/ML/cmail_fullscreen_collapse@dark.svg");
         }
       }
     }

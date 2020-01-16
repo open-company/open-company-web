@@ -89,6 +89,8 @@
           (reset! (::pre-flight-check s) false))))))
 
 (rum/defcs section-editor <
+  ;; Mixins
+  mixins/refresh-tooltips-mixin
   rum/reactive
   ;; Locals
   (rum/local "" ::query)

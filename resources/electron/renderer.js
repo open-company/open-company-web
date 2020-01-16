@@ -30,7 +30,17 @@ window.OCCarrotDesktop.windowHasFocus = function() {
   return ipcRenderer.sendSync('window-has-focus?');
 };
 
+window.OCCarrotDesktop.isDarkMode = function() {
+  console.log("Determining if dark mode is enabled");
+  return ipcRenderer.sendSync('ui-theme-enabled?');
+};
+
 window.OCCarrotDesktop.getElectronAppVersion = function() {
-  console.log("DBG Get electorn app version");
+  console.log("Get electorn app version");
   return package.version;
 }
+
+ipcRenderer.on("ui-theme-changed", function(event, arg) {
+  console.log("Dark mode changed:", arg);
+  oc.web.actions.ui_theme.set_ui_theme();
+});

@@ -10,7 +10,7 @@ div.user-notifications {
     height: calc(100vh - #{$mobile_navbar_height * 2}px);
     margin-top: #{$mobile_navbar_height}px;
     margin-bottom: #{$mobile_navbar_height}px;
-    background-color: white;
+    background-color: var(--mobile-background-color);
     z-index: 21;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -31,10 +31,6 @@ div.user-notifications {
     padding: 0;
     margin: 0;
 
-    // &.active {
-    //   background-image: cdnUrl("/img/ML/notification_bell_active.svg");    
-    // }
-
     &.new:after {
       position: absolute;
       content: "";
@@ -44,7 +40,7 @@ div.user-notifications {
       right: 0px;
       background-color: $carrot_green;
       border-radius: 50%;
-      border: 2px solid $grey_num_2;
+      border: 2px solid var(--background-color);
     }
   }
 
@@ -52,9 +48,9 @@ div.user-notifications {
     position: absolute;
     top: 31px;
     right: 0px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     border-radius: 4px;
-    border: 1px solid $deep_tan;
+    border: 1px solid var(--notifications-border);
     box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);;
     width: 375px;
 
@@ -70,7 +66,7 @@ div.user-notifications {
       width: 100%;
       box-shadow: none;
       border: none;
-      background-color: white;
+      background-color: var(--mobile-background-color);
 
       &.hidden-tray {
         top: unset;
@@ -117,7 +113,7 @@ div.user-notifications {
 
       div.title {
         @include OC_Body_Book();
-        color: $deep_navy;
+        color: var(--color);
         font-size: 14px;
         text-align: center;
         width: 100px;
@@ -168,17 +164,17 @@ div.user-notifications {
       }
 
       div.user-notification {
-        border-top: 1px solid $ultra_light_grey;
+        border-top: 1px solid var(--divider-line);
         padding: 16px 16px 13px;
         cursor: pointer;
         text-align: left;
         opacity: 0.9;
         position: relative;
-        background-color: $grey_num_2;
+        background-color: var(--background-color);
 
         @include mobile() {
-          background-color: white;
-          border-top: 1px solid $divider_line_grey;
+          background-color: var(--mobile-background-color);
+          border-top: 1px solid var(--divider-line);
 
           &:first-child {
             border-top: none;
@@ -197,10 +193,10 @@ div.user-notifications {
         }
 
         &.unread {
-          background-color: white;
+          background-color: var(--overlay-background-color);
 
           @include mobile() {
-            background-color: $oc_gray_8;
+            background-color: var(--background-color);
           }
         }
 
@@ -218,7 +214,7 @@ div.user-notifications {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 16px;
-          color: $deep_navy;
+          color: var(--color);
           float: left;
         }
 
@@ -228,7 +224,7 @@ div.user-notifications {
           width: 42px;
           @include OC_Body_Book();
           font-size: 12px;
-          color: rgba($ui_grey, 0.5);
+          color: var(--light-color);
           height: 12px;
           line-height: 12px;
         }
@@ -241,7 +237,7 @@ div.user-notifications {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 18px;
-          color: #848D95;
+          color: var(--color);
           float: right;
           overflow-wrap: break-word;
 
@@ -275,5 +271,11 @@ div.user-notifications {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.user-notifications button.notification-bell-bt {
+    background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
   }
 }

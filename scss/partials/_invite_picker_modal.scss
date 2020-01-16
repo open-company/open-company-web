@@ -22,7 +22,7 @@ div.invite-picker-modal {
 
   div.invite-picker {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -36,13 +36,13 @@ div.invite-picker-modal {
       width: calc(100% + 48px);
       height: 56px;
       margin-left: -24px;
-      background-color: $grey_num_2;
+      background-color: var(--panel-header-background);
       padding: 12px 16px;
 
       div.invite-picker-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -52,7 +52,7 @@ div.invite-picker-modal {
         padding: 0 0 0 16px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
       }
     }
@@ -65,13 +65,13 @@ div.invite-picker-modal {
         @include OC_Body_Bold();
         font-size: 14px;
         line-height: 18px;
-        color: $deep_navy;
+        color: var(--color);
       }
 
       div.invite-picker-body-description {
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 18px;
         margin-top: 8px;
       }
@@ -94,7 +94,7 @@ div.invite-picker-modal {
 
       button.invite-slack-bt {
         span.disabled {
-          color: rgba($deep_navy, 0.5);
+          opacity: 0.5;
         }
 
         span.enabled {

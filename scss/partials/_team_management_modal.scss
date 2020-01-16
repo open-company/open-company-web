@@ -22,7 +22,7 @@ div.team-management-modal {
 
   div.team-management {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -36,13 +36,13 @@ div.team-management-modal {
       width: calc(100% + 48px);
       height: 56px;
       margin-left: -24px;
-      background-color: $grey_num_2;
+      background-color: var(--panel-header-background);
       padding: 12px 16px;
 
       div.team-management-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -52,7 +52,7 @@ div.team-management-modal {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
       }
 
@@ -76,7 +76,7 @@ div.team-management-modal {
       div.team-management-body-title {
         @include OC_Body_Book();
         font-size: 14px;
-        color: $light_navy;
+        color: var(--color);
       }
 
       div.team-management-search-users {
@@ -88,7 +88,7 @@ div.team-management-modal {
         background-position: top 11px left 8px;
         background-repeat: no-repeat;
         padding-left: 19px;
-        background-color: $ultra_light_grey;
+        background-color: var(--opac-background-color-1);
         border-radius: 4px;
 
         input {
@@ -96,16 +96,16 @@ div.team-management-modal {
           width: 100%;
           float: right;
           border-radius: 4px;
-          background-color: $ultra_light_grey;
+          background-color: transparent;
           padding: 7px 8px;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           outline: none;
           border: none;
 
           @include placeholder(){
-            color: rgba($deep_navy, 0.5);
+            color: var(--light-color);
           }
         }
       }
@@ -174,7 +174,7 @@ div.team-management-modal {
             div.user-name-label {
               @include OC_Body_Book();
               font-size: 14px;
-              color: $light_navy;
+              color: var(--color);
               line-height: 24px;
               max-width: 100%;
               overflow: hidden;
@@ -187,14 +187,14 @@ div.team-management-modal {
 
               span.current-user {
                 font-size: 11px;
-                color: $ui_grey;
+                color: var(--light-color);
               }
             }
 
             div.pending-user {
               @include OC_Body_Book();
               font-size: 12px;
-              color: $light_navy;
+              color: var(--color);
               line-height: 19px;
 
               button.resend-pending-bt {
@@ -218,7 +218,7 @@ div.team-management-modal {
             @include OC_Body_Book();
             font-size: 12px;
             line-height: 24px;
-            color: $light_navy;
+            color: var(--color);
 
             span.self-user-type {
               text-transform: capitalize;
@@ -248,5 +248,11 @@ div.team-management-modal {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.team-management-modal div.team-management div.team-management-body div.team-management-search-users {
+    background-image: cdnUrl("/img/ML/wrt_search_lens.svg");
   }
 }
