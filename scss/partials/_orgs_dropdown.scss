@@ -47,17 +47,17 @@ div.orgs-dropdown {
     top: 40px;
     left: 10%;
     box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(177, 184, 192, 0.5);
+    border: 1px solid var(--divider-line);
     border-radius: 5px;
     padding: 10px 16px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     width: 152px;
 
     div.triangle {
       position: absolute;
       top: -8px;
       left: calc(50% - 7.5px);
-      background-color: white;
+      background-color: var(--overlay-background-color);
       border-top: 1px solid rgba(177, 184, 192, 0.5);
       border-left: 1px solid rgba(177, 184, 192, 0.5);
       transform: rotate(45deg);
@@ -107,12 +107,19 @@ div.orgs-dropdown {
             span.org-name {
               @include OC_Body_Bold();
               font-size: 14px;
-              color: $deep_navy;
+              color: var(--color);
               max-width: 88px;
             }
           }
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.orgs-dropdown button.orgs-dropdown-btn.dropdown-toggle
+  div.org-avatar div.org-avatar-container span.org-name:after {
+    background-image: cdnUrl("/img/ML/select_arrows_white.svg");
   }
 }

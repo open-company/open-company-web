@@ -45,11 +45,11 @@ div.emoji-picker {
       left: 0;
       right: 0;
       height: 100vh;
-      background-color: white;
+      background-color: var(--mobile-background-color);
       z-index: 105;
 
       button.mobile-cancel-bt {
-        color: $deep_navy;
+        color: var(--color);
         padding: 0;
         margin: 0;
         @include OC_Body_Bold();
@@ -102,5 +102,11 @@ div.emoji-mart {
     div.emoji-mart-preview-data span.emoji-mart-title-label {
       display: none;
     }
+  }
+}
+
+@include dark_mode() {
+  div.emoji-picker button.emoji-button {
+    background-image: cdnUrl("/img/ML/new_post_emoji_button@dark.svg");
   }
 }

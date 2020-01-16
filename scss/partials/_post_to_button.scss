@@ -8,8 +8,8 @@ div.post-to-button {
     
     div.post-to-bt-container button.post-to-bt {
       cursor: not-allowed;
-      color: rgba($deep_navy, 0.5);
-      background-color: rgba($deep_navy, 0.1);
+      color: var(--light-color);
+      background-color: var(--opac-background-color-1);
     }
   }
 
@@ -59,19 +59,19 @@ div.post-to-button {
     }
 
     div.post-bt-tooltip {
-      background-color: white;
+      background-color: var(--tooltip-background-color);
       white-space:pre-wrap;
       max-width: none;
       text-align: left;
       opacity: 1;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--tooltip-color);
       line-height: 18px;
       padding: 11px 16px;
       border-radius: 4px;
       box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
-      border: 1px solid $mid_light_grey;
+      border: 1px solid var(--divider-line);
       position: absolute;
       top: 34px;
       right: 0;

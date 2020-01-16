@@ -79,6 +79,7 @@
                 (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])])
         (when-not (and hide-label?
                        (zero? comments-count))
+
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
@@ -90,9 +91,11 @@
                  (if show-new-tag?
                    (:new-comments-count entry-data)
                    comments-count)
-                 (when-not hide-label?
-                   (if show-new-tag?
-                     (str " new comment" (when (not= (:new-comments-count entry-data) 1) "s"))
+                 (if show-new-tag?
+                   (if hide-label?
+                     " new"
+                     (str " new comment" (when (not= (:new-comments-count entry-data) 1) "s")))
+                   (when-not hide-label?
                      (str " comment" (when (not= comments-count 1) "s")))))]
               (when-not hide-label?
                 [:span.add-a-comment
