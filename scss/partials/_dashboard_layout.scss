@@ -114,26 +114,24 @@ div.dashboard-layout {
           backgorund-size: 22px 18px;
           background-repeat: no-repeat;
 
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
+          }
+
           @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
 
           &.active {
             background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
-          }
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
-
-            @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active@dark.svg"));
-
-            &.active {
-              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active@dark.svg");
-            }
           }
         }
 
         button.inbox-tab {
           background-image: cdnUrl("/img/ML/inbox_tab_icon.svg");
           backgorund-size: 22px 19px;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/inbox_tab_icon@dark.svg");
+          }
 
           @include preload_image(cdnUrl("/img/ML/inbox_tab_icon_active.svg"));
 
@@ -147,20 +145,14 @@ div.dashboard-layout {
           backgorund-size: 18px 20px;
           background-repeat: no-repeat;
 
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/follow_ups_tab_icon@dark.svg");
+          }
+
           @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
 
           &.active {
             background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
-          }
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/follow_ups_tab_icon@dark.svg");
-
-            @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active@dark.svg"));
-
-            &.active {
-              background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active@dark.svg");
-            }
           }
         }
 
@@ -170,20 +162,14 @@ div.dashboard-layout {
           background-repeat: no-repeat;
           position: relative;
 
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+          }
+
           @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
 
           &.active {
             background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
-          }
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
-            
-            @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active@dark.svg"));
-
-            &.active {
-              background-image: cdnUrl("/img/ML/notifications_tab_icon_active@dark.svg");
-            }
           }
         }
 
@@ -203,20 +189,14 @@ div.dashboard-layout {
           backgorund-size: 20px 20px;
           background-repeat: no-repeat;
 
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+          }
+
           @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
 
           &.active {
             background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
-          }
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
-            
-            @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active@dark.svg"));
-
-            &.active {
-              background-image: cdnUrl("/img/ML/new_post_tab_icon_active@dark.svg");
-            }
           }
         }
       }
