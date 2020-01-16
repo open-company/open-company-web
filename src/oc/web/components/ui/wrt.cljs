@@ -12,6 +12,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.ui-theme :as ui-theme]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -99,7 +100,10 @@
       [:div.wrt-popup
         {:class (utils/class-set {:loading (not (:reads read-data))})
          :ref :wrt-popup
-         :on-click #(.stopPropagation %)}
+         :on-click #(when @(::list-view-dropdown-open s)
+                      (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
+                        (reset! (::list-view-dropdown-open s) false))
+                        (utils/event-stop %))}
         [:div.wrt-popup-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
@@ -123,7 +127,7 @@
                      :cy "58px"
                      :r "50px"
                      :fill "transparent"
-                     :stroke "#ECECEC"
+                     :stroke (if (= (ui-theme/computed-value (ui-theme/get-ui-theme-setting)) :dark) "#DDDDDD" "#ECECEC")
                      :stroke-width "16px"}]
                   [:circle.wrt-donut-segment
                     {:cx "58"

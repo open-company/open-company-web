@@ -19,7 +19,7 @@
         " to continue using Carrot. Need more time? "
         [:a.chat-with-us
           {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+           :href "mailto:hello@carrot.io"}
           "Chat with us"]
         "."]
       [:div.trial-expired-banner
@@ -27,7 +27,7 @@
         "to subscribe to Carrot. Need more time? "
         [:a.chat-with-us
           {:class "intercom-chat-link"
-           :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+           :href "mailto:hello@carrot.io"}
           "Chat with us"]
         "."]
       )])

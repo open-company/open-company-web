@@ -12,7 +12,7 @@
   .internal {
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
 
     &.new {
@@ -31,11 +31,11 @@
     font-size: 12px;
     line-height: 16px;
     text-align: center;
-    color: $deep_navy;
+    color: var(--color);
     width: 16px;
     height: 16px;
     display: inline-block;
-    background-color: rgba($light_navy, 0.1);
+    background-color: var(--navigation-sidebar-count-bg);
     border-radius: 4px;
     margin-top: 4px;
     margin-right: 16px;
@@ -50,7 +50,7 @@
   div.drafts-label {
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
 
     @include mobile() {
@@ -70,7 +70,7 @@
   div.all-posts-label {
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -87,14 +87,14 @@
 
     &.new {
       @include OC_Body_Bold();
-      color: $deep_navy;
+      color: var(--color);
     }
   }
 
   div.follow-ups-label {
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -117,7 +117,7 @@
   div.must-see-label {
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
@@ -213,8 +213,8 @@
 @mixin item-hover(){
   outline: none;
   text-decoration: none;
-  -webkit-tap-highlight-color: rgba($deep_navy, 0.05);
-  background-color: rgba($deep_navy, 0.05);
+  -webkit-tap-highlight-color: var(--navigation-sidebar-hover-bg);
+  background-color: var(--navigation-sidebar-hover-bg);
   border-radius: 4px;
 
   @include mobile() {
@@ -225,7 +225,7 @@
   .internal {
     @include OC_Body_Book();
     font-size: 14px;
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
 
     @include mobile() {
@@ -239,7 +239,7 @@
   }
 
   div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
-    color: $deep_navy;
+    color: var(--color);
     text-decoration: none;
 
     &:active, &:focus {
@@ -318,7 +318,7 @@ div.left-navigation-sidebar {
       padding-bottom: 40px;
       width: 85%;
       height: auto;
-      background-color: white;
+      background-color: var(--background-color);
       min-height: 100%;
       padding-top: #{$mobile_navbar_height + 16}px;
       -webkit-overflow-scrolling: touch;
@@ -334,9 +334,9 @@ div.left-navigation-sidebar {
         top: 0;
         left: 0;
         width: calc(85% - 1px);
-        background-color: white;
+        background-color: var(--background-color);
         padding: 11px 16px;
-        border-bottom: 1px solid $divider_line_grey;
+        border-bottom: 1px solid var(--divider-line);
         z-index: #{$navbar_zindex};
 
         button.mobile-close-bt {
@@ -351,9 +351,8 @@ div.left-navigation-sidebar {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: $ultra_light_grey;
+          background-color: var(--ultralight-color);
           border-radius: 4px;
-          
         }
 
         div.orgs-dropdown  {
@@ -535,7 +534,7 @@ div.left-navigation-sidebar {
 
       @include big_web() {
         &:hover {
-          background-color: rgba($deep_navy, 0.05);
+          background-color: var(--navigation-sidebar-hover-bg);
         }
       }
 
@@ -566,7 +565,7 @@ div.left-navigation-sidebar {
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 32px;
-          color: $deep_navy;
+          color: var(--color);
           float: left;
         }
 
@@ -576,7 +575,7 @@ div.left-navigation-sidebar {
           cursor: default;
 
           span.sections {
-            color: rgba($deep_navy, 0.5);
+            color: var(--light-color);
             font-size: 16px;
           }
 
@@ -731,10 +730,7 @@ div.left-navigation-sidebar {
     padding: 16px 0;
 
     @include mobile() {
-      button {
-        width: 100%;
-        text-align: left;
-      }
+      display: none;
     }
 
     button.invite-people-bt {
@@ -749,13 +745,69 @@ div.left-navigation-sidebar {
       background-repeat: no-repeat;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--color);
       line-height: 18px;
 
       @include big_web(){
         &:hover {
-          background-color: rgba($deep_navy, 0.05);
+          background-color: var(--light-color);
         }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.left-navigation-sidebar {
+    div.left-navigation-sidebar-content div.left-navigation-sidebar-mobile-header {
+      @include mobile() {
+        button.mobile-close-bt {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+    }
+
+    a.all-posts, a.follow-ups, a.drafts, a.must-see {
+      div.all-posts-icon {
+        background-image: cdnUrl("/img/ML/digest_icon_white.svg");
+      }
+
+      div.follow-ups-icon {
+        background-image: cdnUrl("/img/ML/follow_ups_icon_white.svg");
+      }
+
+      div.must-see-icon {
+        background-image: cdnUrl("/img/ML/follow_ups_white.svg");
+      }
+
+      div.drafts-icon {
+        background-image: cdnUrl("/img/ML/drafts_icon_white.svg");
+      }
+    }
+
+    div.left-navigation-sidebar-top {
+      .left-navigation-sidebar-top-title button.left-navigation-sidebar-sections-arrow:before {
+        background-image: cdnUrl("/img/ML/navigation_sidebar_sections_arrow@dark.svg");
+      }
+
+      button.left-navigation-sidebar-top-title-button {
+        background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+      }
+    }
+
+    div.left-navigation-sidebar-items a.left-navigation-sidebar-item {
+      div.public {
+        background-image: cdnUrl("/img/ML/board_public_white.svg");
+      }
+
+      div.private {
+        background-image: cdnUrl("/img/ML/board_private_white.svg");
+      }
+    }
+
+    div.left-navigation-sidebar-footer {
+      button.invite-people-bt {
+        background-image: cdnUrl("/img/ML/invite_people_bt@dark.svg");
       }
     }
   }

@@ -55,7 +55,7 @@
                 "We’re always happy to talk about Carrot."
                 [:a
                   {:class "intercom-chat-link"
-                   :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+                   :href "mailto:hello@carrot.io"}
                   "Say hello"]]]
             [:div.press-kit-intro-footer
               [:div.press-kit-intro-footer-left
@@ -123,7 +123,7 @@
                 [:li
                   "Chat: "
                   [:a {:class "intercom-chat-link"
-                       :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+                       :href "mailto:hello@carrot.io"}
                     "Say hello"]]
                 [:li
                   "Social: "

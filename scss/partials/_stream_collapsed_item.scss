@@ -1,12 +1,12 @@
-$foc_background_color: rgba($deep_navy, 0.05);
-$mobile_foc_background_color: rgba($deep_navy, 0.05);
-$foc_hover_color: rgb(230, 230, 230); //rgba($deep_navy, 0.10);
-$foc_new_color: white;
-$foc_divider_line_color: rgba($deep_navy, 0.15);
+// --foc-background-color: rgba($deep_navy, 0.05);
+// --mobile-foc-background-color: rgba($deep_navy, 0.05);
+// --foc-hover-color: rgba($deep_navy, 0.10);
+// --foc-new-color: white;
+// --foc-divider-line-color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
 div.virtualized-list-row {
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
 
   @include big_web() {
     z-index: 1;
@@ -20,15 +20,15 @@ div.virtualized-list-row {
   }
 
   @include mobile() {
-    background-color: white;
+    background-color: var(--mobile-background-color);
   }
 }
 
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
   margin: 0;
-  border-bottom: 1px solid $foc_divider_line_color;
-  background-color: $foc_background_color;
+  border-bottom: 1px solid var(--foc-divider-line-color);
+  background-color: var(--foc-background-color);
   overflow: visible;
 
   height: #{$collapsed_foc_height}px;
@@ -36,32 +36,32 @@ div.stream-collapsed-item {
   display: block;
   position: relative;
 
-  &.expandable {
-    cursor: pointer;
+  @include big_web() {
+    &:hover {
+      background-color: var(--foc-hover-color);
+      z-index: 2;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+      height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
 
-    @include big_web() {
-      &:hover {
-        background-color: $foc_hover_color;
-        z-index: 2;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
+      div.more-menu {
+        display: initial;
 
-        div.more-menu {
+        button {
           display: initial;
-
-          button {
-            display: initial;
-          }
         }
       }
     }
   }
 
+  &.expandable {
+    cursor: pointer;
+  }
+
   &.unread-item {
-    background-color: $foc_new_color;
+    background-color: var(--foc-new-color);
     z-index: 1;
     position: relative;
 
@@ -71,11 +71,11 @@ div.stream-collapsed-item {
 
     @include big_web(){
       &:hover {
-        background-color: $foc_new_color;
+        background-color: var(--foc-new-color);
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
-        border: 1px solid rgba($deep_navy, 0.24);
+        border: 1px solid var(--foc-new-border-color);
         padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
         margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
@@ -84,22 +84,12 @@ div.stream-collapsed-item {
     }
 
     div.more-menu {
-      background-color: white;
+      background-color: var(--foc-new-color);
+
       &:before {
-        background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 100%);
+        background: linear-gradient(to left, var(--foc-new-menu-gradient-from), var(--foc-new-menu-gradient-to) 100%);
       }
     }
-  }
-
-  @include mobile() {
-    width: 100%;
-    margin: 0;
-    border-radius: 0;
-    border-top: none;
-    border-bottom: 1px solid $foc_divider_line_color;
-    background-color: $mobile_foc_background_color;
-    padding: 16px 16px 16px;
-    height: #{$mobile_foc_height}px;
   }
 
   div.stream-collapsed-item-inner {
@@ -169,7 +159,7 @@ div.stream-collapsed-item {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        @include activity-body(14, 24, $deep_navy);
+        @include activity-body(14, 24, var(--color));
         margin-left: 4px;
         padding-left: 8px;
         position: relative;
@@ -201,7 +191,7 @@ div.stream-collapsed-item {
           content: "-";
           width: 4px;
           height: 24px;
-          color: $deep_navy;
+          color: var(--color);
           @include OC_Body_Book();
           font-size: 14px;
           line-height: 24px;
@@ -227,7 +217,7 @@ div.stream-collapsed-item {
       @include OC_Body_Book();
       font-size: 12px;
       line-height: 24px;
-      color: rgba($deep_navy, 0.5);
+      color: var(--light-color);
       margin-left: auto;
       padding-left: 8px;
       margin-top: 1px;
@@ -241,7 +231,7 @@ div.stream-collapsed-item {
     top: 16px;
     height: 32px;
     z-index: 100;
-    background-color: $foc_hover_color;
+    background-color: var(--foc-hover-color);
     display: none;
     padding-left: 8px;
 
@@ -252,7 +242,7 @@ div.stream-collapsed-item {
       position: absolute;
       top: 0;
       left: -24px;
-      background: linear-gradient(to left, rgba(230, 230, 230, 1), rgba(230, 230, 230, 0) 100%);
+      background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
     }
 
     ul.more-menu-list {
