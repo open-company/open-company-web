@@ -1,4 +1,4 @@
-@import "../modules/_colors";
+@import "../modules/_theme";
 @import "../modules/_fonts";
 @import "../modules/_deploy";
 
@@ -29,12 +29,11 @@ html, body {
   @include OC_Body_Bold();
   font-size: 16px;
   width: 100%;
-  color: $oc_gray_5;
-  background-color: $grey_num_2;
+  color: var(--color);
+  background-color: var(--background-color);
 
   @include mobile(){
     overflow-x: hidden;
-    background-color: white;
     overflow-y: scroll;
   }
 }
@@ -48,25 +47,25 @@ html, body {
   // Change Bootstrap tooltip style
   &.top .tooltip-arrow {
     display: block;
-    border-top-color: $deep_navy;
+    border-top-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
   &.bottom .tooltip-arrow {
     display: block;
-    border-bottom-color: $deep_navy;
+    border-bottom-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
   &.left .tooltip-arrow {
     display: block;
-    border-left-color: $deep_navy;
+    border-left-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
   &.right .tooltip-arrow {
     display: block;
-    border-right-color: $deep_navy;
+    border-right-color: var(--tooltip-background-color);
     opacity: 1;
   }
 
@@ -85,14 +84,14 @@ html, body {
     // box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.07);
     // border: 1px solid $mid_light_grey;
 
-    background-color: $deep_navy;
+    background-color: var(--tooltip-background-color);
     white-space:pre-wrap;
     max-width: none;
     text-align: left;
     opacity: 1;
     @include OC_Body_Book();
     font-size: 12px;
-    color: white;
+    color: var(--tooltip-color);
     line-height: 18px;
     padding: 5px 8px;
     border-radius: 4px;
@@ -103,7 +102,7 @@ html, body {
 
 div.fullscreen-page {
   position: relative;
-  background-color: white;
+  background-color: var(--background-color);
   width: 100%;
   min-height: 100vh;
 }
@@ -174,51 +173,16 @@ span.num.red {
 }
 
 *::selection {
-  background: rgba(250,100,82, 0.5);
+  background: var(--selection-color);
 }
 
 *::-moz-selection {
-  background: rgba(250,100,82, 0.5);
+  background: var(--selection-color);
 }
 
 div#wrap {
   min-height: 100vh;
   background-color: $ultra_light_gold;
-}
-
-button.slack-button {
-  height: 40px;
-  font-size: 15px;
-  @include OC_Body_Bold();
-  padding: 8px 5px 5px 5px;
-  border-radius: 5px;
-  border: 1px solid rgba(78,90,107,0.4);
-  opacity: 1;
-
-  &:hover {
-    opacity: 0.9;
-  }
-
-  &:before {
-    content: "";
-    background-image: cdnUrl("/img/slack.png");
-    background-position: 0px 0px;
-    background-size: 20px 20px;
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    margin-right: 5px;
-    margin-bottom: -4px;
-  }
-
-  span.slack {
-    font-weight: 700;
-  }
-}
-
-/* Remove the files counter from Filestack picker */
-div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span.fsp-nav__right span.fsp-badge {
-  display: none;
 }
 
 .mobile-only {
@@ -251,49 +215,6 @@ div.fsp-picker div.fsp-modal div.fsp-modal__body div.fsp-footer div.fsp-nav span
 .big-web-tablet-only {
   @media screen and (max-width: #{$min_big_web_width - 1}px) {
     display: none !important;
-  }
-}
-
-div.not-found, div.server-error{
-  div.error-page {
-    text-align: center;
-    min-height: calc(100vh - 336px);
-    padding: 100px 0;
-
-    h1 {
-      color: $oc_gray_6;
-      font-size: 150px;
-      @include OC_Body_Bold();
-    }
-
-    a.login {
-      text-decoration: underline;
-      color: $carrot_orange;
-    }
-
-    @media screen and (max-width: 768px) {
-      padding: 50px 16px;
-      img {
-        max-width: 100%;
-      }
-
-      h2 {
-        font-size: 32px;
-      }
-    }
-
-    @media screen and (min-width: 769px){
-      h2{
-        font-size: 40px;
-      }
-    }
-
-    h2 {
-      margin: 50px auto;
-      color: $carrot_orange;
-      text-align: center;
-      @include OC_Body_Bold();
-    }
   }
 }
 

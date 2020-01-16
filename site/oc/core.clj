@@ -139,7 +139,7 @@
           is-slack-lander?
           [:div.site-navbar-right.big-web-tablet-only
             [:a.signup.continue-with-slack
-              {:id "site-header-login-item"
+              {:id "site-header-signup-item"
                :href (env :slack-signup-url)}
                 "Continue with Slack"]]
           :else
@@ -158,12 +158,13 @@
           is-slack-lander?
           [:div.site-navbar-right.mobile-only
             [:a.signup.continue-with-slack
-              {:id "site-header-login-item-mobile"
+              {:id "site-header-signup-item-mobile"
                :href (env :slack-signup-url)}]]
           :else
           [:div.site-navbar-right.mobile-only
             [:a.login
               {:id "site-header-login-item-mobile"
+               :data-bago false
                :href "/login"}
                 "Login"]])
         [:div.mobile-ham-menu
@@ -198,7 +199,7 @@
           [:div.column-item
             [:a
               {:class "intercom-chat-link"
-               :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+               :href "mailto:hello@carrot.io"}
               "Contact us"]]]]]
       [:div.left-column.group
         [:img.logo
@@ -214,7 +215,7 @@
           [:a {:href "/terms"}
            "Terms"]]
         [:div.copyright
-          "© 2019 Carrot"]]]])
+          "© 2020 Carrot"]]]])
 
 
 (defn read-edn [entry]

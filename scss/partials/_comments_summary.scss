@@ -55,7 +55,7 @@ div.is-comments {
   div.is-comments-summary {
     float: left;
     font-size: 12px;
-    color: rgba($deep_navy, 0.5);
+    color: var(--light-color);
     @include OC_Body_Book();
     margin-top: 4px;
     text-align: left;
@@ -64,7 +64,7 @@ div.is-comments {
     text-overflow: ellipsis;
 
     &.has-new-comments {
-      color: $deep_navy;
+      color: var(--color);
 
       @include mobile() {
         &:before {
@@ -77,10 +77,10 @@ div.is-comments {
       cursor: pointer;
 
       &:hover {
-        color: $deep_navy;
+        color: var(--color);
 
         span.add-a-comment {
-          color: $deep_navy;
+          color: var(--color);
         }
       }
     }
@@ -120,7 +120,7 @@ div.is-comments {
     }
 
     span.add-a-comment {
-      color: rgba($deep_navy, 0.5);
+      color: var(--light-color);
 
       @include mobile() {
         display: none;

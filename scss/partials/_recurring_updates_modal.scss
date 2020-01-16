@@ -22,7 +22,7 @@ div.recurring-updates-modal-container {
 
   div.recurring-updates-modal {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -36,13 +36,13 @@ div.recurring-updates-modal-container {
       width: calc(100% + 48px);
       height: 56px;
       margin-left: -24px;
-      background-color: $grey_num_2;
+      background-color: var(--background-color);
       padding: 12px 16px;
 
       div.recurring-updates-modal-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -64,7 +64,7 @@ div.recurring-updates-modal-container {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
         margin-right: 8px;
       }
@@ -76,14 +76,14 @@ div.recurring-updates-modal-container {
       div.recurring-updates-empty-list-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $light_navy;
+        color: var(--color);
       }
 
       div.recurring-updates-empty-list-desc {
         margin-top: 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
       }
     }
 
@@ -96,7 +96,7 @@ div.recurring-updates-modal-container {
         font-size: 14px;
 
         &:not(:first-child) {
-          border-top: 1px solid $ultra_light_grey;
+          border-top: 1px solid var(--divider-line);
         }
 
         &.editable-reminder {
@@ -128,7 +128,7 @@ div.recurring-updates-modal-container {
           width: calc(100% - 24px - 16px);
 
           div.reminder-title {
-            color: $light_navy;
+            color: var(--color);
             max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -140,7 +140,7 @@ div.recurring-updates-modal-container {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            color: $ui_grey;
+            color: var(--light-color);
           }
         }
       }

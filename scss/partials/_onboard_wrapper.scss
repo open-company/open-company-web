@@ -53,15 +53,23 @@ div.onboard-wrapper-container {
         // text-align: center;
 
         div.onboard-wrapper-box {
-          margin-left: auto;
-          margin-right: auto;
-          width: 400px;
-          margin-top: 180px;
           width: 294px;
           height: 301px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           @include image-2x("/img/ML/carrot_box");
           background-size: 294px 301px;
           background-repeat: no-repeat;
+
+          &.sad-search {
+            width: 240px;
+            height: 240px;
+            background-image: cdnUrl("/img/ML/sad_search.svg");
+            background-size: 240px 240px;
+            transition: all 180ms ease-in;
+          }
         }
       }
     }
@@ -74,11 +82,13 @@ div.onboard-wrapper-container {
       bottom: 0px;
       right: 0px;
       width: 50%;
+      background-color: $grey_num_2;
 
       @include mobile(){
         flex: unset;
         width: 100%;
         position: unset;
+        background-color: white;
       }
     }
   }
@@ -849,6 +859,10 @@ div.onboard-lander {
       font-size: 18px;
       line-height: 23px;
       border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 4px 64px;
 
       &.start-using-carrot {
         background-color: $carrot_orange_2;
@@ -951,6 +965,83 @@ div.onboard-lander {
 
         @include mobile() {
           margin-top: 32px;
+        }
+      }
+    }
+  }
+
+  &.invitee-team-lander {
+    div.main-cta {
+
+      div.title-container {
+        margin-top: 64px;
+
+        div.team-logo-container {
+          width: 100%;
+          display: block;
+          margin: 0 0 24px;
+
+          @include org-avatar(72);
+
+          div.org-avatar {
+            float: none;
+
+            div.org-avatar-container:before {
+              left: 50%;
+              transform: translateX(-50%);
+            }
+          }
+        }
+
+        div.title {
+          margin-top: 0;
+        }
+      }
+
+      div.invite-token-container {
+        position: absolute;
+        left: 50%;
+        top: calc(50% - 32px);
+        transform: translate(-50%, -50%);
+
+        div.title {
+          font-size: 32px;
+        }
+
+        div.subtitle {
+          width: 379px;
+          margin: 16px auto 0;
+          font-size: 18px;
+
+          &.checking-invitation {
+            width: 264px;
+            text-align: left;
+          }
+        }
+      }
+    }
+  }
+
+  &.invitee-lander {
+    div.invite-container {
+      position: absolute;
+      left: 50%;
+      top: calc(50% - 32px);
+      transform: translate(-50%, -50%);
+
+      div.title {
+        width: 400px;
+        font-size: 32px;
+      }
+
+      div.subtitle {
+        width: 379px;
+        margin: 16px auto 0;
+        font-size: 18px;
+
+        &.checking-invitation {
+          width: 264px;
+          text-align: left;
         }
       }
     }

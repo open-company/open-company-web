@@ -1,12 +1,12 @@
 $carrot_switch_animation: 130ms;
 
 div.carrot-switch {
-  display: block-inline;
+  display: inline-block;
   width: 28px;
   height: 16px;
   border-radius: 100px;
-  background-color: $light_ui_grey;
-  color: $light_ui_grey;
+  background-color: var(--ultralight-color); // FIXME $light_ui_grey
+  color: var(--ultralight-color); // FIXME $light_ui_grey
   transition: background-color $carrot_switch_animation, color $carrot_switch_animation;
   position: relative;
   cursor: pointer;
@@ -26,7 +26,7 @@ div.carrot-switch {
   }
 
   span.unselected-label {
-    color: $ui_grey;
+    color: var(--light-color);
     float: right;
     @include OC_Body_Bold();
     font-size: 12px;
@@ -38,7 +38,7 @@ div.carrot-switch {
     left: 0;
     width: 16px;
     height: 16px;
-    background-color: $ui_grey;
+    background-color: var(--light-color);
     display: block;
     border-radius: 50%;
     transition: margin-left $carrot_switch_animation;

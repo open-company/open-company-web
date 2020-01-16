@@ -44,7 +44,7 @@ div.menu {
 
   div.menu-container {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
     height: 100vh;
@@ -65,7 +65,7 @@ div.menu {
       transition: 230ms;
       display: block;
       text-align: left;
-      background-color: white;
+      background-color: var(--mobile-background-color);
       display: none;
       opacity: 0;
       padding: 0 16px;
@@ -76,7 +76,7 @@ div.menu {
       width: calc(100% + 48px);
       height: 56px;
       margin-left: -24px;
-      background-color: $grey_num_2;
+      background-color: var(--panel-header-background);
       padding: 12px 16px 12px 24px;
       margin-bottom: 24px;
 
@@ -86,8 +86,8 @@ div.menu {
         top: 0;
         right: 0;
         width: 85vw;
-        border-bottom: 1px solid $divider_line_grey;
-        background-color: white;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
         padding: 15px 16px 15px 24px;
         margin: 0;
         z-index: 2;
@@ -108,7 +108,7 @@ div.menu {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
-          background-color: $ultra_light_grey;
+          background-color: var(--divider-line);
           border-radius: 4px;
         }
       }
@@ -129,7 +129,7 @@ div.menu {
       div.user-name {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
 
@@ -143,7 +143,7 @@ div.menu {
 
     div.oc-menu-separator {
       height: 1px;
-      background-color: $ultra_light_grey;
+      background-color: var(--divider-line);
       margin: 16px 0;
 
       @include mobile() {
@@ -158,7 +158,7 @@ div.menu {
       @include OC_Body_Book();
       font-size: 16px;
       line-height: 18px;
-      color: $light_navy;
+      color: var(--color);
       text-align: left;
       margin: 16px 0;
 
@@ -172,7 +172,7 @@ div.menu {
         cursor: default;
 
         div.oc-menu-item {
-          color: rgba($deep_navy, 0.5);
+          color: var(--light-color);
         }
       }
     }
@@ -202,7 +202,7 @@ div.menu {
         @include OC_Body_Book();
         font-size: 14px;
         line-height: 18px;
-        color: rgba($light_navy, 0.5);
+        color: var(--light-color);
         text-align: left;
         margin: 16px 0;
       }
@@ -220,16 +220,77 @@ div.menu {
         }
       }
 
-      &.native-app::after {
+      &.native-app span.beta {
         @include OC_Body_Bold();
-        content: "BETA";
         margin-left: 0.5em;
         padding: 0.3em 0.5em;
-        color: $light_navy;
-        background-color: $oc_gray_6;
+        color: var(--color);
+        background-color: var(--opac-background-color-2);
         border-radius: 4px;
         opacity: 0.5;
         font-size: 0.8em;
+      }
+    }
+
+    div.ui-theme-switch {
+      height: 16px;
+
+      @include mobile() {
+        margin-top: 30px;
+      }
+
+      a.ui-theme-auto {
+        color: $carrot_green;
+        display: inline-block;
+        cursor: pointer;
+        margin: 1px 0 0 16px;
+        padding: 0;
+        line-height: 16px;
+        height: 16px;
+        vertical-align: top;
+      }
+
+      span.ui-theme-icon {
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        background-size: 16px 16px;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.5;
+        cursor: pointer;
+
+        &.active {
+          opacity: 1;
+        }
+
+        &.light {
+          background-image: cdnUrl("/img/ML/dark_mode_light.svg");
+          margin-right: 8px;
+        }
+
+        &.dark {
+          background-image: cdnUrl("/img/ML/dark_mode_dark.svg");
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.menu div.menu-container {
+    div.menu-header button.mobile-close-bt { 
+      background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+    }
+
+    div.ui-theme-switch span.ui-theme-icon {
+      &.light {
+        background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg")
+      }
+
+      &.dark {
+        background-image: cdnUrl("/img/ML/dark_mode_dark@dark.svg")
       }
     }
   }

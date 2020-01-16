@@ -27,6 +27,7 @@
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.ui-theme]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
@@ -141,20 +142,12 @@
 
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
-        loading (or (and ;; if is board page
-                         (not (contains? query-params :ap))
-                         ;; if the board data are not present
-                         (not (dis/posts-data)))
-                         ;; if the all-posts data are not preset
-                    (and (contains? query-params :ap)
-                         ;; this latter is used when displaying modal over AP
-                         (not (dis/posts-data))))
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:org :team :invite :integrations :payments} (keyword (:org-settings query-params))))
+                              (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
         reminders (when (and (not org-settings)
                              (contains? query-params :reminders))
@@ -170,8 +163,7 @@
                                         (contains? query-params :result))
                                {dis/checkout-result-key (= (:result query-params) "true")
                                 dis/checkout-update-plan-key (:update-plan query-params)})
-        next-app-state (merge {:loading loading
-                               :panel-stack panel-stack
+        next-app-state (merge {:panel-stack panel-stack
                                :bot-access bot-access}
                         billing-checkout-map)]
     (swap! dis/app-state merge next-app-state)))
@@ -434,12 +426,16 @@
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
-      (when (empty? (:token query-params))
+      (when (and (empty? (:token query-params))
+                 (empty? (:invite-token query-params)))
         (router/redirect! urls/home))
       (when (jwt/jwt)
         (cook/remove-cookie! :jwt)
         (cook/remove-cookie! :show-login-overlay))
-      (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
+      (let [invitee-type (if (contains? query-params :invite-token)
+                          :invitee-team-lander
+                          :invitee-lander)]
+        (simple-handler #(onboard-wrapper invitee-type) "confirm-invitation" target params)))
 
     (defroute confirm-invitation-password-route urls/confirm-invitation-password {:as params}
       (timbre/info "Routing confirm-invitation-password-route" urls/confirm-invitation-password)

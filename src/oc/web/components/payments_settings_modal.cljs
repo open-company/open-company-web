@@ -172,7 +172,7 @@
           "Have a team of 250+"
           [:a.chat-with-us
             {:class "intercom-chat-link"
-             :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+             :href "mailto:hello@carrot.io"}
             "Chat with us"]])]))
 
 (defn- show-error-alert [s]
@@ -345,13 +345,13 @@
        [:br]
        [:a.chat-with-us
          {:class "intercom-chat-link"
-          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+          :href "mailto:hello@carrot.io"}
          "Chat with us"]]
      [:div.plan-change-details
        "Team of 250+? "
        [:a.chat-with-us
          {:class "intercom-chat-link"
-          :href "mailto:zcwtlybw@carrot-test-28eb3360a1a3.intercom-mail.com"}
+          :href "mailto:hello@carrot.io"}
          "Contact us"]
        " about an enterprise plan."]]))
 

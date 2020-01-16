@@ -13,17 +13,17 @@ div.dropdown-list-container {
     position: absolute;
     top: -2px;
     left: calc(50% - 10px);
-    background-color: white;
-    border-top: 1px solid rgba(177,184,192,0.50);
-    border-left: 1px solid rgba(177,184,192,0.50);
+    background-color: var(--overlay-background-color);
+    border-top: 1px solid var(--divider-line);
+    border-left: 1px solid var(--divider-line);
     transform: rotate(45deg);
     width: 20px;
     height: 20px;
   }
 
   div.dropdown-list-content {
-    background-color: white;
-    border: 1px solid rgba(177,184,192,0.50);
+    background-color: var(--overlay-background-color);
+    border: 1px solid var(--divider-line);
     box-shadow: 0 4px 10px 1px rgba(0,0,0,0.10);
     border-radius: 5px;
     margin: 8px 0;
@@ -34,7 +34,7 @@ div.dropdown-list-container {
       list-style-type: none;
       margin: 0;
       padding: 0;
-      background-color: white;
+      background-color: var(--overlay-background-color);
       position: relative;
 
       li.dropdown-list-item {
@@ -43,7 +43,7 @@ div.dropdown-list-container {
         cursor: pointer;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $carrot_light_gray_3;
+        color: var(--light-color);
         cursor: pointer;
         border-radius: 100px;
 
@@ -53,22 +53,22 @@ div.dropdown-list-container {
           width: calc(100% + 16px);
           padding: 0px;
           margin: 3px 0 3px -8px;
-          background-color: rgba(177,184,192,0.50);
+          background-color: var(--divider-line);
           border-radius: 0px;
 
           &:hover {
-            background-color: rgba(177,184,192,0.50);
+            background-color: var(--divider-line);
           }
         }
 
         &:hover {
-          color: $carrot_dark_gray_2;
+          color: var(--color);
         }
 
         &.select {
           @include OC_Body_Bold();
           text-decoration: none;
-          color: $carrot_dark_gray_2;
+          color: var(--color);
         }
 
         &.disabled {
@@ -97,7 +97,7 @@ div.dropdown-list-container {
         span.dropdown-list-item-label {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $carrot_light_gray_3;
+          color: var(--light-color);
           max-width: 100%;
           overflow: hidden;
           text-overflow: ellipsis;

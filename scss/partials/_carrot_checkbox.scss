@@ -1,7 +1,6 @@
 div.carrot-checkbox {
-  display: block-inline;
   border-radius: 2px;
-  border: 1.5px solid #848D95;
+  border: 1.5px solid var(--light-color);
   width: 16px;
   height: 16px;
   cursor: pointer;
@@ -17,12 +16,19 @@ div.carrot-checkbox {
   }
 
   &.disabled {
-    border: 1.5px solid $light_navy;
+    border: 1.5px solid var(--color);
     opacity: 0.5;
     cursor: not-allowed;
   }
 
   &.selected.disabled {
-    background-color: $light_navy;
+    background-color: var(--color);
+  }
+}
+
+
+@include dark_mode() {
+  div.carrot-checkbox.selected {
+    background-image: cdnUrl("/img/ML/carrot_checkbox_mark@dark.svg");
   }
 }
