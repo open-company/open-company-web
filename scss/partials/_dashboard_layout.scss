@@ -474,10 +474,6 @@ div.dashboard-layout {
             margin-left: 19px;
             margin-right: 5px;
 
-            @include dark_mode() {
-              background-image: cdnUrl("/img/ML/inbox_complete_all@dark.svg");
-            }
-
             @include mobile() {
               width: 100%;
               height: 50px;
