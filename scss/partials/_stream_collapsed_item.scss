@@ -14,7 +14,7 @@ div.virtualized-list-row.collapsed-item {
     &:hover {
       z-index: 2;
       width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
-      height: #{collapsed_foc_height + ($foc_hover_extra_padding * 2)}px !important;
+      height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px !important;
       margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
     }
   }
