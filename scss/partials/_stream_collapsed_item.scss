@@ -5,7 +5,7 @@
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
-div.virtualized-list-row {
+div.virtualized-list-row.collapsed-item {
   background-color: var(--background-color);
 
   @include big_web() {

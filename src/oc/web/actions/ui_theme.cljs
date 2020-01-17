@@ -44,7 +44,8 @@
 
 (defn system-ui-theme-enabled? []
   (if (and ua/mac?
-           ua/desktop-app?)
+           ua/desktop-app?
+           (exists? js/OCCarrotDesktop.isDarkMode))
     (js/OCCarrotDesktop.isDarkMode)
     (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))))
 
