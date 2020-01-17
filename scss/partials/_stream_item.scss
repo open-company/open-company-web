@@ -43,7 +43,9 @@ div.stream-item {
     width: 100%;
     margin: 0;
     border-radius: 0;
-    border-top: none;
+    border-top: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
     border-bottom: 1px solid var(--foc-divider-line-color);
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px 16px;
@@ -80,19 +82,6 @@ div.stream-item {
         }
       }
     }
-  }
-
-  @include mobile() {
-    width: 100%;
-    margin: 0;
-    border-radius: 0;
-    border-top: 1px solid transparent;
-    border-left: 1px solid transparent;
-    border-right: 1px solid transparent;
-    border-bottom: 1px solid var(--foc-divider-line-color);
-    background-color: var(--mobile-foc-background-color);
-    padding: 16px 16px 16px;
-    height: #{$mobile_foc_height}px;
   }
 
   &.draft {
