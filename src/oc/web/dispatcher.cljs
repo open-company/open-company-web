@@ -162,6 +162,8 @@
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
 
+(def ui-theme-key [:ui-theme])
+
 ;; Functions needed by derivatives
 
 (declare org-data)
@@ -212,6 +214,7 @@
    :expo                [[:base] (fn [base] (get-in base expo-key))]
    :expo-deep-link-origin [[:base] (fn [base] (get-in base expo-deep-link-origin-key))]
    :expo-app-version    [[:base] (fn [base] (get-in base expo-app-version-key))]
+   :invite-add-slack-checked [[:base] (fn [base] (:invite-add-slack-checked base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -366,6 +369,11 @@
                                :auth-settings auth-settings
                                :token (:token (:query-params route))
                                :jwt jwt})]
+   :team-invite           [[:base :route :auth-settings :jwt]
+                            (fn [base route auth-settings jwt]
+                              {:auth-settings auth-settings
+                               :invite-token (:invite-token (:query-params route))
+                               :jwt jwt})]
    :collect-password      [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
@@ -451,7 +459,9 @@
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
-   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
+   :foc-layout            [[:base] (fn [base] (:foc-layout base))]
+   :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]})
 
 ;; Action Loop =================================================================
 

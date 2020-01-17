@@ -77,7 +77,7 @@
 
 (defn read-teams [teams]
   (let [current-panel (last (:panel-stack @dis/app-state))
-        load-delay (if (#{:org :integrations :team :invite} current-panel)
+        load-delay (if (#{:org :integrations :team :invite-picker :invite-email :invite-slack} current-panel)
                      0
                      2500)]
     (doseq [team teams
@@ -323,14 +323,17 @@
     (teams-get))
   (dis/dispatch! [:email-domain-team-add/finish (= status 204)]))
 
+(defn- add-email-domain-link [team-data-links]
+  (utils/link-for
+   team-data-links
+   "add"
+   "POST"
+   {:content-type "application/vnd.open-company.team.email-domain.v1+json"}))
+
 (defn email-domain-team-add [domain cb]
   (when (utils/valid-domain? domain)
     (let [team-data (dis/team-data)
-          add-email-domain-link (utils/link-for
-                                   (:links team-data)
-                                   "add"
-                                   "POST"
-                                   {:content-type "application/vnd.open-company.team.email-domain.v1+json"})
+          add-email-domain-link (add-email-domain-link (:links team-data))
           fixed-domain (if (.startsWith domain "@") (subs domain 1) domain)]
       (api/add-email-domain add-email-domain-link fixed-domain
        (fn [{:keys [success] :as resp}]
@@ -339,6 +342,10 @@
          (cb success)))
        team-data))
     (dis/dispatch! [:email-domain-team-add])))
+
+(defn can-add-email-domain? [& [team-data]]
+  (let [fixed-team-data (or team-data (dis/team-data))]
+    (seq (add-email-domain-link (:links fixed-team-data)))))
 
 ;; Slack team add
 
@@ -368,3 +375,23 @@
     (when (fn? cb)
       (cb success))
     (user-action-cb resp))))
+
+;; Invite team link handling
+
+(defn create-invite-token-link [create-token-link & [cb]]
+  (when create-token-link
+    (api/handle-invite-link create-token-link
+     (fn [{:keys [body success status]}]
+      (when success
+        (dis/dispatch! [:team-loaded (json->cljs body)])
+        (when (fn? cb)
+          (cb success)))))))
+
+(defn delete-invite-token-link [delete-invite-link & [cb]]
+  (when delete-invite-link
+    (api/handle-invite-link delete-invite-link
+     (fn [{:keys [body success status]}]
+      (when success
+        (dis/dispatch! [:team-loaded (json->cljs body)])
+        (when (fn? cb)
+          (cb success)))))))

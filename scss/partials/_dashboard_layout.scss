@@ -5,7 +5,7 @@ div.dashboard-layout {
 
   &.expanded-post-view {
     @include mobile() {
-      background-color: white;
+      background-color: var(--mobile-background-color);
     }
 
     div.cmail-outer:not(.fullscreen) {
@@ -18,7 +18,7 @@ div.dashboard-layout {
   }
 
   @include mobile() {
-    background-color: rgba($deep_navy, 0.05);
+    background-color: var(--mobile-background-color); // FIXME: rgba($deep_navy, 0.05);
 
     &.sticky-board-name {
       padding-top: 48px;
@@ -30,27 +30,6 @@ div.dashboard-layout {
           }
         }
       }
-    }
-  }
-
-  button.mobile-floating-compose-bt {
-    display: none;
-
-    @include mobile() {
-      display: block;
-      background-image: cdnUrl("/img/ML/white_pen.svg");
-      background-size: 16px 16px;
-      background-position: center;
-      background-repeat: no-repeat;
-      width: 48px;
-      height: 48px;
-      background-color: $carrot_green;
-      border-radius: 6px;
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 2;
-      box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.16);
     }
   }
 
@@ -82,9 +61,9 @@ div.dashboard-layout {
 
       @include mobile (){
         display: block;
-        background-color: white;
+        background-color: var(--mobile-background-color);
         padding: 15px 0;
-        border-top: 1px solid rgba($deep_navy, 0.15);
+        border-top: 1px solid var(--divider-line);
         height: #{$mobile_navbar_height}px;
         position: fixed;
         bottom: 0;
@@ -133,6 +112,7 @@ div.dashboard-layout {
         button.all-posts-tab {
           background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
           backgorund-size: 22px 18px;
+          background-repeat: no-repeat;
 
           @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
 
@@ -144,6 +124,7 @@ div.dashboard-layout {
         button.follow-ups-tab {
           background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
           backgorund-size: 18px 20px;
+          background-repeat: no-repeat;
 
           @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
 
@@ -155,6 +136,7 @@ div.dashboard-layout {
         button.notifications-tab {
           background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
           backgorund-size: 18px 20px;
+          background-repeat: no-repeat;
           position: relative;
 
           @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
@@ -170,7 +152,7 @@ div.dashboard-layout {
           height: 4px;
           position: absolute;
           bottom: 4px;
-          background-color: $carrot_green;
+          background-color: $carrot_green; // FIXME
           border-radius: 50%;
           right: 16.1vw;
         }
@@ -178,6 +160,7 @@ div.dashboard-layout {
         button.new-post-tab {
           background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
           backgorund-size: 20px 20px;
+          background-repeat: no-repeat;
 
           @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
 
@@ -190,7 +173,7 @@ div.dashboard-layout {
 
     div.board-container {
       width: #{$board_container_width}px;
-      background-color: $grey_num_2;
+      background-color: var(--background-color);
       position: relative;
       margin: 0;
       padding: 24px 0 0;
@@ -210,7 +193,7 @@ div.dashboard-layout {
         height: 40px;
         // Use 0.19 opacity on this to make it look like the rest of the lines
         // that are on a darker background
-        border-bottom: 1px solid rgba($deep_navy, 0.19);
+        border-bottom: 1px solid var(--ultralight-color); // FIXME rgba($deep_navy, 0.19);
 
         @include mobile() {
           height: 50px;
@@ -238,7 +221,7 @@ div.dashboard-layout {
             @include OC_Body_Bold();
             font-size: 18px;
             line-height: 32px;
-            color: $deep_navy;
+            color: var(--color);
             float: left;
             max-width: 350px;
             overflow: hidden;
@@ -276,7 +259,7 @@ div.dashboard-layout {
             @include mobile() {
               @include OC_Body_Bold();
               font-size: 15px;
-              color: $deep_navy;
+              color: var(--mobile-color);
               width: auto;
               height: 18px;
               text-align: center;
@@ -301,6 +284,10 @@ div.dashboard-layout {
                     left: 0px;
                     width: 10px;
                     height: 12px;
+
+                    @include dark_mode() {
+                      background-image: cdnUrl("/img/ML/board_private_dark.svg");
+                    }
                   }
                 }
                 &.public {
@@ -316,6 +303,10 @@ div.dashboard-layout {
                     left: 0px;
                     width: 12px;
                     height: 12px;
+
+                    @include dark_mode() {
+                      background-image: cdnUrl("/img/ML/board_public_dark.svg");
+                    }
                   }
                 }
               }
@@ -338,13 +329,13 @@ div.dashboard-layout {
               padding: 0 0 0 16px;
               margin: 3px 0 0 16px;
               position: relative;
-              border-left: 1px solid rgba($deep_navy, 0.3);
+              border-left: 1px solid var(--divider-line);
               opacity: 0.5;
 
               @include big_web() {
                 &:hover {
                   opacity: 1;
-                  border-left: 1px solid rgba($deep_navy, 0.15);
+                  border-left: 1px solid var(--divider-line);
                 }
               }
 
@@ -387,6 +378,10 @@ div.dashboard-layout {
             float: left;
             margin-left: 6px;
 
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/board_private_dark@dark.svg");
+            }
+
             @include mobile(){
               left: unset;
               height: 12px;
@@ -406,6 +401,10 @@ div.dashboard-layout {
             float: left;
             margin-left: 6px;
 
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/board_public_dark@dark.svg");
+            }
+
             @include mobile(){
               left: unset;
               height: 12px;
@@ -423,12 +422,16 @@ div.dashboard-layout {
           @include mobile() {
             width: 100%;
             height: 50px;
-            background-color: rgba($deep_navy, 0.05);
-            border-bottom: 1px solid rgba($deep_navy, 0.15);;
+            background-color: var(--mobile-foc-background-color);
+            border-bottom: 1px solid var(--opac-background-color-15);
           }
 
           button.mobile-search-bt {
             display: none;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/inbox_complete_all@dark.svg");
+            }
 
             @include mobile() {
               display: block;
@@ -449,7 +452,7 @@ div.dashboard-layout {
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 23px;
-            color: $deep_navy;
+            color: var(--color);
             padding: 0 14px 0 0;
             margin: 0;
             position: relative;
@@ -463,7 +466,7 @@ div.dashboard-layout {
               height: 50px;
               line-height: 50px;
               text-align: center;
-              color: $deep_navy;
+              color: var(--color);
               opacity: 1;
             }
 
@@ -500,7 +503,7 @@ div.dashboard-layout {
             position: absolute;
             top: 30px;
             right: 0;
-            background-color: white;
+            background-color: var(--background-color);
             width: 138px;
             padding: 9px 0;
             border-radius: 4px;
@@ -528,128 +531,54 @@ div.dashboard-layout {
               cursor: pointer;
 
               &.active, &:hover, &:active, &:focus {
-                background-color: $feint_emerald;
+                background-color: $feint_emerald;   // FIXME
                 color: $carrot_green;
                 -webkit-tap-highlight-color: $feint_emerald;
               }
             }
           }
         }
-
-        div.new-post-top-dropdown-container {
-          position: relative;
-          float: right;
-          margin-left: 24px;
-
-          button.add-to-board-top-button {
-            height: 42px;
-            background-color: $carrot_orange_light;
-            color: $carrot_orange;
-            border-radius: 6px;
-            padding: 8px 24px;
-            margin-top: -3px;
-            border: 2px solid transparent;
-            opacity: 1;
-            transition: 0ms;
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            // Remove to show settings button on mobile
-            @include mobile() {
-              display: none;
-            }
-
-            &.disabled {
-              opacity: 0.4;
-            }
-
-            &:not(.disabled) {
-              &:hover, &:active, &:focus, &.active {
-                background-color: $carrot_orange;
-                color: white;
-                opacity: 1;
-
-                div.add-to-board-plus {
-                  background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
-                }
-
-                label.add-to-board-label {
-                  color: white;
-                }
-              }
-
-              &:active, &:focus {
-                background-color: #ED4F3B;
-                opacity: 1;
-              }
-            }
-
-            div.add-to-board-plus {
-              background-image: cdnUrl("/img/ML/add_to_board_plus_orange.svg");
-              background-size: 12px 12px;
-              background-repeat: no-repeat;
-              width: 12px;
-              height: 12px;
-              position: relative;
-              top: -2px;
-              pointer-events: none;
-
-              @include preload_image(cdnUrl("/img/ML/add_to_board_plus_white.svg"));
-            }
-
-            label.add-to-board-label {
-              @include OC_Body_Bold();
-              font-size: 16px;
-              color: $carrot_orange;
-              margin-left: 6px;
-              margin-bottom: 0px;
-              pointer-events: none;
-            }
-          }
-        }
       }
     }
+  }
+}
 
-    div.new-post-floating-dropdown-container {
-      position: absolute;
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
+@include dark_mode() {
+  div.dashboard-layout div.dashboard-layout-container {
+    div.board-container div.board-name-container div.board-name
+    div.board-settings-container button.board-settings-bt {
+      background-image: cdnUrl("/img/ML/section_settings_gear@dark.svg");
+    }
 
-      @include mobile() {
-        display: none;
-      }
+    div.dashboard-layout-mobile-tabbar {
+      @include mobile (){
 
-      button.add-to-board-floating-button {
-        width: 56px;
-        height: 56px;
-        border-radius: 33px;
-        background-color: $carrot_orange_2;
-        box-shadow: 0px 2px 4px 0px rgba(0,0,0, 0.24);
-        opacity: 1;
-        padding: 0px;
-        margin: 0px;
-
-        &:hover, &.active {
-          background-color: #FF7C6C;
-          opacity: 1;
+        button.all-posts-tab {
+          background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+          }
         }
 
-        &:active, &:focus {
-          background-color: #ED4F3B;
-          opacity: 1;
+        button.follow-ups-tab {
+          background-image: cdnUrl("/img/ML/follow_ups_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
+          }
         }
 
-        div.add-to-board-plus {
-          background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
-          background-size: 16px 16px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 56px;
-          height: 56px;
+        button.notifications-tab {
+          background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+          }
+        }
+
+        button.new-post-tab {
+          background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+          &.active {
+            background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+          }
         }
       }
     }
