@@ -5,7 +5,7 @@
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
 $foc_hover_extra_padding: 4;
 
-div.virtualized-list-row {
+div.virtualized-list-row.collapsed-item {
   background-color: var(--background-color);
 
   @include big_web() {
@@ -14,7 +14,7 @@ div.virtualized-list-row {
     &:hover {
       z-index: 2;
       width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
-      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
+      height: #{collapsed_foc_height + ($foc_hover_extra_padding * 2)}px !important;
       margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
     }
   }

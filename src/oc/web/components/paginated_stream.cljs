@@ -95,11 +95,13 @@
            foc-layout
            is-mobile] :as props}]
   (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
-                       (activity-utils/is-published? entry))]
+                       (activity-utils/is-published? entry))
+        collapsed-item? (and (= foc-layout dis/other-foc-layout)
+                             (not is-mobile))]
    [:div.virtualized-list-row
-    {:style style}
-    (if (and (= foc-layout dis/other-foc-layout)
-            (not is-mobile))
+    {:class (when collapsed-item? "collapsed-item")
+     :style style}
+    (if collapsed-item?
       (stream-collapsed-item {:activity-data entry
                               :comments-data comments-data
                               :read-data reads-data
