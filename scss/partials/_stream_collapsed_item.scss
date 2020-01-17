@@ -69,6 +69,18 @@ div.stream-collapsed-item {
 
   &.expandable {
     cursor: pointer;
+
+    @include big_web() {
+    &:hover {
+      div.more-menu {
+        display: initial;
+
+        button {
+          display: initial;
+        }
+      }
+    }
+  }
   }
 
   &.unread-item {
