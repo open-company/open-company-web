@@ -208,11 +208,11 @@
                            with-fixed-containers
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too
-    (if (= (:uuid (get-in db [:cmail-data])) (:uuid activity-data))
+    (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
       (-> with-fixed-boards
           (assoc-in [:cmail-data] {:delete true})
           (assoc-in posts-key next-posts))
-      with-fixed-boards)))
+      (assoc-in with-fixed-boards posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
@@ -274,8 +274,14 @@
         fixed-activity-data (au/fix-entry
                              activity-data
                              board-data
-                             (dispatcher/change-data db))]
-    (assoc-in db activity-key fixed-activity-data)))
+                             (dispatcher/change-data db))
+        next-db (if (and (= (get-in db [:cmail-data :uuid]) activity-uuid)
+                         (pos? (compare (:updated-at fixed-activity-data) (get-in db [:cmail-data :updated-at]))))
+                  (-> db
+                    (update-in [:cmail-data] #(merge % fixed-activity-data))
+                    (update :cmail-state assoc :key (utils/activity-uuid)))
+                  db)]
+    (assoc-in next-db activity-key fixed-activity-data)))
 
 (defmethod dispatcher/action :follow-up-toggle
   [db [_ org-slug activity-data follow-ups]]
