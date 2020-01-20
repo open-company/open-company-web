@@ -101,7 +101,9 @@
                                 can-react?
                                 can-reply?
                                 (and (not external-share)
-                                     share-link))
+                                     share-link)
+                                (and mark-unread-link
+                                     show-unread))
         inbox-follow-link (utils/link-for (:links entity-data) "follow")
         inbox-unfollow-link (utils/link-for (:links entity-data) "unfollow")
         show-menu (or @(::showing-menu s) force-show-menu)]
@@ -113,7 +115,8 @@
               can-react?
               can-reply?
               add-bookmark-link
-              remove-bookmark-link)
+              remove-bookmark-link
+              mark-unread-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded (or @(::move-activity s)
