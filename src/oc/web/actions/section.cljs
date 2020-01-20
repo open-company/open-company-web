@@ -80,9 +80,10 @@
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
     (let [current-section-data (dispatcher/board-data)
+          is-drafts-board? (= section-uuid (:uuid utils/default-drafts-board))
           sort-type (router/current-sort-type)
-          link-rel (if (= sort-type :recent-activity) "activity" "self")]
-      (when (= section-uuid (:uuid utils/default-drafts-board))
+          link-rel (if (and (not is-drafts-board?) (= sort-type :recent-activity)) "activity" "self")]
+      (when is-drafts-board?
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
@@ -225,7 +226,8 @@
         ;; Refresh the section only in case of items added or removed
         ;; let the activity handle the item update case
         (when (or (= change-type :add)
-                  (= change-type :delete))
+                  (= change-type :delete)
+                  (= change-type :move))
           (section-change section-uuid))
         ;; On item/change :add let's add the UUID to the unseen list of
         ;; the specified container to make sure it's marked as seen
@@ -235,8 +237,7 @@
         (when (= change-type :delete)
           (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))
         (when (= change-type :move)
-          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data])
-          (section-change section-uuid))))))
+          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data]))))))
 
 ;; Section editing
 

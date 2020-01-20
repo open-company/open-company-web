@@ -18,13 +18,17 @@ div.paginated-stream {
     }
 
     div.loading-updates {
-      width: 100%;
       text-align: center;
-      margin-bottom: 16px;
+      height: 60px;
+      padding: 24px 0 16px;
       font-size: 14px;
-      margin-top: 24px;
       @include OC_Body_Book();
       color: var(--light-color);
+
+      @include mobile() {
+        height: 44px;
+        padding: 16px 0 8px;
+      }
     }
 
     div.paginated-stream-cards-inner {
@@ -50,6 +54,10 @@ div.paginated-stream {
         position: absolute;
         bottom: 0;
         left: 0;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
+        }
       }
 
       div.activities-overlay {
@@ -102,11 +110,5 @@ div.paginated-stream {
         @include OC_Body_Bold();
       }
     }
-  }
-}
-
-@include dark_mode() {
-  div.paginated-stream div.paginated-stream-cards div.paginated-stream-cards-inner.closing-carrot:after {
-    background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
   }
 }
