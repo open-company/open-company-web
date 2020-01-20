@@ -968,3 +968,16 @@
                        (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
                       board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
             (sa/section-get sort-type board-link)))))))
+
+;; FOC Layout
+
+(defn saved-foc-layout [org-slug]
+  (if-let [foc-layout-cookie (cook/get-cookie (router/last-foc-layout-cookie org-slug))]
+    (keyword foc-layout-cookie)
+    dis/default-foc-layout))
+
+(defn toggle-foc-layout []
+  (let [current-value (:foc-layout @dis/app-state)
+        next-value (if (= current-value dis/default-foc-layout) dis/other-foc-layout dis/default-foc-layout)]
+    (cook/set-cookie! (router/last-foc-layout-cookie (router/current-org-slug)) (name next-value) cook/default-cookie-expire)
+    (dis/dispatch! [:input [:foc-layout] next-value])))

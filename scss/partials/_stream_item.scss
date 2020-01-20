@@ -3,11 +3,23 @@
 // --foc-hover-color: rgba($deep_navy, 0.10);
 // --foc-new-color: white;
 // --foc-divider-line-color: rgba($deep_navy, 0.15);
+$foc_hover_extra_padding: 4;
 
-div.virtualized-list-row {
+div.virtualized-list-row:not(.collapsed-item) {
   background-color: var(--background-color);
 
-  @include mobile(){
+  @include big_web() {
+    z-index: 1;
+
+    &:hover {
+      z-index: 2;
+      width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
+      margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+    }
+  }
+
+  @include mobile() {
     background-color: var(--mobile-background-color);
   }
 }
@@ -27,22 +39,6 @@ div.stream-item {
   background-color: var(--foc-background-color);
   overflow: visible;
 
-  &.expandable {
-    cursor: pointer;
-
-    @include big_web() {
-      &:hover {
-        background-color: var(--foc-hover-color);
-
-        div.stream-item-header {
-          div.more-menu button {
-            display: initial;
-          }
-        }
-      }
-    }
-  }
-
   @include mobile() {
     width: 100%;
     margin: 0;
@@ -54,6 +50,38 @@ div.stream-item {
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px 16px;
     height: #{$mobile_foc_height}px;
+  }
+
+  &.expandable {
+    cursor: pointer;
+
+    @include big_web() {
+      &:hover {
+        div.stream-item-header {
+          div.more-menu button {
+            display: initial;
+          }
+        }
+      }
+    }
+  }
+
+  @include big_web() {
+    &:hover {
+      background-color: var(--foc-hover-color);
+      z-index: 2;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
+      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+
+      div.stream-item-header {
+        div.more-menu button {
+          display: initial;
+        }
+      }
+    }
   }
 
   &.draft {
@@ -76,6 +104,9 @@ div.stream-item {
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
         border: 1px solid var(--foc-new-border-color);
+        padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
       }
     }
   }
@@ -192,17 +223,16 @@ div.stream-item {
     }
 
     div.more-menu {
-      height: 24px;
+      height: 32px;
 
       @include big_web() {
+        margin: -12px -24px 0 0;
         &:not(.menu-expanded) button {
           display: none;
         }
       }
 
       @include mobile() {
-        height: 32px;
-
         ul.more-menu-list {
           left: unset;
           right: 0;
