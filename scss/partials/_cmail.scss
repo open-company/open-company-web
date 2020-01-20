@@ -1022,7 +1022,7 @@ div.cmail-outer {
           @include activity-title(14px, 18px);
           color: var(--color);
           white-space: pre-wrap;
-          word-wrap: break-word;
+          overflow-wrap: break-word;
           min-height: 18px;
           line-height: 18px;
           float: right;
