@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -115,6 +116,7 @@
   (drv/drv :team-roster)
   (drv/drv :current-user-data)
   {:will-mount (fn [s]
+   (team-actions/teams-get)
    (let [initial-section-data (first (:rum/args s))
          new-section (nil? initial-section-data)
          fixed-section-data (if new-section
