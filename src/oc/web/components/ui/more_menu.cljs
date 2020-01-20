@@ -218,7 +218,7 @@
                               (when (fn? will-close)
                                 (will-close))
                               (activity-actions/inbox-unread entity-data))}
-                "Move to Unread"])
+                "Add to Unread"])
             (when (or is-mobile?
                       (not external-follow))
               (if inbox-follow-link
