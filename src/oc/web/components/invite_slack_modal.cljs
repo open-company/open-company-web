@@ -151,41 +151,39 @@
             {:on-click (fn [_] (close-clicked s #(nav-actions/show-org-settings nil)))}
             "Back"]]
         [:div.invite-slack-body
-          (when is-admin?
-            [:div.invite-token-container
-              [:div.invite-token-title
-                "Share this link in Slack " [:i.mdi.mdi-slack]]
-              [:div.invite-token-description
-                "Anyone on your Slack team can use this link to join Carrot as a "
-                [:strong "contributor"]
-                "."]
-              [:div.invite-token-description
-                "Invite link"]
-              [:div.invite-token-field
-                [:input.invite-token-field-input
-                  {:value (str ls/web-server-domain oc-urls/sign-up-slack)
-                   :read-only true
-                   :ref "invite-token-url-field"
-                   :content-editable false
-                   :on-click #(highlight-url s)}]
-                [:button.mlb-reset.invite-token-field-bt
-                  {:ref "invite-token-copy-btn"
-                   :on-click (fn [e]
-                              (utils/event-stop e)
-                              (let [url-input (rum/ref-node s "invite-token-url-field")]
-                                (highlight-url s)
-                                (let [copied? (utils/copy-to-clipboard url-input)]
-                                  (notification-actions/show-notification {:title (if copied? "Invite URL copied to clipboard" "Error copying the URL")
-                                                                           :description (when-not copied? "Please try copying the URL manually")
-                                                                           :primary-bt-title "OK"
-                                                                           :primary-bt-dismiss true
-                                                                           :primary-bt-inline copied?
-                                                                           :expire 3
-                                                                           :id (if copied? :invite-token-url-copied :invite-token-url-copy-error)}))))}
-                  "Copy"]]])
+          [:div.invite-token-container
+            [:div.invite-token-title
+              "Share this link in Slack " [:i.mdi.mdi-slack]]
+            [:div.invite-token-description
+              "Anyone on your Slack team can use this link to join Carrot as a "
+              [:strong "contributor"]
+              "."]
+            [:div.invite-token-description
+              "Invite link"]
+            [:div.invite-token-field
+              [:input.invite-token-field-input
+                {:value (str ls/web-server-domain oc-urls/sign-up-slack)
+                 :read-only true
+                 :ref "invite-token-url-field"
+                 :content-editable false
+                 :on-click #(highlight-url s)}]
+              [:button.mlb-reset.invite-token-field-bt
+                {:ref "invite-token-copy-btn"
+                 :on-click (fn [e]
+                            (utils/event-stop e)
+                            (let [url-input (rum/ref-node s "invite-token-url-field")]
+                              (highlight-url s)
+                              (let [copied? (utils/copy-to-clipboard url-input)]
+                                (notification-actions/show-notification {:title (if copied? "Invite URL copied to clipboard" "Error copying the URL")
+                                                                         :description (when-not copied? "Please try copying the URL manually")
+                                                                         :primary-bt-title "OK"
+                                                                         :primary-bt-dismiss true
+                                                                         :primary-bt-inline copied?
+                                                                         :expire 3
+                                                                         :id (if copied? :invite-token-url-copied :invite-token-url-copy-error)}))))}
+                "Copy"]]]
           (if (:can-slack-invite team-data)
-            [:div.invites-list
-              {:class (when is-admin? "top-border")}
+            [:div.invites-list.top-border
               [:div.invites-list-title
                 "Invite someone as an admin, contributor, or viewer"]
               (for [i (range (count invite-users))
@@ -253,8 +251,7 @@
                 @(::send-bt-cta s)]]
             ;; Only admins can add the bot
             (when is-admin?
-              [:div.invites-list
-                {:class (when is-admin? "top-border")}
+              [:div.invites-list.top-border
                 [:div.invites-list-title
                   "Invite someone with a specific permission level"]
                 [:button.mlb-reset.enable-carrot-bot-bt
