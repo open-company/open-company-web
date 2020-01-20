@@ -4,7 +4,7 @@ div.is-comments {
   height: 26px;
 
   @include mobile() {
-    height: 20px;
+    height: 22px;
   }
 
   div.is-comments-authors {
@@ -39,7 +39,7 @@ div.is-comments {
 
       @include mobile(){
         width: 20px;
-        height: 20px;
+        height: 22px;
         border: 1px solid transparent;
         margin-left: -8px;
 
@@ -93,7 +93,8 @@ div.is-comments {
 
     @include mobile() {
       margin-top: 0;
-      line-height: 20px;
+      font-size: 17px;
+      line-height: 22px;
 
       div.is-comments-summary-inner {
         float: left;
@@ -103,11 +104,11 @@ div.is-comments {
       &:before {
         content: "";
         background-image: cdnUrl("/img/ML/tile_comments_icon.svg");
-        background-size: 12px 12px;
-        background-position: center 5px;
+        background-position: center;
+        background-size: 18px 18px;
         background-repeat: no-repeat;
-        width: 12px;
-        height: 20px;
+        width: 18px;
+        height: 22px;
         float: left;
         display: block;
         opacity: 0.5;

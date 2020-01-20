@@ -28,7 +28,6 @@ div.dropdown {
     width: 144px;
     min-width: 144px;
     background-color: var(--overlay-background-color);
-    border: none;
     padding: 0.5rem 0;
     position: absolute;
     top: 0px;
@@ -36,6 +35,7 @@ div.dropdown {
     box-shadow: 0 0 1px 0 var(--user-dropdown-shadow-start), 0 5px 12.5px 0.5px var(--user-dropdown-shadow-end);
     border-radius: 4px;
     padding: 8px 0;
+    border: 1px solid (--divider-line);
 
     li {
       cursor: pointer;

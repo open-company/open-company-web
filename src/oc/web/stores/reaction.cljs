@@ -241,8 +241,8 @@
   db)
 
 (defmethod reducer :bookmarks-get/finish
-  [db [_ {:keys [org year month from body]}]]
-  (swap! reactions-atom index-posts org (-> body :collection :items))
+  [db [_ org sort-type fixed-body]]
+  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :section
