@@ -591,39 +591,6 @@ div.dashboard-layout {
               background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
             }
           }
-
-          div.board-sort-menu {
-            position: absolute;
-            top: 30px;
-            right: 0;
-            background-color: var(--background-color);
-            width: 138px;
-            padding: 9px 0;
-            border-radius: 4px;
-            border: 1px solid var(--divider-line);
-            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-            display: none;
-            z-index: 100;
-
-            @include mobile() {
-              display: none;
-            }
-
-            &.collapsed {
-              background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
-              background-color: 14px 16px;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/foc_layout_expand@dark.svg");
-              }
-            }
-
-            @include big_web(){
-              &:hover {
-                opacity: 1;
-              }
-            }
-          }
         }
       }
     }

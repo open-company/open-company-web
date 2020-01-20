@@ -213,7 +213,8 @@
         ;; Refresh the section only in case of items added or removed
         ;; let the activity handle the item update case
         (when (or (= change-type :add)
-                  (= change-type :delete))
+                  (= change-type :delete)
+                  (= change-type :move))
           (section-change section-uuid))
         ;; On item/change :add let's add the UUID to the unseen list of
         ;; the specified container to make sure it's marked as seen
@@ -223,8 +224,7 @@
         (when (= change-type :delete)
           (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))
         (when (= change-type :move)
-          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data])
-          (section-change section-uuid))))))
+          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data]))))))
 
 ;; Section editing
 
