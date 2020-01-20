@@ -609,6 +609,10 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
+
+        @include mobile() {
+          margin-top: 1px;
+        }
       }
 
       div.reactions {
