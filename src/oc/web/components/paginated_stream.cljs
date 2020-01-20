@@ -270,4 +270,5 @@
                                        :foc-layout foc-layout
                                        :show-loading-more @(::bottom-loading s)
                                        :show-carrot-close (and (not @(::bottom-loading s))
+                                                               (not @(::has-next s))
                                                                (> (count items) 10))}))]]]))
