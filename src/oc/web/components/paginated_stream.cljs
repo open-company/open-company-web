@@ -13,8 +13,8 @@
             [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
-            [oc.web.components.ui.all-caught-up :refer (all-caught-up)]
             [oc.web.components.stream-item :refer (stream-item)]
+            [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             cljsjs.react-virtualized))
@@ -24,8 +24,19 @@
 
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
+(def scroll-card-threshold-collapsed 5)
+(def collapsed-foc-height 56)
 (def foc-height 188)
 (def mobile-foc-height 172)
+
+(defn- calc-card-height [mobile? foc-layout]
+  (cond
+    mobile?
+    mobile-foc-height
+    (= foc-layout dis/other-foc-layout)
+    collapsed-foc-height
+    :else
+    foc-height))
 
 (defn did-scroll
   "Scroll listener, load more activities when the scroll is close to a margin."
@@ -36,24 +47,27 @@
                     (if (< @(::last-scroll s) scroll-top)
                       :down
                       :stale))
-        max-scroll (- (.-scrollHeight (.-body js/document)) (.-innerHeight js/window))
-        card-height (if (responsive/is-mobile-size?) mobile-foc-height foc-height)]
+        max-scroll (- (.-scrollHeight (.-scrollingElement js/document)) (.-innerHeight js/window))
+        card-height (calc-card-height (responsive/is-mobile-size?) @(drv/get-ref s :foc-layout))
+        scroll-threshold (if (= card-height collapsed-foc-height) scroll-card-threshold-collapsed scroll-card-threshold)
+        current-board-slug (router/current-board-slug)]
     ;; scrolling down
     (when (and ;; not already loading more
                (not @(::bottom-loading s))
                ;; has a link to load more that can be used
                @(::has-next s)
                ;; scroll is moving down
-               (= direction :down)
+               (or (= direction :down)
+                   (= direction :stale))
                ;; and the threshold point has been reached
-               (>= scroll-top (- max-scroll (* scroll-card-threshold card-height))))
+               (>= scroll-top (- max-scroll (* scroll-threshold card-height))))
       ;; Show a spinner at the bottom
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
-        (= (router/current-board-slug) "all-posts")
+        (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
-        (= (router/current-board-slug) "follow-ups")
+        (= current-board-slug "follow-ups")
         (activity-actions/follow-ups-more @(::has-next s) :down)
         :else
         (section-actions/section-more @(::has-next s) :down)))
@@ -69,9 +83,6 @@
         sorted-items @(drv/get-ref s :filtered-posts)
         next-link (utils/link-for (:links container-data) "next")]
     (reset! (::has-next s) next-link)
-    (if next-link
-      (reset! (::show-all-caught-up-message s) false)
-      (reset! (::show-all-caught-up-message s) (> (count sorted-items) 10)))
     (did-scroll s nil)))
 
 (rum/defc wrapped-stream-item < rum/static
@@ -80,20 +91,39 @@
            reads-data
            org-data
            comments-data
-           editable-boards] :as props}]
+           editable-boards
+           foc-layout
+           is-mobile] :as props}]
   (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
-                       (activity-utils/is-published? entry))]
+                       (activity-utils/is-published? entry))
+        collapsed-item? (and (= foc-layout dis/other-foc-layout)
+                             (not is-mobile))]
    [:div.virtualized-list-row
+    {:class (when collapsed-item? "collapsed-item")
+     :style style}
+    (if collapsed-item?
+      (stream-collapsed-item {:activity-data entry
+                              :comments-data comments-data
+                              :read-data reads-data
+                              :show-wrt? show-wrt?
+                              :editable-boards editable-boards})
+      (stream-item {:activity-data entry
+                    :comments-data comments-data
+                    :read-data reads-data
+                    :show-wrt? show-wrt?
+                    :editable-boards editable-boards}))]))
+
+(rum/defc load-more < rum/static
+  [{:keys [style]}]
+  [:div.loading-updates.bottom-loading
     {:style style}
-    (stream-item {:activity-data entry
-                  :comments-data comments-data
-                  :read-data reads-data
-                  :show-wrt? show-wrt?
-                  :editable-boards editable-boards})]))
+    "Loading more posts..."])
 
 (rum/defc virtualized-stream < rum/static
   [{:keys [items
-           activities-read]
+           activities-read
+           foc-layout
+           show-loading-more]
     :as derivatives}
    virtualized-props]
   (let [{:keys [height
@@ -102,34 +132,49 @@
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
         is-mobile? (responsive/is-mobile-size?)
+        key-prefix (if is-mobile? "mobile" foc-layout)
         row-renderer (fn [row-props]
                        (let [{:keys [key
                                      index
                                      isScrolling
                                      isVisible
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
-                             entry (nth items index)
+                             loading-more? (and show-loading-more
+                                                (= index (count items)))
+                             entry (when-not loading-more? (nth items index))
                              reads-data (get activities-read (:uuid entry))]
-                         (rum/with-key
-                           (wrapped-stream-item row-props (merge derivatives
+                         (if loading-more?
+                           (rum/with-key
+                             (load-more row-props)
+                             key)
+                           (rum/with-key
+                            (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry entry
-                                                                  :reads-data reads-data}))
-                           (str "stream-item-" key))))]
-    (virtualized-list {:autoHeight true
-                       :height height
-                       :width (if is-mobile?
-                                js/window.innerWidth
-                                720)
-                       :isScrolling isScrolling
-                       :onScroll onChildScroll
-                       :rowCount (count items)
-                       :rowHeight (if is-mobile? mobile-foc-height foc-height)
-                       :rowRenderer row-renderer
-                       :scrollTop scrollTop
-                       :ref registerChild
-                       :overscanRowCount 10
-                       :style {:outline "none"}
-                       })))
+                                                                  :reads-data reads-data
+                                                                  :foc-layout foc-layout
+                                                                  :is-mobile is-mobile?}))
+                            (str key-prefix "-" key)))))]
+    [:div.virtualized-list-container
+      {:ref registerChild
+       :key (str "virtualized-list-" key-prefix)}
+      (virtualized-list {:autoHeight true
+                         :height height
+                         :width (if is-mobile?
+                                  js/window.innerWidth
+                                  720)
+                         :isScrolling isScrolling
+                         :onScroll onChildScroll
+                         :rowCount (if show-loading-more (inc (count items)) (count items))
+                         :rowHeight (fn [params]
+                                      (let [{:keys [index]} (js->clj params :keywordize-keys true)]
+                                        (if (and show-loading-more
+                                                 (= index (count items)))
+                                          (if is-mobile? 44 60)
+                                          (calc-card-height is-mobile? foc-layout))))
+                         :rowRenderer row-renderer
+                         :scrollTop scrollTop
+                         :overscanRowCount 20
+                         :style {:outline "none"}})]))
 
 (rum/defcs paginated-stream  < rum/static
                                rum/reactive
@@ -140,19 +185,20 @@
                         (drv/drv :activities-read)
                         (drv/drv :comments-data)
                         (drv/drv :editable-boards)
+                        (drv/drv :foc-layout)
                         ;; Locals
                         (rum/local nil ::scroll-listener)
                         (rum/local (.. js/document -scrollingElement -scrollTop) ::last-scroll)
                         (rum/local false ::has-next)
                         (rum/local nil ::bottom-loading)
-                        (rum/local false ::show-all-caught-up-message)
+                        (rum/local nil ::last-foc-layout)
                         ;; Mixins
                         mixins/first-render-mixin
-                        (mixins/ap-seen-mixin "div.ap-seen-item-headline" ap-seen-mixin-cb)
                         section-mixins/container-nav-in
                         section-mixins/window-focus-auto-loader
 
                         {:will-mount (fn [s]
+                          (reset! (::last-foc-layout s) @(drv/get-ref s :foc-layout))
                           (check-pagination s)
                           s)
                          :did-remount (fn [_ s]
@@ -169,7 +215,12 @@
                             (when (and (not (:loading-more container-data))
                                        @(::bottom-loading s))
                               (reset! (::bottom-loading s) false)
-                              (reset! (::show-all-caught-up-message s) true)
+                              (check-pagination s)))
+                          s)
+                         :after-render (fn [s]
+                          (let [foc-layout @(drv/get-ref s :foc-layout)]
+                            (when (not= @(::last-foc-layout s) foc-layout)
+                              (reset! (::last-foc-layout s) foc-layout)
                               (check-pagination s)))
                           s)
                          :will-unmount (fn [s]
@@ -182,7 +233,8 @@
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
         items (drv/react s :filtered-posts)
-        activities-read (drv/react s :activities-read)]
+        activities-read (drv/react s :activities-read)
+        foc-layout (drv/react s :foc-layout)]
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
@@ -193,10 +245,6 @@
                                        :comments-data comments-data
                                        :items items
                                        :activities-read activities-read
-                                       :editable-boards editable-boards}))]
-        (when @(::bottom-loading s)
-          [:div.loading-updates.bottom-loading
-            "Loading more posts..."])
-        (when (and @(::show-all-caught-up-message s)
-                   (responsive/is-mobile-size?))
-          (all-caught-up))]]))
+                                       :editable-boards editable-boards
+                                       :foc-layout foc-layout
+                                       :show-loading-more @(::bottom-loading s)}))]]]))

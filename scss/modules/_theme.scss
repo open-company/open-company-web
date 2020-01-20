@@ -37,10 +37,14 @@ $dark_mode: "dark";
   // Stream-item
   --foc-background-color: #{rgba($deep_navy, 0.05)};
   --mobile-foc-background-color: #{rgba($deep_navy, 0.05)};
-  --foc-hover-color: #{rgba($deep_navy, 0.1)};
+  --foc-hover-color: #{rgba(230, 232, 232, 1)};
   --foc-new-color: white;
   --foc-divider-line-color: #{rgba($deep_navy, 0.15)};
-  --foc-new-border-color: #{rgba($deep_navy, 0.24)}; 
+  --foc-new-border-color: #{rgba($deep_navy, 0.24)};
+  --foc-menu-gradient-from: #{rgba(230, 232, 232, 1)};
+  --foc-menu-gradient-to: #{rgba(230, 232, 232, 0)};
+  --foc-new-menu-gradient-from: white;
+  --foc-new-menu-gradient-to: #{rgba(white, 0)};
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
@@ -104,10 +108,14 @@ $dark_mode: "dark";
   // Stream-item
   --foc-background-color: #{rgba(black, 0.16)};
   --mobile-foc-background-color: #1B202A;
-  --foc-hover-color: #{rgba(white, 0.04)};
-  --foc-new-color: #{rgba(white, 0.08)};
+  --foc-hover-color: #{rgba(36, 41, 50, 1)};
+  --foc-new-color: #{rgba(45, 49, 59, 1)};
   --foc-divider-line-color: #{rgba(white, 0.16)};
   --foc-new-border-color: #{rgba(white, 0.22)};
+  --foc-menu-gradient-from: #{rgba(36, 41, 50, 1)};
+  --foc-menu-gradient-to: #{rgba(36, 41, 50, 0)};
+  --foc-new-menu-gradient-from: #{rgba(45, 49, 59, 1)};
+  --foc-new-menu-gradient-to: #{rgba(45, 49, 59, 0)};
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
