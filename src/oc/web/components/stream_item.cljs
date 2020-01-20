@@ -8,16 +8,12 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.activity :as am]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.utils.org :as org-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.draft :as draft-utils]
             [oc.web.lib.responsive :as responsive]
-            [oc.web.mixins.mention :as mention-mixins]
-            [oc.web.actions.comment :as comment-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.wrt :refer (wrt-count)]
             [oc.web.actions.activity :as activity-actions]
@@ -29,10 +25,10 @@
 
 (defn- stream-item-summary [activity-data]
   (if (seq (:abstract activity-data))
-    [:div.stream-item-body.oc-mentions.oc-mentions-hover
+    [:div.stream-item-body.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}]
-    [:div.stream-item-body.no-abstract.oc-mentions.oc-mentions-hover
+    [:div.stream-item-body.no-abstract.oc-mentions
       {:data-itemuuid (:uuid activity-data)
        :dangerouslySetInnerHTML {:__html (:body activity-data)}}]))
 
@@ -55,7 +51,6 @@
                          (ui-mixins/render-on-resize calc-video-height)
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
-                         (mention-mixins/oc-mentions-hover)
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)}

@@ -17,6 +17,9 @@
 (def default-sort-type :recent-activity)
 (def other-sort-type :recently-posted)
 
+(def default-foc-layout :expanded)
+(def other-foc-layout :collapsed)
+
 ;; Data key paths
 
 (def checkout-result-key :checkout-success-result)

@@ -242,4 +242,5 @@
                                 (activity-actions/create-self-follow-up entity-data create-follow-up-link))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
+                   :data-container "body"
                    :title "Follow up later"}]])))])))
