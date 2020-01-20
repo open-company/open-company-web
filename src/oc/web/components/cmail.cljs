@@ -307,10 +307,8 @@
                     :solid-button-style :red
                     :solid-button-title "Yes"
                     :solid-button-cb #(do
-                                       (reset! (::deleting s) true)
                                        (activity-actions/activity-delete activity-data)
-                                       (alert-modal/hide-alert)
-                                       (real-close))
+                                       (alert-modal/hide-alert))
                     }]
     (alert-modal/show-alert alert-data)))
 
@@ -392,7 +390,6 @@
                    (rum/local false ::disable-post)
                    (rum/local nil ::debounced-autosave)
                    (rum/local 0 ::mobile-video-height)
-                   (rum/local false ::deleting)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
@@ -512,10 +509,8 @@
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
                     (when-let [cmail-data @(drv/get-ref s :cmail-data)]
-                      ;; Did activity get removed in another client?
-                      (when (and @(::deleting s)
-                                 (:delete cmail-data))
-                        (reset! (::deleting s) false)
+                      ;; Did activity get removed here or in another client?
+                      (when (:delete cmail-data)
                         (real-close))
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
@@ -584,9 +579,7 @@
                                          :body
                                          (cleaned-body)))
                     (autosave s)
-                    (do
-                      (reset! (::deleting s) true)
-                      (activity-actions/activity-delete cmail-data)))
+                    (activity-actions/activity-delete cmail-data))
                   (if (and (= (:status cmail-data) "published")
                            (:has-changes cmail-data))
                     (cancel-clicked s)
@@ -810,7 +803,7 @@
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
                                ;; Block the rich-body-editor component when
-                               ;; the current editing post has been created alreaduks
+                               ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
                                :placeholder (when (:collapsed cmail-state) "Share something with your team...")
                                :fullscreen is-fullscreen?
