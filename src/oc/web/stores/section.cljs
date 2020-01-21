@@ -7,18 +7,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
 
-;; Reducers used to watch for org/section dispatch data
-(defmulti reducer (fn [db [action-type & _]]
-                    (when-not (some #{action-type} [:update :input])
-                      (timbre/debug "Dispatching section reducer:" action-type))
-                    action-type))
-
-(def sections-dispatch
-  (flux/register
-   dispatcher/actions
-   (fn [payload]
-     (swap! dispatcher/app-state reducer payload))))
-
 (defmethod dispatcher/action :section
   [db [_ section-data]]
   (let [db-loading (if (:is-loaded section-data)
@@ -203,15 +191,6 @@
         change-key (dispatcher/change-data-key org-slug)
         old-change-data (get-in db change-key)]
     (assoc-in db change-key (update-unseen-unread-add old-change-data item-id container-id change-data))))
-
-;; Section store specific reducers
-(defmethod reducer :default [db payload]
-  ;; ignore state changes not specific to reactions
-  db)
-
-(defmethod reducer :org-loaded
-  [db [_ org-data saved?]]
-  (fix-org-section-data db org-data (dispatcher/change-data db)))
 
 (defmethod dispatcher/action :section-more
   [db [_ org-slug board-slug]]

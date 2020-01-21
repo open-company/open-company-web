@@ -356,7 +356,7 @@
                                  (seq (:reactions comment-data)))
                        [:div.stream-comment-reactions-footer.group
                           (reactions {:entity-data comment-data
-                                      :hide-last-reaction (zero? (count (:reactions comment-data)))
+                                      :hide-picker (zero? (count (:reactions comment-data)))
                                       :optional-activity-data activity-data})])]]]
               (when should-show-add-comment?
                 [:div.stream-comment
