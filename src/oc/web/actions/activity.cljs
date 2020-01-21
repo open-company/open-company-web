@@ -642,7 +642,7 @@
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
-      (when (and (#{:dismiss :unread :follow :unfollow} (:change-type (:data data)))
+      (when (and (#{:dismiss :unread :follow :unfollow :comment-add} (:change-type (:data data)))
                  (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
