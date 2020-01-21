@@ -132,7 +132,6 @@ div.dashboard-layout {
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/inbox_tab_icon@dark.svg");
           }
-
           @include preload_image(cdnUrl("/img/ML/inbox_tab_icon_active.svg"));
 
           &.active {

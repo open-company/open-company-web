@@ -109,7 +109,7 @@
                                      (not is-inbox)
                                      (not is-all-posts)
                                      (not is-follow-ups)
-                                     (not (:read-only board-data)))
+                                     (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
