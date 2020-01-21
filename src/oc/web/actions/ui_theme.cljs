@@ -56,13 +56,15 @@
     (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))))
 
 (defn computed-value [v]
-  (if (and (support-system-dark-mode?)
-           (dark-allowed-path?)
-           (or (and (= v :auto)
-                     (system-ui-theme-enabled?))
-               (= v :dark)))
-    :dark
-    :light))
+  (if (dark-allowed-path?)
+    (if (= v :auto)
+      (if (support-system-dark-mode?)
+        (if (system-ui-theme-enabled?)
+          :dark
+          :light)
+        ui-theme-default-value)
+     v)
+   :light))
 
 (defn get-ui-theme-setting []
   (let [current-mode (read-ui-theme-cookie)]
