@@ -7,11 +7,6 @@
             [oc.web.mixins.section :as section-mixins]
             [oc.web.actions.activity :as activity-actions]))
 
-(def mobile-image-size
- {:width 250
-  :height 211
-  :ratio (/ 250 211)})
-
 (rum/defcs empty-board < rum/reactive
                          section-mixins/container-nav-in
   [s]
@@ -32,5 +27,5 @@
            is-inbox? "You’re all caught up!"
            is-all-posts? "All posts is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"
-           is-bookmarks? "You don't have any bookmarks"
+           is-bookmarks? "You have no drafts"
            :else "This section is empty")]]]))

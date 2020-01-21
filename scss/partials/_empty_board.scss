@@ -46,8 +46,8 @@ div.empty-board {
         }
 
         &.drafts {
-          background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
-          background-size: 24px 24px;
+          background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+          background-size: 18px 22px;
         }
 
         &.bookmarks {
@@ -63,7 +63,7 @@ div.empty-board {
           }
 
           &.drafts {
-            background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+            background-image: cdnUrl("/img/ML/empty_state_drafts@dark.svg");
           }
 
           &.bookmarks {
