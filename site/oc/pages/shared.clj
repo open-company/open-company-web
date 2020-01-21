@@ -27,9 +27,8 @@
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
-                          "“Carrot helps us communicate efficiently across time zones. "
-                          "It minimizes FOMO from missed Slack conversations, and cuts out "
-                          "the \"Did you see my message?\" nagging.”")
+                          "“Carrot eliminates the fear of missing key Slack conversations, "
+                          "and cuts out the \"Did you see my message?\" nagging.”")
                          (= slug :blend-labs)
                          (str
                           "“Carrot is a perfect compliment for Slack. We use it for longer-form "
@@ -270,18 +269,17 @@
   [:div.pricing-table.group
     [:div.pricing-table-left
       [:div.pricing-table-left-price
-        "$5"]
+        "$3.25"]
       [:div.pricing-table-left-subprice
         "/month per user"]]
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
-         "Carrot starts with a 14-day free trial, no credit card required. "
-         "After that, monthly pricing starts at $60, which includes your first "
-         "12 members. Then it’s just $5 a user after that.")]
+         "Carrot is free for up to 10 people. After that, it's "
+         "just $3.25 / month for each person with our annual plan.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
-        "Start your 14-day free trial"]]])
+        "Get started for FREE"]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer
@@ -297,7 +295,7 @@
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      "Simple pricing for remote team communication"]
+      "We use Carrot for longer-form weekly updates no one should miss."]
 
     [:div.pricing-subheadline
       "Questions? "
@@ -421,7 +419,7 @@
               (str
                "“We use Carrot when we need to make sure everyone "
                "is on the same page across all our offices here "
-               "and abroad. It helps us share BIG wins, and in a "
+               "and abroad. It helps us share BIG wins and in a "
                "fast-growing startup keeping that family vibe, "
                "its awesome.”")]
             [:div.testimonial-footer.group

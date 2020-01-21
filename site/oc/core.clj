@@ -79,7 +79,7 @@
         "Login"]
       [:button.mlb-reset.get-started-button.get-started-action
         {:id "site-mobile-menu-getstarted"}
-        "Try Carrot"]]])
+        "Start free"]]])
 
 (defn nav
   "Static hiccup for the site header."

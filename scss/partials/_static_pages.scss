@@ -207,6 +207,10 @@ div.testimonials-block {
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_novo");
     }
+
+    div.testimonial-copy {
+      max-width: 880px;
+    }
   }
 
   &.hello-tickets {
