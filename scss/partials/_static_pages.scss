@@ -180,7 +180,7 @@ div.homepage-testimonials-container {
 }
 
 button.get-started-button {
-  width: 180px;
+  width: 220px;
   height: 56px;
   border-radius: 6px;
   background-color: $carrot_orange;
@@ -194,6 +194,8 @@ button.get-started-button {
   text-align: center;
   padding: 0;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   @include mobile(){
     max-width: 100%;
@@ -201,7 +203,7 @@ button.get-started-button {
     height: 48px;
     font-size: 18px;
     line-height: 23px;
-    padding: 12px 0;
+    padding: 12px 24px;
   }
 }
 
