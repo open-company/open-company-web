@@ -123,10 +123,8 @@ div.dashboard-layout {
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
 
-            @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active@dark.svg"));
-
             &.active {
-              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active@dark.svg");
+              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
             }
           }
         }
@@ -145,10 +143,8 @@ div.dashboard-layout {
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/follow_ups_tab_icon@dark.svg");
 
-            @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active@dark.svg"));
-
             &.active {
-              background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active@dark.svg");
+              background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
             }
           }
         }
@@ -167,11 +163,9 @@ div.dashboard-layout {
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
-            
-            @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active@dark.svg"));
 
             &.active {
-              background-image: cdnUrl("/img/ML/notifications_tab_icon_active@dark.svg");
+              background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
             }
           }
         }
@@ -200,11 +194,9 @@ div.dashboard-layout {
 
           @include dark_mode() {
             background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
-            
-            @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active@dark.svg"));
 
             &.active {
-              background-image: cdnUrl("/img/ML/new_post_tab_icon_active@dark.svg");
+              background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
             }
           }
         }
@@ -546,7 +538,7 @@ div.dashboard-layout {
                 background-position: center;
 
                 @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/board_sort_dropdown.svg");
+                  background-image: cdnUrl("/img/ML/board_sort_dropdown@dark.svg");
                 }
 
                 @include mobile() {
@@ -562,7 +554,7 @@ div.dashboard-layout {
               position: absolute;
               top: 30px;
               right: 0;
-              background-color: white;
+              background-color: var(--overlay-background-color);
               width: 138px;
               padding: 9px 0;
               border-radius: 4px;
