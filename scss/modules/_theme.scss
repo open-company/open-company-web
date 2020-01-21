@@ -76,6 +76,10 @@ $dark_mode: "dark";
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.1);
 
+  // General settings
+  --selected-row-background-color: #EBF8F1;
+  --selected-row-color: #{$carrot_green};
+
   html, body {
     scrollbar-color: light;
   }
@@ -147,6 +151,10 @@ $dark_mode: "dark";
   // User dropdown
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.1);
+
+  // General settings
+  --selected-row-background-color: #{rgba(white, 0.2)};
+  --selected-row-color: #{$carrot_green};
 
   &, body {
     scrollbar-color: dark;
