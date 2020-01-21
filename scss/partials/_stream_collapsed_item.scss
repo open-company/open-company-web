@@ -45,6 +45,7 @@ div.stream-collapsed-item {
       padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
       width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
       height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
+      border: 1px solid var(--foc-hover-border-color);
 
       div.more-menu {
         display: initial;
