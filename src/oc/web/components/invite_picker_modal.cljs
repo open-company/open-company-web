@@ -50,13 +50,17 @@
             "Invite via email"]
           ;; Show invite via Slack if team has a bot, or if the team has a Slack org associated
           ;; or if the user logged in via Slack
-          (if (or (-> team-data :slack-orgs count pos?)
+          (if (or ;; if team has at least one slack org associated
+                  (-> team-data :slack-orgs count pos?)
+                  ;; if team has a bot installed
                   (:can-slack-invite team-data)
+                  ;; if user signed in via Slack
                   (= (jwt/get-key :auth-source) "slack"))
             [:button.mlb-reset.invite-slack-bt
               {:on-click #(nav-actions/show-org-settings :invite-slack)}
               "Invite via Slack"]
-            [:button.mlb-reset.invite-slack-bt
-              {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
-              [:span.disabled "Invite via Slack"]
-              [:span.enabled "(add Slack)"]])]]]))
+            (when (-> team-data :team-id jwt/is-admin?)
+              [:button.mlb-reset.invite-slack-bt
+                {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
+                [:span.disabled "Invite via Slack"]
+                [:span.enabled "(add Slack)"]]))]]]))
