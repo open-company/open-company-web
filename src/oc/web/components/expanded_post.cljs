@@ -121,7 +121,8 @@
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
-        add-comment-force-update (drv/react s :add-comment-force-update)
+        add-comment-force-update* (drv/react s :add-comment-force-update)
+        add-comment-force-update (get-in add-comment-force-update* (dis/add-comment-string-key (:uuid activity-data)))
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
                           (and (:new-at activity-data)
                                ;; and that's after the user last read
@@ -208,7 +209,7 @@
         (reactions {:entity-data activity-data})
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
-                             :comments-data comments-data
+                             :comments-data comments-drv
                              :show-new-tag? has-new-comments?
                              :hide-face-pile? true})]]
       [:div.expanded-post-comments.group
