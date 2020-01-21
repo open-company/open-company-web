@@ -603,6 +603,10 @@ div.dashboard-layout {
             opacity: 0.5;
             margin-left: 9px;
 
+            @include mobile() {
+              display: none;
+            }
+
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
             }
