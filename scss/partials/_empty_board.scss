@@ -37,7 +37,7 @@ div.empty-board {
 
       &.drafts {
         background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-        background-size: 56px 56px;
+        background-size: 18px 22px;
       }
 
       &.follow-ups {
@@ -60,8 +60,8 @@ div.empty-board {
   div.empty-board div.empty-board-grey-box div.empty-board-illustration { 
     background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
 
-    &.darfts {
-      background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+    &.drafts {
+      background-image: cdnUrl("/img/ML/empty_state_drafts@dark.svg");
     }
 
     &.follow-ups {
