@@ -19,7 +19,7 @@ div.reactions {
       @include OC_Body_Bold();
       box-shadow: none;
       font-size: 11px;
-      color: var(--light-color);
+      color: var(--color);
       min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
@@ -53,6 +53,7 @@ div.reactions {
         height: 15px;
         text-align: center;
         margin-left: -1px;
+        color: var(--light-color);
 
         @include mobile() {
           margin-top: 3px;

@@ -31,33 +31,28 @@ div.paginated-stream {
       }
     }
 
+    div.carrot-close {
+      text-align: center;
+      height: 60px;
+      background-image: cdnUrl("/img/ML/closing_carrot.svg");
+      background-size: 14px 24px;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.2;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
+      }
+    }
+
     div.paginated-stream-cards-inner {
       position: relative;
       overflow: visible !important;
-      padding-bottom: 48px;
+      padding-bottom: 24px;
 
       .ReactVirtualized__Grid.ReactVirtualized__List,
       .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
         overflow: visible !important;
-      }
-
-      &.closing-carrot:after {
-        content: "";
-        background-image: cdnUrl("/img/ML/closing_carrot.svg");
-        background-size: 14px 24px;
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 100%;
-        height: 24px;
-        margin-top: 24px;
-        opacity: 0.2;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-
-        @include dark_mode() {
-          background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
-        }
       }
 
       div.activities-overlay {
