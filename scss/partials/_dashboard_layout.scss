@@ -603,27 +603,9 @@ div.dashboard-layout {
             opacity: 0.5;
             margin-left: 9px;
 
-            @include mobile() {
-              display: none;
-            }
-
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
             }
-          }
-
-          div.board-sort-menu {
-            position: absolute;
-            top: 30px;
-            right: 0;
-            background-color: var(--background-color);
-            width: 138px;
-            padding: 9px 0;
-            border-radius: 4px;
-            border: 1px solid var(--divider-line);
-            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-            display: none;
-            z-index: 100;
 
             @include mobile() {
               display: none;
@@ -641,6 +623,45 @@ div.dashboard-layout {
             @include big_web(){
               &:hover {
                 opacity: 1;
+              }
+            }
+          }
+
+          div.board-sort-menu {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: var(--background-color);
+            width: 138px;
+            padding: 9px 0;
+            border-radius: 4px;
+            border: 1px solid var(--divider-line);
+            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
+            display: none;
+            z-index: 100;
+
+            @include mobile() {
+              right: unset;
+              left: 50%;
+              margin-left: -69px;
+              top: 38px;
+            }
+
+            &.show-menu {
+              display: block;
+            }
+
+            div.board-sort-menu-item {
+              height: 34px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              padding: 8px 16px;
+              cursor: pointer;
+
+              &.active, &:hover, &:active, &:focus {
+                background-color: $feint_emerald;   // FIXME
+                color: $carrot_green;
+                -webkit-tap-highlight-color: $feint_emerald;
               }
             }
           }
