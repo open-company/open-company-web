@@ -69,12 +69,13 @@
   [section-uuid & [finish-cb]]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
-    (let [current-section-data (dispatcher/board-data)]
+    (let [current-section-data (dispatcher/board-data)
+          board-rel (if (= (:slug current-section-data) utils/default-drafts-board-slug) ["item" "self"] "activity")]
       (when (= section-uuid (:uuid utils/default-drafts-board))
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
-        (api/get-board (utils/link-for (:links current-section-data) "activity")
+        (api/get-board (utils/link-for (:links current-section-data) board-rel)
                        (fn [{:keys [status body success] :as resp}]
                          (when success (section-get-finish (json->cljs body)))
                          (when (fn? finish-cb)
