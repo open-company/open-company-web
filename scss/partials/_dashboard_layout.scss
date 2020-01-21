@@ -590,6 +590,25 @@ div.dashboard-layout {
             @include dark_mode() {
               background-image: cdnUrl("/img/ML/foc_layout_collapse@dark.svg");
             }
+
+            @include mobile() {
+              display: none;
+            }
+
+            &.collapsed {
+              background-image: cdnUrl("/img/ML/foc_layout_expand.svg");
+              background-color: 14px 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/foc_layout_expand@dark.svg");
+              }
+            }
+
+            @include big_web(){
+              &:hover {
+                opacity: 1;
+              }
+            }
           }
         }
       }
