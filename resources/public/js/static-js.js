@@ -345,10 +345,11 @@ function isiPhoneWithoutPhysicalHomeBt(){
 
 function OCDarkModeEarlySetup(){
   var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("ui-theme"));
-  if (darkModeCookie === "dark" ||
-      (darkModeCookie === "auto" &&
-       window.matchMedia &&
-       window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+  if (!window.location.pathname.match(/^\/(\bsign\-up\b|\blogin\b)?(\/|$)/ig) &&
+      (darkModeCookie === "dark" ||
+       (darkModeCookie === "auto" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches))) {
     $("html").addClass("theme-mode-dark");
   }
 }

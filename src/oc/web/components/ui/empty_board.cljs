@@ -30,6 +30,6 @@
         [:div.empty-board-title
           (cond
            is-all-posts? "All posts is a stream of what’s new in Carrot."
-           is-drafts-board? "Nothing in drafts"
+           is-drafts-board? "You have no drafts."
            is-follow-ups? "You’re all caught up!"
-           :else "This section is empty")]]]))
+           :else "This section is empty.")]]]))
