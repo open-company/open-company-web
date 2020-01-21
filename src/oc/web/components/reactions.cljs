@@ -22,17 +22,15 @@
                        (ui-mixins/on-window-click-mixin (fn [s e]
                         (when-not (utils/event-inside? e (rum/dom-node s))
                           (reset! (::show-picker s) false))))
-  [s {:keys [entity-data hide-last-reaction? optional-activity-data max-reactions]}]
+  [s {:keys [entity-data hide-picker optional-activity-data max-reactions]}]
   ;; optional-activity-data: is passed only when rendering the list of reactions for a comment
   ;; in that case entity-data is the comment-data. When optional-activity-data is nil it means
   ;; entity-data is the activity-data
   (let [reactions-max-count (or max-reactions default-reaction-number)
-        reactions-data (if hide-last-reaction?
-                         (vec (take (dec default-reaction-number) (:reactions entity-data)))
-                         (vec (:reactions entity-data)))
+        reactions-data (vec (take reactions-max-count (:reactions entity-data)))
         reactions-loading (:reactions-loading entity-data)
         react-link (utils/link-for (:links entity-data) "react")
-        should-show-picker? (and (not hide-last-reaction?)
+        should-show-picker? (and (not hide-picker)
                                  react-link
                                  (< (count reactions-data) reactions-max-count))
         is-mobile? (responsive/is-tablet-or-mobile?)]
