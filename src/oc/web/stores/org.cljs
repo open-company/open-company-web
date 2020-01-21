@@ -1,6 +1,7 @@
 (ns oc.web.stores.org
   (:require [oc.web.lib.utils :as utils]
             [taoensso.timbre :as timbre]
+            [oc.web.utils.activity :as activity-utils]
             [oc.web.dispatcher :as dispatcher]))
 
 (defn read-only-org
@@ -12,7 +13,11 @@
 (defn fix-org
   "Fix org data coming from the API."
   [org-data]
-  (read-only-org org-data))
+  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links activity-utils/readonly-board?))
+                      (:boards org-data))]
+    (-> org-data
+     read-only-org
+     (assoc :boards fixed-boards))))
 
 (defmethod dispatcher/action :org-loaded
   [db [_ org-data saved? email-domain]]

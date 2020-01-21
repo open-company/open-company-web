@@ -75,6 +75,7 @@ div.stream-item {
       padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
       width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
       height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+      border: 1px solid var(--foc-hover-border-color);
 
       div.stream-item-header {
         div.more-menu button {
@@ -657,7 +658,6 @@ div.stream-item {
           font-size: 12px;
           color: var(--color);
           opacity: 0.5;
-          margin-top: 4px;
 
           @include mobile() {
             margin-top: 0;
