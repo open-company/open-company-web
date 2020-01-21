@@ -92,8 +92,8 @@
           (.on hr "swiperight" (partial swipe-right s)))
         (when (fn? long-press)
           (.on hr "press" (partial long-press s)))
-        (reset! (::hammer-recognizer s) hr)
-        s)))
+        (reset! (::hammer-recognizer s) hr)))
+    s)
    :will-unmount (fn [s]
     (when @(::hammer-recognizer s)
       (.remove @(::hammer-recognizer s) "swipeleft")
