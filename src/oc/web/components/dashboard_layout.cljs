@@ -107,7 +107,7 @@
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and current-board-slug
                                      (not (dis/is-container? current-board-slug))
-                                     (not (:read-only board-data)))
+                                     (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
         user-notifications-data (drv/react s :user-notifications)
