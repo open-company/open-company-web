@@ -14,6 +14,12 @@
 
 (def ^:private ui-theme-default-value :auto)
 
+(defn- dark-allowed-path? []
+  (-> (.. js/window -location -pathname)
+      (.match #"(?i)^/(\bsign\-up\b|\blogin\b)?(/|$)")
+      seq
+      not))
+
 (defn ui-theme-cookie-name []
   (str (name ui-theme-cookie-name-suffix)))
 
@@ -50,13 +56,15 @@
     (.-matches (.matchMedia js/window "(prefers-color-scheme: dark)"))))
 
 (defn computed-value [v]
-  (if (= v :auto)
-    (if (support-system-dark-mode?)
-      (if (system-ui-theme-enabled?)
-        :dark
-        :light)
-      ui-theme-default-value)
-    v))
+  (if (dark-allowed-path?)
+    (if (= v :auto)
+      (if (support-system-dark-mode?)
+        (if (system-ui-theme-enabled?)
+          :dark
+          :light)
+        ui-theme-default-value)
+     v)
+   :light))
 
 (defn get-ui-theme-setting []
   (let [current-mode (read-ui-theme-cookie)]
