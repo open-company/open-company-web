@@ -6,8 +6,8 @@
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
-    [:div.homepage-testimonials-copy
-      "Growing and distributed teams around the world ❤️ Carrot"]
+    ; [:div.homepage-testimonials-copy
+    ;   "Growing and distributed teams around the world ❤️ Carrot"]
     [:div.homepage-testimonials-logos
       [:div.homepage-testimonials-logo.logo-ifttt]
       [:div.homepage-testimonials-logo.logo-hopper]
@@ -31,12 +31,11 @@
                           "and cuts out the \"Did you see my message?\" nagging.”")
                          (= slug :blend-labs)
                          (str
-                          "“Carrot is a perfect compliment for Slack. We use it for longer-form "
-                          "weekly updates no one should miss.”")
+                          "“We use Carrot for longer-form weekly updates no one should miss.”")
                          (= slug :bank-novo)
                          (str
                           "“Carrot keeps everyone across our global offices up to date. It "
-                          "helps us share big wins, and key information across our growing family.”"))
+                          "helps us share big wins and key information across our growing family.”"))
         footer-copy (cond
                       (= slug :ifttt)
                       "Kevin Ebaugh, Senior Platform Community Manager"
@@ -82,7 +81,7 @@
                 (= block :analytics)
                 "Know who saw your update"
                 (= block :stay-in-sync)
-                "Daily digest to stay in sync"
+                "Daily newsletter to stay in sync"
                 (= block :stay-in-sync-slack)
                 "Daily digest to stay in sync"
                 (= block :share-to-slack)
@@ -228,7 +227,7 @@
                             (cdn "/img/ML/testimonials_commgaps_email@3x.png") " 3x, "
                             (cdn "/img/ML/testimonials_commgaps_email@4x.png") " 4x")}])
           [:div.testimonials-commgaps-column-header
-            "Daily digest to stay in sync"]
+            "Daily newsletter to stay in sync"]
           [:div.testimonials-commgaps-column-subheader
             "Everyone gets a daily, personalized summary of what's important."]]
         [:div.testimonials-commgaps-column.right-column
@@ -279,7 +278,7 @@
          "just $3.25 / month for each person with our annual plan.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
-        "Get started for FREE"]]])
+        "Try Carrot"]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer
@@ -291,18 +290,21 @@
          :href "mailto:hello@carrot.io"}
         "Let’s chat about our Enterprise plan."]]])
 
+(def pricing-chat
+  [:div.pricing-subheadline
+    "Questions? "
+    [:a.chat-with-us
+      {:class "intercom-chat-link"
+       :href "mailto:hello@carrot.io"}
+      "Let's chat"]])
+
 (def pricing-footer
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      "We use Carrot for longer-form weekly updates no one should miss."]
+      "Simple pricing, and free for small teams."]
 
-    [:div.pricing-subheadline
-      "Questions? "
-      [:a.chat-with-us
-        {:class "intercom-chat-link"
-         :href "mailto:hello@carrot.io"}
-        "Let's chat"]]
+    pricing-chat
 
     pricing-table
     

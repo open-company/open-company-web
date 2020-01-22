@@ -31,7 +31,7 @@ div.main-animation-container {
 }
 
 div.homepage-testimonials-container {
-  margin: 0 auto;
+  margin: 40px auto 0;
   width: 100%;
   text-align: center;
   z-index: 3;
@@ -51,7 +51,6 @@ div.homepage-testimonials-container {
     font-size: 24px;
     color: $deep_navy;
     line-height: 32px;
-    margin-top: 40px;
     margin-bottom: 24px;
 
     @include mobile() {
@@ -244,28 +243,23 @@ div.testimonials-block {
   }
 
   &.ifttt {
+    max-width: 640px;
     div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_ifttt");
     }
   }
 
   &.blend-labs {
+    max-width: 710px;
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_blend_labs");
-    }
-
-    div.testimonial-copy {
-      max-width: 670px;
     }
   }
 
   &.novo {
+    max-width: 880px;
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_novo");
-    }
-
-    div.testimonial-copy {
-      max-width: 880px;
     }
   }
 
@@ -585,28 +579,28 @@ section.pricing-footer {
       padding: 0 24px;
     }
   }
+}
 
-  div.pricing-subheadline {
+div.pricing-subheadline {
+  color: $deep_navy;
+  font-size: 22px;
+  line-height: 28px;
+  @include OC_Body_Book();
+  margin: 24px auto 0px;
+  position: relative;
+  max-width: 630px;
+
+  @include mobile(){
+    margin-top: 16px;
+    font-size: 20px;
+    line-height: 26px;
+    padding: 0px;
     color: $deep_navy;
-    font-size: 22px;
-    line-height: 28px;
-    @include OC_Body_Book();
-    margin: 24px auto 0px;
-    position: relative;
-    max-width: 630px;
+    max-width: initial;
+  }
 
-    @include mobile(){
-      margin-top: 16px;
-      font-size: 20px;
-      line-height: 26px;
-      padding: 0px;
-      color: $deep_navy;
-      max-width: initial;
-    }
-
-    a.chat-with-us {
-      color: $carrot_green;
-    }
+  a.chat-with-us {
+    color: $carrot_green;
   }
 }
 

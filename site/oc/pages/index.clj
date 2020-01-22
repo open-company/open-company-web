@@ -18,9 +18,9 @@
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Get started for FREE"]
+            "Try Carrot"]
           [:span.get-started-subtitle
-            "Free 14 day trial"]]
+            "Free for small teams"]]
 
         [:div.main-animation-container
           [:img.main-animation

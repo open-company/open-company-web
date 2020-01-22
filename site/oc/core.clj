@@ -151,7 +151,7 @@
             [:a.signup
               {:id "site-header-signup-item"
                :href "/sign-up"}
-              "Free trial"]])
+              "Start free"]])
 
         ;; Mobile
         (cond
