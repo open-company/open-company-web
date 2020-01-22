@@ -662,6 +662,7 @@ div.stream-item {
           font-size: 12px;
           color: var(--color);
           opacity: 0.5;
+          line-height: 26px;
 
           @include mobile() {
             margin-top: 0;
@@ -678,7 +679,7 @@ div.stream-item {
           max-height: 200px;
           background-color: var(--overlay-background-color);
           border-radius: 4px;
-          border: 1px solid var(--light-color);
+          border: 1px solid var(--divider-line);
           padding: 8px 0;
           display: none;
           z-index: 2;
@@ -689,16 +690,16 @@ div.stream-item {
             display: block;
 
             &:active, &:hover {
-              background-color: #EBF8F1;
+              background-color: var(--selected-row-background-color);
               div.stream-item-attachments-item-desc {
-                color: $carrot_green;
+                color: var(--selected-row-background-color);
               }
             }
 
             div.stream-item-attachments-item-desc {
               @include OC_Body_Book();
               font-size: 14px;
-              color: var(--ultralight-color);
+              color: var(--light-color);
               white-space: nowrap;
               max-width: 100%;
 
