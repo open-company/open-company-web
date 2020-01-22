@@ -18,7 +18,7 @@
             [:p
               (str
                "In the age of Slack and fast-moving conversations, the lack of "
-               "focus and clarity have become a huge problem in the workplace."
+               "focus and clarity have become a huge problem in the workplace. "
                "Teams are hyper-connected throughout the day, and yet "
                "it's become even more difficult to know what matters. "
                "How can that be?")]

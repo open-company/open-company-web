@@ -11,7 +11,9 @@
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Carrot is free for small teams"]
+          "Simple pricing, and free for small teams."]
+
+        shared/pricing-chat
 
         shared/pricing-table
         
@@ -30,7 +32,7 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/sign-up"}
-                "Get started for FREE"]]]
+                "Try Carrot"]]]
           [:div.pricing-apps-separator]
           [:div.pricing-apps-app-block
             [:div.pricing-apps-app-header
@@ -126,6 +128,6 @@
 
       (shared/dashed-string 5 "big-web-tablet-only")
 
-      shared/pricing-footer
+      ; shared/pricing-footer
 
     ]])
