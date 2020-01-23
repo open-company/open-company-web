@@ -93,8 +93,7 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
-(def other-resources-initial-delay 5000)
-(def other-resources-inter-delay 1000)
+(def other-resources-delay 1000)
 
 (defn org-loaded
   "Dispatch the org data into the app-state to be used by all the components.
@@ -121,20 +120,20 @@
         delay-count (atom 0)
         inbox-delay (if is-inbox?
                       0
-                      (+ other-resources-initial-delay
-                       (* other-resources-inter-delay (swap! delay-count inc))))
+                      (+ other-resources-delay
+                       (* other-resources-delay (swap! delay-count inc))))
         all-posts-delay (if is-all-posts?
                           0
-                          (+ other-resources-initial-delay
-                           (* other-resources-inter-delay (swap! delay-count inc))))
+                          (+ other-resources-delay
+                           (* other-resources-delay (swap! delay-count inc))))
         bookmarks-delay (if is-bookmarks?
                           0
-                          (+ other-resources-initial-delay
-                           (* other-resources-inter-delay (swap! delay-count inc))))
+                          (+ other-resources-delay
+                           (* other-resources-delay (swap! delay-count inc))))
         drafts-delay (if is-drafts?
                        0
-                       (+ other-resources-initial-delay
-                        (* other-resources-inter-delay (swap! delay-count inc))))]
+                       (+ other-resources-delay
+                        (* other-resources-delay (swap! delay-count inc))))]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
