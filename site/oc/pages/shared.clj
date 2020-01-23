@@ -278,7 +278,7 @@
          "just $3.25 / month for each person with our annual plan.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
-        "Try Carrot"]]])
+        "Try Carrot for free"]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer

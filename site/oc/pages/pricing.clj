@@ -4,7 +4,7 @@
 (defn pricing
   "Pricing page."
   [options]
-  [:div.pricing-wrap
+  [:div.pricing-wrap.group
     {:id "wrap"}
     [:div.main.pricing
 
@@ -32,7 +32,7 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/sign-up"}
-                "Try Carrot"]]]
+                "Try Carrot for free"]]]
           [:div.pricing-apps-separator]
           [:div.pricing-apps-app-block
             [:div.pricing-apps-app-header

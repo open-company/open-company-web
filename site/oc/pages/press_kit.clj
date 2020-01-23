@@ -4,7 +4,7 @@
 (defn press-kit
   "Press kit page."
   [options]
-  [:div.press-kit-wrap
+  [:div.press-kit-wrap.group
     {:id "wrap"}
     [:div.main.press-kit
       [:section.cta.group

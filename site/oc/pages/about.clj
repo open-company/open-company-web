@@ -5,7 +5,7 @@
   "About page. This is a copy of oc.web.components.about and
    every change here should be reflected there and vice versa."
   [options]
-  [:div.about-wrap
+  [:div.about-wrap.group
     {:id "wrap"}
     [:div.main.about
       [:section.about-header

@@ -270,6 +270,7 @@ div.testimonials-block {
   }
 
   &.bank-novo {
+    max-width: 850px;
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_bank_novo");
     }
