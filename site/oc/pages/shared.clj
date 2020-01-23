@@ -31,7 +31,7 @@
                           "and cuts out the \"Did you see my message?\" nagging.”")
                          (= slug :blend-labs)
                          (str
-                          "“We use Carrot for longer-form weekly updates no one should miss.”")
+                          "“We use Carrot for key announcements and weekly updates no one can miss.”")
                          (= slug :bank-novo)
                          (str
                           "“Carrot keeps everyone across our global offices up to date. It "
