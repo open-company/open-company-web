@@ -118,22 +118,10 @@
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
         delay-count (atom 0)
-        inbox-delay (if is-inbox?
-                      0
-                      (+ other-resources-delay
-                       (* other-resources-delay (swap! delay-count inc))))
-        all-posts-delay (if is-all-posts?
-                          0
-                          (+ other-resources-delay
-                           (* other-resources-delay (swap! delay-count inc))))
-        bookmarks-delay (if is-bookmarks?
-                          0
-                          (+ other-resources-delay
-                           (* other-resources-delay (swap! delay-count inc))))
-        drafts-delay (if is-drafts?
-                       0
-                       (+ other-resources-delay
-                        (* other-resources-delay (swap! delay-count inc))))]
+        inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
+        all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
+        bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
+        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
