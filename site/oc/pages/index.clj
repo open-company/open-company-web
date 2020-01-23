@@ -2,7 +2,7 @@
   (:require [oc.pages.shared :as shared]))
 
 (defn index [options]
-  [:div.home-wrap
+  [:div.home-wrap.group
     {:id "wrap"}
     [:div.main.home-page
       ; Hope page header
@@ -18,9 +18,10 @@
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
-            "Try Carrot"]
-          [:span.get-started-subtitle
-            "Free for small teams"]]
+            "Try Carrot for free"]
+          ; [:span.get-started-subtitle
+          ;   "Free for small teams"]
+            ]
 
         [:div.main-animation-container
           [:img.main-animation
