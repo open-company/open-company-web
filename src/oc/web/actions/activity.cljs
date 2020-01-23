@@ -968,7 +968,7 @@
     (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
     (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
-       (notification-actions/show-notification {:title (if success "Post moved to Unread" "An error occurred")
+       (notification-actions/show-notification {:title (if success "Post added to Unread" "An error occurred")
                                                 :description (when-not success "Please try again")
                                                 :dismiss true
                                                 :expire 3
