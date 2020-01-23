@@ -149,7 +149,7 @@
                  (and is-all-posts?
                       (not activity-link))
                  (and is-follow-ups?
-                      (not inbox-link)))
+                      (not follow-ups-link)))
         (check-org-404))
       
       ; If there is a board slug let's load the board data
