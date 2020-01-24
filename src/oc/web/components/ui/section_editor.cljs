@@ -387,7 +387,7 @@
               [:span.main-label
                 "Section members"]
               [:span.role-header
-                "Role"]])
+                "Access"]])
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
                               (count (:viewers section-editing)))))
@@ -401,8 +401,8 @@
                 [:div.section-editor-add-private-users-dropdown-container
                   {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
                            :display (if @(::show-edit-user-dropdown s) "block" "none")}}
-                  (dropdown-list {:items [{:value :viewer :label "Viewer"}
-                                          {:value :author :label "Contributor"}
+                  (dropdown-list {:items [{:value :viewer :label "View"}
+                                          {:value :author :label "Edit"}
                                           {:value :remove :label "Remove"}]
                                   :value user-type
                                   :on-change (fn [item]
@@ -469,13 +469,13 @@
                                    (alert-modal/hide-alert))})))}
                             "Leave section"]
                           [:div.user-type.no-dropdown
-                            "Contributor"])
+                            "Edit"])
                         [:div.user-type
                           {:class (utils/class-set {:no-dropdown (not can-change)
                                                     :active showing-dropdown})}
                           (if (= user-type :author)
-                            "Contributor"
-                            "Viewer")])]))]])
+                            "Edit"
+                            "View")])]))]])
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-label
               "Personal note"])
