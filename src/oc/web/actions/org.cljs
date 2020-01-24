@@ -109,10 +109,8 @@
   (let [boards (:boards org-data)
         current-board-slug (router/current-board-slug)
         inbox-link (utils/link-for (:links org-data) "inbox")
-        activity-link (utils/link-for (:links org-data) "entries")
-        recent-activity-link (utils/link-for (:links org-data) "activity")
-        bookmarks-link (utils/link-for (:links org-data) "bookmarks")
-        recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
+        activity-link (utils/link-for (:links org-data) "activity")
+        bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")]
@@ -132,16 +130,10 @@
           (when (and activity-link
                      is-all-posts?)
             (aa/activity-get org-data))
-          (when (and recent-activity-link
-                     is-all-posts?)
-            (aa/recent-activity-get org-data))
           ;; Preload bookmarks data
           (when (and bookmarks-link
                      is-bookmarks?)
-            (aa/bookmarks-get org-data))
-          (when (and recent-bookmarks-link
-                     is-bookmarks?)
-            (aa/recent-bookmarks-get org-data)))))
+            (aa/bookmarks-get org-data)))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
@@ -162,13 +154,12 @@
           ;; Rewrite the URL in case it's using the board UUID instead of the slug
           (when (= (:uuid board-data) current-board-slug)
             (router/rewrite-board-uuid-as-slug current-board-slug (:slug board-data)))
-          (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-            (sa/section-get :recently-posted board-link))
-          (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
-            (sa/section-get :recent-activity recent-board-link)))
+          (when-let* [board-rel (if (= current-board-slug utils/default-drafts-board-slug) ["item" "self"] "activity")
+                      board-link (utils/link-for (:links board-data) board-rel "GET")]
+            (sa/section-get board-link)))
         ; The board wasn't found, showing a 404 page
         (if (= current-board-slug utils/default-drafts-board-slug)
-          (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
+          (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
           (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles
