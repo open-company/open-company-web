@@ -383,4 +383,265 @@ div.more-menu {
       }
     }
   }
+
+  &.mobile-tray-menu {
+    @include mobile() {
+      display: block;
+      position: fixed;
+      float: unset;
+      width: 100vw;
+      height: 0;
+      left: 0;
+      top: 100vh;
+      background-color: var(--opac-background-color-2);
+      opacity: 0;
+      z-index: #{$navbar_zindex + 10};
+      visibility: hidden;
+      transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
+
+      &.menu-expanded {
+        visibility: visible;
+        opacity: 1;
+        top: 0;
+        height: 100vh;
+
+        & > * {
+          display: none;
+        }
+
+        ul.more-menu-list {
+          height: auto;
+        }
+      }
+
+      & > * {
+        display: none;
+      }
+      // Add some extra padding at the bottom of mobile browsers
+      //  to avoid having the bottom part of the menu hidden
+      &.ios-browser ul.more-menu-list {
+        // bottom: #{$mobile_navbar_height}px;
+        padding: 32px 16px #{32 + 104}px 16px;
+      }
+
+      &.android-browser ul.more-menu-list {
+        // bottom: #{$mobile_navbar_height}px;
+        padding: 32px 16px #{32 + 52}px 16px;
+      }
+
+      ul.more-menu-list {
+        display: block;
+        float: unset;
+        bottom: 0;
+        top: unset;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background-color: white;
+        opacity: 1;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        padding: 32px 16px;
+        height: 0;
+        transition: height 100ms ease-in;
+
+        @include no-user-select();
+
+        li {
+          padding: 12px 16px;
+          background-color: var(--opac-background-color-1);
+          height: 48px;
+          margin: 0;
+          @include OC_Body_Book();
+          font-size: 17px;
+          line-height: 24px;
+          color: var(--color);
+          position: relative;
+          margin-top: 1px;
+
+          &.top-rounded {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+          }
+
+          &.bottom-rounded {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+          }
+
+          &.bottom-margin {
+            margin-bottom: 24px;
+          }
+
+          &.edit {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_edit.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_edit@dark.svg");
+              }
+            }
+          }
+
+          &.delete {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_delete.svg");
+              background-size: 14px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 17px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_delete@dark.svg");
+              }
+            }
+          }
+
+          &.share {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_share.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_share@dark.svg");
+              }
+            }
+          }
+
+          &.follow {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+              background-size: 16px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 15px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
+              }
+            }
+          }
+
+          &.unfollow {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_more_unfollow.svg");
+              background-size: 16px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 15px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_unfollow@dark.svg");
+              }
+            }
+          }
+
+          &.create-follow-up {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
+              background-size: 14px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 17px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_create_follow_up@dark.svg");
+              }
+            }
+          }
+
+          &.complete-follow-up {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
+              background-size: 14px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 17px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_complete_follow_up@dark.svg");
+              }
+            }
+          }
+
+          &.dismiss {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_dismiss.svg");
+              background-size: 16px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_dismiss@dark.svg");
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

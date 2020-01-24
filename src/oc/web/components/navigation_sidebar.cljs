@@ -144,10 +144,11 @@
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
                                 :collapsed-sections @(::sections-list-collapsed s)})
-       :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
       [:div.left-navigation-sidebar-content
+        {:ref :left-navigation-sidebar-content}
         (when is-mobile?
           [:div.left-navigation-sidebar-mobile-header
             [:button.mlb-reset.mobile-close-bt
@@ -212,7 +213,7 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
-                 :on-click #(when-not is-mobile? (toggle-collapse-sections s))}
+                 :on-click #(toggle-collapse-sections s)}
                 [:span.sections "Sections"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
