@@ -72,7 +72,7 @@ function OCStaticGetYourBoardsUrl (jwt_data) {
       if ( user_id ) {
         org_slug = OCStaticGetCookie(OCStaticCookieName("last-org-" + user_id));
         if ( org_slug ) {
-          board_slug = "all-posts";
+          board_slug = "inbox";
           // Replace all-posts above withe the following to go back to the last visited board
           // OCStaticGetCookie(OCStaticCookieName("last-board-" + user_id + "-" + org_slug));
           if ( board_slug ){
@@ -345,10 +345,11 @@ function isiPhoneWithoutPhysicalHomeBt(){
 
 function OCDarkModeEarlySetup(){
   var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("ui-theme"));
-  if (darkModeCookie === "dark" ||
-      (darkModeCookie === "auto" &&
-       window.matchMedia &&
-       window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+  if (!window.location.pathname.match(/^\/(\bsign\-up\b|\blogin\b)?(\/|$)/ig) &&
+      (darkModeCookie === "dark" ||
+       (darkModeCookie === "auto" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches))) {
     $("html").addClass("theme-mode-dark");
   }
 }

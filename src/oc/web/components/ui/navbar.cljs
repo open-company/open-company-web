@@ -47,6 +47,8 @@
          mobile-title (cond
                        showing-mobile-user-notifications
                        "Notifications"
+                       (= (router/current-board-slug) "inbox")
+                       "Unread"
                        (= (router/current-board-slug) "all-posts")
                        "All Posts"
                        (= (router/current-board-slug) "follow-ups")

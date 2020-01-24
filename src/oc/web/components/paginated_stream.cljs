@@ -26,7 +26,7 @@
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
-(def foc-height 188)
+(def foc-height 184)
 (def mobile-foc-height 172)
 
 (defn- calc-card-height [mobile? foc-layout]
@@ -65,6 +65,8 @@
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
+        (= current-board-slug "inbox")
+        (activity-actions/inbox-more @(::has-next s) :down)
         (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= current-board-slug "follow-ups")
@@ -74,9 +76,6 @@
     ;; Save the last scrollTop value
     (when (not= scroll-top @(::last-scroll s))
       (reset! (::last-scroll s) scroll-top))))
-
-(defn- ap-seen-mixin-cb [_ item-uuid]
-  (activity-actions/ap-seen-events-gate item-uuid))
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
@@ -119,11 +118,17 @@
     {:style style}
     "Loading more posts..."])
 
+(rum/defc carrot-close < rum/static
+  [{:keys [style]}]
+  [:div.carrot-close
+    {:style style}])
+
 (rum/defc virtualized-stream < rum/static
   [{:keys [items
            activities-read
            foc-layout
-           show-loading-more]
+           show-loading-more
+           show-carrot-close]
     :as derivatives}
    virtualized-props]
   (let [{:keys [height
@@ -141,19 +146,27 @@
                                      style] :as row-props} (js->clj row-props :keywordize-keys true)
                              loading-more? (and show-loading-more
                                                 (= index (count items)))
-                             entry (when-not loading-more? (nth items index))
-                             reads-data (get activities-read (:uuid entry))]
-                         (if loading-more?
-                           (rum/with-key
-                             (load-more row-props)
-                             key)
+                             carrot-close? (and show-carrot-close
+                                                (not loading-more?)
+                                                (= index (count items)))
+                             entry (when (and (not loading-more?)
+                                              (not carrot-close?))
+                                     (nth items index))
+                             reads-data (get activities-read (:uuid entry))
+                             row-key (str key-prefix "-" key)]
+                         (cond
+                          carrot-close?
+                           (rum/with-key (carrot-close row-props) row-key)
+                          loading-more?
+                           (rum/with-key (load-more row-props) row-key)
+                           :else
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives
                                                                  {:entry entry
                                                                   :reads-data reads-data
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
-                            (str key-prefix "-" key)))))]
+                            row-key))))]
     [:div.virtualized-list-container
       {:ref registerChild
        :key (str "virtualized-list-" key-prefix)}
@@ -164,12 +177,20 @@
                                   720)
                          :isScrolling isScrolling
                          :onScroll onChildScroll
-                         :rowCount (if show-loading-more (inc (count items)) (count items))
+                         :rowCount (if (or show-loading-more
+                                           show-carrot-close)
+                                     (inc (count items))
+                                     (count items))
                          :rowHeight (fn [params]
                                       (let [{:keys [index]} (js->clj params :keywordize-keys true)]
-                                        (if (and show-loading-more
-                                                 (= index (count items)))
+                                        (cond
+                                          (and (= index (count items))
+                                               show-loading-more)
                                           (if is-mobile? 44 60)
+                                          (and (= index (count items))
+                                               show-carrot-close)
+                                          72
+                                          :else
                                           (calc-card-height is-mobile? foc-layout))))
                          :rowRenderer row-renderer
                          :scrollTop scrollTop
@@ -238,7 +259,6 @@
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group
-         {:class (when-not @(::has-next s) "closing-carrot")}
          (window-scroller
           {}
           (partial virtualized-stream {:org-data org-data
@@ -247,4 +267,7 @@
                                        :activities-read activities-read
                                        :editable-boards editable-boards
                                        :foc-layout foc-layout
-                                       :show-loading-more @(::bottom-loading s)}))]]]))
+                                       :show-loading-more @(::bottom-loading s)
+                                       :show-carrot-close (and (not @(::bottom-loading s))
+                                                               (not @(::has-next s))
+                                                               (> (count items) 10))}))]]]))

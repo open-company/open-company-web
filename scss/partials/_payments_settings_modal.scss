@@ -279,17 +279,17 @@ div.payments-settings-modal {
                   border-radius: 0;
 
                   &.select {
-                    background-color: #ebf8f1;
+                    background-color: var(--selected-row-background-color);
                     span.dropdown-list-item-label {
-                      color: $carrot_green;
+                      color: var(--selected-row-color);
                     }
                   }
 
                   @include big_web() {
                     &.select {
-                      background-color: #ebf8f1;
+                      background-color: var(--selected-row-background-color);
                       span.dropdown-list-item-label {
-                        color: $carrot_green;
+                        color: var(--selected-row-color);
                         text-decoration: none;
                       }
                     }
