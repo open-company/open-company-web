@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="12px" viewBox="0 0 16 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Mobile" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="Inbox-(m):-Dismiss-swipe-action" transform="translate(-255.000000, -380.000000)" fill="#FFFFFF" stroke="#FFFFFF">
+            <g id="Group-20" transform="translate(232.000000, 362.000000)">
+                <g id="Group-19" transform="translate(24.000000, 14.000000)">
+                    <path d="M12.218935,5.29960538 C12.6262417,4.90013154 13.2953269,4.90013154 13.7026336,5.29960538 C14.0991221,5.68846913 14.0991221,6.31153087 13.7026336,6.70039462 L5.54577085,14.7003946 C5.1384642,15.0998685 4.46937894,15.0998685 4.06207228,14.7003946 L0.297366401,11.0080869 C-0.0991221337,10.6192232 -0.0991221337,9.99616144 0.297366401,9.60729768 C0.704673056,9.20782385 1.37375832,9.20782385 1.78106497,9.60729768 L4.80392157,12.5720224 L12.218935,5.29960538 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

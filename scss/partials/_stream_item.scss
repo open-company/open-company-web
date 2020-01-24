@@ -31,6 +31,9 @@ div.stream-item {
   width: #{$board_container_width}px;
   height: #{$foc_height}px;
   margin: 0;
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
   border-bottom: 1px solid var(--foc-divider-line-color);
   border-top: 1px solid transparent;
   border-left: 1px solid transparent;
@@ -50,6 +53,97 @@ div.stream-item {
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px 16px;
     height: #{$mobile_foc_height}px;
+  }
+
+  // Mobile swipe buttons
+  button.mobile-more-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: $deep_navy;
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    left: 16px;
+    z-index: 4;
+    transition: width 180ms;
+    width: 0;
+    overflow: hidden;
+
+    @include big_web() {
+      display: none;
+    }
+
+    span {
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      margin-left: 26px;
+    }
+
+    &:before {
+      content: "";
+      width: 18px;
+      height: 4px;
+      background-image: cdnUrl("/img/ML/mobile_more_ellipsis_white.svg");
+      background-size: 18px 4px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 22px;
+      left: 24px;
+    }
+
+    &.visible {
+      width: 114px;
+    }
+  }
+
+  button.mobile-dismiss-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: $carrot_green;
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    right: 16px;
+    z-index: 4;
+    transition: width 180ms, margin-right 180ms;
+    width: 0;
+    margin-right: -124px;
+    overflow: hidden;
+
+    @include big_web() {
+      display: none;
+    }
+
+    span {
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      margin-left: 26px;
+    }
+
+    &:before {
+      content: "";
+      width: 14px;
+      height: 10px;
+      background-image: cdnUrl("/img/ML/mobile_dismiss_checkmark.svg");
+      background-size: 14px 10px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 19px;
+      left: 24px;
+    }
+
+    &.visible {
+      width: 124px;
+      margin-right: 0;
+    }
   }
 
   &.expandable {
@@ -75,6 +169,7 @@ div.stream-item {
       padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
       width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
       height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+      border: 1px solid var(--foc-hover-border-color);
 
       div.stream-item-header {
         div.more-menu button {
@@ -103,7 +198,10 @@ div.stream-item {
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
-        border: 1px solid var(--foc-new-border-color);
+        border-top: 1px solid var(--foc-new-border-color);
+        border-right: 1px solid var(--foc-new-border-color);
+        border-left: 1px solid var(--foc-new-border-color);
+        border-bottom: 1px solid var(--foc-new-border-color);
         padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
@@ -229,13 +327,6 @@ div.stream-item {
         margin: -12px -24px 0 0;
         &:not(.menu-expanded) button {
           display: none;
-        }
-      }
-
-      @include mobile() {
-        ul.more-menu-list {
-          left: unset;
-          right: 0;
         }
       }
     }
@@ -515,6 +606,10 @@ div.stream-item {
       div.stream-item-comments-summary {
         margin-right: 16px;
         float: left;
+
+        @include mobile() {
+          margin-top: 1px;
+        }
       }
 
       div.reactions {
@@ -563,6 +658,7 @@ div.stream-item {
           font-size: 12px;
           color: var(--color);
           opacity: 0.5;
+          line-height: 26px;
 
           @include mobile() {
             margin-top: 0;
@@ -579,7 +675,7 @@ div.stream-item {
           max-height: 200px;
           background-color: var(--overlay-background-color);
           border-radius: 4px;
-          border: 1px solid var(--light-color);
+          border: 1px solid var(--divider-line);
           padding: 8px 0;
           display: none;
           z-index: 2;
@@ -590,16 +686,16 @@ div.stream-item {
             display: block;
 
             &:active, &:hover {
-              background-color: #EBF8F1;
+              background-color: var(--selected-row-background-color);
               div.stream-item-attachments-item-desc {
-                color: $carrot_green;
+                color: var(--selected-row-background-color);
               }
             }
 
             div.stream-item-attachments-item-desc {
               @include OC_Body_Book();
               font-size: 14px;
-              color: var(--ultralight-color);
+              color: var(--light-color);
               white-space: nowrap;
               max-width: 100%;
 

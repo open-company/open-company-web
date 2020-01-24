@@ -37,7 +37,8 @@ $dark_mode: "dark";
   // Stream-item
   --foc-background-color: #{rgba($deep_navy, 0.05)};
   --mobile-foc-background-color: #{rgba($deep_navy, 0.05)};
-  --foc-hover-color: #{rgba(230, 232, 232, 1)};
+  --foc-hover-color: #F1F0F0;
+  --foc-hover-border-color: #{rgba($deep_navy, 0.24)};
   --foc-new-color: white;
   --foc-divider-line-color: #{rgba($deep_navy, 0.15)};
   --foc-new-border-color: #{rgba($deep_navy, 0.24)};
@@ -75,6 +76,10 @@ $dark_mode: "dark";
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.1);
 
+  // General settings
+  --selected-row-background-color: #EBF8F1;
+  --selected-row-color: #{$carrot_green};
+
   html, body {
     scrollbar-color: light;
   }
@@ -109,6 +114,7 @@ $dark_mode: "dark";
   --foc-background-color: #{rgba(black, 0.16)};
   --mobile-foc-background-color: #1B202A;
   --foc-hover-color: #{rgba(36, 41, 50, 1)};
+  --foc-hover-border-color: #{rgba(white, 0.22)};
   --foc-new-color: #{rgba(45, 49, 59, 1)};
   --foc-divider-line-color: #{rgba(white, 0.16)};
   --foc-new-border-color: #{rgba(white, 0.22)};
@@ -145,6 +151,10 @@ $dark_mode: "dark";
   // User dropdown
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.1);
+
+  // General settings
+  --selected-row-background-color: #{rgba(white, 0.2)};
+  --selected-row-color: #{$carrot_green};
 
   &, body {
     scrollbar-color: dark;
