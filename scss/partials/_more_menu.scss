@@ -564,6 +564,10 @@ div.more-menu {
               position: absolute;
               top: 18px;
               left: 18px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_read@dark.svg");
+              }
             }
           }
 
@@ -581,6 +585,10 @@ div.more-menu {
               position: absolute;
               top: 18px;
               left: 18px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_unread@dark.svg");
+              }
             }
           }
 
