@@ -27,6 +27,9 @@ div.virtualized-list-row.collapsed-item {
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
   margin: 0;
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
   border-bottom: 1px solid var(--foc-divider-line-color);
   background-color: var(--foc-background-color);
   overflow: visible;
@@ -88,7 +91,10 @@ div.stream-collapsed-item {
         z-index: 2;
         box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
         border-radius: 4px;
-        border: 1px solid var(--foc-new-border-color);
+        border-top: 1px solid var(--foc-new-border-color);
+        border-right: 1px solid var(--foc-new-border-color);
+        border-left: 1px solid var(--foc-new-border-color);
+        border-bottom: 1px solid var(--foc-new-border-color);
         padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
         margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;

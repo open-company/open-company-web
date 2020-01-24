@@ -287,7 +287,7 @@
                                  :data-title (utils/activity-date-tooltip comment-data)}
                                 (utils/foc-date-time (:created-at comment-data))]]]
                           (when new-comment?
-                            [:div.new-comment-tag "(NEW)"])
+                            [:div.new-comment-tag])
                           (when-not is-editing?
                             (if (responsive/is-mobile-size?)
                               [:div.stream-comment-mobile-menu

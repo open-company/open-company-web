@@ -144,6 +144,38 @@
   (api/load-more-items more-link direction (partial all-posts-more-finish direction (router/current-sort-type)))
   (dis/dispatch! [:all-posts-more (router/current-org-slug) (router/current-sort-type)]))
 
+;; Inbox
+
+(defn inbox-get-finish [{:keys [body success]}]
+  (when body
+    (let [org-data (dis/org-data)
+          org (router/current-org-slug)
+          posts-data-key (dis/posts-data-key org)
+          inbox-data (when success (json->cljs body))
+          fixed-inbox-data (au/fix-container (:collection inbox-data) (dis/change-data) org-data)]
+      (when (= (router/current-board-slug) "inbox")
+        (cook/set-cookie! (router/last-board-cookie org) "inbox" (* 60 60 24 365))
+        (request-reads-count (keys (:fixed-items fixed-inbox-data)))
+        (watch-boards (:fixed-items fixed-inbox-data)))
+      (dis/dispatch! [:inbox-get/finish org fixed-inbox-data]))))
+
+(defn inbox-get [org-data & [finish-cb]]
+  (when-let [inbox-link (utils/link-for (:links org-data) "inbox")]
+    (api/get-all-posts inbox-link
+     (fn [resp]
+       (inbox-get-finish resp)
+       (when (fn? finish-cb)
+         (finish-cb resp))))))
+
+(defn inbox-more-finish [direction {:keys [success body]}]
+  (when success
+    (request-reads-count (map :uuid (:items (:collection (json->cljs body))))))
+  (dis/dispatch! [:inbox-more/finish (router/current-org-slug) direction (when success (json->cljs body))]))
+
+(defn inbox-more [more-link direction]
+  (api/load-more-items more-link direction (partial inbox-more-finish direction))
+  (dis/dispatch! [:inbox-more (router/current-org-slug)]))
+
 ;; Must see
 (defn must-see-get-finish
   [sort-type {:keys [success body]}]
@@ -184,9 +216,12 @@
   (let [org-data (json->cljs body)
         is-all-posts (= (router/current-board-slug) "all-posts")
         is-follow-ups (= (router/current-board-slug) "follow-ups")
+        is-inbox (= (router/current-board-slug) "inbox")
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
         sort-type (router/current-sort-type)
-        board-rel (if (= sort-type :recent-activity) "activity" "self")]
+        board-rel (if (= sort-type :recent-activity) "activity" "self")
+        board-link (when (and (not is-all-posts) (not is-follow-ups) (not is-inbox))
+                     (utils/link-for (:links board-data) board-rel "GET"))]
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-all-posts
@@ -195,8 +230,10 @@
         (activity-get org-data))
       is-follow-ups
       (follow-ups-sort-get org-data)
-      :else
-      (sa/section-get sort-type (utils/link-for (:links board-data) board-rel "GET")))))
+      is-inbox
+      (inbox-get org-data)
+      (seq board-link)
+      (sa/section-get sort-type board-link))))
 
 (defn refresh-org-data []
   (let [org-link (utils/link-for (:links (dis/org-data)) ["item" "self"] "GET")]
@@ -671,7 +708,44 @@
             change-type (:change-type change-data)]
         ;; Refresh AP if user is looking at it
         (when (= (router/current-board-slug) "all-posts")
-          (all-posts-get (dis/org-data))))))
+          (all-posts-get (dis/org-data)))
+        (when (= (router/current-board-slug) "follow-ups")
+          (follow-ups-get (dis/org-data)))
+        (when (= (router/current-board-slug) "inbox")
+          (inbox-get (dis/org-data))))))
+  (ws-cc/subscribe :entry/inbox-action
+    (fn [data]
+      ;; Only in case the event is from/to this user:
+      (when (and (#{:dismiss :follow :unfollow} (:change-type (:data data)))
+                 (= (-> data :data :user-id) (jwt/user-id)))
+        (let [change-data (:data data)
+              activity-uuid (:item-id change-data)
+              change-type (:change-type change-data)
+              inbox-action (:inbox-action change-data)]
+          (cond
+            (= change-type :dismiss)
+            (do
+              (timbre/debug "Dismiss for" activity-uuid "with" (:dismiss-at inbox-action))
+              (dis/dispatch! [:inbox/dismiss (router/current-org-slug) activity-uuid])
+              (inbox-get (dis/org-data)))
+            (= change-type :follow)
+            (do
+              (timbre/debug "Follow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (inbox-get (dis/org-data)))
+            (= change-type :unfollow)
+            (do
+              (timbre/debug "Unfollow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (inbox-get (dis/org-data))))))
+      (when (and (utils/in? (-> data :data :users) (jwt/user-id))
+                 (= :comment-add (:change-type (:data data))))
+        (let [change-data (:data data)
+              activity-uuid (:item-id change-data)
+              change-type (:change-type change-data)
+              inbox-action (:inbox-action change-data)]
+          (timbre/debug "Comment added for" activity-uuid)
+          ;; Delay the inbox refresh to make sure follows have been added
+          ;; for al mentioned users
+          (utils/after 500 #(inbox-get (dis/org-data)))))))
   (ws-cc/subscribe :item/change
     (fn [data]
       (let [change-data (:data data)
@@ -700,6 +774,8 @@
             (all-posts-get org-data dispatch-unread)
             (= (router/current-board-slug) "follow-ups")
             (follow-ups-get org-data dispatch-unread)
+            (= (router/current-board-slug) "inbox")
+            (inbox-get org-data dispatch-unread)
             :else
             (sa/section-change section-uuid dispatch-unread)))
         ;; Refresh the activity in case of an item update
@@ -714,45 +790,14 @@
 
 ;; AP Seen
 
-(defn- send-item-seen
+(defn send-item-seen
   "Actually send the seen. Needs to get the activity data from the app-state
-  to read the published-at and make sure it's still inside the TTL."
+  to read the published-at."
   [activity-id]
   (when-let* [activity-data (dis/activity-data (router/current-org-slug) activity-id)
               publisher-id (:user-id (:publisher activity-data))
-              container-id (:board-uuid activity-data)
-              published-at-ts (.getTime (utils/js-date (:published-at activity-data)))
-              today-ts (.getTime (utils/js-date))
-              oc-seen-ttl-ms (* ls/oc-seen-ttl 24 60 60 1000)
-              minimum-ttl (- today-ts oc-seen-ttl-ms)]
-    (when (> published-at-ts minimum-ttl)
-      ;; Send the seen because:
-      ;; 1. item is published
-      ;; 2. item is newer than TTL
-      (ws-cc/item-seen publisher-id container-id activity-id))))
-
-(def ap-seen-timeouts-list (atom {}))
-(def ap-seen-wait-interval 3)
-
-(defn ap-seen-events-gate
-  "Gate to throttle too many seen call for the same UUID.
-  Set a timeout to ap-seen-wait-interval seconds every time it's called with a new UUID,
-  if there was already a timeout for that item remove the old one.
-  Once the timeout finishes it means no other events were fired for it so we can send a seen.
-  It will send seen every 3 seconds or more."
-  [activity-id]
-  ;; Discard everything if we are not on AP
-  (when (= :all-posts (keyword (router/current-board-slug)))
-    (let [wait-interval-ms (* ap-seen-wait-interval 1000)]
-      ;; Remove the old timeout if there is
-      (when-let [uuid-timeout (get @ap-seen-timeouts-list activity-id)]
-        (.clearTimeout js/window uuid-timeout))
-      ;; Set the new timeout
-      (swap! ap-seen-timeouts-list assoc activity-id
-       (utils/after wait-interval-ms
-        (fn []
-         (swap! ap-seen-timeouts-list dissoc activity-id)
-         (send-item-seen activity-id)))))))
+              container-id (:board-uuid activity-data)]
+    (ws-cc/item-seen publisher-id container-id activity-id)))
 
 ;; WRT read
 
@@ -864,7 +909,7 @@
       (api/delete-samples delete-samples-link
        #(do
           (api/get-org org-link refresh-org-data-cb)
-          (router/nav! (oc-urls/all-posts)))))))
+          (router/nav! (oc-urls/default-landing)))))))
 
 (defn has-sample-posts? []
   (let [org-data (dis/org-data)]
@@ -943,14 +988,19 @@
         (follow-ups-get org-data)
         (recent-follow-ups-get org-data))))))
 
+;; Refresh data
+
 (defn refresh-board-data [board-slug sort-type]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
-          board-data (if (#{"all-posts" "follow-ups"} board-slug)
+          board-data (if (dis/is-container? board-slug)
                        (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
                        (dis/board-data board-slug))]
        (cond
+
+        (= board-slug "inbox")
+        (inbox-get org-data)
 
         (= board-slug "all-posts")
         (all-posts-get org-data)
@@ -979,3 +1029,68 @@
         next-value (if (= current-value dis/default-foc-layout) dis/other-foc-layout dis/default-foc-layout)]
     (cook/set-cookie! (router/last-foc-layout-cookie (router/current-org-slug)) (name next-value) cook/default-cookie-expire)
     (dis/dispatch! [:input [:foc-layout] next-value])))
+
+;; Inbox actions
+
+(defn inbox-follow [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        follow-link (utils/link-for (:links activity-data) "follow")]
+    (api/inbox-follow follow-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))))))
+
+(defn inbox-unfollow [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        unfollow-link (utils/link-for (:links activity-data) "unfollow")]
+    (api/inbox-unfollow unfollow-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))))))
+
+(defn inbox-dismiss [entry-uuid]
+  (let [activity-data (dis/activity-data entry-uuid)
+        dismiss-link (utils/link-for (:links activity-data) "dismiss")]
+    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid])
+    (api/inbox-dismiss dismiss-link
+     (fn [{:keys [status success body]}]
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
+          nil]))
+        (inbox-get (dis/org-data))))))
+
+(defn- inbox-real-dismiss-all []
+  (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
+        dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
+    (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
+    (api/inbox-dismiss-all dismiss-all-link
+     (fn [{:keys [status success body]}]
+       (inbox-get (dis/org-data))))))
+
+(defn inbox-dismiss-all []
+  (let [alert-data {:action "dismiss-all"
+                    :title "Dismiss all posts?"
+                    :message " This action cannot be undone."
+                    :link-button-title "No, keep them"
+                    :link-button-style :green
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-title "Yes, dismiss them"
+                    :solid-button-style :red
+                    :solid-button-cb (fn []
+                                      (inbox-real-dismiss-all)
+                                      (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
