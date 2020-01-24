@@ -701,7 +701,7 @@ div.left-navigation-sidebar {
 
       @include big_web(){
         &:hover {
-          background-color: var(--light-color);
+          background-color: var(--navigation-sidebar-hover-bg);
         }
       }
     }
