@@ -53,10 +53,10 @@
           (activity-actions/activity-get org-data)
           (activity-actions/recent-activity-get org-data))
 
-        (= board-slug "follow-ups")
+        (= board-slug "bookmarks")
         (do
-          (activity-actions/follow-ups-get org-data)
-          (activity-actions/recent-follow-ups-get org-data))
+          (activity-actions/bookmarks-get org-data)
+          (activity-actions/recent-bookmarks-get org-data))
 
         :default
         (let [fixed-board-data (or board-data
@@ -256,15 +256,6 @@
 
 (defn hide-wrt []
   (pop-panel))
-
-;; Follow-ups users picker
-
-(defn show-follow-ups-picker [activity-uuid callback]
-  (dis/dispatch! [:input [:follow-ups-picker-callback] (fn [users-list]
-   (when (fn? callback)
-     (callback users-list))
-   (dis/dispatch! [:input [:follow-ups-picker-callback] nil]))])
-  (push-panel (keyword (str "follow-ups-picker-" (or activity-uuid "")))))
 
 ;; Integrations
 

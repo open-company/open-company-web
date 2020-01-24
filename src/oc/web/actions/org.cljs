@@ -111,11 +111,11 @@
         inbox-link (utils/link-for (:links org-data) "inbox")
         activity-link (utils/link-for (:links org-data) "entries")
         recent-activity-link (utils/link-for (:links org-data) "activity")
-        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
-        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
+        bookmarks-link (utils/link-for (:links org-data) "bookmarks")
+        recent-bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
-        is-follow-ups? (= current-board-slug "follow-ups")]
+        is-bookmarks? (= (router/current-board-slug) "bookmarks")]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
@@ -135,21 +135,22 @@
           (when (and recent-activity-link
                      is-all-posts?)
             (aa/recent-activity-get org-data))
-          ;; Load follow-ups data
-          (when (and follow-ups-link
-                     is-follow-ups?)
-            (aa/follow-ups-get org-data))
-          (when (and recent-follow-ups-link
-                     is-follow-ups?)
-            (aa/recent-follow-ups-get org-data)))))
+          ;; Preload bookmarks data
+          (when (and bookmarks-link
+                     is-bookmarks?)
+            (aa/bookmarks-get org-data))
+          (when (and recent-bookmarks-link
+                     is-bookmarks?)
+            (aa/recent-bookmarks-get org-data)))))
     (cond
-       (dis/is-container? current-board-slug)
-       (when (or (and is-inbox?
+      ;; If it's all posts page or must see, loads AP and must see for the current org
+      (dis/is-container? current-board-slug)
+      (when (or (and is-inbox?
                       (not inbox-link))
                  (and is-all-posts?
                       (not activity-link))
-                 (and is-follow-ups?
-                      (not follow-ups-link)))
+                 (and is-bookmarks?
+                      (not bookmarks-link)))
         (check-org-404))
       
       ; If there is a board slug let's load the board data

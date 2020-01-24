@@ -87,12 +87,12 @@
         activity-data (drv/react s :activity-data)
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
-        is-follow-ups (= current-board-slug "follow-ups")
+        is-bookmarks (= current-board-slug "bookmarks")
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
-        board-container-data (if (or is-inbox is-all-posts is-follow-ups) container-data board-data)
+        board-container-data (if (dis/is-container? current-board-slug) container-data board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
@@ -106,9 +106,7 @@
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and current-board-slug
-                                     (not is-inbox)
-                                     (not is-all-posts)
-                                     (not is-follow-ups)
+                                     (not (dis/is-container? current-board-slug))
                                      (not (:read-only current-board-data)))
         cmail-state (drv/react s :cmail-state)
         _cmail-data (drv/react s :cmail-data)
@@ -149,13 +147,12 @@
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= current-board-slug "inbox"))
                           "active")}]
-              [:button.mlb-reset.follow-ups-tab
+              [:button.mlb-reset.bookmarks-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "follow-ups" (oc-urls/follow-ups)))
+                              (nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (or (= current-board-slug "follow-ups")
-                                       (= current-board-slug "must-see")))
+                                   (= current-board-slug "bookmarks"))
                           "active")}]
               [:button.mlb-reset.notifications-tab
                 {:on-click #(do
@@ -229,8 +226,8 @@
                                                    is-all-posts
                                                    "All posts"
 
-                                                   is-follow-ups
-                                                   "Follow-ups"
+                                                   is-bookmarks
+                                                   "Bookmarks"
 
                                                    :default
                                                    ;; Fallback to the org board data
@@ -322,5 +319,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-follow-ups "FU" :else (:slug current-board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-bookmarks "BM" :else (:slug current-board-data)) "-" board-sort))
               )]]]))

@@ -245,9 +245,9 @@
   (swap! reactions-atom index-posts org (-> body :collection :items))
   db)
 
-(defmethod reducer :follow-ups-get/finish
-  [db [_ {:keys [org year month from body]}]]
-  (swap! reactions-atom index-posts org (-> body :collection :items))
+(defmethod reducer :bookmarks-get/finish
+  [db [_ org sort-type fixed-body]]
+  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :section
