@@ -65,6 +65,8 @@
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
+        (= current-board-slug "inbox")
+        (activity-actions/inbox-more @(::has-next s) :down)
         (= current-board-slug "all-posts")
         (activity-actions/all-posts-more @(::has-next s) :down)
         (= current-board-slug "follow-ups")
@@ -74,9 +76,6 @@
     ;; Save the last scrollTop value
     (when (not= scroll-top @(::last-scroll s))
       (reset! (::last-scroll s) scroll-top))))
-
-(defn- ap-seen-mixin-cb [_ item-uuid]
-  (activity-actions/ap-seen-events-gate item-uuid))
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)

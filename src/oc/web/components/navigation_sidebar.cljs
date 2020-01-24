@@ -115,12 +115,15 @@
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
         selected-slug (or (:back-to @router/path) (router/current-board-slug))
+        is-inbox (= selected-slug "inbox")
         is-all-posts (= selected-slug "all-posts")
         is-follow-ups (= selected-slug "follow-ups")
         is-drafts-board (= selected-slug utils/default-drafts-board-slug)
         create-link (utils/link-for (:links org-data) "create")
         show-boards (or create-link (pos? (count boards)))
         user-is-part-of-the-team? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-inbox (and user-is-part-of-the-team?
+                        (utils/link-for (:links org-data) "inbox"))
         show-all-posts (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "activity"))
         show-follow-ups (and user-is-part-of-the-team?
@@ -132,6 +135,7 @@
         is-tall-enough? (not (neg? (- @(::window-height s) sidebar-top-margin @(::content-height s))))
         follow-ups-data (drv/react s :follow-ups-data)
         drafts-data (drv/react s :drafts-data)
+        all-unread-items (mapcat :unread (vals filtered-change-data))
         user-role (user-store/user-role org-data current-user-data)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
@@ -140,10 +144,11 @@
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
                                 :collapsed-sections @(::sections-list-collapsed s)})
-       :on-click #(when-not (utils/event-inside? % (rum/ref-node s "left-navigation-sidebar-content"))
+       :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
       [:div.left-navigation-sidebar-content
+        {:ref :left-navigation-sidebar-content}
         (when is-mobile?
           [:div.left-navigation-sidebar-mobile-header
             [:button.mlb-reset.mobile-close-bt
@@ -157,8 +162,22 @@
              :on-click #(nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts))}
             [:div.all-posts-icon]
             [:div.all-posts-label
-              {:class (utils/class-set {:new (seq (apply concat (map :unread (vals filtered-change-data))))})}
-              "All posts"]])
+              {:class (utils/class-set {:new (seq all-unread-items)})}
+              "All posts"]
+            ; (when (pos? (count all-unread-items))
+            ;   [:span.count (count all-unread-items)])
+            ])
+        ;; Inbox
+        (when show-inbox
+          [:a.inbox.hover-item.group
+            {:class (utils/class-set {:item-selected is-inbox})
+             :href (oc-urls/inbox)
+             :on-click #(nav-actions/nav-to-url! % "inbox" (oc-urls/inbox))}
+            [:div.inbox-icon]
+            [:div.inbox-label
+              "Unread"]
+            (when (pos? (:inbox-count org-data))
+              [:span.count (:inbox-count org-data)])])
         (when show-follow-ups
           [:a.follow-ups.hover-item.group
             {:class (utils/class-set {:item-selected is-follow-ups})
@@ -173,7 +192,9 @@
           (let [board-url (oc-urls/board (:slug drafts-board))
                 draft-count (if drafts-data (count (:posts-list drafts-data)) (:count drafts-link))]
             [:a.drafts.hover-item.group
-              {:class (when (and (not is-all-posts)
+              {:class (when (and (not is-inbox)
+                                 (not is-all-posts)
+                                 (not is-follow-ups)
                                  (= (router/current-board-slug) (:slug drafts-board)))
                         "item-selected")
                :data-board (name (:slug drafts-board))
@@ -192,7 +213,7 @@
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
-                 :on-click #(when-not is-mobile? (toggle-collapse-sections s))}
+                 :on-click #(toggle-collapse-sections s)}
                 [:span.sections "Sections"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
@@ -206,11 +227,13 @@
           [:div.left-navigation-sidebar-items.group
             (for [board sorted-boards
                   :let [board-url (oc-urls/board org-slug (:slug board))
-                        is-current-board (= selected-slug (:slug board))
+                        is-current-board (and (not is-inbox)
+                                              (not is-all-posts)
+                                              (not is-follow-ups)
+                                              (= selected-slug (:slug board)))
                         board-change-data (get change-data (:uuid board))]]
               [:a.left-navigation-sidebar-item.hover-item
-                {:class (utils/class-set {:item-selected (and (not is-all-posts)
-                                                              is-current-board)})
+                {:class (utils/class-set {:item-selected is-current-board})
                  :data-board (name (:slug board))
                  :key (str "board-list-" (name (:slug board)) "-" (rand 100))
                  :href board-url

@@ -205,7 +205,7 @@
                                            (= @(::show-picker s) (:uuid comment-data)))
                       new-comment? (and (not= (-> comment-data :author :user-id) current-user-id)
                                         (< (.getTime (utils/js-date last-read-at))
-                                           (.getTime (utils/js-date (:created-at comment-data)))))]]
+                                        (.getTime (utils/js-date (:created-at comment-data)))))]]
             (if is-editing?
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
@@ -275,7 +275,7 @@
                             [:div.stream-comment-author-timestamp
                               (utils/foc-date-time (:created-at comment-data))]]
                           (when new-comment?
-                            [:div.new-comment-tag "(NEW)"])
+                            [:div.new-comment-tag])
                           (when-not is-editing?
                             (if (responsive/is-mobile-size?)
                               [:div.stream-comment-mobile-menu
