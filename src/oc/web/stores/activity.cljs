@@ -1,9 +1,11 @@
 (ns oc.web.stores.activity
-  (:require [taoensso.timbre :as timbre]
+  (:require [cuerdas.core :as str]
+            [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]))
+
 (defn add-remove-item-from-all-posts
   "Given an activity map adds or remove it from the all-posts list of posts depending on the activity
    status"
@@ -495,7 +497,6 @@
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread true)
-        temp-val (get-in db section-change-key)
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
@@ -503,17 +504,27 @@
       (assoc-in activity-key next-activity-data))))
 
 (defmethod dispatcher/action :mark-read
-  [db [_ org-slug activity-data]]
+  [db [_ org-slug activity-data dismiss-at]]
   (let [board-uuid (:board-uuid activity-data)
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
+        all-comments-data (dispatcher/activity-comments-data org-slug activity-uuid db)
+        comments-data (filterv #(not= (j/user-id) (-> % :author :user-id)) all-comments-data)
         activity-key (dispatcher/activity-key org-slug activity-uuid)
-        next-activity-data (assoc (get-in db activity-key) :unread false)
-        temp-val (get-in db section-change-key)
+        old-activity-data (get-in db activity-key)
+        ;; Update the activity to read and update the new-at with the max btw the current value
+        ;; and the created-at of the last comment.
+        next-activity-data (merge old-activity-data {:unread false
+                                                     :new-at (if (and (seq comments-data)
+                                                                                (-> comments-data last :created-at
+                                                                                 (compare (:new-at old-activity-data))
+                                                                                 pos?))
+                                                                         (-> comments-data last :created-at)
+                                                                         (:new-at old-activity-data))})
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
-      (update-in activity-read-key merge {:last-read-at (utils/as-of-now)})
+      (update-in activity-read-key merge {:last-read-at dismiss-at})
       (assoc-in activity-key next-activity-data))))
 
 ;; Inbox
@@ -566,10 +577,37 @@
     (let [inbox-key (dispatcher/container-key org-slug "inbox")
           inbox-data (get-in db inbox-key)
           without-item (update inbox-data :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
-          org-data-key (dispatcher/org-data-key org-slug)]
+          org-data-key (dispatcher/org-data-key org-slug)
+          update-count? (not= (-> inbox-data :posts-list count) (-> without-item :posts-list count))]
       (-> db
         (assoc-in inbox-key without-item)
-        (update-in (conj org-data-key :inbox-count) dec)))
+        (update-in (conj org-data-key :inbox-count) (if update-count? dec identity))))
+    db))
+
+(defmethod dispatcher/action :inbox/unread
+  [db [_ org-slug current-board-slug item-id]]
+  (if-let [activity-data (dispatcher/activity-data item-id)]
+    (let [inbox-key (dispatcher/container-key org-slug "inbox")
+          posts-list-key (conj inbox-key :posts-list)
+          inbox-data (get-in db inbox-key)
+          next-db (if inbox-data
+                    (update-in db posts-list-key (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
+                    db)
+          activity-key (dispatcher/activity-key org-slug item-id)
+          activity-data (get-in db activity-key)
+          fixed-activity-data (update activity-data :links (fn [links]
+                               (mapv (fn [link]
+                                (if (= (:rel link) "follow")
+                                  (merge link {:href (str/replace (:href link) #"/follow/?$" "/unfollow/")
+                                               :rel "unfollow"})
+                                  link))
+                                 links)))
+          org-data-key (dispatcher/org-data-key org-slug)
+          update-count? (and inbox-data
+                             (not= (count (get-in db posts-list-key)) (count (get-in next-db posts-list-key))))]
+      (-> next-db
+       (update-in (conj org-data-key :inbox-count) (if update-count? inc identity))
+       (assoc-in activity-key fixed-activity-data)))
     db))
 
 (defmethod dispatcher/action :inbox/dismiss-all

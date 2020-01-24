@@ -57,6 +57,14 @@ div.stream-collapsed-item {
           display: initial;
         }
       }
+
+      div.more-menu {
+        background-color: var(--foc-hover-color);
+
+        &:before {
+          background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
+        }
+      }
     }
   }
 
@@ -96,7 +104,6 @@ div.stream-collapsed-item {
         border-left: 1px solid var(--foc-new-border-color);
         border-bottom: 1px solid var(--foc-new-border-color);
         padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
       }

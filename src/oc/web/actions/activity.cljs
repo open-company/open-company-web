@@ -370,8 +370,7 @@
             (do
               (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid entry-data) nil])
               (routing-actions/maybe-404))
-            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-             nil])))))))
+            (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil])))))))
 
 (declare entry-revert)
 
@@ -643,7 +642,7 @@
   (ws-cc/subscribe :entry/inbox-action
     (fn [data]
       ;; Only in case the event is from/to this user:
-      (when (and (#{:dismiss :follow :unfollow} (:change-type (:data data)))
+      (when (and (#{:dismiss :unread :follow :unfollow :comment-add} (:change-type (:data data)))
                  (= (-> data :data :user-id) (jwt/user-id)))
         (let [change-data (:data data)
               activity-uuid (:item-id change-data)
@@ -652,16 +651,21 @@
           (cond
             (= change-type :dismiss)
             (do
-              (timbre/debug "Dismiss for" activity-uuid "with" (:dismiss-at inbox-action))
+              (timbre/debug "Dismiss for" activity-uuid)
               (dis/dispatch! [:inbox/dismiss (router/current-org-slug) activity-uuid])
+              (inbox-get (dis/org-data)))
+            (= change-type :unread)
+            (do
+              (timbre/debug "Unread for" activity-uuid)
+              (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) activity-uuid])
               (inbox-get (dis/org-data)))
             (= change-type :follow)
             (do
-              (timbre/debug "Follow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (timbre/debug "Follow for" activity-uuid)
               (inbox-get (dis/org-data)))
             (= change-type :unfollow)
             (do
-              (timbre/debug "Unfollow for" activity-uuid "with" (:dismiss-at inbox-action))
+              (timbre/debug "Unfollow for" activity-uuid)
               (inbox-get (dis/org-data))))))
       (when (and (utils/in? (-> data :data :users) (jwt/user-id))
                  (= :comment-add (:change-type (:data data))))
@@ -743,20 +747,22 @@
 (defn send-item-read
   "Actually send the read. Needs to get the activity data from the app-state
   to read the published-id and the board uuid."
-  [activity-id & [show-notification]]
+  [activity-id]
   (when-let* [activity-key (dis/activity-key (router/current-org-slug) activity-id)
               activity-data (get-in @dis/app-state activity-key)
               org-id (:uuid (dis/org-data))
               container-id (:board-uuid activity-data)
               user-name (jwt/get-key :name)
               avatar-url (jwt/get-key :avatar-url)]
-    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)
+    (ws-cc/item-read org-id container-id activity-id user-name avatar-url)))
+
+(declare inbox-dismiss)
+
+(defn mark-read [activity-uuid]
+  (let [activity-data (dis/activity-data activity-uuid)]
+    (send-item-read activity-uuid)
     (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
-    (when show-notification
-      (notification-actions/show-notification {:title "Post marked as read"
-                                               :dismiss true
-                                               :expire 3
-                                               :id :mark-read-success}))))
+    (inbox-dismiss activity-uuid)))
 
 (def wrt-timeouts-list (atom {}))
 (def wrt-wait-interval 3)
@@ -860,17 +866,6 @@
           cmail-state {:fullscreen true :key (utils/activity-uuid)}]
       (cmail-actions/cmail-show fixed-activity-data cmail-state))))
 
-(defn mark-unread [activity-data]
-  (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
-    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
-    (api/mark-unread mark-unread-link (:board-uuid activity-data)
-     (fn [{:keys [success]}]
-      (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
-                                               :description (when-not success "Please try again")
-                                               :dismiss true
-                                               :expire 3
-                                               :id (if success :mark-unread-success :mark-unread-error)})))))
-
 (defn add-bookmark [activity-data add-bookmark-link]
   (when add-bookmark-link
     (dis/dispatch! [:bookmark-toggle (router/current-org-slug) (:uuid activity-data) true])
@@ -939,8 +934,7 @@
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))))))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-unfollow [entry-uuid]
   (let [activity-data (dis/activity-data entry-uuid)
@@ -952,29 +946,47 @@
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))))))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))))))
 
 (defn inbox-dismiss [entry-uuid]
-  (let [activity-data (dis/activity-data entry-uuid)
+  (let [dismiss-at (utils/as-of-now)
+        activity-data (dis/activity-data entry-uuid)
         dismiss-link (utils/link-for (:links activity-data) "dismiss")]
-    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid])
-    (api/inbox-dismiss dismiss-link
+    (dis/dispatch! [:inbox/dismiss (router/current-org-slug) entry-uuid dismiss-at])
+    (api/inbox-dismiss dismiss-link dismiss-at
      (fn [{:keys [status success body]}]
        (if (and (= status 404)
                 (= (:uuid activity-data) (router/current-activity-id)))
          (do
            (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
            (routing-actions/maybe-404))
-         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body)
-          nil]))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
         (inbox-get (dis/org-data))))))
 
+(defn inbox-unread [activity-data]
+  (when-let [unread-link (utils/link-for (:links activity-data) "unread")]
+    (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
+    (api/inbox-unread unread-link
+     (fn [{:keys [status success body]}]
+       (notification-actions/show-notification {:title (if success "Post added to Unread" "An error occurred")
+                                                :description (when-not success "Please try again")
+                                                :dismiss true
+                                                :expire 3
+                                                :id (if success :inbox-unread-success :inbox-unread-error)})
+       (if (and (= status 404)
+                (= (:uuid activity-data) (router/current-activity-id)))
+         (do
+           (dis/dispatch! [:activity-get/not-found (router/current-org-slug) (:uuid activity-data) nil])
+           (routing-actions/maybe-404))
+         (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
+       (inbox-get (dis/org-data))))))
+
 (defn- inbox-real-dismiss-all []
-  (let [inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
+  (let [dismiss-at (utils/as-of-now)
+        inbox-data (dis/container-data @dis/app-state (router/current-org-slug) "inbox")
         dismiss-all-link (utils/link-for (:links inbox-data) "dismiss-all")]
     (dis/dispatch! [:inbox/dismiss-all (router/current-org-slug)])
-    (api/inbox-dismiss-all dismiss-all-link
+    (api/inbox-dismiss-all dismiss-all-link dismiss-at
      (fn [{:keys [status success body]}]
        (inbox-get (dis/org-data))))))
 

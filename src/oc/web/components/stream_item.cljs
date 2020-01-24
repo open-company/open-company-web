@@ -193,6 +193,7 @@
                            :external-follow (not is-mobile?)
                            :show-edit? true
                            :show-delete? true
+                           :show-unread (not is-inbox?)
                            :show-move? (not is-mobile?)
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))

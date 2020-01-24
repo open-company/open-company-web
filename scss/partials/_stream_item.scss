@@ -35,9 +35,6 @@ div.stream-item {
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   border-bottom: 1px solid var(--foc-divider-line-color);
-  border-top: 1px solid transparent;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
   padding: 24px 32px;
   background-color: var(--foc-background-color);
   overflow: visible;
@@ -53,6 +50,93 @@ div.stream-item {
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px 16px;
     height: #{$mobile_foc_height}px;
+  }
+
+  &.expandable {
+    cursor: pointer;
+
+    @include big_web() {
+      &:hover {
+        div.stream-item-header {
+          div.more-menu button {
+            display: initial;
+          }
+        }
+      }
+    }
+  }
+
+  @include big_web() {
+    &:hover {
+      background-color: var(--foc-hover-color);
+      z-index: 2;
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
+      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+      border: 1px solid var(--foc-hover-border-color);
+
+      div.stream-item-header {
+        div.more-menu button {
+          display: initial;
+        }
+      }
+    }
+  }
+
+  &.draft {
+    cursor: pointer;
+  }
+
+  &.unread-item {
+    background-color: var(--foc-new-color);
+    z-index: 1;
+    position: relative;
+
+    &.showing-share {
+      z-index: 3;
+    }
+
+    @include big_web(){
+      &:hover {
+        background-color: var(--foc-new-color);
+        z-index: 2;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        border-top: 1px solid var(--foc-new-border-color);
+        border-right: 1px solid var(--foc-new-border-color);
+        border-left: 1px solid var(--foc-new-border-color);
+        border-bottom: 1px solid var(--foc-new-border-color);
+        padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+      }
+    }
+  }
+
+  &:not(.bookmark-item).must-see-item {
+
+    div.must-see-tag {
+      display: inline-block;
+    }
+  }
+
+  &.bookmark-item, &.bookmark-item.must-see-item {
+    div.must-see-tag {
+      display: none;
+    }
+
+    div.bookmark-tag, div.bookmark-tag-small {
+      display: inline-block;
+    }
+  }
+
+  div.activity-share-container {
+    div.activity-share-modal-container {
+      right: -9px;
+      margin-top: 32px;
+    }
   }
 
   // Mobile swipe buttons
@@ -143,93 +227,6 @@ div.stream-item {
     &.visible {
       width: 124px;
       margin-right: 0;
-    }
-  }
-
-  &.expandable {
-    cursor: pointer;
-
-    @include big_web() {
-      &:hover {
-        div.stream-item-header {
-          div.more-menu button {
-            display: initial;
-          }
-        }
-      }
-    }
-  }
-
-  @include big_web() {
-    &:hover {
-      background-color: var(--foc-hover-color);
-      z-index: 2;
-      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-      padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
-      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
-      border: 1px solid var(--foc-hover-border-color);
-
-      div.stream-item-header {
-        div.more-menu button {
-          display: initial;
-        }
-      }
-    }
-  }
-
-  &.draft {
-    cursor: pointer;
-  }
-
-  &.unread-item {
-    background-color: var(--foc-new-color);
-    z-index: 1;
-    position: relative;
-
-    &.showing-share {
-      z-index: 3;
-    }
-
-    @include big_web(){
-      &:hover {
-        background-color: var(--foc-new-color);
-        z-index: 2;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        border-top: 1px solid var(--foc-new-border-color);
-        border-right: 1px solid var(--foc-new-border-color);
-        border-left: 1px solid var(--foc-new-border-color);
-        border-bottom: 1px solid var(--foc-new-border-color);
-        padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
-        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
-      }
-    }
-  }
-
-  &:not(.bookmark-item).must-see-item {
-
-    div.must-see-tag {
-      display: inline-block;
-    }
-  }
-
-  &.bookmark-item, &.bookmark-item.must-see-item {
-    div.must-see-tag {
-      display: none;
-    }
-
-    div.bookmark-tag, div.bookmark-tag-small {
-      display: inline-block;
-    }
-  }
-
-  div.activity-share-container {
-    div.activity-share-modal-container {
-      right: -9px;
-      margin-top: 32px;
     }
   }
 
@@ -334,7 +331,6 @@ div.stream-item {
       height: 32px;
 
       @include big_web() {
-        margin: -12px -24px 0 0;
         &:not(.menu-expanded) button {
           display: none;
         }

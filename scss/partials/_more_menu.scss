@@ -316,7 +316,7 @@ div.more-menu {
   ul.more-menu-list {
     position: absolute;
     top: 26px;
-    left: calc(100% - 108px);
+    left: 0;
     width: 94px;
     outline: none;
     z-index: 110;
@@ -329,8 +329,6 @@ div.more-menu {
     list-style-type: none;
 
     &.has-add-bookmark {
-      left: unset;
-      right: 0;
       width: 144px;
 
       @include mobile() {
@@ -341,8 +339,6 @@ div.more-menu {
     }
 
     &.has-remove-bookmark {
-      left: unset;
-      right: 0;
       width: 162px;
 
       @include mobile() {
@@ -350,6 +346,16 @@ div.more-menu {
         right: 0;
         width: 162px;
       }
+    }
+
+    &.has-mark-unread {
+      width: 138px;
+
+      @include mobile() {
+        left: unset;
+        right: 0;
+        width: 138px;
+      } 
     }
 
     @include mobile() {
@@ -541,6 +547,40 @@ div.more-menu {
               @include dark_mode() {
                 background-image: cdnUrl("/img/ML/mobile_more_share@dark.svg");
               }
+            }
+          }
+
+          &.read {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_read.svg");
+              background-size: 12px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 18px;
+            }
+          }
+
+          &.unread {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_unread.svg");
+              background-size: 12px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 18px;
             }
           }
 
