@@ -55,7 +55,7 @@
                               ;; Locals
                               (rum/local false ::sorting-menu-expanded)
                               ;; Mixins
-                              ui-mixins/refresh-tooltips-mixin
+                              ui-mixins/strict-refresh-tooltips-mixin
                               (ui-mixins/on-window-click-mixin (fn [s e]
                                (when (and @(::sorting-menu-expanded s)
                                           (not (utils/event-inside? e (rum/ref-node s :board-sort-menu))))
@@ -72,11 +72,6 @@
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)
                                 (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-                                s)
-                               :did-remount (fn [_ s]
-                                (doto (.find (js/$ (rum/dom-node s)) "[data-toggle=\"tooltip\"]")
-                                  (.tooltip "hide")
-                                  (.tooltip "fixTitle"))
                                 s)}
   [s]
   (let [org-data (drv/react s :org-data)
@@ -90,13 +85,14 @@
         route (drv/react s :route)
         team-data (drv/react s :team-data)
         activity-data (drv/react s :activity-data)
+        is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-follow-ups (= current-board-slug "follow-ups")
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
-        board-container-data (if (or is-all-posts is-follow-ups) container-data board-data)
+        board-container-data (if (or is-inbox is-all-posts is-follow-ups) container-data board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
@@ -110,6 +106,7 @@
         current-user-data (drv/react s :current-user-data)
         is-admin-or-author (utils/is-admin-or-author? org-data)
         should-show-settings-bt (and current-board-slug
+                                     (not is-inbox)
                                      (not is-all-posts)
                                      (not is-follow-ups)
                                      (not (:read-only current-board-data)))
@@ -124,7 +121,11 @@
                                 (or (= (:board-slug activity-data) current-board-slug)
                                     (= (:board-uuid activity-data) current-board-slug)))
         no-phisical-home-button (and ua/mobile-app?
-                                     (js/isiPhoneWithoutPhysicalHomeBt))]
+                                     (js/isiPhoneWithoutPhysicalHomeBt))
+        should-show-sort? (and (not is-drafts-board)
+                               (not is-inbox))
+        dismiss-all-link (when is-inbox
+                           (utils/link-for (:links container-data) "dismiss-all"))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (when show-expanded-post "expanded-post-view")}
@@ -140,12 +141,12 @@
                                         :ios-tabbar no-phisical-home-button
                                         :ios (and (not no-phisical-home-button)
                                                   ua/ios?)})}
-              [:button.mlb-reset.all-posts-tab
+              [:button.mlb-reset.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "all-posts" (oc-urls/all-posts)))
+                              (nav-actions/nav-to-url! % "inbox" (oc-urls/inbox)))
                  :class (when (and (not showing-mobile-user-notifications)
-                                   (= current-board-slug "all-posts"))
+                                   (= current-board-slug "inbox"))
                           "active")}]
               [:button.mlb-reset.follow-ups-tab
                 {:on-click #(do
@@ -221,6 +222,8 @@
                                                                 (not is-drafts-board))
                                                   :public (= (:access current-board-data) "public")})
                          :dangerouslySetInnerHTML (utils/emojify (cond
+                                                   is-inbox
+                                                   "Unread"
 
                                                    is-all-posts
                                                    "All posts"
@@ -260,6 +263,14 @@
                          :title (str (:name current-board-data) " settings")
                          :on-click #(nav-actions/show-section-editor (:slug current-board-data))}]])]
                 [:div.board-name-right
+                  (when (and dismiss-all-link
+                             (pos? (count posts-data)))
+                    [:button.mlb-reset.complete-all-bt
+                      {:on-click #(activity-actions/inbox-dismiss-all)
+                       :data-toggle (when-not is-mobile? "tooltip")
+                       :data-placement "top"
+                       :data-container "body"
+                       :title "Dismiss all"}])
                   (when-not is-drafts-board
                     (let [default-sort (= board-sort dis/default-sort-type)]
                       [:div.board-sort.group
@@ -269,25 +280,32 @@
                             {:on-click (fn [e]
                                          (search-actions/active)
                                          (utils/after 500 #(.focus (js/$ "input.search"))))}])
-                        [:button.mlb-reset.board-sort-bt
-                          {:on-click #(swap! (::sorting-menu-expanded s) not)}
-                          (if default-sort "Recent activity" "Recently posted")]
-                        [:div.board-sort-menu
-                          {:class (when @(::sorting-menu-expanded s) "show-menu")}
-                          [:div.board-sort-menu-item
-                            {:class (when default-sort "active")
-                             :on-click #(do
-                                          (reset! (::sorting-menu-expanded s) false)
-                                          (activity-actions/change-sort-type :recent-activity))}
-                            "Recent activity"]
-                          [:div.board-sort-menu-item
-                            {:class (when-not default-sort "active")
-                             :on-click #(do
-                                          (reset! (::sorting-menu-expanded s) false)
-                                          (activity-actions/change-sort-type :recently-posted))}
-                            "Recently posted"]]]))
+                        (when-not is-inbox
+                          [:button.mlb-reset.board-sort-bt
+                            {:on-click #(swap! (::sorting-menu-expanded s) not)}
+                            (if default-sort "Recent activity" "Recently posted")])
+                        (when-not is-inbox
+                          [:div.board-sort-menu
+                            {:class (when @(::sorting-menu-expanded s) "show-menu")}
+                            [:div.board-sort-menu-item
+                              {:class (when default-sort "active")
+                               :on-click #(do
+                                            (reset! (::sorting-menu-expanded s) false)
+                                            (activity-actions/change-sort-type :recent-activity))}
+                              "Recent activity"]
+                            [:div.board-sort-menu-item
+                              {:class (when-not default-sort "active")
+                               :on-click #(do
+                                            (reset! (::sorting-menu-expanded s) false)
+                                            (activity-actions/change-sort-type :recently-posted))}
+                              "Recently posted"]])]))
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
+                     :data-toggle (when-not is-mobile? "tooltip")
+                     :data-placement "top"
+                     :data-container "body"
+                     :data-offset-left "-2px"
+                     :title (if (= foc-layout dis/other-foc-layout) "Expanded view" "Compact view")
                      :class (when (= foc-layout dis/other-foc-layout) "collapsed")}]]])
 
             ;; Board content: empty org, all posts, empty board, drafts view, entries view
@@ -303,5 +321,5 @@
               ;; Paginated board/container
               :else
               (rum/with-key (lazy-stream paginated-stream)
-               (str "paginated-posts-component-" (cond is-all-posts "AP" is-follow-ups "FU" :else (:slug current-board-data)) "-" board-sort))
+               (str "paginated-posts-component-" (cond is-inbox "IN" is-all-posts "AP" is-follow-ups "FU" :else (:slug current-board-data)) "-" board-sort))
               )]]]))

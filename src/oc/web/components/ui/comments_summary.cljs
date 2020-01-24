@@ -35,7 +35,6 @@
 (rum/defc comments-summary < rum/static
   [{:keys [entry-data
            comments-data
-           show-new-tag?
            hide-label?
            hide-face-pile?]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
@@ -57,12 +56,16 @@
                           (if is-mobile?
                             (+ 8 (* 12 face-pile-count))
                             (+ 10 (* 12 face-pile-count)))
-                            0)]
+                            0)
+        show-new-tag? (pos? (:new-comments-count entry-data))]
     (when comments-count
       [:div.is-comments
         {:on-click (fn [e]
-                     (nav-actions/open-post-modal entry-data true)
-                     (comment-actions/add-comment-focus (:uuid entry-data)))}
+                     ;; To avoid navigating to the post again and lose the coming from data
+                     ;; nav only when not in the expanded post
+                     (when-not (seq (router/current-activity-id))
+                       (nav-actions/open-post-modal entry-data true)
+                       (comment-actions/add-comment-focus (:uuid entry-data))))}
         ; Comments authors heads
         (when (and (not hide-face-pile?)
                   (or (not hide-label?)
@@ -76,6 +79,7 @@
                 (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])])
         (when-not (and hide-label?
                        (zero? comments-count))
+
           ; Comments count
           [:div.is-comments-summary
             {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
@@ -83,12 +87,16 @@
                                       :has-new-comments show-new-tag?})}
             (if (pos? comments-count)
               [:div.is-comments-summary-inner.group
-                (str comments-count
-                 (when-not hide-label?
-                  (str " comment" (when (not= comments-count 1) "s"))))
-                (when show-new-tag?
-                  [:div.new-comments-tag
-                    "(NEW)"])]
+                (str
+                 (if show-new-tag?
+                   (:new-comments-count entry-data)
+                   comments-count)
+                 (if show-new-tag?
+                   (if hide-label?
+                     " new"
+                     (str " new comment" (when (not= (:new-comments-count entry-data) 1) "s")))
+                   (when-not hide-label?
+                     (str " comment" (when (not= comments-count 1) "s")))))]
               (when-not hide-label?
                 [:span.add-a-comment
                   "Add a comment"]))])])))

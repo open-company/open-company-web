@@ -7,6 +7,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.lib.responsive :as responsive]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.activity-move :refer (activity-move)]))
@@ -59,11 +60,20 @@
                             (when (fn? will-close)
                               (will-close)))
                          (reset! (::showing-menu s) false))))
-                       ui-mixins/refresh-tooltips-mixin
+                       {:did-mount (fn [s]
+                        (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+                       s)
+                       :did-update (fn [s]
+                        (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+                          #(doto (js/$ %2)
+                             (.tooltip "fixTitle")
+                             (.tooltip "hide")))
+                       s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
-             reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title]}]
+             reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title
+             show-inbox?]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
@@ -78,7 +88,9 @@
                                 can-react?
                                 can-reply?
                                 (and (not external-share)
-                                     share-link))]
+                                     share-link))
+        inbox-follow-link (utils/link-for (:links entity-data) "follow")
+        inbox-unfollow-link (utils/link-for (:links entity-data) "unfollow")]
     (when (or edit-link
               share-link
               delete-link
@@ -114,6 +126,35 @@
                                                                    complete-follow-up-link)
                                       :has-create-follow-up (and is-mobile?
                                                                  create-follow-up-link)})}
+            (if (and is-mobile?
+                     inbox-follow-link)
+              [:li.dismiss
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/inbox-follow (:uuid entity-data)))}
+                "Follow"]
+              (when (and is-mobile?
+                         inbox-unfollow-link)
+                [:li.dismiss
+                  {:on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/inbox-unfollow (:uuid entity-data)))}
+                  "Mute"]))
+            (when (and is-mobile?
+                       show-inbox?)
+              [:li.dismiss
+                {:on-click #(do
+                              (reset! (::showing-menu s) false)
+                              (when (fn? will-close)
+                                (will-close))
+                              (activity-actions/inbox-dismiss (:uuid entity-data))
+                              (when (seq (router/current-activity-id))
+                                (nav-actions/dismiss-post-modal %)))}
+                "Dismiss"])
             (when (and edit-link
                        show-edit?)
               [:li.edit
@@ -205,6 +246,12 @@
           [:button.mlb-reset.more-menu-share-bt
             {:type "button"
              :ref "tile-menu-share-bt"
+             :class (when (or inbox-follow-link
+                              inbox-unfollow-link
+                              show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
@@ -215,11 +262,48 @@
              :data-placement (or tooltip-position "top")
              :data-delay "{\"show\":\"100\", \"hide\":\"0\"}"
              :title "Share"}])
+        (if inbox-follow-link
+          [:button.mlb-reset.more-menu-inbox-follow-bt
+            {:type "button"
+             :ref "more-menu-inbox-follow-bt"
+             :key "more-menu-inbox-follow-bt"
+             :class (when (or show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/inbox-follow (:uuid entity-data)))
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :title "Get notified about new post activity"}]
+          (when inbox-unfollow-link
+            [:button.mlb-reset.more-menu-inbox-unfollow-bt
+              {:type "button"
+               :ref "more-menu-inbox-unfollow-bt"
+               :key "more-menu-inbox-unfollow-bt"
+               :class (when (or show-inbox?
+                              (and external-follow-up
+                                   (or complete-follow-up-link
+                                       create-follow-up-link))) "has-next-bt")
+               :on-click #(do
+                            (reset! (::showing-menu s) false)
+                            (when (fn? will-close)
+                              (will-close))
+                            (activity-actions/inbox-unfollow (:uuid entity-data)))
+               :data-toggle (if is-mobile? "" "tooltip")
+               :data-placement (or tooltip-position "top")
+               :data-container "body"
+               :title "Ignore future activity unless mentioned"}]))
         (when external-follow-up
           (if complete-follow-up-link
             [:button.mlb-reset.more-menu-complete-follow-up-bt
               {:type "button"
                :ref "more-menu-complete-follow-up-bt"
+               :class (when show-inbox? "has-next-bt")
                :on-click #(do
                             (reset! (::showing-menu s) false)
                             (when (fn? will-close)
@@ -234,6 +318,7 @@
               [:div.more-menu-create-follow-up-bt-container
                 [:button.mlb-reset.more-menu-create-follow-up-bt
                   {:type "button"
+                   :class (when show-inbox? "has-next-bt")
                    :ref "more-menu-create-follow-up-bt"
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
@@ -243,4 +328,19 @@
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
                    :data-container "body"
-                   :title "Follow up later"}]])))])))
+                   :title "Follow up later"}]])))
+        (when show-inbox?
+          [:button.mlb-reset.more-menu-inbox-dismiss-bt
+            {:type "button"
+             :ref "more-menu-inbox-dismiss-bt"
+             :on-click #(do
+                          (reset! (::showing-menu s) false)
+                          (when (fn? will-close)
+                            (will-close))
+                          (activity-actions/inbox-dismiss (:uuid entity-data))
+                          (when (seq (router/current-activity-id))
+                            (nav-actions/dismiss-post-modal %)))
+             :data-toggle (if is-mobile? "" "tooltip")
+             :data-placement (or tooltip-position "top")
+             :data-container "body"
+             :title "Dismiss"}])])))

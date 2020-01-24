@@ -187,10 +187,10 @@
         sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
-        first-ever-cookie-name (when (= route "all-posts")
-                                 (router/first-ever-ap-land-cookie (jwt/user-id)))
+        first-ever-cookie-name (when (= route urls/default-board-slug)
+                                 (router/first-ever-landing-cookie (jwt/user-id)))
         ;; First ever landing cookie value
-        first-ever-cookie (when (= route "all-posts")
+        first-ever-cookie (when (= route urls/default-board-slug)
                             (cook/get-cookie first-ever-cookie-name))]
     (if first-ever-cookie
       ;; If first ever land cookie is set redirect user to the hello url
@@ -198,7 +198,7 @@
         ;; Remove the cookie
         (cook/remove-cookie! first-ever-cookie-name)
         ;; Redirect to the first ever landing page
-        (router/redirect! (urls/first-ever-all-posts org)))
+        (router/redirect! (urls/first-ever-landing org)))
       (do
         (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
@@ -321,7 +321,7 @@
             ;; to avoid infinite loop redirects.
             (cook/remove-cookie! (router/last-org-cookie))
             ;; and redirect him there,
-            (router/redirect! (urls/all-posts last-org-cookie)))
+            (router/redirect! (urls/default-landing last-org-cookie)))
           ;; if no cookie or logged out do the login dance
           (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login" target params true))))
 
@@ -329,7 +329,7 @@
       (timbre/info "Routing signup-route" urls/sign-up)
       (when (jwt/jwt)
         (if (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie))))
           (router/redirect! urls/sign-up-profile)))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
@@ -337,7 +337,7 @@
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
       (when (and (jwt/jwt)
                  (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
@@ -356,7 +356,7 @@
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
       (if (jwt/jwt)
         (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+          (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
@@ -364,7 +364,7 @@
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
       (if (jwt/jwt)
         (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+          (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
@@ -461,7 +461,7 @@
     (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
       (when (jwt/jwt)
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
     (defroute login-wall-route urls/login-wall {:keys [query-params] :as params}
@@ -482,7 +482,7 @@
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
-           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           (urls/default-landing (cook/get-cookie (router/last-org-cookie)))
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
@@ -491,7 +491,7 @@
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
-           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           (urls/default-landing (cook/get-cookie (router/last-org-cookie)))
            urls/login))
         (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
 
@@ -521,6 +521,14 @@
       (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
       (org-handler "org" target org-dashboard params))
 
+    (defroute inbox-route (urls/inbox ":org") {:as params}
+      (timbre/info "Routing inbox-route" (urls/inbox ":org"))
+      (org-handler "inbox" target org-dashboard (assoc params :board "inbox")))
+
+    (defroute inbox-slash-route (str (urls/inbox ":org") "/") {:as params}
+      (timbre/info "Routing inbox-slash-route" (str (urls/inbox ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "inbox")))
+
     (defroute all-posts-route (urls/all-posts ":org") {:as params}
       (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))
       (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
@@ -529,13 +537,13 @@
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
       (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
 
-    (defroute first-ever-all-posts-route (urls/first-ever-all-posts ":org") {:as params}
-      (timbre/info "Routing first-ever-all-posts-route" (urls/first-ever-all-posts ":org"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
+    (defroute first-ever-landing-route (urls/first-ever-landing ":org") {:as params}
+      (timbre/info "Routing first-ever-landing-route" (urls/first-ever-landing ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))
 
-    (defroute first-ever-all-posts-slash-route (str (urls/first-ever-all-posts ":org") "/") {:as params}
-      (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
-      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
+    (defroute first-ever-landing-slash-route (str (urls/first-ever-landing ":org") "/") {:as params}
+      (timbre/info "Routing first-ever-landing-slash-route" (str (urls/first-ever-landing ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))
 
     (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
       (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))

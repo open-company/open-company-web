@@ -82,6 +82,8 @@
     (save-fixed-comment-height! s)
     (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
       (activity-actions/send-item-read activity-uuid)
+      (when (= (:back-to @router/path) "inbox")
+        (activity-actions/inbox-dismiss activity-uuid))
       (reset! (::activity-uuid s) activity-uuid))
     (load-comments s true)
     s)
@@ -146,7 +148,8 @@
                    :show-delete? true
                    :show-move? (not is-mobile?)
                    :tooltip-position "bottom"
-                   :assigned-follow-up-data assigned-follow-up-data})
+                   :assigned-follow-up-data assigned-follow-up-data
+                   :show-inbox? (= (:back-to @router/path) "inbox")})
        (when user-is-part-of-the-team
          [:div.expanded-post-wrt-container
            (wrt-count {:activity-data activity-data
@@ -209,8 +212,7 @@
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
                              :comments-data comments-data
-                             :show-new-tag? has-new-comments?
-                             :hide-face-pile? true})]]
+                             :show-new-tag? has-new-comments?})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
           (rum/with-key (add-comment {:activity-data activity-data

@@ -51,6 +51,7 @@
                          (ui-mixins/render-on-resize calc-video-height)
                          (when-not ua/edge?
                            (am/truncate-element-mixin "div.stream-item-body" (* 24 2)))
+                         ui-mixins/strict-refresh-tooltips-mixin
                          {:will-mount (fn [s]
                            (calc-video-height s)
                            s)}
@@ -59,6 +60,7 @@
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
+        is-inbox? (= (router/current-board-slug) "inbox")
         dom-element-id (str "stream-item-" (:uuid activity-data))
         is-published? (au/is-published? activity-data)
         publisher (if is-published?
@@ -93,7 +95,8 @@
                                 :follow-up-item (and (map? assigned-follow-up-data)
                                                      (not (:completed? assigned-follow-up-data)))
                                 :unseen-item (:unseen activity-data)
-                                :unread-item (:unread activity-data)
+                                :unread-item (or (pos? (:new-comments-count activity-data))
+                                                 (:unread activity-data))
                                 :expandable is-published?
                                 :showing-share (= (drv/react s :activity-share-container) dom-element-id)})
        :data-new-at (:new-at activity-data)
@@ -171,7 +174,8 @@
              :show-edit? true
              :show-delete? true
              :show-move? (not is-mobile?)
-             :assigned-follow-up-data assigned-follow-up-data}))]
+             :assigned-follow-up-data assigned-follow-up-data
+             :show-inbox? is-inbox?}))]
       [:div.stream-item-body-ext.group
         [:div.thumbnail-container.group
           (if has-video

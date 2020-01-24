@@ -32,13 +32,14 @@
     line-height: 16px;
     text-align: center;
     color: var(--color);
-    width: 16px;
+    min-width: 16px;
     height: 16px;
     display: inline-block;
     background-color: var(--navigation-sidebar-count-bg);
     border-radius: 4px;
     margin-top: 4px;
     margin-right: 16px;
+    padding: 0 4px;
 
     @include mobile() {
       float: left;
@@ -62,12 +63,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.follow-ups-label, div.must-see-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.follow-ups-label, div.must-see-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
-  div.all-posts-label {
+  div.inbox-label, div.all-posts-label, div.follow-ups-label, div.must-see-label {
     @include OC_Body_Book();
     font-size: 14px;
     color: var(--color);
@@ -90,52 +91,6 @@
       color: var(--color);
     }
   }
-
-  div.follow-ups-label {
-    @include OC_Body_Book();
-    font-size: 14px;
-    color: var(--color);
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @include mobile() {
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    &:active, &:focus {
-      text-decoration: none;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
-    }
-  }
-
-  div.must-see-label {
-    @include OC_Body_Book();
-    font-size: 14px;
-    color: var(--color);
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @include mobile() {
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    &:active, &:focus {
-      text-decoration: none;
-    }
-
-    &.new {
-      @include OC_Body_Bold();
-    }
-  }
 }
 
 @mixin item-selected() {
@@ -147,7 +102,7 @@
     border-radius: 0;
   }
 
-  .internal, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+  .internal, div.inbox-label, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     // color: $carrot_green;
     @include OC_Body_Book();
     font-size: 14px;
@@ -178,7 +133,7 @@
     color: $deep_navy;
   }
 
-  div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+  div.inbox-label, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     font-size: 14px;
     text-decoration: none;
 
@@ -191,12 +146,12 @@
   &:active, &:focus {
     text-decoration: none;
 
-    div.all-posts-label, div.follow-ups-label, div.must-see-label, div.drafts-label {
+    div.inbox-label, div.all-posts-label, div.follow-ups-label, div.must-see-label, div.drafts-label {
       text-decoration: none;
     }
   }
 
-  div.all-posts-label, div.follow-ups-label, div.must-see-label {
+  div.inbox-label, div.all-posts-label, div.follow-ups-label, div.must-see-label {
     @include OC_Body_Book();
     text-decoration: none;
 
@@ -238,7 +193,7 @@
     }
   }
 
-  div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+  div.inbox-label, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
     color: var(--color);
     text-decoration: none;
 
@@ -366,7 +321,7 @@ div.left-navigation-sidebar {
     }
   }
 
-  a.all-posts, a.follow-ups, a.drafts, a.must-see {
+  a.inbox, a.all-posts, a.follow-ups, a.drafts, a.must-see {
     display: block;
     background-color: transparent;
     border: none;
@@ -397,6 +352,10 @@ div.left-navigation-sidebar {
 
     &.item-selected {
 
+      div.inbox-icon {
+        background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
+      }
+
       div.all-posts-icon {
         background-image: cdnUrl("/img/ML/digest_icon_white.svg");
       }
@@ -414,7 +373,7 @@ div.left-navigation-sidebar {
       }
     }
 
-    div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
+    div.inbox-label, div.all-posts-label, div.follow-ups-label, div.drafts-label, div.must-see-label {
       padding: 2px 0px 0px 0;
       float: left;
       text-align: left;
@@ -432,6 +391,21 @@ div.left-navigation-sidebar {
 
       @include mobile() {
         padding: 0;
+      }
+    }
+
+    div.inbox-icon {
+      background-image: cdnUrl("/img/ML/inbox_icon_grey.svg");
+      background-size: 14px 13px;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 16px;
+      height: 23px;
+      float: left;
+
+      @include mobile() {
+        opacity: 1;
+        height: 24px;
       }
     }
 
@@ -671,8 +645,7 @@ div.left-navigation-sidebar {
       }
 
       div.public {
-        float: right;
-        margin-right: 16px;
+        margin-left: 1px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_public.svg");
@@ -680,11 +653,16 @@ div.left-navigation-sidebar {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
       }
 
       div.private {
-        float: right;
-        margin-right: 16px;
+        margin-left: 1px;
         width: 16px;
         height: 21px;
         background-image: cdnUrl("/img/ML/board_private.svg");
@@ -692,18 +670,20 @@ div.left-navigation-sidebar {
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
+
+        @include mobile() {
+          margin-left: 0;
+          margin-top: 2px;
+          opacity: 1;
+        }
       }
 
       div.board-name {
         width: 168px;
         float: left;
 
-        &.public-board, &.private-board {
-          width: 128px;
-        }
-
         div.internal {
-          padding: 1px 0px 0px;
+          padding: 1px 0px 0px 28px;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
@@ -767,7 +747,11 @@ div.left-navigation-sidebar {
       }
     }
 
-    a.all-posts, a.follow-ups, a.drafts, a.must-see {
+    a.inbox, a.all-posts, a.follow-ups, a.drafts, a.must-see {
+      div.inbox-icon {
+        background-image: cdnUrl("/img/ML/inbox_icon_white.svg");
+      }
+
       div.all-posts-icon {
         background-image: cdnUrl("/img/ML/digest_icon_white.svg");
       }
