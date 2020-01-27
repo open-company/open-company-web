@@ -9,16 +9,16 @@
                 <g id="Group-12" transform="translate(0.000000, 39.000000)">
                     <g id="Group-10">
                         <g stroke-width="1">
-                            <g id="Group-18" transform="translate(30.000000, 25.000000)" fill="#ECECEC">
+                            <g id="Group-18" transform="translate(30.000000, 25.000000)" fill="#FFFFFF" fill-opacity="0.08">
                                 <rect id="Rectangle-13-Copy-4" x="0" y="0" width="219" height="16" rx="4"></rect>
                                 <rect id="Rectangle-13-Copy-5" x="0" y="40" width="558" height="24" rx="4"></rect>
                                 <rect id="Rectangle-13-Copy-6" x="0" y="72" width="618" height="16" rx="4"></rect>
                                 <rect id="Rectangle-13-Copy-6" x="0" y="96" width="418" height="16" rx="4"></rect>
                                 <rect id="Rectangle-13-Copy-7" x="0" y="136" width="480" height="16" rx="4"></rect>
                             </g>
-                            <polygon id="Mask-Copy-8" fill-opacity="0" fill="#34414F" opacity="0.149999991" points="0 0 720 0 720 1 0 1"></polygon>
+                            <polygon id="Mask-Copy-8" fill-opacity="0.01" fill="#34414F" opacity="0.149999991" points="0 0 720 0 720 1 0 1"></polygon>
                         </g>
-                        <polygon id="Mask-Copy-8" fill="#34414F" opacity="0.149999991" points="0 201 720 201 720 202 0 202"></polygon>
+                        <polygon id="Mask-Copy-8" fill-opacity="0.16" fill="#FFFFFF" points="0 201 720 201 720 202 0 202"></polygon>
                     </g>
                 </g>
             </g>

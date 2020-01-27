@@ -18,7 +18,7 @@ div.dashboard-layout {
   }
 
   @include mobile() {
-    background-color: var(--mobile-background-color); // FIXME: rgba($deep_navy, 0.05);
+    background-color: var(--opac-background-color-05);
 
     &.sticky-board-name {
       padding-top: 48px;
@@ -261,7 +261,7 @@ div.dashboard-layout {
         height: 40px;
         // Use 0.19 opacity on this to make it look like the rest of the lines
         // that are on a darker background
-        border-bottom: 1px solid var(--ultralight-color); // FIXME rgba($deep_navy, 0.19);
+        border-bottom: 1px solid var(--divider-line);
 
         @include mobile() {
           height: 50px;
@@ -498,8 +498,8 @@ div.dashboard-layout {
           @include mobile () {
             float: unset;
             height: 50px;
-            background-color: rgba($deep_navy, 0.05);
-            border-bottom: 1px solid rgba($deep_navy, 0.15);
+            background-color: var(--mobile-background-color);
+            border-bottom: 1px solid var(--divider-line);
           }
 
           button.complete-all-bt {
