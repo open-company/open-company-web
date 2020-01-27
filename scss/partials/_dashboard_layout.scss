@@ -267,6 +267,7 @@ div.dashboard-layout {
           height: 50px;
           border-bottom: none;
           padding: 0;
+          background-color: var(--mobile-background-color);
 
           &.drafts-board {
             height: 0;
@@ -498,7 +499,7 @@ div.dashboard-layout {
           @include mobile () {
             float: unset;
             height: 50px;
-            background-color: var(--mobile-background-color);
+            background-color: var(--mobile-foc-background-color);
             border-bottom: 1px solid var(--divider-line);
           }
 
