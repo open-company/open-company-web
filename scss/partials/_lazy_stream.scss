@@ -38,7 +38,7 @@ div.lazy-stream {
       margin-top: 0;
       background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
       min-height: calc(100vh - #{$mobile_navbar_height}px - 8px);
-      background-size: 100% auto;
+      background-size: 100% 173px;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
