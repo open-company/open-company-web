@@ -187,7 +187,7 @@
             [:div.invites-list
               {:class (when is-admin? "top-border")}
               [:div.invites-list-title
-                "Invite someone as an admin, contributor, or viewer"]
+                "Invite someone with a specific role (Admin, Contributor, or Viewer)"]
               (for [i (range (count invite-users))
                     :let [user-data (get invite-users i)
                           key-string (str "invite-users-tabe-" i)]]
