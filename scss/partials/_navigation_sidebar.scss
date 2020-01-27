@@ -650,7 +650,7 @@ div.left-navigation-sidebar {
       }
 
       div.board-name {
-        width: 168px;
+        width: calc(100% - 8px);
         float: left;
 
         div.internal {
