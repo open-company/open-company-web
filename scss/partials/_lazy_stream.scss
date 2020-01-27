@@ -15,16 +15,16 @@ div.lazy-stream {
     background-position: 0 0;
 
     @include big_web() {
-      margin-top: 10px;
       min-height: calc(100vh - 140px);
       background-image: cdnUrl("/img/ML/interstitial.svg");
-      background-size: #{$board_container_width}px 202px;
+      background-size: #{$board_container_width}px 185px;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/interstitial@dark.svg");
       }
 
       &.collapsed {
+        margin-top: 10px;
         background-image: cdnUrl("/img/ML/interstitial_collapsed.svg");
         background-size: #{$board_container_width}px 115px;
 
