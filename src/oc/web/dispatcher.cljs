@@ -86,8 +86,8 @@
 
 (def add-comment-force-update-root-key :add-comment-force-update)
 
-(defn add-comment-force-update-key [add-comment-key]
-  (concat [add-comment-force-update-root-key] add-comment-key))
+(defn add-comment-force-update-key [add-comment-string-key]
+  (vec (concat [add-comment-force-update-root-key] [add-comment-string-key])))
 
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
