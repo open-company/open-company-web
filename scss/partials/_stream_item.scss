@@ -633,6 +633,42 @@ div.stream-item {
         }
       }
 
+      div.stream-item-mobile-attachments {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          float: left;
+          height: 22px;
+
+          span.mobile-attachments-icon {
+            display: inline-block;
+            width: 18px;
+            height: 22px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 18px 20px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-right: 6px;
+            opacity: 0.5;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+            }
+          }
+
+          span.mobile-attachments-count {
+            @include OC_Body_Book();
+            font-size: 17px;
+            line-height: 22px;
+            color: var(--light-color);
+            display: inline-block;
+            height: 22px;
+            vertical-align: top;
+          }
+        }
+      }
+
       div.stream-item-attachments {
         float: left;
         margin-right: 16px;
@@ -640,7 +676,7 @@ div.stream-item {
         position: relative;
 
         @include mobile() {
-          height: 20px;
+          display: none;
         }
 
         &:hover {
