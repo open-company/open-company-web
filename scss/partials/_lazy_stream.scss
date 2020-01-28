@@ -26,7 +26,7 @@ div.lazy-stream {
       &.collapsed {
         margin-top: 10px;
         background-image: cdnUrl("/img/ML/interstitial_collapsed.svg");
-        background-size: #{$board_container_width}px #{($mobile_foc_height * 2) + 3}px;
+        background-size: #{$board_container_width}px #{($collapsed_foc_height * 2) + 3}px;
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/interstitial_collapsed@dark.svg");
