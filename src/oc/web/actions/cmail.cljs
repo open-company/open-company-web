@@ -50,12 +50,14 @@
 (defn get-default-section [& [editable-boards]]
   (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (router/current-org-slug))))
         cookie-value (au/last-used-section)
-        board-from-cookie (some #(when (and (not (:draft %)) (= (:slug %) cookie-value)) %)
-                           editable-boards)
+        board-from-cookie (when cookie-value
+                            (some #(when (and (not (:draft %)) (= (:slug %) cookie-value)) %)
+                             editable-boards))
         filtered-boards (filterv #(not (:draft %)) editable-boards)
         board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
-    {:board-name (:name board-data)
-     :board-slug (:slug board-data)}))
+    (when board-data
+      {:board-name (:name board-data)
+       :board-slug (:slug board-data)})))
 
 (defn get-board-for-edit [& [board-slug editable-boards]]
   (let [board-data (if (seq board-slug)

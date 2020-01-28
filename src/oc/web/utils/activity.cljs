@@ -294,9 +294,9 @@
 ;; Last used section
 
 (defn last-used-section []
-  (let [org-slug (router/current-org-slug)
-        cookie-name (router/last-used-board-slug-cookie org-slug)]
-    (cook/get-cookie cookie-name)))
+  (when-let [org-slug (router/current-org-slug)]
+    (let [cookie-name (router/last-used-board-slug-cookie org-slug)]
+      (cook/get-cookie cookie-name))))
 
 (defn save-last-used-section [section-slug]
   (let [org-slug (router/current-org-slug)
