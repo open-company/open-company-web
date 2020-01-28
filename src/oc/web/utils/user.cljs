@@ -22,9 +22,6 @@
 (defn notification-title [notification]
   (let [mention? (:mention? notification)
         reminder? (:reminder? notification)
-        follow-up? (:follow-up? notification)
-        follow-up-data (when follow-up?
-                         (:follow-up notification))
         author (:author notification)
         first-name (or (:first-name author) (first (clojure.string/split (:name author) #"\s")))
         reminder (when reminder?
@@ -36,12 +33,6 @@
         entry-publisher (:entry-publisher notification)
         user-id (:user-id notification)]
     (cond
-      ;; A follow-up was created for the current user
-      (and follow-up?
-           follow-up-data
-           (not= (-> follow-up-data :author :user-id) (jwt/user-id))
-           (not (:completed? follow-up-data)))
-      (str (user-lib/name-for (:author follow-up-data)) " created a follow-up for you")
       ;; A reminder was created for current user
       (and reminder
            (= notification-type "reminder-notification"))
@@ -118,9 +109,7 @@
         reminder-data (:reminder notification)
         reminder? (:reminder? notification)
         entry-uuid (:entry-id notification)
-        interaction-uuid (:interaction-id notification)
-        follow-up? (:follow-up? notification)
-        follow-up-data (:follow-up notification)]
+        interaction-uuid (:interaction-id notification)]
     (when (seq title)
       {:uuid entry-uuid
        :board-slug (:slug board-data)
@@ -130,21 +119,17 @@
        :mention? (:mention? notification)
        :reminder? reminder?
        :reminder reminder-data
-       :follow-up? follow-up?
-       :follow-up follow-up-data
        :created-at (:notify-at notification)
        :body (notification-content notification)
        :title title
        :author (:author notification)
-       :click (if follow-up?
-                (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)
-                (if reminder?
-                  (when-not (responsive/is-mobile-size?)
-                    (if (and reminder-data
-                             (= (:notification-type reminder-data) "reminder-notification"))
-                      #(oc.web.actions.nav-sidebar/show-reminders)
-                      #(ui-compose)))
-                  (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid)))})))
+       :click (if reminder?
+                (when-not (responsive/is-mobile-size?)
+                  (if (and reminder-data
+                           (= (:notification-type reminder-data) "reminder-notification"))
+                    #(oc.web.actions.nav-sidebar/show-reminders)
+                    #(ui-compose)))
+                (load-item-if-needed (or (:slug board-data) board-id) entry-uuid interaction-uuid))})))
 
 (defn sorted-notifications [notifications]
   (vec (reverse (sort-by :created-at notifications))))

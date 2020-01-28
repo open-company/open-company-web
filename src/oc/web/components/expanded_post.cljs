@@ -49,12 +49,15 @@
       (comment-actions/get-comments activity-data)
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
-(defn- save-initial-last-read-at [s]
-  (when-not @(::initial-last-read-at s)
-    (let [activity-data @(drv/get-ref s :activity-data)
-          reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
-      (when (:last-read-at reads-data)
-        (reset! (::initial-last-read-at s) (:last-read-at reads-data))))))
+(defn- save-initial-read-data [s]
+  (let [activity-data @(drv/get-ref s :activity-data)
+        reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
+    (when (and (not @(::initial-last-read-at s))
+               (:last-read-at reads-data))
+      (reset! (::initial-last-read-at s) (:last-read-at reads-data)))
+    (when (and (not @(::initial-new-at s))
+               (:new-at activity-data))
+      (reset! (::initial-new-at s) (:new-at activity-data)))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -72,29 +75,29 @@
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
+  (rum/local nil ::initial-new-at)
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
-    (save-initial-last-read-at s)
+    (save-initial-read-data s)
     s)
    :did-mount (fn [s]
     (save-fixed-comment-height! s)
     (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
-      (activity-actions/send-item-read activity-uuid)
-      (when (= (:back-to @router/path) "inbox")
-        (activity-actions/inbox-dismiss activity-uuid))
+      (activity-actions/mark-read activity-uuid)
       (reset! (::activity-uuid s) activity-uuid))
     (load-comments s true)
     s)
    :did-remount (fn [_ s]
     (load-comments s false)
-    (save-initial-last-read-at s)
+    (save-initial-read-data s)
     s)
    :will-unmount (fn [s]
-    (activity-actions/send-item-read @(::activity-uuid s))
+    (activity-actions/mark-read @(::activity-uuid s))
+    (reset! (::activity-uuid s) nil)
     s)}
   [s]
   (let [activity-data (drv/react s :activity-data)
@@ -124,13 +127,12 @@
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
         add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update (drv/react s :add-comment-force-update)
         has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and (:new-at activity-data)
+                          (and @(::initial-new-at s)
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at reads-data)))
-                                  (.getTime (utils/js-date (:new-at activity-data)))))
+                                  (.getTime (utils/js-date @(::initial-new-at s)))))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
                                       mobile-more-menu-el)
@@ -138,13 +140,13 @@
                                     :share-container-id dom-element-id
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
-                                    :external-follow-up (not is-mobile?)
+                                    :external-bookmark (not is-mobile?)
                                     :external-follow (not is-mobile?)
                                     :show-edit? true
                                     :show-delete? true
+                                    :show-unread true
                                     :show-move? (not is-mobile?)
                                     :tooltip-position "bottom"
-                                    :assigned-follow-up-data assigned-follow-up-data
                                     :show-inbox? (= (:back-to @router/path) "inbox")
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
@@ -201,15 +203,14 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :data-title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]]
-          (when (or (and assigned-follow-up-data
-                         (not (:completed? assigned-follow-up-data)))
-                    (:must-see activity-data))
+          (when (or (:must-see activity-data)
+                    (:bookmarked activity-data))
             [:div.expanded-post-author-dot])
-          (if (and assigned-follow-up-data
-                   (not (:completed? assigned-follow-up-data)))
-            [:div.follow-up-tag]
-            (when (:must-see activity-data)
-              [:div.must-see-tag]))]]
+          (cond
+            (:bookmarked activity-data)
+            [:div.bookmark-tag]
+            (:must-see activity-data)
+            [:div.must-see-tag])]]
       (when (seq (:abstract activity-data))
         [:div.expanded-post-abstract.oc-mentions.oc-mentions-hover
           {:class utils/hide-class
