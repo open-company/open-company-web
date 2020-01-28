@@ -47,7 +47,6 @@
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at read-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         has-zero-comments? (and (-> activity-data :comments count zero?)
                                 (-> comments-data (get (:uuid activity-data)) :sorted-comments count zero?))]
     [:div.stream-collapsed-item
@@ -80,8 +79,7 @@
        :id dom-element-id}
       [:div.stream-collapsed-item-inner
         {:class (utils/class-set {:must-see-item (:must-see activity-data)
-                                  :follow-up-item (and (map? assigned-follow-up-data)
-                                                       (not (:completed? assigned-follow-up-data)))
+                                  :bookmark-item (:bookmarked activity-data)
                                   :no-comments has-zero-comments?})}
         (user-avatar-image publisher)
         [:div.stream-collapsed-item-fill
@@ -90,7 +88,7 @@
              :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.must-see-tag]
-          [:div.follow-up-tag]
+          [:div.bookmark-tag]
           (stream-item-summary activity-data)]
         (when-not has-zero-comments?
           (comments-summary {:entry-data activity-data
@@ -111,10 +109,10 @@
                   :share-container-id dom-element-id
                   :editable-boards editable-boards
                   :external-share (not is-mobile?)
-                  :external-follow-up (not is-mobile?)
+                  :external-bookmark (not is-mobile?)
                   :external-follow (not is-mobile?)
                   :show-edit? true
                   :show-delete? true
+                  :show-unread (not is-inbox?)
                   :show-move? (not is-mobile?)
-                  :assigned-follow-up-data assigned-follow-up-data
                   :show-inbox? is-inbox?})]))

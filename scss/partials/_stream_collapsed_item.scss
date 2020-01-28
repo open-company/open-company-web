@@ -57,6 +57,14 @@ div.stream-collapsed-item {
           display: initial;
         }
       }
+
+      div.more-menu {
+        background-color: var(--foc-hover-color);
+
+        &:before {
+          background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
+        }
+      }
     }
   }
 
@@ -96,7 +104,6 @@ div.stream-collapsed-item {
         border-left: 1px solid var(--foc-new-border-color);
         border-bottom: 1px solid var(--foc-new-border-color);
         padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
       }
@@ -135,7 +142,7 @@ div.stream-collapsed-item {
       flex: 0 0 20px;
     }
 
-    &.follow-up-item div.stream-collapsed-item-fill div.follow-up-tag {
+    &.bookmark-item div.stream-collapsed-item-fill div.bookmark-tag {
         display: block;
       }
 
@@ -163,13 +170,13 @@ div.stream-collapsed-item {
 
       @include must-see-tag();
 
-      @include follow-up-tag();
+      @include bookmark-tag();
 
-      div.follow-up-tag, div.follow-up-tag-small, div.must-see-tag {
+      div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
         display: none;
       }
 
-      div.follow-up-tag, div.must-see-tag {
+      div.bookmark-tag, div.must-see-tag {
         margin: 4px 0 0 8px;
         flex: 0 0 auto;
       }
