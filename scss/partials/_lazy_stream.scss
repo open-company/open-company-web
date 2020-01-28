@@ -17,7 +17,7 @@ div.lazy-stream {
     @include big_web() {
       min-height: calc(100vh - 140px);
       background-image: cdnUrl("/img/ML/interstitial.svg");
-      background-size: #{$board_container_width}px 185px;
+      background-size: #{$board_container_width}px #{$foc_height + 1}px;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/interstitial@dark.svg");
@@ -26,7 +26,7 @@ div.lazy-stream {
       &.collapsed {
         margin-top: 10px;
         background-image: cdnUrl("/img/ML/interstitial_collapsed.svg");
-        background-size: #{$board_container_width}px 115px;
+        background-size: #{$board_container_width}px #{($mobile_foc_height * 2) + 3}px;
 
         @include dark_mode() {
           background-image: cdnUrl("/img/ML/interstitial_collapsed@dark.svg");
@@ -38,7 +38,7 @@ div.lazy-stream {
       margin-top: 0;
       background-image: cdnUrl("/img/ML/interstitial_mobile.svg");
       min-height: calc(100vh - #{$mobile_navbar_height}px - 8px);
-      background-size: 100% 173px;
+      background-size: 100% #{$mobile_foc_height + 1}px;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/interstitial_mobile@dark.svg");
