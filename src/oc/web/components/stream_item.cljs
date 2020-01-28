@@ -178,7 +178,6 @@
                                ;; and that's after the user last read
                                (< (.getTime (utils/js-date (:last-read-at read-data)))
                                   (.getTime (utils/js-date (:new-at activity-data)))))
-        assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         ; post-added-tooltip (drv/react s :show-post-added-tooltip)
         ; show-post-added-tooltip? (and post-added-tooltip
         ;                               (= post-added-tooltip (:uuid activity-data)))
@@ -190,12 +189,12 @@
                            :share-container-id dom-element-id
                            :editable-boards editable-boards
                            :external-share (not is-mobile?)
-                           :external-follow-up (not is-mobile?)
+                           :external-bookmark (not is-mobile?)
                            :external-follow (not is-mobile?)
                            :show-edit? true
                            :show-delete? true
+                           :show-unread (not is-inbox?)
                            :show-move? (not is-mobile?)
-                           :assigned-follow-up-data assigned-follow-up-data
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))
                            :force-show-menu @(::force-show-menu s)
@@ -205,8 +204,7 @@
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :follow-up-item (and (map? assigned-follow-up-data)
-                                                     (not (:completed? assigned-follow-up-data)))
+                                :bookmark-item (:bookmarked activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (or (pos? (:new-comments-count activity-data))
                                                  (:unread activity-data))
@@ -289,8 +287,8 @@
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/foc-date-time t)])]]
             [:div.must-see-tag]
-            [:div.follow-up-tag-small.mobile-only]
-            [:div.follow-up-tag.big-web-tablet-only]]]
+            [:div.bookmark-tag-small.mobile-only]
+            [:div.bookmark-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?
@@ -365,22 +363,24 @@
                     ;       "OK, got it"]])
                     (wrt-count {:activity-data activity-data
                                 :reads-data read-data})])
-                (when (and (seq activity-attachments)
-                           ;; Show attachments on FoC on mobile only if there are no reactions
-                           (or (not is-mobile?)
-                               (seq (:reactions activity-data))))
-                  [:div.stream-item-attachments
-                    {:ref :stream-item-attachments}
-                    [:div.stream-item-attachments-count
-                      (str (count activity-attachments)
-                       " attachment" (when (> (count activity-attachments) 1) "s"))]
-                    [:div.stream-item-attachments-list
-                      (for [atc activity-attachments]
-                        [:a.stream-item-attachments-item
-                          {:href (:file-url atc)
-                           :target "_blank"}
-                          [:div.stream-item-attachments-item-desc
-                            [:span.file-name
-                              (:file-name atc)]
-                            [:span.file-size
-                              (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]])]])]]))
+                (when (seq activity-attachments)
+                  (if-not is-mobile?
+                    [:div.stream-item-attachments
+                      {:ref :stream-item-attachments}
+                      [:div.stream-item-attachments-count
+                        (str (count activity-attachments)
+                         " attachment" (when (> (count activity-attachments) 1) "s"))]
+                      [:div.stream-item-attachments-list
+                        (for [atc activity-attachments]
+                          [:a.stream-item-attachments-item
+                            {:href (:file-url atc)
+                             :target "_blank"}
+                            [:div.stream-item-attachments-item-desc
+                              [:span.file-name
+                                (:file-name atc)]
+                              [:span.file-size
+                                (str "(" (filesize (:file-size atc) :binary false :format "%.2f") ")")]]])]]
+                      [:div.stream-item-mobile-attachments
+                        [:span.mobile-attachments-icon]
+                        [:span.mobile-attachments-count
+                          (count activity-attachments)]]))]])]]))

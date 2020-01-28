@@ -247,9 +247,9 @@ div.expanded-post {
         }
       }
 
-      @include follow-up-tag();
+      @include bookmark-tag();
 
-      div.follow-up-tag {
+      div.bookmark-tag {
         display: inline-block;
 
         @include mobile() {

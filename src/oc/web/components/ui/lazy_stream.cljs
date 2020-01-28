@@ -10,6 +10,7 @@
                          (drv/drv :board-data)
                          (drv/drv :container-data)
                          (drv/drv :activity-data)
+                         (drv/drv :foc-layout)
                          {:did-mount (fn [s]
                            (utils/scroll-to-y (:scroll-y @router/path) 0)
                            s)}
@@ -17,6 +18,7 @@
   (let [board-data (drv/react s :board-data)
         container-data (drv/react s :container-data)
         activity-data (drv/react s :activity-data)
+        foc-layout (drv/react s :foc-layout)
         is-container? (dis/is-container? (router/current-board-slug))
         loading? (or ;; Board specified
                      (and (not (router/current-activity-id))
@@ -35,7 +37,8 @@
       (if-not loading?
         (stream-comp)
         [:div.lazy-stream-interstitial
-          {:style {:height (str (+ (:scroll-y @router/path)
+          {:class (when (= foc-layout dis/other-foc-layout) "collapsed")
+           :style {:height (str (+ (:scroll-y @router/path)
                                    (or (.. js/document -documentElement -clientHeight)
                                        (.-innerHeight js/window)))
                              "px")}}])]))

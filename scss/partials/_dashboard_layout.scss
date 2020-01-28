@@ -18,7 +18,7 @@ div.dashboard-layout {
   }
 
   @include mobile() {
-    background-color: var(--mobile-background-color); // FIXME: rgba($deep_navy, 0.05);
+    background-color: var(--opac-background-color-05);
 
     &.sticky-board-name {
       padding-top: 48px;
@@ -60,9 +60,14 @@ div.dashboard-layout {
       display: none;
 
       @include mobile (){
-        display: block;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-content: stretch;
+        align-items: stretch;
+        flex-wrap: nowrap;
         background-color: var(--mobile-background-color);
-        padding: 15px 0;
+        padding: 0;
         border-top: 1px solid var(--divider-line);
         height: #{$mobile_navbar_height}px;
         position: fixed;
@@ -71,131 +76,180 @@ div.dashboard-layout {
         width: 100vw;
         z-index: #{$navbar_zindex + 5};
 
-        &.ios-tabbar {
+        &.ios-app-tabbar {
           height: #{$mobile_navbar_height + 24}px;
-          padding: 7px 0 48px;
+          padding-bottom: 24px;
+        }
 
-          span.unread-notifications-dot {
-            bottom: 32px;
-          }
+        &.ios-web-tabbar {
+          height: #{$mobile_navbar_height + 8}px;
+          padding-bottom: 8px;
         }
 
         &.can-compose {
-          button {
-            width: 25%;
-          }
-
-          span.unread-notifications-dot {
-            right: 37vw;
+          button.tab-button.new-post-tab {
+            display: flex;
           }
         }
 
-        &.ios button {
-          top: -4px;
-        }
-
-        button {
-          width: 33.3%;
-          height: 24px;
+        button.tab-button {
           margin: 0;
           padding: 0;
-          background-position: center;
-          background-repeat: no-repeat;
-          opacity: 0.5;
           position: relative;
+          flex: 1 1 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-content: center;
+          flex-wrap: nowrap;
+          align-items: center;
+
+          span.tab-icon {
+            backgorund-size: 18px 18px;
+            background-repeat: no-repeat;
+            margin-bottom: 6px;
+          }
+
+          span.tab-label {
+            @include OC_Body_Bold();
+            font-size: 12px;
+            color: var(--color);
+            line-height: 15px;
+          }
 
           &.active {
-            opacity: 1;
+            span.tab-label {
+              color: #07C176;
+            }
           }
-        }
+          
 
-        button.all-posts-tab {
-          background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
-          backgorund-size: 22px 18px;
-          background-repeat: no-repeat;
+          &.all-posts-tab {
+            span.tab-icon {
+              width: 18px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
-          }
+              @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
 
-          @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/all_posts_tab_icon@dark.svg");
+              }
+            }
 
-          &.active {
-            background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
-          }
-        }
+            &.active span.tab-icon {
+              background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
 
-        button.inbox-tab {
-          background-image: cdnUrl("/img/ML/inbox_tab_icon.svg");
-          backgorund-size: 22px 19px;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/inbox_tab_icon@dark.svg");
-          }
-          @include preload_image(cdnUrl("/img/ML/inbox_tab_icon_active.svg"));
-
-          &.active {
-            background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
-          }
-        }
-
-        button.follow-ups-tab {
-          background-image: cdnUrl("/img/ML/follow_ups_tab_icon.svg");
-          backgorund-size: 18px 20px;
-          background-repeat: no-repeat;
-
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/follow_ups_tab_icon@dark.svg");
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+              }
+            }
           }
 
-          @include preload_image(cdnUrl("/img/ML/follow_ups_tab_icon_active.svg"));
+          &.inbox-tab {
+            span.tab-icon {
+              width: 18px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/inbox_tab_icon.svg");
+              position: relative;
 
-          &.active {
-            background-image: cdnUrl("/img/ML/follow_ups_tab_icon_active.svg");
+              @include preload_image(cdnUrl("/img/ML/inbox_tab_icon_active.svg"));
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/inbox_tab_icon@dark.svg");
+              }
+
+              span.count-badge {
+                padding: 2px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 14px;
+                padding: 2px;
+                text-align: center;
+                color: white;
+                display: block;
+                background-color: $carrot_green;
+                vertical-align: top;
+                border-radius: 4px;
+                position: absolute;
+                top: -9px;
+                left: 12px;
+                border: 2px solid white;
+                min-width: 22px;
+              }
+            }
+
+            &.active span.tab-icon span.count-badge {
+              background-color: $ui_grey; //rgb(130, 130, 130);
+              color: white;
+            }
+
+            &.active span.tab-icon {
+              background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+              }
+            }
           }
-        }
 
-        button.notifications-tab {
-          background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
-          backgorund-size: 18px 20px;
-          background-repeat: no-repeat;
-          position: relative;
+          &.notifications-tab {
+            span.tab-icon {
+              width: 16px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
+              position: relative;
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+              @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/notifications_tab_icon@dark.svg");
+              }
+
+              span.unread-dot {
+                display: block;
+                width: 8px;
+                height: 8px;
+                border: 2px solid white;
+                border-radius: 50%;
+                position: absolute;
+                background-color: $carrot_green;
+                top: -1px;
+                right: -1px;
+              }
+            }
+
+            &.active span.tab-icon {
+              background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+              }
+            }
           }
 
-          @include preload_image(cdnUrl("/img/ML/notifications_tab_icon_active.svg"));
+          &.new-post-tab {
+            display: none;
 
-          &.active {
-            background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
-          }
-        }
+            span.tab-icon {
+              width: 18px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
 
-        span.unread-notifications-dot {
-          display: block;
-          width: 4px;
-          height: 4px;
-          position: absolute;
-          bottom: 4px;
-          background-color: $carrot_green;
-          border-radius: 50%;
-          right: 16.1vw;
-        }
+              @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
 
-        button.new-post-tab {
-          background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
-          backgorund-size: 20px 20px;
-          background-repeat: no-repeat;
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
+              }
+            }
 
-          @include dark_mode() {
-            background-image: cdnUrl("/img/ML/new_post_tab_icon@dark.svg");
-          }
+            &.active span.tab-icon {
+              background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
 
-          @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));
-
-          &.active {
-            background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+              }
+            }
           }
         }
       }
@@ -223,12 +277,13 @@ div.dashboard-layout {
         height: 40px;
         // Use 0.19 opacity on this to make it look like the rest of the lines
         // that are on a darker background
-        border-bottom: 1px solid var(--ultralight-color); // FIXME rgba($deep_navy, 0.19);
+        border-bottom: 1px solid var(--divider-line);
 
         @include mobile() {
           height: 50px;
           border-bottom: none;
           padding: 0;
+          background-color: var(--mobile-background-color);
 
           &.drafts-board {
             height: 0;
@@ -276,6 +331,10 @@ div.dashboard-layout {
                 position: absolute;
                 top: 6px;
                 left: 0px;
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/section_chevron@dark.svg");
+                }
               }
             }
 
@@ -456,6 +515,8 @@ div.dashboard-layout {
           @include mobile () {
             float: unset;
             height: 50px;
+            background-color: var(--mobile-foc-background-color);
+            border-bottom: 1px solid var(--divider-line);
           }
 
           button.complete-all-bt {
@@ -490,138 +551,41 @@ div.dashboard-layout {
             }
           }
 
-          div.board-sort {
-            float: left;
-            height: 32px;
-            margin-left: 19px;
-            margin-right: 5px;
-
-            &:empty {
-              display: none;
-            }
+          button.mobile-search-bt {
+            display: none;
 
             @include mobile() {
-              float: unset;
+              display: block;
               margin: 0;
-              width: 100%;
+              display: block;
+              padding: 12px 16px 12px 40px;
               height: 50px;
-              background-color: var(--mobile-foc-background-color);
-              border-bottom: 1px solid var(--opac-background-color-15);
-            }
+              width: 106px;
+              @include OC_Body_Book();
+              font-size: 16px;
+              line-height: 26px;
+              margin: 0 auto;
+              text-align: center;
+              position: absolute;
+              top: 0;
+              left: 50%;
+              margin-left: -54px;
 
-            button.mobile-search-bt {
-              display: none;
-
-              @include mobile() {
+              &:before {
+                content: "";
                 display: block;
-                position: absolute;
-                padding: 0;
-                left: 16px;
-                top: 0;
+                width: 16px;
+                height: 16px;
                 background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
                 background-size: 16px 16px;
                 background-position: center;
                 background-repeat: no-repeat;
-                width: 24px;
-                height: 50px;
+                position: absolute;
+                top: 17px;
+                left: 16px;
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/mobile_search_lens@dark.svg");
-                }
-              }
-            }
-
-            button.board-sort-bt {
-              height: 32px;
-              @include OC_Body_Book();
-              font-size: 14px;
-              line-height: 32px;
-              color: var(--color);
-              padding: 0 14px 0 0;
-              margin: 0;
-              position: relative;
-
-              @include mobile(){
-                width: 200px;
-                position: absolute;
-                top: 0;
-                left: 50%;
-                margin-left: -100px;
-                height: 50px;
-                line-height: 50px;
-                text-align: center;
-                color: var(--color);
-                opacity: 1;
-              }
-
-              @include big_web() {
-                opacity: 0.5;
-
-                &:hover, &:active, &:focus, &.active {
-                  opacity: 1;
-                }
-              }
-
-              &:after {
-                content: "";
-                width: 8px;
-                height: 4px;
-                position: absolute;
-                top: 14px;
-                right: 0;
-                background-image: cdnUrl("/img/ML/board_sort_dropdown.svg");
-                background-size: 8px 4px;
-                background-repeat: no-repeat;
-                background-position: center;
-
-                @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/board_sort_dropdown@dark.svg");
-                }
-
-                @include mobile() {
-                  position: absolute;
-                  top: 24px;
-                  left: 50%;
-                  margin-left: 47px;
-                }
-              }
-            }
-
-            div.board-sort-menu {
-              position: absolute;
-              top: 30px;
-              right: 0;
-              background-color: var(--overlay-background-color);
-              width: 138px;
-              padding: 9px 0;
-              border-radius: 4px;
-              border: 1px solid var(--divider-line);
-              box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-              display: none;
-              z-index: 100;
-
-              @include mobile() {
-                right: unset;
-                left: 50%;
-                margin-left: -69px;
-                top: 38px;
-              }
-
-              &.show-menu {
-                display: block;
-              }
-
-              div.board-sort-menu-item {
-                height: 34px;
-                @include OC_Body_Book();
-                font-size: 14px;
-                padding: 8px 16px;
-                cursor: pointer;
-
-                &.active, &:hover, &:active, &:focus {
-                  background-color: $feint_emerald;
-                  color: $carrot_green;
-                  -webkit-tap-highlight-color: $feint_emerald;
                 }
               }
             }
@@ -660,45 +624,6 @@ div.dashboard-layout {
             @include big_web(){
               &:hover {
                 opacity: 1;
-              }
-            }
-          }
-
-          div.board-sort-menu {
-            position: absolute;
-            top: 30px;
-            right: 0;
-            background-color: var(--background-color);
-            width: 138px;
-            padding: 9px 0;
-            border-radius: 4px;
-            border: 1px solid var(--divider-line);
-            box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-            display: none;
-            z-index: 100;
-
-            @include mobile() {
-              right: unset;
-              left: 50%;
-              margin-left: -69px;
-              top: 38px;
-            }
-
-            &.show-menu {
-              display: block;
-            }
-
-            div.board-sort-menu-item {
-              height: 34px;
-              @include OC_Body_Book();
-              font-size: 14px;
-              padding: 8px 16px;
-              cursor: pointer;
-
-              &.active, &:hover, &:active, &:focus {
-                background-color: $feint_emerald;   // FIXME
-                color: $carrot_green;
-                -webkit-tap-highlight-color: $feint_emerald;
               }
             }
           }

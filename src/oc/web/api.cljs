@@ -232,15 +232,13 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
 
-(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :follow-ups])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
-
-(def follow-up-assignee-keys [:user-id :name :avatar-url])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -914,38 +912,31 @@
      callback)
     (handle-missing-link "get-reminders-roster" roster-link callback)))
 
-;; Follow-ups
+;; Bookmarks
 
-(defn complete-follow-up [complete-follow-up-link callback]
-  (if complete-follow-up-link
-    (storage-http (method-for-link complete-follow-up-link) (relative-href complete-follow-up-link)
-     {:headers (headers-for-link complete-follow-up-link)}
+(defn toggle-bookmark [bookmark-link callback]
+  (if bookmark-link
+    (storage-http (method-for-link bookmark-link) (relative-href bookmark-link)
+     {:headers (headers-for-link bookmark-link)}
      callback)
-    (handle-missing-link "complete-follow-up" complete-follow-up-link callback)))
-
-(defn create-follow-ups [create-follow-up-link follow-ups-map callback]
-  (if create-follow-up-link
-    (let [filtered-assignees (if (:assignees follow-ups-map)
-                               (map #(select-keys % follow-up-assignee-keys) (:assignees follow-ups-map))
-                               [])
-          final-data {:self (:self follow-ups-map)
-                      :assignees filtered-assignees}
-          json-data (cljs->json final-data)]
-      (storage-http (method-for-link create-follow-up-link) (relative-href create-follow-up-link)
-       {:headers (headers-for-link create-follow-up-link)
-        :json-params json-data}
-       callback))
-    (handle-missing-link "create-follow-ups" create-follow-up-link callback)))
+    (handle-missing-link "toggle-bookmark" bookmark-link callback)))
 
 ;; Inbox
 
-(defn inbox-dismiss [dismiss-link callback]
+(defn inbox-dismiss [dismiss-link dismiss-at callback]
   (if dismiss-link
     (storage-http (method-for-link dismiss-link) (relative-href dismiss-link)
      {:headers (headers-for-link dismiss-link)
-      :body (utils/as-of-now)}
+      :body dismiss-at}
      callback)
-    (handle-missing-link "inbox-dismiss" dismiss-link callback)))
+    (handle-missing-link "inbox-dismiss" dismiss-link callback {:dismiss-at dismiss-at})))
+
+(defn inbox-unread [unread-link callback]
+  (if unread-link
+    (storage-http (method-for-link unread-link) (relative-href unread-link)
+     {:headers (headers-for-link unread-link)}
+     callback)
+    (handle-missing-link "inbox-unread" unread-link callback)))
 
 (defn inbox-follow [follow-link callback]
   (if follow-link
@@ -961,13 +952,13 @@
      callback)
     (handle-missing-link "inbox-unfollow" unfollow-link callback)))
 
-(defn inbox-dismiss-all [dismiss-all-link callback]
+(defn inbox-dismiss-all [dismiss-all-link dismiss-at callback]
   (if dismiss-all-link
     (storage-http (method-for-link dismiss-all-link) (relative-href dismiss-all-link)
      {:headers (headers-for-link dismiss-all-link)
-      :body (utils/as-of-now)}
+      :body dismiss-at}
      callback)
-    (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback)))
+    (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
 
 ;; WRT
 
@@ -978,15 +969,3 @@
 (defn request-reads-count [item-ids]
   (when (seq item-ids)
     (ws-cc/who-read-count item-ids)))
-
-;; 
-
-;; Change service http
-
-(defn mark-unread [mark-unread-link container-id callback]
-  (if mark-unread-link
-    (change-http (method-for-link mark-unread-link) (relative-href mark-unread-link)
-     {:headers (headers-for-link mark-unread-link)
-      :body container-id}
-     callback)
-    (handle-missing-link "mark-unread" mark-unread-link callback)))

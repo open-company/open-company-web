@@ -93,7 +93,7 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
-(def other-resources-delay 10000)
+(def other-resources-delay 1000)
 
 (defn org-loaded
   "Dispatch the org data into the app-state to be used by all the components.
@@ -109,13 +109,19 @@
   (let [boards (:boards org-data)
         current-board-slug (router/current-board-slug)
         inbox-link (utils/link-for (:links org-data) "inbox")
-        activity-link (utils/link-for (:links org-data) "entries")
-        recent-activity-link (utils/link-for (:links org-data) "activity")
-        follow-ups-link (utils/link-for (:links org-data) "follow-ups")
-        recent-follow-ups-link (utils/link-for (:links org-data) "follow-ups-activity")
+        all-posts-link (utils/link-for (:links org-data) "activity")
+        bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
+        drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
+        drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
-        is-follow-ups? (= current-board-slug "follow-ups")]
+        is-bookmarks? (= (router/current-board-slug) "bookmarks")
+        is-drafts? (= current-board-slug utils/default-drafts-board-slug)
+        delay-count (atom 0)
+        inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
+        all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
+        bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
+        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
@@ -125,49 +131,43 @@
           (when (router/current-activity-id)
             (cmail-actions/get-entry-with-uuid current-board-slug (router/current-activity-id)))
           ;; Load inbox data
-          (when (and inbox-link
-                     is-inbox?)
-            (aa/inbox-get org-data))
+          (when inbox-link
+            (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data
-          (when (and activity-link
-                     is-all-posts?)
-            (aa/activity-get org-data))
-          (when (and recent-activity-link
-                     is-all-posts?)
-            (aa/recent-activity-get org-data))
-          ;; Load follow-ups data
-          (when (and follow-ups-link
-                     is-follow-ups?)
-            (aa/follow-ups-get org-data))
-          (when (and recent-follow-ups-link
-                     is-follow-ups?)
-            (aa/recent-follow-ups-get org-data)))))
+          (when all-posts-link
+            (utils/maybe-after all-posts-delay #(aa/activity-get org-data)))
+          ;; Preload bookmarks data
+          (when bookmarks-link
+            (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
+          (when drafts-link
+            (utils/maybe-after drafts-delay #(sa/section-get drafts-link))))))
     (cond
-       (dis/is-container? current-board-slug)
-       (when (or (and is-inbox?
+      ;; If it's all posts page or must see, loads AP and must see for the current org
+      (dis/is-container? current-board-slug)
+      (when (or (and is-inbox?
                       (not inbox-link))
                  (and is-all-posts?
-                      (not activity-link))
-                 (and is-follow-ups?
-                      (not follow-ups-link)))
+                      (not all-posts-link))
+                 (and is-bookmarks?
+                      (not bookmarks-link)))
         (check-org-404))
       
       ; If there is a board slug let's load the board data
       current-board-slug
       (if-let [board-data (first (filter #(or (= (:slug %) current-board-slug)
                                               (= (:uuid %) current-board-slug)) boards))]
-        ; Load the board data since there is a link to the board in the org data
-        (do
+        ;; Load the board data except for drafts if there is a link in the boards list
+        ;; except for drafts which is preloaded with the rest
+        (when-not is-drafts?
           ;; Rewrite the URL in case it's using the board UUID instead of the slug
           (when (= (:uuid board-data) current-board-slug)
             (router/rewrite-board-uuid-as-slug current-board-slug (:slug board-data)))
-          (when-let [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
-            (sa/section-get :recently-posted board-link))
-          (when-let [recent-board-link (utils/link-for (:links board-data) "activity" "GET")]
-            (sa/section-get :recent-activity recent-board-link)))
+          (when-let* [board-rel (if is-drafts? ["item" "self"] "activity")
+                      board-link (utils/link-for (:links board-data) board-rel "GET")]
+            (sa/section-get board-link)))
         ; The board wasn't found, showing a 404 page
-        (if (= current-board-slug utils/default-drafts-board-slug)
-          (utils/after 100 #(sa/section-get-finish (router/current-sort-type) utils/default-drafts-board))
+        (if is-drafts?
+          (utils/after 100 #(sa/section-get-finish utils/default-drafts-board))
           (when-not (router/current-activity-id) ;; user is not asking for a specific post
             (routing-actions/maybe-404))))
       ;; Board redirect handles

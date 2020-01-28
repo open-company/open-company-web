@@ -1,6 +1,7 @@
 (ns oc.web.components.invite-picker-modal
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.actions.org :as org-actions]
@@ -47,11 +48,19 @@
           [:button.mlb-reset.invite-email-bt
             {:on-click #(nav-actions/show-org-settings :invite-email)}
             "Invite via email"]
-          (if (-> team-data :slack-orgs count pos?)
+          ;; Show invite via Slack if team has a bot, or if the team has a Slack org associated
+          ;; or if the user logged in via Slack
+          (if (or ;; if team has at least one slack org associated
+                  (-> team-data :slack-orgs count pos?)
+                  ;; if team has a bot installed
+                  (:can-slack-invite team-data)
+                  ;; if user signed in via Slack
+                  (= (jwt/get-key :auth-source) "slack"))
             [:button.mlb-reset.invite-slack-bt
               {:on-click #(nav-actions/show-org-settings :invite-slack)}
               "Invite via Slack"]
-            [:button.mlb-reset.invite-slack-bt
-              {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
-              [:span.disabled "Invite via Slack"]
-              [:span.enabled "(add Slack)"]])]]]))
+            (when (-> team-data :team-id jwt/is-admin?)
+              [:button.mlb-reset.invite-slack-bt
+                {:on-click #(org-actions/bot-auth team-data current-user-data (str (router/get-token) "?org-settings=invite-picker"))}
+                [:span.disabled "Invite via Slack"]
+                [:span.enabled "(add Slack)"]]))]]]))

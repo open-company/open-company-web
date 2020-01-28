@@ -83,36 +83,40 @@
                              (.tooltip "hide")))
                        s)}
   [s {:keys [entity-data share-container-id editable-boards will-open will-close external-share
-             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move?
+             tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
-             reply-cb assigned-follow-up-data external-follow-up complete-follow-up-title
+             reply-cb external-bookmark remove-bookmark-title
              show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
+        mark-unread-link (utils/link-for (:links entity-data) "unread")
         is-mobile? (responsive/is-tablet-or-mobile?)
-        create-follow-up-link (utils/link-for (:links entity-data) "follow-up" "POST")
-        complete-follow-up-link (when (and assigned-follow-up-data
-                                           (not (:completed? assigned-follow-up-data)))
-                                  (utils/link-for (:links assigned-follow-up-data) "mark-complete" "POST"))
+        add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
+        remove-bookmark-link (when (:bookmarked entity-data)
+                               (utils/link-for (:links entity-data) "bookmark" "DELETE"))
         should-show-more-bt (or edit-link
                                 delete-link
                                 can-comment-share?
                                 can-react?
                                 can-reply?
                                 (and (not external-share)
-                                     share-link))
+                                     share-link)
+                                (and mark-unread-link
+                                     show-unread))
         inbox-follow-link (utils/link-for (:links entity-data) "follow")
         inbox-unfollow-link (utils/link-for (:links entity-data) "unfollow")
         show-menu (or @(::showing-menu s) force-show-menu)]
     (when (or edit-link
               share-link
+              mark-unread-link
               delete-link
               can-comment-share?
               can-react?
               can-reply?
-              create-follow-up-link
-              complete-follow-up-link)
+              add-bookmark-link
+              remove-bookmark-link
+              mark-unread-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded (or @(::move-activity s)
@@ -146,10 +150,13 @@
                           :dismiss-cb #(reset! (::move-activity s) false)})
           show-menu
           [:ul.more-menu-list
-            {:class (utils/class-set {:has-complete-follow-up (and is-mobile?
-                                                                   complete-follow-up-link)
-                                      :has-create-follow-up (and is-mobile?
-                                                                 create-follow-up-link)})}
+            {:class (utils/class-set {:has-remove-bookmark (and add-bookmark-link
+                                                                (or is-mobile?
+                                                                    (not external-bookmark)))
+                                      :has-add-bookmark (and remove-bookmark-link
+                                                             (or is-mobile?
+                                                                 (not external-bookmark)))
+                                      :has-mark-unread mark-unread-link})}
             (when (and edit-link
                        show-edit?)
               [:li.edit.top-rounded
@@ -175,58 +182,87 @@
             (when (and edit-link
                        show-move?)
               [:li.move.top-rounded
-               {:on-click #(do
+               {:class (when (and (not (and (not external-share)
+                                            share-link))
+                                  (not (or is-mobile?
+                                            (not external-follow)))
+                                   (not (or is-mobile?
+                                            (not external-bookmark))))
+                          "bottom-rounded bottom-margin")
+                :on-click #(do
                              (reset! (::showing-menu s) false)
                              (reset! (::move-activity s) true))}
                "Move"])
             (when (and (not external-share)
                        share-link)
               [:li.share
-                {:on-click #(do
+                {:class (when (and (not mark-unread-link)
+                                   (not (or is-mobile?
+                                            (not external-follow)))
+                                   (not (or is-mobile?
+                                            (not external-bookmark))))
+                          "bottom-rounded bottom-margin")
+                 :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (if inbox-follow-link
-              [:li.follow
-                {:class (when-not (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
+            (when (and mark-unread-link
+                       show-unread)
+              [:li.unread
+                {:class (when (and (not (or is-mobile?
+                                            (not external-follow)))
+                                   (not (or is-mobile?
+                                            (not external-bookmark))))
+                          "bottom-rounded bottom-margin")
                  :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/inbox-follow (:uuid entity-data)))}
-                "Follow"]
-              (when inbox-unfollow-link
-                [:li.unfollow
-                  {:class (when-not (or is-mobile? (not external-follow-up)) "bottom-rounded bottom-margin")
-                   :on-click #(do
-                                (reset! (::showing-menu s) false)
-                                (when (fn? will-close)
-                                  (will-close))
-                                (activity-actions/inbox-unfollow (:uuid entity-data)))}
-                  "Mute"]))
+                              (activity-actions/inbox-unread entity-data))}
+                "Add to Unread"])
             (when (or is-mobile?
-                       (not external-follow-up))
-              (if complete-follow-up-link
-                [:li.complete-follow-up.bottom-rounded.bottom-margin
-                  {:ref "more-menu-complete-follow-up-bt"
+                      (not external-follow))
+              (if inbox-follow-link
+                [:li.follow
+                  {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/complete-follow-up entity-data assigned-follow-up-data))}
-                  "Complete follow-up"]
-                (when create-follow-up-link
-                  [:li.create-follow-up.bottom-rounded.bottom-margin
-                    {:ref "more-menu-create-follow-up-bt"
+                                (activity-actions/inbox-follow (:uuid entity-data)))}
+                  "Follow"]
+                (when inbox-unfollow-link
+                  [:li.unfollow
+                    {:class (when-not (or is-mobile? (not external-bookmark)) "bottom-rounded bottom-margin")
+                     :on-click #(do
+                                  (reset! (::showing-menu s) false)
+                                  (when (fn? will-close)
+                                    (will-close))
+                                  (activity-actions/inbox-unfollow (:uuid entity-data)))}
+                    "Mute"])))
+            (when (or is-mobile?
+                      (not external-bookmark))
+              (if remove-bookmark-link
+                [:li.remove-bookmark.bottom-rounded.bottom-margin
+                  {:ref "more-menu-remove-bookmark-bt"
+                   :on-click #(do
+                                (reset! (::showing-menu s) false)
+                                (when (fn? will-close)
+                                  (will-close))
+                                (activity-actions/remove-bookmark entity-data remove-bookmark-link))}
+                  "Remove bookmark"]
+                (when add-bookmark-link
+                  [:li.add-bookmark.bottom-rounded.bottom-margin
+                    {:ref "more-menu-add-bookmark-bt"
                      :data-container "body"
                      :on-click #(do
                                   (reset! (::showing-menu s) false)
                                   (when (fn? will-close)
                                     (will-close))
-                                  (activity-actions/create-self-follow-up entity-data create-follow-up-link))}
-                    "Follow-up later"])))
+                                  (activity-actions/add-bookmark entity-data add-bookmark-link))}
+                    "Bookmark"])))
             (when can-react?
               [:li.react.top-rounded
                 {:on-click #(do
@@ -272,9 +308,9 @@
              :class (when (or inbox-follow-link
                               inbox-unfollow-link
                               show-inbox?
-                              (and external-follow-up
-                                   (or complete-follow-up-link
-                                       create-follow-up-link))) "has-next-bt")
+                              (and external-bookmark
+                                   (or add-bookmark-link
+                                       remove-bookmark-link))) "has-next-bt")
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
@@ -292,9 +328,9 @@
              :ref "more-menu-inbox-follow-bt"
              :key "more-menu-inbox-follow-bt"
              :class (when (or show-inbox?
-                              (and external-follow-up
-                                   (or complete-follow-up-link
-                                       create-follow-up-link))) "has-next-bt")
+                              (and external-bookmark
+                                   (or add-bookmark-link
+                                       remove-bookmark-link))) "has-next-bt")
              :on-click #(do
                           (reset! (::showing-menu s) false)
                           (when (fn? will-close)
@@ -310,9 +346,9 @@
                  :ref "more-menu-inbox-unfollow-bt"
                  :key "more-menu-inbox-unfollow-bt"
                  :class (when (or show-inbox?
-                                (and external-follow-up
-                                     (or complete-follow-up-link
-                                         create-follow-up-link))) "has-next-bt")
+                                (and external-bookmark
+                                     (or add-bookmark-link
+                                         remove-bookmark-link))) "has-next-bt")
                  :on-click #(do
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
@@ -322,37 +358,37 @@
                  :data-placement (or tooltip-position "top")
                  :data-container "body"
                  :title "Ignore future activity unless mentioned"}])))
-        (when external-follow-up
-          (if complete-follow-up-link
-            [:button.mlb-reset.more-menu-complete-follow-up-bt
+        (when external-bookmark
+          (if remove-bookmark-link
+            [:button.mlb-reset.more-menu-remove-bookmark-bt
               {:type "button"
-               :ref "more-menu-complete-follow-up-bt"
+               :ref "more-menu-remove-bookmark-bt"
                :class (when show-inbox? "has-next-bt")
                :on-click #(do
                             (reset! (::showing-menu s) false)
                             (when (fn? will-close)
                               (will-close))
-                            (activity-actions/complete-follow-up entity-data assigned-follow-up-data))
+                            (activity-actions/remove-bookmark entity-data remove-bookmark-link))
                :data-toggle (if is-mobile? "" "tooltip")
                :data-placement (or tooltip-position "top")
                :data-container "body"
-               :title "Complete follow-up"}
-              complete-follow-up-title]
-            (when create-follow-up-link
-              [:div.more-menu-create-follow-up-bt-container
-                [:button.mlb-reset.more-menu-create-follow-up-bt
+               :title "Remove bookmark"}
+              remove-bookmark-title]
+            (when add-bookmark-link
+              [:div.more-menu-add-bookmark-bt-container
+                [:button.mlb-reset.more-menu-add-bookmark-bt
                   {:type "button"
+                   :ref "more-menu-add-bookmark-bt"
                    :class (when show-inbox? "has-next-bt")
-                   :ref "more-menu-create-follow-up-bt"
                    :on-click #(do
                                 (reset! (::showing-menu s) false)
                                 (when (fn? will-close)
                                   (will-close))
-                                (activity-actions/create-self-follow-up entity-data create-follow-up-link))
+                                (activity-actions/add-bookmark entity-data add-bookmark-link))
                    :data-toggle (if is-mobile? "" "tooltip")
                    :data-placement (or tooltip-position "top")
                    :data-container "body"
-                   :title "Follow up later"}]])))
+                   :title "Bookmark"}]])))
         (when show-inbox?
           [:button.mlb-reset.more-menu-inbox-dismiss-bt
             {:type "button"
