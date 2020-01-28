@@ -853,8 +853,7 @@
     (let [cmail-state (:cmail-state @dis/app-state)
           cmail-data (:cmail-data @dis/app-state)
           next-cmail-data (if (and cmail-data
-                                   cmail-state
-                                   (not (:collapsed cmail-state)))
+                                   cmail-state)
                              cmail-data
                              (cmail-actions/get-board-for-edit))]
       (activity-edit next-cmail-data)))

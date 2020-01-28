@@ -404,9 +404,6 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
-                    (let [cmail-state @(drv/get-ref s :cmail-state)]
-                      (when-not (:collapsed cmail-state)
-                        (utils/after 1000 #(.focus (body-element)))))
                     (let [body-el (sel1 [:div.rich-body-editor])
                           abstract-text (.text (.html (js/$ "<div/>") @(::initial-abstract s)))]
                       (when (or (> (count (.-innerText body-el)) body-length-to-show-abstract)
@@ -449,9 +446,7 @@
                               abstract-exceeds :abstract
                               (not (seq (:headline cmail-data))) :title
                               :else nil))
-                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
-                            (when-not (:collapsed cmail-state)
-                              (utils/after 1000 #(.focus (body-element))))))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
@@ -559,7 +554,7 @@
                              current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
-                                :quick-post-collapsed (:collapsed cmail-state)
+                                :quick-post-collapsed show-paywall-alert?
                                 :show-trial-expired-alert show-paywall-alert?})
        :on-click #(when (and (:collapsed cmail-state)
                              (not show-paywall-alert?))
@@ -640,35 +635,13 @@
                                 :width (:width video-size)
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
-            [:div.cmail-content-section-picker.group
-              [:div.cmail-content-section-picker-label
-                "Post to"]
-              [:div.section-picker-bt-container
-                [:button.mlb-reset.section-picker-bt
-                  {:on-click #(swap! (::show-sections-picker s) not)}
-                  (:board-name cmail-data)]
-                (when @(::show-sections-picker s)
-                  [:div.sections-picker-container
-                    {:ref :sections-picker-container}
-                    (sections-picker (:board-slug cmail-data) did-pick-section)])]
-              (when (and @(::show-abstract-button s)
-                         (not @(::show-abstract s)))
-                [:button.mlb-reset.show-abstract-bt
-                  {:on-click #(show-abstract-box s)
-                   :data-toggle (if is-mobile? "" "tooltip")
-                   :data-placement "bottom"
-                   :title (str "For longer posts, a summary makes it easy for viewers "
-                               "to quickly see what it's about and why it's important.")}
-                  "Add a quick summary"])]
             ; Headline element
             [:div.cmail-content-headline-container.group
-              [:div.cmail-content-headline-label
-                {:on-click #(utils/to-end-of-content-editable (rum/ref-node s "headline"))}
-                "Subject"]
               [:div.cmail-content-headline.emoji-autocomplete.emojiable
                 {:class utils/hide-class
                  :content-editable true
                  :key (str "cmail-headline-" (:key cmail-state))
+                 :placeholder "Add a headline"
                  :ref "headline"
                  :on-paste    #(headline-on-paste s %)
                  :on-key-down (fn [e]
@@ -683,6 +656,16 @@
                                     (utils/event-stop e)
                                     (utils/to-end-of-content-editable (body-element)))))
                  :dangerouslySetInnerHTML @(::initial-headline s)}]]
+            (when (and @(::show-abstract-button s)
+                         (not @(::show-abstract s)))
+              [:div.cmail-content-abstract-bt-container.group
+                [:button.mlb-reset.show-abstract-bt
+                  {:on-click #(show-abstract-box s)
+                   :data-toggle (if is-mobile? "" "tooltip")
+                   :data-placement "bottom"
+                   :title (str "For longer posts, a summary makes it easy for viewers "
+                               "to quickly see what it's about and why it's important.")}
+                  "Add a quick summary"]])
             ;; Abstract
             [:div.cmail-content-abstract-container-outer
               {:class (when-not @(::show-abstract s) "hidden")}
@@ -717,7 +700,7 @@
                                ;; Block the rich-body-editor component when
                                ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
-                               :placeholder (when (:collapsed cmail-state) "Share something with your team...")
+                               :placeholder "What’s happening…"
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)
@@ -760,12 +743,14 @@
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
                  :title "Delete"}]])
-          [:div.fullscreen-bt-container
-            [:button.mlb-reset.fullscreen-bt
-              {:on-click #(cmail-actions/cmail-toggle-fullscreen)
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement "auto"
-               :title "Fullscreen"}]]
+          (when (and (not (:collapsed cmail-state))
+                     (not is-fullscreen?))
+            [:div.fullscreen-bt-container
+              [:button.mlb-reset.fullscreen-bt
+                {:on-click #(cmail-actions/cmail-toggle-fullscreen)
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title "Fullscreen"}]])
           [:div.cmail-footer-right
             (when-not is-fullscreen?
               [:div.post-button-container.group
@@ -775,6 +760,15 @@
                                  :post-tt-kw post-tt-kw
                                  :force-show-tooltip @(::show-post-tooltip s)
                                  :show-on-hover true})])
+            (when-not is-fullscreen?
+              [:div.section-picker-bt-container
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])])
             (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
                            :width 32
                            :height 32

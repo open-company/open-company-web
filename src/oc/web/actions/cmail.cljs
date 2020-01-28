@@ -47,24 +47,25 @@
 
 ;; Last used and default section for editing
 
-(defn get-default-section []
-  (let [org-slug (router/current-org-slug)
-        editable-boards (dis/editable-boards-data org-slug)
+(defn get-default-section [& [editable-boards]]
+  (let [editable-boards (or editable-boards (vals (dis/editable-boards-data (router/current-org-slug))))
         cookie-value (au/last-used-section)
-        board-from-cookie (some #(when (= (:slug %) cookie-value) %) (vals editable-boards))
-        filtered-boards (filterv #(not (:draft %)) (vals editable-boards))
+        board-from-cookie (some #(when (and (not (:draft %)) (= (:slug %) cookie-value)) %)
+                           editable-boards)
+        filtered-boards (filterv #(not (:draft %)) editable-boards)
         board-data (or board-from-cookie (first (sort-by :name filtered-boards)))]
     {:board-name (:name board-data)
      :board-slug (:slug board-data)}))
 
-(defn get-board-for-edit [& [board-slug]]
+(defn get-board-for-edit [& [board-slug editable-boards]]
   (let [board-data (if (seq board-slug)
                     (dis/board-data (router/current-org-slug) board-slug)
                     (dis/board-data))]
     (if (or (not board-data)
             (= (:slug board-data) utils/default-drafts-board-slug)
+            (:draft board-data)
             (not (utils/link-for (:links board-data) "create")))
-      (get-default-section)
+      (get-default-section editable-boards)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
 
