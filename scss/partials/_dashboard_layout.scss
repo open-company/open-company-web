@@ -18,7 +18,7 @@ div.dashboard-layout {
   }
 
   @include mobile() {
-    background-color: var(--mobile-background-color); // FIXME: rgba($deep_navy, 0.05);
+    background-color: var(--opac-background-color-05);
 
     &.sticky-board-name {
       padding-top: 48px;
@@ -139,6 +139,10 @@ div.dashboard-layout {
 
             &.active span.tab-icon {
               background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/all_posts_tab_icon_active.svg");
+              }
             }
           }
 
@@ -182,6 +186,10 @@ div.dashboard-layout {
 
             &.active span.tab-icon {
               background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/inbox_tab_icon_active.svg");
+              }
             }
           }
 
@@ -213,6 +221,10 @@ div.dashboard-layout {
 
             &.active span.tab-icon {
               background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/notifications_tab_icon_active.svg");
+              }
             }
           }
 
@@ -233,6 +245,10 @@ div.dashboard-layout {
 
             &.active span.tab-icon {
               background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/new_post_tab_icon_active.svg");
+              }
             }
           }
         }
@@ -261,12 +277,13 @@ div.dashboard-layout {
         height: 40px;
         // Use 0.19 opacity on this to make it look like the rest of the lines
         // that are on a darker background
-        border-bottom: 1px solid var(--ultralight-color); // FIXME rgba($deep_navy, 0.19);
+        border-bottom: 1px solid var(--divider-line);
 
         @include mobile() {
           height: 50px;
           border-bottom: none;
           padding: 0;
+          background-color: var(--mobile-background-color);
 
           &.drafts-board {
             height: 0;
@@ -498,8 +515,8 @@ div.dashboard-layout {
           @include mobile () {
             float: unset;
             height: 50px;
-            background-color: rgba($deep_navy, 0.05);
-            border-bottom: 1px solid rgba($deep_navy, 0.15);
+            background-color: var(--mobile-foc-background-color);
+            border-bottom: 1px solid var(--divider-line);
           }
 
           button.complete-all-bt {
