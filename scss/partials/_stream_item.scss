@@ -232,6 +232,7 @@ div.stream-item {
 
   div.stream-item-header {
     position: relative;
+    height: 24px;
 
     @include mobile() {
       width: 100%;
@@ -396,7 +397,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 88px;
+      min-height: 76px;
       position: relative;
       cursor: pointer;
 
@@ -529,21 +530,21 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body(17, 22, var(--color));
+        @include activity-body(15, 18, var(--color));
         color: var(--color);
         @include OC_Body_Book();
-        line-height: 22px;
+        line-height: 18px;
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
 
-        max-height: #{22 * 2}px;
+        max-height: #{18 * 2}px;
 
         h2 {
           color: var(--color);
           @include OC_Body_Book();
-          font-size: 17px;
-          line-height: 22px;
+          font-size: 15px;
+          line-height: 18px;
         }
 
         b, strong, &.editing b, &.editing strong {
