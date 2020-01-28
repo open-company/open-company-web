@@ -58,8 +58,12 @@ div.stream-item {
     @include big_web() {
       &:hover {
         div.stream-item-header {
-          div.more-menu button {
-            display: initial;
+          div.more-menu {
+            display: block;
+
+            button {
+              display: initial;
+            }
           }
         }
       }
@@ -78,8 +82,12 @@ div.stream-item {
       border: 1px solid var(--foc-hover-border-color);
 
       div.stream-item-header {
-        div.more-menu button {
-          display: initial;
+        div.more-menu {
+          display: block;
+
+          button {
+            display: initial;
+          }
         }
       }
     }
@@ -111,6 +119,16 @@ div.stream-item {
         padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+
+        div.stream-item-header {
+          div.more-menu {
+            display: block;
+
+            button {
+              display: initial;
+            }
+          }
+        }
       }
     }
   }
@@ -331,6 +349,11 @@ div.stream-item {
       height: 32px;
 
       @include big_web() {
+        display: none;
+        position: absolute;
+        right: -12px;
+        top: -4px;
+
         &:not(.menu-expanded) button {
           display: none;
         }
@@ -396,7 +419,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 88px;
+      min-height: 84px;
       position: relative;
       cursor: pointer;
 
