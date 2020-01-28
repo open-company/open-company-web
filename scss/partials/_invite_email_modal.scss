@@ -151,18 +151,32 @@ div.invite-email-modal {
 
       div.invites-list {
         margin-top: 24px;
-        padding-top: 16px;
 
         &.top-border {
+          padding-top: 16px;
           padding-top: 24px;
-          border-top: 1px solid rgba($deep_navy, 0.15);
+          border-top: 1px solid var(--divider-line);
         }
 
         div.invites-list-title {
           @include OC_Body_Bold();
           font-size: 14px;
-          color: var(--light-color);
+          color: var(--color);
           letter-spacing: .1px;
+        }
+
+        div.invites-list-description {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          line-height: 18px;
+          margin-top: 8px;
+
+          strong {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+          }
         }
 
         div.invites-list-item {
