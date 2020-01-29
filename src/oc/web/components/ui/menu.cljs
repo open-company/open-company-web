@@ -18,7 +18,6 @@
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
-            [oc.web.actions.ui-theme :as ui-theme-actions]
             [oc.web.components.ui.carrot-switch :refer (carrot-switch)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
@@ -87,11 +86,14 @@
     (str "Version " (.getElectronAppVersion js/OCCarrotDesktop))
     ""))
 
+(defn- theme-settings-click [s e]
+  (.preventDefault e)
+  (nav-actions/show-theme-settings))
+
 (rum/defcs menu < rum/reactive
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
-                  (drv/drv :ui-theme)
   mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
@@ -120,8 +122,7 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           (router/current-org-slug))
-        ui-theme-data (drv/react s :ui-theme)]
+                           (router/current-org-slug))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -156,24 +157,10 @@
               "Notifications"]])
         (when-not is-mobile?
           [:div.oc-menu-separator])
-        [:div.ui-theme-switch
-          [:span.ui-theme-icon.light
-            {:class (when (not= (:computed-value ui-theme-data) :dark) "active")
-             :on-click #(ui-theme-actions/set-ui-theme :light)}]
-          (carrot-switch {:selected (= (:computed-value ui-theme-data) :dark)
-                          :did-change-cb #(ui-theme-actions/set-ui-theme (if % :dark :light))})
-          [:span.ui-theme-icon.dark
-            {:class (when (= (:computed-value ui-theme-data) :dark) "active")
-             :on-click #(ui-theme-actions/set-ui-theme :dark)}]
-          (when (and (not= (:setting-value ui-theme-data) :auto)
-                     (ui-theme-actions/support-system-dark-mode?))
-            [:a.ui-theme-auto
-              {:on-click #(ui-theme-actions/set-ui-theme :auto)
-               :title "Uses system preference"
-               :data-toggle (when-not is-mobile? "tooltip")
-               :data-placement "top"
-               :data-container "body"}
-              "Auto"])]
+        [:a
+          {:href "#"
+           :on-click (partial theme-settings-click s)}
+          "Theme"]
         [:div.oc-menu-separator]
         (when (and show-reminders?
                    (not is-mobile?))
