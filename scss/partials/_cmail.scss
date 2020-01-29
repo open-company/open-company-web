@@ -75,6 +75,12 @@ div.cmail-outer {
           div.section-picker-bt-container {
             button.section-picker-bt {
               opacity: 0.5;
+
+              @include big_web() {
+                &:hover {
+                  opacity: 0.9;
+                }
+              }
             }
           }
 
@@ -83,11 +89,11 @@ div.cmail-outer {
           }
 
           div.post-button-container {
-
             div.post-to-button, div.post-to-button.disabled {
               div.post-to-bt-container button.post-to-bt {
                 color: var(--light-color);
                 background-color: var(--opac-background-color-1);
+                opacity: 1;
               }
             }
           }
@@ -1035,12 +1041,13 @@ div.cmail-outer {
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
-            color: var(--light-color);
+            color: var(--color);
             position: relative;
 
             @include mobile() {
               height: 28px;
               font-size: 16px;
+              color: var(--light-color);
 
               &:after {
                 top: 9px;
@@ -1059,7 +1066,6 @@ div.cmail-outer {
               background-size: 8px 10px;
               background-repeat: no-repeat;
               background-position: center;
-              opacity: 1;
 
               @include dark_mode() {
                 background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
@@ -1068,7 +1074,7 @@ div.cmail-outer {
 
             @include big_web() {
               &:hover {
-                color: var(--color);
+                opacity: 0.9;
               }
             }
           }
