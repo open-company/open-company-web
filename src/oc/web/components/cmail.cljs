@@ -556,12 +556,17 @@
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?})
-       :on-click #(when (and (:collapsed cmail-state)
+       :on-click (when (and (:collapsed cmail-state)
                              (not show-paywall-alert?))
-                    (nux-actions/dismiss-add-post-tooltip)
-                    (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
-                                                                                  :fullscreen false
-                                                                                  :key (:key cmail-state)}))}
+                   #(let [headline-el (rum/ref-node s "headline")]
+                      (nux-actions/dismiss-add-post-tooltip)
+                      (cmail-actions/cmail-expand cmail-data cmail-state)
+                      (when (and headline-el
+                                 (not (utils/button-clicked? %))
+                                 (not (utils/input-clicked? %))
+                                 (not (utils/event-inside? % headline-el))
+                                 (not (utils/event-inside? % (body-element))))
+                        (.focus headline-el))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state)
                  (not (:fullscreen cmail-state)))

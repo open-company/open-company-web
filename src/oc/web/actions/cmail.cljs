@@ -93,6 +93,9 @@
 (defn- cmail-fullscreen-save [fullscreen?]
   (cook/set-cookie! (cmail-fullscreen-cookie) fullscreen? (* 60 60 24 30)))
 
+(defn- save-edit-open-cookie [entry-data]
+  (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug entry-data) "/" (:uuid entry-data)) true) (* 60 60 24 365)))
+
 (defn cmail-show [initial-entry-data & [cmail-state]]
   (let [cmail-default-state {:fullscreen (if (contains? cmail-state :fullscreen)
                                            (:fullscrreen cmail-state)
@@ -105,9 +108,15 @@
         (cook/remove-cookie! (cmail-fullscreen-cookie))))
     (when (and (not (:auto cmail-state))
                (not (:collapsed cmail-state)))
-      (cook/set-cookie! (edit-open-cookie) (or (str (:board-slug initial-entry-data) "/" (:uuid initial-entry-data)) true) (* 60 60 24 365)))
+      (save-edit-open-cookie initial-entry-data))
     (load-cached-item initial-entry-data :cmail-data
      #(dis/dispatch! [:input [:cmail-state] fixed-cmail-state]))))
+
+(defn cmail-expand [initial-entry-data cmail-state]
+  (cook/remove-cookie! (cmail-fullscreen-cookie))
+  (save-edit-open-cookie initial-entry-data)
+  (load-cached-item initial-entry-data :cmail-data
+   #(dis/dispatch! [:input [:cmail-state] (merge cmail-state {:collapsed false})])))
 
 (defn cmail-hide []
   (cook/remove-cookie! (edit-open-cookie))

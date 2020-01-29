@@ -616,10 +616,11 @@ div.cmail-outer {
       margin-left: 16px;
       float: right;
 
-      div.post-to-button, div.post-to-button.disabled {
+      div.post-to-button.disabled {
         div.post-to-bt-container button.post-to-bt {
-          background-color: $feint_emerald;
+          background-color: $carrot_green;
           color: white;
+          opacity: 0.4;
         }
       }
     }

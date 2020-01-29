@@ -51,6 +51,7 @@
                          editing-board)
                   (-> db
                     (assoc :cmail-state {:key (utils/activity-uuid)
+                                         :fullscreen false
                                          :collapsed true})
                     (update :cmail-data merge editing-board))
                   db)]
