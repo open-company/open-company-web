@@ -420,7 +420,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 76px;
+      min-height: 80px;
       position: relative;
       cursor: pointer;
 
@@ -553,21 +553,21 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body(16, 18, var(--color));
+        @include activity-body(16, 20, var(--color));
         color: var(--color);
         @include OC_Body_Book();
-        line-height: 18px;
+        line-height: 20px;
         overflow: hidden;
         white-space: pre-wrap;
         word-break: break-word;
 
-        max-height: #{18 * 2}px;
+        max-height: #{20 * 2}px;
 
         h2 {
           color: var(--color);
           @include OC_Body_Book();
-          font-size: 15px;
-          line-height: 18px;
+          font-size: 16px;
+          line-height: 20px;
         }
 
         b, strong, &.editing b, &.editing strong {
