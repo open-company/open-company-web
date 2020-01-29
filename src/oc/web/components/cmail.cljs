@@ -554,7 +554,7 @@
                              current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
-                                :quick-post-collapsed show-paywall-alert?
+                                :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?})
        :on-click #(when (and (:collapsed cmail-state)
                              (not show-paywall-alert?))
@@ -757,7 +757,9 @@
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
                                  :title post-button-title
-                                 :post-tt-kw post-tt-kw
+                                 :post-tt-kw (when (and (not (:collapsed cmail-state))
+                                                        (not show-paywall-alert?))
+                                               post-tt-kw)
                                  :force-show-tooltip @(::show-post-tooltip s)
                                  :show-on-hover true})])
             (when-not is-fullscreen?
