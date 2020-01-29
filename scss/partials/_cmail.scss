@@ -32,14 +32,15 @@ div.cmail-outer {
     }
 
     &.show-trial-expired-alert {
-      div.cmail-container, div.cmail-container div.cmail-content-outer,
-      div.cmail-container div.cmail-content-outer div.cmail-content
-      div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
-        cursor: not-allowed;
+      cursor: not-allowed;
+      div.cmail-container {
+        pointer-events: none;
       }
 
       div.trial-expired-alert-container {
+        cursor: initial;
         margin-left: -#{$paywall_alert_width / 2}px;
+        margin-top: 32px;
       }
 
       @include big_web() {
@@ -51,50 +52,42 @@ div.cmail-outer {
       }
     }
 
-    &:not(.show-trial-expired-alert) {
-      div.cmail-container {
-        div.cmail-content-outer {
-          div.cmail-content div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
-            div.medium-editor-media-picker {
-              div.media-picker-container {
-                button.media.media-gif, button.media.media-video, button.media.media-photo {
-                  opacity: 0.5;
-                }
+    div.cmail-container {
+      div.cmail-content-outer {
+        div.cmail-content div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
+          div.medium-editor-media-picker {
+            div.media-picker-container {
+              button.media.media-gif, button.media.media-video, button.media.media-photo {
+                opacity: 0.5;
               }
             }
           }
         }
+      }
 
-        div.cmail-footer div.cmail-footer-right {
-          div.emoji-picker {
-            button.emoji-button {
-              opacity: 0.5;
-            }
-          }
-
-          div.section-picker-bt-container {
-            button.section-picker-bt {
-              opacity: 0.5;
-
-              @include big_web() {
-                &:hover {
-                  opacity: 0.9;
-                }
-              }
-            }
-          }
-
-          button.attachment-button {
+      div.cmail-footer div.cmail-footer-right {
+        div.emoji-picker {
+          button.emoji-button {
             opacity: 0.5;
           }
+        }
 
-          div.post-button-container {
-            div.post-to-button, div.post-to-button.disabled {
-              div.post-to-bt-container button.post-to-bt {
-                color: var(--light-color);
-                background-color: var(--opac-background-color-1);
-                opacity: 1;
-              }
+        div.section-picker-bt-container {
+          button.section-picker-bt {
+            opacity: 0.5;
+          }
+        }
+
+        button.attachment-button {
+          opacity: 0.5;
+        }
+
+        div.post-button-container {
+          div.post-to-button, div.post-to-button.disabled {
+            div.post-to-bt-container button.post-to-bt {
+              color: var(--light-color);
+              background-color: var(--opac-background-color-1);
+              opacity: 1;
             }
           }
         }
