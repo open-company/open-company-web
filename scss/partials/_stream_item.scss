@@ -544,7 +544,7 @@ div.stream-item {
 
       div.stream-item-headline {
         height: 28px;
-        @include activity-title(20px, 28px);
+        @include activity-title(18px, 26px);
         color: var(--color);
         overflow: hidden;
         text-overflow: ellipsis;

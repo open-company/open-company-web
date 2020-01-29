@@ -912,17 +912,18 @@ div.cmail-outer {
 
       div.fullscreen-bt-container {
         float: left;
-        height: 32px;
+        height: 16px;
+        margin-top: 8px;
         margin-left: 4px;
         padding-left: 4px;
         border-left: 1px solid var(--divider-line);
-        height: 32px;
 
         @include mobile() {
           display: none;
         }
 
         button.fullscreen-bt {
+          margin-top: -8px;
           height: 32px;
           width: 32px;
           background-image: cdnUrl("/img/ML/cmail_fullscreen_expand_black.svg");
@@ -999,10 +1000,12 @@ div.cmail-outer {
 
         div.section-picker-bt-container {
           position: relative;
+          margin-top: 8px;
           margin-left: 7px;
           padding-left: 8px;
           border-left: 1px solid var(--divider-line);
           float: right;
+          height: 16px;
 
           div.sections-picker {
             position: absolute;
@@ -1017,6 +1020,7 @@ div.cmail-outer {
 
           button.section-picker-bt {
             height: 32px;
+            margin-bottom: 8px;
             padding: 7px 16px 7px 8px;
             color: white;
             border-radius: 4px;
