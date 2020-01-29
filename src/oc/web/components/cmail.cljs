@@ -646,7 +646,7 @@
                 {:class utils/hide-class
                  :content-editable true
                  :key (str "cmail-headline-" (:key cmail-state))
-                 :placeholder "Add a headline"
+                 :placeholder utils/default-headline
                  :ref "headline"
                  :on-paste    #(headline-on-paste s %)
                  :on-key-down (fn [e]
