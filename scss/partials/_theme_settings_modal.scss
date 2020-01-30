@@ -146,7 +146,54 @@ div.theme-settings-modal {
           width: 100%;
           vertical-align: top;
 
+          &.auto-theme {
+            margin-bottom: 8px;
+            &.light-icon {
+              span.theme-icon {
+                background-image: cdnUrl("/img/ML/dark_mode_light.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg");
+                }
+              }
+            }
+
+            &.dark-icon {
+              span.theme-icon {
+                background-image: cdnUrl("/img/ML/dark_mode_dark.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/dark_mode_dark@dark.svg");
+                }
+              }
+            }
+
+            &.active {
+              &.light-icon {
+                span.theme-icon {
+                  background-image: cdnUrl("/img/ML/dark_mode_light_active.svg");
+
+                  @include dark_mode() {
+                    background-image: cdnUrl("/img/ML/dark_mode_light_active.svg");
+                  }
+                }
+              }
+
+              &.dark-icon {
+                span.theme-icon {
+                  background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+
+                  @include dark_mode() {
+                    background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+                  }
+                }
+              }
+            }
+          }
+
           &.light-theme {
+            margin-bottom: 8px;
+
             span.theme-icon {
               background-image: cdnUrl("/img/ML/dark_mode_light.svg");
 
@@ -167,8 +214,6 @@ div.theme-settings-modal {
           }
 
           &.dark-theme {
-            margin-top: 8px;
-
             span.theme-icon {
               background-image: cdnUrl("/img/ML/dark_mode_dark.svg");
 
