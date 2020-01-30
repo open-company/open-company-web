@@ -165,6 +165,15 @@ div.theme-settings-modal {
                   background-image: cdnUrl("/img/ML/dark_mode_light_active.svg");
                 }
               }
+
+              div.carrot-option-button:not(.selected) {
+                opacity: 0.5;
+                background-image: cdnUrl("/img/ML/carrot_option_button_selected.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/carrot_option_button_selected@dark.svg");
+                }
+              }
             }
           }
 
@@ -183,6 +192,15 @@ div.theme-settings-modal {
 
                 @include dark_mode() {
                   background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+                }
+              }
+
+              div.carrot-option-button:not(.selected) {
+                opacity: 0.5;
+                background-image: cdnUrl("/img/ML/carrot_option_button_selected.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/carrot_option_button_selected@dark.svg");
                 }
               }
             }
