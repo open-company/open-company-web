@@ -23,8 +23,6 @@
           client (js/Sentry.BrowserClient. #js {:dsn ls/local-dsn})
           client-hub (js/Sentry.Hub. client)]
       (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
-      (js/console.log "DBG sentry-setup hub:" client-hub)
-      (js/console.log "DBG    hub.configureScope:" (.-configureScope client-hub))
       (.configureScope client-hub (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
         (.setTag scope "hasJWT" (not (not (jwt/jwt))))
