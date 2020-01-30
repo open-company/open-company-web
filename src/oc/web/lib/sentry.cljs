@@ -21,10 +21,11 @@
     (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)
           client (js/Sentry.BrowserClient. #js {:dsn ls/local-dsn})
-          hub (js/Sentry.Hub. client)]
+          client-hub (js/Sentry.Hub. client)]
       (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
-      ; (.init js/Sentry sentry-params)
-      (.configureScope js/Sentry (fn [scope]
+      (js/console.log "DBG sentry-setup hub:" client-hub)
+      (js/console.log "DBG    hub.configureScope:" (.-configureScope client-hub))
+      (.configureScope client-hub (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
         (.setTag scope "hasJWT" (not (not (jwt/jwt))))
         (when (jwt/jwt)
@@ -33,7 +34,7 @@
                                     :id (jwt/get-key :user-id)
                                     :first-name (jwt/get-key :first-name)
                                     :last-name (jwt/get-key :last-name)})))))
-      (reset! sentry-hub hub))))
+      (reset! sentry-hub client-hub))))
 
 (defn capture-error!
   ([e]
