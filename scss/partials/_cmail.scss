@@ -72,6 +72,37 @@ div.cmail-outer {
         }
       }
 
+      div.cmail-footer div.cmail-footer-right {
+        div.emoji-picker {
+          button.emoji-button {
+            opacity: 0.5;
+            display: none;
+          }
+        }
+
+        div.section-picker-bt-container {
+          border-left: 1px solid transparent;
+          button.section-picker-bt {
+            opacity: 0.5;
+          }
+        }
+
+        button.attachment-button {
+          opacity: 0.5;
+          display: none;
+        }
+
+        div.post-button-container {
+          div.post-to-button, div.post-to-button.disabled {
+            div.post-to-bt-container button.post-to-bt {
+              color: var(--light-color);
+              background-color: var(--opac-background-color-1);
+              opacity: 1;
+            }
+          }
+        }
+      }
+
       @include big_web(){
         &:hover {
           div.cmail-content-outer {
@@ -86,32 +117,20 @@ div.cmail-outer {
               }
             }
           }
-        }
-      }
 
-      div.cmail-footer div.cmail-footer-right {
-        div.emoji-picker {
-          button.emoji-button {
-            opacity: 0.5;
-          }
-        }
+          div.cmail-footer div.cmail-footer-right {
+            div.emoji-picker {
+              button.emoji-button {
+                display: block;
+              }
+            }
 
-        div.section-picker-bt-container {
-          button.section-picker-bt {
-            opacity: 0.5;
-          }
-        }
+            div.section-picker-bt-container {
+              border-left: 1px solid var(--divider-line);
+            }
 
-        button.attachment-button {
-          opacity: 0.5;
-        }
-
-        div.post-button-container {
-          div.post-to-button, div.post-to-button.disabled {
-            div.post-to-bt-container button.post-to-bt {
-              color: var(--light-color);
-              background-color: var(--opac-background-color-1);
-              opacity: 1;
+            button.attachment-button {
+              display: block;
             }
           }
         }
