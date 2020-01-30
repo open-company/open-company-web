@@ -77,10 +77,17 @@
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
-(defn add-comment-string-key [activity-uuid parent-comment-uuid comment-uuid]
-  (str activity-uuid "-" parent-comment-uuid "-" comment-uuid))
+(defn add-comment-string-key [activity-uuid & [parent-comment-uuid comment-uuid]]
+  (str activity-uuid
+    (when parent-comment-uuid
+      (str "-" parent-comment-uuid))
+    (when comment-uuid
+      (str "-" comment-uuid))))
 
-(def add-comment-force-update-key :add-comment-force-update)
+(def add-comment-force-update-root-key :add-comment-force-update)
+
+(defn add-comment-force-update-key [add-comment-string-key]
+  (vec (concat [add-comment-force-update-root-key] [add-comment-string-key])))
 
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
@@ -203,7 +210,7 @@
    :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
-   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
+   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
    :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
    checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
    checkout-update-plan-key [[:base] (fn [base] (get base checkout-update-plan-key))]
