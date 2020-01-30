@@ -714,7 +714,7 @@
                                ;; Block the rich-body-editor component when
                                ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
-                               :placeholder "What’s happening…"
+                               :placeholder "Share with your team..."
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)
