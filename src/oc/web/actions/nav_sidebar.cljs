@@ -76,7 +76,8 @@
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          org-slug (router/current-org-slug)
-         is-container? (dis/is-container? board-slug)]
+         is-container? (dis/is-container? board-slug)
+         org-data (dis/org-data)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -96,7 +97,7 @@
          (when (and (not is-container?)
                     (not is-drafts-board?)
                     (-> @dis/app-state :cmail-state :collapsed))
-           (when-let* [nav-to-board-data (dis/board-data board-slug)
+           (when-let* [nav-to-board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
                        edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
              (dis/dispatch! [:input [:cmail-data] {:board-slug (:slug nav-to-board-data)
                                                    :board-name (:name nav-to-board-data)}])
