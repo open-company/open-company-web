@@ -61,11 +61,16 @@ div.cmail-outer {
 
     div.cmail-container {
       div.cmail-content-outer {
-        div.cmail-content div.rich-body-editor-outer-container div.rich-body-editor-container {
-          div.medium-editor-media-picker {
-            div.media-picker-container {
-              button.media.media-gif, button.media.media-video, button.media.media-photo {
-                display: none;
+        div.cmail-content {
+          min-height: 60px;
+          max-height: 60px;
+
+          div.rich-body-editor-outer-container div.rich-body-editor-container {
+            div.medium-editor-media-picker {
+              div.media-picker-container {
+                button.media.media-gif, button.media.media-video, button.media.media-photo {
+                  display: none;
+                }
               }
             }
           }
@@ -673,6 +678,7 @@ div.cmail-outer {
     }
 
     div.cmail-content {
+      min-height: 112px;
       overflow-y: auto;
       overflow-x: auto;
       overflow: visible;
@@ -846,9 +852,9 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(17, 22, var(--color), 16);
-            font-size: 17px;
-            line-height: 22px;
+            @include activity-body(16, 20, var(--color), 16);
+            font-size: 16px;
+            line-height: 20px;
             min-height: 24px;
           }
 
@@ -878,7 +884,7 @@ div.cmail-outer {
 
           &:after {
             margin: 0;
-            line-height: 22px;
+            line-height: 20px;
           }
         }
       }
