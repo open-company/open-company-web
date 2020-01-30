@@ -852,14 +852,14 @@ div.cmail-outer {
           height: auto;
 
           @include big_web() {
-            @include activity-body(16, 20, var(--color), 16);
-            font-size: 16px;
-            line-height: 20px;
-            min-height: 24px;
+            @include activity-body(17, 22, var(--color), 16);
+            font-size: 17px;
+            line-height: 22px;
+            min-height: 26px;
           }
 
           @media screen and (min-height: 556px) {
-            min-height: 24px;
+            min-height: 26px;
           }
 
           @include mobile() {
@@ -884,7 +884,7 @@ div.cmail-outer {
 
           &:after {
             margin: 0;
-            line-height: 20px;
+            line-height: 22px;
           }
         }
       }
