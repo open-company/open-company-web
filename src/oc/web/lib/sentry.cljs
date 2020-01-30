@@ -37,11 +37,14 @@
 
 (defn capture-error!
   ([e]
+    (timbre/info "Capture error:" e)
     (.captureException js/Sentry e))
   ([e error-info]
+    (timbre/info "Capture error:" e "extra:" error-info)
     (.captureException js/Sentry e #js {:extra error-info})))
 
 (defn capture-message! [msg & [log-level]]
+  (timbre/info "Capture message:" msg)
   (.captureMessage js/Sentry msg (or log-level "info")))
 
 (defn test-sentry []
@@ -58,11 +61,13 @@
       (.setExtra scope (str prefix (when (seq prefix) "|") (name k)) (get ctx k)))))
 
 (defn capture-message-with-extra-context! [ctx message]
+  (timbre/info "Capture message:" message "with context:" ctx)
   (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (capture-message! message))))
 
 (defn capture-error-with-extra-context! [ctx error-name & [error-message]]
+  (timbre/info "Capture error:" error-name "message:" error-message "with context:" ctx)
   (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (let [err (js/Error. (or error-message error-name))]
@@ -70,9 +75,7 @@
       (capture-error! err)))))
 
 (defn capture-error-with-message [error-name & [error-message]]
+  (timbre/info "Capture error:" error-name "message:" error-message)
   (let [err (js/Error. (or error-message error-name))]
     (set! (.-name err) (or error-name "Error"))
     (capture-error! err)))
-
-(defn set-user-context! [ctx]
-  (.setUser js/Sentry (when ctx (clj->js ctx))))
