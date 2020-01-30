@@ -296,21 +296,30 @@
 ;; Delete handling
 
 (defn delete-clicked [s e activity-data]
-  (let [post-type (if (= (:status activity-data) "published")
-                    "post"
-                    "draft")
-        alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message (str "Delete this " post-type "?")
-                    :link-button-title "No"
-                    :link-button-cb #(alert-modal/hide-alert)
-                    :solid-button-style :red
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(do
-                                       (activity-actions/activity-delete activity-data)
-                                       (alert-modal/hide-alert))
-                    }]
-    (alert-modal/show-alert alert-data)))
+  (if (or (:uuid activity-data)
+           (:links activity-data)
+           (:auto-saving activity-data))
+    (let [post-type (if (= (:status activity-data) "published")
+                      "post"
+                      "draft")
+          alert-data {:icon "/img/ML/trash.svg"
+                      :action "delete-entry"
+                      :message (str "Delete this " post-type "?")
+                      :link-button-title "No"
+                      :link-button-cb #(alert-modal/hide-alert)
+                      :solid-button-style :red
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                         (activity-actions/activity-delete activity-data)
+                                         (alert-modal/hide-alert))
+                      }]
+      (alert-modal/show-alert alert-data))
+    (do
+      ;; In case the data are queued up to be saved but the request didn't started yet
+      (when (:has-changes activity-data)
+        ;; Remove them
+        (dis/dispatch! [:update [:cmail-data] #(dissoc % :has-changes)]))
+      (cmail-actions/cmail-hide))))
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))

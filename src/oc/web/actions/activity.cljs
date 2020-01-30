@@ -506,14 +506,19 @@
   (when (= (router/current-board-slug) utils/default-drafts-board-slug)
     (refresh-org-data)))
 
+(defn- real-activity-delete [activity-data]
+  (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
+    (api/delete-entry activity-delete-link activity-delete-finish)
+    (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data])))
+
 (defn activity-delete [activity-data]
   ;; Make sure the WRT sample is dismissed
   (nux-actions/dismiss-post-added-tooltip)
   (cmail-actions/remove-cached-item (:uuid activity-data))
-  (when (:links activity-data)
-    (let [activity-delete-link (utils/link-for (:links activity-data) "delete")]
-      (api/delete-entry activity-delete-link activity-delete-finish)
-      (dis/dispatch! [:activity-delete (router/current-org-slug) activity-data]))))
+  (if (:links activity-data)
+    (real-activity-delete activity-data)
+    (when (:auto-saving activity-data)
+      (utils/after 1000 #(real-activity-delete (:cmail-data @dis/app-state))))))
 
 (defn activity-move [activity-data board-data]
   (let [fixed-activity-data (assoc activity-data :board-slug (:slug board-data))
