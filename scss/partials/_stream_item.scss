@@ -747,7 +747,7 @@ div.stream-item {
             &:active, &:hover {
               background-color: var(--selected-row-background-color);
               div.stream-item-attachments-item-desc {
-                color: var(--selected-row-background-color);
+                color: var(--selected-row-color);
               }
             }
 
