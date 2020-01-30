@@ -35,21 +35,21 @@
                                     :last-name (jwt/get-key :last-name)})))))
       (reset! sentry-hub hub))))
 
-(defn test-sentry []
-  (js/setTimeout #(.captureMessage js/Sentry "Message from clojure" "info") 1000)
-  (try
-    (throw (js/errorThrowingCode.))
-    (catch :default e
-      (.captureException js/Sentry e))))
-
 (defn capture-error!
   ([e]
     (.captureException js/Sentry e))
   ([e error-info]
     (.captureException js/Sentry e #js {:extra error-info})))
 
-(defn capture-message! [msg]
-  (.captureMessage js/Sentry msg "info"))
+(defn capture-message! [msg & [log-level]]
+  (.captureMessage js/Sentry msg (or log-level "info")))
+
+(defn test-sentry []
+  (js/setTimeout #(capture-message! "Message from clojure") 1000)
+  (try
+    (throw (js/errorThrowingCode.))
+    (catch :default e
+      (capture-error! e))))
 
 (defn set-extra-context! [scope ctx & [prefix]]
   (doseq [k (keys ctx)]
