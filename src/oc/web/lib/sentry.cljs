@@ -21,7 +21,7 @@
     (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)
           client (js/Sentry.BrowserClient. #js {:dsn ls/local-dsn})
-          hub (js/Sentry.Hub client)]
+          hub (js/Sentry.Hub. client)]
       (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
       ; (.init js/Sentry sentry-params)
       (.configureScope hub (fn [scope]
