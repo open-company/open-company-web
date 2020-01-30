@@ -24,7 +24,7 @@
           hub (js/Sentry.Hub. client)]
       (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
       ; (.init js/Sentry sentry-params)
-      (.configureScope hub (fn [scope]
+      (.configureScope js/Sentry (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
         (.setTag scope "hasJWT" (not (not (jwt/jwt))))
         (when (jwt/jwt)
