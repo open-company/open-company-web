@@ -75,7 +75,8 @@
   (utils/after 0 (fn []
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
-         org-slug (router/current-org-slug)]
+         org-slug (router/current-org-slug)
+         is-container? (dis/is-container? board-slug)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -84,16 +85,24 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if (dis/is-container? board-slug) "dashboard" board-slug)]
+         (router/set-route! [org-slug board-slug (if is-container? "dashboard" board-slug)]
           {:org org-slug
            :board board-slug
            :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+         ;; Let's change the QP section if it's not active and going to an editable section
+         (when (and (not is-container?)
+                    (not is-drafts-board?)
+                    (-> @dis/app-state :cmail-state :collapsed))
+           (when-let* [nav-to-board-data (dis/board-data board-slug)
+                       edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
+             (dis/dispatch! [:input [:cmail-data] {:board-slug (:slug nav-to-board-data)
+                                                   :board-name (:name nav-to-board-data)}])
+             (dis/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)])))
          (when refresh?
            (utils/after 0 #(refresh-board-data board-slug))))))
-   (cmail-actions/cmail-hide)
    (user-actions/hide-mobile-user-notifications)))))
 
 (defn dismiss-post-modal [e]
