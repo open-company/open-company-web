@@ -2,7 +2,10 @@
   (:require [oc.web.local-settings :as ls]
             [oc.web.lib.responsive :as responsive]
             [oc.web.lib.jwt :as jwt]
-            [cljsjs.sentry-browser]))
+            [cljsjs.sentry-browser]
+            [taoensso.timbre :as timbre]))
+
+(defonce sentry-hub (atom nil))
 
 (defn init-parameters [dsn]
   #js {:whitelistUrls ls/local-whitelist-array
@@ -10,17 +13,27 @@
                   :hasJWT (not (not (jwt/jwt)))}
        :sourceRoot ls/web-server
        :release ls/deploy-key
-       :debug true
+       :debug (= ls/log-level "debug")
        :dsn dsn})
 
 (defn sentry-setup []
   (when (and (exists? js/Sentry) ls/local-dsn)
-    (.init js/Sentry (init-parameters ls/local-dsn))
-    (when (jwt/jwt)
-      (.setUser js/Sentry (clj->js {:user-id (jwt/get-key :user-id)
+    (timbre/info "Setup Sentry")
+    (let [sentry-params (init-parameters ls/local-dsn)
+          client (js/Sentry.BrowserClient. #js {:dsn ls/local-dsn})
+          hub (js/Sentry.Hub client)]
+      (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
+      ; (.init js/Sentry sentry-params)
+      (.configureScope hub (fn [scope]
+        (.setTag scope "isMobile" (responsive/is-mobile-size?))
+        (.setTag scope "hasJWT" (not (not (jwt/jwt))))
+        (when (jwt/jwt)
+          (timbre/debug "Set Sentry user:" (jwt/get-key :user-id))
+          (.setUser scope (clj->js {:user-id (jwt/get-key :user-id)
                                     :id (jwt/get-key :user-id)
                                     :first-name (jwt/get-key :first-name)
                                     :last-name (jwt/get-key :last-name)})))))
+      (reset! sentry-hub hub))))
 
 (defn test-sentry []
   (js/setTimeout #(.captureMessage js/Sentry "Message from clojure" "info") 1000)
