@@ -22,7 +22,7 @@ div.stream-attachments {
       margin-top: 8px;
       @include OC_Body_Book();
       font-size: 12px;
-      color: $deep_navy;
+      color: var(--color);
       line-height: 20px;
       float: left;
     }
@@ -37,7 +37,7 @@ div.stream-attachments {
       span.attachment-uploading {
         @include OC_Body_Book();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         float: left;
       }
 
@@ -53,6 +53,10 @@ div.stream-attachments {
           background-position: center;
           float: left;
           opacity: 0.5;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+          }
 
           @include mobile() {
             width: 14px;
@@ -86,7 +90,7 @@ div.stream-attachments {
           span.attachment-description {
             @include OC_Body_Book();
             font-size: 12px;
-            color: rgba($deep_navy, 0.5);
+            color: var(--light-color);
             white-space: nowrap;
             line-height: 20px;
             display: block;
@@ -99,14 +103,19 @@ div.stream-attachments {
           height: 20px;
           background-image: cdnUrl("/img/ML/remove_attachment.svg");
           background-size: 16px 16px;
-          background-position: center;
+          background-position: right 2px top 2px;
           background-repeat: no-repeat;
           margin-left: 8px;
+          padding-right: 0px;
           padding-left: 8px;
-          border-left: 1px solid $light_ui_grey;
-          opacity: 0.4;
+          border-left: 1px solid var(--color);
           display: block;
           float: left;
+          opacity: 0.5;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/remove_attachment@dark.svg");
+          }
 
           @include big_web(){
             &:hover {
