@@ -39,7 +39,7 @@
               [:span.theme-icon]
               (when (and (= computed-value :light)
                          (= setting-value :auto))
-                [:span.description
+                [:div.theme-description
                   "Chose automatically by your OS"])]
             [:button.mlb-reset.theme-settings-row.dark-theme
               {:class (when (= computed-value :dark) "active")

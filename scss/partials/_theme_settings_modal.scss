@@ -41,12 +41,13 @@ div.theme-settings-modal {
     background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
-    height: 100vh;
+    height: calc(100vh - #{$navbar_height}px);
     right: 0;
+    margin-top: #{$navbar_height}px;
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     @include mobile() {
       width: 100%;
@@ -58,11 +59,14 @@ div.theme-settings-modal {
     }
 
     div.theme-settings-header {
-      width: calc(100% + 48px);
-      height: 56px;
-      margin-left: -24px;
+      width: 320px;
+      height: #{$navbar_height}px;
       background-color: var(--panel-header-background);
-      padding: 12px 16px;
+      padding: 12px 24px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
       @include mobile() {
         height: #{$mobile_navbar_height}px;
@@ -94,7 +98,7 @@ div.theme-settings-modal {
 
       button.cancel-bt {
         height: 32px;
-        padding: 0 8px;
+        padding: 0;
         @include OC_Body_Book();
         font-size: 14px;
         color: var(--light-color);
@@ -194,7 +198,7 @@ div.theme-settings-modal {
 
           div.carrot-option-button {
             position: absolute;
-            top: 22px;
+            top: 20px;
             left: 18px;
             opacity: 0.5;
 
@@ -210,9 +214,8 @@ div.theme-settings-modal {
               
           span.theme-name {
             position: absolute;
-            top: 20px;
+            top: 18px;
             left: 40px;
-            margin-left: 8px;
             @include OC_Body_Bold();
             color: var(--color);
             font-size: 14px;
@@ -221,7 +224,7 @@ div.theme-settings-modal {
 
           span.theme-icon {
             position: absolute;
-            top: 20px;
+            top: 18px;
             right: 16px;
             width: 16px;
             height: 16px;
@@ -233,7 +236,7 @@ div.theme-settings-modal {
               
           div.theme-description {
             position: absolute;
-            bottom: 18px;
+            bottom: 14px;
             width: 272px;
             left: 50%;
             margin-left: -136px;
