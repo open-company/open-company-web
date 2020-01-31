@@ -155,13 +155,16 @@
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
-        (when-not is-mobile?
+        (when (and (jwt/jwt)
+                   (not is-mobile?))
           [:div.oc-menu-separator])
         [:a
           {:href "#"
            :on-click (partial theme-settings-click s)}
           "Theme"]
-        [:div.oc-menu-separator]
+        (when (and show-reminders?
+                   (not is-mobile?))
+          [:div.oc-menu-separator])
         (when (and show-reminders?
                    (not is-mobile?))
           [:a

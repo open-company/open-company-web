@@ -60,7 +60,7 @@ div.menu {
       left: unset;
       right: 0;
       width: 85vw;
-      min-height: calc(100vh - #{$mobile_navbar_height}px);
+      min-height: calc(100vh - #{$mobile_navbar_height - 2}px);
       border: none;
       box-shadow: none;
       transition: 230ms;
@@ -69,8 +69,8 @@ div.menu {
       background-color: var(--mobile-background-color);
       display: none;
       opacity: 0;
-      padding: 0 16px;
-      padding-top: #{$mobile_navbar_height}px;
+      padding: #{$mobile_navbar_height}px 16px 0;
+      margin-top: -2px;
     }
 
     div.menu-header {
