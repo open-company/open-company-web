@@ -197,7 +197,7 @@
                :port 3559)
         (from-jars)
         (watch)
-        (sass :--sourcemap "css/app.main.css.map")
+        (sass)
         (build-site)
         (cljs-repl)
         (reload :asset-path "/public"
