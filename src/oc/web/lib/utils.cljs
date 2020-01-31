@@ -713,7 +713,7 @@
              (seq board-slug)
              (not= board-slug default-drafts-board-slug)
              is-mobile?)
-      50
+      65
       0)))
 
 (defn back-to [org-data]

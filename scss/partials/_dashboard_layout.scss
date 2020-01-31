@@ -280,7 +280,7 @@ div.dashboard-layout {
         border-bottom: 1px solid var(--divider-line);
 
         @include mobile() {
-          height: 50px;
+          height: 65px;
           border-bottom: none;
           padding: 0;
           background-color: var(--mobile-background-color);
