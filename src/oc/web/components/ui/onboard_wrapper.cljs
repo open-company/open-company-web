@@ -204,7 +204,7 @@
       (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
 (defn- check-email-domain [domain s & [reset-email-domain]]
-  (when (team-actions/can-add-email-domain?)
+  (when (team-actions/can-add-email-domain? (first @(drv/get-ref s :teams-data)))
     (reset! (::checking-email-domain s) (not reset-email-domain))
     ;; If user is here it means he has only one team, if he already had one
     ;; he was redirected to it, not here to create a new team, so use the first team
@@ -354,7 +354,7 @@
                :placeholder "Enter a team name..."
                :class (utils/class-set {:error (:error org-editing)
                                         utils/hide-class true})
-               :max-length 50 ;org-utils/org-name-max-length
+               :max-length org-utils/org-name-max-length
                :value (:name org-editing)
                :on-change #(let [new-name (.. % -target -value)
                                  clean-org-name (subs new-name 0 (min (count new-name)
