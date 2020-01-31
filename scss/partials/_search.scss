@@ -154,15 +154,15 @@ div.search-box {
       position: relative;
       left: unset;
       top: unset;
-      width: 100%; //calc(100% - 28px);
-      height: 38px;
-      background-color: transparent;
+      width: 100%;
+      height: 40px;
       padding: 10px 14px;
       @include OC_Body_Book();
       font-size: 14px;
       color: var(--color);
       margin: 16px 0 4px;
       border-radius: 4px;
+      background-color: var(--opac-background-color-1);
 
       @include placeholder() {
         color: var(--light-color);
@@ -173,10 +173,6 @@ div.search-box {
   &:not(.active) {
     button.search-close {
       display: none;
-
-      @include mobile() {
-        display: block;
-      }
     }
   }
 
@@ -198,8 +194,7 @@ div.search-box {
     right: 8px;
 
     @include mobile() {
-      right: 13px;
-      top: 72px;
+      display: none;
     }
 
     &:hover {

@@ -276,7 +276,9 @@
                       {:on-click (fn [e]
                                    (search-actions/active)
                                    (utils/after 500 #(.focus (js/$ "input.search"))))}
-                      "Search"])
+                      [:span.mobile-search-icon]
+                      [:span.mobile-search-label
+                        "Search..."]])
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :data-toggle (when-not is-mobile? "tooltip")

@@ -424,7 +424,7 @@ div.stream-item {
       cursor: pointer;
 
       @include mobile() {
-        min-height: 84px;
+        min-height: 73px;
       }
 
       div.ziggeo-player {
@@ -549,6 +549,12 @@ div.stream-item {
         text-overflow: ellipsis;
         max-width: 100%;
         white-space: nowrap;
+
+        @include mobile() {
+          margin-top: 2px;
+          height: 23px;
+          @include activity-title(18px, 23px);
+        }
       }
 
       div.stream-item-body {
@@ -576,6 +582,17 @@ div.stream-item {
 
         .carrot-no-preview {
           display: none;
+        }
+
+        @include mobile() {
+          @include activity-body(16, 18, var(--color));
+          line-height: 18px;
+          max-height: #{18 * 2}px;
+
+          h2 {
+            font-size: 16px;
+            line-height: 18px;
+          }
         }
       }
     }
