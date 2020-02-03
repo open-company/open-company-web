@@ -87,6 +87,10 @@ div.search-box {
     @include mobile() {
       display: none;
     }
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/spyglass@dark.svg");
+    }
   }
 
   input.search {
@@ -169,28 +173,52 @@ div.search-box {
 }
 
 div.search-history {
-  display: none;
+  position: absolute;
+  top: 40px;
+  width: 430px;
+  text-align: left;
+  background-color: var(--overlay-background-color);
+  border: 1px solid var(--divider-line);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  border-radius: 4px;
+  max-height: calc(100vh - 180px - 47px);
+  overflow-y: auto;
 
   @include mobile() {
-    display: block;
+    text-align: initial;
+    top: unset;
+    position: initial;
+    border: none;
+    border-radius: 0;
+    max-height: initial;
+    overflow-y: initial;
+  }
 
-    div.search-history-row {
-      height: 42px;
+  div.search-history-row {
+    padding: 12px 16px 12px 32px;
+    height: 42px;
+    width: 100%;
+    background-image: cdnUrl("/img/ML/search_history_icon.svg");
+    background-size: 14px 14px;
+    background-position: left 8px top 15px;
+    background-repeat: no-repeat;
+    @include OC_Body_Book();
+    font-size: 16px;
+    color: var(--color);
+    line-height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    @include mobile() {
       padding: 12px 0 12px 28px;
-      background-image: cdnUrl("/img/ML/search_history_icon.svg");
-      background-size: 14px 14px;
       background-position: left 0px top 14px;
-      background-repeat: no-repeat;
-      @include OC_Body_Book();
-      font-size: 16px;
-      color: var(--color);
-      line-height: 18px;
-
-      @include dark_mode() {
-        background-image: cdnUrl("/img/ML/search_history_icon@dark.svg");
-      }
     }
-  }  
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/search_history_icon@dark.svg");
+    }
+  }
 }
 
 div.search-results.inactive {
@@ -358,14 +386,6 @@ div.search-results {
       @include OC_Body_Book();
       font-size: 14px;
       color: var(--color);
-    }
-  }
-}
-
-@include dark_mode() {
-  div.search-box {
-    div.spyglass-icon {
-      background-image: cdnUrl("/img/ML/spyglass@dark.svg");
     }
   }
 }
