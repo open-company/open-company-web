@@ -3,6 +3,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.jwt :as jwt]
+            [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]))
 
 (rum/defcs trial-expired-banner < rum/static
@@ -10,26 +11,36 @@
                                   (drv/drv :org-data)
   [s]
   [:div.trial-expired-banner-container
-    (if (jwt/is-admin? (:team-id (drv/react s :org-data)))
-      [:div.trial-expired-banner
-        "📣 Your 14-day free trial has ended. Please "
-        [:button.mlb-reset.open-payments-bt
-          {:on-click #(nav-actions/show-org-settings :payments)}
-          "select a plan"]
-        " to continue using Carrot. Need more time? "
-        [:a.chat-with-us
-          {:class "intercom-chat-link"
-           :href "mailto:hello@carrot.io"}
-          "Chat with us"]
-        "."]
-      [:div.trial-expired-banner
-        "Your team's 14-day free trial has ended. Please ask your team admin "
-        "to subscribe to Carrot. Need more time? "
-        [:a.chat-with-us
-          {:class "intercom-chat-link"
-           :href "mailto:hello@carrot.io"}
-          "Chat with us"]
-        "."]
+    (if true;(jwt/is-admin? (:team-id (drv/react s :org-data)))
+      [:div
+        [:div.trial-expired-banner.reduced-copy
+          "📣 Your 14-day free trial has ended. Please "
+          [:button.mlb-reset.open-payments-bt
+            {:on-click #(nav-actions/show-org-settings :payments)}
+            "select a plan"]
+          " to continue using Carrot."]
+        [:div.trial-expired-banner
+          "📣 Your 14-day free trial has ended. Please "
+          [:button.mlb-reset.open-payments-bt
+            {:on-click #(nav-actions/show-org-settings :payments)}
+            "select a plan"]
+          " to continue using Carrot. Need more time? "
+          [:a.chat-with-us
+            {:class "intercom-chat-link"
+             :href "mailto:hello@carrot.io"}
+            "Chat with us"]
+          "."]]
+      [:div
+        [:div.trial-expired-banner.reduced-copy
+          "📣 Your 14-day free trial has ended. Please ask your team admin to choose a new plan."]
+        [:div.trial-expired-banner
+          "📣 Your team's 14-day free trial has ended. Please ask your team admin "
+          "to subscribe to Carrot. Need more time? "
+          [:a.chat-with-us
+            {:class "intercom-chat-link"
+             :href "mailto:hello@carrot.io"}
+            "Chat with us"]
+          "."]]
       )])
 
 (rum/defcs trial-expired-alert < rum/static
