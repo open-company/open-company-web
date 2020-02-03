@@ -3,9 +3,9 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
-(def search-limit 20)
-(def lastsearch (atom ""))
-(def savedsearch (atom ""))
+(defonce search-limit 20)
+(defonce lastsearch (atom ""))
+(defonce savedsearch (atom ""))
 
 (defonce search-key :search-results)
 (defonce search-active? :search-active)
@@ -43,7 +43,8 @@
   (let [total-hits (:total body)
         results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
     (when success
-      (reset! lastsearch query))
+      (reset! lastsearch query)
+      (reset! savedsearch query))
     (if success
       (assoc db search-key {:count total-hits :results (cleanup-uuid results)})
       db)))

@@ -16,23 +16,19 @@ div.search-box {
   }
 
   @include mobile() {
-    position: absolute;
-    top: 0;
-    left: 0px;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--mobile-background-color);
-    border-radius: unset;
-    z-index: #{$navbar_zindex + 16};
-    padding: #{$mobile_navbar_height}px 16px 0px;
+    width: 100%;
+    height: #{$mobile_search_header_height}px;
+    background-color: var(--mobile-foc-background-color);
     border: none;
+    border-bottom: 1px solid var(--divider-line);
+    padding: 16px;
     box-shadow: none;
     transition: width 0ms ease-in, background-color 0ms ease-in;
+    border-radius: 0;
+  }
 
-    &.active {
-      border: none;
-      box-shadow: none;
-    }
+  div.search-history {
+    display: none;
   }
 
   &.active {
@@ -43,9 +39,10 @@ div.search-box {
 
     @include mobile() {
       background-color: var(--mobile-background-color);
-      border: 0px solid var(--mobile-background-color);
+      width: 100%;
       box-shadow: none;
-      width: 100vw;
+      height: calc(100vh - #{$mobile_navbar_height}px);
+      border: none;
     }
 
     div.spyglass-icon {
@@ -70,46 +67,9 @@ div.search-box {
         color: var(--light-color);
       }
     }
-  }
 
-  div.mobile-header {
-    display: none;
-
-    @include mobile() {
-      height: #{$mobile_navbar_height}px;
-      width: 100vw;
-      background-color: var(--mobile-background-color);
-      padding: 15px 16px;
+    div.search-history {
       display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      text-align: center;
-      border-bottom: 1px solid var(--divider-line);
-      z-index: 2;
-
-      button.search-close-bt {
-        display: block;
-        width: 32px;
-        height: 32px;
-        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 12px 12px;
-        background-color: var(--divider-line);
-        border-radius: 4px;
-        position: absolute;
-        left: 16px;
-        top: 11px;
-      }
-
-      div.mobile-header-title {
-        @include OC_Body_Bold();
-        font-size: 18px;
-        color: var(--color);
-        line-height: 24px;
-        height: 24px;
-      }
     }
   }
 
@@ -155,12 +115,11 @@ div.search-box {
       left: unset;
       top: unset;
       width: 100%;
-      height: 40px;
+      height: 32px;
       padding: 10px 14px;
       @include OC_Body_Book();
       font-size: 14px;
       color: var(--color);
-      margin: 16px 0 4px;
       border-radius: 4px;
       background-color: var(--opac-background-color-1);
 
@@ -192,13 +151,19 @@ div.search-box {
     position: absolute;
     top: 3px;
     right: 8px;
+    z-index: 2;
 
     @include mobile() {
-      display: none;
+      top: 19px;
+      right: 20px;
     }
 
     &:hover {
       opacity: 0.5;
+    }
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/black_close@dark.svg");
     }
   }
 }
@@ -220,6 +185,10 @@ div.search-history {
       font-size: 16px;
       color: var(--color);
       line-height: 18px;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/search_history_icon@dark.svg");
+      }
     }
   }  
 }
@@ -395,14 +364,6 @@ div.search-results {
 
 @include dark_mode() {
   div.search-box {
-    div.mobile-header {
-      @include mobile() {
-        button.search-close-bt {
-          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-        }
-      }
-    }
-
     div.spyglass-icon {
       background-image: cdnUrl("/img/ML/spyglass@dark.svg");
     }

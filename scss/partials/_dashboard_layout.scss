@@ -3,6 +3,22 @@ div.dashboard-layout {
   width: 100%;
   overflow: visible;
 
+  @include mobile() {
+    &.search-active {
+      div.dashboard-layout-container {
+        div.dashboard-layout-mobile-tabbar {
+          display: none;
+        }
+
+        div.board-container {
+          div.lazy-stream {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
   &.expanded-post-view {
     @include mobile() {
       background-color: var(--mobile-background-color);
@@ -512,12 +528,17 @@ div.dashboard-layout {
           height: 32px;
           position: relative;
 
+          & > div.search-box {
+            display: none;
+
+            @include mobile() {
+              display: block;
+            }
+          }
+
           @include mobile () {
             float: unset;
-            height: 65px;
-            background-color: var(--mobile-foc-background-color);
-            border-bottom: 1px solid var(--divider-line);
-            padding: 16px;
+            height: #{$mobile_search_header_height}px;
           }
 
           button.complete-all-bt {
@@ -543,50 +564,6 @@ div.dashboard-layout {
             @include big_web(){
               &:hover {
                 opacity: 1;
-              }
-            }
-          }
-
-          button.mobile-search-bt {
-            display: none;
-
-            @include mobile() {
-              display: block;
-              margin: 0;
-              display: block;
-              padding: 8px 24px;
-              height: 32px;
-              text-align: center;
-              background-color: var(--opac-background-color-1);
-              width: 100%;
-              display: flex;
-              flex-direction: row;
-              border-radius: 4px;
-              justify-content: center;
-
-              span.mobile-search-label {
-                @include OC_Body_Book();
-                font-size: 14px;
-                line-height: 18px;
-                color: var(--light-color);
-              }
-
-              span.mobile-search-icon {
-                width: 16px;
-                height: 16px;
-                background-image: cdnUrl("/img/ML/mobile_search_lens.svg");
-                background-size: 16px 16px;
-                background-position: center;
-                background-repeat: no-repeat;
-                margin-right: 8px;
-                opacity: 0.5;
-                // position: absolute;
-                // top: 17px;
-                // left: 16px;
-
-                @include dark_mode() {
-                  background-image: cdnUrl("/img/ML/mobile_search_lens@dark.svg");
-                }
               }
             }
           }

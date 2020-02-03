@@ -10,7 +10,6 @@
             [oc.web.lib.utils :as utils]
             [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.search :as search]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
@@ -19,7 +18,6 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
@@ -57,8 +55,6 @@
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
-                           (drv/drv search/search-key)
-                           (drv/drv search/search-active?)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-scrollingElement js/document)) (utils/page-scroll-top)))
@@ -86,10 +82,6 @@
                 app-loading
                 payments-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        search-active? (drv/react s search/search-active?)
-        search-results? (pos?
-                         (count
-                          (:results (drv/react s search/search-key))))
         loading? (or ;; force loading screen
                      app-loading
                      ;; the org data are not loaded yet
@@ -134,7 +126,6 @@
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
-        is-showing-mobile-search (and is-mobile? search-active?)
         open-panel (last panel-stack)
         show-section-editor (= open-panel :section-edit)
         show-section-add (= open-panel :section-add)
@@ -221,10 +212,7 @@
           (activity-share)
           ;; WRT
           show-wrt-view?
-          (wrt org-data)
-          ;; Search results
-          is-showing-mobile-search
-          (search-box))
+          (wrt org-data))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -264,7 +252,6 @@
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
-                         (and (or (not search-active?) (not search-results?))
-                              (or (not open-panel)
+                         (and (or (not open-panel)
                                   (= open-panel :menu))))
                  (dashboard-layout))]]])])))
