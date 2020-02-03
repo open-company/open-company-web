@@ -90,6 +90,10 @@ div.stream-item {
           }
         }
       }
+
+      div.activity-share-container {
+        display: block;
+      }
     }
   }
 
@@ -151,6 +155,8 @@ div.stream-item {
   }
 
   div.activity-share-container {
+    display: none;
+
     div.activity-share-modal-container {
       right: -9px;
       margin-top: 32px;
