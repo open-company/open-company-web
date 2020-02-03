@@ -186,13 +186,13 @@
                         (search/focus)
                         (search/query search-query))
            :on-change (fn [e]
-                        (let [v (.-value (.-target e))]
-                          (reset! (::query s) v)
-                          (when @(::search-timeout s)
-                            (.clearTimeout js/window @(::search-timeout s)))
-                          (reset! (::search-timeout s)
-                           (utils/after 500
-                            #(search/query v)))))
+                        (when-not is-mobile?
+                          (let [v (.-value (.-target e))]
+                            (reset! (::query s) v)
+                            (when @(::search-timeout s)
+                              (.clearTimeout js/window @(::search-timeout s)))
+                            (reset! (::search-timeout s)
+                             (utils/after 500 #(search/query v))))))
            :on-key-press #(when (= (.-keyCode %) 13)
                             (let [input-field (.-target %)]
                               (search/query (.-value input-field))
