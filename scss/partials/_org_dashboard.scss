@@ -73,10 +73,13 @@ div.org-dashboard {
         padding-top: #{$navbar_height}px;
 
         @include mobile() {
-          padding-top: #{$mobile_trial_expired_banner_height + $mobile_navbar_height}px;
+          padding-top: #{$mobile_trial_expired_banner_height}px;
 
-          div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container div.board-container div.expanded-post div.expanded-post-header {
-            top: #{$mobile_navbar_height}px;
+          div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container div.board-container div.expanded-post {
+            padding-top: #{$mobile_navbar_height + 24}px;
+            div.expanded-post-header {
+              top: #{$mobile_trial_expired_banner_height}px;
+            }
           }
         }
       }

@@ -11,7 +11,7 @@
                                   (drv/drv :org-data)
   [s]
   [:div.trial-expired-banner-container
-    (if true;(jwt/is-admin? (:team-id (drv/react s :org-data)))
+    (if (jwt/is-admin? (:team-id (drv/react s :org-data)))
       [:div
         [:div.trial-expired-banner.reduced-copy
           "📣 Your 14-day free trial has ended. Please "
@@ -40,8 +40,7 @@
             {:class "intercom-chat-link"
              :href "mailto:hello@carrot.io"}
             "Chat with us"]
-          "."]]
-      )])
+          "."]])])
 
 (rum/defcs trial-expired-alert < rum/static
                                  rum/reactive
