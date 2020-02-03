@@ -6,6 +6,10 @@
             [oc.web.components.ui.carrot-checkbox :refer (carrot-checkbox)]
             [oc.web.components.ui.carrot-option-button :refer (carrot-option-button)]))
 
+(def automatically-chosen-copy
+  [:div.theme-description
+    "Chosen automatically by your OS"])
+
 (rum/defc theme-settings-modal <
   rum/static
   [theme-data]
@@ -39,8 +43,7 @@
               [:span.theme-icon]
               (when (and (= computed-value :light)
                          (= setting-value :auto))
-                [:div.theme-description
-                  "Chose automatically by your OS"])]
+                automatically-chosen-copy)]
             [:button.mlb-reset.theme-settings-row.dark-theme
               {:class (when (= computed-value :dark) "active")
                :on-click #(theme-actions/set-ui-theme :dark)}
@@ -51,5 +54,4 @@
               [:span.theme-icon]
               (when (and (= computed-value :dark)
                          (= setting-value :auto))
-                [:div.theme-description
-                  "Chosen automatically by your OS"])]]]]]))
+                automatically-chosen-copy)]]]]]))
