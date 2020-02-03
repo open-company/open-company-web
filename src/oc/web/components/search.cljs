@@ -192,5 +192,9 @@
                             (.clearTimeout js/window @(::search-timeout s)))
                           (reset! (::search-timeout s)
                            (utils/after 500
-                            #(search/query v)))))}]
+                            #(search/query v)))))
+           :on-key-press #(when (= (.-keyCode %) 13)
+                            (let [input-field (.-target %)]
+                              (search/query (.-value input-field))
+                              (.blur input-field)))}]
        (search-results-view)])))

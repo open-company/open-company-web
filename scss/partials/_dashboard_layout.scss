@@ -11,6 +11,8 @@ div.dashboard-layout {
         }
 
         div.board-container {
+          min-height: calc(100vh - #{$mobile_navbar_height * 2}px - 20px);
+
           div.lazy-stream {
             display: none;
           }
@@ -68,8 +70,9 @@ div.dashboard-layout {
       width: 100%;
       max-width: initial;
       min-width: initial;
-      padding-bottom: 52px;
+      padding-bottom: #{$mobile_navbar_height}px;
       left: unset;
+      background-color: var(--mobile-background-color);
     }
 
     div.dashboard-layout-mobile-tabbar {
@@ -282,7 +285,7 @@ div.dashboard-layout {
       @include mobile() {
         width: 100%;
         padding: 0;
-        min-height: calc(100vh - 76px);
+        min-height: calc(100vh - #{$mobile_search_header_height}px);
         margin: 0;
         float: unset;
       }
@@ -537,6 +540,7 @@ div.dashboard-layout {
           }
 
           @include mobile () {
+            z-index: 1;
             float: unset;
             height: #{$mobile_search_header_height}px;
           }
