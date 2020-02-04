@@ -39,14 +39,15 @@
 (defn query
   "Use the search service to query for results."
   [search-query]
-  (if (seq search-query)
-    (do
-      (cook/set-cookie! search-history-cookie (.stringify js/JSON (-> (search-history) (disj search-query) (conj search-query) clj->js))
-        cook/default-cookie-expire)
-      (active)
-      (dispatcher/dispatch! [:search-query/start search-query])
-      (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
-    (reset)))
+  (let [trimmed-query (utils/trim search-query)]
+    (if (seq trimmed-query)
+      (do
+        (cook/set-cookie! search-history-cookie (-> (search-history) (disj trimmed-query) (conj trimmed-query) clj->js js/JSON.stringify)
+          cook/default-cookie-expire)
+        (active)
+        (dispatcher/dispatch! [:search-query/start trimmed-query])
+        (api/query (:uuid (dispatcher/org-data)) trimmed-query query-finished))
+      (reset))))
 
 (defn result-clicked [entry-result url]
   (let [post-loaded? (dispatcher/activity-data (:uuid entry-result))

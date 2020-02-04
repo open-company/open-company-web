@@ -48,14 +48,13 @@
 
 (defmethod dispatcher/action :search-query/finish
   [db [_ {:keys [success error body query]}]]
-
   (let [total-hits (:total body)
         results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
     (when success
       (reset! savedsearch query))
     (if success
-      (assoc db search-key {:count total-hits :results (cleanup-uuid results)})
-      db)))
+      (assoc db search-key {:count total-hits :loading false :results (cleanup-uuid results) :query query})
+      (assoc db search-key {:failed true :loading false :query query}))))
 
 (defmethod dispatcher/action :search-active
   [db [_]]

@@ -11,7 +11,8 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.actions.search :as search]
             [oc.web.stores.search :as store]
-            [oc.web.mixins.ui :refer (on-window-click-mixin)]))
+            [oc.web.mixins.ui :refer (on-window-click-mixin)])
+  (:import [goog.async Debouncer]))
 
 (rum/defcs entry-display < rum/static
 
@@ -45,14 +46,13 @@
   (let [board (:_source data)]
     [:div.search-result
      [:div.content
-      [:span (:name board)]
-      ]
-     ]))
+      [:span (:name board)]]]))
 
 (rum/defcs results-header < rum/static
-  [s result-count]
+  [s result-count failed?]
   [:div.header.group
-    [:span "SEARCH RESULTS"]
+    {:class (when failed? "failed")}
+    [:span (if failed? "SEARCH FAILED" "SEARCH RESULTS")]
       (when (pos? result-count)
         [:span.count (str "(" result-count ")")])])
 
@@ -92,17 +92,22 @@
         {:ref "results"
          :class (when-not search-active? "inactive")}
         (when-not is-mobile?
-          (results-header result-count))
+          (results-header result-count (:failed search-results)))
         [:div.search-results-container
           (when is-mobile?
-            (results-header result-count))
-          (if (pos? result-count)
+            (results-header result-count (:failed search-results)))
+          (cond
+            (pos? result-count)
             (let [results (reverse (:results search-results))]
               (for [sr (take @(::page-size s) results)]
                 (let [key (str "result-" (:uuid (:_source sr)))]
                   (case (:type (:_source sr))
                     "entry" (rum/with-key (entry-display sr) key)
                     "board" (rum/with-key (board-display sr) key)))))
+            (:failed search-results)
+            [:div.empty-result
+              [:div.message "An error occurred, please try again..."]]
+            :else
             [:div.empty-result
               [:div.message "No matching results..."]])]
         (when (< @(::page-size s) result-count)
@@ -110,10 +115,6 @@
             {:on-click (fn [e] (reset! (::page-size s)
                                        (+ @(::page-size s) 15)))}
             [:button.mlb-reset "Show More"]])])))
-
-(defn search-reset [s]
-  (reset! (::query s) "")
-  (search/reset))
 
 (defn- add-window-click-listener [s]
   (reset! (::win-click-listener s)
@@ -129,6 +130,20 @@
     (events/unlistenByKey @(::win-click-listener s))
     (reset! (::win-click-listener s) nil)))
 
+(defn- search-query [s]
+  (search/query @(::query s)))
+
+(defn- debounced-auto-search! [s]
+  (.fire @(::debounced-auto-search s)))
+
+(defn- cancel-auto-search! [s]
+  (.stop @(::debounced-auto-search s)))
+
+(defn search-reset [s]
+  (cancel-auto-search! s)
+  (reset! (::query s) "")
+  (search/reset))
+
 (rum/defcs search-box < (drv/drv store/search-key)
                         (drv/drv store/search-active?)
                         rum/reactive
@@ -137,7 +152,12 @@
                         (rum/local nil ::win-click-listener)
                         (rum/local false ::last-search-active)
                         (rum/local "" ::query)
-                        {:did-update (fn [s]
+                        (rum/local nil ::debounced-auto-search)
+                        {:will-mount (fn [s]
+                          (reset! (::debounced-auto-search s)
+                           (Debouncer. (partial search-query s) (if (responsive/is-mobile-size?) 800 500)))
+                          s)
+                         :did-update (fn [s]
                           (let [current-search-active @(drv/get-ref s store/search-active?)
                                 search-input (rum/ref-node s "search-input")
                                 saved-search @store/savedsearch
@@ -158,6 +178,8 @@
                           s)
                          :will-unmount (fn [s]
                           (remove-window-click-listener s)
+                          (when-let [debounced-auto-search @(::debounced-auto-search s)]
+                            (.dispose debounced-auto-search))
                           s)}
   [s]
   (when (store/should-display)
@@ -190,22 +212,17 @@
              :type "search"
              :value @(::query s)
              :placeholder (if is-mobile? "Search posts..." "Search")
-             :on-focus #(let [search-input (.-target %)
-                              search-query (.-value search-input)]
-                          (search/active))
+             :on-focus #(search/active)
              :on-change (fn [e]
-                          (let [v (utils/trim (.-value (.-target e)))]
+                          (let [v (.-value (.-target e))]
                             (search/query-change v)
                             (reset! (::query s) v)
-                            ;; Auto search only on desktop
-                            (when-not is-mobile?
-                              (when @(::search-timeout s)
-                                (.clearTimeout js/window @(::search-timeout s)))
-                              (reset! (::search-timeout s)
-                               (utils/after 500 #(search/query v))))))
+                            ;; Auto search
+                            (debounced-auto-search! s)))
              :on-key-press (fn [e]
                             (when (or (= (.-key e) "Enter")
                                       (= (.-keyCode e) 13))
+                              (cancel-auto-search! s)
                               (search/query @(::query s))
                               (.blur (rum/ref-node s "search-input"))))}]]
        (search-results-view {:did-select-history-item #(reset! (::query s) %)})])))
