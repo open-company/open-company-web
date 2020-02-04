@@ -115,10 +115,6 @@
   (reset! (::query s) "")
   (search/reset))
 
-(defn search-inactive [s]
-  (search-reset s)
-  (search/inactive))
-
 (defn- add-window-click-listener [s]
   (reset! (::win-click-listener s)
    (events/listen js/window EventType/CLICK
@@ -126,7 +122,7 @@
        (when (and @(::last-search-active s)
                   search-box-el
                   (not (utils/event-inside? % search-box-el)))
-         (search-inactive s))))))
+         (search/inactive))))))
 
 (defn- remove-window-click-listener [s]
   (when @(::win-click-listener s)
@@ -141,30 +137,24 @@
                         (rum/local nil ::win-click-listener)
                         (rum/local false ::last-search-active)
                         (rum/local "" ::query)
-                        {:after-render (fn [s]
-                          (let [search-input (rum/ref-node s "search-input")
+                        {:did-update (fn [s]
+                          (let [current-search-active @(drv/get-ref s store/search-active?)
+                                search-input (rum/ref-node s "search-input")
                                 saved-search @store/savedsearch
-                                search-active? @(drv/get-ref s store/search-active?)
-                                last-search-active @(::last-search-active s)]
-                            (when (and (seq saved-search)
-                                       search-active?
-                                       (not= last-search-active (boolean search-active?)))
-                              (reset! (::query s) (store/saved-search))
-                              (.focus search-input)))
-                            s)
-                         :did-update (fn [s]
-                          (let [current-search-active @(drv/get-ref s store/search-active?)]
-                            (when (compare-and-set! (::last-search-active s) (not current-search-active) (boolean current-search-active))
+                                last-search-active (::last-search-active s)]
+                            (when (compare-and-set! last-search-active (not current-search-active) (boolean current-search-active))
+                              ;; Add/Remove window click listeners for desktop only
                               (when-not (responsive/is-mobile-size?)
                                 (if current-search-active
                                   (add-window-click-listener s)
                                   (remove-window-click-listener s)))
+                              ;; Reset search query in case search is set inactive
                               (when-not current-search-active
-                                (reset! (::query s) ""))))
-                          s)
-                         :will-mount (fn [s]
-                          (when-not (responsive/is-mobile-size?)
-                            (search/inactive))
+                                (reset! (::query s) ""))
+                              ;; Reset query to the latest used one
+                              (when (and current-search-active
+                                         (seq saved-search))
+                                (reset! (::query s) (store/saved-search)))))
                           s)
                          :will-unmount (fn [s]
                           (remove-window-click-listener s)
@@ -190,7 +180,8 @@
                              (:loading search-results))
                     "loading")}]
         [:form
-          {:on-submit #(.preventDefault %)}
+          {:on-submit #(.preventDefault %)
+           :action "."}
           [:input.search.oc-input
             {:class (utils/class-set {:inactive (not search-active?)
                                       :loading (and (map? search-results)
@@ -215,6 +206,5 @@
                             (when (or (= (.-key e) "Enter")
                                       (= (.-keyCode e) 13))
                               (search/query @(::query s))
-                              (.blur (rum/ref-node s "search-input"))
-                              (js/alert (str "Searching for:" @(::query s)))))}]]
+                              (.blur (rum/ref-node s "search-input"))))}]]
        (search-results-view {:did-select-history-item #(reset! (::query s) %)})])))
