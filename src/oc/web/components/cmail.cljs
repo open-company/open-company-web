@@ -329,6 +329,22 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
+(defn- collapse-if-needed [s & [e]]
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        cmail-state @(drv/get-ref s :cmail-state)
+        showing-section-picker? @(::show-sections-picker s)
+        event-in? (if e
+                    (utils/event-inside? e (rum/dom-node s))
+                    false)]
+    (when-not (or (:fullscren cmail-state)
+                  (:collapsed cmail-state)
+                  event-in?
+                  (:has-changes cmail-data)
+                  (:auto-saving cmail-data)
+                  (:uuid cmail-data)
+                  showing-section-picker?)
+      (real-close))))
+
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
@@ -368,18 +384,7 @@
                    ;; Go back to collapsed state on desktop if user didn't touch anything
                    (when-not (responsive/is-mobile-size?)
                      (mixins/on-window-click-mixin (fn [s e]
-                      (let [cmail-data @(drv/get-ref s :cmail-data)
-                            cmail-state @(drv/get-ref s :cmail-state)
-                            showing-section-picker? @(::show-sections-picker s)
-                            event-in? (utils/event-inside? e (rum/dom-node s))]
-                        (when-not (or (:fullscren cmail-state)
-                                      (:collapsed cmail-state)
-                                      event-in?
-                                      (:has-changes cmail-data)
-                                      (:auto-saving cmail-data)
-                                      (:uuid cmail-data)
-                                      showing-section-picker?)
-                          (real-close))))))
+                      (collapse-if-needed s e))))
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-window-click-mixin (fn [s e]
@@ -579,11 +584,22 @@
         current-user-data (drv/react s :current-user-data)
         header-user-data (or (:publisher cmail-data)
                              current-user-data)]
-    (js/console.log "DBG cmail/render")
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?})
+       :on-mouse-enter (when (and (:collapsed cmail-state)
+                             (not show-paywall-alert?))
+                         #(let [headline-el (rum/ref-node s "headline")]
+                            (nux-actions/dismiss-add-post-tooltip)
+                            (cmail-actions/cmail-expand cmail-data cmail-state)
+                            (when (and headline-el
+                                       (not (utils/button-clicked? %))
+                                       (not (utils/input-clicked? %))
+                                       (not (utils/event-inside? % headline-el))
+                                       (not (utils/event-inside? % (body-element))))
+                              (.focus headline-el))))
+       :on-mouse-leave #(collapse-if-needed s)
        :on-click (when (and (:collapsed cmail-state)
                              (not show-paywall-alert?))
                    #(let [headline-el (rum/ref-node s "headline")]
