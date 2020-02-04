@@ -146,13 +146,13 @@
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])
+            (when (:can-comment activity-data)
+              (rum/with-key (add-comment {:activity-data activity-data}) (str "add-comment-" (:uuid activity-data))))
             (when comments-data
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
                                 :new-added-comment add-comment-highlight
-                                :current-user-id (:user-id id-token)}))
-            (when (:can-comment activity-data)
-              (rum/with-key (add-comment {:activity-data activity-data}) (str "add-comment-" (:uuid activity-data))))]])
+                                :current-user-id (:user-id id-token)}))]])
       [:div.secure-activity-footer
         (if id-token
           [:button.mlb-reset.secure-activity-footer-bt
