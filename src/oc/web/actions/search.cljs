@@ -33,6 +33,9 @@
       (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
       #{})))
 
+(defn query-change [search-query]
+  (dispatcher/dispatch! [:search-query/change search-query]))
+
 (defn query
   "Use the search service to query for results."
   [search-query]
@@ -44,6 +47,7 @@
         (cook/set-cookie! search-history-cookie (.stringify js/JSON (clj->js with-new-query))
          cook/default-cookie-expire))
       (active)
+      (dispatcher/dispatch! [:search-query/start search-query])
       (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
     (reset)))
 
@@ -68,6 +72,3 @@
     (if post-loaded?
       (open-post-cb true nil)
       (cmail-actions/get-entry-with-uuid (:board-slug entry-result) (:uuid entry-result) open-post-cb))))
-
-(defn focus []
-  (dispatcher/dispatch! [:search-focus]))

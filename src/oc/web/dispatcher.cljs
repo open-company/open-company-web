@@ -415,9 +415,9 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading payments]
+                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -437,7 +437,8 @@
                                :activity-share-container (:activity-share-container base)
                                :cmail-state (:cmail-state base)
                                :force-login-wall (:force-login-wall base)
-                               :app-loading loading})]
+                               :app-loading loading
+                               :search-active search-active})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]

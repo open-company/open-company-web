@@ -138,7 +138,7 @@ div.dashboard-layout {
 
           &.active {
             span.tab-label {
-              color: #07C176;
+              color: $carrot_green;
             }
           }
           
@@ -288,6 +288,7 @@ div.dashboard-layout {
         min-height: calc(100vh - #{$mobile_search_header_height}px);
         margin: 0;
         float: unset;
+        background-color: var(--mobile-background-color);
       }
 
       div.board-name-container {

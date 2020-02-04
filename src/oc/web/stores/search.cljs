@@ -37,6 +37,16 @@
                 (assoc result :_source (assoc source :uuid new-uuid))))
             results)))
 
+(defmethod dispatcher/action :search-query
+  [db [_ search-query]]
+  (dissoc db search-key))
+
+
+(defmethod dispatcher/action :search-query/start
+  [db [_ search-query]]
+  (assoc-in db [search-key :loading] true))
+
+
 (defmethod dispatcher/action :search-query/finish
   [db [_ {:keys [success error body query]}]]
 
@@ -55,6 +65,7 @@
 
 (defmethod dispatcher/action :search-inactive
   [db [_]]
+  (reset! savedsearch "")
   (assoc db search-active? false))
 
 (defmethod dispatcher/action :search-reset
@@ -64,7 +75,3 @@
 (defmethod dispatcher/action :search-result-clicked
   [db [_]]
   (assoc db search-active? false))
-
-(defmethod dispatcher/action :search-focus
-  [db [_]]
-  db)

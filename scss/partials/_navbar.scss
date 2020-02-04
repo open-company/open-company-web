@@ -257,11 +257,7 @@ nav.oc-navbar {
       background-color: var(--mobile-background-color);
       padding: 15px 16px;
       display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
       text-align: center;
-      border-bottom: 1px solid var(--divider-line);
       z-index: 2;
 
       button.search-close-bt {
