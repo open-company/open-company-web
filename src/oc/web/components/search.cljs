@@ -211,9 +211,7 @@
                              (utils/after 500 #(search/query v))))))
            :on-key-press (fn [e]
                           (when (= (.-key e) "Enter")
-                            (let [input-field (.-target e)
-                                  value (.-value input-field)]
-                              (reset! (::query s) value)
+                            (let [value @(::query s)]
                               (search/query value)
                               (.blur input-field)
                               (js/alert "searching:" value))))}]
