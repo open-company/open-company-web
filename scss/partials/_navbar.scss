@@ -255,6 +255,7 @@ nav.oc-navbar {
       height: #{$mobile_navbar_height}px;
       width: 100vw;
       background-color: var(--mobile-background-color);
+      border-bottom: 1px solid var(--divider-line);
       padding: 15px 16px;
       display: block;
       text-align: center;
