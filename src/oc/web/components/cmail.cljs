@@ -365,10 +365,30 @@
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
+                   ;; Go back to collapsed state on desktop if user didn't touch anything
+                   (when-not (responsive/is-mobile-size?)
+                     (mixins/on-window-click-mixin (fn [s e]
+                      (let [cmail-data @(drv/get-ref s :cmail-data)
+                            cmail-state @(drv/get-ref s :cmail-state)
+                            showing-section-picker? @(::show-sections-picker s)
+                            event-in? (utils/event-inside? e (rum/dom-node s))]
+                        (when-not (or (:fullscren cmail-state)
+                                      (:collapsed cmail-state)
+                                      event-in?
+                                      (:has-changes cmail-data)
+                                      (:auto-saving cmail-data)
+                                      (:uuid cmail-data)
+                                      showing-section-picker?)
+                          (real-close))))))
+                   ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
+                   ;; conflicts with the collapse cmail listener
                    (mixins/on-window-click-mixin (fn [s e]
-                    (when (and @(::show-sections-picker s)
-                               (not (utils/event-inside? e (rum/ref-node s :sections-picker-container))))
-                      (reset! (::show-sections-picker s) false))))
+                    (let [showing-section-picker? @(::show-sections-picker s)
+                          event-in? (utils/event-inside? e (rum/ref-node s :sections-picker-container))]
+                      (utils/after 100
+                       #(when (and showing-section-picker?
+                                   (not event-in?))
+                         (reset! (::show-sections-picker s) false))))))
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -386,8 +406,7 @@
                           body-text (.text (.html (js/$ "<div/>") initial-body))
                           abstract-text (.text (.html (js/$ "<div/>") initial-abstract))
                           abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
-                      (when (and (not (seq (:uuid cmail-data)))
-                                 (not (:collapsed cmail-state)))
+                      (when-not (seq (:uuid cmail-data))
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
@@ -439,8 +458,7 @@
                                 abstract-text (.text (.html (js/$ "<div/>") initial-abstract))
                                 abstract-exceeds (> (count abstract-text) utils/max-abstract-length)
                                 body-text (.text (.html (js/$ "<div/>") initial-body))]
-                            (when (and (not (seq (:uuid cmail-data)))
-                                       (not (:collapsed cmail-state)))
+                            (when-not (seq (:uuid cmail-data))
                               (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
@@ -561,6 +579,7 @@
         current-user-data (drv/react s :current-user-data)
         header-user-data (or (:publisher cmail-data)
                              current-user-data)]
+    (js/console.log "DBG cmail/render")
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
@@ -725,9 +744,8 @@
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})
             ; Attachments
-            (when-not (:collapsed cmail-state)
-              (stream-attachments (:attachments cmail-data) nil
-               #(activity-actions/remove-attachment :cmail-data %)))]]
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))]]
       (if is-fullscreen?
         [:div.cmail-footer
           (when (and (not= (:status cmail-data) "published")
@@ -738,8 +756,7 @@
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))]
         [:div.cmail-footer
-          (when (and (not (:collapsed cmail-state))
-                     (not is-fullscreen?))
+          (when (not is-fullscreen?)
             [:div.dismiss-inline-cmail-container
               {:class (when long-tooltip "long-tooltip")}
               [:button.mlb-reset.dismiss-inline-cmail
@@ -749,16 +766,14 @@
                  :title (if long-tooltip
                           "Save & Close"
                           "Close")}]])
-          (when (and (not (:collapsed cmail-state))
-                     (not is-fullscreen?))
+          (when-not is-fullscreen?
             [:div.delete-bt-container
               [:button.mlb-reset.delete-bt
                 {:on-click #(delete-clicked s % cmail-data)
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
                  :title "Delete"}]])
-          (when (and (not (:collapsed cmail-state))
-                     (not is-fullscreen?))
+          (when-not is-fullscreen?
             [:div.fullscreen-bt-container
               [:button.mlb-reset.fullscreen-bt
                 {:on-click #(cmail-actions/cmail-toggle-fullscreen)
@@ -771,8 +786,7 @@
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
                                  :title post-button-title
-                                 :post-tt-kw (when (and (not (:collapsed cmail-state))
-                                                        (not show-paywall-alert?))
+                                 :post-tt-kw (when-not show-paywall-alert?
                                                post-tt-kw)
                                  :force-show-tooltip @(::show-post-tooltip s)
                                  :show-on-hover true})])

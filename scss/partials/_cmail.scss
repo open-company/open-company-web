@@ -39,15 +39,14 @@ div.cmail-outer {
     }
 
     &.show-trial-expired-alert {
-      cursor: not-allowed;
-      div.cmail-container {
-        pointer-events: none;
+      div.cmail-container, div.cmail-container div.cmail-content-outer,
+      div.cmail-container div.cmail-content-outer div.cmail-content
+      div.rich-body-editor-outer-container div.rich-body-editor-container div.rich-body-editor {
+        cursor: not-allowed;
       }
 
       div.trial-expired-alert-container {
-        cursor: initial;
         margin-left: -#{$paywall_alert_width / 2}px;
-        margin-top: 32px;
       }
 
       @include big_web() {
@@ -60,81 +59,63 @@ div.cmail-outer {
     }
 
     div.cmail-container {
+
       div.cmail-content-outer {
+        padding: 16px 24px;
+
         div.cmail-content {
-          min-height: 60px;
-          max-height: 60px;
+          height: 24px;
+          min-height: 24px;
 
-          div.rich-body-editor-outer-container div.rich-body-editor-container {
-            div.medium-editor-media-picker {
-              div.media-picker-container {
-                button.media.media-gif, button.media.media-video, button.media.media-photo {
-                  display: none;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      div.cmail-footer div.cmail-footer-right {
-        div.emoji-picker {
-          button.emoji-button {
-            opacity: 0.5;
+          div.cmail-content-headline-container {
             display: none;
           }
-        }
 
-        div.section-picker-bt-container {
-          display: none;
-          button.section-picker-bt {
-            opacity: 0.5;
+          div.cmail-content-abstract-container-outer {
+            display: none;
           }
-        }
 
-        button.attachment-button {
-          opacity: 0.5;
-          display: none;
-        }
+          div.rich-body-editor-outer-container {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
 
-        div.post-button-container {
-          div.post-to-button, div.post-to-button.disabled {
-            div.post-to-bt-container button.post-to-bt {
-              color: var(--light-color);
-              background-color: var(--opac-background-color-1);
-              opacity: 1;
-            }
-          }
-        }
-      }
+            div.rich-body-editor-container {
+              margin-top: 0;
+              height: 24px;
 
-      @include big_web(){
-        &:hover {
-          div.cmail-content-outer {
-            div.cmail-content div.rich-body-editor-outer-container div.rich-body-editor-container {
+              div.rich-body-editor {
+                margin-top: 0;
+                min-height: 24px;
+              }
+
               div.medium-editor-media-picker {
                 div.media-picker-container {
                   button.media.media-gif, button.media.media-video, button.media.media-photo {
-                    // opacity: 0.5;
-                    display: block;
+                    display: none;
                   }
                 }
               }
             }
           }
 
-          div.cmail-footer div.cmail-footer-right {
-            div.emoji-picker {
-              button.emoji-button {
-                display: block;
-              }
-            }
+          div.stream-attachments {
+            display: none;
+          }
+        }
+      }
 
-            div.section-picker-bt-container {
-              display: block;
-            }
+      div.cmail-footer {
+        display: none;
+      }
+    }
 
-            button.attachment-button {
+    &:hover {
+      div.cmail-container div.cmail-content-outer div.cmail-content
+      div.rich-body-editor-outer-container div.rich-body-editor-container {
+        div.medium-editor-media-picker {
+          div.media-picker-container {
+            button.media.media-gif, button.media.media-video, button.media.media-photo {
               display: block;
             }
           }
@@ -497,7 +478,7 @@ div.cmail-outer {
 
         div.close-bt-container {
           float: left;
-          
+
           @include mobile() {
             display: none;
           }
@@ -913,7 +894,7 @@ div.cmail-outer {
 
       div.dismiss-inline-cmail-container {
         float: left;
-        
+
         @include mobile() {
           display: none;
         }
@@ -1205,10 +1186,6 @@ div.cmail-outer {
         div.cmail-content-abstract-container-outer button.remove-abstract-bt {
           background-image: cdnUrl("/img/ML/black_close@dark.svg");
         }
-      }
-
-      div.cmail-content div.cmail-content-section-picker div.section-picker-bt-container button.section-picker-bt:after {
-        background-image: cdnUrl("/img/ML/select_arrows_white.svg");
       }
 
       div.cmail-header {
