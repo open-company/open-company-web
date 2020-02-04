@@ -203,8 +203,8 @@
             (set! (.-src img) (:logo-url first-team)))))
       (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
 
-(defn- check-email-domain [domain s & [reset-email-domain]]
-  (when (team-actions/can-add-email-domain?)
+(defn- check-email-domain [team-data domain s & [reset-email-domain]]
+  (when (team-actions/can-add-email-domain? team-data)
     (reset! (::checking-email-domain s) (not reset-email-domain))
     ;; If user is here it means he has only one team, if he already had one
     ;; he was redirected to it, not here to create a new team, so use the first team
@@ -236,7 +236,7 @@
 (defn- precheck-user-email [s]
   (when-not @(::user-email-checked s)
     ;; Wait for the team data to be loaded to have the email domain link
-    (when (first (filter #(= (:team-id %) (first (jwt/get-key :teams))) @(drv/get-ref s :teams-data)))
+    (when-let [team-data (first (filter #(= (:team-id %) (first (jwt/get-key :teams))) @(drv/get-ref s :teams-data)))]
       (let [domain (:email-domain @(drv/get-ref s :org-editing))
             user-email (jwt/get-key :email)
             splitted-email (string/split user-email #"@")
@@ -244,7 +244,7 @@
         (when (and (string/blank? domain)
                    (not (string/blank? user-domain))))
           (reset! (::user-email-checked s) true)
-          (check-email-domain user-domain s true)))))
+          (check-email-domain team-data user-domain s true)))))
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
@@ -354,7 +354,7 @@
                :placeholder "Enter a team name..."
                :class (utils/class-set {:error (:error org-editing)
                                         utils/hide-class true})
-               :max-length 50 ;org-utils/org-name-max-length
+               :max-length org-utils/org-name-max-length
                :value (:name org-editing)
                :on-change #(let [new-name (.. % -target -value)
                                  clean-org-name (subs new-name 0 (min (count new-name)
@@ -401,7 +401,7 @@
                                                                                   :valid-email-domain nil})])
                                 (when (and (seq cleaned-email-domain)
                                            valid-email-domain?)
-                                  (check-email-domain cleaned-email-domain s))))
+                                  (check-email-domain (first teams-data) cleaned-email-domain s))))
                  :placeholder "@domain.com"}]
             [:div.field-label.info
               "When someone signs up with this email domain, they'll join your team."]])
