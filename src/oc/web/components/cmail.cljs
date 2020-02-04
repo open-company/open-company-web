@@ -593,11 +593,7 @@
                          #(let [headline-el (rum/ref-node s "headline")]
                             (nux-actions/dismiss-add-post-tooltip)
                             (cmail-actions/cmail-expand cmail-data cmail-state)
-                            (when (and headline-el
-                                       (not (utils/button-clicked? %))
-                                       (not (utils/input-clicked? %))
-                                       (not (utils/event-inside? % headline-el))
-                                       (not (utils/event-inside? % (body-element))))
+                            (when headline-el
                               (.focus headline-el))))
        :on-mouse-leave #(collapse-if-needed s)
        :on-click (when (and (:collapsed cmail-state)
@@ -605,11 +601,7 @@
                    #(let [headline-el (rum/ref-node s "headline")]
                       (nux-actions/dismiss-add-post-tooltip)
                       (cmail-actions/cmail-expand cmail-data cmail-state)
-                      (when (and headline-el
-                                 (not (utils/button-clicked? %))
-                                 (not (utils/input-clicked? %))
-                                 (not (utils/event-inside? % headline-el))
-                                 (not (utils/event-inside? % (body-element))))
+                      (when headline-el
                         (.focus headline-el))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state)
