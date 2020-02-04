@@ -189,30 +189,32 @@
            :class (when (and (map? search-results)
                              (:loading search-results))
                     "loading")}]
-        [:input.search.oc-input
-          {:class (utils/class-set {:inactive (not search-active?)
-                                    :loading (and (map? search-results)
-                                                  (:loading search-results))})
-           :ref "search-input"
-           :type "search"
-           :value @(::query s)
-           :placeholder (if is-mobile? "Search posts..." "Search")
-           :on-focus #(let [search-input (.-target %)
-                            search-query (.-value search-input)]
-                        (search/active))
-           :on-change (fn [e]
-                        (when-not is-mobile?
-                          (let [v (utils/trim (.-value (.-target e)))]
-                            (search/query-change v)
-                            (reset! (::query s) v)
-                            (when @(::search-timeout s)
-                              (.clearTimeout js/window @(::search-timeout s)))
-                            (reset! (::search-timeout s)
-                             (utils/after 500 #(search/query v))))))
-           :on-key-press (fn [e]
-                          (when (= (.-key e) "Enter")
-                            (let [value @(::query s)]
-                              (search/query value)
-                              (.blur input-field)
-                              (js/alert "searching:" value))))}]
+        [:form
+          {:on-submit #(.preventDefault %)}
+          [:input.search.oc-input
+            {:class (utils/class-set {:inactive (not search-active?)
+                                      :loading (and (map? search-results)
+                                                    (:loading search-results))})
+             :ref "search-input"
+             :type "search"
+             :value @(::query s)
+             :placeholder (if is-mobile? "Search posts..." "Search")
+             :on-focus #(let [search-input (.-target %)
+                              search-query (.-value search-input)]
+                          (search/active))
+             :on-change (fn [e]
+                          (when-not is-mobile?
+                            (let [v (utils/trim (.-value (.-target e)))]
+                              (search/query-change v)
+                              (reset! (::query s) v)
+                              (when @(::search-timeout s)
+                                (.clearTimeout js/window @(::search-timeout s)))
+                              (reset! (::search-timeout s)
+                               (utils/after 500 #(search/query v))))))
+             :on-key-press (fn [e]
+                            (when (= (.-key e) "Enter")
+                              (let [value @(::query s)]
+                                (search/query value)
+                                (.blur (rum/ref-node s "search-input"))
+                                (js/alert "searching:" value))))}]]
        (search-results-view {:did-select-history-item #(reset! (::query s) %)})])))
