@@ -343,7 +343,8 @@
                   (:auto-saving cmail-data)
                   (:uuid cmail-data)
                   showing-section-picker?)
-      (real-close))))
+      (real-close)
+      (.blur (rum/ref-node s "headline")))))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
