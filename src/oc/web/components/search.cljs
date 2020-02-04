@@ -212,7 +212,9 @@
                               (reset! (::search-timeout s)
                                (utils/after 500 #(search/query v))))))
              :on-key-press (fn [e]
-                            (when (= (.-key e) "Enter")
+                            (when (or (= (.-key e) "Enter")
+                                      (= (.-keyCode e) 13))
                               (search/query @(::query s))
-                              (.blur (rum/ref-node s "search-input"))))}]]
+                              (.blur (rum/ref-node s "search-input"))
+                              (js/alert (str "Searching for:" @(::query s)))))}]]
        (search-results-view {:did-select-history-item #(reset! (::query s) %)})])))
