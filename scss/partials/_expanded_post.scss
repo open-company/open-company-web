@@ -242,8 +242,8 @@ div.expanded-post {
           overflow: hidden;
           max-width: 100%;
           text-overflow: ellipsis;
-          white-space: pre-wrap;
-          word-break: break-word;
+          white-space: normal;
+          overflow-wrap: break-word;
         }
       }
 
@@ -260,8 +260,8 @@ div.expanded-post {
           overflow: hidden;
           max-width: 100%;
           text-overflow: ellipsis;
-          white-space: pre-wrap;
-          word-break: break-word;
+          white-space: normal;
+          overflow-wrap: break-word;
         }
       }
     }
@@ -271,8 +271,8 @@ div.expanded-post {
     @include activity-abstract(17px, 22px);
     margin: 16px 0 24px;
     @include OC_Body_Bold();
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
 
     // Abstract is bold only in expanded post view
     // we need to make sure italic doesn't override
