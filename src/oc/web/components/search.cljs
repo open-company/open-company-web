@@ -194,10 +194,11 @@
                               search-query (.-value search-input)]
                           (search/active))
              :on-change (fn [e]
-                          (when-not is-mobile?
-                            (let [v (utils/trim (.-value (.-target e)))]
-                              (search/query-change v)
-                              (reset! (::query s) v)
+                          (let [v (utils/trim (.-value (.-target e)))]
+                            (search/query-change v)
+                            (reset! (::query s) v)
+                            ;; Auto search only on desktop
+                            (when-not is-mobile?
                               (when @(::search-timeout s)
                                 (.clearTimeout js/window @(::search-timeout s)))
                               (reset! (::search-timeout s)
