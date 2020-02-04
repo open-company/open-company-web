@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="720px" height="94px" viewBox="0 0 720 94" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Mask Copy 8</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Ghost-states" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Ghost---List" transform="translate(-388.000000, -220.000000)">
+            <g id="Group-12" transform="translate(388.000000, 160.000000)">
+                <g id="Mask-Copy-8" transform="translate(0.000000, 39.000000)">
+                    <polygon fill-opacity="0.01" fill="#34414F" opacity="0.149999991" points="0 0 720 0 720 1 0 1"></polygon>
+                    <polygon fill-opacity="0.16" fill="#FFFFFF" points="0 57 720 57 720 58 0 58"></polygon>
+                    <polygon id="Mask-Copy-9" fill-opacity="0.16" fill="#FFFFFF" points="0 114 720 114 720 115 0 115"></polygon>
+                    <rect id="Rectangle-13-Copy-4" fill-opacity="0.08" fill="#FFFFFF" x="16" y="21" width="24" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-8" fill-opacity="0.08" fill="#FFFFFF" x="16" y="78" width="24" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-5" fill-opacity="0.08" fill="#FFFFFF" x="48" y="21" width="200" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-9" fill-opacity="0.08" fill="#FFFFFF" x="48" y="78" width="160" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-6" fill-opacity="0.08" fill="#FFFFFF" x="256" y="21" width="344" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-10" fill-opacity="0.08" fill="#FFFFFF" x="216" y="78" width="284" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-7" fill-opacity="0.08" fill="#FFFFFF" x="640" y="21" width="80" height="16" rx="4"></rect>
+                    <rect id="Rectangle-13-Copy-11" fill-opacity="0.08" fill="#FFFFFF" x="640" y="78" width="80" height="16" rx="4"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

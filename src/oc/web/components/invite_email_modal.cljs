@@ -209,7 +209,9 @@
             {:key "org-settings-invite-table"
              :class (when is-admin? "top-border")}
             [:div.invites-list-title
-              "Invite someone with a specific role (Admin, Contributor, or Viewer)"]
+              "Invite someone with a specific role"]
+            [:div.invites-list-description
+              "Admin, Contributor, or Viewer"]
             (for [i (range (count invite-users))
                   :let [user-data (get invite-users i)
                         key-string (str "invite-users-tabe-" i)]]

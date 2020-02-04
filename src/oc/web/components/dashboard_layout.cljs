@@ -51,6 +51,7 @@
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
+                              (drv/drv :activities-read)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -72,6 +73,7 @@
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
         foc-layout (drv/react s :foc-layout)
+        _activities-read (drv/react s :activities-read)
         current-board-slug (router/current-board-slug)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))

@@ -58,8 +58,12 @@ div.stream-item {
     @include big_web() {
       &:hover {
         div.stream-item-header {
-          div.more-menu button {
-            display: initial;
+          div.more-menu {
+            display: block;
+
+            button {
+              display: initial;
+            }
           }
         }
       }
@@ -78,9 +82,17 @@ div.stream-item {
       border: 1px solid var(--foc-hover-border-color);
 
       div.stream-item-header {
-        div.more-menu button {
-          display: initial;
+        div.more-menu {
+          display: block;
+
+          button {
+            display: initial;
+          }
         }
+      }
+
+      div.activity-share-container {
+        display: block;
       }
     }
   }
@@ -111,6 +123,16 @@ div.stream-item {
         padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+
+        div.stream-item-header {
+          div.more-menu {
+            display: block;
+
+            button {
+              display: initial;
+            }
+          }
+        }
       }
     }
   }
@@ -133,6 +155,8 @@ div.stream-item {
   }
 
   div.activity-share-container {
+    display: none;
+
     div.activity-share-modal-container {
       right: -9px;
       margin-top: 32px;
@@ -289,6 +313,7 @@ div.stream-item {
             margin-right: 8px;
             margin-left: 6px;
             overflow: visible;
+            white-sapce: nowrap;
 
             &:before {
               content: "";
@@ -303,7 +328,6 @@ div.stream-item {
 
             @include mobile() {
               display: block;
-              white-space: nowrap;
               float: left;
               line-height: 24px;
             }
@@ -331,6 +355,11 @@ div.stream-item {
       height: 32px;
 
       @include big_web() {
+        display: none;
+        position: absolute;
+        right: -12px;
+        top: -4px;
+
         &:not(.menu-expanded) button {
           display: none;
         }
@@ -396,7 +425,7 @@ div.stream-item {
     }
 
     div.thumbnail-container {
-      min-height: 88px;
+      min-height: 84px;
       position: relative;
       cursor: pointer;
 
@@ -525,7 +554,12 @@ div.stream-item {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
-        white-space: nowrap;
+
+        @include mobile() {
+          margin-top: 2px;
+          height: 23px;
+          @include activity-title(18px, 23px);
+        }
       }
 
       div.stream-item-body {
@@ -534,8 +568,6 @@ div.stream-item {
         @include OC_Body_Book();
         line-height: 22px;
         overflow: hidden;
-        white-space: pre-wrap;
-        word-break: break-word;
 
         max-height: #{22 * 2}px;
 
@@ -632,6 +664,42 @@ div.stream-item {
         }
       }
 
+      div.stream-item-mobile-attachments {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          float: left;
+          height: 22px;
+
+          span.mobile-attachments-icon {
+            display: inline-block;
+            width: 18px;
+            height: 22px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 18px 20px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-right: 6px;
+            opacity: 0.5;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+            }
+          }
+
+          span.mobile-attachments-count {
+            @include OC_Body_Book();
+            font-size: 17px;
+            line-height: 22px;
+            color: var(--light-color);
+            display: inline-block;
+            height: 22px;
+            vertical-align: top;
+          }
+        }
+      }
+
       div.stream-item-attachments {
         float: left;
         margin-right: 16px;
@@ -639,7 +707,7 @@ div.stream-item {
         position: relative;
 
         @include mobile() {
-          height: 20px;
+          display: none;
         }
 
         &:hover {
@@ -688,7 +756,7 @@ div.stream-item {
             &:active, &:hover {
               background-color: var(--selected-row-background-color);
               div.stream-item-attachments-item-desc {
-                color: var(--selected-row-background-color);
+                color: var(--selected-row-color);
               }
             }
 
