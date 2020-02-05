@@ -590,12 +590,13 @@
                                 :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?})
        :on-click (when (and (:collapsed cmail-state)
-                             (not show-paywall-alert?))
-                   #(let [headline-el (rum/ref-node s "headline")]
+                            (not show-paywall-alert?))
+                   (fn [e]
                       (nux-actions/dismiss-add-post-tooltip)
                       (cmail-actions/cmail-expand cmail-data cmail-state)
-                      (when headline-el
-                        (.focus headline-el))))}
+                      (utils/after 100
+                       #(when-let [headline-el (rum/ref-node s "headline")]
+                          (.focus headline-el)))))}
       (when (and show-paywall-alert?
                  (:collapsed cmail-state)
                  (not (:fullscreen cmail-state)))
