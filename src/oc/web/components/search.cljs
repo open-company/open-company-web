@@ -86,7 +86,7 @@
                :on-click #(do
                             (when (fn? did-select-history-item)
                               (did-select-history-item q))
-                            (search/query q))}
+                            (search/query q false))}
               q]))]
       [:div.search-results
         {:ref "results"
@@ -130,8 +130,8 @@
     (events/unlistenByKey @(::win-click-listener s))
     (reset! (::win-click-listener s) nil)))
 
-(defn- search-query [s]
-  (search/query @(::query s)))
+(defn- auto-search-query [s]
+  (search/query @(::query s) true))
 
 (defn- debounced-auto-search! [s]
   (.fire @(::debounced-auto-search s)))
@@ -155,7 +155,7 @@
                         (rum/local nil ::debounced-auto-search)
                         {:will-mount (fn [s]
                           (reset! (::debounced-auto-search s)
-                           (Debouncer. (partial search-query s) (if (responsive/is-mobile-size?) 800 500)))
+                           (Debouncer. (partial auto-search-query s) (if (responsive/is-mobile-size?) 800 500)))
                           s)
                          :did-update (fn [s]
                           (let [current-search-active @(drv/get-ref s store/search-active?)
@@ -222,6 +222,6 @@
                             (when (or (= (.-key e) "Enter")
                                       (= (.-keyCode e) 13))
                               (cancel-auto-search! s)
-                              (search/query @(::query s))
+                              (search/query @(::query s) false)
                               (.blur (rum/ref-node s "search-input"))))}]]
        (search-results-view {:did-select-history-item #(reset! (::query s) %)})])))

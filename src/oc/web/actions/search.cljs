@@ -1,5 +1,6 @@
 (ns oc.web.actions.search
-  (:require [taoensso.timbre :as timbre]
+  (:require [cuerdas.core :as s]
+            [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -30,17 +31,34 @@
 (defn search-history []
   (let [res (cook/get-cookie search-history-cookie)]
     (if (seq res)
-      (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
+      (->> res js/$.parseJSON js->clj vec)
       #{})))
 
 (defn query
-  "Use the search service to query for results."
-  [search-query]
+  "Use the search service to query for results.
+   Keep tracl of the last "
+  [search-query auto-search?]
   (let [trimmed-query (utils/trim search-query)]
     (if (seq trimmed-query)
       (do
-        (cook/set-cookie! search-history-cookie (-> (search-history) (disj trimmed-query) (conj trimmed-query) clj->js js/JSON.stringify)
-          cook/default-cookie-expire)
+        (when (or (not auto-search?)
+                  (> (count trimmed-query) 2))
+          (let [temp-history (-> (search-history) (utils/vec-dissoc trimmed-query))
+                last-search (last temp-history)
+                temp-history* (if (and auto-search?
+                                     (or ; User added one letter to the beginning
+                                         (->> trimmed-query rest (s/join "") (= last-search))
+                                         ; User added one letter to the end
+                                         (->> trimmed-query butlast (s/join "") (= last-search))
+                                         ; User removed one letter from the beginning
+                                         (->> last-search rest (s/join "") (= trimmed-query))
+                                         ; User removed one letter from the end
+                                         (->> last-search butlast (s/join "") (= trimmed-query))))
+                                (butlast temp-history)
+                                temp-history)
+                with-new (conj temp-history* trimmed-query)
+                history  (->> with-new (take-last search-history-length) clj->js js/JSON.stringify)]
+            (cook/set-cookie! search-history-cookie history cook/default-cookie-expire)))
         (active)
         (dispatcher/dispatch! [:search-query/start trimmed-query])
         (api/query (:uuid (dispatcher/org-data)) trimmed-query query-finished))
