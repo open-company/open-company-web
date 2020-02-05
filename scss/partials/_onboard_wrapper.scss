@@ -20,7 +20,9 @@ div.onboard-wrapper-container {
     background-color: white;
     text-align: center;
     box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+    padding-bottom: 180px;
     min-height: 100vh;
+    position: relative;
 
     @include mobile() {
       width: 100%;
@@ -35,7 +37,8 @@ div.onboard-wrapper-container {
       margin-top: -50px;
       background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
       display: block;
-      position: relative;
+      position: fixed;
+      bottom: 0;
 
       div.onboard-box {
         background-image: cdnUrl("/img/ML/onboard_box.svg");
@@ -142,7 +145,10 @@ div.onboard-lander {
   div.main-cta {
 
     div.mobile-header {
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      margin-left: -360px;
 
       button.top-back-button {
         display: block;
@@ -169,11 +175,10 @@ div.onboard-lander {
         text-align: center;
         width: 100%;
         border-bottom: 1px solid $divider_line_grey;
-        position: fixed;
         background-color: white;
-        left: 0px;
-        top: 0px;
         z-index: 1031;
+        left: 0;
+        margin-left: 0;
 
         div.mobile-logo {
           position: absolute;
