@@ -7,6 +7,7 @@
             [org.martinklepsch.derivatives :as drv]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
+            [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.comment :as cu]
             [oc.web.utils.activity :as au]
@@ -178,7 +179,8 @@
                                 (catch :default e false))
                               s)}
   [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
-  (let [add-comment-force-update (drv/react s :add-comment-force-update)]
+  (let [add-comment-force-update* (drv/react s :add-comment-force-update)
+        is-mobile? (responsive/is-mobile-size?)]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}
       (if (pos? (count comments-data))
@@ -205,7 +207,10 @@
                                            (= @(::show-picker s) (:uuid comment-data)))
                       new-comment? (and (not= (-> comment-data :author :user-id) current-user-id)
                                         (< (.getTime (utils/js-date last-read-at))
-                                        (.getTime (utils/js-date (:created-at comment-data)))))]]
+                                           (.getTime (utils/js-date (:created-at comment-data)))))
+                      add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:replay-parent comment-data)
+                                              (:uuid comment-data))
+                      edit-comment-key (get-in add-comment-force-update* add-comment-string-key)]]
             (if is-editing?
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
@@ -224,7 +229,7 @@
                                  :parent-comment-uuid (:reply-parent comment-data)
                                  :dismiss-reply-cb (partial finish-edit s comment-data)
                                  :edit-comment-data comment-data})
-                   (str "add-comment-" (:reply-parent comment-data) "-" add-comment-force-update))]]
+                   (str "edit-comment-" edit-comment-key))]]
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
@@ -244,7 +249,7 @@
                    :on-mouse-leave #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)}
                   [:div.stream-comment-inner
                     (when (and (not is-editing?)
-                               (responsive/is-mobile-size?))
+                               is-mobile?)
                       [:div.stream-comment-mobile-menu
                         (more-menu {:entity-data comment-data
                                     :external-share false
@@ -273,7 +278,14 @@
                             [:div.stream-comment-author-name
                               (:name (:author comment-data))]
                             [:div.stream-comment-author-timestamp
-                              (utils/foc-date-time (:created-at comment-data))]]
+                              [:time
+                                {:date-time (:created-at comment-data)
+                                 :data-toggle (when-not is-mobile? "tooltip")
+                                 :data-placement "top"
+                                 :data-container "body"
+                                 :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                                 :data-title (utils/activity-date-tooltip comment-data)}
+                                (utils/foc-date-time (:created-at comment-data))]]]
                           (when new-comment?
                             [:div.new-comment-tag])
                           (when-not is-editing?
@@ -366,5 +378,5 @@
                                               :parent-comment-uuid (:reply-parent comment-data)
                                               :dismiss-reply-cb (fn [_ _]
                                                                  (swap! (::replying-to s) #(disj % (:reply-parent comment-data))))})
-                   (str "add-comment-" (:reply-parent comment-data) "-" add-comment-force-update))])]))]
+                   (str "add-comment-" edit-comment-key))])]))]
         [:div.stream-comments-empty])]))

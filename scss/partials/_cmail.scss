@@ -735,7 +735,7 @@ div.cmail-outer {
           cursor: text;
           @include activity-title(20px, 28px);
           color: var(--color);
-          white-space: pre-wrap;
+          white-space: normal;
           overflow-wrap: break-word;
           min-height: 28px;
           line-height: 28px;

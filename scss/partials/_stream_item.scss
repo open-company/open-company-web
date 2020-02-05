@@ -90,6 +90,10 @@ div.stream-item {
           }
         }
       }
+
+      div.activity-share-container {
+        display: block;
+      }
     }
   }
 
@@ -151,6 +155,8 @@ div.stream-item {
   }
 
   div.activity-share-container {
+    display: none;
+
     div.activity-share-modal-container {
       right: -9px;
       margin-top: 32px;
@@ -308,6 +314,7 @@ div.stream-item {
             margin-right: 8px;
             margin-left: 6px;
             overflow: visible;
+            white-sapce: nowrap;
 
             &:before {
               content: "";
@@ -322,7 +329,6 @@ div.stream-item {
 
             @include mobile() {
               display: block;
-              white-space: nowrap;
               float: left;
               line-height: 24px;
             }
@@ -549,7 +555,12 @@ div.stream-item {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
-        white-space: nowrap;
+
+        @include mobile() {
+          margin-top: 2px;
+          height: 23px;
+          @include activity-title(18px, 23px);
+        }
       }
 
       div.stream-item-body {
@@ -558,8 +569,6 @@ div.stream-item {
         @include OC_Body_Book();
         line-height: 20px;
         overflow: hidden;
-        white-space: pre-wrap;
-        word-break: break-word;
 
         max-height: #{20 * 2}px;
 
@@ -748,7 +757,7 @@ div.stream-item {
             &:active, &:hover {
               background-color: var(--selected-row-background-color);
               div.stream-item-attachments-item-desc {
-                color: var(--selected-row-background-color);
+                color: var(--selected-row-color);
               }
             }
 
