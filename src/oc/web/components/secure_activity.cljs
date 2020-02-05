@@ -17,6 +17,7 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
@@ -56,7 +57,7 @@
                                (utils/after 2000 #(activity-actions/send-secure-item-seen-read))
                                s)}
   [s]
-  (let [activity-data (drv/react s :secure-activity-data)
+  (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
         add-comment-highlight (drv/react s :add-comment-highlight)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -80,6 +81,8 @@
         activity-link (utils/link-for (:links org-data) "activity")]
     [:div.secure-activity-container
       (login-overlays-handler)
+      (when is-showing-alert
+        (alert-modal))
       (when activity-data
         [:div.activity-header.group
           (org-avatar org-data activity-link (if is-mobile? :never :always))
