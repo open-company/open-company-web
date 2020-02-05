@@ -140,6 +140,7 @@
             (str (jwt/get-key :first-name) " " (jwt/get-key :last-name))]
           (when-not is-mobile?
             (user-avatar-image current-user-data))]
+        ;; Profile
         (when (and (jwt/jwt)
                    (not is-mobile?))
           [:a
@@ -147,6 +148,7 @@
              :on-click (partial user-profile-click s)}
             [:div.oc-menu-item.personal-profile
               "My profile"]])
+        ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))
           [:a
@@ -154,8 +156,11 @@
              :on-click (partial notifications-settings-click s)}
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
-        (when-not is-mobile?
+        ;; Theme switcher separator
+        (when (and (jwt/jwt)
+                   (not is-mobile?))
           [:div.oc-menu-separator])
+        ;; Theme switcher
         [:div.ui-theme-switch
           [:span.ui-theme-icon.light
             {:class (when (not= (:computed-value ui-theme-data) :dark) "active")
@@ -174,7 +179,11 @@
                :data-placement "top"
                :data-container "body"}
               "Auto"])]
-        [:div.oc-menu-separator]
+        ;; Reminders separator
+        (when (and show-reminders?
+                   (not is-mobile?))
+          [:div.oc-menu-separator])
+        ;; Reminders
         (when (and show-reminders?
                    (not is-mobile?))
           [:a
@@ -182,8 +191,13 @@
              :on-click #(reminders-click s %)}
             [:div.oc-menu-item.reminders
               "Recurring updates"]])
-        (when-not is-mobile?
+        ;; Settings separator
+        (when (and (not is-mobile?)
+                   (or org-slug
+                       show-invite-people?
+                       show-billing?))
           [:div.oc-menu-separator])
+        ;; Admin settings
         (when (and (not is-mobile?)
                    (= user-role :admin)
                    org-slug)
@@ -192,6 +206,7 @@
              :on-click #(team-settings-click s %)}
             [:div.oc-menu-item.digest-settings
               "Admin settings"]])
+        ;; Invite
         (when (and (not is-mobile?)
                    show-invite-people?)
           [:a
@@ -199,6 +214,7 @@
              :on-click #(invite-team-click s %)}
             [:div.oc-menu-item.invite-team
               "Invite people"]])
+        ;; Manage team
         (when (and (not is-mobile?)
                    org-slug)
           [:a
@@ -208,6 +224,7 @@
               (if (= user-role :admin)
                 "Manage team"
                 "View team")]])
+        ;; Integrations
         (when (and (not is-mobile?)
                    org-slug
                    (= user-role :admin))
@@ -216,6 +233,7 @@
              :on-click #(integrations-click s %)}
             [:div.oc-menu-item.team-integrations
               "Integrations"]])
+        ;; Billing
         (when (and (not is-mobile?)
                    show-billing?)
           [:a.payments
@@ -223,8 +241,9 @@
              :on-click payments-click}
             [:div.oc-menu-item
               "Billing"]])
-        (when-not is-mobile?
-          [:div.oc-menu-separator])
+        ;; What's new & Support separator
+        [:div.oc-menu-separator]
+        ;; What's new
         [:a.whats-new-link
           (if ua/mobile?
             {:href "https://carrot.news/"
@@ -232,11 +251,13 @@
             {:on-click (partial whats-new-click s)})
           [:div.oc-menu-item.whats-new
             "What’s new"]]
+        ;; Support
         [:a
           {:class "intercom-chat-link"
            :href "mailto:hello@carrot.io"}
           [:div.oc-menu-item.support
             "Get support"]]
+        ;; Mobile billing
         (when (and is-mobile?
                    show-billing?)
           [:a.payments
@@ -244,6 +265,7 @@
              :on-click payments-click}
             [:div.oc-menu-item
               "Billing"]])
+        ;; Desktop app
         (when desktop-app-data
           [:a
             {:href (:href desktop-app-data)
@@ -251,7 +273,9 @@
             [:div.oc-menu-item.native-app
               (:title desktop-app-data)
               [:span.beta "BETA"]]])
+        ;; Logout separator
         [:div.oc-menu-separator]
+        ;; Logout
         (if (jwt/jwt)
           [:a.sign-out
             {:href oc-urls/logout :on-click (partial logout-click s)}
@@ -260,8 +284,10 @@
           [:a {:href "" :on-click (partial sign-in-sign-up-click s)}
             [:div.oc-menu-item
               "Sign in / Sign up"]])
+        ;; Version separator
         (when ua/pseudo-native?
           [:div.oc-menu-separator])
+        ;; Version
         (when ua/pseudo-native?
           [:div.oc-menu-item.app-version
              app-version])]]))
