@@ -153,7 +153,7 @@
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
                           (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
-            "Sign up"]]
+            "Continue"]]
         [:div.footer-link
           "Already have an account?"
           [:a {:href (if ua/pseudo-native?

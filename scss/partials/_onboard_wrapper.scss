@@ -39,6 +39,7 @@ div.onboard-wrapper-container {
       display: block;
       position: fixed;
       bottom: 0;
+      pointer-events: none;
 
       div.onboard-box {
         background-image: cdnUrl("/img/ML/onboard_box.svg");
