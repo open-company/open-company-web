@@ -57,6 +57,7 @@ div.search-box {
       @include mobile() {
         width: 100%;
         left: unset;
+        padding: 10px 14px 10px 32px;
       }
 
       &:before {
@@ -240,7 +241,7 @@ div.search-history {
     max-width: 100%;
 
     @include mobile() {
-      padding: 8px 0 8px 36px;
+      padding: 8px 0 8px 32px;
       background-position: left 10px top 11px;
     }
 
