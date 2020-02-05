@@ -384,8 +384,7 @@
                    mixins/refresh-tooltips-mixin
                    ;; Go back to collapsed state on desktop if user didn't touch anything
                    (when-not (responsive/is-mobile-size?)
-                     (mixins/on-window-click-mixin (fn [s e]
-                      (collapse-if-needed s e))))
+                     (mixins/on-window-click-mixin collapse-if-needed))
                    ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
                    ;; conflicts with the collapse cmail listener
                    (mixins/on-window-click-mixin (fn [s e]
@@ -758,7 +757,7 @@
               (when (false? (:auto-saving cmail-data))
                 [:div.saving-saved "Saved"])))]
         [:div.cmail-footer
-          (when (not is-fullscreen?)
+          (when-not is-fullscreen?
             [:div.dismiss-inline-cmail-container
               {:class (when long-tooltip "long-tooltip")}
               [:button.mlb-reset.dismiss-inline-cmail
