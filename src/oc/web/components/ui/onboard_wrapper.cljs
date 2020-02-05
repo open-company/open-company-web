@@ -67,7 +67,7 @@
                :aria-label "Back"}])
           [:div.mobile-logo]]
         [:div.title.main-lander
-          "Create an account"]]
+          "Let’s get started!"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -1121,9 +1121,6 @@
     (loading {:loading (drv/react s :ap-loading)})
     [:div.onboard-wrapper
       {:class (str "onboard-" (name component))}
-      [:div.onboard-wrapper-left
-        [:div.onboard-wrapper-logo]
-        [:div.onboard-wrapper-left-inner
-          [:div.onboard-wrapper-box]]]
-      [:div.onboard-wrapper-right
-        (get-component component)]]])
+      (get-component component)
+      [:div.bottom-gradient.big-web-only
+        [:div.onboard-box]]]])

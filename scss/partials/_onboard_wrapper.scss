@@ -1,4 +1,9 @@
 div.onboard-wrapper-container {
+  background-color: $grey_num_2;
+
+  @include mobile() {
+    background-color: white;
+  }
 
   div.oc-loading {
     width: 100vw;
@@ -6,89 +11,42 @@ div.onboard-wrapper-container {
     position: fixed;
   }
 
+  @include big_web() {
+  }
+
   div.onboard-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    display: flex;
+    width: 720px;
+    margin: 0 auto;
+    background-color: white;
+    text-align: center;
+    box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+    min-height: 100vh;
 
-    @include mobile(){
+    @include mobile() {
+      width: 100%;
+      box-shadow: unset;
+      margin: 0;
+    }
+
+    div.bottom-gradient {
+      width: 944px;
+      height: 220px;
+      margin-left: -112px;
+      margin-top: -50px;
+      background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
       display: block;
-      background-color: white;
-    }
+      position: relative;
 
-    div.onboard-wrapper-left {
-      background-color: $carrot_dark_bg_gray;
-      padding: 21px;
-      flex: 1;
-      // position: absolute;
-      position: fixed;
-      top: 0px;
-      bottom: 0px;
-      left: 0px;
-      width: 50%;
-      height: 100%;
-      display: table;
-
-      @include mobile(){
-        display: none;
-      }
-
-      div.onboard-wrapper-logo {
-        width: 82px;
-        height: 20px;
-        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
-        background-size: 82px 20px;
+      div.onboard-box {
+        background-image: cdnUrl("/img/ML/onboard_box.svg");
+        background-position: center;
         background-repeat: no-repeat;
+        background-size: 229px 234px;
+        width: 229px;
+        height: 234px;
         position: absolute;
-        left: 21px;
-        top: 21px;
-      }
-
-      div.onboard-wrapper-left-inner {
-        // display: table-cell;
-        // vertical-align: middle;
-        // text-align: center;
-
-        div.onboard-wrapper-box {
-          width: 294px;
-          height: 301px;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          @include image-2x("/img/ML/carrot_box");
-          background-size: 294px 301px;
-          background-repeat: no-repeat;
-
-          &.sad-search {
-            width: 240px;
-            height: 240px;
-            background-image: cdnUrl("/img/ML/sad_search.svg");
-            background-size: 240px 240px;
-            transition: all 180ms ease-in;
-          }
-        }
-      }
-    }
-
-    div.onboard-wrapper-right {
-      text-align: center;
-      flex: 1;
-      position: absolute;
-      top: 0px;
-      bottom: 0px;
-      right: 0px;
-      width: 50%;
-      background-color: $grey_num_2;
-
-      @include mobile(){
-        flex: unset;
-        width: 100%;
-        position: unset;
-        background-color: white;
+        right: 6px;
+        top: -13px;
       }
     }
   }
@@ -184,14 +142,28 @@ div.onboard-lander {
   div.main-cta {
 
     div.mobile-header {
-      display: none;
+      position: relative;
+
+      button.top-back-button {
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: rgba($deep_navy, 0.1);
+        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+        background-size: 14px 10px;
+        border-radius: 4px;
+        position: absolute;
+        top: 24px;
+        left: 24px;
+      }
 
       button.top-continue {
         display: none;
       }
 
       @include mobile() {
-        display: block;
         margin-top: 0px;
         height: 54px;
         text-align: center;
@@ -218,16 +190,8 @@ div.onboard-lander {
         }
 
         button.top-back-button {
-          display: block;
-          width: 32px;
-          height: 32px;
-          background-position: center;
-          background-repeat: no-repeat;
           background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
           background-size: 12px 12px;
-          background-color: $ultra_light_grey;
-          border-radius: 4px;
-          position: absolute;
           top: 16px;
           left: 16px;
         }
@@ -255,11 +219,10 @@ div.onboard-lander {
     }
 
     div.title {
-      font-family: "PT Serif";
-      font-weight: 700;
+      @include OC_Body_Bold();
       font-size: 32px;
-      line-height: 42px;
-      margin-top: 64px;
+      line-height: 41px;
+      padding-top: 64px;
       color: $deep_navy;
 
       @include mobile() {
@@ -361,7 +324,7 @@ div.onboard-lander {
     }
 
     button.signup-with-slack {
-      margin-top: 35px;
+      margin-top: 40px;
 
       @include mobile() {
         margin-top: 24px;
@@ -375,8 +338,8 @@ div.onboard-lander {
     button.signup-with-slack, button.signup-with-google {
       width: 340px;
       height: 40px;
-      border: 1px solid rgba($light_navy, 0.5);
-      color: $light_navy;
+      background-color: rgba($deep_navy, 0.1);
+      color: $deep_navy;
       border-radius: 6px;
       text-align: center;
       @include OC_Body_Bold();
@@ -437,7 +400,7 @@ div.onboard-lander {
         text-align: center;
         @include OC_Body_Book();
         font-size: 14px;
-        color: rgba($light_navy, 0.5);
+        color: rgba($deep_navy, 0.5);
         margin: 0 auto;
       }
     }
@@ -587,7 +550,7 @@ div.onboard-lander {
     div.field-label {
       @include OC_Body_Book();
       font-size: 14px;
-      color: $light_navy;
+      color: $deep_navy;
       margin-top: 24px;
 
       &.email-field {
@@ -665,7 +628,7 @@ div.onboard-lander {
 
     div.field-description {
       @include OC_Body_Book();
-      color: rgba($light_navy, 0.5);
+      color: rgba($deep_navy, 0.5);
       font-size: 12px;
       margin: 16px auto 0;
       width: 249px;
@@ -673,15 +636,17 @@ div.onboard-lander {
 
       a {
         text-decoration: underline;
-        color: rgba($light_navy, 0.5);
+        color: rgba($deep_navy, 0.5);
       }
     }
 
     div.footer-link {
       margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid $divider_line_grey;
       @include OC_Body_Book();
       font-size: 16px;
-      color: $light_navy;
+      color: $deep_navy;
       line-height: 20px;
       text-align: center;
 
@@ -887,7 +852,7 @@ div.onboard-lander {
       text-align: center;
       @include OC_Body_Book();
       font-size: 16px;
-      color: $light_navy;
+      color: $deep_navy;
       margin: 24px 0 0;
 
       button.logout-cancel {
