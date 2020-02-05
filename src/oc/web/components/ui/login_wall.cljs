@@ -40,11 +40,14 @@
       [:div.login-wall-container
         (login-overlays-handler)
         [:div.login-wall-wrapper
-          [:div.login-wall-left
-            [:div.login-wall-logo]
-            [:div.login-wall-box]]
-          [:div.login-wall-right
-            [:div.login-wall-right-content
+          [:div.login-wall-internal
+            (when-not ua/desktop-app?
+              [:a.login-wall-back-arrow
+                {:href oc-urls/home
+                 :on-click #(do
+                             (.preventDefault %)
+                             (router/redirect! oc-urls/home))}])
+            [:div.login-wall-content
               [:div.login-overlay-cta.group
                 (when ua/mobile-app?
                   [:button.mlb-reset.top-back-button
@@ -112,7 +115,7 @@
                 [:form.sign-in-form
                   [:div.fields-container.group
                     [:div.field-label
-                      "Work Email"]
+                      "Work email"]
                     [:input.field-content.email
                       {:type "email"
                        :name "email"
@@ -138,10 +141,13 @@
                     "Log in"]
                   [:div.footer-link
                     "Don't have an account yet?"
-                    [:a
-                      {:href oc-urls/sign-up
-                       :on-click (fn [e]
-                                   (utils/event-stop e)
-                                   (router/nav! oc-urls/sign-up))}
-                      "Sign up here"]]]
-               ]]]]])))
+                    [:div.footer-link-inner
+                      [:a
+                        {:href oc-urls/sign-up
+                         :on-click (fn [e]
+                                     (utils/event-stop e)
+                                     (router/nav! oc-urls/sign-up))}
+                        "Sign up here"]]]]
+               ]]
+              [:div.bottom-gradient.big-web-only
+                [:div.login-box]]]]])))

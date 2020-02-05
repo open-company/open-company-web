@@ -156,15 +156,16 @@
             "Continue"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href (if ua/pseudo-native?
-                       oc-urls/native-login
-                       oc-urls/login)
-               :on-click (fn [e]
-                           (utils/event-stop e)
-                           (router/nav! (if ua/pseudo-native?
-                            oc-urls/native-login
-                            oc-urls/login)))}
-           "Sign in"]]]]))
+          [:div
+            [:a {:href (if ua/pseudo-native?
+                         oc-urls/native-login
+                         oc-urls/login)
+                 :on-click (fn [e]
+                             (utils/event-stop e)
+                             (router/nav! (if ua/pseudo-native?
+                              oc-urls/native-login
+                              oc-urls/login)))}
+             "Sign in"]]]]]))
 
 (defn- profile-setup-team-data
   ""

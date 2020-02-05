@@ -15,63 +15,72 @@ div.login-wall-container {
       display: block;
     }
 
-    div.login-wall-left {
-      background-color: $carrot_dark_bg_gray;
-      padding: 21px;
-      flex: 1;
-      position: absolute;
-      position: fixed;
-      top: 0px;
-      bottom: 0px;
-      left: 0px;
-      width: 50%;
-
-      @include mobile(){
-        display: none;
-      }
-
-      div.login-wall-logo {
-        width: 82px;
-        height: 20px;
-        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
-        background-size: 82px 20px;
-        background-repeat: no-repeat;
-      }
-
-      div.login-wall-box {
-        position: absolute;
-        left: 50%;
-        top: 201px;
-        margin-left: -147px;
-        margin-top: 0px;
-        width: 294px;
-        height: 301px;
-        @include image-2x("/img/ML/carrot_box");
-        background-size: 294px 301px;
-        background-repeat: no-repeat;
-      }
-    }
-
-    div.login-wall-right {
+    div.login-wall-internal {
+      width: 720px;
+      margin: 0 auto;
+      background-color: white;
       text-align: center;
-      flex: 1;
-      position: absolute;
-      top: 0px;
-      bottom: 0px;
-      right: 0px;
-      width: 50%;
-      background-color: $grey_num_2;
+      box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+      padding-bottom: 180px;
+      min-height: calc(64px + 582px + 180px); // Top padding + form height + bottom gradient
+      position: relative;
 
-      @include mobile(){
+      @include mobile() {
+        width: 100%;
+        box-shadow: unset;
+        margin: 0;
         flex: unset;
         width: 100%;
         position: unset;
         background-color: white;
       }
 
-      div.login-wall-right-content {
-        margin: 64px auto;
-        width: 340px;
+      a.login-wall-back-arrow {
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: rgba($deep_navy, 0.1);
+        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+        background-size: 14px 10px;
+        border-radius: 4px;
+        position: absolute;
+        top: 24px;
+        left: 24px;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+
+      div.bottom-gradient {
+        width: 944px;
+        height: 220px;
+        margin-left: -112px;
+        margin-top: -50px;
+        background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
+        display: block;
+        position: fixed;
+        bottom: 0;
+        pointer-events: none;
+
+        div.login-box {
+          background-image: cdnUrl("/img/ML/onboard_box.svg");
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: 229px 234px;
+          width: 229px;
+          height: 234px;
+          position: absolute;
+          right: 6px;
+          top: -13px;
+        }
+      }
+
+      div.login-wall-content {
+        margin: 64px auto 32px;
+        width: 320px;
         text-align: center;
 
         @include mobile() {
@@ -111,6 +120,7 @@ div.login-wall-container {
             @include OC_Body_Bold();
             font-size: 32px;
             color: $deep_navy;
+            line-height: 41px;
             text-transform: none;
           }
 
@@ -135,7 +145,7 @@ div.login-wall-container {
         }
 
         button.signup-with-slack {
-          margin-top: 32px;
+          margin-top: 40px;
 
           @include mobile() {
             margin-top: 24px;
@@ -143,7 +153,7 @@ div.login-wall-container {
         }
 
         button.signup-with-google {
-          margin-top: 16px;
+          margin-top: 8px;
 
           @include mobile() {
             margin-top: 8px;
@@ -151,15 +161,14 @@ div.login-wall-container {
         }
 
         button.signup-with-slack, button.signup-with-google {
-          width: 340px;
+          width: 320px;
           height: 40px;
-          border: 1px solid rgba($light_navy, 0.5);
-          color: $light_navy;
+          background-color: rgba($deep_navy, 0.1);
+          color: $deep_navy;
           border-radius: 6px;
           text-align: center;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $deep_navy;
           line-height: 18px;
           position: relative;
           opacity: 1;
@@ -203,7 +212,7 @@ div.login-wall-container {
 
         div.or-login {
           width: 100%;
-          height: 19px;
+          height: 18px;
           margin-top: 24px;
           position: relative;
 
@@ -211,13 +220,14 @@ div.login-wall-container {
             text-align: center;
             @include OC_Body_Book();
             font-size: 14px;
-            color: rgba($light_navy, 0.5);
+            line-height: 18px;
+            color: rgba($deep_navy, 0.5);
             margin: 0 auto;
           }
         }
 
         div.fields-container {
-          width: 340px;
+          width: 320px;
           margin: 16px auto 0px;
           text-align: left;
 
@@ -228,7 +238,7 @@ div.login-wall-container {
           div.field-label {
             @include OC_Body_Book();
             font-size: 14px;
-            color: $light_navy;
+            color: $deep_navy;
             margin-top: 16px;
             margin-bottom: 0;
           }
@@ -267,16 +277,19 @@ div.login-wall-container {
           }
 
           div.forgot-password {
-            margin-top: 8px;
+            margin-top: 16px;
             float: right;
+            height: 15px;
 
             a {
               @include OC_Body_Book();
+              padding: 0;
+              margin: 0;
               font-size: 12px;
-              line-height: 1.5;
-              color: rgba($light_navy, 0.5);
               line-height: 15px;
+              color: rgba($deep_navy, 0.5);
               text-decoration: none;
+              vertical-align: super;
 
               &:hover {
                 text-decoration: underline;
@@ -286,7 +299,7 @@ div.login-wall-container {
         }
 
         button.continue-btn {
-          margin-top: 32px;
+          margin-top: 47px;
           outline: none;
           border: none;
           width: 100%;
@@ -311,16 +324,21 @@ div.login-wall-container {
 
         div.footer-link {
           margin-top: 24px;
+          padding-top: 24px;
+          border-top: 1px solid $divider_line_grey;
           @include OC_Body_Book();
           font-size: 16px;
-          color: $light_navy;
+          color: $deep_navy;
           text-align: center;
+
+          div.footer-link-inner {
+
+          }
 
           a {
             @include OC_Body_Book();
             font-size: 16px;
             color: $carrot_green;
-            margin-left: 4px;
 
             &:hover {
               text-decoration: underline;
