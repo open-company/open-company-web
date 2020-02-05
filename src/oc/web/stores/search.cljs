@@ -36,11 +36,6 @@
                 (assoc result :_source (assoc source :uuid new-uuid))))
             results)))
 
-(defmethod dispatcher/action :search-query
-  [db [_ search-query]]
-  (dissoc db search-key))
-
-
 (defmethod dispatcher/action :search-query/start
   [db [_ search-query]]
   (assoc-in db [search-key :loading] true))

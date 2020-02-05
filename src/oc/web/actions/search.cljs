@@ -33,9 +33,6 @@
       (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
       #{})))
 
-(defn query-change [search-query]
-  (dispatcher/dispatch! [:search-query/change search-query]))
-
 (defn query
   "Use the search service to query for results."
   [search-query]

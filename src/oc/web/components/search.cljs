@@ -215,7 +215,6 @@
              :on-focus #(search/active)
              :on-change (fn [e]
                           (let [v (.-value (.-target e))]
-                            (search/query-change v)
                             (reset! (::query s) v)
                             ;; Auto search
                             (debounced-auto-search! s)))
