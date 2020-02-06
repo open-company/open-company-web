@@ -74,7 +74,7 @@ div.stream-item {
     &:hover {
       background-color: var(--foc-hover-color);
       z-index: 2;
-      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
       border-radius: 4px;
       padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
       width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
@@ -93,6 +93,12 @@ div.stream-item {
 
       div.activity-share-container {
         display: block;
+      }
+
+      div.stream-item-body-ext div.stream-item-footer {
+        div.reactions div.reactions-picker-container {
+          display: block;
+        }
       }
     }
   }
@@ -114,7 +120,7 @@ div.stream-item {
       &:hover {
         background-color: var(--foc-new-color);
         z-index: 2;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
         border-radius: 4px;
         border-top: 1px solid var(--foc-new-border-color);
         border-right: 1px solid var(--foc-new-border-color);
@@ -650,6 +656,8 @@ div.stream-item {
         margin-right: 14px;
 
         div.reactions-picker-container {
+          display: none;
+
           div.emoji-mart {
             bottom: unset;
             top: 0;

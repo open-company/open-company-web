@@ -46,6 +46,7 @@ $dark_mode: "dark";
   --foc-menu-gradient-to: #{rgba(241, 240, 240, 0)};
   --foc-new-menu-gradient-from: white;
   --foc-new-menu-gradient-to: #{rgba(white, 0)};
+  --foc-box-shadow: rgba(0, 0, 0, 0.1);
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba($light_navy, 0.1)};
@@ -69,7 +70,7 @@ $dark_mode: "dark";
   --cmail-section-bt-color: white;
   --cmail-me-separator: rgba(255, 255, 255, 0.3);
   --cmail-collapsed-background-color: white;
-  --cmail-box-shadow: rgba(0, 0, 0, 0.07);
+  --cmail-box-shadow: rgba(0, 0, 0, 0.1);
   --cmail-qp-outer-border: #{rgba($deep_navy, 0.2)};
 
   // User dropdown
@@ -122,6 +123,7 @@ $dark_mode: "dark";
   --foc-menu-gradient-to: #{rgba(36, 41, 50, 0)};
   --foc-new-menu-gradient-from: #{rgba(45, 49, 59, 1)};
   --foc-new-menu-gradient-to: #{rgba(45, 49, 59, 0)};
+  --foc-box-shadow: rgba(255, 255, 255, 0.14);
 
   //Navigation item
   --navigation-sidebar-count-bg: #{rgba(white, 0.09)};
@@ -145,7 +147,7 @@ $dark_mode: "dark";
   --cmail-section-bt-color: white;
   --cmail-me-separator: #{rgba($deep_navy, 0.3)};
   --cmail-collapsed-background-color: #{rgba(white, 0.09)};
-  --cmail-box-shadow: rgba(255, 255, 255, 0.07);
+  --cmail-box-shadow: rgba(255, 255, 255, 0.14);
   --cmail-qp-outer-border: #{rgba(white, 0.16)};
 
   // User dropdown
