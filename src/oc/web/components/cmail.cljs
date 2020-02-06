@@ -588,7 +588,8 @@
       {:class (utils/class-set {:fullscreen is-fullscreen?
                                 :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
                                 :show-trial-expired-alert show-paywall-alert?})
-       :on-click (when (and (:collapsed cmail-state)
+       :on-click (when (and (not is-mobile?)
+                            (:collapsed cmail-state)
                             (not show-paywall-alert?))
                    (fn [e]
                       (nux-actions/dismiss-add-post-tooltip)
