@@ -88,14 +88,6 @@ div.cmail-outer {
                 margin-top: 0;
                 min-height: 24px;
               }
-
-              div.medium-editor-media-picker {
-                div.media-picker-container {
-                  button.media.media-gif, button.media.media-video, button.media.media-photo {
-                    display: none;
-                  }
-                }
-              }
             }
           }
 
@@ -107,19 +99,6 @@ div.cmail-outer {
 
       div.cmail-footer {
         display: none;
-      }
-    }
-
-    &:hover {
-      div.cmail-container div.cmail-content-outer div.cmail-content
-      div.rich-body-editor-outer-container div.rich-body-editor-container {
-        div.medium-editor-media-picker {
-          div.media-picker-container {
-            button.media.media-gif, button.media.media-video, button.media.media-photo {
-              display: block;
-            }
-          }
-        }
       }
     }
   }
