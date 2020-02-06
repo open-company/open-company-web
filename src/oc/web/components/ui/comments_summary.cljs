@@ -63,7 +63,9 @@
         {:on-click (fn [e]
                      ;; To avoid navigating to the post again and lose the coming from data
                      ;; nav only when not in the expanded post
-                     (when-not (seq (router/current-activity-id))
+                     (if (seq (router/current-activity-id))
+                       (when-let [add-comment-div (.querySelector js/document "div.add-comment")]
+                         (.scrollIntoView add-comment-div #js {:behavior "smooth" :block "center"}))
                        (nav-actions/open-post-modal entry-data true))
                      (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
