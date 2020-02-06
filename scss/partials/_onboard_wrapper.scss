@@ -28,6 +28,8 @@ div.onboard-wrapper-container {
       width: 100%;
       box-shadow: unset;
       margin: 0;
+      min-height: unset;
+      padding-bottom: 32px;
     }
 
     div.bottom-gradient {
@@ -113,14 +115,15 @@ div.onboard-email-container {
   }
 
   button.continue {
-    margin-top: 16px;
     width: 170px;
     height: 42px;
     background-color: $sea_blue;
     color: white;
     @include OC_Body_Bold();
     font-size: 16px;
-    border-radius: 4px;
+    line-height: 20px;
+    padding: 10px 24px;
+    border-radius: 6px;
     outline: none;
     border: none;
 
@@ -140,12 +143,12 @@ div.onboard-lander {
   text-align: center;
 
   @include mobile() {
-    padding: 104px 16px 24px;
+    padding: 0 16px;
   }
 
   div.main-cta {
 
-    div.mobile-header {
+    div.onboard-lander-header {
       position: fixed;
       top: 0;
       left: 50%;
@@ -171,33 +174,12 @@ div.onboard-lander {
       }
 
       @include mobile() {
-        margin-top: 0px;
-        height: 54px;
-        text-align: center;
-        width: 100%;
-        border-bottom: 1px solid $divider_line_grey;
-        background-color: white;
         z-index: 1031;
         left: 0;
         margin-left: 0;
-
-        div.mobile-logo {
-          position: absolute;
-          top: 8px;
-          left: 50%;
-          margin-left: -9px;
-          background-image: cdnUrl("/img/ML/carrot_logo.svg");
-          background-size: 18px 32px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 18px;
-          height: 32px;
-          display: block;
-        }
+        position: absolute;
 
         button.top-back-button {
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
           top: 16px;
           left: 16px;
         }
@@ -233,8 +215,8 @@ div.onboard-lander {
 
       @include mobile() {
         margin-top: 0px;
-        padding-top: 32px;
-        font-size: 24px;
+        padding-top: 61px;
+        font-size: 30px;
         margin: 0 auto;
       }
     }
@@ -264,14 +246,16 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 20px;
+      margin-top: 24px;
       width: 170px;
-      height: 42px;
+      height: 40px;
       background-color: $sea_blue;
       color: white;
       @include OC_Body_Bold();
       font-size: 16px;
-      border-radius: 4px;
+      line-height: 20px;
+      padding: 10px 24px;
+      border-radius: 6px;
       outline: none;
       border: none;
 
@@ -331,10 +315,6 @@ div.onboard-lander {
 
     button.signup-with-slack {
       margin-top: 40px;
-
-      @include mobile() {
-        margin-top: 24px;
-      }
     }
 
     button.signup-with-google {
@@ -397,10 +377,6 @@ div.onboard-lander {
       height: 18px;
       margin-top: 24px;
       position: relative;
-
-      @include mobile() {
-        margin-top: 16px;
-      }
 
       div.or-with-email-copy {
         text-align: center;
@@ -557,6 +533,7 @@ div.onboard-lander {
     div.field-label {
       @include OC_Body_Book();
       font-size: 14px;
+      line-height: 20px;
       color: $deep_navy;
       margin-top: 16px;
 
@@ -665,23 +642,24 @@ div.onboard-lander {
 
     input.field {
       width: 100%;
-      height: 32px;
+      height: 40px;
       border-radius: 4px;
-      background-color: $ultra_light_grey;
+      background-color: rgba($deep_navy, 0.1);
+      border: 1px solid transparent;
       border: none;
       outline: none;
-      padding: 7px 8px;
+      padding: 11px 16px;
       position: relative;
       @include OC_Body_Book();
       font-size: 14px;
       color: $deep_navy;
       line-height: 18px;
-      letter-spacing: 0.2px;
       margin-top: 8px;
 
       @include placeholder() {
         @include OC_Body_Book();
         font-size: 14px;
+        line-height: 18px;
         color: rgba($deep_navy, 0.5);
       }
 
@@ -813,21 +791,25 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 32px;
       outline: none;
       border: none;
       width: 100%;
-      height: 48px;
+      height: 40px;
       background-color: $carrot_orange;
       color: white;
       @include OC_Body_Bold();
-      font-size: 18px;
-      line-height: 23px;
+      font-size: 16px;
+      line-height: 20px;
       border-radius: 6px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 4px 64px;
+      padding: 10px 24px;
+      margin-top: 24px;
+
+      @include mobile() {
+        width: 100%;
+      }
 
       &.start-using-carrot {
         background-color: $carrot_orange_2;
@@ -872,7 +854,7 @@ div.onboard-lander {
         border-bottom: none;
         position: absolute;
 
-        div.mobile-logo {
+        div.onboard-lander-header {
           width: 36px;
           height: 64px;
           background-size: 36px 64px;
@@ -884,10 +866,8 @@ div.onboard-lander {
       }
 
       div.title {
-        padding-top: 0;
-        margin-top: 16px;
         @include OC_Body_Bold();
-        font-size: 32px;
+        font-size: 30px;
         line-height: 41px;
         color: $deep_navy;
       }
@@ -915,22 +895,6 @@ div.onboard-lander {
 
       div.field-label.name-fields {
         margin-top: 0;
-      }
-
-      button.continue {
-        margin-top: 40px;
-      }
-    }
-  }
-
-  &.lander-team {
-    div.onboard-form {
-      button.continue {
-        margin-top: 18px;
-
-        @include mobile() {
-          margin-top: 32px;
-        }
       }
     }
   }
@@ -1085,7 +1049,6 @@ div.onboard-lander {
 
       button.continue {
         padding: 7px;
-        margin-top: 32px;
 
         @include mobile() {
           margin-bottom: 0px;

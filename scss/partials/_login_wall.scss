@@ -32,7 +32,8 @@ div.login-wall-container {
         flex: unset;
         width: 100%;
         position: unset;
-        background-color: white;
+        padding-bottom: 32px;
+        min-height: unset;
       }
 
       a.login-wall-back-arrow {
@@ -50,7 +51,8 @@ div.login-wall-container {
         left: 24px;
 
         @include mobile() {
-          display: none;
+          top: 16px;
+          left: 16px;
         }
       }
 
@@ -99,29 +101,17 @@ div.login-wall-container {
         div.login-overlay-cta {
           text-align: center;
 
-          @include mobile() {
-            width: 100vw;
-            margin-left: -16px;
-            height: 124px;
-            border: none;
-          }
-
-          div.login-logo {
-            margin: 40px auto 16px;
-            width: 36px;
-            height: 64px;
-            background-image: cdnUrl("/img/ML/carrot_logo.svg");
-            background-size: 36px 64px;
-            background-position: center;
-            background-repeat: no-repeat;
-          }
-
           div.login-title {
             @include OC_Body_Bold();
             font-size: 32px;
             color: $deep_navy;
             line-height: 41px;
             text-transform: none;
+
+            @include mobile() {
+              font-size: 30px;
+              padding-top: 61px;
+            }
           }
 
           button.top-back-button {
@@ -146,10 +136,6 @@ div.login-wall-container {
 
         button.signup-with-slack {
           margin-top: 40px;
-
-          @include mobile() {
-            margin-top: 24px;
-          }
         }
 
         button.signup-with-google {
@@ -238,6 +224,7 @@ div.login-wall-container {
           div.field-label {
             @include OC_Body_Book();
             font-size: 14px;
+            line-height: 20px;
             color: $deep_navy;
             margin-top: 16px;
             margin-bottom: 0;
@@ -245,23 +232,24 @@ div.login-wall-container {
 
           input.field-content {
             width: 100%;
-            height: 32px;
+            height: 40px;
             border-radius: 4px;
-            background-color: $ultra_light_grey;
+            background-color: rgba($deep_navy, 0.1);
+            border: 1px solid transparent;
             border: none;
             outline: none;
-            padding: 7px 8px;
+            padding: 11px 16px;
             position: relative;
             @include OC_Body_Book();
             font-size: 14px;
             color: $deep_navy;
             line-height: 18px;
-            letter-spacing: 0.2px;
             margin-top: 8px;
 
             @include placeholder() {
               @include OC_Body_Book();
               font-size: 14px;
+              line-height: 18px;
               color: rgba($deep_navy, 0.5);
             }
 
@@ -299,26 +287,23 @@ div.login-wall-container {
         }
 
         button.continue-btn {
-          margin-top: 47px;
+          margin-top: 39px;
           outline: none;
           border: none;
           width: 100%;
-          height: 48px;
+          height: 40px;
           background-color: $carrot_orange;
           color: white;
           @include OC_Body_Bold();
-          font-size: 18px;
-          line-height: 23px;
+          font-size: 16px;
+          line-height: 20px;
+          padding: 10px 24px;
           border-radius: 6px;
 
           &.disabled, &:disabled {
             background-color: $light_ui_grey;
             color: white;
             opacity: 1 !important;
-          }
-
-          @include mobile() {
-            margin-top: 16px;
           }
         }
 
@@ -329,16 +314,15 @@ div.login-wall-container {
           @include OC_Body_Book();
           font-size: 16px;
           color: $deep_navy;
+          line-height: 20px;
           text-align: center;
-
-          div.footer-link-inner {
-
-          }
 
           a {
             @include OC_Body_Book();
             font-size: 16px;
             color: $carrot_green;
+            line-height: 20px;
+            margin-left: 4px;
 
             &:hover {
               text-decoration: underline;

@@ -59,13 +59,12 @@
         deep-link-origin (drv/react s :expo-deep-link-origin)]
     [:div.onboard-lander.lander
       [:div.main-cta
-        [:div.mobile-header
+        [:div.onboard-lander-header
           (when-not ua/mobile-app?
             [:button.mlb-reset.top-back-button
               {:on-touch-start identity
                :on-click #(router/history-back!)
-               :aria-label "Back"}])
-          [:div.mobile-logo]]
+               :aria-label "Back"}])]
         [:div.title.main-lander
           "Let’s get started!"]]
       [:div.onboard-form
@@ -303,8 +302,7 @@
                          (dis/dispatch! [:input [:org-editing :name] org-name])))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]
+        [:div.onboard-lander-header
           [:button.mlb-reset.top-continue
            {:class (when continue-disabled "disabled")
             :on-touch-start identity
@@ -492,8 +490,6 @@
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title.company-setup
           "Set up your company"]]
       [:div.onboard-form
@@ -644,8 +640,6 @@
         continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title
           "Invite your team"]
         [:div.subtitle
@@ -730,13 +724,12 @@
         (if (:team auth-settings)
           [:div
             [:div.main-cta
-              [:div.mobile-header
+              [:div.onboard-lander-header
                 (when-not ua/mobile-app?
                   [:button.mlb-reset.top-back-button
                     {:on-touch-start identity
                      :on-click #(router/history-back!)
-                     :aria-label "Back"}])
-                [:div.mobile-logo]]
+                     :aria-label "Back"}])]
               [:div.title-container
                 (when (seq (:logo-url team-data))
                   [:div.team-logo-container
@@ -803,8 +796,6 @@
                                 (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
                   (str "Join " (:name team-data))]]]]
           [:div.main-cta
-            [:div.mobile-header.mobile-only
-              [:div.mobile-logo]]
             [:div.invite-token-container.token-error
               [:div.title
                 "Oh oh..."]
@@ -813,8 +804,6 @@
                      "has been deactivated by your account admin "
                      "and is no longer valid.")]]])
         [:div.main-cta
-          [:div.mobile-header.mobile-only
-            [:div.mobile-logo]]
           [:div.invite-token-container
             [:div.title
               "Please wait"]
@@ -850,8 +839,6 @@
   (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.invite-container
           [:div.title
             "Join your team on Carrot"]
@@ -875,8 +862,6 @@
         invitation-confirmed (:invitation-confirmed collect-password)]
     [:div.onboard-lander.invitee-lander-password
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title
           "Set a password"]
         [:div.subtitle
@@ -947,8 +932,6 @@
         user-data (:user-data edit-user-profile)]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title.about-yourself
           "Tell us about you"]
         (when (:error edit-user-profile)
