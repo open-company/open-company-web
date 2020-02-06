@@ -164,7 +164,7 @@
                              (router/nav! (if ua/pseudo-native?
                               oc-urls/native-login
                               oc-urls/login)))}
-             "Sign in"]]]]]))
+             "Sign in here"]]]]]))
 
 (defn- profile-setup-team-data
   ""
