@@ -43,7 +43,7 @@
       (do
         (when (or (not auto-search?)
                   (> (count trimmed-query) 2))
-          (let [temp-history (-> (search-history) (utils/vec-dissoc trimmed-query))
+          (let [temp-history (utils/vec-dissoc (search-history) trimmed-query)
                 last-search (last temp-history)
                 temp-history* (if (and auto-search?
                                      (or ; User added one letter to the beginning
