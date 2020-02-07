@@ -147,6 +147,6 @@
                                      (utils/event-stop e)
                                      (router/nav! oc-urls/sign-up))}
                         "Sign up here"]]]]
-               ]]
-              [:div.bottom-gradient.big-web-only
-                [:div.login-box]]]]])))
+               ]]]
+            [:div.bottom-gradient.big-web-only
+              [:div.login-box]]]])))
