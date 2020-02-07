@@ -685,11 +685,16 @@ div.onboard-lander {
       padding: 11px 16px;
       position: relative;
       @include OC_Body_Book();
+      resize: auto;
       font-size: 14px;
       line-height: 18px;
       color: $deep_navy;
+      height: auto;
       margin-top: 8px;
       min-height: 40px;
+      min-width: 100%;
+      max-width: 100%;
+      max-height: 130px;
 
       &.has-value {
         color: $deep_navy;

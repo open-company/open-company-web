@@ -226,9 +226,11 @@
         user-data (:user-data edit-user-profile)
         continue-disabled (or @(::saving s)
                               (and (empty? (:first-name user-data))
-                                        (empty? (:last-name user-data)))
+                                   (empty? (:last-name user-data)))
                               (and (not has-org?)
-                                   (<= (count (clean-org-name (:name org-editing))) 1)))
+                                   (-> org-editing :name clean-org-name count (<= 1)))
+                              (and (not has-org?)
+                                   (-> org-editing :why-carrot utils/trim seq not)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
@@ -308,7 +310,7 @@
                :placeholder "We'd like Carrot to help with..."
                :class utils/hide-class
                :max-length 1024
-               :value (:why-carrot org-editing)
+               :value (or (:why-carrot org-editing) "")
                :rows "1"
                :on-change #(dis/dispatch! [:input [:org-editing :why-carrot] (.. % -target -value)])}])
           [:button.continue
@@ -372,7 +374,8 @@
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        continue-disabled (< (count (clean-org-name (:name org-editing))) 3)
+        continue-disabled (or (-> org-editing :name clean-org-name count (< 3))
+                              (-> org-editing :why-carrot utils/trim seq not))
         continue-fn #(when-not continue-disabled
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])
@@ -443,7 +446,7 @@
              :placeholder "We'd like Carrot to help with..."
              :class utils/hide-class
              :max-length 1024
-             :value (:why-carrot org-editing)
+             :value (or (:why-carrot org-editing) "")
              :rows "1"
              :on-change #(dis/dispatch! [:input [:org-editing :why-carrot] (.. % -target -value)])}]
           [:button.continue
