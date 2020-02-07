@@ -154,6 +154,12 @@ div.stream-item {
     }
   }
 
+  &.muted-item {
+    div.muted-activity {
+      display: inline-block;
+    }
+  }
+
   div.activity-share-container {
     display: none;
 
@@ -349,6 +355,10 @@ div.stream-item {
       div.bookmark-tag, div.must-see-tag {
         margin-top: 2px;
       }
+
+      div.muted-activity {
+        margin-top: 2px;
+      }
     }
 
     div.more-menu {
@@ -371,11 +381,13 @@ div.stream-item {
   
   @include bookmark-tag();
 
-  div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small {
+  @include muted-activity();
+
+  div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
     display: none;
   }
 
-  & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small {
+  & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small, & > div.muted-activity {
     margin-top: 16px;
   }
 

@@ -143,12 +143,16 @@ div.stream-collapsed-item {
     }
 
     &.bookmark-item div.stream-collapsed-item-fill div.bookmark-tag {
-        display: block;
-      }
+      display: block;
+    }
 
-      &.must-see-item div.stream-collapsed-item-fill div.must-see-tag {
-        display: block;
-      }
+    &.must-see-item div.stream-collapsed-item-fill div.must-see-tag {
+      display: block;
+    }
+
+    &.muted-item div.stream-collapsed-item-fill div.muted-activity {
+      display: block;
+    }
 
     div.stream-collapsed-item-fill {
       width: auto;
@@ -172,13 +176,19 @@ div.stream-collapsed-item {
 
       @include bookmark-tag();
 
-      div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag {
+      @include muted-activity();
+
+      div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag, div.muted-activity {
         display: none;
       }
 
-      div.bookmark-tag, div.must-see-tag {
+      div.bookmark-tag, div.must-see-tag, div.muted-activity {
         margin: 4px 0 0 4px;
         flex: 0 0 auto;
+      }
+
+      div.muted-activity {
+        margin-top: 5px;
       }
 
       div.stream-item-body {

@@ -208,6 +208,7 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (or (pos? (:new-comments-count activity-data))
                                                  (:unread activity-data))
+                                :muted-item (utils/link-for (:links activity-data) "follow")
                                 :expandable is-published?
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
@@ -288,7 +289,8 @@
                     (utils/foc-date-time t)])]]
             [:div.must-see-tag]
             [:div.bookmark-tag-small.mobile-only]
-            [:div.bookmark-tag.big-web-tablet-only]]]
+            [:div.bookmark-tag.big-web-tablet-only]
+            [:div.muted-activity]]]
         [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?
