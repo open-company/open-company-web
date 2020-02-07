@@ -695,6 +695,7 @@ div.onboard-lander {
       min-width: 100%;
       max-width: 100%;
       max-height: 130px;
+      resize: none;
 
       &.has-value {
         color: $deep_navy;

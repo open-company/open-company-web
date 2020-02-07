@@ -29,7 +29,29 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.shared.useragent :as ua]
             [goog.dom :as gdom]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
+
+(defn- autoresize-textarea [ref]
+  (let [lst (atom nil)]
+
+    (letfn [(autoresize [_e]
+              (this-as this
+                (utils/after 0
+                 #(do
+                    (js/console.log "DBG this" this)
+                    (set! (.. this -style -cssText) "height:auto;")
+                    (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))))]
+      {:did-mount (fn [s]
+       (reset! lst
+        (events/listen (rum/ref-node s ref) EventType/KEYDOWN autoresize))
+       s)
+       :will-unmount (fn [s]
+        (when @lst
+          (events/unlistenByKey @lst)
+          (reset! last nil))
+       s)})))
 
 (defn- clean-org-name [org-name]
   (string/trim org-name))
@@ -200,6 +222,7 @@
                                   (drv/drv :org-editing)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
+                                  (autoresize-textarea "why-carrot")
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
                                     (user-actions/user-profile-reset)
@@ -303,11 +326,11 @@
             [:div.error "Must be between 3 and 50 characters"])
           (when-not has-org?
             [:div.field-label.why-carrot
-              "How can Carrot help your team?"])
+              "Why you are giving Carrot a try?"])
           (when-not has-org?
             [:textarea.field.oc-input
               {:ref "why-carrot"
-               :placeholder "We'd like Carrot to help with..."
+               :placeholder "Help us with..."
                :class utils/hide-class
                :max-length 1024
                :value (or (:why-carrot org-editing) "")
