@@ -341,9 +341,25 @@ function isiPhoneWithoutPhysicalHomeBt(){
   return false;
 }
 
+var OCWebUIThemeNotAllowedPaths = ["pricing",
+                                   "about",
+                                   "press-kit",
+                                   "slack",
+                                   "terms",
+                                   "privacy",
+                                   "apps",
+                                   "404",
+                                   "sign-up",
+                                   "login",
+                                   "invite",
+                                   "reset",
+                                   "email-required",
+                                   "login-wall"];
+var OCWebUIThemeAllowedPathRegExp = new RegExp("^\/(" + OCWebUIThemeNotAllowedPaths.join("|") + "){0,1}?(\/|$)", "ig");
+
 function OCDarkModeEarlySetup(){
   var darkModeCookie = OCStaticGetCookie(OCStaticCookieName("ui-theme"));
-  if (!window.location.pathname.match(/^\/(\bsign\-up\b|\blogin\b)?(\/|$)/ig) &&
+  if (!window.location.pathname.match(OCWebUIThemeAllowedPathRegExp) &&
       (darkModeCookie === "dark" ||
        (darkModeCookie === "auto" &&
         window.matchMedia &&
