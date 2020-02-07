@@ -230,7 +230,7 @@
 
 ;; Allowed keys
 
-(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
+(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot])
 
 (def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
 
