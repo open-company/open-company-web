@@ -1,5 +1,9 @@
 div.onboard-wrapper-container {
-  background-color: $grey_num_2;
+  background-color: white;
+  box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+  min-height: 100vh;
+  width: 720px;
+  margin: 0 auto;
 
   @include mobile() {
     background-color: white;
@@ -11,17 +15,34 @@ div.onboard-wrapper-container {
     position: fixed;
   }
 
-  @include big_web() {
+  div.bottom-gradient {
+    width: 944px;
+    height: 27vh;
+    max-height: 220px;
+    margin-left: -112px;
+    margin-top: -50px;
+    background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
+    display: block;
+    position: fixed;
+    bottom: 0;
+    pointer-events: none;
+
+    div.onboard-box {
+      background-image: cdnUrl("/img/ML/onboard_box.svg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 229px 234px;
+      width: 229px;
+      height: 234px;
+      position: absolute;
+      right: 6px;
+      bottom: 0;
+    }
   }
 
   div.onboard-wrapper {
-    width: 720px;
-    margin: 0 auto;
-    background-color: white;
     text-align: center;
-    box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
-    padding-bottom: 180px;
-    min-height: calc(64px + 582px + 180px); // Top padding + form height + bottom gradient
+    padding-bottom: 16vh;
     position: relative;
 
     @include mobile() {
@@ -31,41 +52,17 @@ div.onboard-wrapper-container {
       min-height: unset;
       padding-bottom: 32px;
     }
-
-    div.bottom-gradient {
-      width: 944px;
-      height: 220px;
-      margin-left: -112px;
-      margin-top: -50px;
-      background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
-      display: block;
-      position: fixed;
-      bottom: 0;
-      pointer-events: none;
-
-      div.onboard-box {
-        background-image: cdnUrl("/img/ML/onboard_box.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 229px 234px;
-        width: 229px;
-        height: 234px;
-        position: absolute;
-        right: 6px;
-        top: -13px;
-      }
-    }
   }
 }
 
 div.onboard-email-container {
+  padding-top: 64px;
   width: 339px;
   @include OC_Body_Book();
   color: $carrot_gray;
   font-size: 32px;
   margin: 0 auto;
   position: relative;
-  top: 50%;
 
   &.small {
     font-size: 24px;
@@ -556,7 +553,7 @@ div.onboard-lander {
       }
 
       &.left-half-field-label, &.right-half-field-label {
-        width: calc(50% - 8px);
+        width: calc(50% - 4px);
 
         @include mobile() {
           width: 100%;
@@ -646,7 +643,6 @@ div.onboard-lander {
       border-radius: 4px;
       background-color: rgba($deep_navy, 0.1);
       border: 1px solid transparent;
-      border: none;
       outline: none;
       padding: 11px 16px;
       position: relative;
@@ -672,7 +668,7 @@ div.onboard-lander {
       }
 
       &.right-half-field, &.left-half-field {
-        width: calc(50% - 8px);
+        width: calc(50% - 4px);
 
         @include mobile() {
           width: 100%;
@@ -700,20 +696,28 @@ div.onboard-lander {
       width: 100%;
       height: 40px;
       border-radius: 4px;
-      background-color: white;
-      border: 1px solid $light_ui_grey;
+      background-color: rgba($deep_navy, 0.1);
+      border: 1px solid transparent;
+      border-radius: 4px;
       outline: none;
-      padding: 10px 16px;
+      padding: 11px 16px;
       position: relative;
       @include OC_Body_Book();
       font-size: 14px;
-      color: rgba($deep_navy, 0.5);
-      margin-top: 4px;
-      resize: none;
-      min-height: 100px;
+      line-height: 18px;
+      color: $deep_navy;
+      margin-top: 8px;
+      min-height: 76px;
 
       &.has-value {
         color: $deep_navy;
+      }
+
+      @include placeholder() {
+        color: rgba($deep_navy, 0.5);
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
       }
     }
 
@@ -889,10 +893,6 @@ div.onboard-lander {
     div.onboard-form {
       margin-top: 32px;
 
-      div.field-label.company-name {
-        margin-top: 24px;
-      }
-
       div.field-label.name-fields {
         margin-top: 0;
       }
@@ -903,7 +903,6 @@ div.onboard-lander {
     div.main-cta {
 
       div.title-container {
-        margin-top: 64px;
 
         div.team-logo-container {
           width: 100%;
