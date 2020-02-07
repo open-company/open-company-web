@@ -1,4 +1,6 @@
 (ns oc.web.actions.ui-theme
+  "Add the proper class to the html elemenet when the app starts and when the system mode changes.
+   NB: The list of the routes not allowed to get dark mode is in the static-js.js file."
   (:require [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
@@ -16,7 +18,7 @@
 
 (defn- dark-allowed-path? []
   (-> (.. js/window -location -pathname)
-      (.match #"(?i)^/(\bsign\-up\b|\blogin\b)?(/|$)")
+      (.match (.-OCWebUIThemeAllowedPathRegExp js/window))
       seq
       not))
 
