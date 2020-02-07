@@ -22,6 +22,10 @@ div.login-wall-container {
       bottom: 0;
       pointer-events: none;
 
+      @include mobile() {
+        display: none;
+      }
+
       div.login-box {
         background-image: cdnUrl("/img/ML/onboard_box.svg");
         background-position: center;
@@ -37,6 +41,7 @@ div.login-wall-container {
 
     @include mobile(){
       display: block;
+      width: 100%;
     }
 
     div.login-wall-internal {
