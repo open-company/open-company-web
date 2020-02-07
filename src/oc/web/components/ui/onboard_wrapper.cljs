@@ -40,7 +40,6 @@
               (this-as this
                 (utils/after 0
                  #(do
-                    (js/console.log "DBG this" this)
                     (set! (.. this -style -cssText) "height:auto;")
                     (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))))]
       {:did-mount (fn [s]
@@ -50,8 +49,13 @@
        :will-unmount (fn [s]
         (when @lst
           (events/unlistenByKey @lst)
-          (reset! last nil))
+          (reset! lst nil))
        s)})))
+
+(def why-carrot-label "Why you are giving Carrot a try?")
+
+(defn- why-carrot-value [v]
+  (str why-carrot-label "\n&zwnj;\n" v))
 
 (defn- clean-org-name [org-name]
   (string/trim org-name))
@@ -256,9 +260,9 @@
                                    (-> org-editing :why-carrot utils/trim seq not)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
-                       (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
-                       (let [org-name (clean-org-name (:name org-editing))]
-                         (dis/dispatch! [:input [:org-editing :name] org-name])))]
+                       (dis/dispatch! [:update [:org-editing :name] clean-org-name])
+                       (dis/dispatch! [:update [:org-editing :why-carrot] why-carrot-value])
+                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.onboard-lander-header
@@ -326,7 +330,7 @@
             [:div.error "Must be between 3 and 50 characters"])
           (when-not has-org?
             [:div.field-label.why-carrot
-              "Why you are giving Carrot a try?"])
+              why-carrot-label])
           (when-not has-org?
             [:textarea.field.oc-input
               {:ref "why-carrot"
@@ -402,8 +406,9 @@
         continue-fn #(when-not continue-disabled
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])
+                         (dis/dispatch! [:update [:org-editing :why-carrot] why-carrot-value])
                          (if (and (seq org-name)
-                                  (> (count org-name) 2))
+                                  (>= (count org-name) 2))
                            ;; Create org and show setup screen
                            (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
@@ -463,10 +468,10 @@
           (when (:error org-editing)
             [:div.error "Must be between 3 and 50 characters"])
           [:div.field-label.why-carrot
-            "How can Carrot best help your team?"]
+            why-carrot-label]
           [:textarea.field.oc-input
             {:ref "why-carrot"
-             :placeholder "We'd like Carrot to help with..."
+             :placeholder "Help us with..."
              :class utils/hide-class
              :max-length 1024
              :value (or (:why-carrot org-editing) "")

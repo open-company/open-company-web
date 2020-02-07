@@ -367,8 +367,10 @@
 (defn user-profile-save
   ([current-user-data edit-data]
    (user-profile-save current-user-data edit-data nil))
-  ([current-user-data edit-data org-editing]
-    (let [edit-user-profile (or (:user-data edit-data) edit-data)
+  ([current-user-data edit-data org-editing-kw]
+    (let [org-editing (when org-editing-kw
+                        (get @dis/app-state org-editing-kw))
+          edit-user-profile (or (:user-data edit-data) edit-data)
           new-password (:password edit-user-profile)
           password-did-change (pos? (count new-password))
           with-pswd (if (and password-did-change
