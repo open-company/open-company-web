@@ -301,7 +301,7 @@
             [:div.error "Must be between 3 and 50 characters"])
           (when-not has-org?
             [:div.field-label.why-carrot
-              "How can Carrot best help your team?"])
+              "How can Carrot help your team?"])
           (when-not has-org?
             [:textarea.field.oc-input
               {:ref "why-carrot"
@@ -309,6 +309,7 @@
                :class utils/hide-class
                :max-length 1024
                :value (:why-carrot org-editing)
+               :rows "1"
                :on-change #(dis/dispatch! [:input [:org-editing :why-carrot] (.. % -target -value)])}])
           [:button.continue
             {:class (when continue-disabled "disabled")
@@ -443,6 +444,7 @@
              :class utils/hide-class
              :max-length 1024
              :value (:why-carrot org-editing)
+             :rows "1"
              :on-change #(dis/dispatch! [:input [:org-editing :why-carrot] (.. % -target -value)])}]
           [:button.continue
             {:class (when continue-disabled "disabled")
