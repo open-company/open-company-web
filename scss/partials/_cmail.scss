@@ -696,6 +696,12 @@ div.cmail-outer {
       position: relative;
       margin-left: 16px;
       float: right;
+
+      @include mobile() {
+        margin-left: 16px;
+        padding-left: 16px;
+        border-left: 1px solid var(--divider-line);
+      }
     }
 
     div.cmail-content-outer {
