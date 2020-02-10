@@ -727,6 +727,75 @@ div.cmail-outer {
         overflow-y: visible;
       }
 
+      div.section-picker-bt-container {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          position: relative;
+          margin: 0;
+          width: 100%;
+          height: 40px;
+          border-bottom: 1px solid var(--divider-line);
+          padding-bottom: 16px;
+          margin-bottom: 16px;
+
+          span.post-to {
+            float: left;
+            display: block;
+            height: 28px;
+            font-size: 16px;
+            line-height: 28px;
+            @include OC_Body_Book();
+            color: var(--color);
+            margin-right: 8px;
+            width: 52px;
+          }
+
+          div.sections-picker {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            z-index: #{$navbar_zindex - 1};
+          }
+
+          button.section-picker-bt {
+            float: left;
+            height: 28px;
+            padding: 5px 24px 5px 8px;
+            background-color: var(--cmail-section-bt-background);
+            border-radius: 4px;
+            @include OC_Body_Book();
+            font-size: 14px;
+            line-height: 18px;
+            color: var(--cmail-section-bt-color);
+            position: relative;
+            text-align: left;
+            max-width: calc(100% - 60px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            &:after {
+              content: "";
+              width: 8px;
+              height: 10px;
+              position: absolute;
+              top: calc(50% - 5px);
+              right: 8px;
+              background-image: cdnUrl("/img/ML/select_arrows_white.svg");
+              background-size: 8px 10px;
+              background-repeat: no-repeat;
+              background-position: center;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
+              }
+            }
+          }
+        }
+      }
+
       div.ziggeo-player, div.ziggeo-recorder {
         margin: 0px auto 24px;
 

@@ -676,6 +676,16 @@
         [:div.cmail-content-outer
           {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
+            (when is-mobile?
+              [:div.section-picker-bt-container
+                [:span.post-to "Post to"]
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])])
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
