@@ -126,7 +126,10 @@
     (cook/remove-cookie! router/login-redirect-cookie)
     (if redirect-url
       (router/redirect! redirect-url)
-      (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs)))))))
+      (router/nav!
+       (if (zero? (count orgs))
+         oc-urls/sign-up-profile
+         (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))
 
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point (:org @router/path)
