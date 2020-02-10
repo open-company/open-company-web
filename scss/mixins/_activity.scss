@@ -111,6 +111,10 @@ $h2_top_margin: 24;
     background-size: #{$width}px #{$height}px;
     background-position: center;
     background-repeat: no-repeat;
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+    }
   }
 }
 

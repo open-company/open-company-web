@@ -290,7 +290,10 @@
             [:div.must-see-tag]
             [:div.bookmark-tag-small.mobile-only]
             [:div.bookmark-tag.big-web-tablet-only]
-            [:div.muted-activity]]]
+            [:div.muted-activity
+              {:data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :title "Muted"}]]]
         [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?
