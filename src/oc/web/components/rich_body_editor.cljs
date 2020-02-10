@@ -91,7 +91,8 @@
              cmail-key
              paywall?]}]
   (let [_team-roster (drv/react s :team-roster)
-        _media-input (drv/react s :media-input)]
+        _media-input (drv/react s :media-input)
+        hide-placeholder? (or (not show-placeholder) @(::did-change s))]
     [:div.rich-body-editor-outer-container
       {:key (str "rich-body-editor-" cmail-key)
        :class (when paywall? "block-edit")}
@@ -100,7 +101,9 @@
           {:ref "editor-node"
            :content-editable (not paywall?)
            :class (str classes
-                   (utils/class-set {:medium-editor-placeholder-hidden (or (not show-placeholder) @(::did-change s))
+                   (utils/class-set {:medium-editor-placeholder-hidden hide-placeholder?
+                                     :medium-editor-placeholder-relative (not hide-placeholder?)
+                                     :medium-editor-element true
                                      :uploading @(:me/upload-lock s)}))
            :dangerouslySetInnerHTML (utils/emojify initial-body)}]]
       (when @(:me/showing-media-video-modal s)
