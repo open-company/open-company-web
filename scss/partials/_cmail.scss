@@ -246,6 +246,65 @@ div.cmail-outer {
               top: 28px;
             }
           }
+
+          div.section-picker-bt-container {
+            position: relative;
+            margin-top: 4px;
+            margin-left: 8px;
+            padding-left: 8px;
+            float: left;
+            height: 24px;
+
+            div.sections-picker {
+              position: absolute;
+              top: 26px;
+              left: 0;
+              z-index: #{$navbar_zindex - 1};
+
+              @include mobile (){
+                top: 30px;
+              }
+            }
+
+            button.section-picker-bt {
+              height: 24px;
+              padding: 3px 24px 3px 8px;
+              color: white;
+              background-color: var(--cmail-section-bt-background);
+              border-radius: 4px;
+              @include OC_Body_Book();
+              font-size: 14px;
+              line-height: 18px;
+              color: var(--cmail-section-bt-color);
+              position: relative;
+
+              @include mobile() {
+                height: 28px;
+                font-size: 16px;
+
+                &:after {
+                  top: 9px;
+                }
+              }
+
+              &:after {
+                content: "";
+                width: 8px;
+                height: 10px;
+                position: absolute;
+                top: 7px;
+                right: 8px;
+                background-image: cdnUrl("/img/ML/select_arrows_white.svg");
+                background-size: 8px 10px;
+                background-repeat: no-repeat;
+                background-position: center;
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
+                }
+              }
+            }
+          }
         }
       }
 
@@ -484,9 +543,14 @@ div.cmail-outer {
             }
           }
 
-          &.long-tooltip {
+          &.unpublished-post {
+            button.close-bt {
+              background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+              background-size: 14px 10px;
+            }
+
             .tooltip {
-              width: 90px;
+              width: 103px;
               // margin-left: -24px;
             }
           }
@@ -515,6 +579,16 @@ div.cmail-outer {
               background-color: var(--opac-background-color-1);
             }
           }
+        }
+
+        div.saving-saved {
+          height: 32px;
+          @include OC_Body_Book();
+          color: var(--light-color);
+          font-size: 16px;
+          line-height: 32px;
+          margin: 0 0 0 16px;
+          float: left;
         }
       }
 
@@ -1017,12 +1091,12 @@ div.cmail-outer {
 
         div.section-picker-bt-container {
           position: relative;
-          margin-top: 8px;
-          margin-left: 7px;
-          padding-left: 8px;
+          margin-top: 4px;
+          margin-left: 8px;
+          padding-left: 16px;
           border-left: 1px solid var(--divider-line);
           float: right;
-          height: 16px;
+          height: 24px;
 
           div.sections-picker {
             position: absolute;
@@ -1036,21 +1110,20 @@ div.cmail-outer {
           }
 
           button.section-picker-bt {
-            height: 32px;
-            top: -8px;
-            padding: 7px 16px 7px 8px;
+            height: 24px;
+            padding: 3px 24px 3px 8px;
             color: white;
+            background-color: var(--cmail-section-bt-background);
             border-radius: 4px;
             @include OC_Body_Book();
             font-size: 14px;
             line-height: 18px;
-            color: var(--color);
+            color: var(--cmail-section-bt-color);
             position: relative;
 
             @include mobile() {
               height: 28px;
               font-size: 16px;
-              color: var(--light-color);
 
               &:after {
                 top: 9px;
@@ -1062,22 +1135,15 @@ div.cmail-outer {
               width: 8px;
               height: 10px;
               position: absolute;
-              top: 50%;
-              margin-top: -5px;
-              right: 2px;
-              background-image: cdnUrl("/img/ML/select_arrows.svg");
+              top: 7px;
+              right: 8px;
+              background-image: cdnUrl("/img/ML/select_arrows_white.svg");
               background-size: 8px 10px;
               background-repeat: no-repeat;
               background-position: center;
 
               @include dark_mode() {
-                background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-              }
-            }
-
-            @include big_web() {
-              &:hover {
-                opacity: 0.9;
+                background-image: cdnUrl("/img/ML/select_arrows_white@dark.svg");
               }
             }
           }

@@ -143,8 +143,8 @@ $dark_mode: "dark";
 
   // Cmail
   --cmail-fullscreen-bt-bg: #{rgba($deep_navy, 0.2)};
-  --cmail-section-bt-background: #{rgba(white, 0.12)};
-  --cmail-section-bt-color: white;
+  --cmail-section-bt-background: white;
+  --cmail-section-bt-color: #{$deep_navy};
   --cmail-me-separator: #{rgba($deep_navy, 0.3)};
   --cmail-collapsed-background-color: #{rgba(white, 0.09)};
   --cmail-box-shadow: rgba(255, 255, 255, 0.14);

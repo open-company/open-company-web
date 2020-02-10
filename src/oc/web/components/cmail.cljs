@@ -560,7 +560,7 @@
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
         current-user-id (jwt/user-id)
-        long-tooltip (not= (:status cmail-data) "published")
+        unpublished? (not= (:status cmail-data) "published")
         post-button-title (if (= (:status cmail-data) "published")
                             "Save"
                             "Post")
@@ -617,13 +617,13 @@
         [:div.cmail-header.group
           [:div.cmail-header-left-buttons.group
             [:div.close-bt-container
-              {:class (when long-tooltip "long-tooltip")}
+              {:class (when unpublished? "unpublished-post")}
               [:button.mlb-reset.close-bt
                 {:on-click close-cb
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
-                 :title (if long-tooltip
-                          "Save & Close"
+                 :title (if unpublished?
+                          "Save & Go back"
                           "Close")}]]
             [:div.delete-button-container
               [:button.mlb-reset.delete-button
@@ -631,7 +631,14 @@
                  :data-toggle "tooltip"
                  :data-placement "bottom"
                  :data-container "body"
-                 :on-click #(delete-clicked s % cmail-data)}]]]
+                 :on-click #(delete-clicked s % cmail-data)}]]
+            (when (and (not= (:status cmail-data) "published")
+                       (not is-mobile?))
+              (if (or (:has-changes cmail-data)
+                      (:auto-saving cmail-data))
+                [:div.saving-saved "Saving..."]
+                (when (false? (:auto-saving cmail-data))
+                  [:div.saving-saved "Saved"])))]
           [:div.cmail-header-center.group
             (user-avatar-image header-user-data)
             [:div.cmail-header-center-title
@@ -651,6 +658,14 @@
                  :data-placement "auto"
                  :data-container "body"
                  :title "Add attachment"}]
+              [:div.section-picker-bt-container
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])]
               [:div.post-button-container.group
                 (post-to-button {:on-submit #(post-clicked s)
                                  :disabled disabled?
@@ -748,24 +763,16 @@
                                :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
                                :attachments-enabled true})]]
-      (if is-fullscreen?
-        [:div.cmail-footer
-          (when (and (not= (:status cmail-data) "published")
-                     (not is-mobile?))
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.saving-saved "Saved"])))]
+      (when-not is-fullscreen?
         [:div.cmail-footer
           (when-not is-fullscreen?
             [:div.dismiss-inline-cmail-container
-              {:class (when long-tooltip "long-tooltip")}
+              {:class (when unpublished? "long-tooltip")}
               [:button.mlb-reset.dismiss-inline-cmail
                 {:on-click close-cb
                  :data-toggle (if is-mobile? "" "tooltip")
                  :data-placement "auto"
-                 :title (if long-tooltip
+                 :title (if unpublished?
                           "Save & Close"
                           "Close")}]])
           (when-not is-fullscreen?
