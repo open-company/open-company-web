@@ -255,6 +255,10 @@ div.cmail-outer {
             float: left;
             height: 24px;
 
+            .tooltip {
+              width: 118px;
+            }
+
             div.sections-picker {
               position: absolute;
               top: 26px;
@@ -1172,6 +1176,10 @@ div.cmail-outer {
           border-left: 1px solid var(--divider-line);
           float: right;
           height: 16px;
+
+          .tooltip {
+            width: 118px;
+          }
 
           div.sections-picker {
             position: absolute;

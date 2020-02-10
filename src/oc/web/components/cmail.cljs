@@ -660,7 +660,10 @@
                  :title "Add attachment"}]
               [:div.section-picker-bt-container
                 [:button.mlb-reset.section-picker-bt
-                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  {:on-click #(swap! (::show-sections-picker s) not)
+                   :data-placement "bottom"
+                   :data-toggle "tooltip"
+                   :title "Post to this section"}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
@@ -812,7 +815,10 @@
             (when-not is-fullscreen?
               [:div.section-picker-bt-container
                 [:button.mlb-reset.section-picker-bt
-                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  {:on-click #(swap! (::show-sections-picker s) not)
+                   :data-placement "top"
+                   :data-toggle "tooltip"
+                   :title "Post to this section"}
                   (:board-name cmail-data)]
                 (when @(::show-sections-picker s)
                   [:div.sections-picker-container
