@@ -125,7 +125,8 @@
                                                                            :primary-bt-dismiss true
                                                                            :expire 3
                                                                            :primary-bt-inline true
-                                                                           :id :invites-sent}))
+                                                                           :id :invites-sent})
+                                  (setup-initial-rows s))
                                 (reset! (::send-bt-cta s) "Send Slack invitations"))))))))
                   s)
    :will-unmount (fn [s]
