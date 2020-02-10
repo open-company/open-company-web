@@ -32,6 +32,7 @@
 ;; :section-add
 ;; :section-edit
 ;; :wrt-{uuid}
+;; :theme
 
 (defn- container-data [board-slug]
   (if (dis/is-container? board-slug)
@@ -260,3 +261,11 @@
     (show-org-settings :integrations)))
 
 (set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)
+
+;; Theme
+
+(defn show-theme-settings []
+  (push-panel :theme))
+
+(defn hide-theme-settings []
+  (pop-panel))

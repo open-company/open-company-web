@@ -35,6 +35,7 @@
             [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
             [oc.web.components.invite-email-modal :refer (invite-email-modal)]
             [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
+            [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
             [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
             [oc.web.components.payments-settings-modal :refer (payments-settings-modal)]
@@ -55,6 +56,7 @@
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
+                           (drv/drv :ui-theme)
 
                            {:did-mount (fn [s]
                              (utils/after 100 #(set! (.-scrollTop (.-scrollingElement js/document)) (utils/page-scroll-top)))
@@ -212,7 +214,10 @@
           (activity-share)
           ;; WRT
           show-wrt-view?
-          (wrt org-data))
+          (wrt org-data)
+          ;; UI Theme settings panel
+          (= open-panel :theme)
+          (theme-settings-modal (drv/react s :ui-theme)))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
