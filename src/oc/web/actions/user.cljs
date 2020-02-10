@@ -369,10 +369,10 @@
 
 (defn user-profile-save
   ([current-user-data edit-data]
-   (user-profile-save current-user-data edit-data nil))
-  ([current-user-data edit-data org-editing-kw]
+   (user-profile-save current-user-data edit-data nil nil))
+  ([current-user-data edit-data org-editing-kw why-carrot-with-question]
     (let [org-editing (when org-editing-kw
-                        (get @dis/app-state org-editing-kw))
+                        (assoc (get @dis/app-state org-editing-kw) :why-carrot why-carrot-with-question))
           edit-user-profile (or (:user-data edit-data) edit-data)
           new-password (:password edit-user-profile)
           password-did-change (pos? (count new-password))
