@@ -101,31 +101,16 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin muted-activity($width: 14, $height: 16) {
+@mixin muted-activity($width: 12, $height: 14) {
   div.muted-activity {
     margin-right: 8px;
     vertical-align: top;
     width: #{$width}px;
     height: #{$height}px;
-    background-image: cdnUrl("/img/ML/mobile_more_unfollow.svg");
+    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
     background-size: #{$width}px #{$height}px;
     background-position: center;
     background-repeat: no-repeat;
-
-    &:after {
-      content: "";
-      width: #{$width}px;
-      height: #{$height}px;
-      top: 0;
-      left: 0;
-      display: block;
-      background: linear-gradient(to top left,
-                                  rgba($deep_navy,0) 0%,
-                                  rgba($deep_navy,0) calc(50% - 1px),
-                                  rgba($deep_navy,1) 50%,
-                                  rgba($deep_navy,0) calc(50% + 1px),
-                                  rgba($deep_navy,0) 100%);
-    }
   }
 }
 
