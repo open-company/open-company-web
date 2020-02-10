@@ -1,0 +1,272 @@
+div.theme-settings-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+
+    @include mobile() {
+      left: 16px;
+      top: 11px;
+      right: unset;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: var(--mobile-background-color);
+      border-radius: 4px;
+    }
+  }
+
+  div.theme-settings {
+    width: 320px;
+    background-color: var(--overlay-background-color);
+    position: absolute;
+    top: 0;
+    height: calc(100vh - #{$navbar_height}px);
+    right: 0;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+    }
+
+    div.theme-settings-header {
+      width: 320px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
+      padding: 12px 24px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
+      }
+
+      div.theme-settings-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: var(--color);
+        line-height: 32px;
+        float: left;
+
+        @include mobile() {
+          float: unset;
+          text-align: center;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--light-color);
+        float: right;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+
+    div.theme-settings-body {
+      width: 272px;
+      margin: 24px auto 0;
+
+      div.theme-settings-auto-container {
+        height: 18px;
+        margin-bottom: 16px;
+
+        div.carrot-checkbox {
+          float: left;
+          margin-top: 1px;
+        }
+
+        span.auto-label {
+          float: left;
+          line-height: 18px;
+          font-size: 14px;
+          margin-left: 8px;
+          color: var(--color);
+          @include OC_Body_Book();
+          cursor: pointer;
+        }
+      }
+
+      div.theme-settings-rows {
+        
+        button.theme-settings-row {
+          height: 80px;
+          border: 2px solid var(--ui-theme-border-color);
+          border-radius: 4px;
+          position: relative;
+          padding: 18px 16px;
+          display: block;
+          width: 100%;
+          vertical-align: top;
+
+          &.light-theme {
+            margin-bottom: 8px;
+
+            span.theme-icon {
+              background-image: cdnUrl("/img/ML/dark_mode_light.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/dark_mode_light@dark.svg");
+              }
+            }
+
+            &.active {
+              span.theme-icon {
+                background-image: cdnUrl("/img/ML/dark_mode_light_active.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/dark_mode_light_active.svg");
+                }
+              }
+
+              div.carrot-option-button:not(.selected) {
+                opacity: 0.5;
+                background-image: cdnUrl("/img/ML/carrot_option_button_selected.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/carrot_option_button_selected@dark.svg");
+                }
+              }
+            }
+          }
+
+          &.dark-theme {
+            span.theme-icon {
+              background-image: cdnUrl("/img/ML/dark_mode_dark.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/dark_mode_dark@dark.svg");
+              }
+            }
+
+            &.active {
+              span.theme-icon {
+                background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/dark_mode_dark_active.svg");
+                }
+              }
+
+              div.carrot-option-button:not(.selected) {
+                opacity: 0.5;
+                background-image: cdnUrl("/img/ML/carrot_option_button_selected.svg");
+
+                @include dark_mode() {
+                  background-image: cdnUrl("/img/ML/carrot_option_button_selected@dark.svg");
+                }
+              }
+            }
+          }
+
+          &.active {
+            border: 2px solid $carrot_green;
+
+            span.theme-icon {
+              opacity: 1;
+            }
+          }
+
+          div.carrot-option-button {
+            position: absolute;
+            top: 20px;
+            left: 18px;
+            opacity: 0.5;
+
+            &.selected {
+              opacity: 1;
+              background-image: cdnUrl("/img/ML/carrot_option_button_green.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/carrot_option_button_green@dark.svg");
+              }
+            }
+          }
+              
+          span.theme-name {
+            position: absolute;
+            top: 18px;
+            left: 40px;
+            @include OC_Body_Bold();
+            color: var(--color);
+            font-size: 14px;
+            line-height: 18px;
+          }
+
+          span.theme-icon {
+            position: absolute;
+            top: 18px;
+            right: 16px;
+            width: 16px;
+            height: 16px;
+            background-position: center;
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+          }
+              
+          div.theme-description {
+            position: absolute;
+            bottom: 14px;
+            width: 272px;
+            left: 50%;
+            margin-left: -136px;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 18px;
+            @include OC_Body_Book();
+            color: var(--color);
+          }
+        }
+      }
+    }
+  }
+}

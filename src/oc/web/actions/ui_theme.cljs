@@ -1,5 +1,9 @@
 (ns oc.web.actions.ui-theme
-  (:require [taoensso.timbre :as timbre]
+  "Add the proper class to the html elemenet when the app starts and when the system mode changes.
+   NB: The list of the routes not allowed to get dark mode is in the static-js.js file."
+  (:require [goog.events :as events]
+            [goog.events.EventType :as EventType]
+            [taoensso.timbre :as timbre]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
@@ -16,7 +20,7 @@
 
 (defn- dark-allowed-path? []
   (-> (.. js/window -location -pathname)
-      (.match #"(?i)^/(\bsign\-up\b|\blogin\b)?(/|$)")
+      (.match (.-OCWebUIThemeAllowedPathRegExp js/window))
       seq
       not))
 
@@ -77,6 +81,8 @@
     (set-ui-theme-class (computed-value fixed-value))
     (dis/dispatch! [:input dis/ui-theme-key {:setting-value fixed-value :computed-value (computed-value fixed-value)}])))
 
+(defonce visibility-change-listener (atom nil))
+
 (defn setup-ui-theme []
   (let [cur-val (get-ui-theme-setting)
         computed-val (computed-value cur-val)]
@@ -88,7 +94,14 @@
     (when (support-system-dark-mode?)
       (set! (.-onchange (.matchMedia js/window "(prefers-color-scheme: light)"))
        #(when (= (get-ui-theme-setting) :auto)
-          (set-ui-theme :auto))))))
+          (set-ui-theme :auto)))
+      (when @visibility-change-listener
+        (events/unlistenByKey @visibility-change-listener))
+      (reset! visibility-change-listener
+       (events/listen js/document EventType/VISIBILITYCHANGE
+        #(when (and (= (.-visibilityState js/document) "visible")
+                    (= (get-ui-theme-setting) :auto))
+            (set-ui-theme :auto)))))))
 
 (setup-ui-theme)
 

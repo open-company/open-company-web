@@ -134,6 +134,8 @@ $h2_top_margin: 24;
   font-size: $font_size;
   color: var(--color);
   line-height: $line_height;
+  white-space: normal;
+  overflow-wrap: break-word;
 
   .emojione {
     @include emoji-size(22);
@@ -145,6 +147,8 @@ $h2_top_margin: 24;
   font-size: $font_size;
   color: var(--color);
   line-height: $line_height;
+  white-space: normal;
+  overflow-wrap: break-word;
 
   i {
     @include OC_Body_Bold_Italic();
@@ -185,6 +189,8 @@ $h2_top_margin: 24;
   font-size: 22px;
   color: var(--color);
   line-height: 28px;
+  white-space: normal;
+  overflow-wrap: break-word;
 
   .emojione {
     @include emoji-size(18);
@@ -224,7 +230,7 @@ $h2_top_margin: 24;
   font-size: #{$font_size}px;
   line-height: #{$line_height}px;
   color: $color;
-  white-space: pre-wrap;
+  white-space: normal;
   overflow-wrap: break-word;
 
   p, ul > li, i {
@@ -405,6 +411,8 @@ $h2_top_margin: 24;
     background-color: #F0EFEA; // FIXME
     border-radius: 4px;
     margin-top: 4px;
+    white-space: normal;
+    overflow-wrap: break-word;
 
     & > * {
       opacity: 0.8;
@@ -524,7 +532,7 @@ $h2_top_margin: 24;
   @include OC_Body_Book();
   font-size: $font-size;
   color: var(--color);
-  white-space: pre-wrap;
+  white-space: normal;
   overflow-wrap: break-word;
   line-height: $line-height;
 

@@ -188,6 +188,8 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// UI Theme detection
+var OCWebUIThemeAllowedPathRegExp = {};
 // Mobile app (Expo)
 var ReactNativeWebView = {};
 ReactNativeWebView.postMessage = function() {};

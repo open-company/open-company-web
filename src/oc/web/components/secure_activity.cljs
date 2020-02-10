@@ -117,8 +117,15 @@
               [:div.name
                 {:class utils/hide-class}
                 (str (:name (:publisher activity-data)) " in "
-                 (:board-name activity-data) " on "
-                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+                 (:board-name activity-data) " on ")
+                 [:time
+                   {:date-time (:published-at activity-data)
+                    :data-toggle (when-not is-mobile? "tooltip")
+                    :data-placement "top"
+                    :data-container "body"
+                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                    :data-title (utils/activity-date-tooltip activity-data)}
+                   (utils/date-string (utils/js-date (:published-at activity-data)) [:year])]]]
             (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
@@ -134,7 +141,7 @@
                  :class utils/hide-class}])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (comments-summary activity-data)
+              (comments-summary {:activity-data activity-data :comments-data comments-drv})
               (reactions {:entity-data activity-data})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
