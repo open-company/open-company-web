@@ -333,7 +333,7 @@
           (when-not has-org?
             [:textarea.field.oc-input
               {:ref "why-carrot"
-               :placeholder "Help us with..."
+               :placeholder "Why you're trying it..."
                :class utils/hide-class
                :max-length 1024
                :value (or (:why-carrot org-editing) "")
