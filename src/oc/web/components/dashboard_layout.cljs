@@ -232,7 +232,7 @@
                                                    "Unread"
 
                                                    is-all-posts
-                                                   "All posts"
+                                                   "Recent"
 
                                                    is-bookmarks
                                                    "Bookmarks"

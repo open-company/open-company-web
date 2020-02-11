@@ -163,7 +163,7 @@
             [:div.all-posts-icon]
             [:div.all-posts-label
               {:class (utils/class-set {:new (seq all-unread-items)})}
-              "All posts"]
+              "Recent"]
             ; (when (pos? (count all-unread-items))
             ;   [:span.count (count all-unread-items)])
             ])
