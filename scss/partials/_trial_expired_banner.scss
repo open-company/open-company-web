@@ -11,17 +11,34 @@ div.trial-expired-banner-container {
   z-index: $navbar_zindex;
   background-color: $carrot_orange;
 
+  @include mobile() {
+    height: #{$mobile_trial_expired_banner_height}px;
+    padding: 8px 16px;
+  }
+
   div.trial-expired-banner {
     @include OC_Body_Book();
     font-size: 16px;
     line-height: 26px;
     color: white;
 
+    &.reduced-copy {
+      display: none;
+    }
+
     @include mobile() {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
+      height: 100%;
+      line-height: 22px;
+    }
+
+    @media screen and (max-width: 374px) {
+      &:not(.reduced-copy) {
+        display: none;
+      }
+
+      &.reduced-copy {
+        display: block;
+      }
     }
 
     button.open-payments-bt, a.chat-with-us {

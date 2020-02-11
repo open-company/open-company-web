@@ -80,6 +80,9 @@ $dark_mode: "dark";
   --selected-row-background-color: #EBF8F1;
   --selected-row-color: #{$carrot_green};
 
+  // Theme settings
+  --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
+
   html, body {
     scrollbar-color: light;
   }
@@ -155,6 +158,9 @@ $dark_mode: "dark";
   // General settings
   --selected-row-background-color: #{rgba(white, 0.2)};
   --selected-row-color: #{$carrot_green};
+
+  // Theme settings
+  --ui-theme-border-color: #{rgba(white, 0.22)};
 
   &, body {
     scrollbar-color: dark;

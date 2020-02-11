@@ -88,13 +88,15 @@ div.wrt-popup-container {
     background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
-    height: 100vh;
+    height: calc(100vh - #{$navbar_height}px);
     right: 0;
-    padding: 0;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px 16px;
     overflow-x: hidden;
     overflow-y: auto;
 
     @include mobile() {
+      min-height: 100vh;
       position: relative;
       top: unset;
       right: unset;
@@ -105,13 +107,17 @@ div.wrt-popup-container {
     }
 
     div.wrt-popup-header {
-      width: 100%;
-      height: 56px;
+      width: 320px;
+      height: #{$navbar_height}px;
       background-color: var(--panel-header-background);
       padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
       @include mobile() {
-        position: fixed;
+        width: 100%;
         border-bottom: 1px solid var(--divider-line);
         z-index: 2;
         height: #{$mobile_navbar_height}px;
