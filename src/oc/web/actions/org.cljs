@@ -79,7 +79,7 @@
     ; (or (cook/get-cookie (router/last-board-cookie (:slug org-data))) default-board)]
     (cond
       (and (= last-board-slug "all-posts")
-           (utils/link-for (:links org-data) "activity"))
+           (utils/link-for (:links org-data) "entries"))
       {:slug "all-posts"}
       (and (= last-board-slug "inbox")
            (utils/link-for (:links org-data) "inbox"))
@@ -109,8 +109,8 @@
   (let [boards (:boards org-data)
         current-board-slug (router/current-board-slug)
         inbox-link (utils/link-for (:links org-data) "inbox")
-        all-posts-link (utils/link-for (:links org-data) "activity")
-        bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
+        all-posts-link (utils/link-for (:links org-data) "entries")
+        bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
@@ -122,6 +122,7 @@
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
+    (js/console.log "DBG org-loaded all-posts-link" all-posts-link all-posts-delay "bookmarks-link" bookmarks-link bookmarks-delay)
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
@@ -135,7 +136,7 @@
             (utils/maybe-after inbox-delay #(aa/inbox-get org-data)))
           ;; Load all posts data
           (when all-posts-link
-            (utils/maybe-after all-posts-delay #(aa/activity-get org-data)))
+            (utils/maybe-after all-posts-delay #(aa/all-posts-get org-data)))
           ;; Preload bookmarks data
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
@@ -162,8 +163,7 @@
           ;; Rewrite the URL in case it's using the board UUID instead of the slug
           (when (= (:uuid board-data) current-board-slug)
             (router/rewrite-board-uuid-as-slug current-board-slug (:slug board-data)))
-          (when-let* [board-rel (if is-drafts? ["item" "self"] "activity")
-                      board-link (utils/link-for (:links board-data) board-rel "GET")]
+          (when-let* [board-link (utils/link-for (:links board-data) ["item" "self"] "GET")]
             (sa/section-get board-link)))
         ; The board wasn't found, showing a 404 page
         (if is-drafts?

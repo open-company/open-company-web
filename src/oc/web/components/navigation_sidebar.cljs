@@ -125,7 +125,7 @@
         show-inbox (and user-is-part-of-the-team?
                         (utils/link-for (:links org-data) "inbox"))
         show-all-posts (and user-is-part-of-the-team?
-                            (utils/link-for (:links org-data) "activity"))
+                            (utils/link-for (:links org-data) "entries"))
         show-bookmarks (and user-is-part-of-the-team?
                             (utils/link-for (:links org-data) "bookmarks"))
         drafts-board (first (filter #(= (:slug %) utils/default-drafts-board-slug) all-boards))
