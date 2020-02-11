@@ -65,7 +65,8 @@ div.cmail-outer {
     div.cmail-container {
 
       div.cmail-content-outer {
-        padding: 16px 24px;
+        // padding: 16px 24px;
+        padding: 24px 24px 16px;
 
         div.cmail-content {
           height: 24px;
@@ -341,14 +342,6 @@ div.cmail-outer {
         @include mobile() {
           padding: 16px 16px 24px;
           width: 100%;
-        }
-
-        div.cmail-content-headline {
-          @include activity-title(14px, 18px);
-
-          @include mobile() {
-            @include activity-title(32px, 40px);
-          }
         }
 
         div.cmail-content-abstract-container-outer {
@@ -881,15 +874,22 @@ div.cmail-outer {
             min-height: 22px;
             line-height: 22px;
             width: calc(100% - 55px - 8px);
+
+            &:empty:before {
+              @include activity-title(16px, 22px);
+              height: 22px;
+            }
           }
 
           &:empty:before {
             content: attr(placeholder);
-            @include activity-title(14px, 24px);
+            // @include activity-title(14px, 24px);
+            @include activity-title(20px, 28px);
             display: inline-block;
             color: var(--light-color) !important;
             font-style: none;
-            height: 24px;
+            // height: 24px;
+            height: 28px;
             margin: 0;
             padding: 0;
           }
