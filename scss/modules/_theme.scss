@@ -69,9 +69,11 @@ $dark_mode: "dark";
   --cmail-section-bt-background: #{$deep_navy};
   --cmail-section-bt-color: white;
   --cmail-me-separator: rgba(255, 255, 255, 0.3);
-  --cmail-collapsed-background-color: white;
-  --cmail-box-shadow: rgba(0, 0, 0, 0.1);
-  --cmail-qp-outer-border: #{rgba($deep_navy, 0.2)};
+  --cmail-background-color: white;
+  --cmail-border: 1px solid #{rgba($deep_navy, 0.24)};
+  --cmail-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
+  --cmail-active-border: 1px solid #{rgba($deep_navy, 0.32)};
+  --cmail-active-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(0, 0, 0, 0.2);
@@ -146,9 +148,11 @@ $dark_mode: "dark";
   --cmail-section-bt-background: white;
   --cmail-section-bt-color: #{$deep_navy};
   --cmail-me-separator: #{rgba($deep_navy, 0.3)};
-  --cmail-collapsed-background-color: #{rgba(white, 0.09)};
-  --cmail-box-shadow: rgba(255, 255, 255, 0.14);
-  --cmail-qp-outer-border: #{rgba(white, 0.16)};
+  --cmail-background-color: #{rgba(white, 0.09)};
+  --cmail-border: 1px solid #{rgba(white, 0.16)};
+  --cmail-box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.16);
+  --cmail-active-border: 1px solid #{rgba(white, 0.24)};
+  --cmail-active-box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.32);
 
   // User dropdown
   --user-dropdown-shadow-start: rgba(255, 255, 255, 0.2);
