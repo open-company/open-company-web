@@ -207,7 +207,7 @@
                :data-title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]]
           (when muted-post?
-            [:div.expanded-post-author-dot])
+            [:div.expanded-post-author-dot.muted-dot])
           (when muted-post?
             [:div.muted-activity
               {:data-toggle (when-not is-mobile? "tooltip")

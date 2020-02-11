@@ -287,12 +287,10 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/foc-date-time t)])]]
-            [:div.stream-item-header-dot.muted-dot]
             [:div.muted-activity
               {:data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
                :title "Muted"}]
-            [:div.stream-item-header-dot.bookmark-must-see-dot]
             [:div.must-see-tag]
             [:div.bookmark-tag-small.mobile-only]
             [:div.bookmark-tag.big-web-tablet-only]]]

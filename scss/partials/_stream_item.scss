@@ -137,15 +137,8 @@ div.stream-item {
     }
   }
 
-  &:not(.bookmark-item).must-see-item {
-
-    div.must-see-tag {
+  &:not(.bookmark-item).must-see-item div.must-see-tag {
       display: inline-block;
-    }
-
-    div.stream-item-header-dot.bookmark-must-see-dot {
-      display: inline-block;
-    }
   }
 
   &.bookmark-item, &.bookmark-item.must-see-item {
@@ -156,20 +149,10 @@ div.stream-item {
     div.bookmark-tag, div.bookmark-tag-small {
       display: inline-block;
     }
-
-    div.stream-item-header-dot.bookmark-must-see-dot {
-      display: inline-block;
-    }
   }
 
-  &.muted-item {
-    div.muted-activity {
-      display: inline-block;
-    }
-
-    div.stream-item-header-dot.muted-dot {
-      display: inline-block;
-    }
+  &.muted-item div.muted-activity {
+    display: inline-block;
   }
 
   div.activity-share-container {
@@ -389,15 +372,6 @@ div.stream-item {
     }
   }
 
-  div.stream-item-header-dot {
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background-color: var(--opac-background-color-2);
-    margin: 0 6px -1px;
-    display: none;
-  }
-
   @include must-see-tag();
   
   @include bookmark-tag();
@@ -408,6 +382,7 @@ div.stream-item {
   div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
     display: none;
     margin-right: 0;
+    margin-left: 8px;
   }
 
   & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small {

@@ -142,34 +142,16 @@ div.stream-collapsed-item {
       flex: 0 0 20px;
     }
 
-    &.bookmark-item div.stream-collapsed-item-fill {
-      div.stream-collapsed-item-dot.bookmark-must-see-dot {
-        display: block;
-      }
-
-      div.bookmark-tag {
-        display: block;
-      }
+    &.bookmark-item div.stream-collapsed-item-fill div.bookmark-tag {
+      display: block;
     }
 
-    &.must-see-item div.stream-collapsed-item-fill {
-      div.stream-collapsed-item-dot.bookmark-must-see-dot {
-        display: block;
-      }
-
-      div.must-see-tag {
-        display: block;
-      }
+    &.must-see-item div.stream-collapsed-item-fill div.must-see-tag {
+      display: block;
     }
 
-    &.muted-item div.stream-collapsed-item-fill {
-      div.stream-collapsed-item-dot.muted-dot {
-        display: block;
-      }
-
-      div.muted-activity {
-        display: block;
-      }
+    &.muted-item div.stream-collapsed-item-fill div.muted-activity {
+      display: block;
     }
 
     div.stream-collapsed-item-fill {
@@ -190,17 +172,6 @@ div.stream-collapsed-item {
         flex: 0 0 auto;
       }
 
-      div.stream-collapsed-item-dot {
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background-color: var(--color);
-        opacity: 0.5;
-        margin: 12px 6px 0;
-        display: none;
-        flex: 0 0 auto;
-      }
-
       @include must-see-tag();
 
       @include bookmark-tag();
@@ -212,13 +183,13 @@ div.stream-collapsed-item {
       }
 
       div.bookmark-tag, div.must-see-tag {
-        margin: 3px 0 0;
+        margin: 4px 0 0 6px;
         flex: 0 0 auto;
       }
 
       div.muted-activity {
         flex: 0 0 auto;
-        margin: 5px 0 0;
+        margin: 5px 0 0 6px;
       }
 
       div.stream-item-body {
@@ -227,7 +198,7 @@ div.stream-collapsed-item {
         white-space: nowrap;
         @include activity-body(14, 24, var(--color));
         margin-left: 3px;
-        padding-left: 6px;
+        padding-left: 8px;
         position: relative;
         height: 24px;
         min-width: 0;
@@ -254,14 +225,16 @@ div.stream-collapsed-item {
         }
 
         &:before {
-          content: "";
-          width: 3px;
-          height: 3px;
-          background-color: var(--color);
-          border-radius: 50%;
-          opacity: 0.3;
+          content: "-";
+          width: 8px;
+          height: 24px;
+          color: var(--color);
+          @include OC_Body_Book();
+          font-size: 14px;
+          line-height: 24px;
+          display: block;
           position: absolute;
-          top: 12px;
+          top: 0;
           left: 0;
         }
       }

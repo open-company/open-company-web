@@ -90,7 +90,6 @@
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
           [:div.stream-collapsed-item-dot.muted-dot]
           [:div.muted-activity]
-          [:div.stream-collapsed-item-dot.bookmark-must-see-dot]
           [:div.must-see-tag]
           [:div.bookmark-tag]
           (stream-item-summary activity-data)]
