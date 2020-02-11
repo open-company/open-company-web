@@ -1,5 +1,6 @@
 (ns oc.web.actions.search
-  (:require [taoensso.timbre :as timbre]
+  (:require [cuerdas.core :as s]
+            [taoensso.timbre :as timbre]
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
@@ -30,22 +31,38 @@
 (defn search-history []
   (let [res (cook/get-cookie search-history-cookie)]
     (if (seq res)
-      (set (reverse (take search-history-length (reverse (js->clj (.parseJSON js/$ res))))))
+      (->> res js/$.parseJSON js->clj vec)
       #{})))
 
 (defn query
-  "Use the search service to query for results."
-  [search-query]
-  (if (seq search-query)
-    (do
-      (let [old-queries (search-history)
-            without-new-query (disj old-queries search-query)
-            with-new-query (conj without-new-query search-query)]
-        (cook/set-cookie! search-history-cookie (.stringify js/JSON (clj->js with-new-query))
-         cook/default-cookie-expire))
-      (active)
-      (api/query (:uuid (dispatcher/org-data)) search-query query-finished))
-    (reset)))
+  "Use the search service to query for results.
+   Keep tracl of the last "
+  [search-query auto-search?]
+  (let [trimmed-query (utils/trim search-query)]
+    (if (seq trimmed-query)
+      (do
+        (when (or (not auto-search?)
+                  (> (count trimmed-query) 2))
+          (let [temp-history (utils/vec-dissoc (search-history) trimmed-query)
+                last-search (last temp-history)
+                temp-history* (if (and auto-search?
+                                     (or ; User added one letter to the beginning
+                                         (->> trimmed-query rest (s/join "") (= last-search))
+                                         ; User added one letter to the end
+                                         (->> trimmed-query butlast (s/join "") (= last-search))
+                                         ; User removed one letter from the beginning
+                                         (->> last-search rest (s/join "") (= trimmed-query))
+                                         ; User removed one letter from the end
+                                         (->> last-search butlast (s/join "") (= trimmed-query))))
+                                (butlast temp-history)
+                                temp-history)
+                with-new (conj temp-history* trimmed-query)
+                history  (->> with-new (take-last search-history-length) clj->js js/JSON.stringify)]
+            (cook/set-cookie! search-history-cookie history cook/default-cookie-expire)))
+        (active)
+        (dispatcher/dispatch! [:search-query/start trimmed-query])
+        (api/query (:uuid (dispatcher/org-data)) trimmed-query query-finished))
+      (reset))))
 
 (defn result-clicked [entry-result url]
   (let [post-loaded? (dispatcher/activity-data (:uuid entry-result))
@@ -68,6 +85,3 @@
     (if post-loaded?
       (open-post-cb true nil)
       (cmail-actions/get-entry-with-uuid (:board-slug entry-result) (:uuid entry-result) open-post-cb))))
-
-(defn focus []
-  (dispatcher/dispatch! [:search-focus]))
