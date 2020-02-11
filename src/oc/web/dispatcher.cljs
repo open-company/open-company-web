@@ -310,7 +310,8 @@
                             (activity-data org-slug activity-uuid base))]
    :secure-activity-data [[:base :org-slug :secure-id]
                           (fn [base org-slug secure-id]
-                            (secure-activity-data org-slug secure-id base))]
+                            {:activity-data (secure-activity-data org-slug secure-id base)
+                             :is-showing-alert (boolean (:alert-modal base))})]
    :comments-data       [[:base :org-slug]
                          (fn [base org-slug]
                            (get-in base (comments-key org-slug)))]
