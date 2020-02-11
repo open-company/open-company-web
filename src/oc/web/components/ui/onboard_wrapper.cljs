@@ -226,6 +226,7 @@
                                   (drv/drv :org-editing)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
+                                  (rum/local "" ::why-carrot)
                                   (autoresize-textarea "why-carrot")
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
@@ -257,11 +258,12 @@
                               (and (not has-org?)
                                    (-> org-editing :name clean-org-name count (<= 1)))
                               (and (not has-org?)
-                                   (-> org-editing :why-carrot utils/trim seq not)))
+                                   (-> @(::why-carrot s) utils/trim seq not)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
                        (dis/dispatch! [:update [:org-editing :name] clean-org-name])
-                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing why-carrot-value))]
+                       (dis/dispatch! [:update [:org-editing :why-carrot] why-carrot-value])
+                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
         [:div.onboard-lander-header
@@ -336,9 +338,9 @@
                :placeholder "Why you're trying it..."
                :class utils/hide-class
                :max-length 1024
-               :value (or (:why-carrot org-editing) "")
+               :value @(::why-carrot s)
                :rows "1"
-               :on-change #(dis/dispatch! [:input [:org-editing :why-carrot] (.. % -target -value)])}])
+               :on-change #(reset! (::why-carrot s) (.. % -target -value))}])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -386,6 +388,7 @@
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
+                         (rum/local "" ::why-carrot)
                          {:will-mount (fn [s]
                            (dis/dispatch! [:input [:org-editing :name] ""])
                            s)
@@ -401,7 +404,7 @@
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)
         continue-disabled (or (-> org-editing :name clean-org-name count (< 3))
-                              (-> org-editing :why-carrot utils/trim seq not))
+                              (-> @(::why-carrot s) utils/trim seq not))
         continue-fn #(when-not continue-disabled
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])
@@ -473,9 +476,9 @@
              :placeholder "Help us with..."
              :class utils/hide-class
              :max-length 1024
-             :value (or (:why-carrot org-editing) "")
+             :value @(::why-carrot s)
              :rows "1"
-             :on-change #(dis/dispatch! [:input [:org-editing :why-carrot] (.. % -target -value)])}]
+             :on-change #(reset! (::why-carrot s) (.. % -target -value))}]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
