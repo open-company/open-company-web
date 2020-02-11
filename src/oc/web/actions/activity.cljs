@@ -173,13 +173,13 @@
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-inbox
-      (inbox-get org-data
+      (inbox-get org-data)
 
       is-all-posts
       (activity-get org-data)
 
       is-bookmarks
-      (bookmarks-get org-data))
+      (bookmarks-get org-data)
 
       (seq board-link)
       (sa/section-get board-link))))
