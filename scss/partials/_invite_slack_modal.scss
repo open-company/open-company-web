@@ -25,18 +25,19 @@ div.invite-slack-modal {
     background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
-    height: 100vh;
+    height: calc(100vh - #{$navbar_height}px);
     right: 0;
-    padding: 56px 24px 16px;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
     overflow-y: auto;
 
     div.invite-slack-header {
       width: 320px;
-      height: 56px;
-      background-color: var(--background-color);
-      padding: 12px 16px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
+      padding: 12px 24px;
       position: fixed;
       top: 0;
       right: 0;
@@ -136,18 +137,32 @@ div.invite-slack-modal {
 
       div.invites-list {
         margin-top: 24px;
-        padding-top: 16px;
 
         &.top-border {
+          padding-top: 16px;
           padding-top: 24px;
-          border-top: 1px solid rgba($deep_navy, 0.15);
+          border-top: 1px solid var(--divider-line);
         }
 
         div.invites-list-title {
-          @include OC_Body_Bold();
+          @include OC_Body_Book();
           font-size: 14px;
-          color: var(--light-color);
+          color: var(--color);
           letter-spacing: .1px;
+        }
+
+        div.invites-list-description {
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          line-height: 18px;
+          margin-top: 8px;
+
+          strong {
+            @include OC_Body_Bold();
+            font-size: 14px;
+            line-height: 18px;
+          }
         }
 
         button.enable-carrot-bot-bt {

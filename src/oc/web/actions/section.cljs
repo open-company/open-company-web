@@ -75,7 +75,7 @@
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
-        (api/get-board (utils/link-for (:links current-section-data) board-rel)
+        (api/get-board (utils/link-for (:links current-section-data) board-rel "GET")
                        (fn [{:keys [status body success] :as resp}]
                          (when success (section-get-finish (json->cljs body)))
                          (when (fn? finish-cb)

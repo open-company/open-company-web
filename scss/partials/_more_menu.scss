@@ -95,7 +95,7 @@ div.more-menu {
     border-bottom-right-radius: 4px;
   }
 
-  button.has-next-bt {
+  button.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: var(--opac-background-color-15);
@@ -564,6 +564,10 @@ div.more-menu {
               position: absolute;
               top: 18px;
               left: 18px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_read@dark.svg");
+              }
             }
           }
 
@@ -581,6 +585,10 @@ div.more-menu {
               position: absolute;
               top: 18px;
               left: 18px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_unread@dark.svg");
+              }
             }
           }
 

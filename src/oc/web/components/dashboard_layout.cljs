@@ -11,6 +11,7 @@
             [oc.web.lib.cookies :as cook]
             [oc.web.utils.activity :as au]
             [oc.web.mixins.ui :as ui-mixins]
+            [oc.web.stores.search :as search]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.utils.ui :refer (ui-compose)]
@@ -22,6 +23,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.reminder :as reminder-actions]
+            [oc.web.components.search :refer (search-box)]
             [oc.web.components.expanded-post :refer (expanded-post)]
             [oc.web.components.paginated-stream :refer (paginated-stream)]
             [oc.web.components.ui.empty-org :refer (empty-org)]
@@ -51,6 +53,8 @@
                               (drv/drv :mobile-user-notifications)
                               (drv/drv :activity-data)
                               (drv/drv :foc-layout)
+                              (drv/drv :activities-read)
+                              (drv/drv search/search-active?)
                               ;; Mixins
                               ui-mixins/strict-refresh-tooltips-mixin
                               {:before-render (fn [s]
@@ -72,6 +76,7 @@
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
         foc-layout (drv/react s :foc-layout)
+        _activities-read (drv/react s :activities-read)
         current-board-slug (router/current-board-slug)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
@@ -112,10 +117,12 @@
                                     (= (:board-uuid activity-data) current-board-slug)))
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
-                           (utils/link-for (:links container-data) "dismiss-all"))]
+                           (utils/link-for (:links container-data) "dismiss-all"))
+        search-active? (drv/react s search/search-active?)]
       ;; Entries list
       [:div.dashboard-layout.group
-        {:class (when show-expanded-post "expanded-post-view")}
+        {:class (utils/class-set {:expanded-post-view show-expanded-post
+                                  :search-active search-active?})}
         [:div.mobile-more-menu]
         [:div.dashboard-layout-container.group
           (navigation-sidebar)
@@ -272,11 +279,7 @@
                        :title "Dismiss all"}])
                   (when (and (not is-drafts-board)
                              is-mobile?)
-                    [:button.mlb-reset.mobile-search-bt
-                      {:on-click (fn [e]
-                                   (search-actions/active)
-                                   (utils/after 500 #(.focus (js/$ "input.search"))))}
-                      "Search"])
+                    (search-box))
                   [:button.mlb-reset.foc-layout-bt
                     {:on-click #(activity-actions/toggle-foc-layout)
                      :data-toggle (when-not is-mobile? "tooltip")

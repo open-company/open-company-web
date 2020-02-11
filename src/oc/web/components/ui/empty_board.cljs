@@ -27,5 +27,5 @@
            is-inbox? "You’re all caught up!"
            is-all-posts? "All posts is a stream of what’s new in Carrot"
            is-drafts-board? "Nothing in drafts"
-           is-bookmarks? "You have no drafts"
+           is-bookmarks? "You don't have any bookmarks"
            :else "This section is empty")]]]))

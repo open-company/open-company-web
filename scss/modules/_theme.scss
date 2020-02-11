@@ -37,13 +37,13 @@ $dark_mode: "dark";
   // Stream-item
   --foc-background-color: #{rgba($deep_navy, 0.05)};
   --mobile-foc-background-color: #{rgba($deep_navy, 0.05)};
-  --foc-hover-color: #F1F0F0;
+  --foc-hover-color: #F1F0F0; // rgb(241, 240, 240)
   --foc-hover-border-color: #{rgba($deep_navy, 0.24)};
   --foc-new-color: white;
   --foc-divider-line-color: #{rgba($deep_navy, 0.15)};
   --foc-new-border-color: #{rgba($deep_navy, 0.24)};
-  --foc-menu-gradient-from: #{rgba(230, 232, 232, 1)};
-  --foc-menu-gradient-to: #{rgba(230, 232, 232, 0)};
+  --foc-menu-gradient-from: #{rgba(241, 240, 240, 1)};
+  --foc-menu-gradient-to: #{rgba(241, 240, 240, 0)};
   --foc-new-menu-gradient-from: white;
   --foc-new-menu-gradient-to: #{rgba(white, 0)};
 
@@ -79,6 +79,9 @@ $dark_mode: "dark";
   // General settings
   --selected-row-background-color: #EBF8F1;
   --selected-row-color: #{$carrot_green};
+
+  // Theme settings
+  --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
 
   html, body {
     scrollbar-color: light;
@@ -155,6 +158,9 @@ $dark_mode: "dark";
   // General settings
   --selected-row-background-color: #{rgba(white, 0.2)};
   --selected-row-color: #{$carrot_green};
+
+  // Theme settings
+  --ui-theme-border-color: #{rgba(white, 0.22)};
 
   &, body {
     scrollbar-color: dark;

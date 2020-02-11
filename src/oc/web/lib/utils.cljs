@@ -131,6 +131,14 @@
       :else
       (if short? "now" "Just now"))))
 
+(defn local-date-time [past-date]
+  (let [time-string (.toLocaleTimeString past-date (.. js/window -navigator -language)
+                     #js {:hour "2-digit"
+                          :minute "2-digit"
+                          :format "hour:minute"})
+        without-leading-zeros (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1")]
+    (s/upper without-leading-zeros)))
+
 (defn foc-date-time [past-date & [flags]]
   (let [past-js-date (js-date past-date)
         past (.getTime past-js-date)
@@ -139,12 +147,7 @@
     (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
              (= (.getMonth past-js-date) (.getMonth now-date))
              (= (.getDate past-js-date) (.getDate now-date)))
-      (s/upper
-       (.replace
-        (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
-                                                                                   :minute "2-digit"
-                                                                                   :format "hour:minute"})
-        (js/RegExp. "^0(?:0:0?)?" "ig") ""))
+      (local-date-time past-js-date)
       (time-since past-date (concat flags [:short])))))
 
 (defn class-set
@@ -710,7 +713,7 @@
              (seq board-slug)
              (not= board-slug default-drafts-board-slug)
              is-mobile?)
-      50
+      65
       0)))
 
 (defn back-to [org-data]

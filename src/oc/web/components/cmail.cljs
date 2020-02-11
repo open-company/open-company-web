@@ -708,6 +708,10 @@
             ;       [:button.mlb-reset.edit-tooltip-bt
             ;         {:on-click #(nux-actions/dismiss-edit-tooltip)}
             ;         "OK, got it"]]])
+            ; Attachments
+            (when-not (:collapsed cmail-state)
+              (stream-attachments (:attachments cmail-data) nil
+               #(activity-actions/remove-attachment :cmail-data %)))
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :media-picker-initially-visible true
@@ -726,11 +730,7 @@
                                :media-config ["gif" "photo" "video"]
                                :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
-                               :attachments-enabled true})
-            ; Attachments
-            (when-not (:collapsed cmail-state)
-              (stream-attachments (:attachments cmail-data) nil
-               #(activity-actions/remove-attachment :cmail-data %)))]]
+                               :attachments-enabled true})]]
       (if is-fullscreen?
         [:div.cmail-footer
           (when (and (not= (:status cmail-data) "published")

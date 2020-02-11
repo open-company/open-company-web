@@ -650,7 +650,7 @@ div.left-navigation-sidebar {
       }
 
       div.board-name {
-        width: 168px;
+        width: calc(100% - 8px);
         float: left;
 
         div.internal {
@@ -701,7 +701,7 @@ div.left-navigation-sidebar {
 
       @include big_web(){
         &:hover {
-          background-color: var(--light-color);
+          background-color: var(--navigation-sidebar-hover-bg);
         }
       }
     }
