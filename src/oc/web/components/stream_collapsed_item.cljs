@@ -88,12 +88,11 @@
             {:ref "activity-headline"
              :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          [:div.stream-collapsed-item-dot.muted-dot]
+          [:div.muted-activity]
+          [:div.stream-collapsed-item-dot.bookmark-must-see-dot]
           [:div.must-see-tag]
           [:div.bookmark-tag]
-          [:div.muted-activity
-            {:data-toggle (when-not is-mobile? "tooltip")
-             :data-placement "top"
-             :title "Muted"}]
           (stream-item-summary activity-data)]
         (when-not has-zero-comments?
           (comments-summary {:entry-data activity-data

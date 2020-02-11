@@ -287,13 +287,15 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/foc-date-time t)])]]
-            [:div.must-see-tag]
-            [:div.bookmark-tag-small.mobile-only]
-            [:div.bookmark-tag.big-web-tablet-only]
+            [:div.stream-item-header-dot.muted-dot]
             [:div.muted-activity
               {:data-toggle (when-not is-mobile? "tooltip")
                :data-placement "top"
-               :title "Muted"}]]]
+               :title "Muted"}]
+            [:div.stream-item-header-dot.bookmark-must-see-dot]
+            [:div.must-see-tag]
+            [:div.bookmark-tag-small.mobile-only]
+            [:div.bookmark-tag.big-web-tablet-only]]]
         [:div.activity-share-container]
         (when is-published?
           (if (and is-mobile?

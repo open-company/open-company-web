@@ -231,6 +231,15 @@ div.expanded-post {
         }
       }
 
+      @include muted-activity();
+
+      div.muted-activity {
+        display: inline-block;
+        margin-top: 2px;
+        opacity: 0.5;
+        margin-right: 0;
+      }
+
       div.must-see-tag {
         display: inline-block;
 

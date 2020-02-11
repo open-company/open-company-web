@@ -142,6 +142,10 @@ div.stream-item {
     div.must-see-tag {
       display: inline-block;
     }
+
+    div.stream-item-header-dot.bookmark-must-see-dot {
+      display: inline-block;
+    }
   }
 
   &.bookmark-item, &.bookmark-item.must-see-item {
@@ -152,10 +156,18 @@ div.stream-item {
     div.bookmark-tag, div.bookmark-tag-small {
       display: inline-block;
     }
+
+    div.stream-item-header-dot.bookmark-must-see-dot {
+      display: inline-block;
+    }
   }
 
   &.muted-item {
     div.muted-activity {
+      display: inline-block;
+    }
+
+    div.stream-item-header-dot.muted-dot {
       display: inline-block;
     }
   }
@@ -316,7 +328,6 @@ div.stream-item {
             font-size: 12px;
             color: var(--light-color);
             position: relative;
-            margin-right: 8px;
             margin-left: 6px;
             overflow: visible;
             white-sapce: nowrap;
@@ -353,7 +364,7 @@ div.stream-item {
       }
 
       div.bookmark-tag, div.must-see-tag {
-        margin-top: 2px;
+        margin-top: 3px;
       }
 
       div.muted-activity {
@@ -378,17 +389,28 @@ div.stream-item {
     }
   }
 
+  div.stream-item-header-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: var(--opac-background-color-2);
+    margin: 0 6px -1px;
+    display: none;
+  }
+
   @include must-see-tag();
   
   @include bookmark-tag();
 
   @include muted-activity();
 
+
   div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
     display: none;
+    margin-right: 0;
   }
 
-  & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small, & > div.muted-activity {
+  & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small {
     margin-top: 16px;
   }
 
