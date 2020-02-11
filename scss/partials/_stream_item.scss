@@ -437,7 +437,7 @@ div.stream-item {
       cursor: pointer;
 
       @include mobile() {
-        min-height: 73px;
+        min-height: 71px;
       }
 
       div.ziggeo-player {
@@ -499,7 +499,7 @@ div.stream-item {
           display: none;
 
           img.body-thumbnail {
-            max-height: 71px;
+            max-height: 72px;
             max-width: 95px;
           }
         }
@@ -595,13 +595,13 @@ div.stream-item {
         }
 
         @include mobile() {
-          @include activity-body(16, 18, var(--color));
-          line-height: 18px;
-          max-height: #{18 * 2}px;
+          @include activity-body(16, 20, var(--color));
+          line-height: 20px;
+          max-height: #{20 * 2}px;
 
           h2 {
             font-size: 16px;
-            line-height: 18px;
+            line-height: 20px;
           }
         }
       }
