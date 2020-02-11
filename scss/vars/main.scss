@@ -21,7 +21,7 @@ $left_navigation_sidebar_minimum_right_margin: 40;
 $board_container_width: 600;
 $foc_height: 180;
 $collapsed_foc_height: 56;
-$mobile_foc_height: 172;
+$mobile_foc_height: 163;
 
 // setting panel sizes
 $settings_header_height: 48px;
@@ -32,3 +32,7 @@ $user_profile_footer_height: 90px;
 
 // Payments
 $paywall_alert_width: 270;
+
+// Mobile specific
+$mobile_trial_expired_banner_height: 82;
+$mobile_search_header_height: 64;

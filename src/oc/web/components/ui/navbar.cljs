@@ -9,6 +9,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
+            [oc.web.stores.search :as search]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
@@ -29,6 +30,7 @@
                     (drv/drv :show-add-post-tooltip)
                     (drv/drv :mobile-user-notifications)
                     (ui-mixins/render-on-resize nil)
+                    (drv/drv search/search-active?)
   [s]
   (let [{:keys [org-data
                 board-data
@@ -54,7 +56,8 @@
                        (= (router/current-board-slug) "bookmarks")
                        "Bookmarks"
                        :else
-                       (:name board-data))]
+                       (:name board-data))
+         search-active? (drv/react s search/search-active?)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -67,29 +70,39 @@
                                                      (not (:read-only org-data)))})}
       (when-not (utils/is-test-env?)
         (login-overlays-handler))
-      [:div.oc-navbar-header.group
-        [:div.oc-navbar-header-container.group
-          [:div.navbar-left
+      (if (and is-mobile?
+               search-active?)
+        [:div.mobile-header
+          [:button.mlb-reset.search-close-bt
+            {:on-click (fn [e]
+                         (utils/event-stop e)
+                         (search-actions/reset)
+                         (search-actions/inactive))}]
+          [:div.mobile-header-title
+            "Search"]]
+        [:div.oc-navbar-header.group
+          [:div.oc-navbar-header-container.group
+            [:div.navbar-left
+              (if is-mobile?
+                [:button.mlb-reset.mobile-ham-menu
+                  {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
+                (orgs-dropdown))]
             (if is-mobile?
-              [:button.mlb-reset.mobile-ham-menu
-                {:on-click #(dis/dispatch! [:update [:mobile-navigation-sidebar] not])}]
-              (orgs-dropdown))]
-          (if is-mobile?
-            [:div.navbar-center
-              [:div.navbar-mobile-title
-                mobile-title]]
-            [:div.navbar-center
-              {:class (when search-active "search-active")}
-              (search-box)])
-          [:div.navbar-right
-            (if (jwt/jwt)
-              [:div.group
-                (when-not is-mobile?
-                  (user-notifications))
-                [:div.user-menu
-                  [:div.user-menu-button
-                    {:ref "user-menu"
-                     :class (when show-whats-new-green-dot "green-dot")}
-                    (user-avatar
-                     {:click-cb #(nav-actions/menu-toggle)})]]]
-              (login-button))]]]]))
+              [:div.navbar-center
+                [:div.navbar-mobile-title
+                  mobile-title]]
+              [:div.navbar-center
+                {:class (when search-active "search-active")}
+                (search-box)])
+            [:div.navbar-right
+              (if (jwt/jwt)
+                [:div.group
+                  (when-not is-mobile?
+                    (user-notifications))
+                  [:div.user-menu
+                    [:div.user-menu-button
+                      {:ref "user-menu"
+                       :class (when show-whats-new-green-dot "green-dot")}
+                      (user-avatar
+                       {:click-cb #(nav-actions/menu-toggle)})]]]
+                (login-button))]]])]))

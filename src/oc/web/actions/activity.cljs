@@ -589,7 +589,7 @@
 (defn org-data-from-secure-activity [secure-activity-data]
   (let [old-org-data (dis/org-data)]
     (-> secure-activity-data
-      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height])
+      (select-keys [:org-uuid :org-name :org-slug :org-logo-url :org-logo-width :org-logo-height :team-id])
       (clojure.set/rename-keys {:org-uuid :uuid
                                 :org-name :name
                                 :org-slug :slug

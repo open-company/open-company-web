@@ -222,7 +222,8 @@
            {:ref "editor-node"
             :class (utils/class-set {add-comment-class true
                                      :medium-editor-placeholder-hidden @(::did-change s)
-                                     :medium-editor-placeholder (not @(::did-change s))
+                                     :medium-editor-placeholder-relative (not @(::did-change s))
+                                     :medium-editor-element true
                                      utils/hide-class true})
             :on-focus #(focus-add-comment s)
             :on-blur #(disable-add-comment-if-needed s)
@@ -244,7 +245,10 @@
             [:button.mlb-reset.close-reply-bt
               {:on-click (fn [_]
                           (let [dismiss-fn (if (fn? dismiss-reply-cb)
-                                             #(dismiss-reply-cb true)
+                                             #(do
+                                                (reset! (::did-change s) false)
+                                                (reset! (::show-post-button s) false)
+                                                (dismiss-reply-cb true))
                                              (fn []
                                                 (set! (.-innerHTML (rum/ref-node s "editor-node")) @(::initial-add-comment s))
                                                 (disable-add-comment-if-needed s)
