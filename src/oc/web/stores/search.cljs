@@ -3,9 +3,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dispatcher]))
 
-(def search-limit 20)
-(def lastsearch (atom ""))
-(def savedsearch (atom ""))
+(defonce search-limit 20)
+(defonce savedsearch (atom ""))
 
 (defonce search-key :search-results)
 (defonce search-active? :search-active)
@@ -37,16 +36,20 @@
                 (assoc result :_source (assoc source :uuid new-uuid))))
             results)))
 
+(defmethod dispatcher/action :search-query/start
+  [db [_ search-query]]
+  (assoc-in db [search-key :loading] true))
+
+
 (defmethod dispatcher/action :search-query/finish
   [db [_ {:keys [success error body query]}]]
-
   (let [total-hits (:total body)
         results (vec (sort-by #(:created-at (:_source %)) (:hits body)))]
     (when success
-      (reset! lastsearch query))
+      (reset! savedsearch query))
     (if success
-      (assoc db search-key {:count total-hits :results (cleanup-uuid results)})
-      db)))
+      (assoc db search-key {:count total-hits :loading false :results (cleanup-uuid results) :query query})
+      (assoc db search-key {:failed true :loading false :query query}))))
 
 (defmethod dispatcher/action :search-active
   [db [_]]
@@ -63,7 +66,3 @@
 (defmethod dispatcher/action :search-result-clicked
   [db [_]]
   (assoc db search-active? false))
-
-(defmethod dispatcher/action :search-focus
-  [db [_]]
-  db)

@@ -863,7 +863,7 @@
          (callback {:query search-query
                     :success success
                     :error (when-not success body)
-                    :body (when (seq body) (json->cljs body))})))
+                    :body (when (and success (seq body)) (json->cljs body))})))
       (handle-missing-link "query" search-link callback
        {:org-uuid org-uuid
         :search-query search-query}))))
