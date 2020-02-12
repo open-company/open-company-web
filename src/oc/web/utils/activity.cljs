@@ -11,6 +11,117 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.comment :as comment-utils]))
 
+;; Posts separators
+
+(defn- post-month-date-from-date [past-month]
+  (doto past-month
+    ;; Reset day to first of the month
+    (.setDate 1)
+    ;; Reset time to midnight
+    (.setHours 0)
+    (.setMinutes 0)
+    (.setSeconds 0)
+    (.setMilliseconds 0)))
+
+(defn- post-month-string-from-date [d]
+  (let [now (utils/js-date)
+        month-string (utils/full-month-string (.getMonth d))]
+    (if (= (.getYear now) (.getYear d))
+      month-string
+      (str month-string ", " (.getFullYear d)))))
+
+; (defn- calc-date-separators
+;   "Get the seconds btw now and every one of the potential groups"
+;   [last-date]
+;   (let [now (utils/js-date)
+
+;         last-monday (utils/js-date)
+;         _last-monday (doto last-monday
+;                        (.setDate (- (.getDate last-monday)
+;                                     (-> (.getDay last-monday) (+ 6) (mod 7))))
+;                        (.setHours 0)
+;                        (.setMinutes 0)
+;                        (.setSeconds 0)
+;                        (.setMilliseconds 0))
+
+;         two-weeks-ago (utils/js-date)
+;         _two-weeks-ago (doto two-weeks-ago
+;                          (.setDate (- (.getDate two-weeks-ago)
+;                                       ;; Monday before last
+;                                       (-> (.getDay two-weeks-ago) (+ 6) (mod 7) (+ 7))))
+;                          ;; Reset time to midnight
+;                          (.setHours 0)
+;                          (.setMinutes 0)
+;                          (.setSeconds 0)
+;                          (.setMilliseconds 0))
+
+;         last-date-js (utils/js-date last-date)]
+;     (loop [separators [{:label "Recent" :date last-monday}
+;                        {:label "2 weeks ago" :date two-weeks-ago}]
+;            idx 0]
+;       (let [prev-separator (past-month-date idx)]
+;         (if (<= prev-separator last-date-js)
+;           separators
+;           (recur (conj separators {:label (month-label prev-separator) :date prev-separator})
+;                  (inc idx)))))))
+
+(defn- add-post-to-separators [post-data current-separators last-monday two-weeks-ago]
+  ; (js/console.log "DBG2 add-post-to-separators" post-data)
+  ; (js/console.log "DBG2    current-separators" current-separators (empty? current-separators))
+  (let [post-date (utils/js-date (:published-at post-data))]
+    (if (and (not (empty? current-separators))
+             (> post-date (:date (last current-separators))))
+      (update-in current-separators [(dec (count current-separators)) :posts-list] conj (:uuid post-data))
+      (let [new-separator (cond
+                            (<= post-date last-monday)
+                            {:label "Recent"
+                             :date last-monday
+                             :posts-list [(:uuid post-data)]}
+                            (<= post-date two-weeks-ago)
+                            {:label "2 weeks ago"
+                             :date two-weeks-ago
+                             :posts-list [(:uuid post-data)]}
+                            :else
+                            {:label (post-month-string-from-date post-date)
+                             :date (post-month-date-from-date post-date)
+                             :posts-list [(:uuid post-data)]})]
+        (conj current-separators new-separator)))))
+
+(defn grouped-posts [sorted-posts-list]
+  ; (js/console.log "DBG2 grouped-posts sorted-posts-list" sorted-posts-list)
+  (let [now (utils/js-date)
+
+        last-monday (utils/js-date)
+        _last-monday (doto last-monday
+                       (.setDate (- (.getDate last-monday)
+                                    (-> (.getDay last-monday) (+ 6) (mod 7))))
+                       (.setHours 0)
+                       (.setMinutes 0)
+                       (.setSeconds 0)
+                       (.setMilliseconds 0))
+
+        two-weeks-ago (utils/js-date)
+        _two-weeks-ago (doto two-weeks-ago
+                         (.setDate (- (.getDate two-weeks-ago)
+                                      ;; Monday before last
+                                      (-> (.getDay two-weeks-ago) (+ 6) (mod 7) (+ 7))))
+                         ;; Reset time to midnight
+                         (.setHours 0)
+                         (.setMinutes 0)
+                         (.setSeconds 0)
+                         (.setMilliseconds 0))
+
+        last-date (:published-at (last sorted-posts-list))]
+
+    (loop [separators []
+           posts sorted-posts-list]
+      (if (empty? posts)
+        separators
+        (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago)
+               (rest posts))))))
+
+;; 
+
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
 
@@ -213,14 +324,23 @@
                                                               new-items)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
-                             with-posts-list)]
-      with-saved-items)))
+                             with-posts-list)
+          with-posts-separators (if-not (= (:slug board-data) utils/default-drafts-board-slug)
+                                  (assoc with-saved-items :grouped-posts
+                                   (grouped-posts (mapv #(get-in with-saved-items [:fixed-items %]) (:posts-list with-saved-items))))
+                                  with-saved-items)]
+      with-posts-separators)))
 
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."
   ([container-data]
    (fix-container container-data {} (dis/org-data)))
   ([container-data change-data org-data & [direction]]
+    ; (js/console.log "DBG fix-container-data " (:href container-data))
+    ; (js/console.log "DBG   items:" (count (:items container-data)))
+    ; (js/console.log "DBG   fixed-items:" (count (:fixed-items container-data)))
+    ; (js/console.log "DBG   posts-list:" (count (:posts-list container-data)))
+    ; (js/console.log "DBG   grouped-posts:" (count (:grouped-posts container-data)))
     (let [all-boards (:boards org-data)
           with-fixed-activities (reduce (fn [ret item]
                                           (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
@@ -255,8 +375,15 @@
                                                               new-items)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
-                             with-posts-list)]
-      with-saved-items)))
+                             with-posts-list)
+          with-posts-separators (if-not (clojure.string/ends-with? (:href container-data) "/inbox")
+                                  (assoc with-saved-items :grouped-posts
+                                   (grouped-posts (mapv #(get-in with-saved-items [:fixed-items %]) (:posts-list with-saved-items))))
+                                  with-saved-items)]
+      ; (js/console.log "DBG2    after fixed-items" (count (:fixed-items with-posts-separators)))
+      ; (js/console.log "DBG2    after posts-list" (count (:posts-list with-posts-separators)))
+      ; (js/console.log "DBG2    after grouped-posts" (count (:grouped-posts with-posts-separators)))
+      with-posts-separators)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

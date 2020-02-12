@@ -28,6 +28,7 @@
 (def collapsed-foc-height 56)
 (def foc-height 184)
 (def mobile-foc-height 163)
+(def foc-separators-height 50)
 
 (defn- calc-card-height [mobile? foc-layout]
   (cond
@@ -79,7 +80,6 @@
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
-        sorted-items @(drv/get-ref s :filtered-posts)
         next-link (utils/link-for (:links container-data) "next")]
     (reset! (::has-next s) next-link)
     (did-scroll s nil)))
@@ -97,20 +97,25 @@
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
-   [:div.virtualized-list-row
-    {:class (when collapsed-item? "collapsed-item")
-     :style style}
-    (if collapsed-item?
-      (stream-collapsed-item {:activity-data entry
-                              :comments-data comments-data
-                              :read-data reads-data
-                              :show-wrt? show-wrt?
-                              :editable-boards editable-boards})
-      (stream-item {:activity-data entry
-                    :comments-data comments-data
-                    :read-data reads-data
-                    :show-wrt? show-wrt?
-                    :editable-boards editable-boards}))]))
+   ; (js/console.log "DBG wrapped-stream-item" entry)
+   (if (= (:content-type entry) "entry")
+     [:div.virtualized-list-row
+       {:class (when collapsed-item? "collapsed-item")
+        :style style}
+       (if collapsed-item?
+         (stream-collapsed-item {:activity-data entry
+                                 :comments-data comments-data
+                                 :read-data reads-data
+                                 :show-wrt? show-wrt?
+                                 :editable-boards editable-boards})
+         (stream-item {:activity-data entry
+                       :comments-data comments-data
+                       :read-data reads-data
+                       :show-wrt? show-wrt?
+                       :editable-boards editable-boards}))]
+      [:div.virtualized-list-separator
+        {:style style}
+        (:label entry)])))
 
 (rum/defc load-more < rum/static
   [{:keys [style]}]
@@ -182,8 +187,11 @@
                                      (inc (count items))
                                      (count items))
                          :rowHeight (fn [params]
-                                      (let [{:keys [index]} (js->clj params :keywordize-keys true)]
+                                      (let [{:keys [index]} (js->clj params :keywordize-keys true)
+                                            item (get items index)]
                                         (cond
+                                          (not= (:content-type item) "entry")
+                                          foc-separators-height
                                           (and (= index (count items))
                                                show-loading-more)
                                           (if is-mobile? 44 60)
@@ -201,7 +209,7 @@
                                rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
-                        (drv/drv :filtered-posts)
+                        (drv/drv :grouped-posts)
                         (drv/drv :container-data)
                         (drv/drv :activities-read)
                         (drv/drv :comments-data)
@@ -253,9 +261,10 @@
         comments-data (drv/react s :comments-data)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
-        items (drv/react s :filtered-posts)
+        items (drv/react s :grouped-posts)
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)]
+    ; (js/console.log "DBG items:" items)
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group

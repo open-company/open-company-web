@@ -21,7 +21,12 @@
                              (if is-published?
                                (conj ap-without-uuid (:uuid activity-data))
                                ap-without-uuid))
-          next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)]
+          all-posts-list (mapv #(dispatcher/activity-data org-slug % db) new-ap-data-posts)
+          next-ap-data (merge old-ap-data {:posts-list new-ap-data-posts
+                                           :grouped-posts (au/grouped-posts all-posts-list)})]
+      ; (js/console.log "DBG1 add-remove-item-from-all-posts all-posts-list" all-posts-list)
+      ; (js/console.log "DBG1         new-ap-data-posts" new-ap-data-posts)
+      ; (js/console.log "DBG1         grouped-posts" (au/grouped-posts all-posts-list))
       (assoc-in db ap-key next-ap-data))
     db))
 
@@ -40,7 +45,9 @@
                              (if is-bookmark?
                                (conj bm-without-uuid (:uuid activity-data))
                                bm-without-uuid))
-          next-bm-data (assoc old-bm-data :posts-list new-bm-data-posts)]
+          bookmarks-posts-list (mapv #(dispatcher/activity-data org-slug % db) new-bm-data-posts)
+          next-bm-data (merge old-bm-data {:posts-list new-bm-data-posts
+                                           :grouped-posts (au/grouped-posts bookmarks-posts-list)})]
       (assoc-in db bm-key next-bm-data))
     db))
 
@@ -330,6 +337,7 @@
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :fixed-items (:fixed-items container-data)
                                                               :old-links (:links container-data)})
           fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
@@ -373,6 +381,7 @@
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :fixed-items (:fixed-items container-data)
                                                               :old-links (:links container-data)})
           fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))
@@ -559,6 +568,7 @@
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
           prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :fixed-items (:fixed-items container-data)
                                                               :old-links (:links container-data)})
           fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
           new-items-map (merge old-posts (:fixed-items fixed-posts-data))

@@ -165,6 +165,25 @@
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
 
+(defn- get-container-grouped-posts [base posts-data is-board? org-slug container-slug]
+  (let [cnt-key (if is-board?
+                  (board-data-key org-slug container-slug)
+                  (container-key org-slug container-slug))
+        container-data (get-in base cnt-key)
+        grouped-list (:grouped-posts container-data)
+        container-grouped-posts (mapv
+                                 (fn [separator-group]
+                                   (assoc separator-group :posts-list
+                                    (mapv #(when (contains? posts-data %) (get posts-data %)) (:posts-list separator-group))))
+                                 grouped-list)
+        all-items (vec (rest ;; Remove the first label since it's always the same and it's not part of the scrolling list
+                   (apply concat
+                    (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) container-grouped-posts))))]
+    ; (js/console.log "DBG get-container-grouped-posts grouped-list" grouped-list)
+    ; (js/console.log "DBG    container-grouped-posts" container-grouped-posts)
+    ; (js/console.log "DBG    all-items" all-items)
+    all-items))
+
 (def ui-theme-key [:ui-theme])
 
 ;; Functions needed by derivatives
@@ -291,6 +310,17 @@
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
                               (get-container-posts base posts-data is-board? org-slug container-slug))))]
+   :grouped-posts       [[:base :org-data :posts-data :route]
+                         (fn [base org-data posts-data route]
+                           (when (and base org-data posts-data route (:board route))
+                             (let [org-slug (:slug org-data)
+                                   all-boards-slug (map :slug (:boards org-data))
+                                   container-slug (:board route)
+                                   is-board? ((set all-boards-slug) container-slug)]
+                              (if (or (= (:board route) utils/default-drafts-board-slug)
+                                      (= (:board route) "inbox"))
+                                (get-container-posts base posts-data is-board? org-slug container-slug)
+                                (get-container-grouped-posts base posts-data is-board? org-slug container-slug)))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
