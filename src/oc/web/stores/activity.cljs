@@ -177,27 +177,23 @@
                                  (let [base-container-key (dispatcher/container-key org-slug ckey)
                                        next-ndb (update-in ndb (conj base-container-key :posts-list)
                                                  (fn [posts-list]
-                                                   (filter #(not= % (:uuid activity-data)) posts-list)))]
+                                                   (filterv #(not= % (:uuid activity-data)) posts-list)))]
                                     (if (au/show-separators? ckey)
-                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (au/grouped-posts (:posts-list next-ndb)))
-                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (:posts-list next-ndb)))))
+                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (au/grouped-posts (get-in next-ndb base-container-key)))
+                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (get-in next-ndb (conj base-container-key :posts-list))))))
                                db
                                (keys (get-in db containers-key)))
         ;; Remove the post from all the boards posts list too
         boards-key (dispatcher/boards-key org-slug)
         with-fixed-boards (reduce
                            (fn [ndb ckey]
-                             (update-in ndb (conj (dispatcher/board-data-key org-slug ckey) :posts-list)
-                              (fn [posts-list]
-                                (filter #(not= % (:uuid activity-data)) posts-list)))
-
                              (let [base-board-key (dispatcher/board-data-key org-slug ckey)
                                    next-ndb (update-in ndb (conj base-board-key :posts-list)
                                              (fn [posts-list]
-                                               (filter #(not= % (:uuid activity-data)) posts-list)))]
+                                               (filterv #(not= % (:uuid activity-data)) posts-list)))]
                                 (if (au/show-separators? ckey)
-                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (au/grouped-posts (:posts-list next-ndb)))
-                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (:posts-list next-ndb)))))
+                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (au/grouped-posts (get-in next-ndb base-board-key)))
+                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (get-in next-ndb (conj base-board-key :posts-list))))))
                            with-fixed-containers
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too

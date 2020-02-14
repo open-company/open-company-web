@@ -13,9 +13,12 @@
 
 ;; Posts separators
 
-(defn show-separators? [container-slug]
-  (and (not (responsive/is-mobile-size?))
-       (not (#{utils/default-drafts-board-slug "inbox" "bookmarks"} container-slug))))
+(defn show-separators? [container-slug-or-href]
+  (and container-slug-or-href
+       (not (responsive/is-mobile-size?))
+       (not (or (#{utils/default-drafts-board-slug "inbox" "bookmarks"} (name container-slug-or-href))
+                (and (string? container-slug-or-href)
+                     (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)"))))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -111,14 +114,17 @@
                        (.setSeconds 0)
                        (.setMilliseconds 0))
 
-        last-date (:published-at (last sorted-posts-list))]
-
-    (loop [separators []
-           posts sorted-posts-list]
-      (if (empty? posts)
-        separators
-        (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
-               (rest posts))))))
+        last-date (:published-at (last sorted-posts-list))
+        separators-data (loop [separators []
+                               posts sorted-posts-list]
+                          (if (empty? posts)
+                            separators
+                            (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
+                                   (rest posts))))
+        unwrapped-items (vec (rest ;; Always remove the first label
+                         (apply concat
+                          (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))]
+        unwrapped-items))
 
 ;; 
 
@@ -325,16 +331,8 @@
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
                              with-posts-list)
-
-          should-group-posts? (and (not (responsive/is-mobile-size?))
-                                   (not (= (:slug board-data) utils/default-drafts-board-slug)))
-          grouped-posts-list (when should-group-posts?
-                              (grouped-posts with-saved-items))
-          with-posts-separators (if should-group-posts?
-                                  (assoc with-saved-items :items-to-render
-                                   (vec (rest ;; Remove the first label
-                                    (apply concat
-                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts-list)))))
+          with-posts-separators (if (show-separators? (:slug board-data))
+                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
@@ -378,15 +376,8 @@
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
                              with-posts-list)
-          should-group-posts? (and (not (responsive/is-mobile-size?))
-                                   (not (.match (:href container-data) #"(?i)/(inbox|bookmarks)(/|$)")))
-          grouped-posts-list (when should-group-posts?
-                               (grouped-posts with-saved-items))
-          with-posts-separators (if should-group-posts?
-                                  (assoc with-saved-items :items-to-render
-                                   (vec (rest ;; Remove the first label
-                                    (apply concat
-                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts-list)))))
+          with-posts-separators (if (show-separators? (:href container-data))
+                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
