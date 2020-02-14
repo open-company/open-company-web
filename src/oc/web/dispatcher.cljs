@@ -176,12 +176,10 @@
                                    (assoc separator-group :posts-list
                                     (mapv #(when (contains? posts-data %) (get posts-data %)) (:posts-list separator-group))))
                                  grouped-list)
-        all-items (vec (rest ;; Remove the first label since it's always the same and it's not part of the scrolling list
+        remove-header-fn (if (= container-slug "all-posts") rest identity)
+        all-items (vec (remove-header-fn ;; Remove the first label since it's always the same and it's not part of the scrolling list
                    (apply concat
                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) container-grouped-posts))))]
-    ; (js/console.log "DBG get-container-grouped-posts grouped-list" grouped-list)
-    ; (js/console.log "DBG    container-grouped-posts" container-grouped-posts)
-    ; (js/console.log "DBG    all-items" all-items)
     all-items))
 
 (def ui-theme-key [:ui-theme])
