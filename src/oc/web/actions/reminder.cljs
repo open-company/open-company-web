@@ -4,6 +4,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.local-settings :as ls]
             [oc.web.lib.json :refer (json->cljs)]
             [oc.web.utils.reminder :as reminder-utils]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -12,13 +13,14 @@
 (defn load-reminders-roster
   "Load the roster of the users that can be assigned to reminders."
   []
-  (let [reminders-data (dis/reminders-data)
-        roster-link (utils/link-for (:links reminders-data) "roster")]
-    (when roster-link
-      (api/get-reminders-roster roster-link
-       (fn [{:keys [success body status]}]
-         (when success
-           (dis/dispatch! [:reminders-roster-loaded (router/current-org-slug) (json->cljs body)])))))))
+  (when ls/reminders-enabled
+    (let [reminders-data (dis/reminders-data)
+          roster-link (utils/link-for (:links reminders-data) "roster")]
+      (when roster-link
+        (api/get-reminders-roster roster-link
+         (fn [{:keys [success body status]}]
+           (when success
+             (dis/dispatch! [:reminders-roster-loaded (router/current-org-slug) (json->cljs body)]))))))))
 
 (defn- reminders-loaded
   "Reminders data loaded, parse and dispatch the content to the app-state."
@@ -37,9 +39,10 @@
   Load the reminders list.
   NB: first reminders is loaded in did-mount of dashboard-layout component."
   []
-  (when-let* [org-data (dis/org-data)
-              reminders-link (utils/link-for (:links org-data) "reminders")]
-    (api/get-reminders reminders-link reminders-loaded)))
+  (when ls/reminders-enabled
+    (when-let* [org-data (dis/org-data)
+                reminders-link (utils/link-for (:links org-data) "reminders")]
+      (api/get-reminders reminders-link reminders-loaded))))
 
 (defn edit-reminder
   "Move a reminder in the edit location of the app-state and open the edit component."
