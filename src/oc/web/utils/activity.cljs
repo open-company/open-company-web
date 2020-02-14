@@ -14,7 +14,8 @@
 ;; Posts separators
 
 (defn show-separators? [container-slug]
-  (not (#{utils/default-drafts-board-slug "inbox" "bookmarks"} container-slug)))
+  (and (not (responsive/is-mobile-size?))
+       (not (#{utils/default-drafts-board-slug "inbox" "bookmarks"} container-slug))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
