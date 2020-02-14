@@ -13,6 +13,9 @@
 
 ;; Posts separators
 
+(defn show-separators? [container-slug]
+  (not (#{utils/default-drafts-board-slug "inbox" "bookmarks"} container-slug)))
+
 (defn- post-month-date-from-date [post-date]
   (doto post-date
     ;; Reset day to first of the month
@@ -25,10 +28,17 @@
 
 (defn- separator-from-date [d last-monday two-weeks-ago first-month]
   (let [now (utils/js-date)
+        ten-mins-ago (utils/js-date)
+        ten-mins-ago* (doto ten-mins-ago
+                        (.setMinutes (- (.getMinutes ten-mins-ago) 10)))
         month-string (utils/full-month-string (inc (.getMonth d)))]
     (cond
-      (> d last-monday)
+      (> d ten-mins-ago)
       {:label "Recent"
+       :content-type "separator"
+       :date ten-mins-ago}
+      (> d last-monday)
+      {:label "10s ago"
        :content-type "separator"
        :date last-monday}
       (> d two-weeks-ago)
