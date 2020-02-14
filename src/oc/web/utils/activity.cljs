@@ -367,7 +367,7 @@
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
                              with-posts-list)
           should-group-posts? (and (not (responsive/is-mobile-size?))
-                                   (not (.match (:href container-data) #"(?i)/inbox?(/|$)")))
+                                   (not (.match (:href container-data) #"(?i)/(inbox|bookmarks)(/|$)")))
           grouped-posts (when should-group-posts?
                           (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
                                                     (dis/activity-data %))
