@@ -108,7 +108,7 @@
         current-user-data (drv/react s :current-user-data)
         user-role (user-store/user-role org-data current-user-data)
         is-mobile? (responsive/is-mobile-size?)
-        show-reminders? (when ls/reminders-enabled
+        show-reminders? (when ls/reminders-enabled?
                           (utils/link-for (:links org-data) "reminders"))
         expanded-user-menu (= (last panel-stack) :menu)
         org-slug (router/current-org-slug)

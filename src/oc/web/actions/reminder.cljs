@@ -13,7 +13,7 @@
 (defn load-reminders-roster
   "Load the roster of the users that can be assigned to reminders."
   []
-  (when ls/reminders-enabled
+  (when ls/reminders-enabled?
     (let [reminders-data (dis/reminders-data)
           roster-link (utils/link-for (:links reminders-data) "roster")]
       (when roster-link
@@ -39,7 +39,7 @@
   Load the reminders list.
   NB: first reminders is loaded in did-mount of dashboard-layout component."
   []
-  (when ls/reminders-enabled
+  (when ls/reminders-enabled?
     (when-let* [org-data (dis/org-data)
                 reminders-link (utils/link-for (:links org-data) "reminders")]
       (api/get-reminders reminders-link reminders-loaded))))

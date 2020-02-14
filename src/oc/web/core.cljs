@@ -151,7 +151,8 @@
                               (contains? query-params :org-settings)
                               (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
-        reminders (when (and (not org-settings)
+        reminders (when (and ls/reminders-enabled?
+                             (not org-settings)
                              (contains? query-params :reminders))
                     :reminders)
         panel-stack (cond
