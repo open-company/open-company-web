@@ -63,8 +63,11 @@
         (assoc (separator-from-date post-date last-monday two-weeks-ago first-month)
          :posts-list [(:uuid post-data)]))))))
 
-(defn grouped-posts [sorted-posts-list]
-  (let [now (utils/js-date)
+(defn grouped-posts [container-data]
+  (let [sorted-post-uuids (:posts-list container-data)
+        sorted-posts-list (mapv #(or (get-in container-data [:fixed-items %])
+                                     (dis/activity-data %))
+                           sorted-post-uuids)
 
         last-monday (utils/js-date)
         _last-monday (doto last-monday
@@ -314,15 +317,13 @@
 
           should-group-posts? (and (not (responsive/is-mobile-size?))
                                    (not (= (:slug board-data) utils/default-drafts-board-slug)))
-          grouped-posts (when should-group-posts?
-                          (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
-                                                    (dis/activity-data %))
-                                          (:posts-list with-saved-items))))
+          grouped-posts-list (when should-group-posts?
+                              (grouped-posts with-saved-items))
           with-posts-separators (if should-group-posts?
                                   (assoc with-saved-items :items-to-render
                                    (vec (rest ;; Remove the first label
                                     (apply concat
-                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts)))))
+                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts-list)))))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
@@ -368,15 +369,13 @@
                              with-posts-list)
           should-group-posts? (and (not (responsive/is-mobile-size?))
                                    (not (.match (:href container-data) #"(?i)/(inbox|bookmarks)(/|$)")))
-          grouped-posts (when should-group-posts?
-                          (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
-                                                    (dis/activity-data %))
-                                          (:posts-list with-saved-items))))
+          grouped-posts-list (when should-group-posts?
+                               (grouped-posts with-saved-items))
           with-posts-separators (if should-group-posts?
                                   (assoc with-saved-items :items-to-render
                                    (vec (rest ;; Remove the first label
                                     (apply concat
-                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts)))))
+                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts-list)))))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 

@@ -21,9 +21,8 @@
                              (if is-published?
                                (conj ap-without-uuid (:uuid activity-data))
                                ap-without-uuid))
-          all-posts-list (mapv #(dispatcher/activity-data org-slug % db) new-ap-data-posts)
           next-ap-data (merge old-ap-data {:posts-list new-ap-data-posts
-                                           :grouped-posts (au/grouped-posts all-posts-list)})]
+                                           :items-to-render (au/grouped-posts (assoc old-ap-data :posts-list new-ap-data-posts))})]
       (assoc-in db ap-key next-ap-data))
     db))
 
@@ -44,7 +43,7 @@
                                bm-without-uuid))
           bookmarks-posts-list (mapv #(dispatcher/activity-data org-slug % db) new-bm-data-posts)
           next-bm-data (merge old-bm-data {:posts-list new-bm-data-posts
-                                           :grouped-posts (au/grouped-posts bookmarks-posts-list)})]
+                                           :items-to-render new-bm-data-posts})]
       (assoc-in db bm-key next-bm-data))
     db))
 
