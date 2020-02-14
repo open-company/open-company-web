@@ -97,7 +97,6 @@
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
-   ; (js/console.log "DBG wrapped-stream-item" entry)
    (if (= (:content-type entry) "entry")
      [:div.virtualized-list-row
        {:class (when collapsed-item? "collapsed-item")
@@ -264,7 +263,6 @@
         items (drv/react s :grouped-posts)
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)]
-    ; (js/console.log "DBG items:" items)
     [:div.paginated-stream.group
       [:div.paginated-stream-cards
         [:div.paginated-stream-cards-inner.group

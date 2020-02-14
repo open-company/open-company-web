@@ -122,7 +122,6 @@
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
         drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
-    ; (js/console.log "DBG org-loaded all-posts-link" all-posts-link all-posts-delay "bookmarks-link" bookmarks-link bookmarks-delay)
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
