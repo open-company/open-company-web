@@ -98,6 +98,7 @@ var OCWebPrintCommentsData = function(){};
 var OCWebPrintContainerData = function(){};
 var OCWebPrintEntryEditingData = function(){};
 var OCWebPrintFilteredPostsData = function(){};
+var OCWebPrintItemsToRender = function(){};
 var OCWebPrintJWTContents = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintPanelStack = function(){};

@@ -97,7 +97,10 @@
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
-   (if (= (:content-type entry) "entry")
+   (if (= (:content-type entry) "separator")
+     [:div.virtualized-list-separator
+        {:style style}
+        (:label entry)]
      [:div.virtualized-list-row
        {:class (when collapsed-item? "collapsed-item")
         :style style}
@@ -111,10 +114,7 @@
                        :comments-data comments-data
                        :read-data reads-data
                        :show-wrt? show-wrt?
-                       :editable-boards editable-boards}))]
-      [:div.virtualized-list-separator
-        {:style style}
-        (:label entry)])))
+                       :editable-boards editable-boards}))])))
 
 (rum/defc load-more < rum/static
   [{:keys [style]}]
@@ -189,7 +189,7 @@
                                       (let [{:keys [index]} (js->clj params :keywordize-keys true)
                                             item (get items index)]
                                         (cond
-                                          (not= (:content-type item) "entry")
+                                          (= (:content-type item) "separator")
                                           foc-separators-height
                                           (and (= index (count items))
                                                show-loading-more)
@@ -208,7 +208,7 @@
                                rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
-                        (drv/drv :grouped-posts)
+                        (drv/drv :items-to-render)
                         (drv/drv :container-data)
                         (drv/drv :activities-read)
                         (drv/drv :comments-data)
@@ -260,7 +260,7 @@
         comments-data (drv/react s :comments-data)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
-        items (drv/react s :grouped-posts)
+        items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)]
     [:div.paginated-stream.group

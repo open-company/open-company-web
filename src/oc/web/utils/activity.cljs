@@ -23,35 +23,44 @@
     (.setSeconds 0)
     (.setMilliseconds 0)))
 
-(defn- separator-from-date [d last-monday two-weeks-ago]
+(defn- separator-from-date [d last-monday two-weeks-ago first-month]
   (let [now (utils/js-date)
         month-string (utils/full-month-string (inc (.getMonth d)))]
     (cond
-      (>= d last-monday)
+      (> d last-monday)
       {:label "Recent"
+       :content-type "separator"
        :date last-monday}
-      (>= d two-weeks-ago)
-      {:label "2 weeks ago"
+      (> d two-weeks-ago)
+      {:label "Last week"
+       :content-type "separator"
        :date two-weeks-ago}
+      (> d first-month)
+      {:label "2 weeks ago"
+       :content-type "separator"
+       :date first-month}
       (and (= (.getMonth now) (.getMonth d))
            (= (.getFullYear now) (.getFullYear d)))
       {:label "This month"
+       :content-type "separator"
        :date (post-month-date-from-date d)}
       (= (.getFullYear now) (.getFullYear d))
       {:label month-string
+       :content-type "separator"
        :date (post-month-date-from-date d)}
       :else
       {:label (str month-string ", " (.getFullYear d))
+       :content-type "separator"
        :date (post-month-date-from-date d)})))
 
-(defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago]
+(defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))]
     (if (and (not (empty? separators-map))
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj (:uuid post-data)) vec))
       (vec
        (conj separators-map
-        (assoc (separator-from-date post-date last-monday two-weeks-ago)
+        (assoc (separator-from-date post-date last-monday two-weeks-ago first-month)
          :posts-list [(:uuid post-data)]))))))
 
 (defn grouped-posts [sorted-posts-list]
@@ -78,13 +87,23 @@
                          (.setSeconds 0)
                          (.setMilliseconds 0))
 
+        first-month (utils/js-date)
+        _first-month (doto first-month
+                       (.setDate (- (.getDate first-month)
+                                    (-> (.getDay first-month) (+ 6) (mod 7) (+ 14))))
+                       ;; Reset time to midnight
+                       (.setHours 0)
+                       (.setMinutes 0)
+                       (.setSeconds 0)
+                       (.setMilliseconds 0))
+
         last-date (:published-at (last sorted-posts-list))]
 
     (loop [separators []
            posts sorted-posts-list]
       (if (empty? posts)
         separators
-        (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago); first-month)
+        (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
                (rest posts))))))
 
 ;; 
@@ -292,12 +311,19 @@
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
                              with-posts-list)
-          with-posts-separators (if-not (= (:slug board-data) utils/default-drafts-board-slug)
-                                  (assoc with-saved-items :grouped-posts
-                                   (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
-                                                             (dis/activity-data %))
-                                                   (:posts-list with-saved-items))))
-                                  with-saved-items)]
+
+          should-group-posts? (and (not (responsive/is-mobile-size?))
+                                   (not (= (:slug board-data) utils/default-drafts-board-slug)))
+          grouped-posts (when should-group-posts?
+                          (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
+                                                    (dis/activity-data %))
+                                          (:posts-list with-saved-items))))
+          with-posts-separators (if should-group-posts?
+                                  (assoc with-saved-items :items-to-render
+                                   (vec (rest ;; Remove the first label
+                                    (apply concat
+                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts)))))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
 (defn fix-container
@@ -340,12 +366,18 @@
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
                              with-posts-list)
-          with-posts-separators (if-not (.match (:href container-data) #"(?i)/inbox?(/|$)")
-                                  (assoc with-saved-items :grouped-posts
-                                   (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
-                                                             (dis/activity-data %))
-                                                   (:posts-list with-saved-items))))
-                                  with-saved-items)]
+          should-group-posts? (and (not (responsive/is-mobile-size?))
+                                   (not (.match (:href container-data) #"(?i)/inbox?(/|$)")))
+          grouped-posts (when should-group-posts?
+                          (grouped-posts (mapv #(or (get-in with-saved-items [:fixed-items %])
+                                                    (dis/activity-data %))
+                                          (:posts-list with-saved-items))))
+          with-posts-separators (if should-group-posts?
+                                  (assoc with-saved-items :items-to-render
+                                   (vec (rest ;; Remove the first label
+                                    (apply concat
+                                     (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) grouped-posts)))))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))
 
 (defn get-comments [activity-data comments-data]

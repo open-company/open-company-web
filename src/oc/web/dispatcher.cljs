@@ -154,33 +154,24 @@
                           (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
-(defn- get-container-posts [base posts-data is-board? org-slug container-slug]
+(defn- get-container-posts [base posts-data is-board? org-slug container-slug posts-key]
   (let [cnt-key (if is-board?
                   (board-data-key org-slug container-slug)
                   (container-key org-slug container-slug))
         container-data (get-in base cnt-key)
-        items-list (:posts-list container-data)
-        container-posts (map #(when (contains? posts-data %) (get posts-data %)) items-list)]
+        items-list (get container-data posts-key)
+        container-posts (vec (remove nil?
+                         (mapv #(cond
+                                 (map? %)
+                                 %
+                                 (and (string? %) (contains? posts-data %))
+                                 (get posts-data %)
+                                 :else
+                                 nil)
+                          items-list)))]
     (if (= container-slug utils/default-drafts-board-slug)
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
-
-(defn- get-container-grouped-posts [base posts-data is-board? org-slug container-slug]
-  (let [cnt-key (if is-board?
-                  (board-data-key org-slug container-slug)
-                  (container-key org-slug container-slug))
-        container-data (get-in base cnt-key)
-        grouped-list (:grouped-posts container-data)
-        container-grouped-posts (mapv
-                                 (fn [separator-group]
-                                   (assoc separator-group :posts-list
-                                    (mapv #(when (contains? posts-data %) (get posts-data %)) (:posts-list separator-group))))
-                                 grouped-list)
-        remove-header-fn (if (= container-slug "all-posts") rest identity)
-        all-items (vec (remove-header-fn ;; Remove the first label since it's always the same and it's not part of the scrolling list
-                   (apply concat
-                    (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) container-grouped-posts))))]
-    all-items))
 
 (def ui-theme-key [:ui-theme])
 
@@ -299,7 +290,6 @@
                          (fn [base org-slug]
                            (when (and base org-slug)
                              (get-in base (posts-data-key org-slug))))]
-
    :filtered-posts      [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route (:board route))
@@ -307,18 +297,15 @@
                                    all-boards-slug (map :slug (:boards org-data))
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
-                              (get-container-posts base posts-data is-board? org-slug container-slug))))]
-   :grouped-posts       [[:base :org-data :posts-data :route]
+                              (get-container-posts base posts-data is-board? org-slug container-slug :posts-list))))]
+   :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
                                    all-boards-slug (map :slug (:boards org-data))
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
-                              (if (or (= (:board route) utils/default-drafts-board-slug)
-                                      (= (:board route) "inbox"))
-                                (get-container-posts base posts-data is-board? org-slug container-slug)
-                                (get-container-grouped-posts base posts-data is-board? org-slug container-slug)))))]
+                              (get-container-posts base posts-data is-board? org-slug container-slug :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -625,7 +612,32 @@
           all-boards-slug (map :slug (:boards org-data))
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data posts-data is-board? org-slug posts-filter)))
+     (get-container-posts data posts-data is-board? org-slug posts-filter :posts-list)))
+  ; ([data org-slug posts-filter activity-id]
+  ;   (let [org-data (org-data data org-slug)
+  ;         all-boards-slug (map :slug (:boards org-data))
+  ;         is-board? ((set all-boards-slug) posts-filter)
+  ;         posts-data (get-in data (posts-data-key org-slug))]
+  ;    (if is-board?
+  ;      (get-posts-for-board activity-id posts-data posts-filter)
+  ;      (let [container-key (container-key org-slug posts-filter)
+  ;            items-list (:posts-list (get-in data container-key))]
+  ;       (zipmap items-list (map #(get posts-data %) items-list))))))
+  )
+
+(defn items-to-render-data
+  ([]
+    (items-to-render-data @app-state))
+  ([data]
+    (items-to-render-data data (router/current-org-slug) (router/current-posts-filter)))
+  ([data org-slug]
+    (items-to-render-data data org-slug (router/current-posts-filter)))
+  ([data org-slug posts-filter]
+    (let [org-data (org-data data org-slug)
+          all-boards-slug (map :slug (:boards org-data))
+          is-board? ((set all-boards-slug) posts-filter)
+          posts-data (get-in data (posts-data-key org-slug))]
+     (get-container-posts data posts-data is-board? org-slug posts-filter :items-to-render)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -857,6 +869,9 @@
 (defn print-filtered-posts []
   (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter)))
 
+(defn print-items-to-render []
+  (items-to-render-data @app-state (router/current-org-slug) (router/current-posts-filter)))
+
 (defn print-user-notifications []
   (user-notifications-data (router/current-org-slug) @app-state))
 
@@ -887,6 +902,7 @@
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
+(set! (.-OCWebPrintItemsToRender js/window) print-items-to-render)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
