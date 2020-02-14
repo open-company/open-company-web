@@ -32,17 +32,10 @@
 
 (defn- separator-from-date [d last-monday two-weeks-ago first-month]
   (let [now (utils/js-date)
-        ten-mins-ago (utils/js-date)
-        ten-mins-ago* (doto ten-mins-ago
-                        (.setMinutes (- (.getMinutes ten-mins-ago) 10)))
         month-string (utils/full-month-string (inc (.getMonth d)))]
     (cond
-      (> d ten-mins-ago)
-      {:label "Recent"
-       :content-type "separator"
-       :date ten-mins-ago}
       (> d last-monday)
-      {:label "10s ago"
+      {:label "Recent"
        :content-type "separator"
        :date last-monday}
       (> d two-weeks-ago)
