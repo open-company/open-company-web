@@ -232,17 +232,18 @@
          next-state))}))
 
 (defn on-window-click-mixin [callback]
-  {:did-mount (fn [s]
-   (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
-                            (fn [e]
-                             (callback s e)))]
-    (assoc s :on-click-out-listener on-click-listener)))
-   :will-unmount (fn [s]
-   (if (:on-click-out-listener s)
-    (do
-      (events/unlistenByKey (:on-click-out-listener s))
-      (dissoc s :on-click-out-listener))
-    s))})
+  (let [click-out-kw (keyword (str "on-click-out-listenr-" (rand 100)))]
+    {:did-mount (fn [s]
+     (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
+                              (fn [e]
+                               (callback s e)))]
+      (assoc s click-out-kw on-click-listener)))
+     :will-unmount (fn [s]
+     (if (click-out-kw s)
+      (do
+        (events/unlistenByKey (click-out-kw s))
+        (dissoc s click-out-kw))
+      s))}))
 
 (defn on-window-resize-mixin [callback]
   {:did-mount (fn [s]
