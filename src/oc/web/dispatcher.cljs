@@ -10,9 +10,7 @@
             [oc.shared.useragent :as ua]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false
-                          :cmail-state {:key (utils/activity-uuid)
-                                        :collapsed true}}))
+                          :show-login-overlay false}))
 
 ; (def default-sort-type :recent-activity)
 ; (def other-sort-type :recently-posted)

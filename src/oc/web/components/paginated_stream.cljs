@@ -26,7 +26,7 @@
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
 (def collapsed-foc-height 56)
-(def foc-height 184)
+(def foc-height 180)
 (def mobile-foc-height 163)
 
 (defn- calc-card-height [mobile? foc-layout]
@@ -174,7 +174,7 @@
                          :height height
                          :width (if is-mobile?
                                   js/window.innerWidth
-                                  720)
+                                  600)
                          :isScrolling isScrolling
                          :onScroll onChildScroll
                          :rowCount (if (or show-loading-more

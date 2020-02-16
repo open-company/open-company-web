@@ -208,6 +208,7 @@
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (or (pos? (:new-comments-count activity-data))
                                                  (:unread activity-data))
+                                :muted-item (utils/link-for (:links activity-data) "follow")
                                 :expandable is-published?
                                 :show-mobile-more-bt true
                                 :show-mobile-dismiss-bt true
@@ -286,6 +287,10 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip activity-data)}
                     (utils/foc-date-time t)])]]
+            [:div.muted-activity
+              {:data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :title "Muted"}]
             [:div.must-see-tag]
             [:div.bookmark-tag-small.mobile-only]
             [:div.bookmark-tag.big-web-tablet-only]]]

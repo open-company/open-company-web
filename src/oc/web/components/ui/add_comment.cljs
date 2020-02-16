@@ -90,15 +90,24 @@
   (reset! (::show-post-button s) true)
   (enable-add-comment? s))
 
-(defn- should-focus-field? [s]
+(defn- should-focus-field? [s & [mounting]]
   (let [{:keys [activity-data parent-comment-uuid
          parent-comment-uuid edit-comment-data]} (first (:rum/args s))
         add-comment-focus @(drv/get-ref s :add-comment-focus)]
-    (or edit-comment-data
+    (or (and mounting
+             edit-comment-data)
         (and (= (:uuid activity-data) add-comment-focus)
              (not parent-comment-uuid))
-        (and (seq parent-comment-uuid)
+        (and mounting
+             (seq parent-comment-uuid)
              (= parent-comment-uuid add-comment-focus)))))
+
+(defn- maybe-focus-field [s & [mounting]]
+  (when (should-focus-field? s mounting)
+    (let [add-comment-node (rum/ref-node s "editor-node")]
+      (.focus add-comment-node)
+      (utils/after 0
+       #(utils/to-end-of-content-editable add-comment-node)))))
 
 (rum/defcs add-comment < rum/reactive
                          ;; Locals
@@ -127,6 +136,7 @@
                          (rum/local "" ::initial-add-comment)
                          (rum/local false ::did-change)
                          (rum/local false ::show-post-button)
+                         (rum/local false ::last-add-comment-focus)
                          ;; Mixins
                          ui-mixins/first-render-mixin
                          (mention-mixins/oc-mentions-hover)
@@ -154,12 +164,14 @@
                           s)
                           :did-mount (fn [s]
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))
-                           (let [add-comment-node (rum/ref-node s "editor-node")]
-                             (when (should-focus-field? s)
-                               (.focus add-comment-node)
-                               (utils/after 0
-                                #(utils/to-end-of-content-editable add-comment-node))))
+                           (maybe-focus-field s true)
                            (utils/after 2500 #(js/emojiAutocomplete))
+                           s)
+                          :did-update (fn [s]
+                           (let [add-comment-focus @(drv/get-ref s :add-comment-focus)]
+                             (when (not= @(::last-add-comment-focus s) add-comment-focus)
+                               (maybe-focus-field s)
+                               (reset! (::last-add-comment-focus s) add-comment-focus)))
                            s)
                           :will-update (fn [s]
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))
