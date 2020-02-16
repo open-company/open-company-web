@@ -1,4 +1,14 @@
 div.onboard-wrapper-container {
+  background-color: white;
+  box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.16);
+  min-height: 100vh;
+  width: 720px;
+  margin: 0 auto;
+
+  @include mobile() {
+    background-color: white;
+    width: 100%;
+  }
 
   div.oc-loading {
     width: 100vw;
@@ -6,102 +16,58 @@ div.onboard-wrapper-container {
     position: fixed;
   }
 
-  div.onboard-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    display: flex;
+  div.bottom-gradient {
+    width: 944px;
+    height: 27vh;
+    max-height: 220px;
+    margin-left: -112px;
+    margin-top: -50px;
+    background: linear-gradient(-180deg, rgba(251, 250, 249, 0) 0%, rgb(251, 250, 249) 100%);
+    display: block;
+    position: fixed;
+    bottom: 0;
+    pointer-events: none;
 
-    @include mobile(){
-      display: block;
-      background-color: white;
+    @include mobile() {
+      display: none;
     }
 
-    div.onboard-wrapper-left {
-      background-color: $carrot_dark_bg_gray;
-      padding: 21px;
-      flex: 1;
-      // position: absolute;
-      position: fixed;
-      top: 0px;
-      bottom: 0px;
-      left: 0px;
-      width: 50%;
-      height: 100%;
-      display: table;
-
-      @include mobile(){
-        display: none;
-      }
-
-      div.onboard-wrapper-logo {
-        width: 82px;
-        height: 20px;
-        background-image: cdnUrl("/img/ML/carrot_logo_with_copy_gray.svg");
-        background-size: 82px 20px;
-        background-repeat: no-repeat;
-        position: absolute;
-        left: 21px;
-        top: 21px;
-      }
-
-      div.onboard-wrapper-left-inner {
-        // display: table-cell;
-        // vertical-align: middle;
-        // text-align: center;
-
-        div.onboard-wrapper-box {
-          width: 294px;
-          height: 301px;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          @include image-2x("/img/ML/carrot_box");
-          background-size: 294px 301px;
-          background-repeat: no-repeat;
-
-          &.sad-search {
-            width: 240px;
-            height: 240px;
-            background-image: cdnUrl("/img/ML/sad_search.svg");
-            background-size: 240px 240px;
-            transition: all 180ms ease-in;
-          }
-        }
-      }
-    }
-
-    div.onboard-wrapper-right {
-      text-align: center;
-      flex: 1;
+    div.onboard-box {
+      background-image: cdnUrl("/img/ML/onboard_box.svg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 229px 234px;
+      width: 229px;
+      height: 234px;
       position: absolute;
-      top: 0px;
-      bottom: 0px;
-      right: 0px;
-      width: 50%;
-      background-color: $grey_num_2;
+      right: 6px;
+      bottom: 0;
+    }
+  }
 
-      @include mobile(){
-        flex: unset;
-        width: 100%;
-        position: unset;
-        background-color: white;
-      }
+  div.onboard-wrapper {
+    text-align: center;
+    padding-bottom: 16vh;
+    position: relative;
+
+    @include mobile() {
+      width: 100%;
+      box-shadow: unset;
+      margin: 0;
+      min-height: unset;
+      padding-bottom: 32px;
     }
   }
 }
 
 div.onboard-email-container {
+  padding-top: 64px;
   width: 339px;
   @include OC_Body_Book();
   color: $carrot_gray;
   font-size: 32px;
   margin: 0 auto;
   position: relative;
-  top: 50%;
 
   &.small {
     font-size: 24px;
@@ -151,20 +117,17 @@ div.onboard-email-container {
   }
 
   button.continue {
-    margin-top: 16px;
-    width: 170px;
-    height: 42px;
+    width: 100%;
+    height: 40px;
     background-color: $sea_blue;
     color: white;
     @include OC_Body_Bold();
     font-size: 16px;
-    border-radius: 4px;
+    line-height: 20px;
+    padding: 10px 24px;
+    border-radius: 6px;
     outline: none;
     border: none;
-
-    @include mobile() {
-      width: 100%;
-    }
 
     &.disabled, &:disabled {
       background-color: $light_ui_grey;
@@ -178,56 +141,43 @@ div.onboard-lander {
   text-align: center;
 
   @include mobile() {
-    padding: 104px 16px 24px;
+    padding: 0 16px;
   }
 
   div.main-cta {
 
-    div.mobile-header {
-      display: none;
+    div.onboard-lander-header {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      margin-left: -360px;
+
+      button.top-back-button {
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: rgba($deep_navy, 0.1);
+        background-image: cdnUrl("/img/ML/expanded_post_back_arrow.svg");
+        background-size: 14px 10px;
+        border-radius: 4px;
+        position: absolute;
+        top: 24px;
+        left: 24px;
+      }
 
       button.top-continue {
         display: none;
       }
 
       @include mobile() {
-        display: block;
-        margin-top: 0px;
-        height: 54px;
-        text-align: center;
-        width: 100%;
-        border-bottom: 1px solid $divider_line_grey;
-        position: fixed;
-        background-color: white;
-        left: 0px;
-        top: 0px;
         z-index: 1031;
-
-        div.mobile-logo {
-          position: absolute;
-          top: 8px;
-          left: 50%;
-          margin-left: -9px;
-          background-image: cdnUrl("/img/ML/carrot_logo.svg");
-          background-size: 18px 32px;
-          background-position: center;
-          background-repeat: no-repeat;
-          width: 18px;
-          height: 32px;
-          display: block;
-        }
+        left: 0;
+        margin-left: 0;
+        position: absolute;
 
         button.top-back-button {
-          display: block;
-          width: 32px;
-          height: 32px;
-          background-position: center;
-          background-repeat: no-repeat;
-          background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
-          background-size: 12px 12px;
-          background-color: $ultra_light_grey;
-          border-radius: 4px;
-          position: absolute;
           top: 16px;
           left: 16px;
         }
@@ -255,17 +205,16 @@ div.onboard-lander {
     }
 
     div.title {
-      font-family: "PT Serif";
-      font-weight: 700;
+      @include OC_Body_Bold();
       font-size: 32px;
-      line-height: 42px;
-      margin-top: 64px;
+      line-height: 41px;
+      padding-top: 64px;
       color: $deep_navy;
 
       @include mobile() {
         margin-top: 0px;
-        padding-top: 32px;
-        font-size: 24px;
+        padding-top: 61px;
+        font-size: 30px;
         margin: 0 auto;
       }
     }
@@ -295,19 +244,22 @@ div.onboard-lander {
     }
 
     button.continue {
-      margin-top: 20px;
-      width: 170px;
-      height: 42px;
+      margin-top: 24px;
+      width: 100%;
+      height: 40px;
       background-color: $sea_blue;
       color: white;
       @include OC_Body_Bold();
       font-size: 16px;
-      border-radius: 4px;
+      line-height: 20px;
+      padding: 10px 24px;
+      border-radius: 6px;
       outline: none;
       border: none;
+      max-width: 320px;
 
       @include mobile() {
-        width: 100%;
+        max-width: initial;
       }
 
       &.disabled, &:disabled {
@@ -336,7 +288,7 @@ div.onboard-lander {
   }
 
   div.onboard-form {
-    width: 340px;
+    width: 320px;
     margin: 0 auto 32px;
     text-align: left;
 
@@ -361,11 +313,7 @@ div.onboard-lander {
     }
 
     button.signup-with-slack {
-      margin-top: 35px;
-
-      @include mobile() {
-        margin-top: 24px;
-      }
+      margin-top: 40px;
     }
 
     button.signup-with-google {
@@ -373,10 +321,10 @@ div.onboard-lander {
     }
 
     button.signup-with-slack, button.signup-with-google {
-      width: 340px;
+      width: 320px;
       height: 40px;
-      border: 1px solid rgba($light_navy, 0.5);
-      color: $light_navy;
+      background-color: rgba($deep_navy, 0.1);
+      color: $deep_navy;
       border-radius: 6px;
       text-align: center;
       @include OC_Body_Bold();
@@ -425,26 +373,23 @@ div.onboard-lander {
 
     div.or-with-email{
       width: 100%;
-      height: 19px;
+      height: 18px;
       margin-top: 24px;
       position: relative;
-
-      @include mobile() {
-        margin-top: 16px;
-      }
 
       div.or-with-email-copy {
         text-align: center;
         @include OC_Body_Book();
         font-size: 14px;
-        color: rgba($light_navy, 0.5);
+        line-height: 18px;
+        color: rgba($deep_navy, 0.5);
         margin: 0 auto;
       }
     }
 
     div.logo-upload-container {
       margin-top: 60px;
-      width: 340px;
+      width: 320px;
       min-height: 40px;
       cursor: pointer;
 
@@ -461,7 +406,7 @@ div.onboard-lander {
       }
 
       &.org-logo {
-        width: 340px;
+        width: 320px;
 
         @include mobile() {
           max-width: 100%;
@@ -491,7 +436,7 @@ div.onboard-lander {
 
           div.org-avatar-container {
             img.org-avatar-img {
-              max-width: 340px;
+              max-width: 320px;
             }
           }
         }
@@ -587,16 +532,9 @@ div.onboard-lander {
     div.field-label {
       @include OC_Body_Book();
       font-size: 14px;
-      color: $light_navy;
-      margin-top: 24px;
-
-      &.email-field {
-        margin-top: 24px;
-
-        @include mobile() {
-          margin-top: 16px;
-        }
-      }
+      line-height: 20px;
+      color: $deep_navy;
+      margin-top: 16px;
 
       &.info {
         @include OC_Body_Book();
@@ -617,7 +555,7 @@ div.onboard-lander {
       }
 
       &.left-half-field-label, &.right-half-field-label {
-        width: calc(50% - 8px);
+        width: calc(50% - 4px);
 
         @include mobile() {
           width: 100%;
@@ -638,50 +576,34 @@ div.onboard-lander {
         @include mobile() {
           &.field-label.name-fields {
             float: unset;
-            margin-top: 24px;
+            margin-top: 16px;
           }
-        }
-      }
-
-      &.email-domain-field-label {
-        span.error {
-          float: left;
-        }
-        span.field-label-span {
-          float: left;
-          display: block;
-          line-height: 17px;
-        }
-
-        div.small-loading {
-          margin-left: 8px;
-          height: 17px;
-          padding: 0;
-          float: left;
-          display: block;
         }
       }
     }
 
     div.field-description {
       @include OC_Body_Book();
-      color: rgba($light_navy, 0.5);
       font-size: 12px;
+      line-height: 15px;
+      color: rgba($deep_navy, 0.5);
       margin: 16px auto 0;
       width: 249px;
       text-align: center;
 
       a {
         text-decoration: underline;
-        color: rgba($light_navy, 0.5);
+        color: rgba($deep_navy, 0.5);
       }
     }
 
     div.footer-link {
       margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid $divider_line_grey;
       @include OC_Body_Book();
       font-size: 16px;
-      color: $light_navy;
+      color: $deep_navy;
       line-height: 20px;
       text-align: center;
 
@@ -700,23 +622,23 @@ div.onboard-lander {
 
     input.field {
       width: 100%;
-      height: 32px;
+      height: 40px;
       border-radius: 4px;
-      background-color: $ultra_light_grey;
-      border: none;
+      background-color: rgba($deep_navy, 0.1);
+      border: 1px solid transparent;
       outline: none;
-      padding: 7px 8px;
+      padding: 11px 16px;
       position: relative;
       @include OC_Body_Book();
       font-size: 14px;
       color: $deep_navy;
       line-height: 18px;
-      letter-spacing: 0.2px;
       margin-top: 8px;
 
       @include placeholder() {
         @include OC_Body_Book();
         font-size: 14px;
+        line-height: 18px;
         color: rgba($deep_navy, 0.5);
       }
 
@@ -729,7 +651,7 @@ div.onboard-lander {
       }
 
       &.right-half-field, &.left-half-field {
-        width: calc(50% - 8px);
+        width: calc(50% - 4px);
 
         @include mobile() {
           width: 100%;
@@ -755,22 +677,35 @@ div.onboard-lander {
 
     textarea.field {
       width: 100%;
-      height: 40px;
       border-radius: 4px;
-      background-color: white;
-      border: 1px solid $light_ui_grey;
+      background-color: rgba($deep_navy, 0.1);
+      border: none;
+      border-radius: 4px;
       outline: none;
-      padding: 10px 16px;
+      padding: 11px 16px;
       position: relative;
       @include OC_Body_Book();
+      resize: auto;
       font-size: 14px;
-      color: rgba($deep_navy, 0.5);
-      margin-top: 4px;
+      line-height: 18px;
+      color: $deep_navy;
+      height: auto;
+      margin-top: 8px;
+      min-height: 40px;
+      min-width: 100%;
+      max-width: 100%;
+      max-height: 130px;
       resize: none;
-      min-height: 100px;
 
       &.has-value {
         color: $deep_navy;
+      }
+
+      @include placeholder() {
+        color: rgba($deep_navy, 0.5);
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 18px;
       }
     }
 
@@ -786,83 +721,27 @@ div.onboard-lander {
       }
     }
 
-    div.org-email-domains-row {
-      div.field-label {
-        margin-top: 21px;
-
-        &:before {
-          font-size: 16px;
-        }
-
-        div.tooltip {
-          width: 160px;
-        }
-
-        label.error {
-          margin-left: 0px !important;
-          @include OC_Body_Bold();
-          font-size: 15px;
-          color: $deep_navy;
-          margin-top: 4px;
-        }
-      }
-
-      div.org-email-domain-field {
-         width: 100%;
-         height: 40px;
-         border: 1px solid rgba($carrot_light_gray_1, 0.5);
-         border-radius: 4px;
-         margin-top: 4px;
-
-         input {
-           float: left;
-           width: 95%;
-           height: 100%;
-           border: none;
-           padding: 10px 16px;
-           outline: none;
-
-           @include placeholder(){
-             @include OC_Body_Book();
-             margin-top: 10px;
-             color: $ui_grey;
-             font-size: 14px;
-           }
-
-           &.error {
-             border: 1px solid rgba($carrot_orange, 0.5);
-           }
-         }
-
-         button.add-email-domain-bt {
-           height: 20px;
-           padding: 10px 10px;
-           color: $carrot_green;
-           @include OC_Body_Bold();
-           font-size: 14px;
-           border-top-right-radius: 6px;
-           border-bottom-right-radius: 6px;
-           float: right;
-        }
-      }
-    }
-
     button.continue {
-      margin-top: 32px;
       outline: none;
       border: none;
       width: 100%;
-      height: 48px;
+      height: 40px;
+      max-width: 320px;
       background-color: $carrot_orange;
       color: white;
       @include OC_Body_Bold();
-      font-size: 18px;
-      line-height: 23px;
+      font-size: 16px;
+      line-height: 20px;
       border-radius: 6px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 4px 64px;
+      padding: 10px 24px;
+      margin-top: 24px;
+
+      @include mobile() {
+        max-width: initial;
+      }
 
       &.start-using-carrot {
         background-color: $carrot_orange_2;
@@ -881,21 +760,23 @@ div.onboard-lander {
     }
 
     div.logout-cancel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid $divider_line_grey;
       text-align: center;
       @include OC_Body_Book();
       font-size: 16px;
-      color: $light_navy;
-      margin: 24px 0 0;
+      line-height: 20px;
+      color: $deep_navy;
 
       button.logout-cancel {
         @include OC_Body_Book();
-        font-size: 14px;
+        font-size: 16px;
+        line-height: 20px;
         color: $carrot_green;
         padding: 0;
-        margin-left: 4px;
+        display: block;
+        margin: 0 auto;
       }
     }
   }
@@ -907,7 +788,7 @@ div.onboard-lander {
         border-bottom: none;
         position: absolute;
 
-        div.mobile-logo {
+        div.onboard-lander-header {
           width: 36px;
           height: 64px;
           background-size: 36px 64px;
@@ -919,10 +800,8 @@ div.onboard-lander {
       }
 
       div.title {
-        padding-top: 0;
-        margin-top: 16px;
         @include OC_Body_Bold();
-        font-size: 32px;
+        font-size: 30px;
         line-height: 41px;
         color: $deep_navy;
       }
@@ -944,28 +823,8 @@ div.onboard-lander {
     div.onboard-form {
       margin-top: 32px;
 
-      div.field-label.company-name {
-        margin-top: 24px;
-      }
-
       div.field-label.name-fields {
         margin-top: 0;
-      }
-
-      button.continue {
-        margin-top: 40px;
-      }
-    }
-  }
-
-  &.lander-team {
-    div.onboard-form {
-      button.continue {
-        margin-top: 18px;
-
-        @include mobile() {
-          margin-top: 32px;
-        }
       }
     }
   }
@@ -974,7 +833,6 @@ div.onboard-lander {
     div.main-cta {
 
       div.title-container {
-        margin-top: 64px;
 
         div.team-logo-container {
           width: 100%;
@@ -1080,7 +938,7 @@ div.onboard-lander {
       }
 
       div.invite-rows {
-        width: 340px;
+        width: 320px;
         margin: 0px auto;
 
         @include mobile(){
@@ -1120,7 +978,6 @@ div.onboard-lander {
 
       button.continue {
         padding: 7px;
-        margin-top: 32px;
 
         @include mobile() {
           margin-bottom: 0px;
@@ -1134,7 +991,7 @@ div.onboard-lander {
         padding: 0;
         margin: 16px auto 0px;
         width: 100%;
-        max-width: 340px;
+        max-width: 320px;
         height: 48px;
         color: $sea_blue;
         display: block;
