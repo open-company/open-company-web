@@ -126,16 +126,15 @@
     (cook/remove-cookie! router/login-redirect-cookie)
     (if redirect-url
       (router/redirect! redirect-url)
-      (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs)))))))
+      (router/nav!
+       (if (zero? (count orgs))
+         oc-urls/sign-up-profile
+         (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))
 
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point (:org @router/path)
     (fn [success body]
-      (entry-point-get-finished success body
-        (fn [orgs collection]
-          (if (zero? (count orgs))
-            (router/nav! oc-urls/sign-up-profile)
-            (login-redirect))))))))
+      (entry-point-get-finished success body login-redirect)))))
 
 ;; Login
 (defn login-with-email-finish
@@ -146,8 +145,7 @@
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (jwt-actions/update-jwt-cookie body)
-          (api/get-entry-point (:org @router/path)
-           (fn [success body] (entry-point-get-finished success body login-redirect)))))
+          (lander-check-team-redirect)))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -367,8 +365,10 @@
 (defn user-profile-save
   ([current-user-data edit-data]
    (user-profile-save current-user-data edit-data nil))
-  ([current-user-data edit-data org-editing]
-    (let [edit-user-profile (or (:user-data edit-data) edit-data)
+  ([current-user-data edit-data org-editing-kw]
+    (let [org-editing (when org-editing-kw
+                        (get @dis/app-state org-editing-kw))
+          edit-user-profile (or (:user-data edit-data) edit-data)
           new-password (:password edit-user-profile)
           password-did-change (pos? (count new-password))
           with-pswd (if (and password-did-change

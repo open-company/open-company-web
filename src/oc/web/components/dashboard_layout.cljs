@@ -64,8 +64,8 @@
                                 s)
                                :did-mount (fn [s]
                                 ;; Reopen cmail if it was open
-                                (when-let [org-data @(drv/get-ref s :org-data)]
-                                  (when (utils/is-admin-or-author? org-data)
+                                (when-let [editable-boards @(drv/get-ref s :editable-boards)]
+                                  (when (pos? (count editable-boards))
                                     (cmail-actions/cmail-reopen?)))
                                 ;; Preload reminders
                                 (reminder-actions/load-reminders)

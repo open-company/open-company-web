@@ -153,7 +153,8 @@
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
-                                                  (fn [] (reset! (::force-show-menu s) false)))})]
+                                                  (fn [] (reset! (::force-show-menu s) false)))})
+        muted-post? (seq (utils/link-for (:links activity-data) "follow"))]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
@@ -205,6 +206,13 @@
                :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                :data-title (utils/activity-date-tooltip activity-data)}
               (utils/foc-date-time (:published-at activity-data))]]
+          (when muted-post?
+            [:div.expanded-post-author-dot.muted-dot])
+          (when muted-post?
+            [:div.muted-activity
+              {:data-toggle (when-not is-mobile? "tooltip")
+               :data-placement "top"
+               :title "Muted"}])
           (when (or (:must-see activity-data)
                     (:bookmarked activity-data))
             [:div.expanded-post-author-dot])
