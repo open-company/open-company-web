@@ -60,7 +60,7 @@ div.menu {
       left: unset;
       right: 0;
       width: 85vw;
-      min-height: calc(100vh - #{$mobile_navbar_height - 2}px);
+      min-height: 100vh;
       border: none;
       box-shadow: none;
       transition: 230ms;
