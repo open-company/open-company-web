@@ -99,7 +99,8 @@
                              (not is-mobile))]
    (if (= (:content-type entry) "separator")
      [:div.virtualized-list-separator
-        {:style style}
+        {:style style
+         :key (str "virtualized-list-separator-" (:label entry))}
         (:label entry)]
      [:div.virtualized-list-row
        {:class (when collapsed-item? "collapsed-item")
