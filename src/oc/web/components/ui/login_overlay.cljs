@@ -216,35 +216,35 @@
           (when (contains? (:password-reset (rum/react dis/app-state)) :success)
             (cond
               (:success (:password-reset (rum/react dis/app-state)))
-              [:div.green "We sent you an email with the instructions to reset your account password."]
+              [:div.sent-email-copy "We sent you an email with the instructions to reset your account password."]
               :else
-              [:div.red "An error occurred, please try again."]))
+              [:div.error-copy "An error occurred, please try again."]))
           [:form.sign-in-form
-            [:div.sign-in-label-container
-              [:label.sign-in-label "Please enter your email address"]]
+            ; [:div.sign-in-label-container
+            ;   [:label.sign-in-label ]]
             [:div.sign-in-field-container.email
               [:input.sign-in-field.oc-input
                 {:class utils/hide-class
                  :value (:email (:password-reset (rum/react dis/app-state)))
                  :tabIndex 1
                  :type "email"
+                 :placeholder "Please enter your email address"
                  :autoCapitalize "none"
                  :auto-focus true
                  :on-change #(dis/dispatch! [:input [:password-reset :email] (.. % -target -value )])
                  :name "email"}]]
             (if (:success (:password-reset (rum/react dis/app-state)))
-              [:div.group.pb3.mt3
-                [:div.right
-                  [:dubtton.mlb-reset.mlb-default
-                    {:on-click #(user-actions/show-login nil)}
-                    "Done"]]]
+              [:div.group.pb3.mt1
+                [:button.mlb-reset.continue
+                  {:on-click #(user-actions/show-login nil)}
+                  "Done"]]
               [:div.group
-                [:button.mlb-reset.mlb-default.continue
+                [:button.mlb-reset.continue
                   {:on-click #(user-actions/password-reset (:email (:password-reset @dis/app-state)))
                    :disabled (not (utils/valid-email? (:email (:password-reset @dis/app-state))))
                    :on-touch-start identity}
                   "Reset Password"]
-                [:button.mlb-reset.mlb-link-black
+                [:button.mlb-reset.cancel-bt
                   {:on-click #(user-actions/show-login nil)
                    :disabled (not auth-settings)
                    :on-touch-start identity}
