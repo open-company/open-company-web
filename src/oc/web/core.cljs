@@ -311,7 +311,7 @@
             ;; and redirect him there,
             (router/redirect! (urls/default-landing last-org-cookie)))
           ;; if no cookie or logged out do the login dance
-          (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login" target params true))))
+          (simple-handler #(login-wall {:title "Welcome back!" :desc ""}) "login" target params true))))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
@@ -472,7 +472,7 @@
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/default-landing (cook/get-cookie (router/last-org-cookie)))
            urls/login))
-        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
+        (simple-handler #(login-wall {:title "Welcome back!" :desc ""}) "login-wall" target params true)))
 
     (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
       (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
@@ -481,7 +481,7 @@
          (if (seq (cook/get-cookie (router/last-org-cookie)))
            (urls/default-landing (cook/get-cookie (router/last-org-cookie)))
            urls/login))
-        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
+        (simple-handler #(login-wall {:title "Welcome back!" :desc ""}) "login-wall" target params true)))
 
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)

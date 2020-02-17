@@ -226,12 +226,12 @@ div.login-overlay-container {
 
         input {
           width: 100%;
-          height: 32px;
+          height: 40px;
           border-radius: 4px;
           background-color: $ultra_light_grey;
           border: none;
           outline: none;
-          padding: 7px 8px;
+          padding: 11px 16px;
           position: relative;
           @include OC_Body_Book();
           font-size: 14px;
@@ -279,21 +279,33 @@ div.login-overlay-container {
       }
 
       button.continue {
-        margin-top: 32px;
+        margin-top: 24px;
         outline: none;
         border: none;
         width: 100%;
-        height: 48px;
+        height: 40px;
         background-color: $carrot_orange;
         color: white;
         @include OC_Body_Bold();
         font-size: 18px;
         line-height: 23px;
-        border-radius: 6px;
+        border-radius: 4px;
 
         &.disabled {
           background-color: $light_ui_grey;
         }
+      }
+
+      button.cancel-bt {
+        margin-top: 24px;
+        outline: none;
+        border: none;
+        width: 100%;
+        height: 24px;
+        color: $deep_navy;
+        @include OC_Body_Bold();
+        font-size: 15px;
+        line-height: 18px;
       }
 
       div.footer-link {
@@ -323,6 +335,20 @@ div.login-overlay-container {
         color: $carrot_text_blue;
         @include OC_Body_Bold();
         font-weight: 400;
+      }
+
+      div.sent-email-copy {
+        @include OC_Body_Book();
+        color: $carrot_green;
+        font-size: 14px;
+        line-height: 18px;
+      }
+
+      div.error-copy {
+        @include OC_Body_Book();
+        color: $carrot_orange;
+        font-size: 14px;
+        line-height: 18px;
       }
 
       div.password-reset-label-container {

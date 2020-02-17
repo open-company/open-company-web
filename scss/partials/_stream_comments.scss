@@ -527,7 +527,7 @@ div.stream-comments {
 
           div.stream-comment-body {
             display: inline;
-            @include activity-comment(17px, 22px, 16px);
+            @include activity-comment(15px, 18px, 12px);
 
             @include mobile() {
               @include activity-comment(18px, 24px, 16px);
