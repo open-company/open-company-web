@@ -78,33 +78,33 @@
         last-monday (utils/js-date)
         _last-monday (doto last-monday
                        (.setDate (- (.getDate last-monday)
-                                    ; First monday before now
-                                    (-> (.getDay last-monday) (+ 6) (mod 7))))
-                       (.setHours 0)
-                       (.setMinutes 0)
-                       (.setSeconds 0)
-                       (.setMilliseconds 0))
+                                    ; First saturday before now
+                                    (-> (.getDay last-monday) (+ 8) (mod 7))))
+                       (.setHours 23)
+                       (.setMinutes 59)
+                       (.setSeconds 59)
+                       (.setMilliseconds 999))
 
         two-weeks-ago (utils/js-date)
         _two-weeks-ago (doto two-weeks-ago
                          (.setDate (- (.getDate two-weeks-ago)
-                                      ;; Monday before last
-                                      (-> (.getDay two-weeks-ago) (+ 6) (mod 7) (+ 7))))
+                                      ;; Saturday before last one
+                                      (-> (.getDay two-weeks-ago) (+ 8) (mod 7) (+ 7))))
                          ;; Reset time to midnight
-                         (.setHours 0)
-                         (.setMinutes 0)
-                         (.setSeconds 0)
-                         (.setMilliseconds 0))
+                         (.setHours 23)
+                         (.setMinutes 59)
+                         (.setSeconds 59)
+                         (.setMilliseconds 999))
 
         first-month (utils/js-date)
         _first-month (doto first-month
                        (.setDate (- (.getDate first-month)
-                                    (-> (.getDay first-month) (+ 6) (mod 7) (+ 14))))
+                                    (-> (.getDay first-month) (+ 8) (mod 7) (+ 14))))
                        ;; Reset time to midnight
-                       (.setHours 0)
-                       (.setMinutes 0)
-                       (.setSeconds 0)
-                       (.setMilliseconds 0))
+                       (.setHours 23)
+                       (.setMinutes 59)
+                       (.setSeconds 59)
+                       (.setMilliseconds 999))
 
         last-date (:published-at (last sorted-posts-list))
         separators-data (loop [separators []
