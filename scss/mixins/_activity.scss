@@ -63,12 +63,12 @@ $h2_top_margin: 24;
 @mixin bookmark-tag() {
   div.bookmark-tag {
     @include image-2x("/img/ML/bookmark_tag");
-    background-size: 89px 10px;
+    background-size: 75px 10px;
     background-position: center;
     background-repeat: no-repeat;
     background-color: rgba($sea_blue, 0.2);
     height: 18px;
-    width: 100px;
+    width: 86px;
     margin-right: 8px;
     position: relative;
     vertical-align: top;
@@ -97,6 +97,23 @@ $h2_top_margin: 24;
     &.white-bg {
       // @include image-2x("/img/ML/bookmark_icon_white");
       background-color: rgba(white, 0.2);
+    }
+  }
+}
+
+@mixin muted-activity($width: 12, $height: 14) {
+  div.muted-activity {
+    margin-right: 8px;
+    vertical-align: top;
+    width: #{$width}px;
+    height: #{$height}px;
+    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+    background-size: #{$width}px #{$height}px;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
     }
   }
 }

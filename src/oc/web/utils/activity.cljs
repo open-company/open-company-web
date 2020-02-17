@@ -1,7 +1,6 @@
 (ns oc.web.utils.activity
   (:require [cuerdas.core :as s]
             [cljs-time.format :as time-format]
-            [oc.lib.html :as html]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -151,9 +150,7 @@
         fixed-board-name (or (:board-name entry-data) (:name board-data))
         [has-images stream-view-body] (body-for-stream-view (:body entry-data))
         is-uploading-video? (dis/uploading-video-data (:video-id entry-data))
-        fixed-video-id (:video-id entry-data)
-        ; body-thumbnail (html/first-body-thumbnail (:body entry-data))
-        ]
+        fixed-video-id (:video-id entry-data)]
     (when (seq fixed-video-id)
       (ziggeo/init-ziggeo true))
     (-> entry-data
@@ -170,8 +167,6 @@
       (assoc :stream-view-body stream-view-body)
       (assoc :body-has-images has-images)
       (assoc :fixed-video-id fixed-video-id)
-      ; (assoc :has-thumbnail body-thumbnail)
-      ; (assoc :body-thumbnail body-thumbnail)
       (assoc :comments (comment-utils/sort-comments (:comments entry-data))))))
 
 (defn fix-board

@@ -80,6 +80,7 @@
       [:div.stream-collapsed-item-inner
         {:class (utils/class-set {:must-see-item (:must-see activity-data)
                                   :bookmark-item (:bookmarked activity-data)
+                                  :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
         (user-avatar-image publisher)
         [:div.stream-collapsed-item-fill
@@ -87,6 +88,8 @@
             {:ref "activity-headline"
              :data-itemuuid (:uuid activity-data)
              :dangerouslySetInnerHTML (utils/emojify (:headline activity-data))}]
+          [:div.stream-collapsed-item-dot.muted-dot]
+          [:div.muted-activity]
           [:div.must-see-tag]
           [:div.bookmark-tag]
           (stream-item-summary activity-data)]

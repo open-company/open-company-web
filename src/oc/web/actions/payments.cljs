@@ -120,4 +120,5 @@
              ;; paywall after signup until refresh (Sean on FF with Slack signup)
              (and (map? subscription-data)
                   ;; or the org is on a non active plan
-                  (not (default-positive-statuses subscription-status)))))))
+                  (not (default-positive-statuses subscription-status)))))
+    false))

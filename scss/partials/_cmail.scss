@@ -1096,7 +1096,8 @@ div.cmail-outer {
         }
 
         button.delete-bt {
-          margin-top: -8px;
+          position: relative;
+          top: -8px;
           height: 32px;
           width: 32px;
           background-image: cdnUrl("/img/ML/cmail_delete.svg");
