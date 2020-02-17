@@ -158,6 +158,15 @@
                     [:span.count-badge
                       (:inbox-count org-data)])]
                 [:span.tab-label "Unread"]]
+              [:button.mlb-reset.tab-button.bookmarks-tab
+                {:on-click #(do
+                              (.stopPropagation %)
+                              (nav-actions/nav-to-url! % "bookmarks" (oc-urls/inbox)))
+                 :class (when (and (not showing-mobile-user-notifications)
+                                   (= current-board-slug "bookmarks"))
+                          "active")}
+                [:span.tab-icon]
+                [:span.tab-label "Saved"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -235,7 +244,7 @@
                                                    "All posts"
 
                                                    is-bookmarks
-                                                   "Bookmarks"
+                                                   "Saved"
 
                                                    :default
                                                    ;; Fallback to the org board data
