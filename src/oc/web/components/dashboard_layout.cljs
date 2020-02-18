@@ -147,7 +147,7 @@
                                    (= current-board-slug "all-posts"))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "All"]]
+                [:span.tab-label "Recent"]]
               [:button.mlb-reset.tab-button.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)
