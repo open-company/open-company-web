@@ -93,7 +93,7 @@
         mark-unread-link (utils/link-for (:links entity-data) "unread")
         is-mobile? (responsive/is-tablet-or-mobile?)
         add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
-        remove-bookmark-link (when (:bookmarked entity-data)
+        remove-bookmark-link (when (:bookmarked-at entity-data)
                                (utils/link-for (:links entity-data) "bookmark" "DELETE"))
         should-show-more-bt (or edit-link
                                 delete-link

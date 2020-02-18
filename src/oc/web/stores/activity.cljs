@@ -31,16 +31,19 @@
   (if (:uuid activity-data)
     (let [;; Add/remove item from MS
           is-bookmark? (and (not= (:status activity-data) "draft")
-                            (:bookmarked activity-data))
+                            (:bookmarked-at activity-data))
           bm-key (dispatcher/container-key org-slug :bookmarks)
           old-bm-data (get-in db bm-key)
           old-bm-data-posts (get old-bm-data :posts-list)
           bm-without-uuid (utils/vec-dissoc old-bm-data-posts (:uuid activity-data))
-          new-bm-data-posts (vec
-                             (if is-bookmark?
-                               (conj bm-without-uuid (:uuid activity-data))
-                               bm-without-uuid))
-          next-bm-data (assoc old-bm-data :posts-list new-bm-data-posts)]
+          new-bm-uuids (vec
+                        (if is-bookmark?
+                          (conj bm-without-uuid (:uuid activity-data))
+                          bm-without-uuid))
+          new-bm-data-posts (map #(dispatcher/activity-data %) new-bm-uuids)
+          sorted-new-bm-posts (sort-by :bookmarked-at new-bm-data-posts)
+          sorted-new-bm-uuids (map :uuid sorted-new-bm-posts)
+          next-bm-data (assoc old-bm-data :posts-list sorted-new-bm-uuids)]
       (assoc-in db bm-key next-bm-data))
     db))
 
@@ -270,7 +273,9 @@
         bookmark-link-index (when activity-data
                               (utils/index-of (:links activity-data) #(= (:rel %) "bookmark")))
         next-activity-data* (when activity-data
-                             (assoc activity-data :bookmarked bookmark?))
+                             (if bookmark?
+                              (assoc activity-data :bookmarked-at (utils/as-of-now))
+                              (dissoc activity-data :bookmarked-at)))
         next-activity-data (when (and activity-data
                                       bookmark-link-index)
                              (assoc-in next-activity-data* [:links bookmark-link-index :method]
@@ -280,10 +285,10 @@
                   db)
         next-bookmarks-count (cond
                                (and bookmark?
-                                    (not (:bookmarked activity-data)))
+                                    (not (:bookmarked-at activity-data)))
                                (inc current-bookmarks-count)
                                (and (not bookmark?)
-                                    (:bookmarked activity-data))
+                                    (:bookmarked-at activity-data))
                                (dec current-bookmarks-count)
                                :else
                                current-bookmarks-count)]
