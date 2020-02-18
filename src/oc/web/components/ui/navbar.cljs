@@ -54,7 +54,7 @@
                        (= (router/current-board-slug) "all-posts")
                        "All Posts"
                        (= (router/current-board-slug) "bookmarks")
-                       "Bookmarks"
+                       "Saved"
                        :else
                        (:name board-data))
          search-active? (drv/react s search/search-active?)]
