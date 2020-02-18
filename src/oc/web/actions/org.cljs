@@ -110,7 +110,7 @@
         current-board-slug (router/current-board-slug)
         inbox-link (utils/link-for (:links org-data) "inbox")
         all-posts-link (utils/link-for (:links org-data) "activity")
-        bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")
+        bookmarks-link (utils/link-for (:links org-data) "bookmarks")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")

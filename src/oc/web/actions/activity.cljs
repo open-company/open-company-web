@@ -75,7 +75,7 @@
        (finish-cb resp)))))
 
 (defn bookmarks-get [org-data & [finish-cb]]
-  (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks-activity")]
+  (when-let [bookmarks-link (utils/link-for (:links org-data) "bookmarks")]
     (bookmarks-real-get bookmarks-link (:slug org-data) finish-cb)))
 
 (defn bookmarks-more-finish [direction {:keys [success body]}]
