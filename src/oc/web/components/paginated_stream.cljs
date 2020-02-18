@@ -85,7 +85,7 @@
     (did-scroll s nil)))
 
 (rum/defc wrapped-stream-item < rum/static
-  [{:keys [key style] :as row-props}
+  [{:keys [style] :as row-props}
    {:keys [entry
            reads-data
            org-data
@@ -97,25 +97,20 @@
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
-   (if (= (:content-type entry) "separator")
-     [:div.virtualized-list-separator
-        {:style style
-         :key (str "virtualized-list-separator-" (:label entry))}
-        (:label entry)]
-     [:div.virtualized-list-row
-       {:class (when collapsed-item? "collapsed-item")
-        :style style}
-       (if collapsed-item?
-         (stream-collapsed-item {:activity-data entry
-                                 :comments-data comments-data
-                                 :read-data reads-data
-                                 :show-wrt? show-wrt?
-                                 :editable-boards editable-boards})
-         (stream-item {:activity-data entry
-                       :comments-data comments-data
-                       :read-data reads-data
-                       :show-wrt? show-wrt?
-                       :editable-boards editable-boards}))])))
+   [:div.virtualized-list-row
+     {:class (when collapsed-item? "collapsed-item")
+      :style style}
+     (if collapsed-item?
+       (stream-collapsed-item {:activity-data entry
+                               :comments-data comments-data
+                               :read-data reads-data
+                               :show-wrt? show-wrt?
+                               :editable-boards editable-boards})
+       (stream-item {:activity-data entry
+                     :comments-data comments-data
+                     :read-data reads-data
+                     :show-wrt? show-wrt?
+                     :editable-boards editable-boards}))]))
 
 (rum/defc load-more < rum/static
   [{:keys [style]}]
@@ -127,6 +122,12 @@
   [{:keys [style]}]
   [:div.carrot-close
     {:style style}])
+
+(rum/defc separator-item < rum/static
+  [{:keys [style] :as row-props} {:keys [label] :as props}]
+  [:div.virtualized-list-separator
+    {:style style}
+    label])
 
 (rum/defc virtualized-stream < rum/static
   [{:keys [items
@@ -154,20 +155,28 @@
                              carrot-close? (and show-carrot-close
                                                 (not loading-more?)
                                                 (= index (count items)))
-                             entry (when (and (not loading-more?)
-                                              (not carrot-close?))
-                                     (nth items index))
-                             reads-data (get activities-read (:uuid entry))
+                             item (when (and (not loading-more?)
+                                             (not carrot-close?))
+                                    (nth items index))
+                             separator-item? (and (not loading-more?)
+                                                  (not carrot-close?)
+                                                  (= (:content-type item) "separator"))
+                             reads-data (when (and (not separator-item?)
+                                                   (not loading-more?)
+                                                   (not carrot-close?))
+                                           (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)]
                          (cond
-                          carrot-close?
-                           (rum/with-key (carrot-close row-props) row-key)
-                          loading-more?
-                           (rum/with-key (load-more row-props) row-key)
+                           carrot-close?
+                           (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
+                           loading-more?
+                           (rum/with-key (load-more row-props) (str "loading-more-" row-key))
+                           separator-item?
+                           (rum/with-key (separator-item row-props item) (str "separator-item-" row-key))
                            :else
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives
-                                                                 {:entry entry
+                                                                 {:entry item
                                                                   :reads-data reads-data
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
