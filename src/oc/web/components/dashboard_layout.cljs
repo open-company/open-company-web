@@ -161,7 +161,7 @@
               [:button.mlb-reset.tab-button.bookmarks-tab
                 {:on-click #(do
                               (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "bookmarks" (oc-urls/inbox)))
+                              (nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)))
                  :class (when (and (not showing-mobile-user-notifications)
                                    (= current-board-slug "bookmarks"))
                           "active")}
