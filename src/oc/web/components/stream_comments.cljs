@@ -43,10 +43,12 @@
     (reset! (::show-more-menu s) nil)
     (reset! (::editing? s) (:uuid comment-data))))
 
-(defn delete-clicked [e activity-data comment-data]
+(defn delete-clicked [e activity-data has-children? comment-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-comment"
-                    :message (str "Delete this comment?")
+                    :message (if has-children?
+                               "Delete this comment thread?"
+                               "Delete this comment?")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
@@ -195,6 +197,9 @@
                                                         (utils/in? @(::replying-to s) (:uuid comment-data)))
                                                    (and (not= (:parent-uuid next-comment-data) (:parent-uuid comment-data))
                                                         (utils/in? @(::replying-to s) (:parent-uuid comment-data))))
+                      has-children? (and (not is-indented-comment?)
+                                         next-comment-data
+                                         (= (:parent-uuid next-comment-data) (:uuid comment-data)))
                       needs-left-border? (or is-indented-comment?
                                              (= (:parent-uuid next-comment-data) (:uuid comment-data))
                                              should-show-add-comment?)
@@ -257,7 +262,7 @@
                                     :show-edit? true
                                     :edit-cb (partial start-editing s)
                                     :show-delete? true
-                                    :delete-cb (partial delete-clicked s activity-data)
+                                    :delete-cb (partial delete-clicked s activity-data has-children?)
                                     :can-comment-share? true
                                     :comment-share-cb #(share-clicked comment-data)
                                     :can-react? true
@@ -296,7 +301,7 @@
                                                              :show-edit? true
                                                              :edit-cb (partial start-editing s)
                                                              :show-delete? true
-                                                             :delete-cb (partial delete-clicked s activity-data)
+                                                             :delete-cb (partial delete-clicked s activity-data has-children?)
                                                              :can-comment-share? true
                                                              :comment-share-cb #(share-clicked comment-data)
                                                              :can-react? true
@@ -325,7 +330,7 @@
                                         (when can-show-delete-bt?
                                           [:button.mlb-reset.delete-bt
                                             {:on-click (fn [_]
-                                                        (delete-clicked s activity-data comment-data))}
+                                                        (delete-clicked s activity-data has-children? comment-data))}
                                             "Delete"])
                                         (when can-show-edit-bt?
                                           [:button.mlb-reset.edit-bt
