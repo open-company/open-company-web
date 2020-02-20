@@ -43,17 +43,17 @@
     (reset! (::show-more-menu s) nil)
     (reset! (::editing? s) (:uuid comment-data))))
 
-(defn delete-clicked [e activity-data has-children? comment-data]
+(defn delete-clicked [e activity-data comment-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-comment"
-                    :message (if has-children?
+                    :message (if (pos? (:children-count comment-data))
                                "Delete this comment thread?"
                                "Delete this comment?")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
                     :solid-button-title "Yes"
-                    :solid-button-cb (fn []
+                    :solid-button-cb (fn [_]
                                        (comment-actions/delete-comment activity-data comment-data)
                                        (alert-modal/hide-alert))
                     }]
@@ -81,12 +81,11 @@
 
 (defn- highlight-comment [s comment-id scroll?]
   (when-let [comment-node (rum/ref-node s (str "stream-comment-" comment-id))]
-    (utils/after 10 (fn []
+    (utils/after 10 (fn [_]
      (swap! (::highlighting-comments s) #(conj % comment-id)
      (when scroll?
        (.scrollIntoView comment-node #js {:behavior "smooth" :block "center"}))
-     (utils/after 1000(fn []
-      (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
+     (utils/after 1000 (fn [_] (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
 
 (defn- maybe-highlight-comment [s]
   (let [comments-data (-> s :rum/args first :comments-data)]
@@ -115,7 +114,7 @@
     (react-utils/build (.-Picker js/EmojiMart)
       {:native true
        :autoFocus true
-       :onClick (fn [emoji event]
+       :onClick (fn [emoji _]
                   (add-emoji-cb emoji))})])
 
 (defn- emoji-picker-container [s comment-data]
@@ -123,7 +122,7 @@
         showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid comment-data)))]
     (when showing-picker?
-      (emoji-picker {:dismiss-cb (fn [_] (reset! (::show-picker s) nil))
+      (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
        (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
          (comment-actions/react-from-picker activity-data comment-data
@@ -197,9 +196,6 @@
                                                         (utils/in? @(::replying-to s) (:uuid comment-data)))
                                                    (and (not= (:parent-uuid next-comment-data) (:parent-uuid comment-data))
                                                         (utils/in? @(::replying-to s) (:parent-uuid comment-data))))
-                      has-children? (and (not is-indented-comment?)
-                                         next-comment-data
-                                         (= (:parent-uuid next-comment-data) (:uuid comment-data)))
                       needs-left-border? (or is-indented-comment?
                                              (= (:parent-uuid next-comment-data) (:uuid comment-data))
                                              should-show-add-comment?)
@@ -264,7 +260,7 @@
                                     :show-edit? true
                                     :edit-cb (partial start-editing s)
                                     :show-delete? true
-                                    :delete-cb (partial delete-clicked s activity-data has-children?)
+                                    :delete-cb (partial delete-clicked s activity-data)
                                     :can-comment-share? true
                                     :comment-share-cb #(share-clicked comment-data)
                                     :can-react? true
@@ -303,7 +299,7 @@
                                                              :show-edit? true
                                                              :edit-cb (partial start-editing s)
                                                              :show-delete? true
-                                                             :delete-cb (partial delete-clicked s activity-data has-children?)
+                                                             :delete-cb (partial delete-clicked s activity-data)
                                                              :can-comment-share? true
                                                              :comment-share-cb #(share-clicked comment-data)
                                                              :can-react? true
@@ -331,13 +327,11 @@
                                           "Share"]
                                         (when can-show-delete-bt?
                                           [:button.mlb-reset.delete-bt
-                                            {:on-click (fn [_]
-                                                        (delete-clicked s activity-data has-children? comment-data))}
+                                            {:on-click #(delete-clicked s activity-data comment-data)}
                                             "Delete"])
                                         (when can-show-edit-bt?
                                           [:button.mlb-reset.edit-bt
-                                            {:on-click (fn [_]
-                                                        (start-editing s comment-data))}
+                                            {:on-click #(start-editing s comment-data)}
                                             "Edit"])])]
                                   [:button.mlb-reset.floating-bt.share-bt.separator-bt
                                     {:data-toggle "tooltip"
