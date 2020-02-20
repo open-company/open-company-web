@@ -220,6 +220,7 @@
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
+                 :data-children-count (:children-count comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                           :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                                           :left-border needs-left-border?
@@ -238,6 +239,7 @@
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
+                 :data-children-count (:children-count comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                           :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                                           :left-border needs-left-border?
