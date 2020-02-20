@@ -114,8 +114,7 @@
                             (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
                                    (rest posts))))
         unwrapped-items (vec (rest ;; Always remove the first label
-                         (apply concat
-                          (mapv #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data))))]
+                         (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)))]
         unwrapped-items))
 
 ;; 
