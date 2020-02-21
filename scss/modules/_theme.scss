@@ -86,6 +86,9 @@ $dark_mode: "dark";
   // Theme settings
   --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
 
+  // Polls
+  --poll-reply-background-color: white;
+
   html, body {
     scrollbar-color: light;
   }
@@ -167,6 +170,9 @@ $dark_mode: "dark";
 
   // Theme settings
   --ui-theme-border-color: #{rgba(white, 0.22)};
+
+  // Polls
+  --poll-reply-background-color: #1B202A;
 
   &, body {
     scrollbar-color: dark;
