@@ -14,6 +14,7 @@
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.reactions :refer (reactions)]
+            [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
@@ -142,6 +143,9 @@
               [:div.activity-body.oc-mentions.oc-mentions-hover
                 {:dangerouslySetInnerHTML (utils/emojify (:body activity-data))
                  :class utils/hide-class}])
+            (when (seq (:polls activity-data))
+              (polls-wrapper {:polls-data (:polls activity-data)
+                              :container-selector "div.secure-activity-container"}))
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
               (comments-summary {:activity-data activity-data :comments-data comments-drv})

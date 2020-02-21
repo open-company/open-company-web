@@ -65,37 +65,42 @@
                        (rum/local "" ::new-reply)
                        (rum/local false ::adding-reply)
   [s {:keys [poll-data poll-key current-user-id]}]
-  (let [user-voted? (and (not @(::adding-reply s))
+  (let [can-vote? (seq current-user-id)
+        user-voted? (and (not @(::adding-reply s))
                          (seq (map #(= current-user-id %) (mapcat :votes (:replies poll-data)))))]
-    [:div.poll
+    [:div.poll.poll-read
       {:content-editable false
-       :class (when user-voted? "voted")}
+       :class (utils/class-set {:voted user-voted?})}
       [:div.poll-question
         [:div.poll-question-body
           (:question poll-data)]
         [:div.poll-total-count
           (str (:total-votes-count poll-data) " vote" (when (not= (:total-votes-count poll-data) 1) "s"))]]
       [:div.poll-replies
+        {:class (utils/class-set {:can-vote can-vote?})}
         (for [reply (:replies poll-data)
               :let [votes-percent (* (/ (:votes-count reply) (:total-votes-count poll-data)) 100)
                     rounded-votes-percent (if (js/isNaN votes-percent)
                                             0
                                             (/ (.round js/Math (* 100 votes-percent)) 100))
-                    reply-voted? (some #(when (= % current-user-id) %) (:votes reply))]]
+                    reply-voted? (and can-vote?
+                                      (some #(when (= % current-user-id) %) (:votes reply)))]]
           [:div.poll-reply-outer.group
-            {:key (str "poll-" (:poll-uuid poll-data) "-reply-" (:reply-id reply))}
+            {:key (str "poll-" (:poll-uuid poll-data) "-reply-" (:reply-id reply))
+             :class (utils/class-set {(str "percent-" (.round js/Math votes-percent)) true
+                                      :voted (and (not @(::adding-reply s))
+                                                  reply-voted?)})}
             [:button.mlb-reset.poll-reply
-              {:class (when (and (not @(::adding-reply s))
-                                 reply-voted?)
-                        "voted")
-               :on-click #(if reply-voted?
-                            (poll-actions/unvote-reply poll-data poll-key (:reply-id reply))
-                            (poll-actions/vote-reply poll-data poll-key (:reply-id reply)))}
+              {:on-click (when can-vote?
+                           #(if reply-voted?
+                              (poll-actions/unvote-reply poll-data poll-key (:reply-id reply))
+                              (poll-actions/vote-reply poll-data poll-key (:reply-id reply))))}
               [:div.poll-reply-body
                 (:body reply)]]
             [:div.poll-reply-count
               (str rounded-votes-percent "%")]])
-        (when (:can-add-reply poll-data)
+        (when (and can-vote?
+                   (:can-add-reply poll-data))
           [:div.poll-reply-new
             (if @(::adding-reply s)
               [:div.poll-reply.group
