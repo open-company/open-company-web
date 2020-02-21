@@ -21,6 +21,7 @@
             [oc.web.components.ui.image-modal :as image-modal]
             [oc.web.components.ui.more-menu :refer (more-menu)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
+            [oc.web.components.ui.poll :refer (polls-wrapper)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
@@ -229,6 +230,12 @@
         {:ref "post-body"
          :class utils/hide-class
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+      (when (seq (:polls activity-data))
+        (polls-wrapper {:polls-data (:polls activity-data)
+                        :editing? false
+                        :current-user-id current-user-id
+                        :container-selector "div.expanded-post"
+                        :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?
       ;   [:div.expanded-post-mobile-reactions

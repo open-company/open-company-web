@@ -11,6 +11,8 @@
             [oc.web.lib.jwt :as jwt]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.utils.poll :as poll-utils]
+            [oc.web.actions.poll :as poll-actions]
             [oc.web.utils.activity :as au]
             [oc.web.local-settings :as ls]
             [oc.web.lib.image-upload :as iu]
@@ -19,6 +21,23 @@
             [oc.web.utils.mention :as mention-utils]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
+
+(defn get-media-picker-extension [s]
+  (let [body-el (rum/ref-node s "editor-node")
+        editor (js/MediumEditor.getEditorFromElement body-el)
+        media-picker-ext (.getExtensionByName editor "media-picker")]
+    media-picker-ext))
+
+;; Polls
+
+(defn add-poll [s options editable]
+  (when-not (:use-inline-media-picker options)
+    (let [editable (or editable (get-media-picker-extension s))]
+      (.saveSelection editable)))
+  (let [poll-id (poll-utils/new-poll-id)
+        dispatch-input-key (:dispatch-input-key options)]
+    (poll-actions/add-poll dispatch-input-key poll-id)
+    (.addPoll editable poll-id)))
 
 ;; Gif handling
 
@@ -86,12 +105,6 @@
 
 (defn attachment-upload-error-cb [state editable res error]
   (attachment-upload-failed-cb state editable))
-
-(defn get-media-picker-extension [s]
-  (let [body-el (rum/ref-node s "editor-node")
-        editor (js/MediumEditor.getEditorFromElement body-el)
-        media-picker-ext (.getExtensionByName editor "media-picker")]
-    media-picker-ext))
 
 (defn add-attachment [s options editable]
   (let [editable (or editable (get-media-picker-extension s))]
@@ -248,6 +261,8 @@
 
 (defn on-picker-click [s options editable type]
   (cond
+    (= type "poll")
+    (add-poll s options editable)
     (= type "gif")
     (add-gif s editable)
     (= type "photo")

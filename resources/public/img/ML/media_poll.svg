@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="11px" viewBox="0 0 16 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>Combined Shape</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Polls" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Poll:-Start" transform="translate(-838.000000, -384.000000)" fill="#34414F">
+            <g id="Group-4" transform="translate(320.000000, 380.000000)">
+                <path d="M519.5,4 L524.5,4 C525.328427,4 526,4.67157288 526,5.5 C526,6.32842712 525.328427,7 524.5,7 L519.5,7 C518.671573,7 518,6.32842712 518,5.5 C518,4.67157288 518.671573,4 519.5,4 Z M519.5,8 L532.5,8 C533.328427,8 534,8.67157288 534,9.5 C534,10.3284271 533.328427,11 532.5,11 L519.5,11 C518.671573,11 518,10.3284271 518,9.5 C518,8.67157288 518.671573,8 519.5,8 Z M519.5,12 L528.5,12 C529.328427,12 530,12.6715729 530,13.5 C530,14.3284271 529.328427,15 528.5,15 L519.5,15 C518.671573,15 518,14.3284271 518,13.5 C518,12.6715729 518.671573,12 519.5,12 Z" id="Combined-Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

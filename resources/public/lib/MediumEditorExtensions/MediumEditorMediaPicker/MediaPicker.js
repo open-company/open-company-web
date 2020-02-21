@@ -1,6 +1,6 @@
 function log(){
-  // var args = Array.prototype.slice.call(arguments);
-  // console.debug("DBG MediaPicker", args);
+  var args = Array.prototype.slice.call(arguments);
+  console.debug("DBG MediaPicker", args);
 }
 
 function PlaceCaretAtEnd(el) {
@@ -56,7 +56,7 @@ function PlaceCaretAtEnd(el) {
     /* Selector to identify the click that needs save the caret position */
     saveSelectionClickElementId: undefined,
     /* Contains the picker buttons */
-    options: {buttons: ['entry', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
+    options: {buttons: ['entry', 'poll', 'photo', 'video', 'chart', 'attachment', 'divider-line'],
               delegateMethods: {}},
     /* Force placeholder hide of MediumEditor when the button expands*/
     hidePlaceholderOnExpand: false,
@@ -298,6 +298,63 @@ function PlaceCaretAtEnd(el) {
         img.width = width;
         img.height = height;
         p.appendChild(img);
+
+        var nextP = this.document.createElement("p");
+        var br = this.document.createElement("br");
+        nextP.appendChild(br);
+        this.insertAfter(nextP, p);
+        this.moveCaret($(nextP), 0);
+        this.base.checkContentChanged();
+      }
+      this._waitingCB = false;
+      setTimeout(this.togglePicker(), 100);
+    },
+
+    pollClick: function(event){
+      log("pollClick");
+      if (this.inlinePlusButtonOptions.alwaysExpanded) {
+        this.hidePlaceholder();
+        this.saveSelection();
+      }
+      this.collapse();
+      this._waitingCB = true;
+      this.delegate("onPickerClick", "poll");
+      $(event.target).tooltip("hide");
+    },
+
+    addPoll: function(pollId) {
+      log("addPoll", pollId);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (pollId) {
+        // 2 cases: it's directly the div.medium-editor or it's a p already
+        if (!this.base.getFocusedElement()) {
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
+        var sel = this.window.getSelection(),
+            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
+            p;
+        // if the selection is in a DIV means it's the main editor element
+        if (element.tagName == "DIV") {
+          // we need to add a p to insert the HR in
+          p = this.document.createElement("p");
+          element.appendChild(p);
+        // if it's a P already
+        } else if (element.tagName == "P"){
+          // if it has a BR inside
+          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+            // remove it
+            element.removeChild(element.childNodes[0]);
+          }
+          p = element;
+        }
+        // var pollContainer = this.document.createElement("p");
+        p.className = "carrot-no-preview group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
+        p.id = oc.web.utils.poll.poll_selector_prefix + pollId;
+        p.dataset.mediaType = "poll";
+        p.dataset.pollId = pollId;
 
         var nextP = this.document.createElement("p");
         var br = this.document.createElement("br");
@@ -583,6 +640,11 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-' + idx);
           this.addButtonTooltip(button, "Add update");
           this.on(button, 'click', this.entryClick.bind(this));
+        } else if (opt === 'poll') {
+          button.classList.add('media-poll');
+          button.classList.add('media-' + idx);
+          this.addButtonTooltip(button, "Add poll");
+          this.on(button, 'click', this.pollClick.bind(this));
         } else if (opt === 'gif') {
           button.classList.add('media-gif');
           button.classList.add('media-' + idx);

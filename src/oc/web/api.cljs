@@ -232,7 +232,7 @@
 
 (def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot])
 
-(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :polls])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
@@ -959,6 +959,15 @@
       :body dismiss-at}
      callback)
     (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
+
+;; Polls
+
+(defn poll-vote [vote-link callback]
+  (if vote-link
+    (storage-http (method-for-link vote-link) (relative-href vote-link)
+     {:hreaders (headers-for-link vote-link)}
+     callback)
+    (handle-missing-link "vote-link" vote-link callback)))
 
 ;; WRT
 

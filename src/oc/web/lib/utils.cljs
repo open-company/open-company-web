@@ -565,6 +565,7 @@
   (let [$container (.html (js/$ "<div class=\"hidden\"/>") inner-html)
         _ (.remove (js/$ ".rangySelectionBoundary" $container))
         _ (.remove (js/$ ".oc-mention-popup" $container))
+        _ (.remove (js/$ ".oc-poll-container" $container))
         reg-ex (js/RegExp "^(<br\\s*/?>)?$" "i")
         last-p-html (.html (.find $container "p:last-child"))
         has-empty-ending-paragraph (when (seq last-p-html)
