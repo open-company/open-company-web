@@ -65,10 +65,9 @@
     (when-let [vote-link (utils/link-for (:links reply) "vote")]
       (let [user-id (:user-id (dis/current-user-data))
             updated-replies (mapv (partial update-reply-vote user-id reply-id true) (:replies poll-data))
-            sorted-replies (reverse (sort-by :votes-count updated-replies))
-            total-count (reduce + (map :votes-count sorted-replies))]
+            total-count (reduce + (map :votes-count updated-replies))]
         (dis/dispatch! [:update poll-key #(merge % {:total-votes-count total-count
-                                                    :replies sorted-replies})]))
+                                                    :replies updated-replies})]))
       (api/poll-vote vote-link (fn [{:keys [status body success]}]
        (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))
 
@@ -78,9 +77,8 @@
     (when-let [unvote-link (utils/link-for (:links reply) "unvote")]
       (let [user-id (:user-id (dis/current-user-data))
             updated-replies (mapv (partial update-reply-vote user-id reply-id false) (:replies poll-data))
-            sorted-replies (reverse (sort-by :votes-count updated-replies))
-            total-count (reduce + (map :votes-count sorted-replies))]
+            total-count (reduce + (map :votes-count updated-replies))]
         (dis/dispatch! [:update poll-key #(merge % {:total-votes-count total-count
-                                                    :replies sorted-replies})]))
+                                                    :replies updated-replies})]))
       (api/poll-vote unvote-link (fn [{:keys [status body success]}]
        (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))
