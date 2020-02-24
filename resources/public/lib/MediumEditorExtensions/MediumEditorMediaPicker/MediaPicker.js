@@ -248,6 +248,7 @@ function PlaceCaretAtEnd(el) {
       range.collapse(true);
       sel.removeAllRanges();
       sel.addRange(range);
+      this.repositionMediaPicker();
     },
 
     /**/
