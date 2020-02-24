@@ -274,7 +274,7 @@
                               (utils/index-of (:links activity-data) #(= (:rel %) "bookmark")))
         next-activity-data* (when activity-data
                              (if bookmark?
-                              (assoc activity-data :bookmarked-at (utils/as-of-now))
+                              (update activity-data :bookmarked-at #(or % (utils/as-of-now)))
                               (dissoc activity-data :bookmarked-at)))
         next-activity-data (when (and activity-data
                                       bookmark-link-index)
