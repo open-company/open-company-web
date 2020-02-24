@@ -356,6 +356,7 @@ function PlaceCaretAtEnd(el) {
         this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -422,6 +423,7 @@ function PlaceCaretAtEnd(el) {
         this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -483,6 +485,7 @@ function PlaceCaretAtEnd(el) {
         this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -568,6 +571,7 @@ function PlaceCaretAtEnd(el) {
         this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -618,8 +622,9 @@ function PlaceCaretAtEnd(el) {
       this.insertAfter(nextP, p);
       this.setupIMGLoadEvents();
       this.moveCaret($(nextP), 0);
-
       this.base.checkContentChanged();
+      this.delayedRepositionMediaPicker();
+
       setTimeout(this.togglePicker(), 100);
     },
 
@@ -848,8 +853,12 @@ function PlaceCaretAtEnd(el) {
       }, this);
     },
 
+    delayedRepositionMediaPicker: function() {
+      this.repositionMediaPicker();
+      setTimeout(this.repositionMediaPicker.bind(this), 800);
+    },
+
     repositionMediaPicker: function(x){
-      log("repositionMediaPicker", this.pickerElement, this._lastParagraphElement, x);
       if (this.pickerElement) {
         if (this._lastParagraphElement) {
           var top = ($(this._lastParagraphElement).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
