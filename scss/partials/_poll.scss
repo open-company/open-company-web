@@ -204,6 +204,7 @@ div.poll {
           &.voted:before, &:before {
             background-color: var(--poll-reply-background-color);
             width: 100%;
+            transition: none !important;
           }
 
           div.poll-reply-count {
@@ -257,6 +258,12 @@ div.poll {
       }
     }
 
+    @for $i from 0 through 100 {
+      &:not(.animate) div.poll-reply-outer.percent-#{$i}:before {
+        width: 0;
+      }
+    }
+
     div.poll-reply-outer {
       position: relative;
       margin-top: 8px;
@@ -269,6 +276,7 @@ div.poll {
         left: 0;
         height: 32px;
         content: "";
+        transition: 180ms width ease-in, 180ms background-color ease-in;
       }
 
       @for $i from 0 through 100 {

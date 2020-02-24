@@ -250,7 +250,7 @@ $h2_top_margin: 24;
   white-space: normal;
   overflow-wrap: break-word;
 
-  p, ul > li, i {
+  p, ul > li, i, div {
     min-height: #{$line_height}px;
   }
 
@@ -299,7 +299,7 @@ $h2_top_margin: 24;
     padding-bottom: 8px;
   }
 
-  b, strong{
+  b, strong {
     @include OC_Body_Bold();
     font-weight: normal;
 

@@ -62,8 +62,12 @@
           "Add option"]]]))
 
 (rum/defcs poll-read < rum/static
+                       (rum/local false ::animate)
                        (rum/local "" ::new-reply)
                        (rum/local false ::adding-reply)
+                       {:did-mount (fn [s]
+                        (utils/after 180 #(reset! (::animate s) true))
+                        s)}
   [s {:keys [poll-data poll-key current-user-id]}]
   (let [can-vote? (seq current-user-id)
         user-voted? (and (not @(::adding-reply s))
@@ -77,7 +81,8 @@
         [:div.poll-total-count
           (str (:total-votes-count poll-data) " vote" (when (not= (:total-votes-count poll-data) 1) "s"))]]
       [:div.poll-replies
-        {:class (utils/class-set {:can-vote can-vote?})}
+        {:class (utils/class-set {:can-vote can-vote?
+                                  :animate @(::animate s)})}
         (for [reply (:replies poll-data)
               :let [votes-percent (* (/ (:votes-count reply) (:total-votes-count poll-data)) 100)
                     rounded-votes-percent (if (js/isNaN votes-percent)
