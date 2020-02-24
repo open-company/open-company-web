@@ -59,6 +59,10 @@
                (:new-at activity-data))
       (reset! (::initial-new-at s) (:new-at activity-data)))))
 
+(defn- mark-read [s]
+  (when @(::mark-as-read? s)
+    (activity-actions/mark-read @(::activity-uuid s))))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
@@ -78,6 +82,7 @@
   (rum/local nil ::initial-new-at)
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
+  (rum/local true ::mark-as-read?)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
@@ -86,9 +91,8 @@
     s)
    :did-mount (fn [s]
     (save-fixed-comment-height! s)
-    (let [activity-uuid (:uuid @(drv/get-ref s :activity-data))]
-      (activity-actions/mark-read activity-uuid)
-      (reset! (::activity-uuid s) activity-uuid))
+    (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
+    (mark-read s)
     (load-comments s true)
     s)
    :did-remount (fn [_ s]
@@ -96,7 +100,7 @@
     (save-initial-read-data s)
     s)
    :will-unmount (fn [s]
-    (activity-actions/mark-read @(::activity-uuid s))
+    (mark-read s)
     (reset! (::activity-uuid s) nil)
     s)}
   [s]
@@ -138,7 +142,8 @@
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
                                       mobile-more-menu-el)
-        more-menu-comp #(more-menu {:entity-data activity-data
+        more-menu-comp (fn []
+                        (more-menu {:entity-data activity-data
                                     :share-container-id dom-element-id
                                     :editable-boards editable-boards
                                     :external-share (not is-mobile?)
@@ -147,13 +152,14 @@
                                     :show-edit? true
                                     :show-delete? true
                                     :show-unread true
+                                    :mark-unread-cb #(reset! (::mark-as-read? s) false)
                                     :show-move? (not is-mobile?)
                                     :tooltip-position "bottom"
                                     :show-inbox? (= (:back-to @router/path) "inbox")
                                     :force-show-menu (and is-mobile? @(::force-show-menu s))
                                     :mobile-tray-menu show-mobile-menu?
                                     :will-close (when show-mobile-menu?
-                                                  (fn [] (reset! (::force-show-menu s) false)))})
+                                                  (fn [] (reset! (::force-show-menu s) false)))}))
         muted-post? (seq (utils/link-for (:links activity-data) "follow"))]
     [:div.expanded-post
       {:class (utils/class-set {dom-node-class true

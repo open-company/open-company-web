@@ -116,6 +116,6 @@
                   :external-follow (not is-mobile?)
                   :show-edit? true
                   :show-delete? true
-                  :show-unread (not is-inbox?)
+                  :show-unread (not (:unread activity-data))
                   :show-move? (not is-mobile?)
                   :show-inbox? is-inbox?})]))
