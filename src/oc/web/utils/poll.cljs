@@ -37,3 +37,17 @@
    :author (author-for-user user-data)
    :total-votes-count 0
    :replies (mapv #(poll-reply user-data) (range min-poll-replies))})
+
+(defn clean-polls
+  "Clean not needed keys from poll maps."
+  [activity-data]
+  (if (contains? activity-data :polls)
+    (assoc activity-data :polls
+     (mapv (fn [poll]
+      (-> poll
+       (dissoc :links)
+       (update :replies
+        (fn [replies]
+         (mapv #(dissoc % :links) replies)))))
+      (:polls activity-data)))
+    activity-data))
