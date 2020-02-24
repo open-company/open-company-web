@@ -3,6 +3,53 @@ function log(){
   // console.debug("DBG MediaPicker", args);
 }
 
+var now = Date.now || function() {
+  return new Date().getTime();
+};
+
+// https://github.com/jashkenas/underscore
+function throttle(func, wait) {
+  var THROTTLE_INTERVAL = 50,
+      context,
+      args,
+      result,
+      timeout = null,
+      previous = 0,
+      later;
+
+  if (!wait && wait !== 0) {
+    wait = THROTTLE_INTERVAL;
+  }
+
+  later = function() {
+    previous = now();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) {
+      context = args = null;
+    }
+  };
+
+  return function() {
+    var currNow = now(),
+        remaining = wait - (currNow - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      clearTimeout(timeout);
+      timeout = null;
+      previous = currNow;
+      result = func.apply(context, args);
+      if (!timeout) {
+        context = args = null;
+      }
+    } else if (!timeout) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+}
+
 function PlaceCaretAtEnd(el) {
   el.focus();
   if (typeof window.getSelection != "undefined"
@@ -63,6 +110,7 @@ function PlaceCaretAtEnd(el) {
     /* Internal private properties */
     _lastSelection: undefined,
     _waitingCB: false,
+    _lastParagraphElement: undefined,
 
     constructor: function (options) {
       if (options) {
@@ -85,11 +133,13 @@ function PlaceCaretAtEnd(el) {
           this.on(element, 'keyup', this.togglePicker.bind(this));
           this.on(element, 'focus', this.onFocus.bind(this));
           this.on(element, 'paste', this.togglePicker.bind(this));
+          this.on(element, 'DOMSubtreeModified', throttle(this.repositionMediaPicker).bind(this, "SubtreeModified"));
           this.subscribe('editableInput', this.togglePicker.bind(this));
         }
         // this.on(element, 'blur', this.hide.bind(this));
         this.on(this.window, 'click', this.windowClick.bind(this));
       }, this);
+      this.setupIMGLoadEvents();
 
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
@@ -155,7 +205,6 @@ function PlaceCaretAtEnd(el) {
       picker.id = 'medium-editor-media-picker-' + this.getEditorId();
       picker.className = 'medium-editor-media-picker';
       picker.style.display = "none";
-      // picker.style.left = 
       this.mediaButtonsContainer = this.createPickerMediaButtons();
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.mainButton = this.createPickerMainButton();
@@ -303,6 +352,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
+        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
       }
@@ -368,6 +418,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
+        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
       }
@@ -428,6 +479,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
+        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
       }
@@ -512,6 +564,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
+        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
       }
@@ -562,6 +615,7 @@ function PlaceCaretAtEnd(el) {
       var br = this.document.createElement("br");
       nextP.appendChild(br);
       this.insertAfter(nextP, p);
+      this.setupIMGLoadEvents();
       this.moveCaret($(nextP), 0);
 
       this.base.checkContentChanged();
@@ -708,7 +762,7 @@ function PlaceCaretAtEnd(el) {
         // Remove last selection only on direct click of the button
         this.removeSelection();
       } else {
-        this.expand();        
+        this.expand();
       }
       if (event !== undefined) {
         event.stopPropagation();
@@ -742,6 +796,7 @@ function PlaceCaretAtEnd(el) {
       }
       this.delegate("willHide");
       this.collapse();
+      this._lastParagraphElement = undefined;
       this.pickerElement.style.display = 'none';
       this.delegate("didHide");
     },
@@ -776,6 +831,34 @@ function PlaceCaretAtEnd(el) {
       return false;
     },
 
+    setupIMGLoadEvents: function() {
+      this.getEditorElements().forEach(function(el) {
+        el.querySelectorAll("img, video, iframe").forEach(function(el) {
+          if (el.complete) {
+            this.repositionMediaPicker();
+          } else {
+            this.on(el, "loadedmetadata", this.repositionMediaPicker.bind(this));
+            this.on(el, "onloadeddata", this.repositionMediaPicker.bind(this));
+            this.on(el, "loadStart", this.repositionMediaPicker.bind(this));
+            this.on(el, "canplay", this.repositionMediaPicker.bind(this));
+            this.on(el, "load", this.repositionMediaPicker.bind(this));
+          }
+        }, this);
+      }, this);
+    },
+
+    repositionMediaPicker: function(x){
+      log("repositionMediaPicker", this.pickerElement, this._lastParagraphElement, x);
+      if (this.pickerElement) {
+        if (this._lastParagraphElement) {
+          var top = ($(this._lastParagraphElement).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
+          this.pickerElement.style.top = top + "px";
+        } else {
+          this.hide();
+        }
+      }
+    },
+
     togglePicker: function(event, editable){
       if (this.inlinePlusButtonOptions.inlineButtons) {
         if (this._waitingCB) {
@@ -787,13 +870,13 @@ function PlaceCaretAtEnd(el) {
           if (this.inlinePlusButtonOptions.initiallyVisible && !this.initialButtonsShown) {
             element = this.getEditorElements()[0];
           }else {
-            element = sel.getRangeAt(0).commonAncestorContainer;  
+            element = sel.getRangeAt(0).commonAncestorContainer;
           }
           this.initialButtonsShown = true;
           if (sel !== undefined || element !== undefined) {
             if (this.paragraphIsEmpty(element)){
-              var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
-              this.pickerElement.style.top = top + "px";
+              this._lastParagraphElement = element;
+              this.repositionMediaPicker("togglePicker");
               this.show();
               return;
             }
@@ -802,7 +885,6 @@ function PlaceCaretAtEnd(el) {
         this.hide();
       }
     },
-    
   });
 
   MediaPicker.RemoveAnchor = function(uniqueID, e){
