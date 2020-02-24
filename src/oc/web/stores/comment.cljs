@@ -142,7 +142,8 @@
   [db [_ activity-uuid comment-data comments-key]]
   (let [item-uuid (:uuid comment-data)
         comments-data (get-in db comments-key)
-        new-comments-data (remove #(= item-uuid (:uuid %)) comments-data)]
+        new-comments-data (filterv #(and (not= item-uuid (:uuid %)) (not= item-uuid (:parent-uuid %)))
+                           comments-data)]
     (assoc-in db comments-key new-comments-data)))
 
 (defmethod dispatcher/action :comment-reaction-toggle
