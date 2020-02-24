@@ -967,16 +967,25 @@
          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
         (inbox-get (dis/org-data))))))
 
+(declare inbox-unread)
+
+(defn mark-unread [activity-data]
+  (inbox-unread activity-data)
+  (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
+    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
+    (api/mark-unread mark-unread-link (:board-uuid activity-data)
+     (fn [{:keys [success]}]
+      (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
+                                               :description (when-not success "Please try again")
+                                               :dismiss true
+                                               :expire 3
+                                               :id (if success :mark-unread-success :mark-unread-error)})))))
+
 (defn inbox-unread [activity-data]
   (when-let [unread-link (utils/link-for (:links activity-data) "unread")]
     (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
     (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
-       (notification-actions/show-notification {:title (if success "Post added to Unread" "An error occurred")
-                                                :description (when-not success "Please try again")
-                                                :dismiss true
-                                                :expire 3
-                                                :id (if success :inbox-unread-success :inbox-unread-error)})
        (if (and (= status 404)
                 (= (:uuid activity-data) (router/current-activity-id)))
          (do
