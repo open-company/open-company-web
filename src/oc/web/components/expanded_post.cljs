@@ -165,7 +165,12 @@
       {:class (utils/class-set {dom-node-class true
                                 :android ua/android?})
        :id dom-element-id
-       :style {:padding-bottom (str @(::comment-height s) "px")}}
+       :style {:padding-bottom (str @(::comment-height s) "px")}
+       :data-initial-new-at @(::initial-new-at s)
+       :data-new-at (:new-at activity-data)
+       :data-initial-last-read-at @(::initial-last-read-at s)
+       :data-last-read-at (:last-read-at reads-data)
+       :data-has-new-comments has-new-comments?}
       (image-modal/image-modal {:src expand-image-src})
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
