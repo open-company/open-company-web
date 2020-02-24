@@ -204,3 +204,7 @@ OCCarrotDesktop.isDarkMode = function() {};
 // Stripe
 var Stripe = function(){};
 Stripe.redirectToCheckout = function(){};
+// React virtualized
+var ReactVirtualized = function(){};
+ReactVirtualized.List = function(){};
+ReactVirtualized.List.recomputeRowHeights = function(){};
