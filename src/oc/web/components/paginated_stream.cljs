@@ -129,21 +129,53 @@
     {:style style}
     label])
 
-(rum/defc virtualized-stream < rum/static
-  [{:keys [items
-           activities-read
-           foc-layout
-           show-loading-more
-           show-carrot-close]
-    :as derivatives}
-   virtualized-props]
+(rum/defcs virtualized-stream < rum/static
+                                rum/reactive
+                                (rum/local nil ::last-force-list-update)
+                                (drv/drv :force-list-update)
+                               {:did-remount (fn [o s]
+                                 (when-let [force-list-update @(drv/get-ref s :force-list-update)]
+                                   (when (not= @(::last-force-list-update s) force-list-update)
+                                     (reset! (::last-force-list-update s) force-list-update)
+                                     (.recomputeRowHeights (rum/ref s :virtualized-list-comp))))
+                                 s)}
+  [s {:keys [items
+             activities-read
+             foc-layout
+             show-loading-more
+             show-carrot-close]
+      :as derivatives}
+     virtualized-props]
   (let [{:keys [height
                 isScrolling
                 onChildScroll
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
+        _force-list-update (drv/react s :force-list-update)
         is-mobile? (responsive/is-mobile-size?)
         key-prefix (if is-mobile? "mobile" foc-layout)
+        rowHeight (fn [row-props]
+                    (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
+                          loading-more? (and show-loading-more
+                                             (= index (count items)))
+                          carrot-close? (and show-carrot-close
+                                              (not loading-more?)
+                                              (= index (count items)))
+                          item (when (and (not loading-more?)
+                                           (not carrot-close?))
+                                  (nth items index))
+                          separator-item? (and (not loading-more?)
+                                                (not carrot-close?)
+                                                (= (:content-type item) "separator"))]
+                      (cond
+                        separator-item?
+                        foc-separators-height
+                        loading-more?
+                        (if is-mobile? 44 60)
+                        carrot-close?
+                        72
+                        :else
+                        (calc-card-height is-mobile? foc-layout))))
         row-renderer (fn [row-props]
                        (let [{:keys [key
                                      index
@@ -185,6 +217,7 @@
       {:ref registerChild
        :key (str "virtualized-list-" key-prefix)}
       (virtualized-list {:autoHeight true
+                         :ref :virtualized-list-comp
                          :height height
                          :width (if is-mobile?
                                   js/window.innerWidth
@@ -195,20 +228,7 @@
                                            show-carrot-close)
                                      (inc (count items))
                                      (count items))
-                         :rowHeight (fn [params]
-                                      (let [{:keys [index]} (js->clj params :keywordize-keys true)
-                                            item (get items index)]
-                                        (cond
-                                          (= (:content-type item) "separator")
-                                          foc-separators-height
-                                          (and (= index (count items))
-                                               show-loading-more)
-                                          (if is-mobile? 44 60)
-                                          (and (= index (count items))
-                                               show-carrot-close)
-                                          72
-                                          :else
-                                          (calc-card-height is-mobile? foc-layout))))
+                         :rowHeight rowHeight
                          :rowRenderer row-renderer
                          :scrollTop scrollTop
                          :overscanRowCount 20

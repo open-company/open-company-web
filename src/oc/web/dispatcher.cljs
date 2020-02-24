@@ -173,6 +173,8 @@
 
 (def ui-theme-key [:ui-theme])
 
+(def force-list-update-key [:force-list-update])
+
 ;; Functions needed by derivatives
 
 (declare org-data)
@@ -469,7 +471,8 @@
                                     (get-in base (reminder-edit-key org-slug)))]
    :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
-   :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]})
+   :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
+   :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]})
 
 ;; Action Loop =================================================================
 

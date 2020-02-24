@@ -156,6 +156,7 @@
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
       (add-remove-item-from-all-posts org-slug fixed-activity-data)
       (add-remove-item-from-bookmarks org-slug fixed-activity-data)
+      (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
