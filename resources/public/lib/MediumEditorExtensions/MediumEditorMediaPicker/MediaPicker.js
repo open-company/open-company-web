@@ -85,6 +85,7 @@ function PlaceCaretAtEnd(el) {
           this.on(element, 'keyup', this.togglePicker.bind(this));
           this.on(element, 'focus', this.onFocus.bind(this));
           this.on(element, 'paste', this.togglePicker.bind(this));
+          // this.on(element, 'DOMSubtreeModified', this.togglePicker.bind(this));
           this.subscribe('editableInput', this.togglePicker.bind(this));
         }
         // this.on(element, 'blur', this.hide.bind(this));
@@ -335,13 +336,15 @@ function PlaceCaretAtEnd(el) {
         }
         var sel = this.window.getSelection(),
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
-            p;
-        // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
-          // we need to add a p to insert the HR in
-          p = this.document.createElement("p");
-          element.appendChild(p);
-        // if it's a P already
+            div;
+        // if the selection is in a DIV and it's the main editor element:
+        if (element.tagName == "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
+          // we need to add a DIV to insert the poll in
+          div = this.document.createElement("div");
+          element.appendChild(div);
+        } else if (element.tagName == "DIV"){
+          // if it's a DIV we clean out the content
+          div.innerHTML = "";
         } else if (element.tagName == "P"){
           // if it has a BR inside
           if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
@@ -349,17 +352,24 @@ function PlaceCaretAtEnd(el) {
             element.removeChild(element.childNodes[0]);
           }
           p = element;
+
+          // Replace
+
+          // Remove p and replace it with a DIV
+          div = this.document.createElement("div");
+          element.appendChild(div);
+          p.parentNode.replaceChild(div, element);
         }
         // var pollContainer = this.document.createElement("p");
-        p.className = "carrot-no-preview group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
-        p.id = oc.web.utils.poll.poll_selector_prefix + pollId;
-        p.dataset.mediaType = "poll";
-        p.dataset.pollId = pollId;
+        div.className = "carrot-no-preview group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.dataset.mediaType = "poll";
+        div.dataset.pollId = pollId;
 
         var nextP = this.document.createElement("p");
         var br = this.document.createElement("br");
         nextP.appendChild(br);
-        this.insertAfter(nextP, p);
+        this.insertAfter(nextP, div);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
       }
@@ -804,7 +814,9 @@ function PlaceCaretAtEnd(el) {
       }
       this.delegate("willHide");
       this.collapse();
-      this.pickerElement.style.display = 'none';
+      if (this.pickerElement) {
+        this.pickerElement.style.display = 'none';
+      }
       this.delegate("didHide");
     },
 
