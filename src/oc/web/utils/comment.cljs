@@ -127,7 +127,7 @@
   (let [new? (and (not= (-> comment-data :author :user-id) user-id)
                   (< (.getTime (utils/js-date last-read-at))
                      (.getTime (utils/js-date (:created-at comment-data)))))]
-    {:new (or new? (= (:uuid comment-data) "6185-4d87-abbf"))
+    {:new new?
      :collapse (and (seq (:parent-uuid comment-data))
                     (not new?))}))
 
