@@ -707,7 +707,7 @@ div.cmail-outer {
     }
 
     div.cmail-content-outer {
-      padding: 14px 16px 16px 24px;
+      padding: 16px 16px 16px 24px;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
 
@@ -889,11 +889,11 @@ div.cmail-outer {
 
           &:empty:before {
             content: attr(placeholder);
-            @include activity-title(14px, 24px);
+            @include activity-title(20px, 28px);
             display: inline-block;
             color: var(--light-color) !important;
             font-style: none;
-            height: 24px;
+            height: 28px;
             margin: 0;
             padding: 0;
           }

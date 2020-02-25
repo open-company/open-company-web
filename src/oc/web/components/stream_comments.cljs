@@ -46,12 +46,14 @@
 (defn delete-clicked [e activity-data comment-data]
   (let [alert-data {:icon "/img/ML/trash.svg"
                     :action "delete-comment"
-                    :message (str "Delete this comment?")
+                    :message (if (pos? (:children-count comment-data))
+                               "Delete this comment thread?"
+                               "Delete this comment?")
                     :link-button-title "No"
                     :link-button-cb #(alert-modal/hide-alert)
                     :solid-button-style :red
                     :solid-button-title "Yes"
-                    :solid-button-cb (fn []
+                    :solid-button-cb (fn [_]
                                        (comment-actions/delete-comment activity-data comment-data)
                                        (alert-modal/hide-alert))
                     }]
@@ -79,12 +81,11 @@
 
 (defn- highlight-comment [s comment-id scroll?]
   (when-let [comment-node (rum/ref-node s (str "stream-comment-" comment-id))]
-    (utils/after 10 (fn []
+    (utils/after 10 (fn [_]
      (swap! (::highlighting-comments s) #(conj % comment-id)
      (when scroll?
        (.scrollIntoView comment-node #js {:behavior "smooth" :block "center"}))
-     (utils/after 1000(fn []
-      (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
+     (utils/after 1000 (fn [_] (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
 
 (defn- maybe-highlight-comment [s]
   (let [comments-data (-> s :rum/args first :comments-data)]
@@ -113,7 +114,7 @@
     (react-utils/build (.-Picker js/EmojiMart)
       {:native true
        :autoFocus true
-       :onClick (fn [emoji event]
+       :onClick (fn [emoji _]
                   (add-emoji-cb emoji))})])
 
 (defn- emoji-picker-container [s comment-data]
@@ -121,7 +122,7 @@
         showing-picker? (and (seq @(::show-picker s))
                              (= @(::show-picker s) (:uuid comment-data)))]
     (when showing-picker?
-      (emoji-picker {:dismiss-cb (fn [_] (reset! (::show-picker s) nil))
+      (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
        (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
          (comment-actions/react-from-picker activity-data comment-data
@@ -215,6 +216,7 @@
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
+                 :data-children-count (:children-count comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                           :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                                           :left-border needs-left-border?
@@ -233,6 +235,7 @@
               [:div.stream-comment-outer
                 {:key (str "stream-comment-" (:created-at comment-data))
                  :data-comment-uuid (:uuid comment-data)
+                 :data-children-count (:children-count comment-data)
                  :class (utils/class-set {:not-highlighted (not (utils/in? @(::highlighting-comments s) (:uuid comment-data)))
                                           :highlighted (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                                           :left-border needs-left-border?
@@ -324,13 +327,11 @@
                                           "Share"]
                                         (when can-show-delete-bt?
                                           [:button.mlb-reset.delete-bt
-                                            {:on-click (fn [_]
-                                                        (delete-clicked s activity-data comment-data))}
+                                            {:on-click #(delete-clicked s activity-data comment-data)}
                                             "Delete"])
                                         (when can-show-edit-bt?
                                           [:button.mlb-reset.edit-bt
-                                            {:on-click (fn [_]
-                                                        (start-editing s comment-data))}
+                                            {:on-click #(start-editing s comment-data)}
                                             "Edit"])])]
                                   [:button.mlb-reset.floating-bt.share-bt.separator-bt
                                     {:data-toggle "tooltip"
