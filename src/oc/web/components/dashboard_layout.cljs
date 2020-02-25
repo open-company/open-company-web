@@ -168,7 +168,7 @@
                                    (= current-board-slug "bookmarks"))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "Saved"]]
+                [:span.tab-label "Bookmarks"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -246,7 +246,7 @@
                                                    "Recent"
 
                                                    is-bookmarks
-                                                   "Saved"
+                                                   "Bookmarks"
 
                                                    :default
                                                    ;; Fallback to the org board data
