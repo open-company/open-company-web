@@ -156,11 +156,12 @@
                           (reset! (::add-comment-id s) (utils/activity-uuid))
                           (let [{:keys [activity-data parent-comment-uuid edit-comment-data]} (first (:rum/args s))
                                 add-comment-data @(drv/get-ref s :add-comment-data)
-                                add-comment-key (str (:uuid activity-data) "-" parent-comment-uuid "-" (:uuid edit-comment-data))
-                                activity-add-comment-data (get add-comment-data add-comment-key)
-                                add-comment-activity-data (get add-comment-data (:uuid activity-data))]
+                                add-comment-key (dis/add-comment-string-key (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
+                                activity-add-comment-data (get add-comment-data add-comment-key)]
                             (reset! (::initial-add-comment s) (or activity-add-comment-data ""))
-                            (reset! (::show-post-button s) (should-focus-field? s)))
+                            (reset! (::show-post-button s) (or (seq activity-add-comment-data) (should-focus-field? s)))
+                            (when (seq activity-add-comment-data)
+                              (reset! (::did-change s) true)))
                           s)
                           :did-mount (fn [s]
                            (me-media-utils/setup-editor s add-comment-did-change (me-options (:parent-comment-uuid (first (:rum/args s)))))

@@ -62,7 +62,7 @@
         ;; Replace the old section data
         ;; w/o overriding the posts and links to avoid breaking pagination
         next-board-data (merge fixed-section-data
-                         (select-keys old-board-data [:posts-list :fixed-items :links]))]
+                         (select-keys old-board-data [:posts-list :items-to-render :fixed-items :links]))]
     (-> db
         (assoc-in board-key next-board-data)
         (dissoc :section-editing))))
