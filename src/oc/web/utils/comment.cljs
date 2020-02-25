@@ -109,10 +109,12 @@
    (sort-comments (vals comments)))
   ([comments :guard sequential?]
    (let [root-comments (filterv (comp empty? :parent-uuid) comments)
-         sorted-roots (sort-comments root-comments nil)
-         all-sorted-comments (vec (mapcat #(vec (concat [%] (sort-comments comments (:uuid %)))) sorted-roots))
-         with-children-count (mapv #(assoc % :children-count (count (filter (fn [c] (= (:parent-uuid c) (:uuid %))) all-sorted-comments))) all-sorted-comments)]
-     with-children-count))
+         grouped-comments (mapv #(let [sorted-children (sort-comments comments (:uuid %))]
+                                  (merge % {:thread-children sorted-children
+                                            :last-activity-at (-> sorted-children last :created-at)
+                                            :children-count (count sorted-children)}))
+                           root-comments)]
+     (reverse (sort-by :last-activity-at grouped-comments))))
   ([comments :guard sequential? parent-uuid]
    (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
          filtered-comments (filterv check-fn comments)
@@ -120,3 +122,25 @@
      (if (nil? parent-uuid)
       (vec (reverse sorted-comments))
       (vec sorted-comments)))))
+
+(defn- enrich-comment [user-id last-read-at comment-data]
+  (let [new? (and (not= (-> comment-data :author :user-id) user-id)
+                  (< (.getTime (utils/js-date last-read-at))
+                     (.getTime (utils/js-date (:created-at comment-data)))))]
+    {:new (or new? (= (:uuid comment-data) "6185-4d87-abbf"))
+     :collapse (and (seq (:parent-uuid comment-data))
+                    (not new?))}))
+
+(defn collapsed-comments
+  "Add a collapsed flag to every comment that is a reply and is not new. Also add new? flag to every new one.
+   Add a count of the collapsed comments to each root comment."
+  [user-id last-read-at comments]
+  (mapv
+   (fn [comment]
+    (let [enriched-children (collapsed-comments user-id last-read-at (:thread-children comment))]
+      (-> comment
+       (merge (enrich-comment user-id last-read-at comment))
+       (assoc :thread-children enriched-children)
+       (assoc :new-count (count (filter :new enriched-children)))
+       (assoc :collapsed-count (count (filter (comp not :new) enriched-children))))))
+   comments))
