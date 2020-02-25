@@ -56,8 +56,7 @@
   [sections]
   (doseq [section sections
           :when (not (is-currently-shown? section))
-          :let [board-rel (if (= (:slug section) utils/default-drafts-board-slug) ["item" "self"] "activity")
-                board-link (utils/link-for (:links section) board-rel "GET")]]
+          :let [board-link (utils/link-for (:links section) ["item" "self"] "GET")]]
     (api/get-board board-link
       (fn [{:keys [status body success]}]
         (when success
@@ -69,13 +68,12 @@
   [section-uuid & [finish-cb]]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
-    (let [current-section-data (dispatcher/board-data)
-          board-rel (if (= (:slug current-section-data) utils/default-drafts-board-slug) ["item" "self"] "activity")]
+    (let [current-section-data (dispatcher/board-data)]
       (when (= section-uuid (:uuid utils/default-drafts-board))
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
-        (api/get-board (utils/link-for (:links current-section-data) board-rel "GET")
+        (api/get-board (utils/link-for (:links current-section-data) ["item" "self"] "GET")
                        (fn [{:keys [status body success] :as resp}]
                          (when success (section-get-finish (json->cljs body)))
                          (when (fn? finish-cb)

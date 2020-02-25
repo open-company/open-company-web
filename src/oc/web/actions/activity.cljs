@@ -109,14 +109,9 @@
      (when (fn? finish-cb)
        (finish-cb resp)))))
 
-(defn activity-get [org-data & [finish-cb]]
-  (when-let [activity-link (utils/link-for (:links org-data) "activity")]
-    (activity-real-get activity-link (:slug org-data) finish-cb)))
-
 (defn all-posts-get [org-data & [finish-cb]]
-  (let [activity-link (utils/link-for (:links org-data) "activity")]
-    (when activity-link
-      (activity-real-get activity-link (:slug org-data) finish-cb))))
+  (when-let [activity-link (utils/link-for (:links org-data) "entries" "GET")]
+    (activity-real-get activity-link (:slug org-data) finish-cb)))
 
 (defn all-posts-more-finish [direction {:keys [success body]}]
   (when success
@@ -167,16 +162,15 @@
         is-inbox (= (router/current-board-slug) "inbox")
         is-drafts (= (router/current-board-slug) utils/default-drafts-board-slug)
         board-data (some #(when (= (:slug %) (router/current-board-slug)) %) (:boards org-data))
-        board-link-rel (if is-drafts ["item" "self"] "activity")
         board-link (when (and (not is-all-posts) (not is-bookmarks) (not is-inbox))
-                     (utils/link-for (:links board-data) board-link-rel "GET"))]
+                     (utils/link-for (:links board-data) ["item" "self"] "GET"))]
     (dis/dispatch! [:org-loaded org-data])
     (cond
       is-inbox
       (inbox-get org-data)
 
       is-all-posts
-      (activity-get org-data)
+      (all-posts-get org-data)
 
       is-bookmarks
       (bookmarks-get org-data)
@@ -907,10 +901,9 @@
         (bookmarks-get org-data)
 
         :default
-        (when-let* [board-rel (if (= board-slug utils/default-drafts-board-slug) ["item" "self"] "activity")
-                    fixed-board-data (or board-data
+        (when-let* [fixed-board-data (or board-data
                      (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-                    board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+                    board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (sa/section-get board-link))))))
 
 ;; FOC Layout
@@ -967,16 +960,25 @@
          (dis/dispatch! [:activity-get/finish status (router/current-org-slug) (json->cljs body) nil]))
         (inbox-get (dis/org-data))))))
 
+(declare inbox-unread)
+
+(defn mark-unread [activity-data]
+  (inbox-unread activity-data)
+  (when-let [mark-unread-link (utils/link-for (:links activity-data) "mark-unread")]
+    (dis/dispatch! [:mark-unread (router/current-org-slug) activity-data])
+    (api/mark-unread mark-unread-link (:board-uuid activity-data)
+     (fn [{:keys [success]}]
+      (notification-actions/show-notification {:title (if success "Post marked as unread" "An error occurred")
+                                               :description (when-not success "Please try again")
+                                               :dismiss true
+                                               :expire 3
+                                               :id (if success :mark-unread-success :mark-unread-error)})))))
+
 (defn inbox-unread [activity-data]
   (when-let [unread-link (utils/link-for (:links activity-data) "unread")]
     (dis/dispatch! [:inbox/unread (router/current-org-slug) (router/current-board-slug) (:uuid activity-data)])
     (api/inbox-unread unread-link
      (fn [{:keys [status success body]}]
-       (notification-actions/show-notification {:title (if success "Post added to Unread" "An error occurred")
-                                                :description (when-not success "Please try again")
-                                                :dismiss true
-                                                :expire 3
-                                                :id (if success :inbox-unread-success :inbox-unread-error)})
        (if (and (= status 404)
                 (= (:uuid activity-data) (router/current-activity-id)))
          (do

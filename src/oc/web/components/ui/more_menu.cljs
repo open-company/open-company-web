@@ -86,11 +86,12 @@
              tooltip-position show-edit? show-delete? edit-cb delete-cb show-move? show-unread
              can-comment-share? comment-share-cb can-react? react-cb can-reply?
              reply-cb external-bookmark remove-bookmark-title
-             show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu]}]
+             show-inbox? force-show-menu capture-clicks external-follow mobile-tray-menu
+             mark-unread-cb]}]
   (let [delete-link (utils/link-for (:links entity-data) "delete")
         edit-link (utils/link-for (:links entity-data) "partial-update")
         share-link (utils/link-for (:links entity-data) "share")
-        mark-unread-link (utils/link-for (:links entity-data) "unread")
+        inbox-unread-link (utils/link-for (:links entity-data) "unread")
         is-mobile? (responsive/is-tablet-or-mobile?)
         add-bookmark-link (utils/link-for (:links entity-data) "bookmark" "POST")
         remove-bookmark-link (when (:bookmarked-at entity-data)
@@ -102,21 +103,21 @@
                                 can-reply?
                                 (and (not external-share)
                                      share-link)
-                                (and mark-unread-link
+                                (and inbox-unread-link
                                      show-unread))
         inbox-follow-link (utils/link-for (:links entity-data) "follow")
         inbox-unfollow-link (utils/link-for (:links entity-data) "unfollow")
         show-menu (or @(::showing-menu s) force-show-menu)]
     (when (or edit-link
               share-link
-              mark-unread-link
+              inbox-unread-link
               delete-link
               can-comment-share?
               can-react?
               can-reply?
               add-bookmark-link
               remove-bookmark-link
-              mark-unread-link)
+              inbox-unread-link)
       [:div.more-menu
         {:ref "more-menu"
          :class (utils/class-set {:menu-expanded (or @(::move-activity s)
@@ -156,7 +157,7 @@
                                       :has-add-bookmark (and remove-bookmark-link
                                                              (or is-mobile?
                                                                  (not external-bookmark)))
-                                      :has-mark-unread mark-unread-link})}
+                                      :has-mark-unread inbox-unread-link})}
             (when (and edit-link
                        show-edit?)
               [:li.edit.top-rounded
@@ -196,7 +197,7 @@
             (when (and (not external-share)
                        share-link)
               [:li.share
-                {:class (when (and (not mark-unread-link)
+                {:class (when (and (not inbox-unread-link)
                                    (not (or is-mobile?
                                             (not external-follow)))
                                    (not (or is-mobile?
@@ -208,7 +209,7 @@
                                 (will-close))
                               (activity-actions/activity-share-show entity-data share-container-id))}
                 "Share"])
-            (when (and mark-unread-link
+            (when (and inbox-unread-link
                        show-unread)
               [:li.unread
                 {:class (when (and (not (or is-mobile?
@@ -220,8 +221,10 @@
                               (reset! (::showing-menu s) false)
                               (when (fn? will-close)
                                 (will-close))
-                              (activity-actions/inbox-unread entity-data))}
-                "Add to Unread"])
+                              (activity-actions/mark-unread entity-data)
+                              (when (fn? mark-unread-cb)
+                                (mark-unread-cb)))}
+                "Mark as unread"])
             (when (or is-mobile?
                       (not external-follow))
               (if inbox-follow-link

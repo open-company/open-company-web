@@ -40,6 +40,7 @@
 (def search-enabled? true)
 
 ;; Reminder location
+(def reminders-enabled? true)
 (def reminder-server-domain (str "http://" web-hostname ":3011"))
 
 ;; Web location
