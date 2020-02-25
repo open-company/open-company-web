@@ -17,13 +17,37 @@
           old-ap-data (get-in db ap-key)
           old-ap-data-posts (get old-ap-data :posts-list)
           ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
-          new-ap-data-posts (vec
-                             (if is-published?
-                               (conj ap-without-uuid (:uuid activity-data))
-                               ap-without-uuid))
-          next-ap-data (merge old-ap-data {:posts-list new-ap-data-posts
-                                           :items-to-render (au/grouped-posts (assoc old-ap-data :posts-list new-ap-data-posts))})]
+          new-ap-uuids (vec (if is-published?
+                              (conj ap-without-uuid (:uuid activity-data))
+                              ap-without-uuid))
+          new-ap-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-ap-uuids)
+          sorted-new-ap-posts (reverse (sort-by :published-at new-ap-data-posts))
+          sorted-new-ap-uuids (mapv :uuid sorted-new-ap-posts)
+          next-ap-data (merge old-ap-data {:posts-list sorted-new-ap-uuids
+                                           :items-to-render (au/grouped-posts (assoc old-ap-data :posts-list sorted-new-ap-uuids))})]
       (assoc-in db ap-key next-ap-data))
+    db))
+
+(defn add-remove-item-from-board
+  "Given an activity map adds or remove it from it's board's list of posts depending on the activity status"
+  [db org-slug activity-data]
+  (if (:uuid activity-data)
+    (let [;; Add/remove item from AP
+          is-published? (= (:status activity-data) "published")
+          board-data-key (dispatcher/board-data-key org-slug (:board-slug activity-data))
+          old-board-data (get-in db board-data-key)
+          old-board-data-posts (get old-board-data :posts-list)
+          board-without-uuid (utils/vec-dissoc old-board-data-posts (:uuid activity-data))
+          new-board-uuids (vec (if is-published?
+                                 (conj board-without-uuid (:uuid activity-data))
+                                 board-without-uuid))
+          new-board-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-board-uuids)
+          sorted-new-board-posts (reverse (sort-by :published-at new-board-data-posts))
+          sorted-new-board-uuids (mapv :uuid sorted-new-board-posts)
+          grouped-board-uuids (au/grouped-posts (assoc old-board-data :posts-list sorted-new-board-uuids))
+          next-board-data (merge old-board-data {:posts-list sorted-new-board-uuids
+                                                 :items-to-render grouped-board-uuids})]
+      (assoc-in db board-data-key next-board-data))
     db))
 
 (defn add-remove-item-from-bookmarks
@@ -41,9 +65,9 @@
                         (if is-bookmark?
                           (conj bm-without-uuid (:uuid activity-data))
                           bm-without-uuid))
-          new-bm-data-posts (map #(dispatcher/activity-data %) new-bm-uuids)
+          new-bm-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-bm-uuids)
           sorted-new-bm-posts (reverse (sort-by :bookmarked-at new-bm-data-posts))
-          sorted-new-bm-uuids (map :uuid sorted-new-bm-posts)
+          sorted-new-bm-uuids (mapv :uuid sorted-new-bm-posts)
           next-bm-data (merge old-bm-data {:posts-list sorted-new-bm-uuids
                                            :items-to-render sorted-new-bm-uuids})]
       (assoc-in db bm-key next-bm-data))
@@ -153,11 +177,13 @@
   [db [_ edit-key activity-data]]
   (let [org-slug (utils/post-org-slug activity-data)
         board-data (au/board-by-uuid (:board-uuid activity-data))
-        fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))]
+        fixed-activity-data (au/fix-entry activity-data board-data (dispatcher/change-data db))
+        with-published-at (update fixed-activity-data :published-at #(if (seq %) % (utils/as-of-now)))]
     (-> db
-      (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
-      (add-remove-item-from-all-posts org-slug fixed-activity-data)
-      (add-remove-item-from-bookmarks org-slug fixed-activity-data)
+      (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) with-published-at)
+      (add-remove-item-from-all-posts org-slug with-published-at)
+      (add-remove-item-from-bookmarks org-slug with-published-at)
+      (add-remove-item-from-board org-slug with-published-at)
       (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
