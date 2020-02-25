@@ -42,7 +42,7 @@
                           (conj bm-without-uuid (:uuid activity-data))
                           bm-without-uuid))
           new-bm-data-posts (map #(dispatcher/activity-data %) new-bm-uuids)
-          sorted-new-bm-posts (sort-by :bookmarked-at new-bm-data-posts)
+          sorted-new-bm-posts (reverse (sort-by :bookmarked-at new-bm-data-posts))
           sorted-new-bm-uuids (map :uuid sorted-new-bm-posts)
           next-bm-data (merge old-bm-data {:posts-list sorted-new-bm-uuids
                                            :items-to-render sorted-new-bm-uuids})]
