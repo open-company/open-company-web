@@ -133,13 +133,11 @@ function PlaceCaretAtEnd(el) {
           this.on(element, 'keyup', this.togglePicker.bind(this));
           this.on(element, 'focus', this.onFocus.bind(this));
           this.on(element, 'paste', this.togglePicker.bind(this));
-          this.on(element, 'DOMSubtreeModified', throttle(this.repositionMediaPicker).bind(this, "SubtreeModified"));
           this.subscribe('editableInput', this.togglePicker.bind(this));
         }
         // this.on(element, 'blur', this.hide.bind(this));
         this.on(this.window, 'click', this.windowClick.bind(this));
       }, this);
-      this.setupIMGLoadEvents();
 
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
@@ -353,7 +351,6 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
@@ -420,7 +417,6 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
@@ -482,7 +478,6 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
@@ -568,7 +563,6 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.setupIMGLoadEvents();
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
@@ -620,7 +614,6 @@ function PlaceCaretAtEnd(el) {
       var br = this.document.createElement("br");
       nextP.appendChild(br);
       this.insertAfter(nextP, p);
-      this.setupIMGLoadEvents();
       this.moveCaret($(nextP), 0);
       this.base.checkContentChanged();
       this.delayedRepositionMediaPicker();
@@ -837,28 +830,12 @@ function PlaceCaretAtEnd(el) {
       return false;
     },
 
-    setupIMGLoadEvents: function() {
-      this.getEditorElements().forEach(function(el) {
-        el.querySelectorAll("img, video, iframe").forEach(function(el) {
-          if (el.complete) {
-            this.repositionMediaPicker();
-          } else {
-            this.on(el, "loadedmetadata", this.repositionMediaPicker.bind(this));
-            this.on(el, "onloadeddata", this.repositionMediaPicker.bind(this));
-            this.on(el, "loadStart", this.repositionMediaPicker.bind(this));
-            this.on(el, "canplay", this.repositionMediaPicker.bind(this));
-            this.on(el, "load", this.repositionMediaPicker.bind(this));
-          }
-        }, this);
-      }, this);
-    },
-
     delayedRepositionMediaPicker: function() {
       this.repositionMediaPicker();
       setTimeout(this.repositionMediaPicker.bind(this), 800);
     },
 
-    repositionMediaPicker: function(x){
+    repositionMediaPicker: function(){
       if (this.pickerElement) {
         if (this._lastParagraphElement) {
           var top = ($(this._lastParagraphElement).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
@@ -886,7 +863,7 @@ function PlaceCaretAtEnd(el) {
           if (sel !== undefined || element !== undefined) {
             if (this.paragraphIsEmpty(element)){
               this._lastParagraphElement = element;
-              this.repositionMediaPicker("togglePicker");
+              this.repositionMediaPicker();
               this.show();
               return;
             }
