@@ -102,6 +102,9 @@
     (when should-load-comments?
       (get-comments activity-data))))
 
+(defn ungroup-comments [comments]
+  (vec (mapcat #(concat [(dissoc % :thread-children)] (:thread-children %)) comments)))
+
 (defun sort-comments
   ([comments :guard nil?]
    [])
@@ -110,7 +113,7 @@
   ;; If we have already grouped  the comments we need to ungroup them to recalculate the grouping
   ([comments :guard (fn [c] (and (sequential? c)
                                  (some #(contains? % :thread-children) c)))]
-    (sort-comments (vec (mapcat #(concat [(dissoc % :thread-children)] (:thread-children %)) comments))))
+    (sort-comments (ungroup-comments comments)))
   ([comments :guard sequential?]
    (let [root-comments (filterv (comp empty? :parent-uuid) comments)
          grouped-comments (mapv #(let [sorted-children (sort-comments comments (:uuid %))]
