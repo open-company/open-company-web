@@ -417,6 +417,10 @@ $h2_top_margin: 24;
       max-width: calc(100% + 32px);
     }
   }
+
+  span {
+    background-color: transparent!important;
+  }
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -740,5 +744,9 @@ $h2_top_margin: 24;
 
   & > *:not(:first-child) {
     margin-top: $paragraph-spacing;
+  }
+
+  span {
+    background-color: transparent!important;
   }
 }
