@@ -23,8 +23,11 @@
           new-ap-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-ap-uuids)
           sorted-new-ap-posts (reverse (sort-by :published-at new-ap-data-posts))
           sorted-new-ap-uuids (mapv :uuid sorted-new-ap-posts)
+          grouped-ap-uuids (if (au/show-separators? "all-posts")
+                              (au/grouped-posts (assoc old-ap-data :posts-list sorted-new-ap-uuids))
+                              sorted-new-ap-uuids)
           next-ap-data (merge old-ap-data {:posts-list sorted-new-ap-uuids
-                                           :items-to-render (au/grouped-posts (assoc old-ap-data :posts-list sorted-new-ap-uuids))})]
+                                           :items-to-render grouped-ap-uuids})]
       (assoc-in db ap-key next-ap-data))
     db))
 
@@ -44,7 +47,9 @@
           new-board-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-board-uuids)
           sorted-new-board-posts (reverse (sort-by :published-at new-board-data-posts))
           sorted-new-board-uuids (mapv :uuid sorted-new-board-posts)
-          grouped-board-uuids (au/grouped-posts (assoc old-board-data :posts-list sorted-new-board-uuids))
+          grouped-board-uuids (if (au/show-separators? (:board-slug activity-data))
+                                (au/grouped-posts (assoc old-board-data :posts-list sorted-new-board-uuids))
+                                sorted-new-board-uuids)
           next-board-data (merge old-board-data {:posts-list sorted-new-board-uuids
                                                  :items-to-render grouped-board-uuids})]
       (assoc-in db board-data-key next-board-data))
@@ -68,8 +73,11 @@
           new-bm-data-posts (mapv #(dispatcher/activity-data org-slug % db) new-bm-uuids)
           sorted-new-bm-posts (reverse (sort-by :bookmarked-at new-bm-data-posts))
           sorted-new-bm-uuids (mapv :uuid sorted-new-bm-posts)
+          grouped-bm-uuids (if (au/show-separators? "bookmarks")
+                             (au/grouped-posts (assoc old-bm-data :posts-list sorted-new-bm-uuids))
+                             sorted-new-bm-uuids)
           next-bm-data (merge old-bm-data {:posts-list sorted-new-bm-uuids
-                                           :items-to-render sorted-new-bm-uuids})]
+                                           :items-to-render grouped-bm-uuids})]
       (assoc-in db bm-key next-bm-data))
     db))
 
@@ -206,10 +214,12 @@
                                  (let [base-container-key (dispatcher/container-key org-slug ckey)
                                        next-ndb (update-in ndb (conj base-container-key :posts-list)
                                                  (fn [posts-list]
-                                                   (filterv #(not= % (:uuid activity-data)) posts-list)))]
-                                    (if (au/show-separators? ckey)
-                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (au/grouped-posts (get-in next-ndb base-container-key)))
-                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (get-in next-ndb (conj base-container-key :posts-list))))))
+                                                   (filterv #(not= % (:uuid activity-data)) posts-list)))
+                                       items-to-render-key (conj base-container-key :items-to-render)]
+                                    (assoc-in next-ndb items-to-render-key
+                                     (if (au/show-separators? ckey)
+                                       (au/grouped-posts (get-in next-ndb base-container-key))
+                                       (get-in next-ndb (conj base-container-key :posts-list))))))
                                db
                                (keys (get-in db containers-key)))
         ;; Remove the post from all the boards posts list too
@@ -219,10 +229,12 @@
                              (let [base-board-key (dispatcher/board-data-key org-slug ckey)
                                    next-ndb (update-in ndb (conj base-board-key :posts-list)
                                              (fn [posts-list]
-                                               (filterv #(not= % (:uuid activity-data)) posts-list)))]
-                                (if (au/show-separators? ckey)
-                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (au/grouped-posts (get-in next-ndb base-board-key)))
-                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (get-in next-ndb (conj base-board-key :posts-list))))))
+                                               (filterv #(not= % (:uuid activity-data)) posts-list)))
+                                   items-to-render-key (conj base-board-key :items-to-render) ]
+                                (assoc-in next-ndb items-to-render-key
+                                 (if (au/show-separators? ckey)
+                                   (au/grouped-posts (get-in next-ndb base-board-key))
+                                   (get-in next-ndb (conj base-board-key :posts-list))))))
                            with-fixed-containers
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too
