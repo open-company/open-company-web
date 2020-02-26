@@ -58,7 +58,7 @@
     (dis/dispatch! [:comment-add org-slug activity-data new-comment-map parent-comment-uuid comments-key new-comment-uuid])
     ;; Send WRT read on comment add
     (activity-actions/send-item-read (:uuid activity-data))
-    (api/add-comment add-comment-link comment-body parent-comment-uuid
+    (api/add-comment add-comment-link comment-body new-comment-uuid parent-comment-uuid
       ;; Once the comment api request is finished refresh all the comments, no matter
       ;; if it worked or not
       (fn [{:keys [status success body]}]
