@@ -131,7 +131,8 @@
 
 (rum/defc edit-comment < rum/static
   [{:keys [activity-data comment-data highlighted? closing-thread
-           dismiss-reply-cb edit-comment-key is-indented-comment?]}]
+           dismiss-reply-cb edit-comment-key is-indented-comment?
+           add-comment-cb]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -145,6 +146,7 @@
        (add-comment {:activity-data activity-data
                      :parent-comment-uuid (:reply-parent comment-data)
                      :dismiss-reply-cb dismiss-reply-cb
+                     :add-comment-cb add-comment-cb
                      :edit-comment-data comment-data})
        (str "edit-comment-" edit-comment-key))]])
 
@@ -345,7 +347,8 @@
                               (let [{:keys [comments-data current-user-id last-read-at]} (-> s :rum/args first)
                                     comments-diff (clojure.data/diff (-> o :rum/args first :comments-data) comments-data)]
                                 (when (or (seq (first comments-diff))
-                                          (seq (second comments-diff)))
+                                          (seq (second comments-diff))
+                                          (not= last-read-at (-> o :rum/args first :last-read-at)))
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
                                         collapsed-map (zipmap (map :uuid all-comments) (map :expanded all-comments))]
                                     (reset! (::replying-to s) #{})
@@ -353,7 +356,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
+  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id add-comment-cb]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads @(::threads s)
@@ -389,7 +392,8 @@
                                :highlighted? highlighted?
                                :closing-thread closing-thread
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
-                               :edit-comment-key edit-comment-key})
+                               :edit-comment-key edit-comment-key
+                               :add-comment-cb add-comment-cb})
                 (read-comment {:activity-data activity-data
                                :comment-data root-comment-data
                                :highlighted? highlighted?
@@ -415,7 +419,7 @@
                           (pos? (:collapsed-count root-comment-data)))
                  [:button.mlb-reset.expand-thead-bt
                    {:on-click #(expand-thread s root-comment-data)}
-                   (str "View " (:collapsed-count root-comment-data) " more repl" (if (not= (:collapsed-count root-comment-data) 1) "ies" "y"))])
+                   (str "View " (:collapsed-count root-comment-data) " older repl" (if (not= (:collapsed-count root-comment-data) 1) "ies" "y"))])
                (for [idx (range (count (:thread-children root-comment-data)))
                      :let [comment-data (nth (:thread-children root-comment-data) idx)
                            ind-highlighted? (utils/in? @(::highlighting-comments s) (:uuid comment-data))
@@ -439,7 +443,8 @@
                                     :is-indented-comment? true
                                     :closing-thread ind-closing-thread
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
-                                    :edit-comment-key ind-edit-comment-key})
+                                    :edit-comment-key ind-edit-comment-key
+                                    :add-comment-cb add-comment-cb})
                      (read-comment {:activity-data activity-data
                                     :comment-data comment-data
                                     :is-indented-comment? true
@@ -460,7 +465,6 @@
                                                     (emoji-picker-container s comment-data))
                                     :showing-picker? ind-showing-picker?
                                     :show-more-menu (::show-more-menu s)
-   
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
                                     :edit-comment-key ind-edit-comment-key}))])
           (when show-add-comment?
@@ -474,6 +478,7 @@
                                           :add-comment-container true})}
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :parent-comment-uuid (:reply-parent root-comment-data)
+                                            :add-comment-cb add-comment-cb
                                             :dismiss-reply-cb (fn [_ _]
                                                                (swap! (::replying-to s) #(disj % (:reply-parent root-comment-data))))})
                  (str "add-comment-" edit-comment-key))]])])])]))

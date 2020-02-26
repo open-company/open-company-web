@@ -49,13 +49,15 @@
       (comment-actions/get-comments activity-data)
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
-(defn- save-initial-read-data [s]
+(defn- save-initial-read-data [s & [force-last-read-at force-new-at]]
   (let [activity-data @(drv/get-ref s :activity-data)
         reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
-    (when (and (not @(::initial-last-read-at s))
+    (when (and (or (not @(::initial-last-read-at s))
+                   force-last-read-at)
                (:last-read-at reads-data))
       (reset! (::initial-last-read-at s) (:last-read-at reads-data)))
-    (when (and (not @(::initial-new-at s))
+    (when (and (or (not @(::initial-new-at s))
+                   force-new-at)
                (:new-at activity-data))
       (reset! (::initial-new-at s) (:new-at activity-data)))))
 
@@ -97,7 +99,6 @@
     s)
    :did-remount (fn [_ s]
     (load-comments s false)
-    (save-initial-read-data s)
     s)
    :will-unmount (fn [s]
     (mark-read s)
@@ -254,10 +255,12 @@
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
           (rum/with-key (add-comment {:activity-data activity-data
+                                      :add-comment-cb #(save-initial-read-data s true false)
                                       :scroll-after-posting? true})
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
                           :new-added-comment add-comment-highlight
+                          :add-comment-cb #(save-initial-read-data s true false)
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))

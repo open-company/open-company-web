@@ -51,7 +51,7 @@
   (let [add-comment-div (rum/ref-node s "editor-node")
         comment-body (cu/add-comment-content add-comment-div true)
         {:keys [activity-data parent-comment-uuid dismiss-reply-cb
-         edit-comment-data scroll-after-posting?]} (first (:rum/args s))
+         edit-comment-data scroll-after-posting? add-comment-cb]} (first (:rum/args s))
         save-done-cb (fn [success]
                       (if success
                         (when add-comment-div
@@ -70,6 +70,8 @@
     (reset! (::show-post-button s) false)
     (when (fn? dismiss-reply-cb)
       (dismiss-reply-cb false))
+    (when (fn? add-comment-cb)
+      (add-comment-cb))
     (when (and (not (responsive/is-mobile-size?))
                (not edit-comment-data)
                (not dismiss-reply-cb)
@@ -194,7 +196,7 @@
                              (.destroy @(:me/editor s))
                              (reset! (:me/editor s) nil))
                            s)}
-  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting?]}]
+  [s {:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data scroll-after-posting? add-comment-cb]}]
   (let [_add-comment-data (drv/react s :add-comment-data)
         _media-input (drv/react s :media-input)
         _team-roster (drv/react s :team-roster)
