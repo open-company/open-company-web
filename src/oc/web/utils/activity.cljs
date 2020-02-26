@@ -61,7 +61,7 @@
 
 (defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))]
-    (if (and (not (empty? separators-map))
+    (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj (:uuid post-data)) vec))
       (vec
