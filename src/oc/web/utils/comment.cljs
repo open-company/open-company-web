@@ -107,14 +107,17 @@
    [])
   ([comments :guard map?]
    (sort-comments (vals comments)))
+  ;; If we have already grouped  the comments we need to ungroup them to recalculate the grouping
+  ([comments :guard (fn [c] (and (sequential? c)
+                                 (some #(contains? % :thread-children) c)))]
+    (sort-comments (vec (mapcat #(concat [(dissoc % :thread-children)] (:thread-children %)) comments))))
   ([comments :guard sequential?]
    (let [root-comments (filterv (comp empty? :parent-uuid) comments)
          grouped-comments (mapv #(let [sorted-children (sort-comments comments (:uuid %))]
                                   (merge % {:thread-children sorted-children
-                                            :last-activity-at (-> sorted-children last :created-at)
-                                            :children-count (count sorted-children)}))
+                                            :last-activity-at (-> sorted-children last :created-at)}))
                            root-comments)]
-     (reverse (sort-by :last-activity-at grouped-comments))))
+     (vec (reverse (sort-by :last-activity-at grouped-comments)))))
   ([comments :guard sequential? parent-uuid]
    (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
          filtered-comments (filterv check-fn comments)
@@ -123,24 +126,35 @@
       (vec (reverse sorted-comments))
       (vec sorted-comments)))))
 
-(defn- enrich-comment [user-id last-read-at comment-data]
-  (let [new? (and (not= (-> comment-data :author :user-id) user-id)
-                  (< (.getTime (utils/js-date last-read-at))
-                     (.getTime (utils/js-date (:created-at comment-data)))))]
-    {:new new?
-     :collapse (and (seq (:parent-uuid comment-data))
-                    (not new?))}))
+(defn- new? [user-id last-read-at comment-data]
+  (and (not= (-> comment-data :author :user-id) user-id)
+       (< (.getTime (utils/js-date last-read-at))
+          (.getTime (utils/js-date (:created-at comment-data))))))
+
+(defn- enrich-comment [user-id last-read-at comment-data last-comment? collapsed-map]
+  (let [new-comment? (new? user-id last-read-at comment-data)]
+    {:new new-comment?
+     :expanded (or ;; Keep the comment expanded if it was already
+                   (->> comment-data :uuid (get collapsed-map))
+                   ;; Do not collapse root comments
+                   (not (seq (:parent-uuid comment-data)))
+                   ;; Do not collapse new comments
+                   new-comment?
+                   ;; Do not collapse last comments
+                   last-comment?)}))
 
 (defn collapsed-comments
   "Add a collapsed flag to every comment that is a reply and is not new. Also add new? flag to every new one.
    Add a count of the collapsed comments to each root comment."
-  [user-id last-read-at comments]
+  [user-id last-read-at comments & [collapsed-map root-comment]]
   (mapv
    (fn [comment]
-    (let [enriched-children (collapsed-comments user-id last-read-at (:thread-children comment))]
+    (let [enriched-children (collapsed-comments user-id last-read-at (:thread-children comment) collapsed-map comment)
+          last-comment? (and root-comment
+                             (= (:uuid comment) (-> root-comment :thread-children last :uuid)))]
       (-> comment
-       (merge (enrich-comment user-id last-read-at comment))
+       (merge (enrich-comment user-id last-read-at comment last-comment? collapsed-map))
        (assoc :thread-children enriched-children)
        (assoc :new-count (count (filter :new enriched-children)))
-       (assoc :collapsed-count (count (filter (comp not :new) enriched-children))))))
+       (assoc :collapsed-count (count (filter (comp not :expanded) enriched-children))))))
    comments))

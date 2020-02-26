@@ -43,6 +43,7 @@
         new-comment-map {:body comment-body
                          :created-at (utils/as-of-now)
                          :parent-uuid parent-comment-uuid
+                         :resource-uuid (:uuid activity-data)
                          :uuid new-comment-uuid
                          :author {:name (:name user-data)
                                   :avatar-url (:avatar-url user-data)

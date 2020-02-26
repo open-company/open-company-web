@@ -41,11 +41,12 @@
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
         comments-loaded? (seq sorted-comments)
+        unwrapped-comments (vec (mapcat #(concat [%] (:thread-children %)) sorted-comments))
         comments-authors (if comments-loaded?
-                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at sorted-comments))))))
+                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at unwrapped-comments))))))
                            (reverse (:authors comments-link)))
         comments-count (if comments-loaded?
-                         (count sorted-comments)
+                         (count unwrapped-comments)
                          (:count comments-link))
         face-pile-count (if hide-face-pile?
                           0
