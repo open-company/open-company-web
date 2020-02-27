@@ -131,8 +131,7 @@
 
 (rum/defc edit-comment < rum/static
   [{:keys [activity-data comment-data highlighted? closing-thread
-           dismiss-reply-cb edit-comment-key is-indented-comment?
-           add-comment-cb]}]
+           dismiss-reply-cb edit-comment-key is-indented-comment?]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -146,7 +145,6 @@
        (add-comment {:activity-data activity-data
                      :parent-comment-uuid (:reply-parent comment-data)
                      :dismiss-reply-cb dismiss-reply-cb
-                     :add-comment-cb add-comment-cb
                      :edit-comment-data comment-data})
        (str "edit-comment-" edit-comment-key))]])
 
@@ -294,6 +292,16 @@
                               (fn [children]
                                 (map #(assoc % :expanded true) children))))))))
 
+(defn- thread-mark-read [s thread-uuid]
+  (let [threads @(::threads s)
+        idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
+    (swap! (::threads s) (fn [thread]
+                           (-> thread
+                             (assoc-in [idx :new] false)
+                             (update-in [idx :thread-children]
+                              (fn [children]
+                                (map #(assoc % :new false) children))))))))
+
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
                              (drv/drv :team-roster)
@@ -350,18 +358,17 @@
                                           (seq (second comments-diff))
                                           (not= last-read-at (-> o :rum/args first :last-read-at)))
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
-                                        collapsed-map (zipmap (map :uuid all-comments) (map :expanded all-comments))]
+                                        collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :new]) all-comments))]
                                     (reset! (::replying-to s) #{})
                                     (reset! (::threads s) (cu/collapsed-comments current-user-id last-read-at comments-data collapsed-map)))))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id add-comment-cb]}]
+  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads @(::threads s)
-        all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))
-        collapsed-map (zipmap (map :uuid all-comments) (map :expanded all-comments))]
+        all-comments (vec (mapcat #(concat [%] (:thread-children %)) threads))]
     [:div.stream-comments
       {:class (when (seq @(::editing? s)) "editing")}
       (if (pos? (count threads))
@@ -392,8 +399,7 @@
                                :highlighted? highlighted?
                                :closing-thread closing-thread
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
-                               :edit-comment-key edit-comment-key
-                               :add-comment-cb add-comment-cb})
+                               :edit-comment-key edit-comment-key})
                 (read-comment {:activity-data activity-data
                                :comment-data root-comment-data
                                :highlighted? highlighted?
@@ -443,8 +449,7 @@
                                     :is-indented-comment? true
                                     :closing-thread ind-closing-thread
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
-                                    :edit-comment-key ind-edit-comment-key
-                                    :add-comment-cb add-comment-cb})
+                                    :edit-comment-key ind-edit-comment-key})
                      (read-comment {:activity-data activity-data
                                     :comment-data comment-data
                                     :is-indented-comment? true
@@ -478,7 +483,7 @@
                                           :add-comment-container true})}
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :parent-comment-uuid (:reply-parent root-comment-data)
-                                            :add-comment-cb add-comment-cb
+                                            :add-comment-cb #(thread-mark-read s (:uuid root-comment-data))
                                             :dismiss-reply-cb (fn [_ _]
                                                                (swap! (::replying-to s) #(disj % (:reply-parent root-comment-data))))})
                  (str "add-comment-" edit-comment-key))]])])])]))

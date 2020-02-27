@@ -255,12 +255,10 @@
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
           (rum/with-key (add-comment {:activity-data activity-data
-                                      :add-comment-cb #(save-initial-read-data s true false)
                                       :scroll-after-posting? true})
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
                           :new-added-comment add-comment-highlight
-                          :add-comment-cb #(save-initial-read-data s true false)
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))

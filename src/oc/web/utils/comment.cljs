@@ -139,10 +139,13 @@
 (defn- enrich-comment [user-id last-read-at comment-data last-comment? collapsed-map]
   (let [new-comment? (new? user-id last-read-at comment-data)]
     {:new new-comment?
-     :expanded (or ;; Keep the comment expanded if it was already
-                   (->> comment-data :uuid (get collapsed-map))
+     :expanded (or (-> collapsed-map (:uuid comment-data) :new)
+                   ;; Keep the comment expanded if it was already
+                   (-> collapsed-map (:uuid comment-data) :expanded)
                    ;; Do not collapse root comments
                    (not (seq (:parent-uuid comment-data)))
+                   ;; User has not read the post yet
+                   (not (seq last-read-at))
                    ;; Do not collapse new comments
                    new-comment?
                    ;; Do not collapse last comments
