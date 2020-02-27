@@ -118,7 +118,9 @@
    (let [root-comments (filterv (comp empty? :parent-uuid) comments)
          grouped-comments (mapv #(let [sorted-children (sort-comments comments (:uuid %))]
                                   (merge % {:thread-children sorted-children
-                                            :last-activity-at (-> sorted-children last :created-at)}))
+                                            :last-activity-at (if (seq sorted-children)
+                                                                (-> sorted-children last :created-at)
+                                                                (:created-at %))}))
                            root-comments)]
      (vec (reverse (sort-by :last-activity-at grouped-comments)))))
   ([comments :guard sequential? parent-uuid]
