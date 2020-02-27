@@ -3,53 +3,6 @@ function log(){
   // console.debug("DBG MediaPicker", args);
 }
 
-var now = Date.now || function() {
-  return new Date().getTime();
-};
-
-// https://github.com/jashkenas/underscore
-function throttle(func, wait) {
-  var THROTTLE_INTERVAL = 50,
-      context,
-      args,
-      result,
-      timeout = null,
-      previous = 0,
-      later;
-
-  if (!wait && wait !== 0) {
-    wait = THROTTLE_INTERVAL;
-  }
-
-  later = function() {
-    previous = now();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) {
-      context = args = null;
-    }
-  };
-
-  return function() {
-    var currNow = now(),
-        remaining = wait - (currNow - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      clearTimeout(timeout);
-      timeout = null;
-      previous = currNow;
-      result = func.apply(context, args);
-      if (!timeout) {
-        context = args = null;
-      }
-    } else if (!timeout) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-}
-
 function PlaceCaretAtEnd(el) {
   el.focus();
   if (typeof window.getSelection != "undefined"
