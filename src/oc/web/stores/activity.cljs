@@ -510,7 +510,7 @@
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
-      (update-in activity-read-key merge {:last-read-at nil})
+      (update-in activity-read-key dissoc :last-read-at)
       (assoc-in activity-key next-activity-data))))
 
 (defmethod dispatcher/action :mark-read
@@ -534,7 +534,7 @@
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
-      (update-in activity-read-key merge {:last-read-at dismiss-at})
+      (update-in activity-read-key assoc :last-read-at dismiss-at)
       (assoc-in activity-key next-activity-data))))
 
 ;; Inbox

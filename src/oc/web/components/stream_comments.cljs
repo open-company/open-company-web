@@ -115,7 +115,7 @@
 
 (rum/defc edit-comment < rum/static
   [{:keys [activity-data comment-data closing-thread dismiss-reply-cb
-           edit-comment-key is-indented-comment? add-comment-cb]}]
+           edit-comment-key is-indented-comment?]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -337,7 +337,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data last-read-at current-user-id add-comment-cb]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads @(::threads s)

@@ -132,16 +132,19 @@
       (vec sorted-comments)))))
 
 (defn new? [user-id last-read-at comment-data]
-  (and (not= (-> comment-data :author :user-id) user-id)
-       (< (.getTime (utils/js-date last-read-at))
-          (.getTime (utils/js-date (:created-at comment-data))))))
+  (if (contains? comment-data :new)
+    (:new comment-data)
+    (and (not= (-> comment-data :author :user-id) user-id)
+         (< (.getTime (utils/js-date last-read-at))
+            (.getTime (utils/js-date (:created-at comment-data)))))))
 
 (defn- enrich-comment [user-id last-read-at comment-data last-comment? collapsed-map]
-  (let [new-comment? (new? user-id last-read-at comment-data)]
+  (let [collapsed-comment-map (get collapsed-map (:uuid comment-data))
+        new-comment? (new? user-id last-read-at (merge comment-data collapsed-comment-map))]
     {:new new-comment?
-     :expanded (or (-> collapsed-map (:uuid comment-data) :new)
+     :expanded (or (:new collapsed-comment-map)
                    ;; Keep the comment expanded if it was already
-                   (-> collapsed-map (:uuid comment-data) :expanded)
+                   (:expanded collapsed-comment-map)
                    ;; Do not collapse root comments
                    (not (seq (:parent-uuid comment-data)))
                    ;; User has not read the post yet

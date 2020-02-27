@@ -108,6 +108,17 @@ div.stream-comments {
           background-color: #FFF7DD;
           border-radius: 4px;
 
+          @include dark_mode() {
+            background-color: var(--opac-background-color-2);
+            &.indented-comment {
+              background-color: transparent;
+
+              div.stream-comment div.stream-comment-inner {
+                background-color: var(--opac-background-color-2);
+              }
+            }
+          }
+
           &.indented-comment {
             background-color: transparent;
 

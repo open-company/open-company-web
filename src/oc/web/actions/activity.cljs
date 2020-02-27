@@ -760,7 +760,7 @@
 (defn mark-read [activity-uuid]
   (let [activity-data (dis/activity-data activity-uuid)]
     (send-item-read activity-uuid)
-    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
+    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
     (inbox-dismiss activity-uuid)))
 
 (def wrt-timeouts-list (atom {}))

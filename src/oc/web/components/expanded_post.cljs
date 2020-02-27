@@ -49,15 +49,13 @@
       (comment-actions/get-comments activity-data)
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
-(defn- save-initial-read-data [s & [force-last-read-at force-new-at]]
+(defn- save-initial-read-data [s]
   (let [activity-data @(drv/get-ref s :activity-data)
         reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
-    (when (and (or (not @(::initial-last-read-at s))
-                   force-last-read-at)
-               (:last-read-at reads-data))
-      (reset! (::initial-last-read-at s) (:last-read-at reads-data)))
-    (when (and (or (not @(::initial-new-at s))
-                   force-new-at)
+    (when (and (nil? @(::initial-last-read-at s))
+               (contains? reads-data :last-read-at))
+      (reset! (::initial-last-read-at s) (or (:last-read-at reads-data) "")))
+    (when (and (not @(::initial-new-at s))
                (:new-at activity-data))
       (reset! (::initial-new-at s) (:new-at activity-data)))))
 
@@ -258,6 +256,5 @@
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
-                          :add-comment-cb #(save-initial-read-data s true false)
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))
