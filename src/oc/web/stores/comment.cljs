@@ -208,8 +208,9 @@
       db)))
 
 (defmethod dispatcher/action :comment-save
-  [db [_ org-slug comments-key updated-comment-map]]
-  (let [all-comments (comment-utils/ungroup-comments (get-in db comments-key))
+  [db [_ org-slug comments-key updated-comment-map*]]
+  (let [updated-comment-map (dissoc updated-comment-map* :thread-children)
+        all-comments (comment-utils/ungroup-comments (get-in db comments-key))
         filtered-comments (filterv #(not= (:uuid %) (:uuid updated-comment-map)) all-comments)
         sorted-new-comments (comment-utils/sort-comments (conj filtered-comments updated-comment-map))]
     (assoc-in db comments-key sorted-new-comments)))
