@@ -411,7 +411,7 @@
                               (:expanded comment-data))]
                  [:div.stream-comment-child
                    {:key (str "stream-comments-thread-" (:uuid root-comment-data) "-child-" (:uuid comment-data))}
-                   (if is-editing?
+                   (if ind-is-editing?
                      (edit-comment {:activity-data activity-data
                                     :comment-data comment-data
                                     :is-indented-comment? true
