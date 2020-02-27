@@ -160,15 +160,6 @@
                     [:span.count-badge
                       (:inbox-count org-data)])]
                 [:span.tab-label "Unread"]]
-              [:button.mlb-reset.tab-button.bookmarks-tab
-                {:on-click #(do
-                              (.stopPropagation %)
-                              (nav-actions/nav-to-url! % "bookmarks" (oc-urls/bookmarks)))
-                 :class (when (and (not showing-mobile-user-notifications)
-                                   (= current-board-slug "bookmarks"))
-                          "active")}
-                [:span.tab-icon]
-                [:span.tab-label "Bookmarks"]]
               [:button.mlb-reset.tab-button.notifications-tab
                 {:on-click #(do
                               (.stopPropagation %)
