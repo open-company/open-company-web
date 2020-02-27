@@ -469,7 +469,6 @@
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
-   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
    :foc-layout            [[:base] (fn [base] (:foc-layout base))]
    :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
    :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]})

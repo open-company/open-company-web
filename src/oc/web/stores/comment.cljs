@@ -97,9 +97,7 @@
 
 (defmethod dispatcher/action :comment-add/finish
   [db [_ {:keys [activity-data body]}]]
-  (-> db
-    (assoc :comment-add-finish true)
-    (assoc :add-comment-highlight (:uuid body))))
+  (assoc db :comment-add-finish true))
 
 (defmethod dispatcher/action :comment-add/failed
   [db [_ activity-data comment-data comments-key]]
@@ -114,10 +112,6 @@
         filtered-comments (filterv #(not= (:uuid comment-data) (:uuid %)) all-comments)
         sorted-filtered-comments (comment-utils/sort-comments (conj filtered-comments comment-data))]
     (assoc-in db comments-key sorted-filtered-comments)))
-
-(defmethod dispatcher/action :add-comment-highlight-reset
-  [db [_]]
-  (dissoc db :add-comment-highlight))
 
 (defmethod dispatcher/action :comments-get
   [db [_ comments-key activity-data]]
@@ -310,9 +304,7 @@
               new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
           (-> db
             (assoc-in (dispatcher/activity-comments-key org-slug activity-uuid) new-sorted-comments-data)
-            (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)
-            ;; Highlight the comment being added
-            (update-in [:add-comment-highlight] #(if comment-from-current-user? % (:uuid comment-data)))))
+            (assoc-in (dispatcher/activity-key org-slug activity-uuid) with-new-at)))
         ;; In case we don't have the comments already loaded just update the :new-at value
         ;; needed to compare the last read-at of the current user and show NEW comments
         (assoc-in db (dispatcher/activity-key org-slug activity-uuid) with-new-at)))

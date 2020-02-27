@@ -185,8 +185,7 @@
       (dis/dispatch! [:ws-interaction/comment-add
                       org-slug
                       entry-data
-                      interaction-data]))
-    (dis/dispatch! [:input [:add-comment-highlight] new-comment-uuid])))
+                      interaction-data]))))
 
 (defn subscribe []
   (ws-ic/subscribe :interaction-comment/add
@@ -195,6 +194,3 @@
                    #(ws-comment-update (:data %)))
   (ws-ic/subscribe :interaction-comment/delete
                    #(ws-comment-delete (:data %))))
-
-(defn add-comment-highlight-reset []
-  (dis/dispatch! [:add-comment-highlight-reset]))

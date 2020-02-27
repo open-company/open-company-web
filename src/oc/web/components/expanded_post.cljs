@@ -72,7 +72,6 @@
   (drv/drv :comments-data)
   (drv/drv :add-comment-focus)
   (drv/drv :activities-read)
-  (drv/drv :add-comment-highlight)
   (drv/drv :expand-image-src)
   (drv/drv :add-comment-force-update)
   (drv/drv :editable-boards)
@@ -98,6 +97,7 @@
     (load-comments s true)
     s)
    :did-remount (fn [_ s]
+    (save-initial-read-data s)
     (load-comments s false)
     s)
    :will-unmount (fn [s]
@@ -130,7 +130,6 @@
                        {:width 638
                         :height (utils/calc-video-height 638)}))
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id org-data))
-        add-comment-highlight (drv/react s :add-comment-highlight)
         expand-image-src (drv/react s :expand-image-src)
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update* (drv/react s :add-comment-force-update)
@@ -259,6 +258,6 @@
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
-                          :new-added-comment add-comment-highlight
+                          :add-comment-cb #(save-initial-read-data s true false)
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))

@@ -1,6 +1,7 @@
 (ns oc.web.components.stream-comments
   (:require [rum.core :as rum]
             [cljsjs.emoji-mart]
+            [clojure.data :refer (diff)]
             [goog.object :as gobj]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -79,23 +80,6 @@
     (utils/copy-to-clipboard input-field)
     (.removeChild (.-body js/document) input-field)))
 
-(defn- highlight-comment [s comment-id scroll?]
-  (when-let [comment-node (rum/ref-node s (str "stream-comment-" comment-id))]
-    (utils/after 10 (fn [_]
-     (swap! (::highlighting-comments s) #(conj % comment-id)
-     (when scroll?
-       (.scrollIntoView comment-node #js {:behavior "smooth" :block "center"}))
-     (utils/after 1000 (fn [_] (swap! (::highlighting-comments s) #(disj % comment-id)))))))))
-
-(defn- maybe-highlight-comment [s]
-  (let [comments-data (-> s :rum/args first :comments-data)]
-    (when (and (seq comments-data)
-               (router/current-comment-id)
-               (not @(::initial-comment-scroll s))
-               (rum/ref-node s (str "stream-comment-" (router/current-comment-id))))
-      (reset! (::initial-comment-scroll s) true)
-      (highlight-comment s (router/current-comment-id) true))))
-
 (defn share-clicked [comment-data]
   (copy-comment-url (:url comment-data))
   (notification-actions/show-notification {:title "Share link copied to clipboard"
@@ -130,17 +114,15 @@
        (reset! (::show-picker s) nil))}))))
 
 (rum/defc edit-comment < rum/static
-  [{:keys [activity-data comment-data highlighted? closing-thread
-           dismiss-reply-cb edit-comment-key is-indented-comment?]}]
+  [{:keys [activity-data comment-data closing-thread dismiss-reply-cb
+           edit-comment-key is-indented-comment? add-comment-cb]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
-     :class (utils/class-set {:not-highlighted (not highlighted?)
-                              :highlighted highlighted?
-                              :open-thread (not is-indented-comment?)
-                              :closing-thread closing-thread})}
+     :class (utils/class-set {:open-thread (not is-indented-comment?)
+                              :closing-thread closing-thread
+                              :indented-comment is-indented-comment?})}
     [:div.stream-comment
-      {:class (utils/class-set {:indented-comment is-indented-comment?})}
       (rum/with-key
        (add-comment {:activity-data activity-data
                      :parent-comment-uuid (:reply-parent comment-data)
@@ -150,23 +132,22 @@
 
 
 (rum/defc read-comment < rum/static
-  [{:keys [activity-data comment-data highlighted? closing-thread
-           editing? edit-comment-key is-indented-comment?
-           mouse-leave-cb edit-cb delete-cb share-cb react-cb
-           reply-cb emoji-picker is-mobile? can-show-edit-bt?
-           can-show-delete-bt? show-more-menu showing-picker?]}]
+  [{:keys [activity-data comment-data closing-thread editing?
+           edit-comment-key is-indented-comment? mouse-leave-cb
+           edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
+           is-mobile? can-show-edit-bt? can-show-delete-bt?
+           show-more-menu showing-picker?]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
-     :class (utils/class-set {:not-highlighted (not highlighted?)
-                              :highlighted highlighted?
-                              :open-thread (not is-indented-comment?)
-                              :closing-thread closing-thread})}
+     :class (utils/class-set {:open-thread (not is-indented-comment?)
+                              :closing-thread closing-thread
+                              :new-comment (:new comment-data)
+                              :indented-comment is-indented-comment?})}
     [:div.stream-comment
       {:ref (str "stream-comment-" (:uuid comment-data))
        :class (utils/class-set {:editing-other-comment editing?
-                                :showing-picker showing-picker?
-                                :indented-comment is-indented-comment?})
+                                :showing-picker showing-picker?})
        :on-mouse-leave mouse-leave-cb}
       [:div.stream-comment-inner
         (when is-mobile?
@@ -311,7 +292,6 @@
                              (rum/local nil ::show-picker)
                              (rum/local #{} ::replying-to)
                              (rum/local {} ::comment-url-copy)
-                             (rum/local #{} ::highlighting-comments)
                              (rum/local false ::initial-comment-scroll)
                              (rum/local nil ::show-more-menu)
                              (rum/local [] ::threads)
@@ -341,19 +321,12 @@
                                 (reset! (::threads s) threads))
                               s)
                              :did-mount (fn [s]
-                              (maybe-highlight-comment s)
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)
-                             :did-update (fn [s]
-                              (maybe-highlight-comment s)
-                              s)
                              :did-remount (fn [o s]
-                              (when-let [new-added-comment (-> s :rum/args first :new-added-comment)]
-                                (utils/after 180 #(highlight-comment s new-added-comment false))
-                                (comment-actions/add-comment-highlight-reset))
                               (let [{:keys [comments-data current-user-id last-read-at]} (-> s :rum/args first)
-                                    comments-diff (clojure.data/diff (-> o :rum/args first :comments-data) comments-data)]
+                                    comments-diff (diff (-> o :rum/args first :comments-data) comments-data)]
                                 (when (or (seq (first comments-diff))
                                           (seq (second comments-diff))
                                           (not= last-read-at (-> o :rum/args first :last-read-at)))
@@ -364,7 +337,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
+  [s {:keys [activity-data comments-data last-read-at current-user-id add-comment-cb]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)
         threads @(::threads s)
@@ -376,7 +349,6 @@
           (for [idx (range (count threads))
                 :let [root-comment-data (nth threads idx)
                       expanded-thread? (zero? (:collapsed-count root-comment-data))
-                      highlighted? (utils/in? @(::highlighting-comments s) (:uuid root-comment-data))
                       is-editing? (and (seq @(::editing? s))
                                        (= @(::editing? s) (:uuid root-comment-data)))
                       add-comment-string-key (dis/add-comment-string-key (:uuid activity-data) (:replay-parent root-comment-data)
@@ -396,13 +368,11 @@
               (if is-editing?
                 (edit-comment {:activity-data activity-data
                                :comment-data root-comment-data
-                               :highlighted? highlighted?
                                :closing-thread closing-thread
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
                                :edit-comment-key edit-comment-key})
                 (read-comment {:activity-data activity-data
                                :comment-data root-comment-data
-                               :highlighted? highlighted?
                                :closing-thread closing-thread
                                :editing? (not (nil? @(::editing? s)))
                                :mouse-leave-cb #(compare-and-set! (::show-more-menu s) (:uuid root-comment-data) nil)
@@ -428,7 +398,6 @@
                    (str "View " (:collapsed-count root-comment-data) " older repl" (if (not= (:collapsed-count root-comment-data) 1) "ies" "y"))])
                (for [idx (range (count (:thread-children root-comment-data)))
                      :let [comment-data (nth (:thread-children root-comment-data) idx)
-                           ind-highlighted? (utils/in? @(::highlighting-comments s) (:uuid comment-data))
                            ind-is-editing? (and (seq @(::editing? s))
                                             (= @(::editing? s) (:uuid comment-data)))
                            ind-closing-thread (and (= idx (-> root-comment-data :thread-children count dec))
@@ -445,7 +414,6 @@
                    (if is-editing?
                      (edit-comment {:activity-data activity-data
                                     :comment-data comment-data
-                                    :highlighted? ind-highlighted?
                                     :is-indented-comment? true
                                     :closing-thread ind-closing-thread
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
@@ -453,7 +421,6 @@
                      (read-comment {:activity-data activity-data
                                     :comment-data comment-data
                                     :is-indented-comment? true
-                                    :highlighted? ind-highlighted?
                                     :closing-thread ind-closing-thread
                                     :editing? (not (nil? @(::editing? s)))
                                     :mouse-leave-cb #(compare-and-set! (::show-more-menu s) (:uuid comment-data) nil)
@@ -475,12 +442,11 @@
           (when show-add-comment?
             [:div.stream-comment-outer
               {:key (str "stream-comment-add-" (:uuid root-comment-data))
-               :class (utils/class-set {:not-highlighted true
-                                        :open-thread false
-                                        :closing-thread true})}
+               :class (utils/class-set {:open-thread false
+                                        :closing-thread true
+                                        :indented-comment true})}
               [:div.stream-comment
-                {:class (utils/class-set {:indented-comment true
-                                          :add-comment-container true})}
+                {:class (utils/class-set {:add-comment-container true})}
                 (rum/with-key (add-comment {:activity-data activity-data
                                             :parent-comment-uuid (:reply-parent root-comment-data)
                                             :add-comment-cb #(thread-mark-read s (:uuid root-comment-data))

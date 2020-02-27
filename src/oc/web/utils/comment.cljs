@@ -131,7 +131,7 @@
       (vec (reverse sorted-comments))
       (vec sorted-comments)))))
 
-(defn- new? [user-id last-read-at comment-data]
+(defn new? [user-id last-read-at comment-data]
   (and (not= (-> comment-data :author :user-id) user-id)
        (< (.getTime (utils/js-date last-read-at))
           (.getTime (utils/js-date (:created-at comment-data))))))

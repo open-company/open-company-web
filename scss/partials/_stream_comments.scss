@@ -65,21 +65,6 @@ div.stream-comments {
           padding-left: 8px;
           padding-right: 8px;
           margin-left: -8px;
-
-          &.not-highlighted.open-thread:hover {
-            background-color: var(--opac-background-color-05);
-            border-radius: 4px;
-          }
-
-          &.not-highlighted:not(.open-thread):not(.showing-add-comment):hover div.stream-comment.indented-comment div.stream-comment-inner {
-            background-color: var(--opac-background-color-05);
-            border-radius: 4px;
-          }
-
-          &.not-highlighted:not(.open-thread).showing-add-comment div.stream-comment.indented-comment:hover div.stream-comment-inner {
-            background-color: var(--opac-background-color-05);
-            border-radius: 4px;
-          }
         }
 
         &.open-thread {
@@ -88,9 +73,9 @@ div.stream-comments {
           }
         }
 
-        div.stream-comment.indented-comment div.stream-comment-inner {
+        &.indented-comment div.stream-comment div.stream-comment-inner {
           margin-left: 40px;
-          width: calc(100% - 40px);
+          width: calc(100% - 32px);
           padding: 8px 0 8px 8px;
 
           @include mobile() {
@@ -119,16 +104,17 @@ div.stream-comments {
           }
         }
 
-        &.not-highlighted {
-          background-color: transparent;
-        }
-
-        &.highlighted {
+        &.new-comment {
           background-color: #FFF7DD;
-          transition: background-color 3s ease-in;
+          border-radius: 4px;
 
-          @include dark_mode() {
-            background-color: rgba(0, 0, 0, 0.15);
+          &.indented-comment {
+            background-color: transparent;
+
+            div.stream-comment div.stream-comment-inner {
+              background-color: #FFF7DD;
+              border-radius: 4px;
+            }
           }
         }
 
@@ -224,12 +210,6 @@ div.stream-comments {
           }
 
           &.editing {
-            @include big_web() {
-              &:not(.highlighted):hover div.stream-comment-inner {
-                background-color: initial;
-              }
-            }
-
             div.stream-comment-header {
               display: none;
             }
@@ -610,7 +590,7 @@ div.stream-comments {
           padding-top: 8px;
         }
 
-        div.stream-comment.indented-comment {
+        &.indented-comment div.stream-comment {
           div.add-comment-box-container {
             margin-left: 48px;
 
