@@ -32,4 +32,4 @@
 
       [:button.mlb-reset.activity-removed-button
         {:on-click close-clicked}
-        "Return to all posts"]]])
+        "Return to recent"]]])

@@ -50,7 +50,7 @@
         (activity-actions/inbox-get org-data)
 
         (= board-slug "all-posts")
-        (activity-actions/activity-get org-data)
+        (activity-actions/all-posts-get org-data)
 
         (= board-slug "bookmarks")
         (activity-actions/bookmarks-get org-data)
@@ -58,8 +58,7 @@
         :default
         (let [fixed-board-data (or board-data
                                    (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-              board-rel (if (= board-slug utils/default-drafts-board-slug) ["item" "self"] "activity")
-              board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
+              board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
           (when board-link
             (section-actions/section-get board-link)))))))
 

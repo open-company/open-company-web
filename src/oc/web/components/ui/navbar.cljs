@@ -52,7 +52,7 @@
                        (= (router/current-board-slug) "inbox")
                        "Unread"
                        (= (router/current-board-slug) "all-posts")
-                       "All Posts"
+                       "Recent"
                        (= (router/current-board-slug) "bookmarks")
                        "Bookmarks"
                        :else

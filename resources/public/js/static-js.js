@@ -354,7 +354,9 @@ var OCWebUIThemeNotAllowedPaths = ["pricing",
                                    "invite",
                                    "reset",
                                    "email-required",
-                                   "login-wall"];
+                                   "login-wall",
+                                   "slack-lander",
+                                   "google"];
 var OCWebUIThemeAllowedPathRegExp = new RegExp("^\/(" + OCWebUIThemeNotAllowedPaths.join("|") + "){0,1}?(\/|$)", "ig");
 
 function OCDarkModeEarlySetup(){

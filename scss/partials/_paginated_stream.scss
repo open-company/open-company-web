@@ -53,6 +53,16 @@ div.paginated-stream {
       .ReactVirtualized__Grid.ReactVirtualized__List,
       .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
         overflow: visible !important;
+
+        div.virtualized-list-separator {
+          background-color: var(--background-color);
+          padding: 16px 0;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--light-color);
+          border-bottom: 1px solid var(--foc-divider-line-color);
+        }
       }
 
       div.activities-overlay {
