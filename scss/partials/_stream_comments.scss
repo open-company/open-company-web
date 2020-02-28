@@ -46,9 +46,9 @@ div.stream-comments {
           background-color: var(--opac-background-color-1);
         }
 
-        &.has-new:before {
-          background-color: rgba($carrot_green, 0.4);
-        }
+        // &.has-new:before {
+        //   background-color: rgba($carrot_green, 0.4);
+        // }
 
         &.open-thread:before {
           height: calc(100% - 16px);
