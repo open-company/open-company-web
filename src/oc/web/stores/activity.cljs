@@ -412,16 +412,24 @@
     (update-in db (conj org-key :bookmarks-count) inc)))
 
 (defmethod dispatcher/action :activities-count
-  [db [_ items-count]]
+  [db [_ org-slug items-count]]
   (let [old-reads-data (get-in db dispatcher/activities-read-key)
         ks (vec (map :item-id items-count))
-        vs (map #(zipmap [:count :reads :item-id :last-read-at]
+        vs (map #(zipmap [:count :reads :item-id]
                          [(:count %)
                           (get-in old-reads-data [(:item-id %) :reads])
-                          (:item-id %)
-                          (:last-read-at %)]) items-count)
-        new-items-count (zipmap ks vs)]
-    (update-in db dispatcher/activities-read-key merge new-items-count)))
+                          (:item-id %)]) items-count)
+        new-items-count (zipmap ks vs)
+        last-read-at-map (zipmap ks (map :last-read-at items-count))
+        activities-key (dispatcher/posts-data-key org-slug)
+        next-db (reduce
+                 (fn [tdb [activity-uuid activity-last-read-at]]
+                   (assoc-in tdb
+                    (dispatcher/activity-last-read-at-key org-slug activity-uuid)
+                    activity-last-read-at))
+                 db
+                 last-read-at-map)]
+    (update-in next-db dispatcher/activities-read-key merge new-items-count)))
 
 (defmethod dispatcher/action :activity-reads
   [db [_ org-slug item-id read-data-count read-data team-roster]]
@@ -442,14 +450,15 @@
         unseen-users    (vec (map (fn [user-id]
                          (first (filter #(= (:user-id %) user-id) team-users))) unseen-ids))
         current-user-id (j/user-id)
-        current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)]
-    (assoc-in db (conj dispatcher/activities-read-key item-id) {:count read-data-count
+        current-user-reads (filterv #(= (:user-id %) current-user-id) read-data)
+        last-read-at     (:read-at (last (sort-by :read-at current-user-reads)))]
+    (-> db
+     (assoc-in (conj dispatcher/activities-read-key item-id) {:count read-data-count
                                                                 :reads fixed-read-data
                                                                 :item-id item-id
                                                                 :unreads unseen-users
-                                                                :last-read-at (:read-at (last (sort-by :read-at
-                                                                               current-user-reads)))
-                                                                :private-access? private-access?})))
+                                                                :private-access? private-access?})
+     (assoc-in (dispatcher/activity-last-read-at-key org-slug item-id) last-read-at))))
 
 (defmethod dispatcher/action :uploading-video
   [db [_ org-slug video-id]]
@@ -506,11 +515,13 @@
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
-        next-activity-data (assoc (get-in db activity-key) :unread true)
+        next-activity-data (-> db
+                            (get-in activity-key)
+                            (assoc :unread true)
+                            (dissoc :last-read-at))
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
-      (update-in activity-read-key dissoc :last-read-at)
       (assoc-in activity-key next-activity-data))))
 
 (defmethod dispatcher/action :mark-read
@@ -525,6 +536,7 @@
         ;; Update the activity to read and update the new-at with the max btw the current value
         ;; and the created-at of the last comment.
         next-activity-data (merge old-activity-data {:unread false
+                                                     :last-read-at dismiss-at
                                                      :new-at (if (and (seq comments-data)
                                                                                 (-> comments-data last :created-at
                                                                                  (compare (:new-at old-activity-data))
@@ -534,7 +546,6 @@
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
-      (update-in activity-read-key assoc :last-read-at dismiss-at)
       (assoc-in activity-key next-activity-data))))
 
 ;; Inbox

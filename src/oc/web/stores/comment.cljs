@@ -246,7 +246,7 @@
   [db [_ org-slug interaction-data]]
   (let [activity-uuid (:resource-uuid interaction-data)
         item-uuid (:uuid (:interaction interaction-data))
-        last-read-at (:last-read-at (dispatcher/activity-read-data activity-uuid db))
+        last-read-at (:last-read-at (dispatcher/activity-data org-slug activity-uuid db))
         comments-key (dispatcher/activity-comments-key org-slug activity-uuid)
         comments-data (comment-utils/ungroup-comments (get-in db comments-key))
         deleting-comment-data (some #(when (= (:uuid %) item-uuid) %) comments-data)
