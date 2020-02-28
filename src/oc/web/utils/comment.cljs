@@ -122,7 +122,7 @@
                                                                 (-> sorted-children last :created-at)
                                                                 (:created-at %))}))
                            root-comments)]
-     (vec (reverse (sort-by :last-activity-at grouped-comments)))))
+     (vec (sort-by :created-at grouped-comments))))
   ([comments :guard sequential? parent-uuid]
    (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
          filtered-comments (filterv check-fn comments)

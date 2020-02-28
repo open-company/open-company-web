@@ -88,6 +88,34 @@
                                            :id (keyword (str "comment-url-copied-"
                                             (:uuid comment-data)))}))
 
+(defn- thread-mark-read [s thread-uuid]
+  (let [threads @(::threads s)
+        idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
+    (swap! (::threads s) (fn [threads]
+                           (-> threads
+                             (assoc-in [idx :new] false)
+                             (update-in [idx :thread-children]
+                              (fn [children]
+                                (map #(assoc % :new false) children))))))))
+
+(defn- comment-mark-read [s comment-data]
+  (let [threads @(::threads s)]
+    (js/console.log "DBG comment-mark-read" threads (:uuid comment-data) "parent:" (:parent-uuid comment-data))
+    (if-not (seq (:parent-uuid comment-data))
+      (thread-mark-read s (:uuid comment-data))
+      (let [idx (utils/index-of threads #(= (:uuid %) (:parent-uuid comment-data)))]
+        (js/console.log "DBG    idx:" idx)
+        (swap! (::threads s) (fn [threads]
+                                 (-> threads
+                                   (update-in [idx :thread-children]
+                                    (fn [children]
+                                      (js/console.log "DBG thread" children)
+                                      (map #(do (js/console.log "DBG   checking" (:uuid %))
+                                             (if (= (:uuid %) (:uuid comment-data))
+                                              (assoc % :new false)
+                                              %))
+                                       children))))))))))
+
 (rum/defc emoji-picker < (when (responsive/is-mobile-size?)
                            ui-mixins/no-scroll-mixin)
   [{:keys [add-emoji-cb dismiss-cb]}]
@@ -109,6 +137,7 @@
       (emoji-picker {:dismiss-cb #(reset! (::show-picker s) nil)
                      :add-emoji-cb (fn [emoji]
        (when (reaction-utils/can-pick-reaction? (gobj/get emoji "native") (:reactions comment-data))
+         (comment-mark-read s comment-data)
          (comment-actions/react-from-picker activity-data comment-data
           (gobj/get emoji "native")))
        (reset! (::show-picker s) nil))}))))
@@ -136,7 +165,7 @@
            edit-comment-key is-indented-comment? mouse-leave-cb
            edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt?
-           show-more-menu showing-picker?]}]
+           show-more-menu showing-picker? did-react-cb]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -261,6 +290,7 @@
            [:div.stream-comment-reactions-footer.group
               (reactions {:entity-data comment-data
                           :hide-picker (zero? (count (:reactions comment-data)))
+                          :did-react-cb did-react-cb
                           :optional-activity-data activity-data})])]]]])
 
 (defn- expand-thread [s comment-data]
@@ -272,16 +302,6 @@
                              (update-in [idx :thread-children]
                               (fn [children]
                                 (map #(assoc % :expanded true) children))))))))
-
-(defn- thread-mark-read [s thread-uuid]
-  (let [threads @(::threads s)
-        idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
-    (swap! (::threads s) (fn [threads]
-                           (-> threads
-                             (assoc-in [idx :new] false)
-                             (update-in [idx :thread-children]
-                              (fn [children]
-                                (map #(assoc % :new false) children))))))))
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
@@ -384,6 +404,7 @@
                                :delete-cb (partial delete-clicked s activity-data)
                                :share-cb #(share-clicked root-comment-data)
                                :react-cb #(reset! (::show-picker s) (:uuid root-comment-data))
+                               :did-react-cb #(thread-mark-read s (:uuid root-comment-data))
                                :reply-cb #(reply-to s (:reply-parent root-comment-data))
                                :emoji-picker (when showing-picker?
                                                (emoji-picker-container s root-comment-data))
@@ -432,6 +453,7 @@
                                     :delete-cb (partial delete-clicked s activity-data)
                                     :share-cb #(share-clicked comment-data)
                                     :react-cb #(reset! (::show-picker s) (:uuid comment-data))
+                                    :did-react-cb #(comment-mark-read s comment-data)
                                     :reply-cb #(reply-to s (:reply-parent comment-data))
                                     :emoji-picker (when ind-showing-picker?
                                                     (emoji-picker-container s comment-data))
