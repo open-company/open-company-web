@@ -276,8 +276,8 @@
 (defn- thread-mark-read [s thread-uuid]
   (let [threads @(::threads s)
         idx (utils/index-of threads #(= (:uuid %) thread-uuid))]
-    (swap! (::threads s) (fn [thread]
-                           (-> thread
+    (swap! (::threads s) (fn [threads]
+                           (-> threads
                              (assoc-in [idx :new] false)
                              (update-in [idx :thread-children]
                               (fn [children]
