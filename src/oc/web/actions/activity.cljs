@@ -713,7 +713,7 @@
           (activity-change section-uuid activity-uuid)))))
   (ws-cc/subscribe :item/counts
     (fn [data]
-      (dis/dispatch! [:activities-count (:data data)])))
+      (dis/dispatch! [:activities-count (router/current-org-slug) (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
       (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (count (:reads (:data data))) (:reads (:data data)) (dis/team-roster)]))))
