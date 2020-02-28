@@ -166,7 +166,9 @@
                         (dec (:count reaction-data)))
             new-reaction-data (assoc with-new-reacted :count new-count)
             new-reactions-data (assoc reactions-data reaction-idx new-reaction-data)
-            new-comment-data (assoc comment-data :reactions new-reactions-data)
+            new-comment-data (-> comment-data
+                              (assoc :reactions new-reactions-data)
+                              (dissoc :thread-chilren))
             new-comments-data (assoc comments-data comment-idx new-comment-data)
             new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
         (assoc-in db comments-key new-sorted-comments-data))
@@ -201,7 +203,9 @@
             new-reactions-data (if reaction-idx
                                  (assoc reactions-data reaction-idx new-reaction-data)
                                  (conj reactions-data new-reaction-data))
-            new-comment-data (assoc comment-data :reactions new-reactions-data)
+            new-comment-data (-> comment-data
+                              (assoc :reactions new-reactions-data)
+                              (dissoc :thread-chilren))
             new-comments-data (assoc comments-data comment-idx new-comment-data)
             new-sorted-comments-data (comment-utils/sort-comments new-comments-data)]
         (assoc-in db comments-key new-sorted-comments-data))
