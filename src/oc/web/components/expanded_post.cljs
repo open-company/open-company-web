@@ -82,7 +82,6 @@
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
-    (js/console.log "DBG expanded-post/will-mount")
     (save-initial-read-data s)
     s)
    :did-mount (fn [s]
