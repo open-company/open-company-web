@@ -352,7 +352,6 @@
                                           (not= last-read-at (-> o :rum/args first :last-read-at)))
                                   (let [all-comments (vec (mapcat #(concat [%] (:thread-children %)) @(::threads s)))
                                         collapsed-map (zipmap (map :uuid all-comments) (map #(select-keys % [:expanded :new]) all-comments))]
-                                    (reset! (::replying-to s) #{})
                                     (reset! (::threads s) (cu/collapsed-comments current-user-id last-read-at comments-data collapsed-map)))))
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
