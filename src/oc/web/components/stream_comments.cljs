@@ -100,20 +100,16 @@
 
 (defn- comment-mark-read [s comment-data]
   (let [threads @(::threads s)]
-    (js/console.log "DBG comment-mark-read" threads (:uuid comment-data) "parent:" (:parent-uuid comment-data))
     (if-not (seq (:parent-uuid comment-data))
       (thread-mark-read s (:uuid comment-data))
       (let [idx (utils/index-of threads #(= (:uuid %) (:parent-uuid comment-data)))]
-        (js/console.log "DBG    idx:" idx)
         (swap! (::threads s) (fn [threads]
                                  (-> threads
                                    (update-in [idx :thread-children]
                                     (fn [children]
-                                      (js/console.log "DBG thread" children)
-                                      (map #(do (js/console.log "DBG   checking" (:uuid %))
-                                             (if (= (:uuid %) (:uuid comment-data))
+                                      (map #(if (= (:uuid %) (:uuid comment-data))
                                               (assoc % :new false)
-                                              %))
+                                              %)
                                        children))))))))))
 
 (rum/defc emoji-picker < (when (responsive/is-mobile-size?)
