@@ -36,7 +36,8 @@
   [{:keys [entry-data
            comments-data
            hide-label?
-           hide-face-pile?]}]
+           hide-face-pile?
+           new-comments-count]}]
   (let [entry-comments (get comments-data (:uuid entry-data))
         sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
@@ -58,7 +59,7 @@
                             (+ 8 (* 12 face-pile-count))
                             (+ 10 (* 12 face-pile-count)))
                             0)
-        show-new-tag? (pos? (:new-comments-count entry-data))]
+        show-new-tag? (pos? new-comments-count)]
     (when comments-count
       [:div.is-comments
         {:on-click (fn [e]
@@ -92,12 +93,12 @@
               [:div.is-comments-summary-inner.group
                 (str
                  (if show-new-tag?
-                   (:new-comments-count entry-data)
+                   new-comments-count
                    comments-count)
                  (if show-new-tag?
                    (if hide-label?
                      " new"
-                     (str " new comment" (when (not= (:new-comments-count entry-data) 1) "s")))
+                     (str " new comment" (when (not= new-comments-count 1) "s")))
                    (when-not hide-label?
                      (str " comment" (when (not= comments-count 1) "s")))))]
               (when-not hide-label?
