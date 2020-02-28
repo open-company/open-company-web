@@ -50,14 +50,11 @@
       (comment-actions/get-comments-if-needed activity-data @(drv/get-ref s :comments-data)))))
 
 (defn- save-initial-read-data [s]
-  (let [activity-data @(drv/get-ref s :activity-data)
-        reads-data (get @(drv/get-ref s :activities-read) (:uuid activity-data))]
+  (let [activity-data @(drv/get-ref s :activity-data)]
     (when (and (nil? @(::initial-last-read-at s))
-               (contains? reads-data :last-read-at))
-      (reset! (::initial-last-read-at s) (or (:last-read-at reads-data) "")))
-    (when (and (not @(::initial-new-at s))
-               (:new-at activity-data))
-      (reset! (::initial-new-at s) (:new-at activity-data)))))
+               (or (:last-read-at activity-data)
+                   (:unread activity-data)))
+      (reset! (::initial-last-read-at s) (or (:last-read-at activity-data) "")))))
 
 (defn- mark-read [s]
   (when @(::mark-as-read? s)
@@ -78,7 +75,6 @@
   (rum/local nil ::comment-height)
   (rum/local 0 ::mobile-video-height)
   (rum/local nil ::initial-last-read-at)
-  (rum/local nil ::initial-new-at)
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
@@ -86,13 +82,14 @@
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
+    (js/console.log "DBG expanded-post/will-mount")
     (save-initial-read-data s)
     s)
    :did-mount (fn [s]
     (save-fixed-comment-height! s)
     (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
-    (mark-read s)
     (load-comments s true)
+    (mark-read s)
     s)
    :did-remount (fn [_ s]
     (save-initial-read-data s)
@@ -132,11 +129,6 @@
         assigned-follow-up-data (first (filter #(= (-> % :assignee :user-id) current-user-id) (:follow-ups activity-data)))
         add-comment-force-update* (drv/react s :add-comment-force-update)
         add-comment-force-update (get add-comment-force-update* (dis/add-comment-string-key (:uuid activity-data)))
-        has-new-comments? ;; if the post has a last comment timestamp (a comment not from current user)
-                          (and @(::initial-new-at s)
-                               ;; and that's after the user last read
-                               (< (.getTime (utils/js-date (:last-read-at reads-data)))
-                                  (.getTime (utils/js-date @(::initial-new-at s)))))
         mobile-more-menu-el (sel1 [:div.mobile-more-menu])
         show-mobile-menu? (and is-mobile?
                                       mobile-more-menu-el)
@@ -164,11 +156,10 @@
                                 :android ua/android?})
        :id dom-element-id
        :style {:padding-bottom (str @(::comment-height s) "px")}
-       :data-initial-new-at @(::initial-new-at s)
        :data-new-at (:new-at activity-data)
        :data-initial-last-read-at @(::initial-last-read-at s)
-       :data-last-read-at (:last-read-at reads-data)
-       :data-has-new-comments has-new-comments?}
+       :data-last-read-at (:last-read-at activity-data)
+       :data-new-comments-count (:new-comments-count activity-data)}
       (image-modal/image-modal {:src expand-image-src})
       [:div.expanded-post-header.group
         [:button.mlb-reset.back-to-board
@@ -247,7 +238,7 @@
         [:div.expanded-post-footer-mobile-group
           (comments-summary {:entry-data activity-data
                              :comments-data comments-drv
-                             :show-new-tag? has-new-comments?
+                             :new-comments-count 0
                              :hide-face-pile? true})]]
       [:div.expanded-post-comments.group
         (when (:can-comment activity-data)
