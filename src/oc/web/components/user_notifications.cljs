@@ -78,6 +78,9 @@
       [:button.mlb-reset.notification-bell-bt
         {:class (utils/class-set {:new has-new-content
                                   :active @(::tray-open s)})
+         :data-toggle (when-not is-mobile? "tooltip")
+         :data-placement "bottom"
+         :title "Notifications"
          :on-click #(if @(::tray-open s)
                       (close-tray s)
                       (reset! (::tray-open s) true))}]

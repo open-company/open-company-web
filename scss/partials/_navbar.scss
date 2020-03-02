@@ -219,16 +219,21 @@ nav.oc-navbar {
         }
 
         button.navbar-create-bt {
-          float: right;
-          margin-left: 8px;
+          float: left;
+          margin-right: 8px;
           border-radius: 50%;
           width: 32px;
           height: 32px;
           background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
           background-size: 16px 16px;
-          background-color: $carrot_green;
+          background-color: rgba($carrot_green, 0.3);
           background-repeat: no-repeat;
           background-position: center;
+          transition: background-color 180ms ease-in;
+
+          &.scrolled, &:hover {
+            background-color: $carrot_green;
+          }
         }
 
         div.user-notifications {
