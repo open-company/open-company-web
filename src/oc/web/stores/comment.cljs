@@ -52,9 +52,13 @@
 (defmethod dispatcher/action :add-comment-reset
   [db [_ org-slug activity-uuid parent-comment-uuid comment-uuid]]
   (let [add-comment-key (dispatcher/add-comment-key org-slug)
-        comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)]
+        comment-key (dispatcher/add-comment-string-key activity-uuid parent-comment-uuid comment-uuid)
+        add-comment-activity-key (dispatcher/add-comment-activity-key org-slug comment-key)]
     (-> db
+      ;; Lose the cached body
       (update-in add-comment-key dissoc comment-key)
+      ;; Lose focus on the field
+      (dissoc :add-comment-focus)
       ;; Force refresh of the add comment field to remove the body
       (assoc-in (dispatcher/add-comment-force-update-key comment-key) (utils/activity-uuid)))))
 

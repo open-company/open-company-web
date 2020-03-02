@@ -15,9 +15,9 @@
 (defn show-separators? [container-slug-or-href]
   (and container-slug-or-href
        (not (responsive/is-mobile-size?))
-       (not (or (#{utils/default-drafts-board-slug "inbox" "bookmarks"} (name container-slug-or-href))
+       (not (or (#{utils/default-drafts-board-slug "inbox"} (name container-slug-or-href))
                 (and (string? container-slug-or-href)
-                     (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)"))))))
+                     (.match container-slug-or-href #"(?i)/(inbox)(/|$)"))))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -61,7 +61,7 @@
 
 (defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
   (let [post-date (utils/js-date (:published-at post-data))]
-    (if (and (not (empty? separators-map))
+    (if (and (seq separators-map)
              (> post-date (:date (last separators-map))))
       (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj (:uuid post-data)) vec))
       (vec
