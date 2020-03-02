@@ -161,7 +161,7 @@
            edit-comment-key is-indented-comment? mouse-leave-cb
            edit-cb delete-cb share-cb react-cb reply-cb emoji-picker
            is-mobile? can-show-edit-bt? can-show-delete-bt?
-           show-more-menu showing-picker? did-react-cb]}]
+           show-more-menu showing-picker? did-react-cb new-thread?]}]
   [:div.stream-comment-outer
     {:key (str "stream-comment-" (:created-at comment-data))
      :data-comment-uuid (:uuid comment-data)
@@ -211,7 +211,10 @@
                      :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
                      :data-title (utils/activity-date-tooltip comment-data)}
                     (utils/foc-date-time (:created-at comment-data))]]]
-              (when (:new comment-data)
+              (when (and (:new comment-data)
+                         (or (and is-indented-comment?
+                                  (not new-thread?))
+                             (not is-indented-comment?)))
                 [:div.new-comment-tag])
               (if (responsive/is-mobile-size?)
                 [:div.stream-comment-mobile-menu
@@ -406,7 +409,8 @@
                                :showing-picker? showing-picker?
                                :show-more-menu (::show-more-menu s)
                                :dismiss-reply-cb (partial finish-edit s root-comment-data)
-                               :edit-comment-key edit-comment-key}))
+                               :edit-comment-key edit-comment-key
+                               :new-thread? (:new root-comment-data)}))
                (when (and (not expanded-thread?)
                           (pos? (:collapsed-count root-comment-data)))
                  [:button.mlb-reset.expand-thead-bt
@@ -455,7 +459,8 @@
                                     :showing-picker? ind-showing-picker?
                                     :show-more-menu (::show-more-menu s)
                                     :dismiss-reply-cb (partial finish-edit s comment-data)
-                                    :edit-comment-key ind-edit-comment-key}))])
+                                    :edit-comment-key ind-edit-comment-key
+                                    :new-thread? (:new root-comment-data)}))])
           (when show-add-comment?
             [:div.stream-comment-outer
               {:key (str "stream-comment-add-" (:uuid root-comment-data))
