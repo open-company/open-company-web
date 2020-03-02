@@ -62,18 +62,21 @@ div.medium-editor-media-picker div.media-picker-container {
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media {
-  margin-left: 0;
   transform: rotate(0deg);
   transition: transform 0ms, margin-left 0ms, opacity 0ms;
   float: left;
-  margin-right: 16px;
+  margin: 0;
   opacity: 0;
   width: 24px;
   height: 24px;
 }
 
-div.medium-editor-media-picker div.media-picker-container button.media:last-child {
-  margin-right: 0;
+div.medium-editor-media-picker div.media-picker-container button.media:not(:first-child) {
+  margin-left: 8px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media:not(:last-child) {
+  margin-right: 8px;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-entry {
@@ -85,13 +88,33 @@ div.medium-editor-media-picker div.media-picker-container button.media-entry:hov
   background-image: url("/img/ML/media_entry_white.png");
 }
 
+div.medium-editor-media-picker div.media-picker-container button.media-entry:not(:first-child) {
+  margin-left: 3px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-entry:not(:last-child) {
+  margin-right: 3px;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media-photo {
   background-image: url("/img/ML/media_photo.svg");
   background-size: 16px 14px;
 }
 
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-photo {
+  background-image: url("/img/ML/media_photo@dark.svg");
+}
+
 div.medium-editor-media-picker div.media-picker-container.expanded button.media-photo:hover {
   opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-photo:not(:first-child) {
+  margin-left: 4px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-photo:not(:last-child) {
+  margin-right: 4px;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-gif {
@@ -99,8 +122,20 @@ div.medium-editor-media-picker div.media-picker-container button.media-gif {
   background-size: 24px 14px;
 }
 
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-gif {
+  background-image: url("/img/ML/media_gif@dark.svg");
+}
+
 div.medium-editor-media-picker div.media-picker-container.expanded button.media-gif:hover {
   opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-gif:not(:first-child) {
+  margin-left: 8px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-gif:not(:last-child) {
+  margin-right: 8px;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-video {
@@ -108,8 +143,20 @@ div.medium-editor-media-picker div.media-picker-container button.media-video {
   background-size: 18px 12px;
 }
 
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-video {
+  background-image: url("/img/ML/media_video@dark.svg");
+}
+
 div.medium-editor-media-picker div.media-picker-container.expanded button.media-video:hover {
   opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-video:not(:first-child) {
+  margin-left: 5px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-video:not(:last-child) {
+  margin-right: 5px;
 }
 
 div.medium-editor-media-picker div.media-picker-container button.media-chart {
@@ -117,7 +164,7 @@ div.medium-editor-media-picker div.media-picker-container button.media-chart {
   background-size: 14px;
 }
 
-div.medium-editor-media-picker div.media-picker-container button.media-chart:hover {
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-chart:hover {
   background-image: url("/img/ML/media_chart_white.png");
 }
 
@@ -148,7 +195,7 @@ div.medium-editor-media-picker div.media-picker-container.expanded.media-2 {
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-3 {
-  width: 104px;
+  width: 94px;
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded.media-4 {
@@ -164,5 +211,5 @@ div.medium-editor-media-picker div.media-picker-container.expanded.media-6 {
 }
 
 div.medium-editor-media-picker div.media-picker-container.expanded button.media {
-  opacity: 0.5;
+  opacity: 0.3;
 }

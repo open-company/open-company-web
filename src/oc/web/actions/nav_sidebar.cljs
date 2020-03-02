@@ -5,6 +5,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.shared.useragent :as ua]
+            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.actions.nux :as nux-actions]
             [oc.web.lib.responsive :as responsive]
@@ -20,8 +21,10 @@
 ;; :org
 ;; :integrations
 ;; :team
-;; :invite
-;; :billing
+;; :invite-picker
+;; :invite-email
+;; :invite-slack
+;; :payments
 ;; :profile
 ;; :notifications
 ;; :reminders
@@ -29,32 +32,41 @@
 ;; :section-add
 ;; :section-edit
 ;; :wrt-{uuid}
+;; :theme
 
-(defn- refresh-board-data [board-slug sort-type]
+(defn- container-data [board-slug]
+  (if (dis/is-container? board-slug)
+    (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
+    (dis/board-data board-slug)))
+
+(defn- refresh-board-data [board-slug]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
-          board-data (if (#{"all-posts" "follow-ups"} board-slug)
-                       (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
-                       (dis/board-data board-slug))]
+          board-data (container-data board-slug)]
        (cond
+
+        (= board-slug "inbox")
+        (activity-actions/inbox-get org-data)
 
         (= board-slug "all-posts")
         (activity-actions/all-posts-get org-data)
 
-        (= board-slug "follow-ups")
-        (activity-actions/follow-ups-sort-get org-data)
+        (= board-slug "bookmarks")
+        (activity-actions/bookmarks-get org-data)
 
         :default
-        (let [board-rel (if (= sort-type dis/other-sort-type)
-                          ["item" "self"]
-                          "activity")]
-          (when-let* [fixed-board-data (or board-data
-                       (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
-                      board-link (utils/link-for (:links fixed-board-data) board-rel "GET")]
-            (section-actions/section-get sort-type board-link)))))))
+        (let [fixed-board-data (or board-data
+                                   (some #(when (= (:slug %) board-slug) %) (:boards org-data)))
+              board-link (utils/link-for (:links fixed-board-data) ["item" "self"] "GET")]
+          (when board-link
+            (section-actions/section-get board-link)))))))
 
-(defn nav-to-url! [e board-slug url]
+(defn nav-to-url!
+  ([e board-slug url]
+  (nav-to-url! e board-slug url (or (:back-y @router/path) (utils/page-scroll-top)) true))
+
+  ([e board-slug url back-y refresh?]
   (when (and e
              (.-preventDefault e))
     (.preventDefault e))
@@ -64,9 +76,8 @@
    (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
          is-drafts-board? (= board-slug utils/default-drafts-board-slug)
          org-slug (router/current-org-slug)
-         sort-type (if is-drafts-board?
-                     dis/other-sort-type
-                     (activity-actions/saved-sort-type org-slug))]
+         is-container? (dis/is-container? board-slug)
+         org-data (dis/org-data)]
      (if (= current-path url)
        (do ;; In case user is clicking on the currently highlighted section
            ;; let's refresh the posts list only
@@ -75,16 +86,68 @@
        (do ;; If user clicked on a different section/container
            ;; let's switch to it using pushState and changing
            ;; the internal router state
-         (router/set-route! [org-slug board-slug (if (#{"all-posts" "follow-ups"} board-slug) board-slug "dashboard")]
+         (router/set-route! [org-slug board-slug (if is-container? "dashboard" board-slug)]
           {:org org-slug
            :board board-slug
-           :sort-type sort-type
+           :scroll-y back-y
            :query-params (router/query-params)})
          (.pushState (.-history js/window) #js {} (.-title js/document) url)
          (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
-         (utils/after 0 #(refresh-board-data board-slug sort-type)))))
-   (cmail-actions/cmail-hide)
-   (user-actions/hide-mobile-user-notifications))))
+         ;; Let's change the QP section if it's not active and going to an editable section
+         (when (and (not is-container?)
+                    (not is-drafts-board?)
+                    (-> @dis/app-state :cmail-state :collapsed))
+           (when-let* [nav-to-board-data (some #(when (= (:slug %) board-slug) %) (:boards org-data))
+                       edit-link (utils/link-for (:links nav-to-board-data) "create" "POST")]
+             (dis/dispatch! [:input [:cmail-data] {:board-slug (:slug nav-to-board-data)
+                                                   :board-name (:name nav-to-board-data)}])
+             (dis/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)])))
+         (when refresh?
+           (utils/after 0 #(refresh-board-data board-slug))))))
+   (user-actions/hide-mobile-user-notifications)))))
+
+(defn dismiss-post-modal [e]
+  (let [org-data (dis/org-data)
+        ;; Go back to
+        board (utils/back-to org-data)
+        to-url (oc-urls/board board)
+        board-data (container-data board)
+        should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
+                                 (:refresh @router/path)
+                                 (not board-data))
+        ;; Get the previous scroll top position
+        default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
+        ;; Scroll back to the previous scroll position only if the posts are
+        ;; not going to refresh, if they refresh the old scroll position won't be right anymore
+        back-y (if should-refresh-data?
+                 (utils/page-scroll-top)
+                 default-back-y)]
+    (nav-to-url! e board to-url back-y should-refresh-data?)))
+
+(defn open-post-modal [activity-data dont-scroll]
+  (let [org (router/current-org-slug)
+        old-board (router/current-board-slug)
+        board (:board-slug activity-data)
+        back-to (if (= old-board utils/default-drafts-board-slug)
+                  board
+                  old-board)
+        activity (:uuid activity-data)
+        post-url (oc-urls/entry board activity)
+        query-params (router/query-params)
+        route [org board activity "activity"]
+        scroll-y-position (.. js/document -scrollingElement -scrollTop)]
+    (router/set-route! route {:org org
+                              :board board
+                              :activity activity
+                              :query-params query-params
+                              :back-to back-to
+                              :back-y scroll-y-position})
+    (cmail-actions/cmail-hide)
+    (when-not dont-scroll
+      (if ua/mobile?
+        (utils/after 10 #(utils/scroll-to-y 0 0))
+        (utils/scroll-to-y 0 0)))
+    (.pushState (.-history js/window) #js {} (.-title js/document) post-url)))
 
 ;; Push panel
 
@@ -173,7 +236,9 @@
 
 (defn show-org-settings [panel]
   (if panel
-    (push-panel panel)
+    (when (or (not= panel :payments)
+              ls/payments-enabled)
+      (push-panel panel))
     (pop-panel)))
 
 (defn show-user-settings [panel]
@@ -188,15 +253,6 @@
 
 (defn hide-wrt []
   (pop-panel))
-
-;; Follow-ups users picker
-
-(defn show-follow-ups-picker [activity-uuid callback]
-  (dis/dispatch! [:input [:follow-ups-picker-callback] (fn [users-list]
-   (when (fn? callback)
-     (callback users-list))
-   (dis/dispatch! [:input [:follow-ups-picker-callback] nil]))])
-  (push-panel (keyword (str "follow-ups-picker-" (or activity-uuid "")))))
 
 ;; Integrations
 
@@ -214,3 +270,11 @@
     (show-org-settings :integrations)))
 
 (set! (.-OCWebStaticOpenIntegrationsPanel js/window) open-integrations-panel)
+
+;; Theme
+
+(defn show-theme-settings []
+  (push-panel :theme))
+
+(defn hide-theme-settings []
+  (pop-panel))

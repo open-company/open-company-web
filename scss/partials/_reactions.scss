@@ -19,11 +19,11 @@ div.reactions {
       @include OC_Body_Bold();
       box-shadow: none;
       font-size: 11px;
-      color: $ui_grey;
+      color: var(--color);
       min-width: 40px;
       border-radius: 4px;
       margin-left: 4px;
-      background-color: $ultra_light_grey;
+      background-color: var(--reaction-bt-background);
 
       @include mobile() {
         height: 32px;
@@ -53,6 +53,7 @@ div.reactions {
         height: 15px;
         text-align: center;
         margin-left: -1px;
+        color: var(--light-color);
 
         @include mobile() {
           margin-top: 3px;
@@ -65,14 +66,15 @@ div.reactions {
 
         @include big_web() {
           &:hover {
-            background-color: #D6D9DC;
+            background-color: var(--ultralight-color);
+
             div.count {
-              color: $deep_navy;
+              color: var(--color);
             }
           }
 
           &.reacted:hover {
-            background-color: #C6EBD8;
+            background-color: rgba($carrot_green, 0.35);
             div.count {
               color: $carrot_green;
             }
@@ -81,7 +83,7 @@ div.reactions {
       }
 
       &.reacted {
-        background-color: #D9F2E5;
+        background-color: rgba($carrot_green, 0.2);
 
         div.count {
           color: $carrot_green;
@@ -105,7 +107,7 @@ div.reactions {
           display: inline-block;
           width: 24px;
           height: 16px;
-          background-image: cdnUrl("/img/ML/reaction_picker_icon_hover.svg");
+          background-image: cdnUrl("/img/ML/reaction_picker_icon.svg");
           background-size: 24px 16px;
           background-position: center;
           background-repeat: no-repeat;
@@ -126,7 +128,7 @@ div.reactions {
 
     @include mobile() {
       padding-top: 29px;
-      background-color: white;
+      background-color: var(--mobile-background-color);
       position: fixed;
       top: 0px;
       left: 0px;
@@ -137,7 +139,7 @@ div.reactions {
         position: absolute;
         top: 8px;
         right: 8px;
-        color: $deep_navy;
+        color: var(--color);
         @include OC_Body_Bold();
         font-size: 16px;
       }
@@ -165,5 +167,12 @@ div.reactions {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.reactions div.reactions-list button.reaction-btn.reaction-picker span.reaction {
+    opacity: 1;
+    background-image: cdnUrl("/img/ML/reaction_picker_icon@dark.svg");  
   }
 }

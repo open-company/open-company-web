@@ -12,6 +12,7 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.ui-theme :as ui-theme]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -99,7 +100,10 @@
       [:div.wrt-popup
         {:class (utils/class-set {:loading (not (:reads read-data))})
          :ref :wrt-popup
-         :on-click #(.stopPropagation %)}
+         :on-click #(when @(::list-view-dropdown-open s)
+                      (when-not (utils/event-inside? % (rum/ref-node s :wrt-pop-up-tabs))
+                        (reset! (::list-view-dropdown-open s) false))
+                        (utils/event-stop %))}
         [:div.wrt-popup-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
@@ -123,7 +127,7 @@
                      :cy "58px"
                      :r "50px"
                      :fill "transparent"
-                     :stroke "#ECECEC"
+                     :stroke (if (= (ui-theme/computed-value (ui-theme/get-ui-theme-setting)) :dark) "#DDDDDD" "#ECECEC")
                      :stroke-width "16px"}]
                   [:circle.wrt-donut-segment
                     {:cx "58"
@@ -190,11 +194,7 @@
               (for [u sorted-filtered-users
                     :let [user-sending-notice (get @(::sending-notice s) (:user-id u))
                           is-self-user?       (= (:user-id current-user-data) (:user-id u))
-                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))
-                          follow-up           (first (filterv #(= (-> % :assignee :user-id) (:user-id u)) (:follow-ups activity-data)))
-                          follow-up-string    (when (and follow-up
-                                                         (not (:completed? follow-up)))
-                                                ", marked for follow-up")]]
+                          slack-user          (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
                 [:div.wrt-popup-list-row
                   {:key (str "wrt-popup-row-" (:user-id u))
                    :class (utils/class-set {:seen (and (:seen u) (= @list-view :all))
@@ -214,8 +214,7 @@
                         (if (= user-sending-notice :loading)
                           "Sending..."
                           user-sending-notice)
-                        "Unopened"))
-                    follow-up-string]
+                        "Unopened"))]
                   ;; Send reminder button
                   (when (and (not (:seen u))
                              (not is-self-user?)
@@ -259,20 +258,16 @@
         win-height (.-innerHeight js/window)]
     (>= fixed-top-position (/ win-height 2))))
 
-(rum/defcs wrt-count < rum/reactive
-                       ;; Derivatives
-                       (drv/drv :wrt-show)
-
-  [s activity-data read-data]
+(rum/defc wrt-count < rum/static
+  [{:keys [activity-data reads-data]}]
   (let [item-id (:uuid activity-data)
-        read-count (:count read-data)
-        wrt-show (drv/react s :wrt-show)
-        is-mobile? (responsive/is-tablet-or-mobile?)]
+        reads-count (:count reads-data)]
     [:div.wrt-count-container
       [:div.wrt-count
         {:ref :wrt-count
          :on-click #(nav-actions/show-wrt item-id)
-         :class (when (pos? (count (:reads read-data))) "has-read-list")}
-        (if read-count
-          (str read-count " viewer" (when (not= read-count 1) "s"))
-          "0 viewers")]]))
+         :class (when (pos? (count (:reads reads-data))) "has-read-list")}
+        (if (pos? reads-count)
+          (str reads-count
+           " viewer" (when (not= reads-count 1) "s"))
+          "Viewers")]]))

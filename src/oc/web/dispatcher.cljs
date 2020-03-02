@@ -10,14 +10,24 @@
             [oc.shared.useragent :as ua]))
 
 (defonce app-state (atom {:loading false
-                          :show-login-overlay false
-                          :cmail-state {:key (utils/activity-uuid)
-                                        :collapsed true}}))
+                          :show-login-overlay false}))
 
-(def default-sort-type :recent-activity)
-(def other-sort-type :recently-posted)
+; (def default-sort-type :recent-activity)
+; (def other-sort-type :recently-posted)
+
+(def default-foc-layout :expanded)
+(def other-foc-layout :collapsed)
 
 ;; Data key paths
+
+(def checkout-result-key :checkout-success-result)
+(def checkout-update-plan-key :checkout-update-plan)
+
+(def expo-key [:expo])
+
+(def expo-deep-link-origin-key (vec (conj expo-key :deep-link-origin)))
+(def expo-app-version-key (vec (conj expo-key :app-version)))
+(def expo-push-token-key (vec (conj expo-key :push-token)))
 
 (def api-entry-point-key [:api-entry-point])
 
@@ -37,27 +47,23 @@
 (defn boards-key [org-slug]
   (vec (conj (org-key org-slug) :boards)))
 
+(defn payments-key [org-slug]
+  (vec (conj (org-key org-slug) :payments)))
+
 (defn posts-data-key [org-slug]
   (vec (conj (org-key org-slug) :posts)))
 
 (defn board-key [org-slug board-slug]
   (vec (conj (boards-key org-slug) (keyword board-slug))))
 
-(defn board-data-key
-  ([org-slug board-slug-with-sort]
-    (conj (board-key org-slug board-slug-with-sort) :board-data))
-  ([org-slug board-slug sort-type]
-    (board-data-key org-slug
-     (keyword (str (name board-slug) "-" (name (or sort-type default-sort-type)))))))
+(defn board-data-key [org-slug board-slug]
+    (conj (board-key org-slug board-slug) :board-data))
 
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
 
-(defn container-key
-  ([org-slug posts-filter sort-type]
-  (container-key org-slug (keyword (str (name posts-filter) "-" (name (or sort-type default-sort-type))))))
-  ([org-slug posts-filter-with-sort]
-  (vec (conj (containers-key org-slug) (keyword posts-filter-with-sort)))))
+(defn container-key [org-slug posts-filter]
+   (vec (conj (containers-key org-slug) (keyword posts-filter))))
 
 (defn secure-activity-key [org-slug secure-id]
   (vec (concat (org-key org-slug) [:secure-activities secure-id])))
@@ -69,10 +75,17 @@
 (defn add-comment-key [org-slug]
   (vec (concat (org-key org-slug) [:add-comment-data])))
 
-(defn add-comment-string-key [activity-uuid parent-comment-uuid comment-uuid]
-  (str activity-uuid "-" parent-comment-uuid "-" comment-uuid))
+(defn add-comment-string-key [activity-uuid & [parent-comment-uuid comment-uuid]]
+  (str activity-uuid
+    (when parent-comment-uuid
+      (str "-" parent-comment-uuid))
+    (when comment-uuid
+      (str "-" comment-uuid))))
 
-(def add-comment-force-update-key :add-comment-force-update)
+(def add-comment-force-update-root-key :add-comment-force-update)
+
+(defn add-comment-force-update-key [add-comment-string-key]
+  (vec (concat [add-comment-force-update-root-key] [add-comment-string-key])))
 
 (defn add-comment-activity-key [org-slug activity-uuid]
   (vec (concat (add-comment-key org-slug) [activity-uuid])))
@@ -102,14 +115,12 @@
   []
   (let [org-slug (router/current-org-slug)
         board-slug (router/current-board-slug)]
-     (board-data-key org-slug board-slug (router/current-sort-type))))
+     (board-data-key org-slug board-slug)))
 
 ;; User notifications
 
 (defn user-notifications-key [org-slug]
   (vec (conj (org-key org-slug) :user-notifications)))
-
-(def expo-push-token-key [:expo-push-token])
 
 ;; Reminders
 
@@ -141,16 +152,28 @@
                           (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
-(defn- get-container-posts [base posts-data is-board? org-slug container-slug sort-type]
-  (let [container-key (if is-board?
-                        (board-data-key org-slug container-slug sort-type)
-                        (container-key org-slug container-slug sort-type))
-        container-data (get-in base container-key)
-        items-list (:posts-list container-data)
-        container-posts (map #(when (contains? posts-data %) (get posts-data %)) items-list)]
+(defn- get-container-posts [base posts-data is-board? org-slug container-slug posts-key]
+  (let [cnt-key (if is-board?
+                  (board-data-key org-slug container-slug)
+                  (container-key org-slug container-slug))
+        container-data (get-in base cnt-key)
+        items-list (get container-data posts-key)
+        container-posts (vec (remove nil?
+                         (mapv #(cond
+                                 (map? %)
+                                 %
+                                 (and (string? %) (contains? posts-data %))
+                                 (get posts-data %)
+                                 :else
+                                 nil)
+                          items-list)))]
     (if (= container-slug utils/default-drafts-board-slug)
       (filterv #(= (:status %) "draft") container-posts)
       container-posts)))
+
+(def ui-theme-key [:ui-theme])
+
+(def force-list-update-key [:force-list-update])
 
 ;; Functions needed by derivatives
 
@@ -164,8 +187,8 @@
 
 ;; Container helpers
 
-(defn- is-container? [container-slug]
-  (#{"all-posts" "must-see" "follow-ups"} container-slug))
+(defn is-container? [container-slug]
+  (#{"inbox" "all-posts" "bookmarks"} container-slug))
 
 ;; Derived Data ================================================================
 
@@ -175,7 +198,6 @@
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
    :board-slug          [[:route] (fn [route] (:board route))]
-   :sort-type           [[:route] (fn [route] (:sort-type route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
    :loading             [[:base] (fn [base] (:loading base))]
@@ -190,14 +212,20 @@
    :notifications-data  [[:base] (fn [base] (get-in base notifications-key))]
    :login-with-email    [[:base] (fn [base] (:login-with-email base))]
    :login-with-email-error [[:base] (fn [base] (:login-with-email-error base))]
-   :hide-left-navbar    [[:base] (fn [base] (:hide-left-navbar base))]
    :panel-stack         [[:base] (fn [base] (:panel-stack base))]
    :current-panel       [[:panel-stack] (fn [panel-stack] (last panel-stack))]
    :mobile-navigation-sidebar [[:base] (fn [base] (:mobile-navigation-sidebar base))]
    :mobile-user-notifications [[:base] (fn [base] (:mobile-user-notifications base))]
    :expand-image-src    [[:base] (fn [base] (:expand-image-src base))]
    :attachment-uploading [[:base] (fn [base] (:attachment-uploading base))]
-   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-key))]
+   :add-comment-force-update [[:base] (fn [base] (get base add-comment-force-update-root-key))]
+   :mobile-swipe-menu  [[:base] (fn [base] (:mobile-swipe-menu base))]
+   checkout-result-key [[:base] (fn [base] (get base checkout-result-key))]
+   checkout-update-plan-key [[:base] (fn [base] (get base checkout-update-plan-key))]
+   :expo                [[:base] (fn [base] (get-in base expo-key))]
+   :expo-deep-link-origin [[:base] (fn [base] (get-in base expo-deep-link-origin-key))]
+   :expo-app-version    [[:base] (fn [base] (get-in base expo-app-version-key))]
+   :invite-add-slack-checked [[:base] (fn [base] (:invite-add-slack-checked base))]
    :add-comment-data    [[:base :org-slug] (fn [base org-slug]
                           (get-in base (add-comment-key org-slug)))]
    :email-verification  [[:base :auth-settings]
@@ -214,17 +242,17 @@
                                      (router/current-secure-activity-id))
                               (select-keys (:id-token base) [:user-id :avatar-url :first-name :last-name :name])
                               (:current-user-data base)))]
-   :subscription        [[:base] (fn [base] (:subscription base))]
+   :payments        [[:base :org-slug] (fn [base org-slug] (get-in base (payments-key org-slug)))]
    :show-login-overlay  [[:base] (fn [base] (:show-login-overlay base))]
    :site-menu-open      [[:base] (fn [base] (:site-menu-open base))]
    :ap-loading          [[:base] (fn [base] (:ap-loading base))]
    :edit-reminder       [[:base] (fn [base] (:edit-reminder base))]
    :drafts-data         [[:base :org-slug]
                           (fn [base org-slug]
-                            (get-in base (board-data-key org-slug :drafts other-sort-type)))]
-   :follow-ups-data     [[:base :org-slug]
+                            (get-in base (board-data-key org-slug :drafts)))]
+   :bookmarks-data     [[:base :org-slug]
                           (fn [base org-slug]
-                            (get-in base (container-key org-slug :follow-ups default-sort-type)))]
+                            (get-in base (container-key org-slug :bookmarks)))]
    :org-data            [[:base :org-slug]
                           (fn [base org-slug]
                             (when org-slug
@@ -237,15 +265,6 @@
                           (fn [base org-data]
                             (when org-data
                               (get-in base (team-roster-key (:team-id org-data)))))]
-   :follow-ups-picker-callback [[:base] (fn [base] (:follow-ups-picker-callback base))]
-   :follow-ups-activity-data [[:base :org-slug :current-panel]
-                              (fn [base org-slug current-panel]
-                                (when current-panel
-                                  (let [panel-name (name current-panel)
-                                        activity-uuid (subs panel-name (count "follow-ups-picker-") (count panel-name))]
-                                    (if (seq activity-uuid)
-                                      (get-in base (activity-key org-slug activity-uuid))
-                                      (get base :cmail-data)))))]
    :invite-users        [[:base] (fn [base] (:invite-users base))]
    :invite-data         [[:base :team-data :current-user-data :team-roster :invite-users]
                           (fn [base team-data current-user-data team-roster invite-users]
@@ -260,27 +279,33 @@
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
                              :query-params query-params})]
-   :container-data      [[:base :org-slug :board-slug :sort-type]
-                         (fn [base org-slug board-slug sort-type]
+   :container-data      [[:base :org-slug :board-slug]
+                         (fn [base org-slug board-slug]
                            (when (and org-slug board-slug)
-                             (let [container-key (if (is-container? (router/current-board-slug))
-                                                   (container-key org-slug board-slug sort-type)
-                                                   (board-data-key org-slug board-slug sort-type))]
+                             (let [container-key (if (is-container? board-slug)
+                                                   (container-key org-slug board-slug)
+                                                   (board-data-key org-slug board-slug))]
                                (get-in base container-key))))]
    :posts-data          [[:base :org-slug]
                          (fn [base org-slug]
                            (when (and base org-slug)
                              (get-in base (posts-data-key org-slug))))]
-
    :filtered-posts      [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
                                    all-boards-slug (map :slug (:boards org-data))
-                                   sort-type (:sort-type route)
                                    container-slug (:board route)
                                    is-board? ((set all-boards-slug) container-slug)]
-                              (get-container-posts base posts-data is-board? org-slug container-slug sort-type))))]
+                              (get-container-posts base posts-data is-board? org-slug container-slug :posts-list))))]
+   :items-to-render     [[:base :org-data :posts-data :route]
+                         (fn [base org-data posts-data route]
+                           (when (and base org-data posts-data route (:board route))
+                             (let [org-slug (:slug org-data)
+                                   all-boards-slug (map :slug (:boards org-data))
+                                   container-slug (:board route)
+                                   is-board? ((set all-boards-slug) container-slug)]
+                              (get-container-posts base posts-data is-board? org-slug container-slug :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -300,7 +325,8 @@
                             (activity-data org-slug activity-uuid base))]
    :secure-activity-data [[:base :org-slug :secure-id]
                           (fn [base org-slug secure-id]
-                            (secure-activity-data org-slug secure-id base))]
+                            {:activity-data (secure-activity-data org-slug secure-id base)
+                             :is-showing-alert (boolean (:alert-modal base))})]
    :comments-data       [[:base :org-slug]
                          (fn [base org-slug]
                            (get-in base (comments-key org-slug)))]
@@ -352,6 +378,11 @@
                                :auth-settings auth-settings
                                :token (:token (:query-params route))
                                :jwt jwt})]
+   :team-invite           [[:base :route :auth-settings :jwt]
+                            (fn [base route auth-settings jwt]
+                              {:auth-settings auth-settings
+                               :invite-token (:invite-token (:query-params route))
+                               :jwt jwt})]
    :collect-password      [[:base :jwt]
                             (fn [base jwt]
                               {:invitation-confirmed (:email-confirmed base)
@@ -400,12 +431,13 @@
 
                                   (activity-data-get org-slug wrt-uuid base))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active]
                             (fn [base orgs org-data board-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading]
-                              {:jwt jwt
+                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active]
+                              {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
+                               :payments-data payments
                                :container-data container-data
                                :board-data board-data
                                :initial-section-editing (:initial-section-editing base)
@@ -421,7 +453,8 @@
                                :activity-share-container (:activity-share-container base)
                                :cmail-state (:cmail-state base)
                                :force-login-wall (:force-login-wall base)
-                               :app-loading loading})]
+                               :app-loading loading
+                               :search-active search-active})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]
@@ -436,7 +469,10 @@
                                     (get-in base (reminders-roster-key org-slug)))]
    :reminder-edit         [[:base :org-slug] (fn [base org-slug]
                                     (get-in base (reminder-edit-key org-slug)))]
-   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]})
+   :add-comment-highlight [[:base] (fn [base] (:add-comment-highlight base))]
+   :foc-layout            [[:base] (fn [base] (:foc-layout base))]
+   :ui-theme              [[:base] (fn [base] (get-in base ui-theme-key))]
+   :force-list-update     [[:base] (fn [base] (get-in base force-list-update-key))]})
 
 ;; Action Loop =================================================================
 
@@ -458,6 +494,16 @@
 
 (defn dispatch! [payload]
   (flux/dispatch actions payload))
+
+;; Payments
+
+(defn payments-data
+  ([]
+    (payments-data @app-state (router/current-org-slug)))
+  ([org-slug]
+   (payments-data @app-state org-slug))
+  ([data org-slug]
+   (get-in data (payments-key org-slug))))
 
 ;; Data
 
@@ -520,20 +566,16 @@
   ([]
     (board-data @app-state))
   ([data :guard map?]
-    (board-data data (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
+    (board-data data (router/current-org-slug) (router/current-board-slug)))
   ([board-slug :guard #(or (keyword? %) (string? %))]
-    (board-data @app-state (router/current-org-slug) board-slug (router/current-sort-type)))
+    (board-data @app-state (router/current-org-slug) board-slug))
   ([org-slug :guard #(or (keyword? %) (string? %)) board-slug :guard #(or (keyword? %) (string? %))]
-    (board-data @app-state org-slug board-slug (router/current-sort-type)))
+    (board-data @app-state org-slug board-slug))
   ([data :guard map? org-slug :guard #(or (keyword? %) (string? %))]
-    (board-data @app-state org-slug (router/current-board-slug) (router/current-sort-type)))
+    (board-data @app-state org-slug (router/current-board-slug)))
   ([data org-slug board-slug]
-    (board-data data org-slug board-slug (router/current-sort-type)))
-  ([data org-slug board-slug sort-type]
-    (when (and org-slug board-slug sort-type)
-      (if (= board-slug utils/default-drafts-board-slug)
-        (get-in data (board-data-key org-slug board-slug other-sort-type))
-        (get-in data (board-data-key org-slug board-slug sort-type))))))
+    (when (and org-slug board-slug)
+      (get-in data (board-data-key org-slug board-slug)))))
 
 (defn editable-boards-data
   ([] (editable-boards-data @app-state (router/current-org-slug)))
@@ -557,9 +599,7 @@
   ([data org-slug]
     (container-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
-    (container-data data org-slug posts-filter (router/current-sort-type)))
-  ([data org-slug posts-filter sort-type]
-    (get-in data (container-key org-slug posts-filter sort-type))))
+    (get-in data (container-key org-slug posts-filter))))
 
 (defn filtered-posts-data
   ([]
@@ -569,13 +609,36 @@
   ([data org-slug]
     (filtered-posts-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
-    (filtered-posts-data data org-slug posts-filter (router/current-sort-type)))
-  ([data org-slug posts-filter sort-type]
     (let [org-data (org-data data org-slug)
           all-boards-slug (map :slug (:boards org-data))
           is-board? ((set all-boards-slug) posts-filter)
           posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data posts-data is-board? org-slug posts-filter sort-type)))
+     (get-container-posts data posts-data is-board? org-slug posts-filter :posts-list)))
+  ; ([data org-slug posts-filter activity-id]
+  ;   (let [org-data (org-data data org-slug)
+  ;         all-boards-slug (map :slug (:boards org-data))
+  ;         is-board? ((set all-boards-slug) posts-filter)
+  ;         posts-data (get-in data (posts-data-key org-slug))]
+  ;    (if is-board?
+  ;      (get-posts-for-board activity-id posts-data posts-filter)
+  ;      (let [container-key (container-key org-slug posts-filter)
+  ;            items-list (:posts-list (get-in data container-key))]
+  ;       (zipmap items-list (map #(get posts-data %) items-list))))))
+  )
+
+(defn items-to-render-data
+  ([]
+    (items-to-render-data @app-state))
+  ([data]
+    (items-to-render-data data (router/current-org-slug) (router/current-posts-filter)))
+  ([data org-slug]
+    (items-to-render-data data org-slug (router/current-posts-filter)))
+  ([data org-slug posts-filter]
+    (let [org-data (org-data data org-slug)
+          all-boards-slug (map :slug (:boards org-data))
+          is-board? ((set all-boards-slug) posts-filter)
+          posts-data (get-in data (posts-data-key org-slug))]
+     (get-container-posts data posts-data is-board? org-slug posts-filter :items-to-render)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -594,7 +657,7 @@
   ([org-slug]
     (draft-posts-data @app-state org-slug))
   ([data org-slug]
-    (filtered-posts-data data org-slug utils/default-drafts-board-slug :recently-posted)))
+    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
 
 (defn activity-data
   "Get activity data."
@@ -729,6 +792,20 @@
   ([org-slug data]
     (get-in data (reminder-edit-key org-slug))))
 
+;; Expo
+
+(defn expo-deep-link-origin
+  ([] (expo-deep-link-origin @app-state))
+  ([data] (get-in data expo-deep-link-origin-key)))
+
+(defn expo-app-version
+  ([] (expo-app-version @app-state))
+  ([data] (get-in data expo-app-version-key)))
+
+(defn expo-push-token
+  ([] (expo-push-token @app-state))
+  ([data] (get-in data expo-push-token-key)))
+
 ;; Debug functions
 
 (defn print-app-state []
@@ -750,12 +827,12 @@
   (get-in @app-state activities-read-key))
 
 (defn print-board-data []
-  (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type))))
+  (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug))))
 
 (defn print-container-data []
   (if (is-container? (router/current-board-slug))
-    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))
-    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)))))
+    (get-in @app-state (container-key (router/current-org-slug) (router/current-board-slug)))
+    (get-in @app-state (board-data-key (router/current-org-slug) (router/current-board-slug)))))
 
 (defn print-activity-data []
   (get-in
@@ -793,6 +870,9 @@
 (defn print-filtered-posts []
   (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter)))
 
+(defn print-items-to-render []
+  (items-to-render-data @app-state (router/current-org-slug) (router/current-posts-filter)))
+
 (defn print-user-notifications []
   (user-notifications-data (router/current-org-slug) @app-state))
 
@@ -804,6 +884,9 @@
 
 (defn print-panel-stack []
   (:panel-stack @app-state))
+
+(defn print-payments-data []
+  (payments-data @app-state (router/current-org-slug)))
 
 (set! (.-OCWebPrintAppState js/window) print-app-state)
 (set! (.-OCWebPrintOrgData js/window) print-org-data)
@@ -820,11 +903,13 @@
 (set! (.-OCWebPrintActivityCommentsData js/window) print-activity-comments-data)
 (set! (.-OCWebPrintEntryEditingData js/window) print-entry-editing-data)
 (set! (.-OCWebPrintFilteredPostsData js/window) print-filtered-posts)
+(set! (.-OCWebPrintItemsToRender js/window) print-items-to-render)
 (set! (.-OCWebPrintPostsData js/window) print-posts-data)
 (set! (.-OCWebPrintUserNotifications js/window) print-user-notifications)
 (set! (.-OCWebPrintRemindersData js/window) print-reminders-data)
 (set! (.-OCWebPrintReminderEditData js/window) print-reminder-edit-data)
 (set! (.-OCWebPrintPanelStack js/window) print-panel-stack)
+(set! (.-OCWebPrintPaymentsData js/window) print-payments-data)
 ;; Utility externs
 (set! (.-OCWebUtils js/window) #js {:app_state app-state
                                     :deref cljs.core.deref

@@ -50,4 +50,5 @@
 
 (defn show []
   (when @initialized
-    (.show js/Headway)))
+    (.show js/Headway)
+    (utils/after 1000 check-whats-new-badge)))

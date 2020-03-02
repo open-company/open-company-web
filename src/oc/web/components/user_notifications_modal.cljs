@@ -100,28 +100,33 @@
             [:div.field-label "Daily digest"]
             [:select.field-value.oc-input
               {:value (:digest-medium current-user-data)
-               :disabled (not slack-enabled?)
+               :disabled (and (not slack-enabled?)
+                              (not= (:digest-medium current-user-data) "slack"))
                :on-change #(change! s :digest-medium (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Via email"]
-              (when slack-enabled?
+              (when (or slack-enabled?
+                        (= (:digest-medium current-user-data) "slack"))
                 [:option
-                  {:value "slack"}
+                  {:value "slack"
+                   :disabled (not slack-enabled?)}
                   "Via Slack"])]
             [:div.field-description
               "Carrot will curate all the content you should see and deliver it to you directly each morning."]]
           [:div.user-profile-modal-fields
-            [:div.field-label "Comments, mentions and follow-ups."]
+            [:div.field-label "Comments and mentions."]
             [:select.field-value.oc-input
               {:value (:notification-medium current-user-data)
                :on-change #(change! s :notification-medium (.. % -target -value))}
               [:option
                 {:value "email"}
                 "Via email"]
-              (when slack-enabled?
+              (when (or slack-enabled?
+                        (= (:notification-medium current-user-data) "slack"))
                 [:option
-                  {:value "slack"}
+                  {:value "slack"
+                   :disabled (not slack-enabled?)}
                   "Via Slack"])
               [:option
                 {:value "in-app"}
@@ -134,9 +139,11 @@
               [:option
                 {:value "email"}
                 "Via email"]
-              (when slack-enabled?
+              (when (or slack-enabled?
+                        (= (:reminder-medium current-user-data) "slack"))
                 [:option
-                  {:value "slack"}
+                  {:value "slack"
+                   :disabled (not slack-enabled?)}
                   "Via Slack"])
               [:option
                 {:value "in-app"}

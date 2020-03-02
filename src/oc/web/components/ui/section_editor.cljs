@@ -10,6 +10,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.mixins.ui :as mixins]
             [oc.web.actions.org :as org-actions]
+            [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
@@ -89,6 +90,8 @@
           (reset! (::pre-flight-check s) false))))))
 
 (rum/defcs section-editor <
+  ;; Mixins
+  mixins/refresh-tooltips-mixin
   rum/reactive
   ;; Locals
   (rum/local "" ::query)
@@ -113,6 +116,7 @@
   (drv/drv :team-roster)
   (drv/drv :current-user-data)
   {:will-mount (fn [s]
+   (team-actions/teams-get)
    (let [initial-section-data (first (:rum/args s))
          new-section (nil? initial-section-data)
          fixed-section-data (if new-section
@@ -383,7 +387,7 @@
               [:span.main-label
                 "Section members"]
               [:span.role-header
-                "Role"]])
+                "Access"]])
           (when (and (= (:access section-editing) "private")
                      (pos? (+ (count (:authors section-editing))
                               (count (:viewers section-editing)))))
@@ -397,8 +401,8 @@
                 [:div.section-editor-add-private-users-dropdown-container
                   {:style {:top (str (+ @(::show-edit-user-top s) -114) "px")
                            :display (if @(::show-edit-user-dropdown s) "block" "none")}}
-                  (dropdown-list {:items [{:value :viewer :label "Viewer"}
-                                          {:value :author :label "Contributor"}
+                  (dropdown-list {:items [{:value :viewer :label "View"}
+                                          {:value :author :label "Edit"}
                                           {:value :remove :label "Remove"}]
                                   :value user-type
                                   :on-change (fn [item]
@@ -465,13 +469,13 @@
                                    (alert-modal/hide-alert))})))}
                             "Leave section"]
                           [:div.user-type.no-dropdown
-                            "Contributor"])
+                            "Edit"])
                         [:div.user-type
                           {:class (utils/class-set {:no-dropdown (not can-change)
                                                     :active showing-dropdown})}
                           (if (= user-type :author)
-                            "Contributor"
-                            "Viewer")])]))]])
+                            "Edit"
+                            "View")])]))]])
           (when (= (:access section-editing) "private")
             [:div.section-editor-add-label
               "Personal note"])

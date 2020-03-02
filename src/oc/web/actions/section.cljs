@@ -39,39 +39,28 @@
           (api/request-reads-count cleaned-ids))))))
 
 (defn section-get-finish
-  [sort-type section]
+  [section]
   (let [is-currently-shown (is-currently-shown? section)
         user-is-part-of-the-team (jwt/user-is-part-of-the-team (:team-id (dispatcher/org-data)))]
     (when is-currently-shown
-
       (when user-is-part-of-the-team
-        ;; Tell the container service that we are seeing this board,
-        ;; and update change-data to reflect that we are seeing this board
-        (when-let [section-uuid (:uuid section)]
-          (utils/after 10 #(section-seen section-uuid)))
         ;; only watch the currently visible board.
         ; only for logged in users and if the board is currently shown
         (when (= (router/current-board-slug) (:slug section))
           (watch-single-section section)
           ;; Retrieve reads count if there are items in the loaded section
           (request-reads-count section))))
-    (dispatcher/dispatch! [:section sort-type (assoc section :is-loaded is-currently-shown)])))
+    (dispatcher/dispatch! [:section (assoc section :is-loaded is-currently-shown)])))
 
 (defn load-other-sections
   [sections]
   (doseq [section sections
           :when (not (is-currently-shown? section))
-          :let [board-link (utils/link-for (:links section) ["item" "self"] "GET")
-                recent-board-link (utils/link-for (:links section) "activity" "GET")]]
+          :let [board-link (utils/link-for (:links section) ["item" "self"] "GET")]]
     (api/get-board board-link
       (fn [{:keys [status body success]}]
         (when success
-          (section-get-finish :recently-posted (json->cljs body)))))
-    (when recent-board-link
-      (api/get-board recent-board-link
-        (fn [{:keys [status body success]}]
-          (when success
-            (section-get-finish :recent-activity (json->cljs body))))))))
+          (section-get-finish (json->cljs body)))))))
 
 (declare refresh-org-data)
 
@@ -79,16 +68,14 @@
   [section-uuid & [finish-cb]]
   (timbre/debug "Section change:" section-uuid)
   (utils/after 0 (fn []
-    (let [current-section-data (dispatcher/board-data)
-          sort-type (router/current-sort-type)
-          link-rel (if (= sort-type :recent-activity) "activity" "self")]
+    (let [current-section-data (dispatcher/board-data)]
       (when (= section-uuid (:uuid utils/default-drafts-board))
         (refresh-org-data))
       (if (= section-uuid (:uuid current-section-data))
         ;; Reload the current board data
-        (api/get-board (utils/link-for (:links current-section-data) link-rel)
+        (api/get-board (utils/link-for (:links current-section-data) ["item" "self"] "GET")
                        (fn [{:keys [status body success] :as resp}]
-                         (when success (section-get-finish sort-type (json->cljs body)))
+                         (when success (section-get-finish (json->cljs body)))
                          (when (fn? finish-cb)
                            (finish-cb resp))))
         ;; Reload a secondary board data
@@ -99,10 +86,10 @@
   (dispatcher/dispatch! [:section-change section-uuid]))
 
 (defn section-get
-  [sort-type link]
+  [link]
   (api/get-board link
     (fn [{:keys [status body success]}]
-      (when success (section-get-finish sort-type (json->cljs body))))))
+      (when success (section-get-finish (json->cljs body))))))
 
 (defn section-delete [section-slug & callback]
   (let [section-data (dispatcher/board-data (router/current-org-slug) section-slug)
@@ -117,7 +104,7 @@
            (callback section-slug))
           (if (= section-slug (router/current-board-slug))
             (do
-              (router/nav! (oc-urls/all-posts org-slug))
+              (router/nav! (oc-urls/default-landing org-slug))
               (let [org-link (utils/link-for (:links (dispatcher/org-data)) ["item" "self"] "GET")]
                 (api/get-org org-link
                   (fn [{:keys [status body success]}]
@@ -157,7 +144,7 @@
                   (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
                   (utils/after 500 refresh-org-data)
                   (ws-cc/container-watch (:uuid section-data))
-                  (dispatcher/dispatch! [:section-edit-save/finish (router/current-sort-type) section-data])
+                  (dispatcher/dispatch! [:section-edit-save/finish section-data])
                   (when (fn? success-cb)
                     (success-cb))))))))
       (let [board-patch-link (utils/link-for (:links section-data) "partial-update")]
@@ -167,7 +154,7 @@
               (error-cb status))
             (do
               (refresh-org-data)
-              (dispatcher/dispatch! [:section-edit-save/finish (router/current-sort-type) (json->cljs body)])
+              (dispatcher/dispatch! [:section-edit-save/finish (json->cljs body)])
               (when (fn? success-cb)
                 (success-cb))))))))))
 
@@ -195,18 +182,6 @@
           (refresh-org-data)
           (utils/after 0 #(router/nav! redirect-url))
           (dispatcher/dispatch! [:private-section-kick-out-self/finish success])))))))
-
-(defn ws-comment-add
-  [interaction-data]
-  (let [org-slug   (router/current-org-slug)
-        board-slug (router/current-board-slug)
-        activity-uuid (:resource-uuid interaction-data)
-        entry-data (dispatcher/activity-data org-slug activity-uuid)]
-    (when-not entry-data
-      (let [board-data (dispatcher/board-data)
-            sort-type (router/current-sort-type)
-            link-rel (if (= sort-type :recent-activity) "activity" ["item" "self"])]
-        (section-get sort-type (utils/link-for (:links board-data) link-rel "GET"))))))
 
 (defn ws-change-subscribe []
   (ws-cc/subscribe :container/status
@@ -237,7 +212,8 @@
         ;; Refresh the section only in case of items added or removed
         ;; let the activity handle the item update case
         (when (or (= change-type :add)
-                  (= change-type :delete))
+                  (= change-type :delete)
+                  (= change-type :move))
           (section-change section-uuid))
         ;; On item/change :add let's add the UUID to the unseen list of
         ;; the specified container to make sure it's marked as seen
@@ -245,11 +221,9 @@
                    (not= (:user-id change-data) (jwt/user-id)))
           (dispatcher/dispatch! [:item-add/unseen (router/current-org-slug) change-data]))
         (when (= change-type :delete)
-          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))))))
-
-(defn ws-interaction-subscribe []
-  (ws-ic/subscribe :interaction-comment/add
-                   #(ws-comment-add (:data %))))
+          (dispatcher/dispatch! [:item-delete/unseen (router/current-org-slug) change-data]))
+        (when (= change-type :move)
+          (dispatcher/dispatch! [:item-move (router/current-org-slug) change-data]))))))
 
 ;; Section editing
 
@@ -274,15 +248,16 @@
          (section-save-error 409))
        (dispatcher/dispatch! [:input [:section-editing :pre-flight-loading] false])))))
 
-(defn section-more-finish [direction {:keys [success body]}]
+(defn section-more-finish [board-slug direction {:keys [success body]}]
   (when success
     (request-reads-count (json->cljs body)))
-  (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) (router/current-board-slug)
-   direction (router/current-sort-type) (when success (json->cljs body))]))
+  (dispatcher/dispatch! [:section-more/finish (router/current-org-slug) board-slug
+   direction (when success (json->cljs body))]))
 
 (defn section-more [more-link direction]
-  (api/load-more-items more-link direction (partial section-more-finish direction))
-  (dispatcher/dispatch! [:section-more (router/current-org-slug) (router/current-board-slug) (router/current-sort-type)]))
+  (let [board-slug (router/current-board-slug)]
+    (api/load-more-items more-link direction (partial section-more-finish board-slug direction))
+    (dispatcher/dispatch! [:section-more (router/current-org-slug) board-slug])))
 
 (defn setup-section-editing [section-slug]
   (when-let [board-data (dispatcher/board-data (router/current-org-slug) section-slug)]

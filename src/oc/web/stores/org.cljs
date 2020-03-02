@@ -1,7 +1,9 @@
 (ns oc.web.stores.org
   (:require [oc.web.lib.utils :as utils]
             [taoensso.timbre :as timbre]
-            [oc.web.dispatcher :as dispatcher]))
+            [oc.web.utils.activity :as activity-utils]
+            [oc.web.dispatcher :as dispatcher]
+            [oc.web.actions.cmail :as cmail-actions]))
 
 (defn read-only-org
   [org-data]
@@ -12,7 +14,11 @@
 (defn fix-org
   "Fix org data coming from the API."
   [org-data]
-  (read-only-org org-data))
+  (let [fixed-boards (mapv #(assoc % :read-only (-> % :links activity-utils/readonly-board?))
+                      (:boards org-data))]
+    (-> org-data
+     read-only-org
+     (assoc :boards fixed-boards))))
 
 (defmethod dispatcher/action :org-loaded
   [db [_ org-data saved? email-domain]]
@@ -21,9 +27,7 @@
         old-boards (get-in db boards-key)
         ;; No need to add a spacial case for drafts board here since
         ;; we are only excluding keys that already exists in the app-state
-        board-slugs (set (mapcat #(vec [(keyword (str (:slug %) "-recent-activity"))
-                                        (keyword (str (:slug %) "-recently-posted"))])
-                          (:boards org-data)))
+        board-slugs (set (mapv #(keyword (str (:slug %))) (:boards org-data)))
         filter-board (fn [[k v]]
                        (board-slugs k))
         next-boards (into {} (filter filter-board old-boards))
@@ -38,8 +42,20 @@
                       (assoc org-data :saved saved?))
         next-org-editing (-> with-saved?
                           (assoc :email-domain email-domain)
-                          (dissoc :has-changes))]
-    (-> db
+                          (dissoc :has-changes))
+        editable-boards (filterv #(and (not (:draft %)) (utils/link-for (:links %) "create" "POST"))
+                         (:boards org-data))
+        editing-board (when (seq editable-boards)
+                        (cmail-actions/get-board-for-edit nil editable-boards))
+        next-db (if (and (not (contains? db :cmail-state))
+                         editing-board)
+                  (-> db
+                    (assoc :cmail-state {:key (utils/activity-uuid)
+                                         :fullscreen false
+                                         :collapsed true})
+                    (update :cmail-data merge editing-board))
+                  db)]
+    (-> next-db
       (assoc-in (dispatcher/org-data-key (:slug org-data)) fixed-org-data)
       (assoc :org-editing next-org-editing)
       (assoc :org-avatar-editing (select-keys fixed-org-data [:logo-url :logo-width :logo-height]))

@@ -1,33 +1,68 @@
+// --foc-background-color: rgba($deep_navy, 0.05);
+// --mobile-foc-background-color: rgba($deep_navy, 0.05);
+// --foc-hover-color: rgba($deep_navy, 0.10);
+// --foc-new-color: white;
+// --foc-divider-line-color: rgba($deep_navy, 0.15);
+$foc_hover_extra_padding: 4;
+
+div.virtualized-list-row:not(.collapsed-item) {
+  background-color: var(--background-color);
+
+  @include big_web() {
+    z-index: 1;
+
+    &:hover {
+      z-index: 2;
+      width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
+      margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+    }
+  }
+
+  @include mobile() {
+    background-color: var(--mobile-background-color);
+  }
+}
+
 div.stream-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: #{$board_container_width}px;
+  height: #{$foc_height}px;
   margin: 0;
-  border-bottom: 1px solid $ultra_light_grey;
-  padding: 24px 40px;
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid var(--foc-divider-line-color);
+  padding: 24px 32px;
+  background-color: var(--foc-background-color);
+  overflow: visible;
+
+  @include mobile() {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border-top: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-bottom: 1px solid var(--foc-divider-line-color);
+    background-color: var(--mobile-foc-background-color);
+    padding: 16px 16px 16px;
+    height: #{$mobile_foc_height}px;
+  }
 
   &.expandable {
     cursor: pointer;
 
     @include big_web() {
       &:hover {
-        background-color: #F5F5F5;
-
         div.stream-item-header {
-          div.more-menu button {
-            display: initial;
-          }
-        }
+          div.more-menu {
+            display: block;
 
-        div.stream-item-body-ext {
-          div.stream-item-footer {
-            div.stream-item-comments-summary {
-              div.is-comments {
-                div.is-comments-authors.show-border {
-                  div.is-comments-author {
-                    background-color: #F5F5F5;
-                    border: 2px solid #F5F5F5;
-                  }
-                }
-              }
+            button {
+              display: initial;
             }
           }
         }
@@ -35,14 +70,37 @@ div.stream-item {
     }
   }
 
-  @include mobile() {
-    width: 100%;
-    margin: 0;
-    border-radius: 0;
-    border-top: none;
-    border-bottom: 1px solid $divider_line_grey;
-    background-color: $grey_num_4;
-    padding: 16px 16px 22px;
+  @include big_web() {
+    &:hover {
+      background-color: var(--foc-hover-color);
+      z-index: 2;
+      box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+      border-radius: 4px;
+      padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
+      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+      border: 1px solid var(--foc-hover-border-color);
+
+      div.stream-item-header {
+        div.more-menu {
+          display: block;
+
+          button {
+            display: initial;
+          }
+        }
+      }
+
+      div.activity-share-container {
+        display: block;
+      }
+
+      div.stream-item-body-ext div.stream-item-footer {
+        div.reactions div.reactions-picker-container {
+          display: block;
+        }
+      }
+    }
   }
 
   &.draft {
@@ -50,7 +108,7 @@ div.stream-item {
   }
 
   &.unread-item {
-    background-color: white;
+    background-color: var(--foc-new-color);
     z-index: 1;
     position: relative;
 
@@ -60,36 +118,24 @@ div.stream-item {
 
     @include big_web(){
       &:hover {
-        background-color: white;
+        background-color: var(--foc-new-color);
         z-index: 2;
-        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+        border-radius: 4px;
+        border-top: 1px solid var(--foc-new-border-color);
+        border-right: 1px solid var(--foc-new-border-color);
+        border-left: 1px solid var(--foc-new-border-color);
+        border-bottom: 1px solid var(--foc-new-border-color);
+        padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
 
-        div.stream-item-body-ext {
-          div.stream-item-footer {
-            div.stream-item-comments-summary {
-              div.is-comments {
-                div.is-comments-authors.show-border {
-                  div.is-comments-author {
-                    background-color: white;
-                    border: 2px solid white;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+        div.stream-item-header {
+          div.more-menu {
+            display: block;
 
-      div.stream-item-body-ext {
-        div.stream-item-footer {
-          div.stream-item-comments-summary {
-            div.is-comments {
-              div.is-comments-authors.show-border {
-                div.is-comments-author {
-                  background-color: white;
-                  border: 2px solid white;
-                }
-              }
+            button {
+              display: initial;
             }
           }
         }
@@ -97,32 +143,127 @@ div.stream-item {
     }
   }
 
-  &:not(.follow-up-item).must-see-item {
-
-    div.must-see-tag {
+  &:not(.bookmark-item).must-see-item div.must-see-tag {
       display: inline-block;
-    }
   }
 
-  &.follow-up-item, &.follow-up-item.must-see-item {
+  &.bookmark-item, &.bookmark-item.must-see-item {
     div.must-see-tag {
       display: none;
     }
 
-    div.follow-up-tag {
+    div.bookmark-tag, div.bookmark-tag-small {
       display: inline-block;
     }
   }
 
+  &.muted-item div.muted-activity {
+    display: inline-block;
+  }
+
   div.activity-share-container {
+    display: none;
+
     div.activity-share-modal-container {
       right: -9px;
       margin-top: 32px;
     }
   }
 
+  // Mobile swipe buttons
+  button.mobile-more-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: $deep_navy;
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    left: 16px;
+    z-index: 4;
+    transition: width 180ms;
+    width: 0;
+    overflow: hidden;
+
+    @include big_web() {
+      display: none;
+    }
+
+    span {
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      margin-left: 26px;
+    }
+
+    &:before {
+      content: "";
+      width: 18px;
+      height: 4px;
+      background-image: cdnUrl("/img/ML/mobile_more_ellipsis_white.svg");
+      background-size: 18px 4px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 22px;
+      left: 24px;
+    }
+
+    &.visible {
+      width: 114px;
+    }
+  }
+
+  button.mobile-dismiss-bt {
+    height: 48px;
+    padding: 14px 0;
+    border-radius: 4px;
+    background-color: $carrot_green;
+    position: absolute;
+    top: 50%;
+    margin-top: -24px;
+    right: 16px;
+    z-index: 4;
+    transition: width 180ms, margin-right 180ms;
+    width: 0;
+    margin-right: -124px;
+    overflow: hidden;
+
+    @include big_web() {
+      display: none;
+    }
+
+    span {
+      color: white;
+      @include OC_Body_Bold();
+      font-size: 16px;
+      line-height: 20px;
+      margin-left: 26px;
+    }
+
+    &:before {
+      content: "";
+      width: 14px;
+      height: 10px;
+      background-image: cdnUrl("/img/ML/mobile_dismiss_checkmark.svg");
+      background-size: 14px 10px;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 19px;
+      left: 24px;
+    }
+
+    &.visible {
+      width: 124px;
+      margin-right: 0;
+    }
+  }
+
   div.stream-item-header {
     position: relative;
+    height: 24px;
 
     @include mobile() {
       width: 100%;
@@ -131,113 +272,142 @@ div.stream-item {
     div.stream-header-head-author {
       width: 100%;
 
+      @include mobile() {
+        min-height: 24px;
+      }
+
       @include activity-author(24);
 
       div.user-avatar-img-container {
         margin-right: 8px;
       }
 
-      @include mobile() {
-        @include activity-author(32);
-      }
-
       div.name {
         height: 24px;
         float: left;
         max-width: 70%;
-        color: rgba($deep_navy, 0.5);
+        color: var(--light-color);
 
         @include mobile() {
-          height: 32px;
-          width: calc(100% - 48px);
+          width: calc(100% - 32px);
           max-width: unset;
         }
 
         div.mobile-name {
-          display: inline-block;
-
-          @include mobile() {
-            display: flex;
-            align-items: center;
-          }
+          display: block;
+          float: left;
+          white-space: nowrap;
 
           div.name-inner {
-            display: inline-block;
+            display: block;
             text-overflow: ellipsis;
             overflow: hidden;
             line-height: 24px;
             margin-right: 8px;
-
-            @include mobile() {
-              flex: 1;
-              min-width: 0;
-              display: block;
-              line-height: 32px;
-            }
+            float: left;
+            white-space: nowrap;
           }
 
-          div.mobile-time-since {
-            display: none;
+          div.time-since {
+            display: block;
+            float: left;
+            height: 24px;
+            line-height: 24px;
+            text-align: left;
+            @include OC_Body_Book();
+            font-size: 12px;
+            color: var(--light-color);
+            position: relative;
+            margin-left: 6px;
+            overflow: visible;
+            white-sapce: nowrap;
+
+            &:before {
+              content: "";
+              width: 3px;
+              height: 3px;
+              background-color: var(--ultralight-color);
+              border-radius: 50%;
+              position: absolute;
+              top: 12px;
+              left: -8px;
+            }
 
             @include mobile() {
               display: block;
-              white-space: nowrap;
+              float: left;
+              line-height: 24px;
             }
+          }
+        }
+
+        div.bookmark-tag-small {
+          float: right;
+          margin-right: 0;
+        }
+
+        @include mobile() {
+          div.bookmark-tag-small {
+            margin-top: 3px;
           }
         }
       }
 
-      div.follow-up-tag, div.must-see-tag {
-        margin-top: 2px;
+      div.bookmark-tag, div.must-see-tag {
+        margin-top: 3px;
+      }
+
+      div.muted-activity {
+        margin-top: 5px;
+        opacity: 0.5;
       }
     }
 
     div.more-menu {
-      height: 24px;
+      height: 32px;
 
       @include big_web() {
+        display: none;
+        position: absolute;
+        right: -12px;
+        top: -4px;
+
         &:not(.menu-expanded) button {
           display: none;
         }
       }
-
-      @include mobile() {
-        height: 32px;
-
-        ul.more-menu-list {
-          left: unset;
-          right: 0;
-        }
-      }
     }
-  }
-
-  div.new-tag {
-    display: none;
   }
 
   @include must-see-tag();
+  
+  @include bookmark-tag();
 
-  @include follow-up-tag();
+  @include muted-activity();
 
-  div.follow-up-tag, div.must-see-tag {
+
+  div.must-see-tag, div.bookmark-tag, div.bookmark-tag-small, div.muted-activity {
     display: none;
-
-    @include mobile() {
-      margin-top: 8px;
-    }
+    margin-right: 0;
+    margin-left: 8px;
   }
 
-  & > div.new-tag, & > div.must-see-tag, & > div.follow-up-tag {
+  & > div.must-see-tag, & > div.bookmark-tag, & > div.bookmark-tag-small {
     margin-top: 16px;
   }
 
   div.stream-item-body-ext {
-    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
     border-radius: 6px;
 
     @include mobile() {
       display: block;
+      flex-direction: unset;
+      justify-content: unset;
+      border-radius: 0;
     }
 
     &.expanded {
@@ -248,7 +418,7 @@ div.stream-item {
           margin-top: 24px;
           margin-bottom: 24px;
           float: unset;
-          width: 638px;
+          width: 654px;
           height: 478px;
           position: relative;
           top: unset;
@@ -272,19 +442,24 @@ div.stream-item {
     }
 
     div.thumbnail-container {
+      min-height: 80px;
       position: relative;
       cursor: pointer;
 
+      @include mobile() {
+        min-height: 71px;
+      }
+
       div.ziggeo-player {
-        width: 136px;
-        height: 102px;
+        width: 106px;
+        height: 80px;
         position: absolute;
         right: 0;
         top: 50%;
         transform: translateY(-50%);
 
         video {
-          max-height: 102px;
+          max-height: 80px;
         }
 
         @include tablet(){
@@ -309,9 +484,9 @@ div.stream-item {
       }
 
       div.body-thumbnail-wrapper {
-        width: 136px;
-        // height: 102px;
-        max-height: 102px;
+        width: 106px;
+        // height: 80px;
+        max-height: 80px;
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
@@ -323,8 +498,20 @@ div.stream-item {
         img.body-thumbnail {
           border-radius: 4px;
           object-fit: contain;
-          max-width: 136px;
-          max-height: 102px;
+          max-width: 106px;
+          max-height: 80px;
+        }
+
+        @include mobile() {
+          width: 95px;
+          top: 0;
+          // Remove thumbnails from mobile for now
+          display: none;
+
+          img.body-thumbnail {
+            max-height: 72px;
+            max-width: 95px;
+          }
         }
 
         &.video {
@@ -352,27 +539,21 @@ div.stream-item {
 
     div.stream-body-left {
       position: relative;
-      margin-top: 8px;
+      margin-top: 4px;
 
       &.has-thumbnail, &.has-video {
         float: left;
-        width: 484px;
-        min-height: 98px;
+        width: 478px;
+        min-height: 80px;
 
         @include mobile() {
-          width: calc(100% - 136px - 16px);
+          width: 100%;
         }
       }
 
       @include tablet() {
         width: 100%;
-        margin: 8px 0px 0px;
-      }
-
-      &.has-thumbnail {
-        @include tablet() {
-          width: calc(100% - 136px - 16px);
-        }
+        margin: 0;
       }
 
       &.has-video {
@@ -384,39 +565,34 @@ div.stream-item {
       }
 
       div.stream-item-headline {
-        @include activity-title(24px, 28px);
-        color: $deep_navy;
-        display: inline;
+        height: 28px;
+        @include activity-title(20px, 28px);
+        color: var(--color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
 
         @include mobile() {
-          margin-top: 16px;
-          @include activity-title(22px, 28px);
+          margin-top: 2px;
+          height: 23px;
+          @include activity-title(18px, 23px);
         }
       }
 
       div.stream-item-body {
-        margin-top: 8px;
-        @include activity-body(18, 24, $deep_navy);
-        color: $deep_navy;
+        @include activity-body(16, 20, var(--color));
+        color: var(--color);
         @include OC_Body_Book();
-        line-height: 24px;
+        line-height: 20px;
         overflow: hidden;
-        white-space: pre-wrap;
-        word-break: break-word;
 
-        &.no-abstract {
-          max-height: #{24 * 3}px;
-        }
-
-        @include mobile() {
-          margin-top: 4px;
-        }
+        max-height: #{20 * 2}px;
 
         h2 {
-          color: $deep_navy;
+          color: var(--color);
           @include OC_Body_Book();
-          font-size: 18px;
-          line-height: 24px;
+          font-size: 16px;
+          line-height: 20px;
         }
 
         b, strong, &.editing b, &.editing strong {
@@ -427,18 +603,27 @@ div.stream-item {
         .carrot-no-preview {
           display: none;
         }
+
+        @include mobile() {
+          @include activity-body(16, 20, var(--color));
+          line-height: 20px;
+          max-height: #{20 * 2}px;
+
+          h2 {
+            font-size: 16px;
+            line-height: 20px;
+          }
+        }
       }
     }
 
     div.stream-item-footer {
       min-height: 26px;
-      margin-top: 16px;
 
       @include mobile() {
         height: auto;
         overflow: hidden;
-        margin-top: 10px;
-        min-height: 32px;
+        height: 32px;
       }
 
       div.reactions {
@@ -450,8 +635,8 @@ div.stream-item {
       div.stream-item-footer-mobile-group {
         @include mobile() {
           display: inline-block;
+          padding-top: 4px;
           height: 32px;
-          padding-top: 8px;
         }
       }
 
@@ -474,7 +659,7 @@ div.stream-item {
           padding: 0px;
           @include OC_Body_Bold();
           font-size: 14px;
-          color: $ui_grey;
+          color: var(--light-color);
         }
       }
 
@@ -482,26 +667,18 @@ div.stream-item {
         margin-right: 16px;
         float: left;
 
-        div.is-comments {
-          div.is-comments-authors.show-border {
-            div.is-comments-author {
-              background-color: $grey_num_2;
-              border: 2px solid $grey_num_2;
-
-              @include mobile() {
-                background-color: $grey_num_4;
-                border: 2px solid $grey_num_4;
-              }
-            }
-          }
+        @include mobile() {
+          margin-top: 1px;
         }
       }
 
       div.reactions {
         float: left;
-        margin-right: 16px;
+        margin-right: 14px;
 
         div.reactions-picker-container {
+          display: none;
+
           div.emoji-mart {
             bottom: unset;
             top: 0;
@@ -517,6 +694,42 @@ div.stream-item {
         }
       }
 
+      div.stream-item-mobile-attachments {
+        display: none;
+
+        @include mobile() {
+          display: block;
+          float: left;
+          height: 22px;
+
+          span.mobile-attachments-icon {
+            display: inline-block;
+            width: 18px;
+            height: 22px;
+            background-image: cdnUrl("/img/ML/multi_picker_attachment_icon.svg");
+            background-size: 18px 20px;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-right: 6px;
+            opacity: 0.5;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/multi_picker_attachment_icon@dark.svg");
+            }
+          }
+
+          span.mobile-attachments-count {
+            @include OC_Body_Book();
+            font-size: 17px;
+            line-height: 22px;
+            color: var(--light-color);
+            display: inline-block;
+            height: 22px;
+            vertical-align: top;
+          }
+        }
+      }
+
       div.stream-item-attachments {
         float: left;
         margin-right: 16px;
@@ -524,7 +737,7 @@ div.stream-item {
         position: relative;
 
         @include mobile() {
-          height: 20px;
+          display: none;
         }
 
         &:hover {
@@ -541,9 +754,9 @@ div.stream-item {
           position: relative;
           @include OC_Body_Book();
           font-size: 12px;
-          color: $deep_navy;
+          color: var(--color);
           opacity: 0.5;
-          margin-top: 4px;
+          line-height: 26px;
 
           @include mobile() {
             margin-top: 0;
@@ -558,9 +771,9 @@ div.stream-item {
           left: calc(50% - 120px);
           width: 240px;
           max-height: 200px;
-          background-color: white;
+          background-color: var(--overlay-background-color);
           border-radius: 4px;
-          border: 1px solid $mid_light_grey;
+          border: 1px solid var(--divider-line);
           padding: 8px 0;
           display: none;
           z-index: 2;
@@ -571,16 +784,16 @@ div.stream-item {
             display: block;
 
             &:active, &:hover {
-              background-color: #EBF8F1;
+              background-color: var(--selected-row-background-color);
               div.stream-item-attachments-item-desc {
-                color: $carrot_green;
+                color: var(--selected-row-color);
               }
             }
 
             div.stream-item-attachments-item-desc {
               @include OC_Body_Book();
               font-size: 14px;
-              color: rgba($light_navy, 0.5);
+              color: var(--light-color);
               white-space: nowrap;
               max-width: 100%;
 
@@ -609,65 +822,6 @@ div.stream-item {
         position: relative;
         margin-top: 4px;
         margin-right: 16px;
-
-        @include mobile() {
-          margin-left: 2px;
-          margin-top: 0;
-        }
-
-        div.post-added-tooltip-container {
-          position: absolute;
-          bottom: 30px;
-          left: 0;
-          width: 320px;
-          padding: 16px;
-          border-radius: 4px;
-          background-color: $deep_navy;
-
-          &:after {
-            content: " ";
-            position: absolute;
-            left: 24px;
-            bottom: -3px;
-            width: 6px;
-            height: 6px;
-            transform: rotate(-45deg);
-            background-color: $deep_navy;
-          }
-
-          div.post-added-tooltip-title {
-            color: white;
-            @include OC_Body_Bold();
-            font-size: 16px;
-          }
-
-          div.post-added-tooltip {
-            margin-top: 8px;
-            color: white;
-            @include OC_Body_Book();
-            font-size: 14px;
-          }
-
-          button.post-added-tooltip-bt {
-            @include OC_Body_Bold();
-            font-size: 14px;
-            color: $carrot_green;
-            margin-top: 8px;
-            padding: 0;
-            display: block;
-          }
-        }
-      }
-
-      div.time-since {
-        float: right;
-        max-width: 30%;
-        height: 24px;
-        line-height: 24px;
-        text-align: right;
-        @include OC_Body_Book();
-        font-size: 12px;
-        color: rgba($deep_navy, 0.5);
 
         @include mobile() {
           display: none;

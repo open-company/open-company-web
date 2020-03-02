@@ -65,16 +65,6 @@
 (defn not-found [& [params]]
   (str "/404" (when params (str "?" (params->query-string params)))))
 
-(def oc-twitter "https://twitter.com/carrot_hq")
-
-(def oc-facebook "https://www.facebook.com/Carrot-111981319388047/")
-
-(def oc-github "https://github.com/open-company")
-
-(def oc-trello-public "https://trello.com/b/eKs2LtLu")
-
-(def subscription-callback "/subscription-completed")
-
 (def email-confirmation "/verify")
 
 (def confirm-invitation "/invite")
@@ -87,6 +77,8 @@
 
 (def login-wall "/login-wall")
 
+(def apps-detect "/apps/detect")
+
 ;; Organizations
 
 (defn org
@@ -95,6 +87,13 @@
     (org (router/current-org-slug)))
   ([org-slug]
     (str "/" (name org-slug))))
+
+(defn inbox
+  "Org inbox url"
+  ([]
+    (inbox (router/current-org-slug)))
+  ([org-slug]
+    (str (org org-slug) "/inbox")))
 
 (defn all-posts
   "Org all posts url"
@@ -110,12 +109,12 @@
   ([org-slug]
     (str (org org-slug) "/follow-ups")))
 
-(defn first-ever-all-posts
-  "Org all posts url for the first ever land"
+(defn bookmarks
+  "Org bookmarks url"
   ([]
-    (first-ever-all-posts (router/current-org-slug)))
+    (bookmarks (router/current-org-slug)))
   ([org-slug]
-    (str (all-posts org-slug) "/hello")))
+    (str (org org-slug) "/bookmarks")))
 
 (defn must-see
   "Org must see url"
@@ -134,6 +133,29 @@
     (board (router/current-org-slug) board-slug))
   ([org-slug board-slug]
    (str (org org-slug) "/" (name board-slug))))
+
+;; Default url
+
+(def default-board-slug "inbox")
+
+(defn default-landing
+  ([] (default-landing (router/current-org-slug)))
+  ([org-slug]
+   (case default-board-slug
+    "inbox"
+    (inbox org-slug)
+    "all-posts"
+    (all-posts org-slug)
+    (board org-slug default-board-slug))))
+
+;; First ever landing
+
+(defn first-ever-landing
+  "Org all posts url for the first ever land"
+  ([]
+    (first-ever-landing (router/current-org-slug)))
+  ([org-slug]
+    (str (default-landing org-slug) "/hello")))
 
 ;; Drafts
 

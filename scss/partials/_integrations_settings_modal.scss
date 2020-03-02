@@ -22,27 +22,31 @@ div.integrations-settings-modal {
 
   div.integrations-settings {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
-    height: 100vh;
+    height: calc(100vh - #{$navbar_height}px);
     right: 0;
+    margin-top: #{$navbar_height}px;
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     div.integrations-settings-header {
-      width: calc(100% + 48px);
-      height: 56px;
-      margin-left: -24px;
-      background-color: $grey_num_2;
-      padding: 12px 16px;
+      width: 320px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
+      padding: 12px 24px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
       div.integrations-settings-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -52,7 +56,7 @@ div.integrations-settings-modal {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
         margin-right: 8px;
       }
@@ -78,8 +82,8 @@ div.integrations-settings-modal {
         width: 100%;
         height: 32px;
         border-radius: 4px;
-        background-color: $ultra_light_grey;
-        color: $deep_navy;
+        background-color: var(--opac-background-color-1);
+        color: var(--color);
         font-size: 14px;
         @include OC_Body_Book();
         line-height: 14px;
@@ -102,13 +106,13 @@ div.integrations-settings-modal {
 
       div.integrations-settings-list {
         margin-top: 16px;
-        border-top: 1px solid $ultra_light_grey;
+        border-top: 1px solid var(--divider-line);
         padding-top: 16px;
 
         div.integrations-settings-list-title {
           @include OC_Body_Book();
           font-size: 14px;
-          color: $light_navy;
+          color: var(--color);
         }
 
         div.integrations-settings-item {
@@ -121,15 +125,15 @@ div.integrations-settings-modal {
           div.integration-item-header {
             width: 100%;
             height: 32px;
-            background-color: $ultra_light_grey;
+            background-color: var(--opac-background-color-1);
             border-radius: 4px;
 
             div.logo-container {
               float: left;
               width: 32px;
               height: 32px;
-              border: 1px solid $grey_num_3;
-              background-color: white;
+              border: 1px solid transparent;
+              background-color: transparent;
               border-radius: 4px;
 
               img.slack-logo {
@@ -149,7 +153,7 @@ div.integrations-settings-modal {
             div.slack-team-name {
               @include OC_Body_Bold();
               font-size: 14px;
-              color: $deep_navy;
+              color: var(--color);
               float: left;
               margin-left: 8px;
               margin-top: 6px;
@@ -170,7 +174,7 @@ div.integrations-settings-modal {
             margin-top: 8px;
             @include OC_Body_Book();
             font-size: 14px;
-            color: $light_navy;
+            color: var(--color);
             line-height: 18px;
           }
 
@@ -178,7 +182,7 @@ div.integrations-settings-modal {
             margin-top: 8px;
             @include OC_Body_Book();
             font-size: 14px;
-            color: rgba($light_navy, 0.4);
+            color: var(--light-color);
             line-height: 18px;
 
             select.self-join-select {
@@ -188,7 +192,7 @@ div.integrations-settings-modal {
               padding: 7px 8px;
               @include OC_Body_Book();
               font-size: 14px;
-              color: $deep_navy;
+              color: var(--color);
               margin-top: 8px;
               display: block;
               border: none;
@@ -196,7 +200,7 @@ div.integrations-settings-modal {
               display: block;
               appearance: none;
               -webkit-appearance: none;
-              background-color: $ultra_light_grey;
+              background-color: var(--opac-background-color-1);
               position: relative;
               background-image: cdnUrl("/img/ML/select_arrows.svg");
               background-size: 8px 10px;
@@ -220,7 +224,7 @@ div.integrations-settings-modal {
               option {
                 @include OC_Body_Book();
                 font-size: 14px;
-                color: $deep_navy;
+                color: var(--color);
               }
             }
           }
@@ -229,7 +233,7 @@ div.integrations-settings-modal {
             margin-top: 8px;
             @include OC_Body_Book();
             font-size: 14px;
-            color: $light_navy;
+            color: var(--color);
             line-height: 18px;
              
             button.turn-on-bot-bt {
@@ -250,5 +254,12 @@ div.integrations-settings-modal {
         }
       }
     }
+  }
+}
+
+@include dark_mode() {
+  div.integrations-settings-modal div.integrations-settings div.integrations-settings-body
+  div.integrations-settings-list div.integrations-settings-item div.self-join select.self-join-select {
+    background-image: cdnUrl("/img/ML/select_arrows.svg");
   }
 }

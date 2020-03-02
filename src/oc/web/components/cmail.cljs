@@ -1,6 +1,6 @@
 (ns oc.web.components.cmail
   (:require [rum.core :as rum]
-            [cuerdas.core :as s]
+            [cuerdas.core :as str]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
             [org.martinklepsch.derivatives :as drv]
@@ -14,7 +14,6 @@
             [oc.web.mixins.ui :as mixins]
             [oc.web.utils.activity :as au]
             [oc.web.utils.ui :as ui-utils]
-            [oc.web.local-settings :as ls]
             [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.image-upload :as iu]
             [oc.web.actions.nux :as nux-actions]
@@ -23,21 +22,22 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-alert)]
             [oc.web.components.ui.emoji-picker :refer (emoji-picker)]
             [oc.web.components.carrot-abstract :refer (carrot-abstract)]
+            [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.rich-body-editor :refer (rich-body-editor)]
             [oc.web.components.ui.sections-picker :refer (sections-picker)]
             [oc.web.components.ui.ziggeo :refer (ziggeo-player ziggeo-recorder)]
             [oc.web.components.ui.stream-attachments :refer (stream-attachments)]
+            [oc.web.components.ui.post-to-button :refer (post-to-button)]
             [goog.dom :as gdom]
             [goog.Uri :as guri]
             [goog.object :as gobj]
             [clojure.contrib.humanize :refer (filesize)])
   (:import [goog.async Debouncer]))
-
-(def missing-title-tooltip "Please add a title")
-(def abstract-max-length-exceeded-tooltip "Abstract too long")
 
 ;; Attachments handling
 
@@ -152,23 +152,35 @@
 
 ;; Data change handling
 
+(declare show-abstract-bt)
+
+(def ^:private body-length-to-show-abstract 255)
+
 (defn body-on-change [state]
   (dis/dispatch! [:input [:cmail-data :has-changes] true])
-  (debounced-autosave! state))
+  (debounced-autosave! state)
+  (let [last-body-count @(::last-body-count state)]
+    (when-let [body-el (sel1 [:div.rich-body-editor])]
+      ;; If the body exceeds a certain length and the user is adding chars, not removing them
+      ;; show the abstract
+      (when (and (> (count (.-innerText body-el)) body-length-to-show-abstract)
+                 (> (count (.-innerText body-el)) @(::last-body-count state)))
+        (show-abstract-bt state))
+      (reset! (::last-body-count state) (count (.-innerText body-el))))))
 
 (defn- check-limits [s]
   (let [headline (rum/ref-node s "headline")
         $abstract (js/$ "div.cmail-content-abstract" (rum/dom-node s))
-        abstract-text (s/trim (.text $abstract))
+        abstract-text (if @(::show-abstract s) (str/trim (.text $abstract)) "")
         exceeds-limit (> (count abstract-text) utils/max-abstract-length)
-        clean-headline (s/trim (s/replace (.-innerText headline) #"\n" ""))
+        clean-headline (str/trim (str/replace (.-innerText headline) #"\n" ""))
         post-button-title (cond
                            (not (seq clean-headline)) :title
                            exceeds-limit :abstract
                            :else nil)]
     (reset! (::abstract-exceeds-limit s) exceeds-limit)
     (reset! (::abstract-length s) (count abstract-text))
-    (reset! (::post-button-title s) post-button-title)))
+    (reset! (::post-tt-kw s) post-button-title)))
 
 (defn- headline-on-change [state]
   (when-let [headline (rum/ref-node state "headline")]
@@ -185,6 +197,23 @@
     (check-limits state)
     (debounced-autosave! state)))
 
+;; Abstract show/hide
+
+(defn- show-abstract-bt [s]
+  (when-not (responsive/is-mobile-size?)
+    (reset! (::show-abstract-button s) true)))
+
+(defn- show-abstract-box [s]
+  (when (compare-and-set! (::show-abstract s) false true)
+    (abstract-on-change s)))
+
+(defn- hide-abstract [s]
+  (when (compare-and-set! (::show-abstract s) true false)
+    (dis/dispatch! [:update [:cmail-data] #(merge % {:abstract ""
+                                                     :has-changes true})])
+    (check-limits s)
+    (debounced-autosave! s)))
+
 ;; Headline setup and paste handler
 
 (defn- setup-headline [state]
@@ -195,7 +224,7 @@
 (defn headline-on-paste
   "Avoid to paste rich text into headline, replace it with the plain text clipboard data."
   [state e]
-  ; Prevent the normal paste behaviour
+  ; Prevent the normal paste behavior
   (utils/event-stop e)
   (let [clipboardData (or (.-clipboardData e) (.-clipboardData js/window))
         pasted-data   (.getData clipboardData "text/plain")]
@@ -209,9 +238,11 @@
         (utils/to-end-of-content-editable headline-el)))))
 
 (defn add-emoji-cb [s]
-  (headline-on-change s)
-  (abstract-on-change s)
-  (body-on-change s))
+  (utils/after 180
+   #(do
+     (headline-on-change s)
+     (abstract-on-change s)
+     (body-on-change s))))
 
 (defn- clean-body [s]
   (when-let [body-el (sel1 [:div.rich-body-editor])]
@@ -265,23 +296,30 @@
 ;; Delete handling
 
 (defn delete-clicked [s e activity-data]
-  (let [post-type (if (= (:status activity-data) "published")
-                    "post"
-                    "draft")
-        alert-data {:icon "/img/ML/trash.svg"
-                    :action "delete-entry"
-                    :message (str "Delete this " post-type "?")
-                    :link-button-title "No"
-                    :link-button-cb #(alert-modal/hide-alert)
-                    :solid-button-style :red
-                    :solid-button-title "Yes"
-                    :solid-button-cb #(do
-                                       (reset! (::deleting s) true)
-                                       (activity-actions/activity-delete activity-data)
-                                       (alert-modal/hide-alert)
-                                       (real-close))
-                    }]
-    (alert-modal/show-alert alert-data)))
+  (if (or (:uuid activity-data)
+           (:links activity-data)
+           (:auto-saving activity-data))
+    (let [post-type (if (= (:status activity-data) "published")
+                      "post"
+                      "draft")
+          alert-data {:icon "/img/ML/trash.svg"
+                      :action "delete-entry"
+                      :message (str "Delete this " post-type "?")
+                      :link-button-title "No"
+                      :link-button-cb #(alert-modal/hide-alert)
+                      :solid-button-style :red
+                      :solid-button-title "Yes"
+                      :solid-button-cb #(do
+                                         (activity-actions/activity-delete activity-data)
+                                         (alert-modal/hide-alert))
+                      }]
+      (alert-modal/show-alert alert-data))
+    (do
+      ;; In case the data are queued up to be saved but the request didn't started yet
+      (when (:has-changes activity-data)
+        ;; Remove them
+        (dis/dispatch! [:update [:cmail-data] #(dissoc % :has-changes)]))
+      (cmail-actions/cmail-hide))))
 
 (defn win-width []
   (or (.-clientWidth (.-documentElement js/document))
@@ -291,61 +329,31 @@
   (when (responsive/is-tablet-or-mobile?)
     (reset! (::mobile-video-height s) (utils/calc-video-height (win-width)))))
 
-(defn- follow-ups-header [s cmail-data is-mobile? can-toggle-follow-ups?]
-  (let [published-entry? (= (:status cmail-data) "published")
-        completed-follow-ups (filterv :completed? (:follow-ups cmail-data))
-        remove-follow-ups-cb (fn [e]
-                               (utils/event-stop e)
-                               (when can-toggle-follow-ups?
-                                 (cmail-actions/cmail-toggle-follow-up cmail-data)))]
-    [:div.follow-ups-header
-      {:on-click (fn [_]
-                   (if @(::mobile-follow-ups-remove-menu s)
-                     (reset! (::mobile-follow-ups-remove-menu s) false)
-                     (nav-actions/show-follow-ups-picker nil
-                      (fn [users-list]
-                        (dis/dispatch! [:update [:cmail-data] #(merge % {:has-changes true
-                                                                         :follow-ups users-list})])
-                        (debounced-autosave! s)))))
-       :ref :follow-ups-header}
-      (when-not is-mobile?
-        [:div.follow-up-tag.white-bg])
-      [:div.follow-ups-label
-        "Follow-ups "
-        (when-not published-entry?
-          "will be ")
-        "created for "
-        [:span.follow-ups-label-count
-          (count (:follow-ups cmail-data)) " "
-          (if (= (count (:follow-ups cmail-data)) 1)
-            "person"
-            "people")]
-        (when (and published-entry?
-                   (seq completed-follow-ups))
-          (str " (" (count completed-follow-ups) " completed)"))
-        "."]
-      (when can-toggle-follow-ups?
-        (if is-mobile?
-          [:div.mobile-follow-ups-remove-menu-container
-            [:button.mlb-reset.mobile-follow-ups-remove-menu
-              {:on-click (fn [e]
-                           (utils/event-stop e)
-                           (swap! (::mobile-follow-ups-remove-menu s) not))}]
-            (when @(::mobile-follow-ups-remove-menu s)
-              [:button.mlb-reset.mobile-follow-ups-remove
-                {:on-click remove-follow-ups-cb}
-                "Remove"])]
-          [:button.mlb-reset.remove-follow-up-button
-            {:on-click remove-follow-ups-cb}
-            "Remove"]))]))
+(defn- collapse-if-needed [s & [e]]
+  (let [cmail-data @(drv/get-ref s :cmail-data)
+        cmail-state @(drv/get-ref s :cmail-state)
+        showing-section-picker? @(::show-sections-picker s)
+        event-in? (if e
+                    (utils/event-inside? e (rum/dom-node s))
+                    false)]
+    (when-not (or (:fullscren cmail-state)
+                  (:collapsed cmail-state)
+                  event-in?
+                  (:has-changes cmail-data)
+                  (:auto-saving cmail-data)
+                  (:uuid cmail-data)
+                  showing-section-picker?)
+      (real-close)
+      (.blur (rum/ref-node s "headline")))))
 
 (rum/defcs cmail < rum/reactive
                    ;; Derivatives
                    (drv/drv :cmail-state)
                    (drv/drv :cmail-data)
-                   (drv/drv :show-sections-picker)
                    (drv/drv :section-editing)
                    (drv/drv :show-edit-tooltip)
+                   (drv/drv :current-user-data)
+                   (drv/drv :payments)
                    ;; Locals
                    (rum/local "" ::initial-body)
                    (rum/local "" ::initial-headline)
@@ -360,22 +368,32 @@
                    (rum/local false ::disable-post)
                    (rum/local nil ::debounced-autosave)
                    (rum/local 0 ::mobile-video-height)
-                   (rum/local false ::deleting)
                    (rum/local false ::media-attachment-did-success)
                    (rum/local nil ::media-attachment)
                    (rum/local nil ::latest-key)
-                   (rum/local "" ::post-button-title)
+                   (rum/local "" ::post-tt-kw)
                    (rum/local false ::abstract-exceeds-limit)
                    (rum/local 0 ::abstract-length)
                    (rum/local false ::show-post-tooltip)
-                   (rum/local false ::mobile-follow-ups-remove-menu)
+                   (rum/local false ::show-sections-picker)
+                   (rum/local false ::show-abstract)
+                   (rum/local false ::show-abstract-button)
+                   (rum/local 0 ::last-body-count)
                    ;; Mixins
                    (mixins/render-on-resize calc-video-height)
                    mixins/refresh-tooltips-mixin
+                   ;; Go back to collapsed state on desktop if user didn't touch anything
+                   (when-not (responsive/is-mobile-size?)
+                     (mixins/on-window-click-mixin collapse-if-needed))
+                   ;; Dismiss sectoins picker on window clicks, slightly delay it to avoid
+                   ;; conflicts with the collapse cmail listener
                    (mixins/on-window-click-mixin (fn [s e]
-                    (when (and @(::mobile-follow-ups-remove-menu s)
-                               (not (utils/event-inside? e (rum/ref-node s :follow-ups-header))))
-                      (reset! (::mobile-follow-ups-remove-menu s) false))))
+                    (let [showing-section-picker? @(::show-sections-picker s)
+                          event-in? (utils/event-inside? e (rum/ref-node s :sections-picker-container))]
+                      (utils/after 100
+                       #(when (and showing-section-picker?
+                                   (not event-in?))
+                         (reset! (::show-sections-picker s) false))))))
 
                    {:will-mount (fn [s]
                     (let [cmail-data @(drv/get-ref s :cmail-data)
@@ -390,10 +408,10 @@
                           initial-abstract (if (seq (:abstract cmail-data))
                                              (:abstract cmail-data)
                                              "")
-                          abstract-text (.text (js/$ (str "<div>" initial-abstract "</div>")))
+                          body-text (.text (.html (js/$ "<div/>") initial-body))
+                          abstract-text (.text (.html (js/$ "<div/>") initial-abstract))
                           abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
-                      (when (and (not (seq (:uuid cmail-data)))
-                                 (not (:collapsed cmail-state)))
+                      (when-not (seq (:uuid cmail-data))
                         (nux-actions/dismiss-add-post-tooltip))
                       (reset! (::initial-body s) initial-body)
                       (reset! (::initial-headline s) initial-headline)
@@ -401,7 +419,11 @@
                       (reset! (::initial-uuid s) (:uuid cmail-data))
                       (reset! (::abstract-length s) (count abstract-text))
                       (reset! (::abstract-exceeds-limit s) abstract-exceeds)
-                      (reset! (::post-button-title s)
+                      (reset! (::saving s) (:loading cmail-data))
+                      (reset! (::publishing s) (:publishing cmail-data))
+                      (reset! (::show-abstract s) (boolean (seq abstract-text)))
+                      (reset! (::show-abstract-button s) (> (count body-text) body-length-to-show-abstract))
+                      (reset! (::post-tt-kw s)
                         (cond
                           abstract-exceeds :abstract
                           (not (seq (:headline cmail-data))) :title
@@ -415,9 +437,11 @@
                     (calc-video-height s)
                     (utils/after 300 #(setup-headline s))
                     (reset! (::debounced-autosave s) (Debouncer. (partial autosave s) 2000))
-                    (let [cmail-state @(drv/get-ref s :cmail-state)]
-                      (when-not (:collapsed cmail-state)
-                        (utils/after 1000 #(.focus (body-element)))))
+                    (let [body-el (sel1 [:div.rich-body-editor])
+                          abstract-text (.text (.html (js/$ "<div/>") @(::initial-abstract s)))]
+                      (when (or (> (count (.-innerText body-el)) body-length-to-show-abstract)
+                                (seq abstract-text))
+                        (show-abstract-box s)))
                     s)
                    :will-update (fn [s]
                     (let [cmail-state @(drv/get-ref s :cmail-state)]
@@ -436,10 +460,10 @@
                                 initial-abstract (if (seq (:abstract cmail-data))
                                                    (:abstract cmail-data)
                                                    "")
-                                abstract-text (.text (js/$ "<div>" initial-abstract "</div>"))
-                                abstract-exceeds (> (count abstract-text) utils/max-abstract-length)]
-                            (when (and (not (seq (:uuid cmail-data)))
-                                       (not (:collapsed cmail-state)))
+                                abstract-text (.text (.html (js/$ "<div/>") initial-abstract))
+                                abstract-exceeds (> (count abstract-text) utils/max-abstract-length)
+                                body-text (.text (.html (js/$ "<div/>") initial-body))]
+                            (when-not (seq (:uuid cmail-data))
                               (nux-actions/dismiss-add-post-tooltip))
                             (reset! (::initial-body s) initial-body)
                             (reset! (::initial-headline s) initial-headline)
@@ -447,30 +471,28 @@
                             (reset! (::initial-uuid s) (:uuid cmail-data))
                             (reset! (::abstract-length s) (count abstract-text))
                             (reset! (::abstract-exceeds-limit s) abstract-exceeds)
-                            (reset! (::post-button-title s)
+                            (reset! (::show-abstract s) (boolean (seq abstract-text)))
+                            (reset! (::show-abstract-button s) (> (count body-text) body-length-to-show-abstract))
+                            (reset! (::post-tt-kw s)
                              (cond
                               abstract-exceeds :abstract
                               (not (seq (:headline cmail-data))) :title
                               :else nil))
-                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))
-                            (when-not (:collapsed cmail-state)
-                              (utils/after 1000 #(.focus (body-element))))))
+                            (reset! (::show-placeholder s) (not (.match initial-body #"(?i).*(<iframe\s?.*>).*")))))
                         (reset! (::latest-key s) (:key cmail-state))))
                     s)
                    :before-render (fn [s]
                     ;; Handle saving/publishing states to dismiss the component
-                    (let [cmail-data @(drv/get-ref s :cmail-data)]
-                      ;; Did activity get removed in another client?
-                      (when (and @(::deleting s)
-                                 (:delete cmail-data))
-                        (reset! (::deleting s) false)
+                    (when-let [cmail-data @(drv/get-ref s :cmail-data)]
+                      ;; Did activity get removed here or in another client?
+                      (when (:delete cmail-data)
                         (real-close))
                       (when (and @(::saving s)
                                  (not (:loading cmail-data)))
                         (reset! (::saving s) false)
                         (reset! (::disable-post s) false)
                         (when-not (:error cmail-data)
-                          (real-close)))
+                          (utils/after 100 real-close)))
                       (when (and @(::publishing s)
                                  (not (:publishing cmail-data)))
                         (reset! (::publishing s) false)
@@ -505,7 +527,8 @@
   (let [is-mobile? (responsive/is-tablet-or-mobile?)
         cmail-state (drv/react s :cmail-state)
         cmail-data (drv/react s :cmail-data)
-        show-sections-picker (drv/react s :show-sections-picker)
+        payments-data (drv/react s :payments)
+        show-paywall-alert? (payments-actions/show-paywall-alert? payments-data)
         published? (= (:status cmail-data) "published")
         video-size (if is-mobile?
                      {:width (win-width)
@@ -515,8 +538,9 @@
         show-edit-tooltip (and (drv/react s :show-edit-tooltip)
                                (not (seq @(::initial-uuid s))))
         show-post-bt-tooltip? (not (is-publishable? s cmail-data))
-        post-button-title @(::post-button-title s)
+        post-tt-kw @(::post-tt-kw s)
         disabled? (or show-post-bt-tooltip?
+                      show-paywall-alert?
                       @(::publishing s)
                       @(::disable-post s))
         working? (or (and published?
@@ -530,126 +554,100 @@
                                          :body
                                          (cleaned-body)))
                     (autosave s)
-                    (do
-                      (reset! (::deleting s) true)
-                      (activity-actions/activity-delete cmail-data)))
+                    (activity-actions/activity-delete cmail-data))
                   (if (and (= (:status cmail-data) "published")
                            (:has-changes cmail-data))
                     (cancel-clicked s)
                     (cmail-actions/cmail-hide)))
         current-user-id (jwt/user-id)
-        follow-up? (and ;; if there is at least a follow-up
-                        (seq (:follow-ups cmail-data))
-                        ;; That wasn't created by the owner
-                        (some #(not= (-> % :assignee :user-id) (-> % :author :user-id)) (:follow-ups cmail-data)))
-        can-toggle-follow-ups? (every? #(and (not (:completed? %))
-                                             (or (not (:author %))
-                                                 (= (-> % :author :user-id) (jwt/user-id))))
-                                (:follow-ups cmail-data))
-        long-tooltip (not= (:status cmail-data) "published")]
+        unpublished? (not= (:status cmail-data) "published")
+        post-button-title (if (= (:status cmail-data) "published")
+                            "Save"
+                            "Post")
+        did-pick-section (fn [board-data note dismiss-action]
+                           (reset! (::show-sections-picker s) false)
+                           (dis/dispatch! [:input [:show-sections-picker] false])
+                           (when (and board-data
+                                      (seq (:name board-data)))
+                            (let [has-changes (or (:has-changes cmail-data)
+                                                  (seq (:uuid cmail-data))
+                                                  (:auto-saving cmail-data))]
+                              (dis/dispatch! [:input [:cmail-data]
+                               (merge cmail-data {:board-slug (:slug board-data)
+                                                  :board-name (:name board-data)
+                                                  :has-changes has-changes
+                                                  :invite-note note})])
+                              (when has-changes
+                                (debounced-autosave! s)))
+                            (when (fn? dismiss-action)
+                              (dismiss-action))))
+        current-user-data (drv/react s :current-user-data)
+        header-user-data (or (:publisher cmail-data)
+                             current-user-data)]
     [:div.cmail-outer
       {:class (utils/class-set {:fullscreen is-fullscreen?
-                                :quick-post-collapsed (:collapsed cmail-state)})
-       :on-click #(when (:collapsed cmail-state)
-                    (nux-actions/dismiss-add-post-tooltip)
-                    (cmail-actions/cmail-show (cmail-actions/get-board-for-edit) {:collapsed false
-                                                                                  :fullscreen false
-                                                                                  :key (:key cmail-state)}))}
+                                :quick-post-collapsed (or (:collapsed cmail-state) show-paywall-alert?)
+                                :show-trial-expired-alert show-paywall-alert?})
+       :on-click (when (and (not is-mobile?)
+                            (:collapsed cmail-state)
+                            (not show-paywall-alert?))
+                   (fn [e]
+                      (nux-actions/dismiss-add-post-tooltip)
+                      (cmail-actions/cmail-expand cmail-data cmail-state)
+                      (utils/after 100
+                       #(when-let [headline-el (rum/ref-node s "headline")]
+                          (.focus headline-el)))))}
+      (when (and show-paywall-alert?
+                 (:collapsed cmail-state)
+                 (not (:fullscreen cmail-state)))
+        (trial-expired-alert {:top "48px" :left "50%"}))
       [:div.cmail-container
-        {:class (when follow-up? "has-follow-ups")}
         [:div.cmail-mobile-header
           [:button.mlb-reset.mobile-close-bt
             {:on-click close-cb}]
-          [:div.cmail-mobile-header-title
-            (if (= (:status cmail-data) "published")
-              "Edit"
-              "New")
-            (when (not= (:status cmail-data) "published")
-              (if (or (:has-changes cmail-data)
-                      (:auto-saving cmail-data))
-                [:span.saving-saved " (saving)"]
-                (when (false? (:auto-saving cmail-data))
-                  [:span.saving-saved " (saved)"])))]
-          [:button.mlb-reset.mobile-post-button
-            {:on-click #(post-clicked s)
-             :class (utils/class-set {:disabled disabled?
-                                      :force-show-tooltip @(::show-post-tooltip s)
-                                      :loading working?
-                                      (str "tt-" (when post-button-title (name post-button-title))) true})}
-            (when post-button-title
-              [:div.post-bt-tooltip
-                (cond
-                  (= post-button-title :title)
-                  missing-title-tooltip
-                  (= post-button-title :abstract)
-                  abstract-max-length-exceeded-tooltip)])
-            (if (= (:status cmail-data) "published")
-              "Save"
-              "Post")]]
-        (when (and follow-up?
-                   is-mobile?)
-          (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
-        [:div.cmail-header.group
-          [:div.close-bt-container
-            {:class (when long-tooltip "long-tooltip")}
-            [:button.mlb-reset.close-bt
-              {:on-click close-cb
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement "auto"
-               :title (if long-tooltip
-                        "Save & Close"
-                        "Close")}]]
-          [:div.cmail-header-vertical-separator]
-          [:div.cmail-header-board-follow-ups-container.group
-            {:class (when follow-up? "follow-ups-on")}
-            [:div.board-name.oc-input
-              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container))
-                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-               :class (utils/class-set {:active show-sections-picker
-                                        :has-follow-ups-button (not follow-up?)})}
-              [:div.board-name-inner
-                (:board-name cmail-data)]]
-            (when show-sections-picker
-              [:div.sections-picker-container
-                {:ref :picker-container}
-                (sections-picker (:board-slug cmail-data)
-                 (fn [board-data note dismiss-action]
-                   (dis/dispatch! [:input [:show-sections-picker] false])
-                   (when (and board-data
-                              (seq (:name board-data)))
-                    (let [has-changes (or (:has-changes cmail-data)
-                                          (seq (:uuid cmail-data))
-                                          (:auto-saving cmail-data))]
-                      (dis/dispatch! [:input [:cmail-data]
-                       (merge cmail-data {:board-slug (:slug board-data)
-                                          :board-name (:name board-data)
-                                          :has-changes has-changes
-                                          :invite-note note})])
-                      (when has-changes
-                        (debounced-autosave! s)))
-                    (when (fn? dismiss-action)
-                      (dismiss-action)))))])
+          [:div.cmail-mobile-header-right
             [:button.mlb-reset.mobile-attachment-button
               {:on-click #(add-attachment s)}]
-            (when-not follow-up?
-              [:button.mlb-reset.mobile-follow-up-button
-                {:on-click #(when can-toggle-follow-ups?
-                              (cmail-actions/cmail-toggle-follow-up cmail-data))
-                 :class (when-not can-toggle-follow-ups? "disabled")}])]
+            [:div.post-button-container.group
+              (post-to-button {:on-submit #(post-clicked s)
+                               :disabled disabled?
+                               :title post-button-title
+                               :post-tt-kw post-tt-kw
+                               :force-show-tooltip @(::show-post-tooltip s)})]]]
+        [:div.cmail-header.group
+          [:div.cmail-header-left-buttons.group
+            [:div.close-bt-container
+              {:class (when unpublished? "unpublished-post")}
+              [:button.mlb-reset.close-bt
+                {:on-click close-cb
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title (if unpublished?
+                          "Save & Go back"
+                          "Close")}]]
+            [:div.delete-button-container
+              [:button.mlb-reset.delete-button
+                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
+                 :data-toggle "tooltip"
+                 :data-placement "bottom"
+                 :data-container "body"
+                 :on-click #(delete-clicked s % cmail-data)}]]
+            (when (and (not= (:status cmail-data) "published")
+                       (not is-mobile?))
+              (if (or (:has-changes cmail-data)
+                      (:auto-saving cmail-data))
+                [:div.saving-saved "Saving..."]
+                (when (false? (:auto-saving cmail-data))
+                  [:div.saving-saved "Saved"])))]
+          [:div.cmail-header-center.group
+            (user-avatar-image header-user-data)
+            [:div.cmail-header-center-title
+              (:headline cmail-data)]]
           (when is-fullscreen?
-            [:div.cmail-header-right-buttons
-              (when-not follow-up?
-                [:button.mlb-reset.follow-up-button
-                  {:title "Request follow-up"
-                   :data-toggle "tooltip"
-                   :data-placement "bottom"
-                   :data-container "body"
-                   :on-click #(when can-toggle-follow-ups?
-                                (cmail-actions/cmail-toggle-follow-up cmail-data))
-                   :class (when-not can-toggle-follow-ups? "disabled")}])
+            [:div.cmail-header-right-buttons.group
               (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                             :width 24
-                             :height 24
+                             :width 32
+                             :height 32
                              :position "bottom"
                              :tooltip-position "bottom"
                              :default-field-selector "div.cmail-content div.rich-body-editor"
@@ -660,49 +658,37 @@
                  :data-placement "auto"
                  :data-container "body"
                  :title "Add attachment"}]
-              [:div.delete-button-container
-                [:button.mlb-reset.delete-button
-                  {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                   :data-toggle "tooltip"
+              [:div.section-picker-bt-container
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)
                    :data-placement "bottom"
-                   :data-container "body"
-                   :on-click #(delete-clicked s % cmail-data)}]]])
-          (when is-fullscreen?
-            [:button.mlb-reset.post-button
-              {:on-click #(post-clicked s)
-               :class (utils/class-set {:disabled disabled?
-                                        :force-show-tooltip @(::show-post-tooltip s)
-                                        :loading working?
-                                        (str "tt-" (when post-button-title (name post-button-title))) true})}
-              (when post-button-title
-                [:div.post-bt-tooltip
-                  (cond
-                    (= post-button-title :title)
-                    missing-title-tooltip
-                    (= post-button-title :abstract)
-                    abstract-max-length-exceeded-tooltip)])
-              (if (= (:status cmail-data) "published")
-                "Save"
-                "Post")])]
-        (when (and (not (:collapsed cmail-state))
-                   (not is-fullscreen?))
-          [:div.dismiss-inline-cmail-container
-            {:class (when long-tooltip "long-tooltip")}
-            [:button.mlb-reset.dismiss-inline-cmail
-              {:on-click close-cb
-               :data-toggle (if is-mobile? "" "tooltip")
-               :data-placement "auto"
-               :title (if long-tooltip
-                        "Save & Close"
-                        "Close")}]])
+                   :data-toggle "tooltip"
+                   :title "Post to this section"}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])]
+              [:div.post-button-container.group
+                (post-to-button {:on-submit #(post-clicked s)
+                                 :disabled disabled?
+                                 :title post-button-title
+                                 :post-tt-kw post-tt-kw
+                                 :force-show-tooltip @(::show-post-tooltip s)
+                                 :show-on-hover true})]])]
         [:div.cmail-content-outer
-          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip
-                                    :has-follow-ups follow-up?})}
-          (when (and follow-up?
-                     (not is-mobile?)
-                     is-fullscreen?)
-            (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
+          {:class (utils/class-set {:showing-edit-tooltip show-edit-tooltip})}
           [:div.cmail-content
+            (when is-mobile?
+              [:div.section-picker-bt-container
+                [:span.post-to "Post to"]
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])])
             ;; Video elements
             ; FIXME: disable video on mobile for now
             (when-not is-mobile?
@@ -713,157 +699,143 @@
                                 :height (:height video-size)
                                 :video-processed (:video-processed cmail-data)})))
             ; Headline element
-            [:div.cmail-content-headline.emoji-autocomplete.emojiable.group
-              {:class utils/hide-class
-               :content-editable true
-               :key (str "cmail-headline-" (:key cmail-state))
-               :ref "headline"
-               :placeholder utils/default-headline
-               :on-paste    #(headline-on-paste s %)
-               :on-key-down (fn [e]
-                              (utils/after 10 #(headline-on-change s))
-                              (cond
-                                (and (.-metaKey e)
-                                     (= "Enter" (.-key e)))
-                                (post-clicked s)
-                                (and (= (.-key e) "Enter")
-                                     (not (.-metaKey e)))
-                                (do
-                                  (utils/event-stop e)
-                                  (utils/to-end-of-content-editable (body-element)))))
-               :dangerouslySetInnerHTML @(::initial-headline s)}]
+            [:div.cmail-content-headline-container.group
+              [:div.cmail-content-headline.emoji-autocomplete.emojiable
+                {:class utils/hide-class
+                 :content-editable true
+                 :key (str "cmail-headline-" (:key cmail-state))
+                 :placeholder utils/default-headline
+                 :ref "headline"
+                 :on-paste    #(headline-on-paste s %)
+                 :on-key-down (fn [e]
+                                (utils/after 10 #(headline-on-change s))
+                                (cond
+                                  (and (.-metaKey e)
+                                       (= "Enter" (.-key e)))
+                                  (post-clicked s)
+                                  (and (= (.-key e) "Enter")
+                                       (not (.-metaKey e)))
+                                  (do
+                                    (utils/event-stop e)
+                                    (utils/to-end-of-content-editable (body-element)))))
+                 :dangerouslySetInnerHTML @(::initial-headline s)}]]
+            (when (and @(::show-abstract-button s)
+                         (not @(::show-abstract s)))
+              [:div.cmail-content-abstract-bt-container.group
+                [:button.mlb-reset.show-abstract-bt
+                  {:on-click #(show-abstract-box s)
+                   :data-toggle (if is-mobile? "" "tooltip")
+                   :data-placement "bottom"
+                   :title (str "For longer posts, a summary makes it easy for viewers "
+                               "to quickly see what it's about and why it's important.")}
+                  "Add a quick summary"]])
             ;; Abstract
-            (when (or is-mobile?
-                      is-fullscreen?)
+            [:div.cmail-content-abstract-container-outer
+              {:class (when-not @(::show-abstract s) "hidden")}
+              [:button.mlb-reset.remove-abstract-bt
+                {:on-click #(hide-abstract s)}]
               (carrot-abstract {:initial-value @(::initial-abstract s)
                                 :value (:abstract cmail-data)
                                 :exceeds-limit @(::abstract-exceeds-limit s)
                                 :abstract-length @(::abstract-length s)
                                 :on-change-cb #(abstract-on-change s)
                                 :post-clicked #(post-clicked s)
-                                :cmail-key (:key cmail-state)}))
-            (when (and show-edit-tooltip
-                       is-fullscreen?)
-              [:div.edit-tooltip-outer-container
-                [:div.edit-tooltip-container.group
-                  [:div.edit-tooltip-title
-                    "Quick summary"]
-                  [:div.edit-tooltip
-                    (str
-                     "Help everyone know what your post is about. "
-                     "This is what your team sees first.")]
-                  [:button.mlb-reset.edit-tooltip-bt
-                    {:on-click #(nux-actions/dismiss-edit-tooltip)}
-                    "OK, got it"]]])
+                                :cmail-key (:key cmail-state)})]
+            ; (when (and show-edit-tooltip
+            ;            is-fullscreen?)
+            ;   [:div.edit-tooltip-outer-container
+            ;     [:div.edit-tooltip-container.group
+            ;       [:div.edit-tooltip-title
+            ;         "Quick summary"]
+            ;       [:div.edit-tooltip
+            ;         (str
+            ;          "Help everyone know what your post is about. "
+            ;          "This is what your team sees first.")]
+            ;       [:button.mlb-reset.edit-tooltip-bt
+            ;         {:on-click #(nux-actions/dismiss-edit-tooltip)}
+            ;         "OK, got it"]]])
+            ; Attachments
+            (stream-attachments (:attachments cmail-data) nil
+             #(activity-actions/remove-attachment :cmail-data %))
             (rich-body-editor {:on-change (partial body-on-change s)
                                :use-inline-media-picker true
                                :media-picker-initially-visible true
                                :initial-body @(::initial-body s)
                                :show-placeholder @(::show-placeholder s)
                                :show-h2 true
+                               ;; Block the rich-body-editor component when
+                               ;; the current editing post has been created already
+                               :paywall? show-paywall-alert?
+                               :placeholder "Share something with your team..."
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)
                                :upload-progress-cb (fn [is-uploading?]
                                                      (reset! (::uploading-media s) is-uploading?))
                                :media-config ["gif" "photo" "video"]
-                               :classes (str "emoji-autocomplete emojiable " utils/hide-class)
+                               :classes (str (when-not show-paywall-alert? "emoji-autocomplete ") "emojiable " utils/hide-class)
                                :cmail-key (:key cmail-state)
-                               :attachments-enabled true})
-            ; Attachments
-            (when-not (:collapsed cmail-state)
-              (stream-attachments (:attachments cmail-data) nil
-               #(activity-actions/remove-attachment :cmail-data %)))]]
-      (when (and follow-up?
-                 (not is-mobile?)
-                 (not is-fullscreen?))
-        (follow-ups-header s cmail-data is-mobile? can-toggle-follow-ups?))
-      (if is-fullscreen?
+                               :attachments-enabled true})]]
+      (when-not is-fullscreen?
         [:div.cmail-footer
-          (when (and (not= (:status cmail-data) "published")
-                     (not is-mobile?))
-            (if (or (:has-changes cmail-data)
-                    (:auto-saving cmail-data))
-              [:div.saving-saved "Saving..."]
-              (when (false? (:auto-saving cmail-data))
-                [:div.saving-saved "Saved"])))]
-        [:div.cmail-footer
-          [:div.fullscreen-bt-container
-            [:button.mlb-reset.fullscreen-bt
-              {:on-click #(cmail-actions/cmail-toggle-fullscreen)}
-              "Full-screen"]]
+          (when-not is-fullscreen?
+            [:div.dismiss-inline-cmail-container
+              {:class (when unpublished? "long-tooltip")}
+              [:button.mlb-reset.dismiss-inline-cmail
+                {:on-click close-cb
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title (if unpublished?
+                          "Save & Close"
+                          "Close")}]])
+          (when-not is-fullscreen?
+            [:div.fullscreen-bt-container
+              [:button.mlb-reset.fullscreen-bt
+                {:on-click #(cmail-actions/cmail-toggle-fullscreen)
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title "Fullscreen"}]])
+          (when-not is-fullscreen?
+            [:div.delete-bt-container
+              [:button.mlb-reset.delete-bt
+                {:on-click #(delete-clicked s % cmail-data)
+                 :data-toggle (if is-mobile? "" "tooltip")
+                 :data-placement "auto"
+                 :title "Delete"}]])
           [:div.cmail-footer-right
-            (when (and (not follow-up?)
-                       (not is-fullscreen?))
-              [:button.mlb-reset.follow-up-button
-                {:title "Request follow-up"
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :data-container "body"
-                 :on-click #(when can-toggle-follow-ups?
-                              (cmail-actions/cmail-toggle-follow-up cmail-data))
-                 :class (when-not can-toggle-follow-ups? "disabled")}])
             (when-not is-fullscreen?
-              [:button.mlb-reset.post-button
-                {:on-click #(post-clicked s)
-                 :class (utils/class-set {:disabled disabled?
-                                          :force-show-tooltip @(::show-post-tooltip s)
-                                          :loading working?
-                                          (str "tt-" (when post-button-title (name post-button-title))) true})}
-                (when post-button-title
-                  [:div.post-bt-tooltip
-                    (cond
-                      (= post-button-title :title)
-                      missing-title-tooltip
-                      (= post-button-title :abstract)
-                      abstract-max-length-exceeded-tooltip)])
-                (if (= (:status cmail-data) "published")
-                  "Save"
-                  "Post")])
-            [:div.board-name.oc-input
-              {:on-click #(when-not (utils/event-inside? % (rum/ref-node s :picker-container-footer))
-                            (dis/dispatch! [:input [:show-sections-picker] (not show-sections-picker)]))
-               :class (when show-sections-picker "active")}
-              [:div.board-name-inner
-                (:board-name cmail-data)]]
-            (when show-sections-picker
-              [:div.sections-picker-container
-                {:ref :picker-container-footer}
-                (sections-picker (:board-slug cmail-data)
-                 (fn [board-data note dismiss-action]
-                   (dis/dispatch! [:input [:show-sections-picker] false])
-                   (when (and board-data
-                              (seq (:name board-data)))
-                    (let [has-changes (or (:has-changes cmail-data)
-                                          (seq (:uuid cmail-data))
-                                          (:auto-saving cmail-data))]
-                      (dis/dispatch! [:input [:cmail-data]
-                       (merge cmail-data {:board-slug (:slug board-data)
-                                          :board-name (:name board-data)
-                                          :has-changes has-changes
-                                          :invite-note note})])
-                      (when has-changes
-                        (debounced-autosave! s)))
-                    (when (fn? dismiss-action)
-                      (dismiss-action)))))])
-            [:div.delete-button-container
-              [:button.mlb-reset.delete-button
-                {:title (if (= (:status cmail-data) "published") "Delete post" "Delete draft")
-                 :data-toggle "tooltip"
-                 :data-placement "top"
-                 :on-click #(delete-clicked s % cmail-data)}]]
+              [:div.post-button-container.group
+                (post-to-button {:on-submit #(post-clicked s)
+                                 :disabled disabled?
+                                 :title post-button-title
+                                 :post-tt-kw (when-not show-paywall-alert?
+                                               post-tt-kw)
+                                 :force-show-tooltip @(::show-post-tooltip s)
+                                 :show-on-hover true})])
+            (when-not is-fullscreen?
+              [:div.section-picker-bt-container
+                [:button.mlb-reset.section-picker-bt
+                  {:on-click #(swap! (::show-sections-picker s) not)
+                   :data-placement "top"
+                   :data-toggle "tooltip"
+                   :title "Post to this section"}
+                  (:board-name cmail-data)]
+                (when @(::show-sections-picker s)
+                  [:div.sections-picker-container
+                    {:ref :sections-picker-container}
+                    (sections-picker (:board-slug cmail-data) did-pick-section)])])
+            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
+                           :width 32
+                           :height 32
+                           :position "bottom"
+                           :default-field-selector "div.cmail-content div.rich-body-editor"
+                           :container-selector "div.cmail-content"})
             [:button.mlb-reset.attachment-button
               {:on-click #(add-attachment s)
                :data-toggle "tooltip"
                :data-placement "top"
                :data-container "body"
-               :title "Add attachment"}]
-            (emoji-picker {:add-emoji-cb (partial add-emoji-cb s)
-                           :width 24
-                           :height 24
-                           :position "bottom"
-                           :default-field-selector "div.cmail-content div.rich-body-editor"
-                           :container-selector "div.cmail-content"})]
+               :title "Add attachment"}]]
           (when (and (not= (:status cmail-data) "published")
                      (not is-mobile?))
             (if (or (:has-changes cmail-data)

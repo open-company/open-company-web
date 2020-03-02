@@ -99,6 +99,7 @@ var OCWebPrintCommentsData = function(){};
 var OCWebPrintContainerData = function(){};
 var OCWebPrintEntryEditingData = function(){};
 var OCWebPrintFilteredPostsData = function(){};
+var OCWebPrintItemsToRender = function(){};
 var OCWebPrintJWTContents = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintPanelStack = function(){};
@@ -189,6 +190,8 @@ var OCStaticHideAnimationLightbox = function(){};
 var OCYTVideoInit = function(){};
 // Integrations panel
 var OCWebStaticOpenIntegrationsPanel = function() {};
+// UI Theme detection
+var OCWebUIThemeAllowedPathRegExp = {};
 // Mobile app (Expo)
 var ReactNativeWebView = {};
 ReactNativeWebView.postMessage = function() {};
@@ -198,3 +201,11 @@ OCCarrotDesktop.showDesktopWindow = function() {};
 OCCarrotDesktop.setBadgeCount = function() {};
 OCCarrotDesktop.windowHasFocus = function() {};
 OCCarrotDesktop.getElectronAppVersion = function() {};
+OCCarrotDesktop.isDarkMode = function() {};
+// Stripe
+var Stripe = function(){};
+Stripe.redirectToCheckout = function(){};
+// React virtualized
+var ReactVirtualized = function(){};
+ReactVirtualized.List = function(){};
+ReactVirtualized.List.recomputeRowHeights = function(){};

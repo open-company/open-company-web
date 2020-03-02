@@ -8,7 +8,7 @@
             [oc.web.lib.utils :as utils]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.comment :as comment-actions]
-            [oc.web.actions.routing :as routing-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
 (defn get-author-name [author]
@@ -32,55 +32,73 @@
 
 (def max-face-pile 3)
 
-(rum/defcs comments-summary < rum/static
-                              rum/reactive
-                              (drv/drv :comments-data)
-  [s entry-data should-show-new-tag?]
-  (let [all-comments-data (drv/react s :comments-data)
-        _comments-data (get all-comments-data (:uuid entry-data))
-        comments-data (:sorted-comments _comments-data)
+(rum/defc comments-summary < rum/static
+  [{:keys [entry-data
+           comments-data
+           hide-label?
+           hide-face-pile?]}]
+  (let [entry-comments (get comments-data (:uuid entry-data))
+        sorted-comments (:sorted-comments entry-comments)
         comments-link (utils/link-for (:links entry-data) "comments")
-        has-comments-data (and (sequential? comments-data) (pos? (count comments-data)))
-        comments-authors (if has-comments-data
-                           (vec
-                            (map
-                             first
-                             (vals
-                              (group-by :avatar-url (map :author (sort-by :created-at comments-data))))))
+        comments-loaded? (seq sorted-comments)
+        comments-authors (if comments-loaded?
+                           (vec (map first (vals (group-by :user-id (map :author (sort-by :created-at sorted-comments))))))
                            (reverse (:authors comments-link)))
-        comments-count (if comments-data
-                         (count comments-data)
+        comments-count (if comments-loaded?
+                         (count sorted-comments)
                          (:count comments-link))
-        face-pile-count (min max-face-pile (count comments-authors))
+        face-pile-count (if hide-face-pile?
+                          0
+                          (min max-face-pile (count comments-authors)))
         is-mobile? (responsive/is-mobile-size?)
         faces-to-render (take max-face-pile comments-authors)
         face-pile-width (if (pos? face-pile-count)
                           (if is-mobile?
                             (+ 8 (* 12 face-pile-count))
-                            (+ 10 (* 18 face-pile-count)))
-                            0)]
+                            (+ 10 (* 12 face-pile-count)))
+                            0)
+        show-new-tag? (pos? (:new-comments-count entry-data))]
     (when comments-count
       [:div.is-comments
         {:on-click (fn [e]
-                     (routing-actions/open-post-modal entry-data true)
+                     ;; To avoid navigating to the post again and lose the coming from data
+                     ;; nav only when not in the expanded post
+                     (if (seq (router/current-activity-id))
+                       (when-let [add-comment-div (.querySelector js/document "div.add-comment")]
+                         (.scrollIntoView add-comment-div #js {:behavior "smooth" :block "center"}))
+                       (nav-actions/open-post-modal entry-data true))
                      (comment-actions/add-comment-focus (:uuid entry-data)))}
         ; Comments authors heads
-        [:div.is-comments-authors.group
-          {:style {:width (str face-pile-width "px")}
-           :class (when (> (count faces-to-render) 1) "show-border")}
-          (for [user-data faces-to-render]
-            [:div.is-comments-author
-              {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
-              (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])]
-        ; Comments count
-        [:div.is-comments-summary
-          {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
-                                    :add-a-comment (not (pos? comments-count))})}
-          (if (pos? comments-count)
-            [:div.group
-              (str comments-count " comment" (when (not= comments-count 1) "s"))
-              (when should-show-new-tag?
-                [:div.new-comments-tag
-                  "(NEW)"])]
-            [:span.add-a-comment
-              "Add a comment"])]])))
+        (when (and (not hide-face-pile?)
+                  (or (not hide-label?)
+                      (not (zero? comments-count))))
+          [:div.is-comments-authors.group
+            {:style {:width (str face-pile-width "px")}
+             :class (when (> (count faces-to-render) 1) "show-border")}
+            (for [user-data faces-to-render]
+              [:div.is-comments-author
+                {:key (str "entry-comment-author-" (:uuid entry-data) "-" (:user-id user-data))}
+                (user-avatar-image user-data (not (responsive/is-tablet-or-mobile?)))])])
+        (when-not (and hide-label?
+                       (zero? comments-count))
+
+          ; Comments count
+          [:div.is-comments-summary
+            {:class (utils/class-set {(str "comments-count-" (:uuid entry-data)) true
+                                      :add-a-comment (not (pos? comments-count))
+                                      :has-new-comments show-new-tag?})}
+            (if (pos? comments-count)
+              [:div.is-comments-summary-inner.group
+                (str
+                 (if show-new-tag?
+                   (:new-comments-count entry-data)
+                   comments-count)
+                 (if show-new-tag?
+                   (if hide-label?
+                     " new"
+                     (str " new comment" (when (not= (:new-comments-count entry-data) 1) "s")))
+                   (when-not hide-label?
+                     (str " comment" (when (not= comments-count 1) "s")))))]
+              (when-not hide-label?
+                [:span.add-a-comment
+                  "Add a comment"]))])])))

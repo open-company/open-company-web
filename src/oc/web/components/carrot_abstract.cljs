@@ -14,7 +14,7 @@
       (let [options (first (:rum/args s))
             mobile-editor (responsive/is-tablet-or-mobile?)
             body-el (rum/ref-node s "abstract")
-            buttons ["bold" "italic" "anchor"]
+            buttons ["italic" "anchor"]
             abstract-on-change (:on-change-cb (first (:rum/args s)))
             extensions #js {"autolist" (js/AutoList.)
                             "mention" (mention-utils/mention-ext users-list)}
@@ -39,13 +39,13 @@
                                  :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1" "h2" "h3" "h4" "h5"
                                                        "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
                                                        "details" "summary" "nav" "abbr" "ol" "ul" "li"
-                                                       "table" "thead" "tbody" "tr" "th" "td" "p" "div"]))}
+                                                       "table" "thead" "tbody" "tr" "th" "td" "p" "div" "strong" "b"]))}
                      :placeholder #js {:text utils/default-abstract
                                        :hideOnClick false
                                        :hide-on-click false}
                      :keyboardCommands #js {:commands #js [
                                         #js {
-                                          :command "bold"
+                                          :command false
                                           :key "B"
                                           :meta true
                                           :shift false
@@ -118,12 +118,6 @@
   (let [_team-roster (drv/react s :team-roster)]
     [:div.cmail-content-abstract-container
       {:key (str "carrot-abstract-" cmail-key)}
-      [:div.cmail-content-abstract-counter
-        {:class (utils/class-set {:show-counter (or (and @(::focused s)
-                                                         (> abstract-length abstract-show-counter-from))
-                                                    exceeds-limit)
-                                  :exceeds-max-length exceeds-limit})}
-        (str "Character limit " abstract-length "/" utils/max-abstract-length)]
       [:div.cmail-content-abstract.emoji-autocomplete.emojiable.group.oc-mentions.oc-mentions-hover.editing
         {:class utils/hide-class
          :content-editable true
@@ -142,4 +136,9 @@
                         (when (and (= (.-key e) "Enter")
                                    (.-metaKey e)
                                    (fn? post-clicked))
-                          (post-clicked)))}]]))
+                          (post-clicked)))}]
+       [:div.cmail-content-abstract-counter
+        {:class (when exceeds-limit "exceeds-max-length")}
+        (str abstract-length "/" utils/max-abstract-length
+         (when exceeds-limit
+           " (character limit exceeded)"))]]))

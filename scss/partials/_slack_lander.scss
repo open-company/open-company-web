@@ -6,21 +6,16 @@ div.slack-lander-wrap {
     width: 100%;
 
     section.cta {
-      padding-top: 239px;
-      padding-bottom: 120px;
+      padding-top: 138px;
+      padding-bottom: 80px;
       text-align: center;
       position: relative;
       overflow: hidden;
 
-      @include tablet() {
-        padding-top: 131px;
-        padding-bottom: 80px;
-      }
-
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding: 131px 24px 80px;
+        padding: 88px 16px 40px;
       }
 
       * {
@@ -29,72 +24,49 @@ div.slack-lander-wrap {
       }
 
       &:after {
-        background-color: $another_ui_grey;
-        content: "";
-        width: 100%;
-        height: 39%;
-        min-height: 500px;
-        display: block;
-        border-bottom-left-radius: 200px;
         position: absolute;
         bottom: 0;
-        right: 0;
-        z-index: 2;
-
-        @include tablet() {
-          border-bottom-left-radius: 0;
-          border-top-right-radius: 200px;
-        }
+        left: 50%;
+        width: 100%;
+        height: 50%;
+        transform: translateX(-50%);
+        background-color: $another_ui_grey;
+        border-radius: 20px 200px 20px 20px;
+        display: block;
+        content: "";
+        max-width: 1200px;
 
         @include mobile() {
-          border-top-right-radius: 100px;
-        }
-
-        @media screen and (max-width: 440px) {
-          height: 25%;
+          border-radius: 0;
+          left: 0;
+          transform: translateX(0%);
         }
       }
 
       h1.headline {
-        font-size: 80px;
-        @include OC_Title()
+        font-size: 60px;
+        @include OC_Title();
+        line-height: 76px;
         color: $deep_navy;
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        padding: 0 24px;
 
         @include mobile(){
-          font-size: 50px;
-          line-height: 56px;
-          padding: 0;
-        }
-
-        @media screen and (max-width: 380px) {
-          font-size: 40px;
-          line-height: 46px;
         }
       }
 
       div.subheadline {
-        color: $ui_grey;
-        font-size: 30px;
-        line-height: 38px;
+        font-size: 28px;
+        line-height: 36px;
         @include OC_Body_Book();
-        margin: 24px auto 0px;
+        margin: 8px auto 0;
         z-index: 2;
         position: relative;
-        max-width: 800px;
-        padding: 0 24px;
+        max-width: 700px;
+        color: $deep_navy;
 
         @include mobile(){
-          margin-top: 16px;
-          font-size: 18px;
-          line-height: 23px;
-          padding: 0px;
-          color: $deep_navy;
-          max-width: initial;
-          padding: 0;
         }
       }
     }
@@ -102,18 +74,16 @@ div.slack-lander-wrap {
     a.continue-with-slack-bt {
       display: block;
       width: 320px;
-      height: 64px;
-      background-image: cdnUrl("/img/ML/continue_with_slack.svg");
-      background-size: 209px 17px;
-      background-position: center;
+      height: 56px;
+      box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.07);
+      border: 1px solid #C8CACD;
+      @include image-2x("/img/ML/continue_with_slack");
+      background-size: 219px 25px;
       background-repeat: no-repeat;
-      background-color: $carrot_orange;
-      margin: 32px auto 0;
-      border-radius: 8px;
-
-      @include mobile() {
-        margin: 40px auto 0;        
-      }
+      background-position: center;
+      border-radius: 6px;
+      background-color: white;
+      margin: 24px auto 0;
     }
 
     section.keep-aligned {

@@ -75,9 +75,13 @@
      (entry-point-get-finished success body
        (fn [orgs collection]
          (if org-slug
-           (if-let [org-data (first (filter #(= (:slug %) org-slug) orgs))]
-             ;; We got the org we were looking for
-             (org-actions/get-org org-data)
+           (if-let [org-data (first (filter #(or (= (:slug %) org-slug)
+                                                 (= (:uuid %) org-slug)) orgs))]
+             ;; We got the org we were looking for. Possibly redirect if the client
+             ;; used org uuid in token.
+             (if (= (:uuid org-data) org-slug)
+               (router/rewrite-org-uuid-as-slug org-slug (:slug org-data))
+               (org-actions/get-org org-data))
              (if (router/current-secure-activity-id)
                (activity-actions/secure-activity-get
                 #(comment-utils/get-comments-if-needed (dis/secure-activity-data) (dis/comments-data)))
@@ -122,16 +126,15 @@
     (cook/remove-cookie! router/login-redirect-cookie)
     (if redirect-url
       (router/redirect! redirect-url)
-      (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs)))))))
+      (router/nav!
+       (if (zero? (count orgs))
+         oc-urls/sign-up-profile
+         (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))
 
 (defn lander-check-team-redirect []
   (utils/after 100 #(api/get-entry-point (:org @router/path)
     (fn [success body]
-      (entry-point-get-finished success body
-        (fn [orgs collection]
-          (if (zero? (count orgs))
-            (router/nav! oc-urls/sign-up-profile)
-            (login-redirect))))))))
+      (entry-point-get-finished success body login-redirect)))))
 
 ;; Login
 (defn login-with-email-finish
@@ -142,8 +145,7 @@
         (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
         (do
           (jwt-actions/update-jwt-cookie body)
-          (api/get-entry-point (:org @router/path)
-           (fn [success body] (entry-point-get-finished success body login-redirect)))))
+          (lander-check-team-redirect)))
       (dis/dispatch! [:login-with-email/success body]))
     (cond
      (= status 401)
@@ -157,11 +159,12 @@
     (api/auth-with-email auth-link email pswd (partial login-with-email-finish email))
     (dis/dispatch! [:login-with-email])))
 
-(defn login-with-slack [auth-url]
+(defn login-with-slack [auth-url & [state-map]]
   (let [auth-url-with-redirect (user-utils/auth-link-with-state
-                                 (:href auth-url)
-                                 {:team-id "open-company-auth"
-                                  :redirect oc-urls/slack-lander-check})]
+                                (:href auth-url)
+                                (merge {:team-id "open-company-auth"
+                                        :redirect oc-urls/slack-lander-check}
+                                       state-map))]
     (router/redirect! auth-url-with-redirect)
     (dis/dispatch! [:login-with-slack])))
 
@@ -209,15 +212,18 @@
 (defn auth-settings-get
   "Entry point call for auth service."
   []
-  (api/get-auth-settings (fn [body]
-    (when body
-      ;; auth settings loaded
-      (when-let [user-link (utils/link-for (:links body) "user" "GET")]
-        (get-user user-link))
-      (dis/dispatch! [:auth-settings body])
-      (check-user-walls)
-      ;; Start teams retrieve if we have a link
-      (team-actions/teams-get)))))
+  (api/get-auth-settings (fn [body status]
+    (if body
+      (do
+        ;; auth settings loaded
+        (when-let [user-link (utils/link-for (:links body) "user" "GET")]
+          (get-user user-link))
+        (dis/dispatch! [:auth-settings body])
+        (check-user-walls)
+        ;; Start teams retrieve if we have a link
+        (team-actions/teams-get))
+      (when (= status 401)
+        (dis/dispatch! [:auth-settings status]))))))
 
 (defn auth-with-token-failed [error]
   (dis/dispatch! [:auth-with-token/failed error]))
@@ -248,7 +254,7 @@
         (entry-point-get-finished success body)
         (let [orgs (:items (:collection body))
               to-org (utils/get-default-org orgs)]
-          (router/redirect! (if to-org (oc-urls/all-posts (:slug to-org)) oc-urls/sign-up-profile)))))))
+          (router/redirect! (if to-org (oc-urls/default-landing (:slug to-org)) oc-urls/sign-up-profile)))))))
   (when (= token-type :password-reset)
     (cook/set-cookie! :show-login-overlay "collect-password"))
   (dis/dispatch! [:auth-with-token/success jwt]))
@@ -281,38 +287,41 @@
   (dis/dispatch! [:signup-with-email/failed status]))
 
 (defn signup-with-email-success
-  [user-email status jwt]
-  (cond
-    (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
-    (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
-    (= status 200) ;; Valid login, not signup, redirect to home
-    (if (or
-          (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
-          (empty? (:avatar-url jwt)))
+  [user-email team-token-signup? status jwt]
+  (let [signup-redirect (if team-token-signup?
+                         oc-urls/confirm-invitation-profile
+                         oc-urls/sign-up-profile)]
+    (cond
+      (= status 204) ;; Email wall since it's a valid signup w/ non verified email address
+      (utils/after 10 #(router/nav! (str oc-urls/email-wall "?e=" user-email)))
+      (= status 200) ;; Valid login, not signup, redirect to home
+      (if (or
+            (and (empty? (:first-name jwt)) (empty? (:last-name jwt)))
+            (empty? (:avatar-url jwt)))
+        (do
+          (utils/after 200 #(router/nav! signup-redirect))
+          (api/get-entry-point (:org @router/path) entry-point-get-finished))
+        (api/get-entry-point (:org @router/path)
+         (fn [success body]
+           (entry-point-get-finished success body
+             (fn [orgs collection]
+               (when (pos? (count orgs))
+                 (router/nav! (oc-urls/default-landing (:slug (utils/get-default-org orgs))))))))))
+      :else ;; Valid signup let's collect user data
       (do
-        (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-        (api/get-entry-point (:org @router/path) entry-point-get-finished))
-      (api/get-entry-point (:org @router/path)
-       (fn [success body]
-         (entry-point-get-finished success body
-           (fn [orgs collection]
-             (when (pos? (count orgs))
-               (router/nav! (oc-urls/all-posts (:slug (utils/get-default-org orgs))))))))))
-    :else ;; Valid signup let's collect user data
-    (do
-      (jwt-actions/update-jwt-cookie jwt)
-      (nux-actions/new-user-registered "email")
-      (utils/after 200 #(router/nav! oc-urls/sign-up-profile))
-      (api/get-entry-point (:org @router/path) entry-point-get-finished)
-      (dis/dispatch! [:signup-with-email/success]))))
+        (jwt-actions/update-jwt-cookie jwt)
+        (nux-actions/new-user-registered "email")
+        (utils/after 200 #(router/nav! signup-redirect))
+        (api/get-entry-point (:org @router/path) entry-point-get-finished)
+        (dis/dispatch! [:signup-with-email/success])))))
 
 (defn signup-with-email-callback
-  [user-email success body status]
+  [user-email team-token-signup? success body status]
   (if success
-    (signup-with-email-success user-email status body)
+    (signup-with-email-success user-email team-token-signup? status body)
     (signup-with-email-failed status)))
 
-(defn signup-with-email [signup-data]
+(defn signup-with-email [signup-data & [team-token-signup?]]
   (let [email-links (:links (dis/auth-settings))
         auth-link (utils/link-for email-links "create" "POST" {:auth-source "email"})]
     (api/signup-with-email auth-link
@@ -321,7 +330,7 @@
      (:email signup-data)
      (:pswd signup-data)
      (.. js/moment -tz guess)
-     (partial signup-with-email-callback (:email signup-data)))
+     (partial signup-with-email-callback (:email signup-data) team-token-signup?))
     (dis/dispatch! [:signup-with-email])))
 
 (defn signup-with-email-reset-errors []
@@ -356,8 +365,10 @@
 (defn user-profile-save
   ([current-user-data edit-data]
    (user-profile-save current-user-data edit-data nil))
-  ([current-user-data edit-data org-editing]
-    (let [edit-user-profile (or (:user-data edit-data) edit-data)
+  ([current-user-data edit-data org-editing-kw]
+    (let [org-editing (when org-editing-kw
+                        (get @dis/app-state org-editing-kw))
+          edit-user-profile (or (:user-data edit-data) edit-data)
           new-password (:password edit-user-profile)
           password-did-change (pos? (count new-password))
           with-pswd (if (and password-did-change
@@ -389,7 +400,8 @@
                  #(if org-editing
                     (org-actions/create-or-update-org org-editing)
                     (utils/after 2000
-                      (fn[] (router/nav! (oc-urls/all-posts (:slug (first (dis/orgs-data)))))))))))
+                      (fn[]
+                        (router/nav! (oc-urls/default-landing (:slug (or (dis/org-data) (first (dis/orgs-data))))))))))))
              (dis/dispatch! [:user-data (json->cljs body)]))))))))
 
 (defn user-avatar-save [avatar-url]
@@ -460,6 +472,8 @@
       (dispatch-expo-push-token push-token)
       ;; Novel push token, add it to the Auth service for storage
       (when (and add-token-link push-token)
+        ;; Immediately dispatch placeholder token so we don't wait on network request
+        (dispatch-expo-push-token "PENDING_PUSH_TOKEN")
         (api/add-expo-push-token
          add-token-link
          push-token

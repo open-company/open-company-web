@@ -17,6 +17,7 @@
             [oc.web.components.ui.ziggeo :refer (ziggeo-player)]
             [oc.web.components.ui.org-avatar :refer (org-avatar)]
             [oc.web.components.ui.add-comment :refer (add-comment)]
+            [oc.web.components.ui.alert-modal :refer (alert-modal)]
             [oc.web.components.stream-comments :refer (stream-comments)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.web.components.ui.comments-summary :refer (comments-summary)]
@@ -56,7 +57,7 @@
                                (utils/after 2000 #(activity-actions/send-secure-item-seen-read))
                                s)}
   [s]
-  (let [activity-data (drv/react s :secure-activity-data)
+  (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
         add-comment-highlight (drv/react s :add-comment-highlight)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
@@ -77,9 +78,11 @@
                                             :org-logo-height :logo-height}))
         comments-drv (drv/react s :comments-data)
         comments-data (au/get-comments activity-data comments-drv)
-        activity-link (utils/link-for (:links org-data) "activity")]
+        activity-link (utils/link-for (:links org-data) "entries")]
     [:div.secure-activity-container
       (login-overlays-handler)
+      (when is-showing-alert
+        (alert-modal))
       (when activity-data
         [:div.activity-header.group
           (org-avatar org-data activity-link (if is-mobile? :never :always))
@@ -117,8 +120,15 @@
               [:div.name
                 {:class utils/hide-class}
                 (str (:name (:publisher activity-data)) " in "
-                 (:board-name activity-data) " on "
-                 (utils/date-string (utils/js-date (:published-at activity-data)) [:year]))]]
+                 (:board-name activity-data) " on ")
+                 [:time
+                   {:date-time (:published-at activity-data)
+                    :data-toggle (when-not is-mobile? "tooltip")
+                    :data-placement "top"
+                    :data-container "body"
+                    :data-delay "{\"show\":\"1000\", \"hide\":\"0\"}"
+                    :data-title (utils/activity-date-tooltip activity-data)}
+                   (utils/date-string (utils/js-date (:published-at activity-data)) [:year])]]]
             (when video-id
               (ziggeo-player {:video-id video-id
                               :width (:width video-size)
@@ -134,23 +144,27 @@
                  :class utils/hide-class}])
             (stream-attachments (:attachments activity-data))
             [:div.activity-content-footer.group
-              (comments-summary activity-data)
-              (reactions activity-data)]
+              (comments-summary {:activity-data activity-data :comments-data comments-drv})
+              (reactions {:entity-data activity-data})]
             (when (or (pos? (count comments-data))
                       (:can-comment activity-data))
               [:div.comments-separator])
-            (when comments-data
-              (stream-comments activity-data comments-data add-comment-highlight))
             (when (:can-comment activity-data)
-              (rum/with-key (add-comment activity-data) (str "add-comment-" (:uuid activity-data))))]
-            [:div.secure-activity-footer
-              (if id-token
-                [:button.mlb-reset.secure-activity-footer-bt
-                  {:on-click #(user-actions/show-login :login-with-email)}
-                  "Log in required to access all posts"]
-                [:a.sent-via-carrot
-                  {:href oc-urls/home}
-                  "Learn more about Carrot"])]])
+              (rum/with-key (add-comment {:activity-data activity-data}) (str "add-comment-" (:uuid activity-data))))
+            (when comments-data
+              (stream-comments {:activity-data activity-data
+                                :comments-data comments-data
+                                :new-added-comment add-comment-highlight
+                                :current-user-id (:user-id id-token)}))]])
+      [:div.secure-activity-footer
+        (if id-token
+          [:button.mlb-reset.secure-activity-footer-bt
+            {:on-click #(user-actions/show-login :login-with-email)}
+            "Log in required to access all posts"]
+          [:a.sent-via-carrot
+            {:href oc-urls/home}
+            [:div.sent-via-carrot-copy
+              "Sent by Carrot"]])]
       (when-not activity-data
         [:div.secure-activity-container
           (loading {:loading true})])]))

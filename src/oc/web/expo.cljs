@@ -4,7 +4,8 @@
   See https://github.com/open-company/open-company-mobile/blob/master/src/nativeWebBridge.js
   for the native side of the bridge."
   (:require [oc.web.actions.user :as user-actions]
-            [oc.web.utils.user :as user-utils]))
+            [oc.web.utils.user :as user-utils]
+            [oc.web.dispatcher :as dis]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Native/web bridge primitives
@@ -55,18 +56,6 @@
       (user-actions/deny-push-notification-permission))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Handling of user tapping on push notification
-
-(defn- ^:export on-push-notification-tapped
-  "Callback for responding to the user tapping on a native push notification. Response contains
-  a push notification payload, which is literally a Carrot notification map."
-  [json-str]
-  (when-let [notification (parse-bridge-data json-str)]
-    (let [fixed-notif (user-utils/fix-notification notification)
-          click-handler (:click fixed-notif)]
-      (click-handler))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Grabbing the deep link origin for creating mobile URLs
 
 (def ^:private deep-link-origin (atom nil))
@@ -85,7 +74,8 @@
   [json-str]
   (when-let [origin (parse-bridge-data json-str)]
     (bridge-log! origin)
-    (reset! deep-link-origin origin)))
+    (reset! deep-link-origin origin)
+    (dis/dispatch! [:input dis/expo-deep-link-origin-key origin])))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,4 +97,5 @@
   [av]
   (when av
     (bridge-log! (str "on-app-version " av))
-    (reset! app-version av)))
+    (reset! app-version av)
+    (dis/dispatch! [:input dis/expo-app-version-key av])))

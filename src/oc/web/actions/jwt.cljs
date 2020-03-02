@@ -3,7 +3,6 @@
             [oc.web.api :as api]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
-            [oc.web.lib.chat :as chat]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -56,7 +55,6 @@
     (utils/after 1 #(dis/dispatch! [:jwt jwt-contents]))
     ;; User identifications for third party services
     (when jwt-contents
-      (chat/identify)
       (fullstory/identify))))
 
 (defn update-jwt [jbody]

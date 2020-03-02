@@ -18,7 +18,7 @@
                  (dis/dispatch! [:input [:mobile-navigation-sidebar] false])
                  (dis/dispatch! [:input [:orgs-dropdown-visible] false]))}
     [:a
-      {:href (oc-urls/all-posts (:slug org))}
+      {:href (oc-urls/default-landing (:slug org))}
       (org-avatar org false :always)]])
 
 (rum/defcs orgs-dropdown < rum/static

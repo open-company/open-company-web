@@ -6,24 +6,22 @@
             [goog.events.EventType :as EventType]
             [oc.web.lib.jwt :as jwt]
             [oc.web.router :as router]
-            [oc.web.dispatcher :as dis]
             [oc.shared.useragent :as ua]
             [oc.web.lib.utils :as utils]
-            [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
-            [oc.web.stores.search :as search]
             [oc.web.lib.whats-new :as whats-new]
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.wrt :refer (wrt)]
             [oc.web.components.cmail :refer (cmail)]
             [oc.web.components.ui.menu :refer (menu)]
             [oc.web.actions.section :as section-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.navbar :refer (navbar)]
-            [oc.web.components.search :refer (search-box)]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
-            [oc.web.components.ui.shared-misc :refer (video-lightbox)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -32,11 +30,15 @@
             [oc.web.components.org-settings-modal :refer (org-settings-modal)]
             [oc.web.components.navigation-sidebar :refer (navigation-sidebar)]
             [oc.web.components.user-notifications :refer (user-notifications)]
-            [oc.web.components.ui.follow-ups-picker :refer (follow-ups-picker)]
             [oc.web.components.ui.login-overlay :refer (login-overlays-handler)]
             [oc.web.components.ui.login-wall :refer (login-wall)]
-            [oc.web.components.invite-settings-modal :refer (invite-settings-modal)]
+            [oc.web.components.invite-picker-modal :refer (invite-picker-modal)]
+            [oc.web.components.invite-email-modal :refer (invite-email-modal)]
+            [oc.web.components.invite-slack-modal :refer (invite-slack-modal)]
+            [oc.web.components.theme-settings-modal :refer (theme-settings-modal)]
             [oc.web.components.team-management-modal :refer (team-management-modal)]
+            [oc.web.components.ui.trial-expired-banner :refer (trial-expired-banner)]
+            [oc.web.components.payments-settings-modal :refer (payments-settings-modal)]
             [oc.web.components.recurring-updates-modal :refer (recurring-updates-modal)]
             [oc.web.components.user-notifications-modal :refer (user-notifications-modal)]
             [oc.web.components.edit-recurring-update-modal :refer (edit-recurring-update-modal)]
@@ -54,12 +56,10 @@
                            ;; Derivatives
                            (drv/drv :org-dashboard-data)
                            (drv/drv :user-responded-to-push-permission?)
-                           (drv/drv :route)
-                           (drv/drv search/search-key)
-                           (drv/drv search/search-active?)
+                           (drv/drv :ui-theme)
 
                            {:did-mount (fn [s]
-                             (utils/after 100 #(set! (.-scrollTop (.-body js/document)) (utils/page-scroll-top)))
+                             (utils/after 100 #(set! (.-scrollTop (.-scrollingElement js/document)) (utils/page-scroll-top)))
                              (init-whats-new)
                              s)
                             :did-remount (fn [_ s]
@@ -68,7 +68,7 @@
   [s]
   (let [{:keys [orgs
                 org-data
-                jwt
+                jwt-data
                 board-data
                 initial-section-editing
                 container-data
@@ -81,12 +81,9 @@
                 wrt-read-data
                 force-login-wall
                 panel-stack
-                app-loading]} (drv/react s :org-dashboard-data)
+                app-loading
+                payments-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        search-active? (drv/react s search/search-active?)
-        search-results? (pos?
-                         (count
-                          (:results (drv/react s search/search-key))))
         loading? (or ;; force loading screen
                      app-loading
                      ;; the org data are not loaded yet
@@ -99,30 +96,31 @@
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
                                org-data
+                               (not= (router/current-board-slug) "inbox")
                                (not= (router/current-board-slug) "all-posts")
                                (not= (router/current-board-slug) "must-see")
-                               (not= (router/current-board-slug) "follow-ups")
+                               (not= (router/current-board-slug) "bookmarks")
                                (not ((set (map :slug (:boards org-data))) (router/current-board-slug))))
+        current-activity-data (when (router/current-activity-id)
+                                (get posts-data (router/current-activity-id)))
         entry-not-found (and ;; org is present
                              (not org-not-found)
                              ;; section is present
                              (not section-not-found)
-                             ;; a post id is specified
-                             (router/current-activity-id)
-                             ;; posts data are present
-                             (not (nil? posts-data))
-                             ;; and
-                             (or ;; the post is not present int he posts list
-                                 (not ((set (keys posts-data)) (router/current-activity-id)))
-                                 ;; the board of the post is wrong
-                                 (not= (:board-slug (get posts-data (router/current-activity-id)) (router/current-board-slug)))))
-        show-login-wall (and (not jwt)
+                             ;; route is for a single post and it's been loaded
+                             current-activity-data
+                             ;; post wasn't found
+                             (or (= current-activity-data :404)
+                                 ;; route has wrong board slug/uuid for the current post
+                                 (and (not= (:board-slug current-activity-data) (router/current-board-slug))
+                                      (not= (:board-uuid current-activity-data) (router/current-board-slug)))))
+        show-login-wall (and (not jwt-data)
                              (or force-login-wall
                                  (and (router/current-activity-id)
                                      (or org-not-found
                                          section-not-found
                                          entry-not-found))))
-        show-activity-removed (and jwt
+        show-activity-removed (and jwt-data
                                    (router/current-activity-id)
                                    (or org-not-found
                                        section-not-found
@@ -130,7 +128,6 @@
         is-loading (and (not show-login-wall)
                         (not show-activity-removed)
                         loading?)
-        is-showing-mobile-search (and is-mobile? search-active?)
         open-panel (last panel-stack)
         show-section-editor (= open-panel :section-edit)
         show-section-add (= open-panel :section-add)
@@ -140,24 +137,25 @@
         show-reminders-view? (or show-reminders? show-reminder-edit?)
         show-wrt-view? (and open-panel
                             (s/starts-with? (name open-panel) "wrt-"))
-        show-follow-ups-picker (and open-panel
-                                    (s/starts-with? (name open-panel) "follow-ups-picker-"))
         show-mobile-cmail? (and cmail-state
                                 (not (:collapsed cmail-state))
                                 is-mobile?)
         user-responded-to-push-permission? (drv/react s :user-responded-to-push-permission?)
         show-push-notification-permissions-modal? (and ua/mobile-app?
-                                                       (jwt/jwt)
-                                                       (not user-responded-to-push-permission?))]
+                                                       jwt-data
+                                                       (not user-responded-to-push-permission?))
+        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)]
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
       [:div
         {:class (utils/class-set {:org-dashboard true
+
                                   :mobile-or-tablet is-mobile?
                                   :login-wall show-login-wall
                                   :activity-removed show-activity-removed
                                   :expanded-activity (router/current-activity-id)
+                                  :trial-expired show-trial-expired?
                                   :show-menu (= open-panel :menu)})}
         ;; Use cond for the next components to exclud each other and avoid rendering all of them
         (login-overlays-handler)
@@ -168,15 +166,23 @@
           ;; Activity not found
           show-login-wall
           (login-wall)
+          (= open-panel :payments)
+          (payments-settings-modal {:org-data org-data})
           ;; Org settings
           (= open-panel :org)
           (org-settings-modal)
           ;; Integrations settings
           (= open-panel :integrations)
           (integrations-settings-modal)
-          ;; Invite settings
-          (= open-panel :invite)
-          (invite-settings-modal)
+          ;; Invite picker settings
+          (= open-panel :invite-picker)
+          (invite-picker-modal)
+          ;; Invite via email
+          (= open-panel :invite-email)
+          (invite-email-modal)
+          ;; Invite via Slack
+          (= open-panel :invite-slack)
+          (invite-slack-modal)
           ;; Team management
           (= open-panel :team)
           (team-management-modal)
@@ -209,9 +215,9 @@
           ;; WRT
           show-wrt-view?
           (wrt org-data)
-          ;; Search results
-          is-showing-mobile-search
-          (search-box))
+          ;; UI Theme settings panel
+          (= open-panel :theme)
+          (theme-settings-modal (drv/react s :ui-theme)))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
@@ -226,8 +232,6 @@
         ;; cmail editor
         (when show-mobile-cmail?
           (cmail))
-        (when show-follow-ups-picker
-          (follow-ups-picker))
         ;; Menu always rendered if not on mobile since we need the
         ;; selector for whats-new widget to be present
         (when (or (not is-mobile?)
@@ -240,17 +244,19 @@
         ;; Alert modal
         (when is-showing-alert
           (alert-modal))
-        ;; On mobile don't show the dashboard/stream when showing another panel
-        (when (or (not is-mobile?)
-                  (and (not is-sharing-activity)
-                       (not show-mobile-cmail?)
-                       (not show-push-notification-permissions-modal?)))
+        
+        (when (and ;; On mobile don't show the dashboard/stream when showing another panel
+                   (or (not is-mobile?)
+                       (and (not is-sharing-activity)
+                            (not show-mobile-cmail?)
+                            (not show-push-notification-permissions-modal?))))
           [:div.page
+            (when show-trial-expired?
+              (trial-expired-banner))
             (navbar)
             [:div.org-dashboard-container
               [:div.org-dashboard-inner
                (when (or (not is-mobile?)
-                         (and (or (not search-active?) (not search-results?))
-                              (or (not open-panel)
+                         (and (or (not open-panel)
                                   (= open-panel :menu))))
                  (dashboard-layout))]]])])))

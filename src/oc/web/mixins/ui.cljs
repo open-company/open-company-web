@@ -1,14 +1,14 @@
 (ns oc.web.mixins.ui
   (:require [rum.core :as rum]
-            [dommy.core :as dommy :refer-macros (sel1)]
+            [dommy.core :as dommy]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
+            [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.utils.activity :as au]
+            [oc.web.utils.dom :as dom-utils]
             [oc.web.lib.responsive :as responsive]))
-
-(def -no-scroll-mixin-class :no-scroll)
 
 (def refresh-tooltips-mixin
   {:did-mount (fn [s]
@@ -21,29 +21,28 @@
          (.tooltip "hide")))
    s)})
 
+(def strict-refresh-tooltips-mixin
+  {:did-mount (fn [s]
+    (.tooltip (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s)))
+   s)
+   :did-update (fn [s]
+    (.each (js/$ "[data-toggle=\"tooltip\"]" (rum/dom-node s))
+      #(doto (js/$ %2)
+         (.tooltip "fixTitle")
+         (.tooltip "hide")))
+   s)})
+
 (def no-scroll-mixin
   "Mixin used to check if the body has aleady the no-scroll class, if it does it's a no-op.
    If it doesn't it remember to remove it once the component is going to unmount."
-  {:did-mount
-    (fn [state]
-      ;; Add no-scroll to the body if it doesn't has it already
-      ;; to avoid scrolling while showing this modal
-      (let [body (sel1 [:body])]
-        (if (and body
-                 (dommy/has-class? body -no-scroll-mixin-class))
-          state
-          (do ;; if no-scroll is not preset
-            ;; add it
-            (dommy/add-class! body -no-scroll-mixin-class)
-            ;; remember to remove it on unmount
-            (assoc state ::-no-scroll-mixin-remove-body-class true)))))
-   :will-unmount
-    (fn [state]
-      (when (and (contains? state ::-no-scroll-mixin-remove-body-class)
-                 (::-no-scroll-mixin-remove-body-class state))
-        (dommy/remove-class! (sel1 [:body]) -no-scroll-mixin-class)
-        (dissoc state ::-no-scroll-mixin-remove-body-class))
-      state)})
+  {:did-mount (fn [state]
+     ;; Add no-scroll to the body if it doesn't has it already
+     ;; to avoid scrolling while showing this modal
+     (dom-utils/lock-page-scroll)
+     state)
+   :will-unmount (fn [state]
+     (dom-utils/unlock-page-scroll)
+     state)})
 
 (def first-render-mixin
   "This mixin will add a :first-render-done atom to your component state. It will
@@ -233,17 +232,18 @@
          next-state))}))
 
 (defn on-window-click-mixin [callback]
-  {:did-mount (fn [s]
-   (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
-                            (fn [e]
-                             (callback s e)))]
-    (assoc s :on-click-out-listener on-click-listener)))
-   :will-unmount (fn [s]
-   (if (:on-click-out-listener s)
-    (do
-      (events/unlistenByKey (:on-click-out-listener s))
-      (dissoc s :on-click-out-listener))
-    s))})
+  (let [click-out-kw (keyword (str "on-click-out-listenr-" (rand 100)))]
+    {:did-mount (fn [s]
+     (let [on-click-listener (events/listen (.getElementById js/document "app") EventType/CLICK
+                              (fn [e]
+                               (callback s e)))]
+      (assoc s click-out-kw on-click-listener)))
+     :will-unmount (fn [s]
+     (if (click-out-kw s)
+      (do
+        (events/unlistenByKey (click-out-kw s))
+        (dissoc s click-out-kw))
+      s))}))
 
 (defn on-window-resize-mixin [callback]
   {:did-mount (fn [s]

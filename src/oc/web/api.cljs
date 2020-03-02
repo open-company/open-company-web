@@ -15,6 +15,7 @@
             [oc.web.local-settings :as ls]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.ws.change-client :as ws-cc]
+            [oc.web.lib.fullstory :as fullstory]
             [oc.web.utils.ws-client-ids :as ws-client-ids]
             [oc.web.lib.json :refer (json->cljs cljs->json)]
             [oc.web.actions.notifications :as notification-actions]))
@@ -69,12 +70,21 @@
         with-client-ids (cond-> params
                                change-client-id (assoc-in [:headers "OC-Change-Client-ID"] change-client-id)
                                interaction-client-id (assoc-in [:headers "OC-Interaction-Client-ID"] interaction-client-id)
-                               notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))]
-    (if-let [jwt (or (j/jwt)
-                     (j/id-token))]
+                               notify-client-id (assoc-in [:headers "OC-Notify-Client-ID"] notify-client-id))
+        jwt-or-id-token (or (j/jwt)
+                            (j/id-token))
+        ; invite-token (-> @router/path :query-params :invite-token)
+        ]
+    (cond
+      jwt-or-id-token
       (-> {:with-credentials? false}
           (merge with-client-ids)
-          (update :headers merge {"Authorization" (str "Bearer " jwt)}))
+          (update :headers merge {"Authorization" (str "Bearer " jwt-or-id-token)}))
+      ; invite-token
+      ; (-> {:with-credentials? false}
+      ;     (merge with-client-ids)
+      ;     (update :headers merge {"Authorization" (str "Bearer " invite-token)}))
+      :else
       with-client-ids)))
 
 (defn headers-for-link [link]
@@ -183,7 +193,7 @@
                         :method (method-name method)
                         :jwt (j/jwt)
                         :params params
-                        :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}]
+                        :sessionURL (fullstory/session-url)}]
             (timbre/error "xhr response error:" (method-name method) ":" (str endpoint path) " -> " status)
             (sentry/capture-error-with-extra-context! report (str "xhr response error:" status))))
         (on-complete response)))))
@@ -211,7 +221,7 @@
   (sentry/capture-message-with-extra-context!
     (merge {:callee callee-name
             :link link
-            :sessionURL (when (exists? js/FS) (.-getCurrentSessionURL js/FS))}
+            :sessionURL (fullstory/session-url)}
      parameters)
     (str "Client API error on: " callee-name))
   (notification-actions/show-notification (assoc utils/internal-error :expire 5))
@@ -220,17 +230,15 @@
 
 ;; Allowed keys
 
-(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility])
+(def org-allowed-keys [:name :logo-url :logo-width :logo-height :content-visibility :why-carrot])
 
-(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see :follow-ups])
+(def entry-allowed-keys [:headline :body :abstract :attachments :video-id :video-error :board-slug :status :must-see])
 
 (def board-allowed-keys [:name :access :slack-mirror :viewers :authors :private-notifications])
 
 (def user-allowed-keys [:first-name :last-name :password :avatar-url :timezone :digest-medium :notification-medium :reminder-medium :qsg-checklist])
 
 (def reminder-allowed-keys [:org-uuid :headline :assignee :frequency :period-occurrence :week-occurrence])
-
-(def follow-up-assignee-keys [:user-id :name :avatar-url])
 
 (defn web-app-version-check [callback]
   (web-http http/get (str "/version/version" ls/deploy-key ".json")
@@ -266,18 +274,47 @@
         (callback success fixed-body)))))
 
 (defn get-auth-settings [callback]
-  (let [header-options {:headers (headers-for-link {:access-control-allow-headers nil :content-type "application/json"})}]
-  (auth-http http/get "/" header-options
-   (fn [response]
-     (let [body (if (:success response) (:body response) false)]
-       (callback body))))))
+  (let [invite-token (-> @router/path :query-params :invite-token)
+        default-headers (headers-for-link {:access-control-allow-headers nil
+                                           :content-type "application/json"})
+        with-auth-token (if invite-token
+                          (merge default-headers {"Authorization" (str "Bearer " invite-token)})
+                          default-headers)
+        header-options {:headers with-auth-token}]
+    (auth-http http/get "/" header-options
+     (fn [{:keys [status success body] :as response}]
+       (let [body (when success body)]
+         (callback body status))))))
 
-;; Subscription
+;; Payments
 
-(defn get-subscription [company-uuid callback]
-  (pay-http http/get (str "/subscriptions/" company-uuid)
-   nil
-   callback))
+(defn get-payments [payments-link callback]
+  (if payments-link
+    (auth-http (method-for-link payments-link) (relative-href payments-link)
+     {:headers (headers-for-link payments-link)}
+     callback)
+    (handle-missing-link "get-payments" payments-link callback)))
+
+(defn update-plan-subscription
+  "Used for PUT, PATCH and DELETE of subscriptions. Adds json-params with {:plan-id plan-id}
+   only if a plan-id is passed."
+  [update-link plan-id callback]
+  (if update-link
+    (let [update-subscription-body (cljs->json {:plan-id plan-id})
+          options* {:headers (headers-for-link update-link)}
+          options (if plan-id (assoc options* :json-params update-subscription-body) options*)]
+      (auth-http (method-for-link update-link) (relative-href update-link)
+       options callback))
+    (handle-missing-link "update-plan-subscription" update-link callback)))
+
+(defn get-checkout-session-id [checkout-link success-url cancel-url callback]
+  (if checkout-link
+    (auth-http (method-for-link checkout-link) (relative-href checkout-link)
+     {:headers (headers-for-link checkout-link)
+      :json-params (cljs->json {:success-url success-url
+                                :cancel-url cancel-url})}
+     callback)
+    (handle-missing-link "get-checkout-session-id" checkout-link callback)))
 
 ;; Org
 
@@ -453,7 +490,12 @@
 ;; Signup
 
 (defn signup-with-email [auth-link first-name last-name email pswd timezone callback]
-  (let [user-map {:first-name first-name
+  (let [invite-token (-> @router/path :query-params :invite-token)
+        default-headers (headers-for-link auth-link)
+        with-auth-token (if invite-token
+                          (merge default-headers {"Authorization" (str "Bearer " invite-token)})
+                          default-headers)
+        user-map {:first-name first-name
                   :last-name last-name
                   :email email
                   :password pswd
@@ -461,7 +503,7 @@
     (if (and auth-link first-name last-name email pswd)
       (auth-http (method-for-link auth-link) (relative-href auth-link)
         {:json-params (cljs->json user-map)
-         :headers (headers-for-link auth-link)}
+         :headers with-auth-token}
         (fn [{:keys [success body status]}]
           (callback success body status)))
       (handle-missing-link "signup-with-email" auth-link callback
@@ -543,6 +585,13 @@
       {:headers (headers-for-link remove-admin-link)}
       callback)
     (handle-missing-link "remove-admin" remove-admin-link callback {:user user})))
+
+(defn handle-invite-link [invite-token-link callback]
+  (if invite-token-link
+    (auth-http (method-for-link invite-token-link) (relative-href invite-token-link)
+      {:headers (headers-for-link invite-token-link)}
+      callback)
+    (handle-missing-link "handle-invite-link" invite-token-link callback)))
 
 ;; User
 
@@ -814,7 +863,7 @@
          (callback {:query search-query
                     :success success
                     :error (when-not success body)
-                    :body (when (seq body) (json->cljs body))})))
+                    :body (when (and success (seq body)) (json->cljs body))})))
       (handle-missing-link "query" search-link callback
        {:org-uuid org-uuid
         :search-query search-query}))))
@@ -863,28 +912,53 @@
      callback)
     (handle-missing-link "get-reminders-roster" roster-link callback)))
 
-;; Follow-ups
+;; Bookmarks
 
-(defn complete-follow-up [complete-follow-up-link callback]
-  (if complete-follow-up-link
-    (storage-http (method-for-link complete-follow-up-link) (relative-href complete-follow-up-link)
-     {:headers (headers-for-link complete-follow-up-link)}
+(defn toggle-bookmark [bookmark-link callback]
+  (if bookmark-link
+    (storage-http (method-for-link bookmark-link) (relative-href bookmark-link)
+     {:headers (headers-for-link bookmark-link)}
      callback)
-    (handle-missing-link "complete-follow-up" complete-follow-up-link callback)))
+    (handle-missing-link "toggle-bookmark" bookmark-link callback)))
 
-(defn create-follow-ups [create-follow-up-link follow-ups-map callback]
-  (if create-follow-up-link
-    (let [filtered-assignees (if (:assignees follow-ups-map)
-                               (map #(select-keys % follow-up-assignee-keys) (:assignees follow-ups-map))
-                               [])
-          final-data {:self (:self follow-ups-map)
-                      :assignees filtered-assignees}
-          json-data (cljs->json final-data)]
-      (storage-http (method-for-link create-follow-up-link) (relative-href create-follow-up-link)
-       {:headers (headers-for-link create-follow-up-link)
-        :json-params json-data}
-       callback))
-    (handle-missing-link "create-follow-ups" create-follow-up-link callback)))
+;; Inbox
+
+(defn inbox-dismiss [dismiss-link dismiss-at callback]
+  (if dismiss-link
+    (storage-http (method-for-link dismiss-link) (relative-href dismiss-link)
+     {:headers (headers-for-link dismiss-link)
+      :body dismiss-at}
+     callback)
+    (handle-missing-link "inbox-dismiss" dismiss-link callback {:dismiss-at dismiss-at})))
+
+(defn inbox-unread [unread-link callback]
+  (if unread-link
+    (storage-http (method-for-link unread-link) (relative-href unread-link)
+     {:headers (headers-for-link unread-link)}
+     callback)
+    (handle-missing-link "inbox-unread" unread-link callback)))
+
+(defn inbox-follow [follow-link callback]
+  (if follow-link
+    (storage-http (method-for-link follow-link) (relative-href follow-link)
+     {:headers (headers-for-link follow-link)}
+     callback)
+    (handle-missing-link "inbox-follow" follow-link callback)))
+
+(defn inbox-unfollow [unfollow-link callback]
+  (if unfollow-link
+    (storage-http (method-for-link unfollow-link) (relative-href unfollow-link)
+     {:headers (headers-for-link unfollow-link)}
+     callback)
+    (handle-missing-link "inbox-unfollow" unfollow-link callback)))
+
+(defn inbox-dismiss-all [dismiss-all-link dismiss-at callback]
+  (if dismiss-all-link
+    (storage-http (method-for-link dismiss-all-link) (relative-href dismiss-all-link)
+     {:headers (headers-for-link dismiss-all-link)
+      :body dismiss-at}
+     callback)
+    (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
 
 ;; WRT
 

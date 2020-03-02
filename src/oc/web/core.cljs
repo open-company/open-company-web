@@ -20,13 +20,14 @@
             [oc.web.stores.activity]
             [oc.web.stores.comment]
             [oc.web.stores.reaction]
-            [oc.web.stores.subscription]
+            [oc.web.stores.payments]
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
+            [oc.web.actions.ui-theme]
             [oc.web.actions.activity :as aa]
             [oc.web.actions.org :as oa]
             [oc.web.actions.comment :as ca]
@@ -51,12 +52,6 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.org-dashboard :refer (org-dashboard)]
-            [oc.web.components.about :refer (about)]
-            [oc.web.components.home-page :refer (home-page)]
-            [oc.web.components.pricing :refer (pricing)]
-            [oc.web.components.slack :refer (slack)]
-            [oc.web.components.press-kit :refer (press-kit)]
-            [oc.web.components.slack-lander :refer (slack-lander)]
             [oc.web.components.secure-activity :refer (secure-activity)]
             [oc.web.components.ui.onboard-wrapper :refer (onboard-wrapper)]
             [oc.web.components.ui.notifications :refer (notifications)]
@@ -107,7 +102,7 @@
     (when (seq (.-search l))
       (.pushState (.-history js/window) #js {} (.-title js/document) with-search))))
 
-(defn pre-routing [query-params & [should-rewrite-url rewrite-params]]
+(defn pre-routing [params & [should-rewrite-url rewrite-params]]
   ;; Add Electron classes if needed
   (let [body (sel1 [:body])]
     (when ua/desktop-app?
@@ -117,61 +112,47 @@
       (when ua/windows?
         (dommy/add-class! body :win-electron))))
   ;; Setup timbre log level
-  (when (:log-level query-params)
-    (logging/config-log-level! (:log-level query-params)))
+  (when (-> params :query-params :log-level)
+    (logging/config-log-level! (-> params :query-params :log-level)))
   ; make sure the menu is closed
   (let [pathname (.. js/window -location -pathname)]
     (when (not= pathname (s/lower pathname))
       (let [lower-location (str (s/lower pathname) (.. js/window -location -search) (.. js/window -location -hash))]
         (set! (.-location js/window) lower-location))))
   (swap! router/path {})
-  (when (and (contains? query-params :jwt)
-             (map? (js->clj (jwt/decode (:jwt query-params)))))
+  (when (and (contains? (:query-params params) :jwt)
+             (map? (js->clj (jwt/decode (-> params :query-params :jwt)))))
     ; contains :jwt, so saving it
-    (ja/update-jwt (:jwt query-params)))
+    (ja/update-jwt (-> params :query-params :jwt)))
   (when (and (not (jwt/jwt))
-             (contains? query-params :id)
-             (map? (js->clj (jwt/decode (:id query-params)))))
+             (contains? (:query-params params) :id)
+             (map? (js->clj (jwt/decode (-> params :query-params :id)))))
     ; contains :id, so saving it
-    (ja/update-id-token (:id query-params)))
-  (check-get-params query-params)
+    (ja/update-id-token (-> params :query-params :id)))
+  (check-get-params (:query-params params))
   (when should-rewrite-url
     (rewrite-url rewrite-params))
-  (when (= (:new query-params) "true")
+  (when (= (-> params :query-params :new) "true")
     (swap! dis/app-state assoc :new-slack-user true))
+  (when (contains? params :org)
+    (swap! dis/app-state assoc :foc-layout (aa/saved-foc-layout (:org params))))
   (inject-loading))
 
 (defn post-routing []
   (routing-actions/routing @router/path)
   (user-actions/initial-loading))
 
-;; home
-(defn home-handler [target params]
-  (pre-routing (:query-params params) true)
-  ;; save route
-  (router/set-route! ["home"] {:query-params (:query-params params)})
-  (post-routing)
-  ;; render component
-  (drv-root home-page target))
-
 (defn check-nux [query-params]
   (let [has-at-param (contains? query-params :at)
-        loading (or (and ;; if is board page
-                         (not (contains? query-params :ap))
-                         ;; if the board data are not present
-                         (not (dis/posts-data)))
-                         ;; if the all-posts data are not preset
-                    (and (contains? query-params :ap)
-                         ;; this latter is used when displaying modal over AP
-                         (not (dis/posts-data))))
         user-settings (when (and (contains? query-params :user-settings)
                                  (#{:profile :notifications} (keyword (:user-settings query-params))))
                         (keyword (:user-settings query-params)))
         org-settings (when (and (not user-settings)
                               (contains? query-params :org-settings)
-                              (#{:org :team :invite :integrations} (keyword (:org-settings query-params))))
+                              (#{:org :team :invite-picker :invite-email :invite-slack :integrations :payments} (keyword (:org-settings query-params))))
                        (keyword (:org-settings query-params)))
-        reminders (when (and (not org-settings)
+        reminders (when (and ls/reminders-enabled?
+                             (not org-settings)
                              (contains? query-params :reminders))
                     :reminders)
         panel-stack (cond
@@ -181,32 +162,25 @@
                       :else [])
         bot-access (when (contains? query-params :access)
                       (:access query-params))
-        next-app-state {:loading loading
-                        :panel-stack panel-stack
-                        :bot-access bot-access}]
+        billing-checkout-map (when (and (= org-settings :payments)
+                                        (contains? query-params :result))
+                               {dis/checkout-result-key (= (:result query-params) "true")
+                                dis/checkout-update-plan-key (:update-plan query-params)})
+        next-app-state (merge {:panel-stack panel-stack
+                               :bot-access bot-access}
+                        billing-checkout-map)]
     (swap! dis/app-state merge next-app-state)))
-
-(defn- read-sort-type-from-cookie
-  "Read the sort order from the cookie, fallback to the default,
-   if it's on drafts board force the recently posted sort since that has only that"
-  [params]
-  (let [last-sort-type (aa/saved-sort-type (:org params))]
-    (if (or (= last-sort-type dis/other-sort-type)
-            (= (:board params) utils/default-drafts-board-slug))
-      :recently-posted
-      dis/default-sort-type)))
 
 ;; Company list
 (defn org-handler [route target component params]
   (let [org (:org params)
         board (:board params)
-        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         ;; First ever landing cookie name
-        first-ever-cookie-name (when (= route "all-posts")
-                                 (router/first-ever-ap-land-cookie (jwt/user-id)))
+        first-ever-cookie-name (when (= route urls/default-board-slug)
+                                 (router/first-ever-landing-cookie (jwt/user-id)))
         ;; First ever landing cookie value
-        first-ever-cookie (when (= route "all-posts")
+        first-ever-cookie (when (= route urls/default-board-slug)
                             (cook/get-cookie first-ever-cookie-name))]
     (if first-ever-cookie
       ;; If first ever land cookie is set redirect user to the hello url
@@ -214,11 +188,11 @@
         ;; Remove the cookie
         (cook/remove-cookie! first-ever-cookie-name)
         ;; Redirect to the first ever landing page
-        (router/redirect! (urls/first-ever-all-posts org)))
+        (router/redirect! (urls/first-ever-landing org)))
       (do
-        (pre-routing query-params true {:query-params query-params :keep-params [:at]})
+        (pre-routing params true {:query-params query-params :keep-params [:at]})
         ;; save route
-        (router/set-route! [org route] {:org org :board board :sort-type sort-type :query-params (:query-params params)})
+        (router/set-route! [org route] {:org org :board board :query-params (:query-params params)})
         ;; load data from api
         (when-not (dis/org-data)
           (swap! dis/app-state merge {:loading true}))
@@ -228,7 +202,7 @@
         (drv-root component target)))))
 
 (defn simple-handler [component route-name target params & [rewrite-url]]
-  (pre-routing (:query-params params) rewrite-url)
+  (pre-routing params rewrite-url)
   ;; save route
   (let [org (:org params)]
     (router/set-route! (vec (remove nil? [route-name org])) {:org org :query-params (:query-params params)}))
@@ -245,10 +219,9 @@
         board (:board params)
         entry (:entry params)
         comment (:comment params)
-        sort-type (read-sort-type-from-cookie params)
         query-params (:query-params params)
         has-at-param (contains? query-params :at)]
-    (pre-routing query-params true {:query-params query-params :keep-params [:at]})
+    (pre-routing params true {:query-params query-params :keep-params [:at]})
     ;; save the route
     (router/set-route!
      (vec
@@ -259,7 +232,6 @@
       :board board
       :activity entry
       :comment comment
-      :sort-type sort-type
       :query-params query-params})
     (check-nux query-params)
     (post-routing)
@@ -272,7 +244,7 @@
         secure-id (:secure-id params)
         query-params (:query-params params)]
     (when pre-routing?
-      (pre-routing query-params true))
+      (pre-routing params true))
     ;; save the route
     (router/set-route!
      (vec
@@ -297,21 +269,21 @@
     (drv-root component target)))
 
 (defn entry-handler [target params]
-  (pre-routing (:query-params params) true)
+  (pre-routing params true)
   (if (and (not (jwt/jwt))
            (:secure-uuid (jwt/get-id-token-contents)))
     (secure-activity-handler secure-activity "secure-activity" target params false)
     (board-handler "activity" target org-dashboard params)))
 
 (defn slack-lander-check [params]
-  (pre-routing (:query-params params) true)
+  (pre-routing params true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
       (na/new-user-registered "slack"))
     (user-actions/lander-check-team-redirect)))
 
 (defn google-lander-check [params]
-  (pre-routing (:query-params params) true)
+  (pre-routing params true)
   (let [new-user (= (:new (:query-params params)) "true")]
     (when new-user
       (na/new-user-registered "google"))
@@ -323,22 +295,29 @@
   (do
     (defroute _loading_route "/__loading" {:as params}
       (timbre/info "Routing _loading_route __loading")
-      (pre-routing (:query-params params)))
+      (pre-routing params))
 
     (defroute login-route urls/login {:as params}
       (timbre/info "Routing login-route" urls/login)
-      (when (and (not (contains? (:query-params params) :jwt))
-                 (not (jwt/jwt)))
-        (if (contains? (:query-params params) :slack)
-          (swap! dis/app-state assoc :show-login-overlay :signup-with-slack)
-          (swap! dis/app-state assoc :show-login-overlay :login-with-slack)))
-      (simple-handler home-page "login" target params))
+      ;; In case user is logged in and has a last org cookie
+      
+      (let [last-org-cookie (cook/get-cookie (router/last-org-cookie))]
+        (if (and (jwt/jwt)
+                   (seq last-org-cookie))
+          (do
+            ;; remove the last used org cookie
+            ;; to avoid infinite loop redirects.
+            (cook/remove-cookie! (router/last-org-cookie))
+            ;; and redirect him there,
+            (router/redirect! (urls/default-landing last-org-cookie)))
+          ;; if no cookie or logged out do the login dance
+          (simple-handler #(login-wall {:title "Welcome back!" :desc ""}) "login" target params true))))
 
     (defroute signup-route urls/sign-up {:as params}
       (timbre/info "Routing signup-route" urls/sign-up)
       (when (jwt/jwt)
         (if (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
+          (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie))))
           (router/redirect! urls/sign-up-profile)))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
 
@@ -346,24 +325,8 @@
       (timbre/info "Routing signup-slash-route" (str urls/sign-up "/"))
       (when (and (jwt/jwt)
                  (seq (cook/get-cookie (router/last-org-cookie))))
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :lander) "sign-up" target params))
-
-    (defroute sign-up-slack-route urls/sign-up-slack {:as params}
-      (timbre/info "Routing sign-up-slack-route" urls/sign-up-slack)
-      (when (jwt/jwt)
-        (if (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
-          (router/redirect! urls/sign-up-profile)))
-      (simple-handler slack-lander "slack-lander" target params))
-
-    (defroute sign-up-slack-slash-route (str urls/sign-up-slack "/") {:as params}
-      (timbre/info "Routing sign-up-slack-slash-route" (str urls/sign-up-slack "/"))
-      (when (jwt/jwt)
-        (if (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie))))
-          (router/redirect! urls/sign-up-profile)))
-      (simple-handler slack-lander "slack-lander" target params))
 
     (defroute signup-profile-route urls/sign-up-profile {:as params}
       (timbre/info "Routing signup-profile-route" urls/sign-up-profile)
@@ -381,7 +344,7 @@
       (timbre/info "Routing signup-team-route" urls/sign-up-team)
       (if (jwt/jwt)
         (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+          (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
@@ -389,7 +352,7 @@
       (timbre/info "Routing signup-team-slash-route" (str urls/sign-up-team "/"))
       (if (jwt/jwt)
         (when (seq (cook/get-cookie (router/last-org-cookie)))
-          (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+          (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
         (router/redirect! urls/sign-up))
       (simple-handler #(onboard-wrapper :lander-team) "sign-up" target params))
 
@@ -437,22 +400,6 @@
       ;; Check if the user already have filled the needed data or if it needs to
       (google-lander-check params))
 
-    (defroute about-route urls/about {:as params}
-      (timbre/info "Routing about-route" urls/about)
-      (simple-handler about "about" target params))
-
-    (defroute slack-route urls/slack {:as params}
-      (timbre/info "Routing slack-route" urls/slack)
-      (simple-handler slack "slack" target params))
-
-    (defroute pricing-route urls/pricing {:as params}
-      (timbre/info "Routing pricing-route" urls/pricing)
-      (simple-handler pricing "pricing" target params))
-
-    (defroute press-kit-route urls/press-kit {:as params}
-      (timbre/info "Routing press-kit-route" urls/press-kit)
-      (simple-handler press-kit "press-kit" target params))
-
     (defroute email-confirmation-route urls/email-confirmation {:as params}
       (timbre/info "Routing email-confirmation-route" urls/email-confirmation)
       (when-not (seq (:token (:query-params params)))
@@ -469,12 +416,16 @@
 
     (defroute confirm-invitation-route urls/confirm-invitation {:keys [query-params] :as params}
       (timbre/info "Routing confirm-invitation-route" urls/confirm-invitation)
-      (when (empty? (:token query-params))
+      (when (and (empty? (:token query-params))
+                 (empty? (:invite-token query-params)))
         (router/redirect! urls/home))
       (when (jwt/jwt)
         (cook/remove-cookie! :jwt)
         (cook/remove-cookie! :show-login-overlay))
-      (simple-handler #(onboard-wrapper :invitee-lander) "confirm-invitation" target params))
+      (let [invitee-type (if (contains? query-params :invite-token)
+                          :invitee-team-lander
+                          :invitee-lander)]
+        (simple-handler #(onboard-wrapper invitee-type) "confirm-invitation" target params)))
 
     (defroute confirm-invitation-password-route urls/confirm-invitation-password {:as params}
       (timbre/info "Routing confirm-invitation-password-route" urls/confirm-invitation-password)
@@ -498,7 +449,7 @@
     (defroute email-wall-slash-route (str urls/email-wall "/") {:keys [query-params] :as params}
       (timbre/info "Routing email-wall-slash-route" (str urls/email-wall "/"))
       (when (jwt/jwt)
-        (router/redirect! (urls/all-posts (cook/get-cookie (router/last-org-cookie)))))
+        (router/redirect! (urls/default-landing (cook/get-cookie (router/last-org-cookie)))))
       (simple-handler #(onboard-wrapper :email-wall) "email-wall" target params true))
 
     (defroute login-wall-route urls/login-wall {:keys [query-params] :as params}
@@ -519,22 +470,18 @@
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
-           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           (urls/default-landing (cook/get-cookie (router/last-org-cookie)))
            urls/login))
-        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
+        (simple-handler #(login-wall {:title "Welcome back!" :desc ""}) "login-wall" target params true)))
 
     (defroute native-login-slash-route (str urls/native-login "/") {:keys [query-params] :as params}
       (timbre/info "Routing native-login-slash-route" (str urls/native-login "/"))
       (if (jwt/jwt)
         (router/redirect!
          (if (seq (cook/get-cookie (router/last-org-cookie)))
-           (urls/all-posts (cook/get-cookie (router/last-org-cookie)))
+           (urls/default-landing (cook/get-cookie (router/last-org-cookie)))
            urls/login))
-        (simple-handler #(login-wall {:title "Welcome to Carrot" :desc ""}) "login-wall" target params true)))
-
-    (defroute home-page-route urls/home {:as params}
-      (timbre/info "Routing home-page-route" urls/home)
-      (home-handler target params))
+        (simple-handler #(login-wall {:title "Welcome back!" :desc ""}) "login-wall" target params true)))
 
     (defroute logout-route urls/logout {:as params}
       (timbre/info "Routing logout-route" urls/logout)
@@ -544,6 +491,16 @@
                           urls/native-login
                           urls/home)))
 
+    (defroute apps-detect-route urls/apps-detect {:as params}
+      (timbre/info "Routing apps-detect-route" urls/apps-detect)
+      (router/redirect!
+       (cond
+        ua/mac? ls/mac-app-url
+        ua/windows? ls/win-app-url
+        ua/ios? ls/ios-app-url
+        ua/android? ls/android-app-url
+        :else urls/home)))
+
     (defroute org-route (urls/org ":org") {:as params}
       (timbre/info "Routing org-route" (urls/org ":org"))
       (org-handler "org" target org-dashboard params))
@@ -552,29 +509,45 @@
       (timbre/info "Routing org-slash-route" (str (urls/org ":org") "/"))
       (org-handler "org" target org-dashboard params))
 
+    (defroute inbox-route (urls/inbox ":org") {:as params}
+      (timbre/info "Routing inbox-route" (urls/inbox ":org"))
+      (org-handler "inbox" target org-dashboard (assoc params :board "inbox")))
+
+    (defroute inbox-slash-route (str (urls/inbox ":org") "/") {:as params}
+      (timbre/info "Routing inbox-slash-route" (str (urls/inbox ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "inbox")))
+
     (defroute all-posts-route (urls/all-posts ":org") {:as params}
       (timbre/info "Routing all-posts-route" (urls/all-posts ":org"))
-      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
 
     (defroute all-posts-slash-route (str (urls/all-posts ":org") "/") {:as params}
       (timbre/info "Routing all-posts-slash-route" (str (urls/all-posts ":org") "/"))
-      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "all-posts")))
 
-    (defroute first-ever-all-posts-route (urls/first-ever-all-posts ":org") {:as params}
-      (timbre/info "Routing first-ever-all-posts-route" (urls/first-ever-all-posts ":org"))
-      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
+    (defroute first-ever-landing-route (urls/first-ever-landing ":org") {:as params}
+      (timbre/info "Routing first-ever-landing-route" (urls/first-ever-landing ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))
 
-    (defroute first-ever-all-posts-slash-route (str (urls/first-ever-all-posts ":org") "/") {:as params}
-      (timbre/info "Routing first-ever-all-posts-slash-route" (str (urls/first-ever-all-posts ":org") "/"))
-      (org-handler "all-posts" target org-dashboard (assoc params :board "all-posts")))
+    (defroute first-ever-landing-slash-route (str (urls/first-ever-landing ":org") "/") {:as params}
+      (timbre/info "Routing first-ever-landing-slash-route" (str (urls/first-ever-landing ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board urls/default-board-slug)))
 
     (defroute follow-ups-route (urls/follow-ups ":org") {:as params}
       (timbre/info "Routing follow-ups-route" (urls/follow-ups ":org"))
-      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+      (router/redirect! (urls/bookmarks (:org params))))
 
     (defroute follow-ups-slash-route (str (urls/follow-ups ":org") "/") {:as params}
       (timbre/info "Routing follow-ups-slash-route" (str (urls/follow-ups ":org") "/"))
-      (org-handler "follow-ups" target org-dashboard (assoc params :board "follow-ups")))
+      (router/redirect! (urls/bookmarks (:org params))))
+
+    (defroute bookmarks-route (urls/bookmarks ":org") {:as params}
+      (timbre/info "Routing bookmarks-route" (urls/bookmarks ":org"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "bookmarks")))
+
+    (defroute bookmarks-slash-route (str (urls/bookmarks ":org") "/") {:as params}
+      (timbre/info "Routing bookmarks-slash-route" (str (urls/bookmarks ":org") "/"))
+      (org-handler "dashboard" target org-dashboard (assoc params :board "bookmarks")))
 
     (defroute drafts-route (urls/drafts ":org") {:as params}
       (timbre/info "Routing board-route" (urls/drafts ":org"))
@@ -665,7 +638,6 @@
   ;; Subscribe to websocket client events
   (aa/ws-change-subscribe)
   (sa/ws-change-subscribe)
-  (sa/ws-interaction-subscribe)
   (oa/subscribe)
   (ra/subscribe)
   (ca/subscribe)

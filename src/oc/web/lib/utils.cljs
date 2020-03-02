@@ -131,6 +131,14 @@
       :else
       (if short? "now" "Just now"))))
 
+(defn local-date-time [past-date]
+  (let [time-string (.toLocaleTimeString past-date (.. js/window -navigator -language)
+                     #js {:hour "2-digit"
+                          :minute "2-digit"
+                          :format "hour:minute"})
+        without-leading-zeros (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1")]
+    (s/upper without-leading-zeros)))
+
 (defn foc-date-time [past-date & [flags]]
   (let [past-js-date (js-date past-date)
         past (.getTime past-js-date)
@@ -139,10 +147,7 @@
     (if (and (= (.getFullYear past-js-date) (.getFullYear now-date))
              (= (.getMonth past-js-date) (.getMonth now-date))
              (= (.getDate past-js-date) (.getDate now-date)))
-      (s/lower
-       (.toLocaleTimeString past-js-date (.. js/window -navigator -language) #js {:hour "2-digit"
-                                                                                  :minute "2-digit"
-                                                                                  :format "hour:minute"}))
+      (local-date-time past-js-date)
       (time-since past-date (concat flags [:short])))))
 
 (defn class-set
@@ -375,8 +380,10 @@
       :else (recur (inc idx) (rest items)))))
 
 (def network-error
- {:title "Network error"
-  :description "Shoot, looks like there might be a connection issue. Please try again."
+ {:title "Network request"
+  :description (if ua/pseudo-native?
+                "Probably just a temporary issue. Please try again later if this persists."
+                "Probably just a temporary issue. Please refresh if this persists.")
   :server-error true
   :id :generic-network-error
   :dismiss true})
@@ -420,7 +427,7 @@
   [js-date]
   (let [hours (.getHours js-date)
         minutes (add-zero (.getMinutes js-date))
-        ampm (if (>= hours 12) " p.m." " a.m.")
+        ampm (if (>= hours 12) " PM" " AM")
         hours (mod hours 12)
         hours (if (zero? hours) 12 hours)]
     (str hours ":" minutes ampm)))
@@ -595,9 +602,9 @@
 (defn post-org-slug [post-data]
   (url-org-slug (link-for (:links post-data) ["item" "self"] "GET")))
 
-(def default-headline "Title")
+(def default-headline "Add a title")
 
-(def default-abstract "Quick summary")
+(def default-abstract "Quick summary (optional)")
 
 (def max-abstract-length 280)
 
@@ -706,7 +713,7 @@
              (seq board-slug)
              (not= board-slug default-drafts-board-slug)
              is-mobile?)
-      50
+      65
       0)))
 
 (defn back-to [org-data]

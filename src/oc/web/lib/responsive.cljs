@@ -37,7 +37,7 @@
  @_mobile)
 
 (def left-navigation-sidebar-minimum-right-margin 16)
-(def left-navigation-sidebar-width 200)
+(def left-navigation-sidebar-width 160)
 (def dashboard-container-width 732)
 
 (defn is-tablet-or-mobile? []

@@ -22,27 +22,31 @@ div.user-profile-modal-container {
 
   div.user-profile-modal {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
-    height: 100vh;
+    height: calc(100vh - #{$navbar_height}px);
     right: 0;
+    margin-top: #{$navbar_height}px;
     padding: 0 24px 16px;
     transition: right 180ms ease-in;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     div.user-profile-header {
-      width: calc(100% + 48px);
-      height: 56px;
-      margin-left: -24px;
-      background-color: $grey_num_2;
-      padding: 12px 16px;
+      width: 320px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
+      padding: 12px 24px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
       div.user-profile-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
       }
@@ -52,7 +56,7 @@ div.user-profile-modal-container {
         padding: 0 8px;
         @include OC_Body_Book();
         font-size: 14px;
-        color: $ui_grey;
+        color: var(--light-color);
         float: right;
         margin-right: 8px;
       }
@@ -72,9 +76,9 @@ div.user-profile-modal-container {
 
     div.user-profile-body {
       width: 272px;
-      margin: 24px auto 0;
+      margin: 24px auto 32px;
       position: relative;
-      color: $deep_navy;
+      color: var(--color);
 
       div.user-profile-avatar {
         height: 32px;
@@ -111,14 +115,14 @@ div.user-profile-modal-container {
 
       div.user-profile-modal-fields {
         margin-top: 16px;
-        border-top: 1px solid $ultra_light_grey;
+        border-top: 1px solid var(--divider-line);
         padding-top: 16px;
 
         div.field-label {
           &:not(:first-child) {
             margin-top: 16px;
           }
-          color: $light_navy;
+          color: var(--color);
           @include OC_Body_Book();
           font-size: 14px;
         }
@@ -126,18 +130,18 @@ div.user-profile-modal-container {
         input.field-value {
           width: 100%;
           height: 32px;
-          background: $ultra_light_grey;
+          background-color: var(--opac-background-color-1);
           border-radius: 4px;
           padding: 7px 8px;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           margin-top: 8px;
           border: none;
           outline: none;
 
           @include placeholder(){
-            color: rgba($deep_navy, 0.4);
+            color: var(--light-color);
           }
 
           &:focus, &:active {
@@ -157,7 +161,7 @@ div.user-profile-modal-container {
           padding: 7px 8px;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           margin-top: 8px;
           display: block;
           border: none;
@@ -165,7 +169,7 @@ div.user-profile-modal-container {
           display: block;
           appearance: none;
           -webkit-appearance: none;
-          background-color: $ultra_light_grey;
+          background-color: var(--opac-background-color-1);
           position: relative;
           background-image: cdnUrl("/img/ML/select_arrows.svg");
           background-size: 8px 10px;
@@ -190,23 +194,17 @@ div.user-profile-modal-container {
             @include OC_Body_Book();
             font-size: 14px;
             color: $deep_navy;
+            background-color: rgba($deep_navy, 0.1);
           }
         }
       }
-
-      div.delete-account-container {
-        margin-top: 16px;
-        border-top: 1px solid $ultra_light_grey;
-        padding-top: 16px;
-
-        button.delete-account-bt {
-          padding: 0;
-          @include OC_Body_Book();
-          font-size: 14px;
-          color: #848D95;
-          line-height: 18px;
-        }
-      }
     }
+  }
+}
+
+@include dark_mode() {
+  div.user-profile-modal-container div.user-profile-modal div.user-profile-body
+  div.user-profile-modal-fields select.field-value {
+    background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
   }
 }

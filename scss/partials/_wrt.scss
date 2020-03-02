@@ -40,7 +40,7 @@ div.wrt-count-container {
   div.wrt-count {
     @include OC_Body_Book();
     font-size: 12px;
-    color: $deep_navy;
+    color: var(--color);
     cursor: pointer;
     position: relative;
     opacity: 0.5;
@@ -85,34 +85,40 @@ div.wrt-popup-container {
 
   div.wrt-popup {
     width: 320px;
-    background-color: white;
+    background-color: var(--overlay-background-color);
     position: absolute;
     top: 0;
-    height: 100vh;
+    height: calc(100vh - #{$navbar_height}px);
     right: 0;
-    padding: 0;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px 16px;
     overflow-x: hidden;
     overflow-y: auto;
 
     @include mobile() {
+      min-height: 100vh;
       position: relative;
       top: unset;
       right: unset;
       width: 100%;
       padding: 0;
       overflow-y: hidden;
-      background-color: white;
+      background-color: var(--mobile-background-color);
     }
 
     div.wrt-popup-header {
-      width: 100%;
-      height: 56px;
-      background-color: $grey_num_2;
+      width: 320px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
       padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
 
       @include mobile() {
-        position: fixed;
-        border-bottom: 1px solid $divider_line_grey;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
         z-index: 2;
         height: #{$mobile_navbar_height}px;
         padding: 15px 16px;
@@ -122,7 +128,7 @@ div.wrt-popup-container {
       div.wrt-popup-header-title {
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         line-height: 32px;
         float: left;
 
@@ -189,7 +195,7 @@ div.wrt-popup-container {
           .wrt-chart-text {
             @include OC_Body_Bold();
             font-size: 24px;
-            fill: $deep_navy;
+            fill: var(--color);
             -moz-transform: translateY(8px);
             -ms-transform: translateY(8px);
             -webkit-transform: translateY(8px);
@@ -208,7 +214,7 @@ div.wrt-popup-container {
           text-align: center;
           @include OC_Body_Book();
           font-size: 14px;
-          color: $deep_navy;
+          color: var(--color);
           line-height: 18px;
 
           button.manage-section-bt {
@@ -233,8 +239,8 @@ div.wrt-popup-container {
         div.wrt-popup-tabs-select {
           width: 100%;
           height: 32px;
-          background-color: $ultra_light_grey;
-          color: $deep_navy;
+          background-color: var(--opac-background-color-1);
+          color: var(--color);
           padding: 7px 8px;
           border-radius: 4px;
           @include OC_Body_Book();
@@ -264,7 +270,7 @@ div.wrt-popup-container {
         background-position: top 11px left 8px;
         background-repeat: no-repeat;
         padding-left: 19px;
-        background-color: $ultra_light_grey;
+        background-color: var(--opac-background-color-1);
         border-radius: 4px;
 
         input.wrt-popup-query {
@@ -277,13 +283,13 @@ div.wrt-popup-container {
           padding: 7px 8px;
           @include OC_Body_Book();
           font-size: 14px;
-          background-color: $ultra_light_grey;
-          color: $deep_navy;
+          background-color: transparent;
+          color: var(--color);
           outline: none;
           border-radius: 4px;
 
           @include placeholder(){
-            color: rgba($deep_navy, 0.4);
+            color: var(--light-color);
           }
         }
       }
@@ -301,7 +307,7 @@ div.wrt-popup-container {
 
           @include big_web() {
             &:hover {
-              background-color: $another_ui_grey;
+              background-color: var(--opac-background-color-05);
             }
           }
 
@@ -342,7 +348,7 @@ div.wrt-popup-container {
             margin-left: 8px;
             @include OC_Body_Book();
             font-size: 14px;
-            color: $light_navy;
+            color: var(--color);
             line-height: 18px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -355,7 +361,7 @@ div.wrt-popup-container {
             margin-left: 8px;
             @include OC_Body_Book();
             font-size: 12px;
-            color: $light_navy;
+            color: var(--color);
             line-height: 18px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -378,6 +384,27 @@ div.wrt-popup-container {
             }
           }
         }
+      }
+    }
+  }
+}
+
+@include dark_mode() {
+
+  div.wrt-popup-container div.wrt-popup {
+    div.wrt-popup-header button.mobile-close-bt {
+      @include mobile() {
+        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+      }
+    }
+
+    div.wrt-popup-inner {
+      div.wrt-popup-tabs div.wrt-popup-tabs-select {
+        background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
+      }
+
+      div.wrt-popup-search-container {
+        background-image: cdnUrl("/img/ML/wrt_search_lens@dark.svg");
       }
     }
   }

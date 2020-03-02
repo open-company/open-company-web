@@ -5,6 +5,7 @@
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
+            [oc.web.mixins.ui :as ui-mixins]
             [oc.web.actions.org :as org-actions]
             [oc.web.actions.team :as team-actions]
             [oc.web.actions.nav-sidebar :as nav-actions]
@@ -18,6 +19,7 @@
   (drv/drv :org-data)
   (drv/drv :team-data)
   (drv/drv :current-user-data)
+  ui-mixins/refresh-tooltips-mixin
   ;; Locals
   (rum/local false ::saving)
   {:will-mount (fn [s]
@@ -48,7 +50,7 @@
         [:div.integrations-settings-body
           (when (utils/link-for (:links team-data) "authenticate" "GET" {:auth-source "slack"})
             [:button.btn-reset.add-slack-team-bt
-              {:on-click #(team-actions/slack-team-add cur-user-data (str (router/get-token) "?org-settings=integrations"))}
+              {:on-click #(org-actions/bot-auth team-data cur-user-data (str (router/get-token) "?org-settings=integrations"))}
               [:div.slack-icon]
               "Add to Slack"])
           (when-not (zero? slack-teams-count)

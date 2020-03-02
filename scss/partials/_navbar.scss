@@ -3,9 +3,9 @@ nav.oc-navbar {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
   transition: height 230ms;
-  border-bottom: 1px solid $ultra_light_grey;
+  border-bottom: 1px solid var(--divider-line);
 
   -webkit-app-region: drag;
   -webkit-user-select: none;
@@ -23,8 +23,8 @@ nav.oc-navbar {
     overflow: hidden;
     height: #{$mobile_navbar_height}px;
     padding-bottom: 1px;
-    border-bottom: 1px solid $divider_line_grey;
-    background-color: white;
+    border-bottom: 1px solid var(--divider-line);
+    background-color: var(--mobile-background-color);
     overflow: visible;
 
     &.show-login-overlay {
@@ -83,7 +83,7 @@ nav.oc-navbar {
           div.navbar-mobile-title {
             @include OC_Body_Bold();
             font-size: 18px;
-            color: $deep_navy;
+            color: var(--color);
             line-height: 24px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -121,12 +121,16 @@ nav.oc-navbar {
             background-size: 16px 12px;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: $ultra_light_grey;
+            background-color: var(--ultralight-color);
             border-radius: 4px;
             position: absolute;
             padding: 0;
             top: 11px;
             left: 16px;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/mobile_navbar_ham@dark.svg");
+            }
           }
         }
 
@@ -194,12 +198,16 @@ nav.oc-navbar {
       }
 
       div.navbar-right {
-        float: right;
         margin-right: 0px;
+        position: absolute;
+        left: calc(100vw - 72px - 16px);
+        min-width: 72px;
 
         @include mobile() {
+          min-width: unset;
           position: absolute;
           top: 11px;
+          left: unset;
           right: 16px;
           width: 32px;
           height: 32px;
@@ -232,10 +240,52 @@ nav.oc-navbar {
               position: absolute;
               top: 0;
               right: 0;
-              border: 2px solid $grey_num_2;
+              border: 2px solid var(--background-color);
             }
           }
         }
+      }
+    }
+  }
+
+  div.mobile-header {
+    display: none;
+
+    @include mobile() {
+      height: #{$mobile_navbar_height}px;
+      width: 100vw;
+      background-color: var(--mobile-background-color);
+      border-bottom: 1px solid var(--divider-line);
+      padding: 15px 16px;
+      display: block;
+      text-align: center;
+      z-index: 2;
+
+      button.search-close-bt {
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 12px 12px;
+        background-color: var(--divider-line);
+        border-radius: 4px;
+        position: absolute;
+        left: 16px;
+        top: 11px;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+        }
+      }
+
+      div.mobile-header-title {
+        @include OC_Body_Bold();
+        font-size: 18px;
+        color: var(--color);
+        line-height: 24px;
+        height: 24px;
       }
     }
   }

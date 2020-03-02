@@ -19,6 +19,7 @@
 // Static site
 @import "partials/_static_site";
 // Components
+@import "partials/_404";
 @import "partials/_navbar";
 @import "partials/_org_dashboard";
 @import "partials/_oc_buttons";
@@ -60,7 +61,7 @@
 @import "partials/_site_mobile_menu";
 @import "partials/_slack";
 @import "partials/_search";
-@import "partials/_shared_misc";
+@import "partials/_static_pages";
 @import "partials/_stream_item";
 @import "partials/_add_comment";
 @import "partials/_stream_comments";
@@ -84,7 +85,6 @@
 @import "partials/_carrot_checkbox";
 @import "partials/_org_settings_modal";
 @import "partials/_integrations_settings_modal";
-@import "partials/_invite_settings_modal";
 @import "partials/_user_profile_modal";
 @import "partials/_user_notifications_modal";
 @import "partials/_recurring_updates_modal";
@@ -95,8 +95,15 @@
 @import "partials/_giphy_picker";
 @import "partials/_whats_new";
 @import "partials/_lazy_stream";
-@import "partials/_follow_ups_picker";
 @import "partials/_electron";
 @import "partials/_image_modal";
 @import "partials/_push_notifications_permission_modal";
 @import "partials/_carrot_abstract";
+@import "partials/_post_to_button";
+@import "partials/_invite_picker_modal";
+@import "partials/_payments_settings_modal";
+@import "partials/_trial_expired_banner";
+@import "partials/_stream_collapsed_item";
+@import "partials/_invite_email_modal";
+@import "partials/_invite_slack_modal";
+@import "partials/_theme_settings_modal";

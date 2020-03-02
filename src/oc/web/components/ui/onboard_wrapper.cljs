@@ -1,6 +1,7 @@
 (ns oc.web.components.ui.onboard-wrapper
   (:require [rum.core :as rum]
             [org.martinklepsch.derivatives :as drv]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [cuerdas.core :as string]
             [oc.web.expo :as expo]
             [oc.web.lib.jwt :as jwt]
@@ -28,7 +29,33 @@
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]
             [oc.shared.useragent :as ua]
             [goog.dom :as gdom]
+            [goog.events :as events]
+            [goog.events.EventType :as EventType]
             [goog.object :as gobj]))
+
+(defn- autoresize-textarea [ref]
+  (let [lst (atom nil)]
+
+    (letfn [(autoresize [_e]
+              (this-as this
+                (utils/after 0
+                 #(do
+                    (set! (.. this -style -cssText) "height:auto;")
+                    (set! (.. this -style -cssText) (str "height:" (.-scrollHeight this) "px"))))))]
+      {:did-mount (fn [s]
+       (reset! lst
+        (events/listen (rum/ref-node s ref) EventType/KEYDOWN autoresize))
+       s)
+       :will-unmount (fn [s]
+        (when @lst
+          (events/unlistenByKey @lst)
+          (reset! lst nil))
+       s)})))
+
+(def why-carrot-label "Why you are giving Carrot a try?")
+
+(defn- why-carrot-value [v]
+  (str why-carrot-label "\n&zwnj;\n" v))
 
 (defn- clean-org-name [org-name]
   (string/trim org-name))
@@ -44,6 +71,7 @@
                     rum/reactive
                     (drv/drv user-store/signup-with-email)
                     (drv/drv :auth-settings)
+                    (drv/drv :expo-deep-link-origin)
                     (rum/local false ::email-error)
                     (rum/local false ::password-error)
                     (rum/local "" ::email)
@@ -53,17 +81,18 @@
                       s)}
   [s]
   (let [signup-with-email (drv/react s user-store/signup-with-email)
-        auth-settings (drv/react s :auth-settings)]
+        auth-settings (drv/react s :auth-settings)
+        deep-link-origin (drv/react s :expo-deep-link-origin)]
     [:div.onboard-lander.lander
       [:div.main-cta
-        [:div.mobile-header
-          [:button.mlb-reset.top-back-button
-            {:on-touch-start identity
-             :on-click #(router/history-back!)
-             :aria-label "Back"}]
-          [:div.mobile-logo]]
+        [:div.onboard-lander-header
+          (when-not ua/mobile-app?
+            [:button.mlb-reset.top-back-button
+              {:on-touch-start identity
+               :on-click #(router/history-back!)
+               :aria-label "Back"}])]
         [:div.title.main-lander
-          "Create an account"]]
+          "Let’s get started!"]]
       [:div.onboard-form
         [:button.mlb-reset.signup-with-slack
           {:on-touch-start identity
@@ -71,7 +100,9 @@
                        (.preventDefault %)
                        (when-let [auth-link (utils/link-for (:links auth-settings) "authenticate" "GET"
                                              {:auth-source "slack"})]
-                         (user-actions/login-with-slack auth-link)))}
+                         (user-actions/login-with-slack auth-link
+                                                        (when ua/mobile-app?
+                                                          {:redirect-origin deep-link-origin}))))}
           "Continue with Slack"
           [:div.slack-icon
             {:aria-label "slack"}]]
@@ -83,7 +114,7 @@
                                                             {:auth-source "google"})]
                          (user-actions/login-with-google auth-link
                                                          (when ua/mobile-app?
-                                                           {:redirect-origin (expo/get-deep-link-origin)}))))}
+                                                           {:redirect-origin deep-link-origin}))))}
           "Continue with Google"
           [:div.google-icon
             {:aria-label "google"}]]
@@ -147,30 +178,27 @@
                             (when (<= (count @(::pswd s)) 7)
                               (reset! (::password-error s) true)))
                           (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)}))}
-            "Sign up"]]
+            "Continue"]]
         [:div.footer-link
           "Already have an account?"
-          [:a {:href (if ua/pseudo-native?
-                       oc-urls/native-login
-                       oc-urls/login)}
-           "Sign in"]]]]))
+          [:div
+            [:a {:href (if ua/pseudo-native?
+                         oc-urls/native-login
+                         oc-urls/login)
+                 :on-click (fn [e]
+                             (utils/event-stop e)
+                             (router/nav! (if ua/pseudo-native?
+                              oc-urls/native-login
+                              oc-urls/login)))}
+             "Sign in here"]]]]]))
 
 (defn- profile-setup-team-data
   ""
-  [s & [setup-email-domain]]
+  [s]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)
-        google-domain (jwt/get-key :google-domain)
-        user-email (jwt/get-key :email)
-        with-email-domain (cond
-                            (and setup-email-domain
-                                 google-domain
-                                 (clojure.string/blank? (:email-domain org-editing)))
-                            {:email-domain google-domain}
-                            :else
-                            {:email-domain (or (:email-domain org-editing) "")})]
+        teams-data @(drv/get-ref s :teams-data)]
     (if (and (zero? (count (:name org-editing)))
              (seq teams-data))
       (let [first-team (select-keys
@@ -189,50 +217,7 @@
                (dis/dispatch! [:update [:org-editing] #(dissoc % :logo-url)])
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
-            (set! (.-src img) (:logo-url first-team)))))
-      (dis/dispatch! [:update [:org-editing] #(merge % with-email-domain)]))))
-
-(defn- check-email-domain [domain s & [reset-email-domain]]
-  (reset! (::checking-email-domain s) (not reset-email-domain))
-  ;; If user is here it means he has only one team, if he already had one
-  ;; he was redirected to it, not here to create a new team, so use the first team
-  (let [clean-email-domain (org-utils/clean-email-domain domain)]
-    (org-actions/pre-flight-email-domain domain (first (jwt/get-key :teams))
-     (fn [success status]
-       ;; Discard response if the domain changed
-       (when (or reset-email-domain
-                 (= domain (:email-domain @(drv/get-ref s :org-editing))))
-         (reset! (::checking-email-domain s) false)
-         (let [domain-error (cond
-                             (= status 409)
-                             "Only company email domains are allowed."
-                             (not success)
-                             "An error occurred, please try again."
-                             :else
-                             nil)
-                next-org-editing {:valid-email-domain success
-                                  :domain-error (if reset-email-domain
-                                                  nil
-                                                  domain-error)}
-                with-email-domain (if (and reset-email-domain
-                                           success)
-                                    (assoc next-org-editing :email-domain domain)
-                                    next-org-editing)]
-           (dis/dispatch! [:update [:org-editing]
-            #(merge % with-email-domain)])))))))
-
-(defn- precheck-user-email [s a]
-  (when-not @(::user-email-checked s)
-    ;; Wait for the team data to be loaded to have the email domain link
-    (when (first (filter #(= (:team-id %) (first (jwt/get-key :teams))) @(drv/get-ref s :teams-data)))
-      (let [domain (:email-domain @(drv/get-ref s :org-editing))
-            user-email (jwt/get-key :email)
-            splitted-email (string/split user-email #"@")
-            user-domain (string/trim (second splitted-email))]
-        (when (and (string/blank? domain)
-                   (not (string/blank? user-domain))))
-          (reset! (::user-email-checked s) true)
-          (check-email-domain user-domain s true)))))
+            (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-profile < rum/reactive
                                   (drv/drv :edit-user-profile)
@@ -241,20 +226,15 @@
                                   (drv/drv :org-editing)
                                   (drv/drv :orgs)
                                   (rum/local false ::saving)
-                                  (rum/local false ::user-email-checked)
-                                  (rum/local false ::checking-email-domain)
+                                  (rum/local "" ::why-carrot)
+                                  (autoresize-textarea "why-carrot")
                                   {:will-mount (fn [s]
                                     (dis/dispatch! [:input [:org-editing :name] ""])
-                                    (dis/dispatch! [:input [:org-editing :email-domain] ""])
                                     (user-actions/user-profile-reset)
                                     s)
                                    :did-mount (fn [s]
-                                    (profile-setup-team-data s true)
+                                    (profile-setup-team-data s)
                                     (delay-focus-field-with-ref s "first-name")
-                                    (precheck-user-email s "did-mount")
-                                   s)
-                                   :did-remount (fn [_ s]
-                                    (precheck-user-email s "did-remount")
                                    s)
                                    :will-update (fn [s]
                                     (profile-setup-team-data s)
@@ -264,10 +244,6 @@
                                                  (or (:error edit-user-profile)
                                                      (:error org-editing)))
                                         (reset! (::saving s) false)))
-                                    (precheck-user-email s "will-update")
-                                   s)
-                                   :did-update (fn [s]
-                                    (precheck-user-email s "did-update")
                                    s)}
   [s]
   (let [has-org? (pos? (count (drv/react s :orgs)))
@@ -278,20 +254,19 @@
         user-data (:user-data edit-user-profile)
         continue-disabled (or @(::saving s)
                               (and (empty? (:first-name user-data))
-                                        (empty? (:last-name user-data)))
+                                   (empty? (:last-name user-data)))
                               (and (not has-org?)
-                                   (<= (count (clean-org-name (:name org-editing))) 1))
-                              (and (seq (:email-domain org-editing))
-                                   (not (:valid-email-domain org-editing))))
+                                   (-> org-editing :name clean-org-name count (<= 1)))
+                              (and (not has-org?)
+                                   (-> @(::why-carrot s) utils/trim seq not)))
         continue-fn #(when-not continue-disabled
                        (reset! (::saving s) true)
-                       (user-actions/user-profile-save current-user-data edit-user-profile org-editing)
-                       (let [org-name (clean-org-name (:name org-editing))]
-                         (dis/dispatch! [:input [:org-editing :name] org-name])))]
+                       (dis/dispatch! [:update [:org-editing :name] clean-org-name])
+                       (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
+                       (user-actions/user-profile-save current-user-data edit-user-profile :org-editing))]
     [:div.onboard-lander.lander-profile
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]
+        [:div.onboard-lander-header
           [:button.mlb-reset.top-continue
            {:class (when continue-disabled "disabled")
             :on-touch-start identity
@@ -299,7 +274,9 @@
             :aria-label "Continue"}
             "Continue"]]
         [:div.title.about-yourself
-          "Tell us about you"]]
+          (if has-org?
+           "Tell us about you"
+           "Create your team")]]
       (when (:error edit-user-profile)
         [:div.subtitle.error
           "An error occurred while saving your data, please try again"])
@@ -310,7 +287,7 @@
           [:div.group
             [:div.field-label.left-half-field-label.name-fields
               "First name"]
-            [:div.field-label.right-half-field-label.name-fields
+            [:div.field-label.right-half-field-label.name-fields.big-web-tablet-only
               "Last name"]]
           [:div.group
             [:input.field.left-half-field.oc-input
@@ -321,6 +298,8 @@
                :max-length user-utils/user-name-max-lenth
                :value (or (:first-name user-data) "")
                :on-change #(dis/dispatch! [:input [:edit-user-profile :first-name] (.. % -target -value)])}]
+            [:div.field-label.right-half-field-label.name-fields.mobile-only
+              "Last name"]
             [:input.field.right-half-field.oc-input
               {:class utils/hide-class
                :type "text"
@@ -338,7 +317,7 @@
                :placeholder "Enter a team name..."
                :class (utils/class-set {:error (:error org-editing)
                                         utils/hide-class true})
-               :max-length 50 ;org-utils/org-name-max-length
+               :max-length org-utils/org-name-max-length
                :value (:name org-editing)
                :on-change #(let [new-name (.. % -target -value)
                                  clean-org-name (subs new-name 0 (min (count new-name)
@@ -351,44 +330,17 @@
           (when (:error org-editing)
             [:div.error "Must be between 3 and 50 characters"])
           (when-not has-org?
-            [:div.field-label.email-domain-field-label.group
-              [:span.field-label-span "Email domain — optional"]
-              (cond
-                @(::checking-email-domain s)
-                (small-loading)
-                (string? (:domain-error org-editing))
-                [:span.error
-                  (:domain-error org-editing)])])
+            [:div.field-label.why-carrot
+              why-carrot-label])
           (when-not has-org?
-            [:div.org-email-domain-field
-              [:input.field.email.oc-input
-                {:name "um-domain-invite"
-                 :ref "um-domain-invite"
-                 :class (utils/class-set {:error (and (seq (:email-domain org-editing))
-                                                      (:domain-error org-editing))
-                                          :valid (and (seq (:email-domain org-editing))
-                                                      (:valid-email-domain org-editing))})
-                 :type "text"
-                 :auto-capitalize "none"
-                 :pattern utils/valid-domain-pattern
-                 :autoComplete "off"
-                 :value (:email-domain org-editing)
-                 :on-change (fn [v]
-                              (let [domain (.. v -target -value)
-                                    cleaned-email-domain (org-utils/clean-email-domain domain)
-                                    valid-email-domain? (utils/valid-domain? cleaned-email-domain)]
-                                (dis/dispatch! [:update [:org-editing] #(merge % {:email-domain (if valid-email-domain? cleaned-email-domain domain)
-                                                                                  :domain-error (if (and (seq domain)
-                                                                                                         (not valid-email-domain?))
-                                                                                                  "Please enter a valid email domain."
-                                                                                                  false)
-                                                                                  :valid-email-domain nil})])
-                                (when (and (seq cleaned-email-domain)
-                                           valid-email-domain?)
-                                  (check-email-domain cleaned-email-domain s))))
-                 :placeholder "@domain.com"}]
-            [:div.field-label.info
-              "Any user that signs up with an allowed email domain and verifies their email address will have contributor access to your team."]])
+            [:textarea.field.oc-input
+              {:ref "why-carrot"
+               :placeholder "Why you're trying it..."
+               :class utils/hide-class
+               :max-length 1024
+               :value @(::why-carrot s)
+               :rows "1"
+               :on-change #(reset! (::why-carrot s) (.. % -target -value))}])
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -402,28 +354,21 @@
 
 (defn- setup-team-data
   ""
-  [s & [setup-email-domain]]
+  [s]
   ;; Load the list of teams if it's not already
   (team-actions/teams-get-if-needed)
   (let [org-editing @(drv/get-ref s :org-editing)
-        teams-data @(drv/get-ref s :teams-data)
-        google-domain (jwt/get-key :google-domain)
-        with-email-domain (if (and setup-email-domain
-                                   google-domain
-                                   (clojure.string/blank? (:email-domain org-editing)))
-                            {:email-domain google-domain}
-                            {:email-domain (or (:email-domain org-editing) "")})]
+        teams-data @(drv/get-ref s :teams-data)]
     (if (and (zero? (count (:name org-editing)))
              (zero? (count (:logo-url org-editing)))
              (seq teams-data))
       (let [first-team (select-keys
                         (first teams-data)
-                        [:name :logo-url :logo-width :logo-height])
-            fixed-first-team (merge first-team with-email-domain)]
+                        [:name :logo-url :logo-width :logo-height])]
         (dis/dispatch!
          [:update
           [:org-editing]
-          #(merge % fixed-first-team)])
+          #(merge % first-team)])
         (when (and (not (zero? (count (:logo-url first-team))))
                    (not (:logo-height first-team)))
           (let [img (gdom/createDom "img")]
@@ -437,22 +382,18 @@
                    :logo-height (.-height img)})])
                (gdom/removeNode img)))
             (gdom/append (.-body js/document) img)
-            (set! (.-src img) (:logo-url first-team)))))
-      (dis/dispatch!
-       [:update
-        [:org-editing]
-        #(merge % with-email-domain)]))))
+            (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-team < rum/reactive
                          (drv/drv :teams-data)
                          (drv/drv :org-editing)
                          (rum/local false ::saving)
+                         (rum/local "" ::why-carrot)
                          {:will-mount (fn [s]
                            (dis/dispatch! [:input [:org-editing :name] ""])
-                           (dis/dispatch! [:input [:org-editing :email-domain] ""])
                            s)
                           :did-mount (fn [s]
-                           (setup-team-data s true)
+                           (setup-team-data s)
                            (delay-focus-field-with-ref s "org-name")
                            s)
                           :will-update (fn [s]
@@ -462,21 +403,19 @@
   (let [teams-data (drv/react s :teams-data)
         org-editing (drv/react s :org-editing)
         is-mobile? (responsive/is-tablet-or-mobile?)
-        continue-disabled (or
-                           (< (count (clean-org-name (:name org-editing))) 3)
-                           (:domain-error org-editing))
+        continue-disabled (or (-> org-editing :name clean-org-name count (< 3))
+                              (-> @(::why-carrot s) utils/trim seq not))
         continue-fn #(when-not continue-disabled
                        (let [org-name (clean-org-name (:name org-editing))]
                          (dis/dispatch! [:input [:org-editing :name] org-name])
+                         (dis/dispatch! [:input [:org-editing :why-carrot] (why-carrot-value @(::why-carrot s))])
                          (if (and (seq org-name)
-                                  (> (count org-name) 2))
+                                  (>= (count org-name) 2))
                            ;; Create org and show setup screen
                            (org-actions/create-or-update-org @(drv/get-ref s :org-editing))
                            (dis/dispatch! [:input [:org-editing :error] true]))))]
     [:div.onboard-lander.lander-team
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title.company-setup
           "Set up your company"]]
       [:div.onboard-form
@@ -530,28 +469,16 @@
                (merge org-editing {:error nil :name (.. % -target -value)})])}]
           (when (:error org-editing)
             [:div.error "Must be between 3 and 50 characters"])
-                 ;; Email domains row
-          [:div.org-email-domains-row.group
-            [:div.field-label
-              "Allowed email domain " [:span.info "(optional)"]
-              (when (:error org-editing)
-                [:label.error
-                   "Only company email domains are allowed."])]
-            [:div.org-email-domain-field
-              {:class (when (:domain-error org-editing) "error")}
-              [:input.um-invite-field.email.oc-input
-                {:name "um-domain-invite"
-                 :ref "um-domain-invite"
-                 :type "text"
-                 :auto-capitalize "none"
-                 :pattern utils/valid-domain-pattern
-                 :value (:email-domain org-editing)
-                 :on-change #(let [domain (.. % -target -value)]
-                               (dis/dispatch! [:input [:org-editing :email-domain] domain])
-                               (dis/dispatch! [:input [:org-editing :domain-error] (and (seq domain)
-                                                                                        (not (utils/valid-domain? domain)))]))
-                 :placeholder "Domain, e.g. @acme.com"}]]
-            [:div.field-label.info "Anyone with this email domain can automatically join your team."]]
+          [:div.field-label.why-carrot
+            why-carrot-label]
+          [:textarea.field.oc-input
+            {:ref "why-carrot"
+             :placeholder "Help us with..."
+             :class utils/hide-class
+             :max-length 1024
+             :value @(::why-carrot s)
+             :rows "1"
+             :on-change #(reset! (::why-carrot s) (.. % -target -value))}]
           [:button.continue
             {:class (when continue-disabled "disabled")
              :on-touch-start identity
@@ -627,8 +554,6 @@
         continue-disabled (not (zero? (count error-rows)))]
     [:div.onboard-lander.lander-invite
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title
           "Invite your team"]
         [:div.subtitle
@@ -683,16 +608,137 @@
       (set! (.-innerText dots-node) next-dots)
       (utils/after 800 #(dots-animation s)))))
 
+(rum/defcs invitee-team-lander < rum/reactive
+                                 (drv/drv :team-invite)
+                                 (drv/drv user-store/signup-with-email)
+                                 (rum/local false ::email-error)
+                                 (rum/local false ::password-error)
+                                 (rum/local "" ::email)
+                                 (rum/local "" ::pswd)
+                                 (rum/local false ::auth-settings-loaded)
+                                 {:did-mount (fn [s]
+                                    (dots-animation s)
+                                  s)
+                                  :will-update (fn [s]
+                                    (let [auth-settings (:auth-settings @(drv/get-ref s :team-invite))]
+                                      (when (and (not @(::auth-settings-loaded s))
+                                                 auth-settings
+                                                 (not (:team auth-settings)))
+                                        (reset! (::auth-settings-loaded s) true)
+                                        (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search)))
+                                  s)}
+  [s]
+  (let [team-invite-drv (drv/react s :team-invite)
+        auth-settings (:auth-settings team-invite-drv)
+        email-signup-link (utils/link-for (:links auth-settings) "create" "POST" {:auth-source "email"})
+        team-data (:team auth-settings)
+        signup-with-email (drv/react s user-store/signup-with-email)]
+    [:div.onboard-lander.invitee-team-lander
+      (if auth-settings
+        (if (:team auth-settings)
+          [:div
+            [:div.main-cta
+              [:div.onboard-lander-header
+                (when-not ua/mobile-app?
+                  [:button.mlb-reset.top-back-button
+                    {:on-touch-start identity
+                     :on-click #(router/history-back!)
+                     :aria-label "Back"}])]
+              [:div.title-container
+                (when (seq (:logo-url team-data))
+                  [:div.team-logo-container
+                    (org-avatar team-data false :never)])
+                [:div.title.main-lander
+                  "Join " (:name team-data) " on Carrot"]]]
+            [:div.onboard-form
+              [:form
+                {:on-submit (fn [e]
+                              (.preventDefault e))}
+                [:div.field-label.email-field
+                  "Work email"
+                  (cond
+                    (= (:error signup-with-email) 409)
+                    [:span.error "Email already exists"]
+                    @(::email-error s)
+                    [:span.error "Email is not valid"])]
+                [:input.field.oc-input
+                  {:type "email"
+                   :class (utils/class-set {:error (= (:error signup-with-email) 409)
+                                            utils/hide-class true})
+                   :pattern utils/valid-email-pattern
+                   :value @(::email s)
+                   :on-change #(let [v (.. % -target -value)]
+                                 (reset! (::password-error s) false)
+                                 (reset! (::email-error s) false)
+                                 (reset! (::email s) v))}]
+                [:div.field-label
+                  "Password"
+                  (when @(::password-error s)
+                    [:span.error
+                      "Minimum 8 characters"])]
+                [:input.field.oc-input
+                  {:type "password"
+                   :pattern ".{8,}"
+                   :value @(::pswd s)
+                   :placeholder "Minimum 8 characters"
+                   :on-change #(let [v (.. % -target -value)]
+                                 (reset! (::password-error s) false)
+                                 (reset! (::email-error s) false)
+                                 (reset! (::pswd s) v))}]
+                [:div.field-description
+                  "By signing up you are agreeing to our "
+                  [:a
+                    {:href oc-urls/terms}
+                    "terms of service"]
+                  " and "
+                  [:a
+                    {:href oc-urls/privacy}
+                    "privacy policy"]
+                  "."]
+                [:button.continue
+                  {:class (when (or (not (utils/valid-email? @(::email s)))
+                                    (<= (count @(::pswd s)) 7))
+                            "disabled")
+                   :on-touch-start identity
+                   :on-click #(if (or (not (utils/valid-email? @(::email s)))
+                                      (<= (count @(::pswd s)) 7))
+                                (do
+                                  (when-not (utils/valid-email? @(::email s))
+                                    (reset! (::email-error s) true))
+                                  (when (<= (count @(::pswd s)) 7)
+                                    (reset! (::password-error s) true)))
+                                (user-actions/signup-with-email {:email @(::email s) :pswd @(::pswd s)} true))}
+                  (str "Join " (:name team-data))]]]]
+          [:div.main-cta
+            [:div.invite-token-container.token-error
+              [:div.title
+                "Oh oh..."]
+              [:div.subtitle
+                (str "The invite link you’re trying to access "
+                     "has been deactivated by your account admin "
+                     "and is no longer valid.")]]])
+        [:div.main-cta
+          [:div.invite-token-container
+            [:div.title
+              "Please wait"]
+            [:div.subtitle.checking-invitation
+              "Checking invitation link" [:span.dots {:ref :dots} "."]]]])]))
+
 (defn confirm-invitation-when-ready [s]
   (let [confirm-invitation @(drv/get-ref s :confirm-invitation)]
     (when (and (:auth-settings confirm-invitation)
                (not @(::exchange-started s)))
       (reset! (::exchange-started s) true)
-      (user-actions/confirm-invitation (:token confirm-invitation)))))
+      (user-actions/confirm-invitation (:token confirm-invitation)))
+    (when (and @(::exchange-started s)
+               (not @(::exchange-ended s))
+               (:invitation-error confirm-invitation))
+      (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search))))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
                             (rum/local false ::exchange-started)
+                            (rum/local false ::exchange-ended)
                             {:will-mount (fn [s]
                               (confirm-invitation-when-ready s)
                               s)
@@ -707,14 +753,14 @@
   (let [confirm-invitation (drv/react s :confirm-invitation)]
     [:div.onboard-lander.invitee-lander
       [:div.main-cta
-        [:div.title
-          "Join your team on Carrot"]
-        [:div.mobile-logo.mobile-only]
-        (if (:invitation-error confirm-invitation)
-          [:div.subtitle
-            "An error occurred while confirming your invitation, please try again."]
-          [:div.subtitle
-            "Please wait" [:span.dots {:ref :dots} "."]])]]))
+        [:div.invite-container
+          [:div.title
+            "Join your team on Carrot"]
+          (if (:invitation-error confirm-invitation)
+            [:div.subtitle
+              "An error occurred while confirming your invitation, please try again."]
+            [:div.subtitle.checking-invitation
+              "Checking invitation link" [:span.dots {:ref :dots} "."]])]]]))
 
 (rum/defcs invitee-lander-password < rum/reactive
                                      (drv/drv :collect-password)
@@ -730,8 +776,6 @@
         invitation-confirmed (:invitation-confirmed collect-password)]
     [:div.onboard-lander.invitee-lander-password
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title
           "Set a password"]
         [:div.subtitle
@@ -802,10 +846,8 @@
         user-data (:user-data edit-user-profile)]
     [:div.onboard-lander.invitee-lander-profile
       [:div.main-cta
-        [:div.mobile-header.mobile-only
-          [:div.mobile-logo]]
         [:div.title.about-yourself
-          "Tell us a bit about you"]
+          "Tell us about you"]
         (when (:error edit-user-profile)
             [:div.subtitle.error
               "An error occurred while saving your data, please try again"])]
@@ -841,15 +883,8 @@
                           (user-actions/user-profile-save current-user-data edit-user-profile))}
             "Start using Carrot"]]]]))
 
-(defn vertical-center-mixin [class-selector]
-  {:after-render (fn [s]
-                   (let [el (js/document.querySelector class-selector)]
-                     (set! (.-marginTop (.-style el)) (str (* -1 (/ (.-clientHeight el) 2)) "px")))
-                   s)})
-
 (rum/defcs email-wall < rum/reactive
                         (drv/drv :query-params)
-                        (vertical-center-mixin ".onboard-email-container")
   [s]
   (let [email (:e (drv/react s :query-params))]
     [:div.onboard-email-container.email-wall
@@ -882,7 +917,6 @@
                             (drv/drv :email-verification)
                             (drv/drv :orgs)
                             (rum/local false ::exchange-started)
-                            (vertical-center-mixin ".onboard-email-container")
                             {:will-mount (fn [s]
                                            (exchange-token-when-ready s)
                                            s)
@@ -931,7 +965,6 @@
 (rum/defcs password-reset-lander < rum/reactive
                                    (drv/drv :password-reset)
                                    (rum/local false ::exchange-started)
-                                   (vertical-center-mixin ".onboard-email-container")
                                    {:will-mount (fn [s]
                                                   (exchange-pswd-reset-token-when-ready s)
                                                   s)
@@ -964,6 +997,7 @@
     :invitee-lander (invitee-lander)
     :invitee-lander-password (invitee-lander-password)
     :invitee-lander-profile (invitee-lander-profile)
+    :invitee-team-lander (invitee-team-lander)
     :email-wall (email-wall)
     :email-verified (email-verified)
     :password-reset-lander (password-reset-lander)
@@ -976,9 +1010,6 @@
     (loading {:loading (drv/react s :ap-loading)})
     [:div.onboard-wrapper
       {:class (str "onboard-" (name component))}
-      [:div.onboard-wrapper-left
-        [:div.onboard-wrapper-logo]
-        [:div.onboard-wrapper-left-inner
-          [:div.onboard-wrapper-box]]]
-      [:div.onboard-wrapper-right
-        (get-component component)]]])
+      (get-component component)]
+    [:div.bottom-gradient.big-web-only
+      [:div.onboard-box]]])

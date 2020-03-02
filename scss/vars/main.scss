@@ -16,9 +16,12 @@ $carrot_trend_collapsed_height: 10;
 $carrot_trend_expanded_height: 40;
 $carrot_trend_trending_height: 232;
 
-$left_navigation_sidebar_width: 216;
+$left_navigation_sidebar_width: 176;
 $left_navigation_sidebar_minimum_right_margin: 40;
-$board_container_width: 720;
+$board_container_width: 600;
+$foc_height: 180;
+$collapsed_foc_height: 56;
+$mobile_foc_height: 163;
 
 // setting panel sizes
 $settings_header_height: 48px;
@@ -26,3 +29,10 @@ $settings_content_width: 590;
 
 // User profile
 $user_profile_footer_height: 90px;
+
+// Payments
+$paywall_alert_width: 270;
+
+// Mobile specific
+$mobile_trial_expired_banner_height: 82;
+$mobile_search_header_height: 64;

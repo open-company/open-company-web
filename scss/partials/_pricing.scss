@@ -17,6 +17,11 @@ div.pricing-wrap {
         padding-left: 24px !important;
         padding-right: 24px !important;
       }
+
+      @include mobile(){
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
     }
 
     section {
@@ -27,12 +32,17 @@ div.pricing-wrap {
       padding: 200px 0 0;
       text-align: center;
       position: relative;
+      width: 100%;
 
       @include tablet() {
         overflow: visible;
         padding: 131px 0 0;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      @include mobile() {
+        padding: 88px 16px 40px;
       }
 
       h1.pricing-headline {
@@ -40,396 +50,286 @@ div.pricing-wrap {
         line-height: 78px;
         @include OC_Title()
         color: $deep_navy;
-        min-width: 300px;
         margin: 0 auto;
+        max-width: 840px;
 
         @include mobile() {
-          margin: 0 auto;
+          margin: 0 auto 40px;
           font-size: 36px;
           line-height: initial;
           max-width: initial;
           padding: 0 24px;
         }
       }
+    }
 
-      div.pricing-subheadline {
-        color: $deep_navy;
-        font-size: 30px;
-        line-height: 38px;
-        @include OC_Body_Book();
-        margin: 24px auto 0px;
-        z-index: 2;
-        position: relative;
-        max-width: 630px;
+    section.pricing-apps {
+      padding: 80px 16px;
+      background-color: $another_ui_grey;
 
-        @include mobile(){
-          margin-top: 16px;
-          font-size: 20px;
-          line-height: 26px;
-          padding: 0px;
-          color: $deep_navy;
-          max-width: initial;
-        }
+      @include mobile() {
+        padding: 40px 0 0;
       }
 
-      div.pricing-three-columns{
-        margin: 80px auto 0;
-        width: 1258px;
-        padding: 0 24px;
-
-        @include pricing-tablet() {
-          width: 100%;
-        }
+      div.pricing-apps-block {
+        width: 100%;
+        max-width: 1114px;
+        max-height: 249px;
+        margin: 0 auto;
 
         @include mobile() {
-          padding: 0;
+          max-height: initial;
         }
 
-        div.pricing-column {
-          width: 382px;
-          min-height: 812px;
-          background-color: $another_ui_grey;
+        & > div {
+          margin-left: 92px;
           float: left;
-          margin-left: 32px;
-          padding: 40px 32px 16px;
-          text-align: center;
 
-          &:nth-child(odd) {
-            margin-top: 43px;
+          &:first-child {
+            margin-left: 0;
           }
 
-          @include pricing-tablet() {
-            min-height: initial;
-            float: unset;
-            padding: 40px 32px;
-            margin: 32px auto 0;
+          @include mobile() {
+            margin-left: 0;
+            float: unset; 
           }
+        }
+
+        div.pricing-apps-separator {
+          width: 1px;
+          height: 100%;
+          background-color: rgba($deep_navy, 0.1);
+          height: 249px;
+        }
+
+        div.pricing-apps-app-block {
+          width: calc((100% - 2px - (92px * 4)) / 3);
 
           @include mobile() {
             width: 100%;
           }
 
-          h2.tear-title {
-            @include OC_Title()
-            font-size: 40px;
-            color: $deep_navy;
-          }
-
-          h3.tear-price {
-            @include OC_Title()
-            font-size: 60px;
-            line-height: 78px;
-            color: $deep_navy;
-            margin-top: 35px;
-
-            span {
-              display: none;
-            }
-          }
-
-          div.tear-subtitle {
-            @include OC_Body_Book();
-            font-size: 20px;
-            color: $deep_navy;
-            line-height: 26px;
-            margin: 32px auto 0;
-
-            span.bold {
-              @include OC_Body_Bold();
-            }
-
-            span.billed-monthly {
-              display: none;
-            }
-          }
-
-          a.tear-start-bt {
-            display: block;
-            margin: 32px auto 24px;
-            width: 200px;
-            height: 40px;
-            background-color: $carrot_orange;
-            border-radius: 8px;
-            color: white;
+          div.pricing-apps-app-header {
             @include OC_Body_Bold();
-            font-size: 16px;
-            padding: 10px 24px;
-          }
-
-          div.tear-feature-separator {
-            height: 1px;
-            width: 100%;
-            background-color: $more_ultra_light_grey;
-            margin-top: 16px;
-          }
-
-          div.tear-feature {
-            max-width: 200px;
-            @include OC_Body_Book();
-            font-size: 20px;
+            font-size: 30px;
+            line-height: 38px;
             color: $deep_navy;
             text-align: center;
-            margin: 16px auto 0;
-            cursor: pointer;
 
-            &[data-toggle="tooltip"] {
-              span{
-                border-bottom: 1px dotted $deep_navy;
-              }
+            @include mobile() {
+              font-size: 20px;
+              line-height: 25px;
+            }
+          }
+
+          img.pricing-apps-app-screenshot {
+            max-height: 140px;
+            max-width: 248px;
+            margin: 24px auto 0;
+            display: block;
+          }
+
+          div.pricing-apps-app-links {
+            margin-top: 24px;
+            text-align: center;
+            color: $carrot_green;
+            @include OC_Body_Bold();
+            font-size: 18px;
+            line-height: 23px;
+
+            &.mac-and-windows {
+              width: 280px;
+              margin-left: -20px;
             }
 
-            @include big_web() {
-              &[data-toggle="tooltip"] {
-                &:hover {
-                  color: $deep_navy;
+            @include mobile() {
+              margin-top: 10px;
+              @include OC_Body_Bold();
+              font-size: 20px;
+              line-height: 23px;
+            }
+
+            a {
+              color: $carrot_green;
+              @include OC_Body_Bold();
+              font-size: 18px;
+              line-height: 23px;
+
+              @include mobile() {
+                @include OC_Body_Bold();
+                font-size: 20px;
+                line-height: 23px;
+                display: block;
+              }
+
+              span.app-lablel {
+                color: $carrot_green;
+                @include OC_Body_Bold();
+                font-size: 18px;
+                line-height: 23px;
+
+                @include mobile() {
+                  @include OC_Body_Bold();
+                  font-size: 20px;
+                  line-height: 23px;
+                }                
+              }
+
+              &:hover {
+                text-decoration: underline;
+              }
+
+              &.mac-icon {
+                padding-left: 22px;
+                position: relative;
+
+                &:before {
+                  content: "";
+                  display: block;
+                  width: 14px;
+                  height: 16px;
+                  background-image: cdnUrl("/img/ML/pricing_apps_mac_icon.svg");
+                  background-size: 14px 16px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  position: absolute;
+                  left: 0;
+                  top: 3.5px;
                 }
               }
-            }
 
-            @include pricing-tablet() {
-              max-width: initial;
-            }
-
-            span.heavy {
-              @include OC_Body_Bold();
-            }
-          }
-
-          &.free-column {
-            border-bottom-left-radius: 100px;
-            margin-left: 0;
-
-            @include pricing-tablet() {
-              margin: 32px auto 0;
-            }
-
-            div.tear-subtitle {
-              max-width: 192px;
-            }
-          }
-
-          &.team-column {
-            min-height: 856px;
-            background-color: white;
-            border: 1px solid $deep_tan;
-            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.07);
-
-            h3.tear-price {
-              margin-top: 39px;
-            }
-
-            div.tear-subtitle {
-              height: 52px;
-
-              @include tablet(){
-                height: auto;
-              }
-            }
-
-            div.pricing-toggle-line {
-              margin: 16px auto;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              height: 22px;
-
-              span.pricing-toggle-annual {
-                @include OC_Body_Bold();
-                font-size: 14px;
-                color: $deep_navy;
-                line-height: 22px;
-              }
-
-              div.pricing-toggle {
-                float: left;
-                margin: 0 16px;
-                height: 22px;
-                width: 40px;
-                background-color: $deep_navy;
-                border-radius: 100px;
+              &.win-icon {
+                padding-left: 24px;
+                margin-left: 24px;
                 position: relative;
-                cursor: pointer;
 
-                span.pricing-toggle-dot {
-                  position: absolute;
+                &:before {
+                  content: "";
+                  display: block;
                   width: 16px;
                   height: 16px;
-                  border-radius: 50%;
-                  background-color: white;
-                  top: 3px;
+                  background-image: cdnUrl("/img/ML/pricing_apps_win_icon.svg");
+                  background-size: 16px 16px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  position: absolute;
                   left: 0;
-                  margin-left: 3px;
-                  transition: margin-left 180ms; 
+                  top: 3.5px;
                 }
               }
-
-              span.pricing-toggle-monthly {
-                @include OC_Body_Bold();
-                font-size: 14px;
-                color: $ui_grey;
-                width: 90px;
-                text-align: left;
-              }
-            }
-
-            &.monthly {
-              div.tear-subtitle {
-                span.billed-monthly {
-                  display: block;
-                }
-
-                span.billed-annually {
-                  display: none;
-                }
-              }
-
-              div.pricing-toggle-line {
-
-                span.pricing-toggle-annual {
-                  color: $ui_grey;
-                }
-
-                div.pricing-toggle {
-                  span.pricing-toggle-dot {
-                    margin-left: 21px;
-                  }
-                }
-
-                span.pricing-toggle-monthly {
-                  color: $deep_navy;
-                }
-              }
-            }
-
-            &.monthly {
-              h3.tear-price {
-                span.annual {
-                  display: none;
-                }
-
-                span.monthly {
-                  display: block;
-                }
-              }
-            }
-
-            &.annual {
-              h3.tear-price {
-                span.annual {
-                  display: block;
-                }
-
-                span.monthly {
-                  display: none;
-                }
-              }
-            }
-
-            div.tear-subtitle {
-              max-width: 185px;
             }
           }
 
-          &.enterprise-column {
-            border-bottom-right-radius: 40px;
-
-            div.tear-price {
-              width: 80px;
-              height: 80px;
-              border-radius: 50%;
-              background-color: rgba(#314150, 0.1);
-              background-image: cdnUrl("/img/ML/carrot_logo_grey.svg");
-              background-size: 23px 40px;
-              background-position: center;
-              background-repeat: no-repeat;
-              margin: 36px auto 0;
-            }
-
-            a.tear-start-bt {
-              background-color: $feint_emerald;
-              color: $carrot_green;
-              margin: 32px auto 24px;
-            }
-
-            div.tear-subtitle {
-              max-width: 241px;
-              margin-top: 29px;
-
-              @include pricing-tablet() {
-                max-width: initial;
-              }
-            }
+          img.pricing-apps-mobile-screenshot {
+            width: 226px;
+            height: 196px;
+            margin: 24px auto 0;
+            display: block;
           }
         }
       }
     }
 
     section.pricing-faq {
-      width: 795px;
-      margin: 120px auto;
-      text-align: left;
+      margin: 0 auto;
+      max-width: 1200px;
+      position: relative;
 
-      @include tablet() {
+      &:after {
+        content: "";
+        background-color: $another_ui_grey;
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        margin: 80px auto;
-      }
-
-      h2.faq-header {
-        @include OC_Title()
-        font-size: 60px;
-        color: $deep_navy;
-        margin-bottom: 80px;
+        height: 100%;
+        border-radius: 20px 20px 200px 20px;
+        z-index: 1;
 
         @include mobile() {
-          font-size: 36px;
-          margin-bottom: 40px;
+          border-radius: 0px 0px 0px 0px;
         }
       }
 
-      div.faq-row {
-        border-top: 1px solid $more_ultra_light_grey;
-        margin-top: 40px;
+      & > div {
+        position: relative;
+        z-index: 2;
+      }
 
-        div.faq-row-question {
-          @include OC_Title()
-          font-size: 20px;
+      div.pricing-faq-block {
+        max-width: 784px;
+        margin: 0 auto;
+        padding: 90px 0;
+        text-align: left;
+
+        h1.pricing-faq-header {
+          @include OC_Body_Bold();
+          font-size: 60px;
+          line-height: 62px;
           color: $deep_navy;
-          line-height: 28px;
-          margin-top: 40px;
+          margin: 0 0 40px;
+          padding: 0;
+
+          @include mobile() {
+            font-size: 36px;
+            line-height: 40px;
+            text-align: center;
+            margin: 0;
+          }
         }
 
-        div.faq-row-answer {
-          @include OC_Body_Book();
-          font-size: 20px;
-          color: $deep_navy;
-          margin-top: 8px;
+        div.pricing-faq-question-block {
+          margin: 40px 0;
+          border-top: 1px solid $more_ultra_light_grey;
+          padding: 40px 0 0;
 
-          span.heavy {
-            @include OC_Body_Bold();
+          @include mobile() {
+            margin-top: 24px;
+            padding-top: 24px;
           }
 
-          a.chat-with-us {
-            float: left;
-            color: $carrot_green;
-            @include OC_Body_Bold();
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5;
+          &:first-of-type {
+            margin-top: 0;
+            border-top: none;
 
-            &:hover {
-              text-decoration: underline;
+            @include mobile() {
+              margin-top: 24px;
+              border-top: 1px solid $more_ultra_light_grey;
             }
           }
 
-          a {
-            color: $carrot_green;
+          &:last-of-type {
+            margin-bottom: 0;
+          }
 
-            &:hover {
-              text-decoration: underline;
+          div.pricing-faq-question {
+            @include OC_Body_Bold();
+            font-size: 20px;
+            line-height: 28px;
+            color: #294154;
+          }
+
+          div.pricing-faq-answer {
+            @include OC_Body_Book();
+            font-size: 20px;
+            line-height: 28px;
+            color: $deep_navy;
+            margin-top: 8px;
+
+            a {
+              @include OC_Body_Book();
+              font-size: 20px;
+              line-height: 28px;
+              color: $carrot_green;
             }
           }
         }
       }
+    }
+
+    section.pricing-footer {
+      padding: 80px 0;
+      background-color: $another_ui_grey;
     }
   }
 }

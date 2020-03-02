@@ -1,5 +1,6 @@
 (ns oc.web.stores.activity
-  (:require [taoensso.timbre :as timbre]
+  (:require [cuerdas.core :as str]
+            [taoensso.timbre :as timbre]
             [oc.web.dispatcher :as dispatcher]
             [oc.web.lib.jwt :as j]
             [oc.web.lib.utils :as utils]
@@ -12,59 +13,38 @@
   (if (:uuid activity-data)
     (let [;; Add/remove item from AP
           is-published? (= (:status activity-data) "published")
-          ap-key (dispatcher/container-key org-slug :all-posts dispatcher/other-sort-type)
-          recent-ap-key (dispatcher/container-key org-slug :all-posts dispatcher/default-sort-type)
+          ap-key (dispatcher/container-key org-slug :all-posts)
           old-ap-data (get-in db ap-key)
-          old-recent-ap-data (get-in db recent-ap-key)
           old-ap-data-posts (get old-ap-data :posts-list)
-          old-recent-ap-data-posts (get old-recent-ap-data :posts-list)
           ap-without-uuid (utils/vec-dissoc old-ap-data-posts (:uuid activity-data))
-          recent-ap-without-uuid (utils/vec-dissoc old-recent-ap-data-posts (:uuid activity-data))
           new-ap-data-posts (vec
                              (if is-published?
                                (conj ap-without-uuid (:uuid activity-data))
                                ap-without-uuid))
-          new-recent-ap-data-posts (vec
-                                    (if is-published?
-                                      (conj recent-ap-without-uuid (:uuid activity-data))
-                                      recent-ap-without-uuid))
-          next-ap-data (assoc old-ap-data :posts-list new-ap-data-posts)
-          next-recent-ap-data (assoc old-ap-data :posts-list new-recent-ap-data-posts)]
-      (-> db
-       (assoc-in ap-key next-ap-data)
-       (assoc-in recent-ap-key next-recent-ap-data)))
+          next-ap-data (merge old-ap-data {:posts-list new-ap-data-posts
+                                           :items-to-render (au/grouped-posts (assoc old-ap-data :posts-list new-ap-data-posts))})]
+      (assoc-in db ap-key next-ap-data))
     db))
 
-(defn add-remove-item-from-follow-ups
-  "Given an activity map adds or remove it from the follow-ups list of posts depending on the activity
-   status and if the user assigned follow-up is not completed."
+(defn add-remove-item-from-bookmarks
+  "Given an activity map adds or remove it from the bookmarks list of posts."
   [db org-slug activity-data]
   (if (:uuid activity-data)
     (let [;; Add/remove item from MS
-          user-follow-up (first (filterv #(= (-> % :assignee :user-id) (j/user-id)) (:follow-ups activity-data)))
-          is-follow-ups? (and (not= (:status activity-data) "draft")
-                              (not (:completed? user-follow-up)))
-          fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
-          recent-fu-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-          old-fu-data (get-in db fu-key)
-          old-recent-fu-data (get-in db recent-fu-key)
-          old-fu-data-posts (get old-fu-data :posts-list)
-          old-recent-fu-data-posts (get old-recent-fu-data :posts-list)
-          fu-without-uuid (utils/vec-dissoc old-fu-data-posts (:uuid activity-data))
-          recent-fu-without-uuid (utils/vec-dissoc old-recent-fu-data-posts (:uuid activity-data))
-          new-fu-data-posts (vec
-                             (if is-follow-ups?
-                               (conj fu-without-uuid (:uuid activity-data))
-                               fu-without-uuid))
-          new-recent-fu-data-posts (vec
-                                    (if is-follow-ups?
-                                      (conj recent-fu-without-uuid (:uuid activity-data))
-                                      recent-fu-without-uuid))
-          next-fu-data (assoc old-fu-data :posts-list new-fu-data-posts)
-          next-recent-fu-data (assoc old-recent-fu-data :posts-list new-recent-fu-data-posts)]
-      (-> db
-        (assoc-in fu-key next-fu-data)
-        (assoc-in recent-fu-key next-recent-fu-data)))
+          is-bookmark? (and (not= (:status activity-data) "draft")
+                            (:bookmarked activity-data))
+          bm-key (dispatcher/container-key org-slug :bookmarks)
+          old-bm-data (get-in db bm-key)
+          old-bm-data-posts (get old-bm-data :posts-list)
+          bm-without-uuid (utils/vec-dissoc old-bm-data-posts (:uuid activity-data))
+          new-bm-data-posts (vec
+                             (if is-bookmark?
+                               (conj bm-without-uuid (:uuid activity-data))
+                               bm-without-uuid))
+          bookmarks-posts-list (mapv #(dispatcher/activity-data org-slug % db) new-bm-data-posts)
+          next-bm-data (merge old-bm-data {:posts-list new-bm-data-posts
+                                           :items-to-render new-bm-data-posts})]
+      (assoc-in db bm-key next-bm-data))
     db))
 
 (defmethod dispatcher/action :entry-edit/dismiss
@@ -150,11 +130,11 @@
     (update-in [:section-editing] dissoc :loading)))
 
 (defmethod dispatcher/action :entry-publish-with-board/finish
-  [db [_ sort-type new-board-data edit-key]]
+  [db [_ new-board-data edit-key]]
   (let [org-slug (utils/section-org-slug new-board-data)
         board-slug (:slug new-board-data)
         posts-key (dispatcher/posts-data-key org-slug)
-        board-key (dispatcher/board-data-key org-slug board-slug sort-type)
+        board-key (dispatcher/board-data-key org-slug board-slug)
         fixed-board-data (au/fix-board new-board-data (dispatcher/change-data db))
         merged-items (merge (get-in db posts-key)
                             (:fixed-items fixed-board-data))]
@@ -175,7 +155,8 @@
     (-> db
       (assoc-in (dispatcher/activity-key org-slug (:uuid activity-data)) fixed-activity-data)
       (add-remove-item-from-all-posts org-slug fixed-activity-data)
-      (add-remove-item-from-follow-ups org-slug fixed-activity-data)
+      (add-remove-item-from-bookmarks org-slug fixed-activity-data)
+      (assoc-in dispatcher/force-list-update-key (utils/activity-uuid))
       (update-in [edit-key] dissoc :publishing)
       (dissoc :entry-toggle-save-on-exit))))
 
@@ -194,26 +175,34 @@
         containers-key (dispatcher/containers-key org-slug)
         with-fixed-containers (reduce
                                (fn [ndb ckey]
-                                 (update-in ndb (conj (dispatcher/container-key org-slug ckey) :posts-list)
-                                  (fn [posts-list]
-                                    (filter #(not= % (:uuid activity-data)) posts-list))))
+                                 (let [base-container-key (dispatcher/container-key org-slug ckey)
+                                       next-ndb (update-in ndb (conj base-container-key :posts-list)
+                                                 (fn [posts-list]
+                                                   (filterv #(not= % (:uuid activity-data)) posts-list)))]
+                                    (if (au/show-separators? ckey)
+                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (au/grouped-posts (get-in next-ndb base-container-key)))
+                                      (assoc-in next-ndb (conj base-container-key :items-to-render) (get-in next-ndb (conj base-container-key :posts-list))))))
                                db
                                (keys (get-in db containers-key)))
         ;; Remove the post from all the boards posts list too
         boards-key (dispatcher/boards-key org-slug)
         with-fixed-boards (reduce
                            (fn [ndb ckey]
-                             (update-in ndb (conj (dispatcher/board-data-key org-slug ckey) :posts-list)
-                              (fn [posts-list]
-                                (filter #(not= % (:uuid activity-data)) posts-list))))
+                             (let [base-board-key (dispatcher/board-data-key org-slug ckey)
+                                   next-ndb (update-in ndb (conj base-board-key :posts-list)
+                                             (fn [posts-list]
+                                               (filterv #(not= % (:uuid activity-data)) posts-list)))]
+                                (if (au/show-separators? ckey)
+                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (au/grouped-posts (get-in next-ndb base-board-key)))
+                                  (assoc-in next-ndb (conj base-board-key :items-to-render) (get-in next-ndb (conj base-board-key :posts-list))))))
                            with-fixed-containers
                            (keys (get-in db boards-key)))]
     ;; Now if the post is the one being edited in cmail let's remove it from there too
-    (if (= (:uuid (get-in db [:cmail-data])) (:uuid activity-data))
+    (if (= (get-in db [:cmail-data :uuid]) (:uuid activity-data))
       (-> with-fixed-boards
           (assoc-in [:cmail-data] {:delete true})
           (assoc-in posts-key next-posts))
-      with-fixed-boards)))
+      (assoc-in with-fixed-boards posts-key next-posts))))
 
 (defmethod dispatcher/action :activity-move
   [db [_ activity-data org-slug board-data]]
@@ -258,12 +247,16 @@
   ;; do nothing for now
   db)
 
+(defmethod dispatcher/action :activity-get/not-found
+  [db [_ org-slug activity-uuid secure-uuid]]
+  (let [activity-key (if secure-uuid
+                       (dispatcher/secure-activity-key org-slug secure-uuid)
+                       (dispatcher/activity-key org-slug activity-uuid))]
+    (assoc-in db activity-key :404)))
+
 (defmethod dispatcher/action :activity-get/finish
   [db [_ status org-slug activity-data secure-uuid]]
-  (let [next-db (if (= status 404)
-                  (dissoc db :latest-entry-point)
-                  db)
-        activity-uuid (:uuid activity-data)
+  (let [activity-uuid (:uuid activity-data)
         board-data (au/board-by-uuid (:board-uuid activity-data))
         activity-key (if secure-uuid
                        (dispatcher/secure-activity-key org-slug secure-uuid)
@@ -271,35 +264,48 @@
         fixed-activity-data (au/fix-entry
                              activity-data
                              board-data
-                             (dispatcher/change-data db))]
-    (assoc-in db activity-key fixed-activity-data)))
+                             (dispatcher/change-data db))
+        next-db (if (and (= (get-in db [:cmail-data :uuid]) activity-uuid)
+                         (pos? (compare (:updated-at fixed-activity-data) (get-in db [:cmail-data :updated-at]))))
+                  (-> db
+                    (update-in [:cmail-data] #(merge % fixed-activity-data))
+                    (update :cmail-state assoc :key (utils/activity-uuid)))
+                  db)]
+    (assoc-in next-db activity-key fixed-activity-data)))
 
-(defmethod dispatcher/action :follow-up-toggle
-  [db [_ org-slug activity-data follow-ups]]
-  (let [should-update-post? (:uuid activity-data)
-        activity-key (when should-update-post?
-                      (dispatcher/activity-key org-slug (:uuid activity-data)))
-        post-activity-data (when should-update-post?
-                             (get-in db activity-key))
-        next-activity-data (when should-update-post?
-                             (if (seq follow-ups)
-                               (assoc post-activity-data :follow-ups follow-ups)
-                               (dissoc post-activity-data :follow-ups)))
-        with-updated-activity-data (if should-update-post?
-                                    (assoc-in db activity-key next-activity-data)
-                                    db)
-        cmail-data (get db :cmail-data)
-        next-cmail-data* (assoc cmail-data :has-changes true)
-        next-cmail-data (if (seq follow-ups)
-                           (assoc next-cmail-data* :follow-ups follow-ups)
-                           (dissoc next-cmail-data* :follow-ups))]
-      (-> with-updated-activity-data
-        (assoc :cmail-data next-cmail-data)
-        (add-remove-item-from-follow-ups org-slug next-activity-data))))
+(defmethod dispatcher/action :bookmark-toggle
+  [db [_ org-slug activity-uuid bookmark?]]
+  (let [bookmarks-count-key (conj (dispatcher/org-data-key org-slug) :bookmarks-count)
+        current-bookmarks-count (get-in db bookmarks-count-key)
+        activity-key (dispatcher/activity-key org-slug activity-uuid)
+        activity-data (get-in db activity-key)
+        bookmark-link-index (when activity-data
+                              (utils/index-of (:links activity-data) #(= (:rel %) "bookmark")))
+        next-activity-data* (when activity-data
+                             (assoc activity-data :bookmarked bookmark?))
+        next-activity-data (when (and activity-data
+                                      bookmark-link-index)
+                             (assoc-in next-activity-data* [:links bookmark-link-index :method]
+                              (if bookmark? "DELETE" "POST")))
+        next-db (if activity-data
+                  (assoc-in db activity-key next-activity-data)
+                  db)
+        next-bookmarks-count (cond
+                               (and bookmark?
+                                    (not (:bookmarked activity-data)))
+                               (inc current-bookmarks-count)
+                               (and (not bookmark?)
+                                    (:bookmarked activity-data))
+                               (dec current-bookmarks-count)
+                               :else
+                               current-bookmarks-count)]
+      (-> next-db
+       (add-remove-item-from-bookmarks org-slug next-activity-data)
+       (assoc-in bookmarks-count-key next-bookmarks-count))))
 
 (defmethod dispatcher/action :entry-save-with-board/finish
-  [db [_ org-slug sort-type fixed-board-data]]
-  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data) sort-type)
+  [db [_ org-slug fixed-board-data]]
+  (let [board-key (dispatcher/board-data-key org-slug (:slug fixed-board-data))
         posts-key (dispatcher/posts-data-key org-slug)]
   (-> db
     (assoc-in board-key (dissoc fixed-board-data :fixed-items))
@@ -310,28 +316,27 @@
     (dissoc :entry-toggle-save-on-exit))))
 
 (defmethod dispatcher/action :all-posts-get/finish
-  [db [_ org-slug sort-type fixed-posts]]
+  [db [_ org-slug fixed-posts]]
   (let [posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-posts))
-        container-key (dispatcher/container-key org-slug :all-posts sort-type)
-        with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))]
+        container-key (dispatcher/container-key org-slug :all-posts)]
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
       (assoc-in posts-key merged-items))))
 
 (defmethod dispatcher/action :all-posts-more
-  [db [_ org-slug sort-type]]
-  (let [container-key (dispatcher/container-key org-slug :all-posts sort-type)
+  [db [_ org-slug]]
+  (let [container-key (dispatcher/container-key org-slug :all-posts)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-posts-data)))
 
 (defmethod dispatcher/action :all-posts-more/finish
-  [db [_ org direction sort-type posts-data]]
+  [db [_ org direction posts-data]]
   (if posts-data
     (let [org-data (dispatcher/org-data db org)
-          container-key (dispatcher/container-key org :all-posts sort-type)
+          container-key (dispatcher/container-key org :all-posts)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
@@ -347,31 +352,33 @@
         (assoc-in posts-data-key new-items-map)))
     db))
 
-;; Follow-ups
+;; Bookmarks
 
-(defmethod dispatcher/action :follow-ups-get/finish
-  [db [_ org-slug sort-type fixed-posts]]
-  (let [posts-key (dispatcher/posts-data-key org-slug)
+(defmethod dispatcher/action :bookmarks-get/finish
+  [db [_ org-slug fixed-posts]]
+  (let [org-key (dispatcher/org-data-key org-slug)
+        posts-key (dispatcher/posts-data-key org-slug)
         old-posts (get-in db posts-key)
         merged-items (merge old-posts (:fixed-items fixed-posts))
-        container-key (dispatcher/container-key org-slug :follow-ups sort-type)
-        with-posts-list (assoc fixed-posts :posts-list (map :uuid (:items fixed-posts)))]
+        container-key (dispatcher/container-key org-slug :bookmarks)]
     (-> db
       (assoc-in container-key (dissoc fixed-posts :fixed-items))
-      (assoc-in posts-key merged-items))))
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-key :bookmarks-count) (:total-count fixed-posts)))))
 
-(defmethod dispatcher/action :follow-ups-more
-  [db [_ org-slug sort-type]]
-  (let [container-key (dispatcher/container-key org-slug :follow-ups sort-type)
+(defmethod dispatcher/action :bookmarks-more
+  [db [_ org-slug]]
+  (let [container-key (dispatcher/container-key org-slug :bookmarks)
         container-data (get-in db container-key)
         next-posts-data (assoc container-data :loading-more true)]
     (assoc-in db container-key next-posts-data)))
 
-(defmethod dispatcher/action :follow-ups-more/finish
-  [db [_ org direction sort-type posts-data]]
+(defmethod dispatcher/action :bookmarks-more/finish
+  [db [_ org direction posts-data]]
   (if posts-data
-    (let [org-data (dispatcher/org-data db org)
-          container-key (dispatcher/container-key org :follow-ups sort-type)
+    (let [org-key (dispatcher/org-data-key org)
+          org-data (get-in db org-key)
+          container-key (dispatcher/container-key org :bookmarks)
           container-data (get-in db container-key)
           posts-data-key (dispatcher/posts-data-key org)
           old-posts (get-in db posts-data-key)
@@ -384,26 +391,25 @@
                               (dissoc :loading-more))]
       (-> db
         (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)))
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-key :bookmarks-count) (:total-count posts-data))))
     db))
 
-(defmethod dispatcher/action :follow-up-complete
+(defmethod dispatcher/action :remove-bookmark
   [db [_ org-slug entry-data]]
   (let [activity-key (dispatcher/activity-key org-slug (:uuid entry-data))
-        follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/other-sort-type)
-        follow-up-data (get-in db follow-up-key)
-        recent-follow-up-key (dispatcher/container-key org-slug :follow-ups dispatcher/default-sort-type)
-        recent-follow-up-data (get-in db recent-follow-up-key)
+        bookmarks-key (dispatcher/container-key org-slug :bookmarks)
+        bookmarks-data (get-in db bookmarks-key)
         org-key (dispatcher/org-data-key org-slug)]
     (-> db
-      (update-in (conj org-key :follow-ups-count) dec)
+      (update-in (conj org-key :bookmarks-count) dec)
       (assoc-in activity-key entry-data)
-      (add-remove-item-from-follow-ups org-slug entry-data))))
+      (add-remove-item-from-bookmarks org-slug entry-data))))
 
-(defmethod dispatcher/action :follow-up-create-self
+(defmethod dispatcher/action :add-bookmark
   [db [_ org-slug activity-data]]
   (let [org-key (dispatcher/org-data-key org-slug)]
-    (update-in db (conj org-key :follow-ups-count) inc)))
+    (update-in db (conj org-key :bookmarks-count) inc)))
 
 (defmethod dispatcher/action :activities-count
   [db [_ items-count]]
@@ -444,43 +450,6 @@
                                                                 :last-read-at (:read-at (last (sort-by :read-at
                                                                                current-user-reads)))
                                                                 :private-access? private-access?})))
-
-(defmethod dispatcher/action :must-see-get/finish
-  [db [_ org-slug sort-type must-see-posts]]
-  (let [posts-data-key (dispatcher/posts-data-key org-slug)
-        old-posts (get-in db posts-data-key)
-        merged-items (merge old-posts (:fixed-items must-see-posts))]
-    (-> db
-     (assoc-in posts-data-key merged-items)
-     (assoc-in (dispatcher/container-key org-slug :must-see sort-type) (dissoc must-see-posts :fixed-items)))))
-
-(defmethod dispatcher/action :must-see-more
-  [db [_ org-slug sort-type]]
-  (let [container-key (dispatcher/container-key org-slug :must-see sort-type)
-        container-data (get-in db container-key)
-        next-posts-data (assoc container-data :loading-more true)]
-    (assoc-in db container-key next-posts-data)))
-
-(defmethod dispatcher/action :must-see-more/finish
-  [db [_ org direction sort-type posts-data]]
-  (if posts-data
-    (let [org-data (dispatcher/org-data db org)
-          container-key (dispatcher/container-key org :must-see sort-type)
-          container-data (get-in db container-key)
-          posts-data-key (dispatcher/posts-data-key org)
-          old-posts (get-in db posts-data-key)
-          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
-                                                              :old-links (:links container-data)})
-
-          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
-          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
-          new-container-data (-> fixed-posts-data
-                              (assoc :direction direction)
-                              (dissoc :loading-more))]
-      (-> db
-        (assoc-in container-key new-container-data)
-        (assoc-in posts-data-key new-items-map)))
-    db))
 
 (defmethod dispatcher/action :uploading-video
   [db [_ org-slug video-id]]
@@ -538,7 +507,6 @@
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
         activity-key (dispatcher/activity-key org-slug activity-uuid)
         next-activity-data (assoc (get-in db activity-key) :unread true)
-        temp-val (get-in db section-change-key)
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key #(vec (conj (or % []) activity-uuid)))
@@ -546,15 +514,124 @@
       (assoc-in activity-key next-activity-data))))
 
 (defmethod dispatcher/action :mark-read
-  [db [_ org-slug activity-data]]
+  [db [_ org-slug activity-data dismiss-at]]
   (let [board-uuid (:board-uuid activity-data)
         activity-uuid (:uuid activity-data)
         section-change-key (vec (concat (dispatcher/change-data-key org-slug) [board-uuid :unread]))
+        all-comments-data (dispatcher/activity-comments-data org-slug activity-uuid db)
+        comments-data (filterv #(not= (j/user-id) (-> % :author :user-id)) all-comments-data)
         activity-key (dispatcher/activity-key org-slug activity-uuid)
-        next-activity-data (assoc (get-in db activity-key) :unread false)
-        temp-val (get-in db section-change-key)
+        old-activity-data (get-in db activity-key)
+        ;; Update the activity to read and update the new-at with the max btw the current value
+        ;; and the created-at of the last comment.
+        next-activity-data (merge old-activity-data {:unread false
+                                                     :new-at (if (and (seq comments-data)
+                                                                                (-> comments-data last :created-at
+                                                                                 (compare (:new-at old-activity-data))
+                                                                                 pos?))
+                                                                         (-> comments-data last :created-at)
+                                                                         (:new-at old-activity-data))})
         activity-read-key (conj dispatcher/activities-read-key activity-uuid)]
     (-> db
       (update-in section-change-key (fn [unreads] (filterv #(not= % activity-uuid) (or unreads []))))
-      (update-in activity-read-key merge {:last-read-at (utils/as-of-now)})
+      (update-in activity-read-key merge {:last-read-at dismiss-at})
       (assoc-in activity-key next-activity-data))))
+
+;; Inbox
+
+(defmethod dispatcher/action :inbox-get/finish
+  [db [_ org-slug fixed-posts]]
+  (let [posts-key (dispatcher/posts-data-key org-slug)
+        old-posts (get-in db posts-key)
+        merged-items (merge old-posts (:fixed-items fixed-posts))
+        container-key (dispatcher/container-key org-slug :inbox)
+        org-data-key (dispatcher/org-data-key org-slug)]
+    (-> db
+      (assoc-in container-key (dissoc fixed-posts :fixed-items))
+      (assoc-in posts-key merged-items)
+      (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts)))))
+
+(defmethod dispatcher/action :inbox-more
+  [db [_ org-slug]]
+  (let [container-key (dispatcher/container-key org-slug :inbox)
+        container-data (get-in db container-key)
+        next-posts-data (assoc container-data :loading-more true)]
+    (assoc-in db container-key next-posts-data)))
+
+(defmethod dispatcher/action :inbox-more/finish
+  [db [_ org direction posts-data]]
+  (if posts-data
+    (let [org-data-key (dispatcher/org-data-key org)
+          org-data (get-in db org-data-key)
+          container-key (dispatcher/container-key org :inbox)
+          container-data (get-in db container-key)
+          posts-data-key (dispatcher/posts-data-key org)
+          old-posts (get-in db posts-data-key)
+          prepare-posts-data (merge (:collection posts-data) {:posts-list (:posts-list container-data)
+                                                              :old-links (:links container-data)})
+          fixed-posts-data (au/fix-container prepare-posts-data (dispatcher/change-data db) org-data direction)
+          new-items-map (merge old-posts (:fixed-items fixed-posts-data))
+          new-container-data (-> fixed-posts-data
+                              (assoc :direction direction)
+                              (dissoc :loading-more))]
+      (-> db
+        (assoc-in container-key new-container-data)
+        (assoc-in posts-data-key new-items-map)
+        (assoc-in (conj org-data-key :inbox-count) (:total-count fixed-posts-data))))
+    db))
+
+(defmethod dispatcher/action :inbox/dismiss
+  [db [_ org-slug item-id]]
+  (if-let [activity-data (dispatcher/activity-data item-id)]
+    (let [inbox-key (dispatcher/container-key org-slug "inbox")
+          inbox-data (get-in db inbox-key)
+          without-item (-> inbox-data
+                         (update :posts-list (fn [posts-list] (filterv #(not= % item-id) posts-list)))
+                         (update :items-to-render (fn [posts-list] (filterv #(not= % item-id) posts-list))))
+          org-data-key (dispatcher/org-data-key org-slug)
+          update-count? (not= (-> inbox-data :posts-list count) (-> without-item :posts-list count))]
+      (-> db
+        (assoc-in inbox-key without-item)
+        (update-in (conj org-data-key :inbox-count) (if update-count? dec identity))))
+    db))
+
+(defmethod dispatcher/action :inbox/unread
+  [db [_ org-slug current-board-slug item-id]]
+  (if-let [activity-data (dispatcher/activity-data item-id)]
+    (let [inbox-key (dispatcher/container-key org-slug "inbox")
+          posts-list-key (conj inbox-key :posts-list)
+          items-to-render-key (conj inbox-key :items-to-render)
+          inbox-data (get-in db inbox-key)
+          next-db (if inbox-data
+                    (-> db
+                     (update-in posts-list-key (fn [posts-list] (->> item-id (conj (set posts-list)) vec)))
+                     (update-in items-to-render-key (fn [posts-list] (->> item-id (conj (set posts-list)) vec))))
+                    db)
+          activity-key (dispatcher/activity-key org-slug item-id)
+          activity-data (get-in db activity-key)
+          fixed-activity-data (update activity-data :links (fn [links]
+                               (mapv (fn [link]
+                                (if (= (:rel link) "follow")
+                                  (merge link {:href (str/replace (:href link) #"/follow/?$" "/unfollow/")
+                                               :rel "unfollow"})
+                                  link))
+                                 links)))
+          org-data-key (dispatcher/org-data-key org-slug)
+          update-count? (and inbox-data
+                             (not= (count (get-in db posts-list-key)) (count (get-in next-db posts-list-key))))]
+      (-> next-db
+       (update-in (conj org-data-key :inbox-count) (if update-count? inc identity))
+       (assoc-in activity-key fixed-activity-data)))
+    db))
+
+(defmethod dispatcher/action :inbox/dismiss-all
+  [db [_ org-slug]]
+  (let [inbox-key (dispatcher/container-key org-slug "inbox")
+        inbox-data (get-in db inbox-key)
+        without-items (-> inbox-data
+                       (assoc-in [:posts-list] [])
+                       (assoc-in [:items-to-render] []))
+        org-data-key (dispatcher/org-data-key org-slug)]
+    (-> db
+      (assoc-in inbox-key without-items)
+      (assoc-in (conj org-data-key :inbox-count) 0))))

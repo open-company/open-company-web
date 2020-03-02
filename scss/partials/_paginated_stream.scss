@@ -18,17 +18,52 @@ div.paginated-stream {
     }
 
     div.loading-updates {
-      width: 100%;
       text-align: center;
-      margin-bottom: 16px;
+      height: 60px;
+      padding: 24px 0 16px;
       font-size: 14px;
-      margin-top: 24px;
       @include OC_Body_Book();
-      color: rgba($deep_navy, 0.5);
+      color: var(--light-color);
+
+      @include mobile() {
+        height: 44px;
+        padding: 16px 0 8px;
+      }
+    }
+
+    div.carrot-close {
+      text-align: center;
+      height: 60px;
+      background-image: cdnUrl("/img/ML/closing_carrot.svg");
+      background-size: 14px 24px;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.2;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/closing_carrot@dark.svg");
+      }
     }
 
     div.paginated-stream-cards-inner {
       position: relative;
+      overflow: visible !important;
+      padding-bottom: 24px;
+
+      .ReactVirtualized__Grid.ReactVirtualized__List,
+      .ReactVirtualized__Grid.ReactVirtualized__List .ReactVirtualized__Grid__innerScrollContainer {
+        overflow: visible !important;
+
+        div.virtualized-list-separator {
+          background-color: var(--background-color);
+          padding: 16px 0;
+          @include OC_Body_Bold();
+          font-size: 14px;
+          line-height: 18px;
+          color: var(--light-color);
+          border-bottom: 1px solid var(--foc-divider-line-color);
+        }
+      }
 
       div.activities-overlay {
         position: fixed;
@@ -38,12 +73,12 @@ div.paginated-stream {
         height: calc(100vh - 50px);
         width: #{$board_container_width}px;
         margin-left: -244px;
-        background-color: $grey_num_2;
+        background-color: var(--background-color);
         text-align: center;
 
         @include mobile() {
           width: 100%;
-          background-color: white;
+          background-color: var(--mobile-background-color);
         }
 
         div.oc-loading {
@@ -59,7 +94,7 @@ div.paginated-stream {
           top: 300px;
           position: absolute;
           width: 100%;
-          color: rgba($oc_gray_7, 0.5);
+          color: var(--light-color);
           font-size: 16px;
           @include OC_Body_Bold();
           text-align: center;

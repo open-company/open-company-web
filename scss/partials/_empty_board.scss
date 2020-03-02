@@ -24,32 +24,59 @@ div.empty-board {
       margin: 100px auto 0;
     }
 
-    div.empty-board-illustration {
+    div.empty-board-illustration-container {
       width: 56px;
       height: 56px;
-      background-color: #F3F0EF;
+      background-color: var(--opac-background-color-1);
       border-radius: 8px;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 24px 20px;
       margin: 0 auto;
-      background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
 
-      &.drafts {
-        background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
-        background-size: 56px 56px;
-      }
+      div.empty-board-illustration {
+        width: 56px;
+        height: 56px;
+        opacity: 0.5;
+        background-image: cdnUrl("/img/ML/empty_state_ap_section.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 24px 21px;
 
-      &.follow-ups {
-        background-image: cdnUrl("/img/ML/empty_state_follow_ups_section.svg");
-        background-size: 18px 24px;
+        &.inbox {
+          background-image: cdnUrl("/img/ML/empty_state_inbox_section.svg");
+          background-size: 24px 21px;
+        }
+
+        &.drafts {
+          background-image: cdnUrl("/img/ML/empty_state_drafts.svg");
+          background-size: 18px 22px;
+        }
+
+        &.bookmarks {
+          background-image: cdnUrl("/img/ML/empty_state_bookmarks_section.svg");
+          background-size: 18px 24px;
+        }
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/empty_state_ap_section@dark.svg");
+
+          &.inbox {
+            background-image: cdnUrl("/img/ML/empty_state_inbox_section@dark.svg");
+          }
+
+          &.drafts {
+            background-image: cdnUrl("/img/ML/empty_state_drafts@dark.svg");
+          }
+
+          &.bookmarks {
+            background-image: cdnUrl("/img/ML/empty_state_bookmarks_section@dark.svg");
+          }
+        }
       }
     }
 
     div.empty-board-title {
       @include OC_Body_Bold();
       font-size: 16px;
-      color: $deep_navy;
+      color: var(--color);
       line-height: 20px;
       margin: 16px auto 0;
     }

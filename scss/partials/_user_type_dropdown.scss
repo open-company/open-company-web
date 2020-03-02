@@ -1,4 +1,4 @@
-div.dropdown{
+div.dropdown {
   position: relative;
 
   button.user-type-btn {
@@ -27,15 +27,15 @@ div.dropdown{
     padding: 0;
     width: 144px;
     min-width: 144px;
-    background-color: white;
-    border: none;
+    background-color: var(--overlay-background-color);
     padding: 0.5rem 0;
     position: absolute;
     top: 0px;
     left: -20px;
-    box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.2), 0 5px 12.5px 0.5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 1px 0 var(--user-dropdown-shadow-start), 0 5px 12.5px 0.5px var(--user-dropdown-shadow-end);
     border-radius: 4px;
     padding: 8px 0;
+    border: 1px solid (--divider-line);
 
     li {
       cursor: pointer;
@@ -44,11 +44,11 @@ div.dropdown{
       padding: 4px 16px;
       @include OC_Body_Book();
       font-size: 14px;
-      color: $ui_grey;
+      color: var(--light-color);
       background-color: transparent;
 
       &.selected {
-        color: $deep_navy;
+        color: var(--color);
         background-color: transparent;
       }
 
@@ -60,8 +60,16 @@ div.dropdown{
       &.remove-li {
         color: $carrot_orange;
         background-color: transparent;
-        border-top: 1px solid rgba($carrot_light_gray_1, 0.2);
+        border-top: 1px solid var(--divider-line);
       }
+    }
+  }
+}
+
+@include dark_mode() {
+  div.dropdown {
+    button.user-type-btn:after {
+      background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
     }
   }
 }

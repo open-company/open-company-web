@@ -359,7 +359,8 @@
                                :hidePlaceholderOnExpand false
                                :inlinePlusButtonOptions #js {:inlineButtons (:use-inline-media-picker options)
                                                              :alwaysExpanded (:use-inline-media-picker options)
-                                                             :initiallyVisible (:media-picker-initially-visible options)}
+                                                             :initiallyVisible (:media-picker-initially-visible options)
+                                                             :disableButtons (:paywall? options)}
                                ; :saveSelectionClickElementId default-mutli-picker-button-id
                                :delegateMethods #js {:onPickerClick (partial on-picker-click s options)}}
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
@@ -382,6 +383,7 @@
                      :buttonLabels "fontawesome"
                      :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
                      :extensions extensions
+                     :disableEditing (:paywall? options)
                      :imageDragging false
                      :targetBlank true
                      :autoLink true
@@ -399,7 +401,7 @@
                                  :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
                                                        (when-not show-subtitle "h2") "h3" "h4" "h5"
                                                        "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                       "details" "summary" "nav" "abbr"
+                                                       "details" "summary" "nav" "abbr" "mark"
                                                        "table" "thead" "tbody" "tr" "th" "td"]))}
                      :placeholder #js {:text placeholder
                                        :hideOnClick false
@@ -442,5 +444,6 @@
         (reset! (:me/editor s) body-editor)
         ;; Setup autocomplete
         (let [classes (:classes options)]
-          (when (string/includes? classes "emoji-autocomplete")
+          (when (and (string/includes? classes "emoji-autocomplete")
+                     (not (:paywall? options)))
             (js/emojiAutocomplete)))))))

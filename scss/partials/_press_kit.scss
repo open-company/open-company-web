@@ -6,65 +6,69 @@ div.press-kit-wrap {
     width: 100%;
 
     section.cta {
-      padding-top: 239px;
-      padding-bottom: 120px;
+      padding-top: 138px;
+      padding-bottom: 0;
       text-align: center;
       position: relative;
       overflow: hidden;
 
       @include tablet() {
         padding-top: 131px;
-        padding-bottom: 80px;
       }
 
       @include mobile() {
         width: 100%;
         overflow: visible;
-        padding: 131px 0 80px;
+        padding: 88px 0 0;
       }
 
       h1.headline {
         font-size: 60px;
-        line-height: 78px;
+        line-height: 76px;
         @include OC_Title()
         color: $deep_navy;
         margin: 0 auto;
         position: relative;
-        padding: 0 24px;
+        padding: 0 16px;
         z-index: 3;
 
         @include mobile(){
-          font-size: 50px;
-          line-height: 56px;
+          font-size: 36px;
+          line-height: 40px;
           padding: 0;
-        }
-
-        @media screen and (max-width: 380px) {
-          font-size: 40px;
-          line-height: 46px;
         }
       }
 
       div.press-kit-intro-container {
-        margin-top: 80px;
-        padding: 120px 0;
+        margin-top: 40px;
+        padding: 80px 0;
         position: relative;
+
+        @include mobile() {
+          margin-top: 36px;
+          padding: 40px 0;
+        }
 
         &:before {
           background-color: $another_ui_grey;
           content: "";
-          width: 90vw;
+          width: 100%;
+          max-width: 1200px;
           height: 100%;
           display: block;
-          border-top-right-radius: 200px;
+          border-radius: 20px 20px 200px 20px;
           position: absolute;
           top: 0;
-          left: 0;
+          left: 50%;
+          transform: translateX(-50%);
           z-index: 2;
 
-          @include tablet() {
-            border-top-right-radius: 100px;
+          @include mobile() {
+            border-radius: 0;
             width: 100%;
+            top: 0;
+            left: 0;
+            transform: translateX(0);
           }
         }
 
@@ -80,35 +84,81 @@ div.press-kit-wrap {
           }
 
           @include mobile() {
-            padding: 0 24px;
+            padding: 0 16px;
           }
 
           div.press-kit-intro-title {
             @include OC_Title();
             font-size: 40px;
+            line-height: 51px;
+            color: $deep_navy;
+
+            @include mobile() {
+              font-size: 22px;
+              line-height: 28px;
+            }
           }
 
           div.press-kit-intro-description {
-            @include OC_Body_Book();
-            font-size: 30px;
+
+            @include mobile() {
+              margin-top: 8px;
+            }
 
             p {
-              margin: 40px 0 0;
+              @include OC_Body_Book();
+              font-size: 24px;
+              line-height: 32px;
+              color: $deep_navy;
+              margin: 24px 0 0;
               padding: 0;
+
+              @include mobile() {
+                font-size: 20px;
+                line-height: 26px;
+              }
+
+              &.core-feature {
+                @include OC_Body_Bold();
+                font-size: 22px;
+                line-height: 40px;
+                color: $deep_navy;
+
+                @include mobile() {
+                  font-size: 22px;
+                  line-height: 28px;
+                }
+              }
+            }
+
+            ul.core-feature-list {
+              margin-top: 8px;
+
+              li {
+                @include OC_Body_Book();
+                font-size: 20px;
+                line-height: 32px;
+                color: $deep_navy;
+
+                @include mobile() {
+                  font-size: 20px;
+                  line-height: 26px;
+                }
+              }
             }
           }
 
           div.press-kit-intro-footer {
-            margin-top: 80px;
+            margin-top: 40px;
             padding-top: 40px;
             display: grid;
-            grid-template-columns: 1fr 373px;
+            grid-template-columns: 1fr 488px;
             grid-template-rows: 1fr;
             border-top: 1px solid $more_ultra_light_grey;
 
             @include tablet(){
               grid-template-columns: 1fr;
-              grid-template-rows: 50% 50%;
+              grid-template-rows: 22% 78%;
               margin-top: 40px;
               padding-top: 32px;
             }
@@ -117,7 +167,14 @@ div.press-kit-wrap {
               grid-column-start: 1;
               grid-row-start: 1;
               @include OC_Title();
-              font-size: 20px;
+              font-size: 22px;
+              line-height: 30px;
+              color: $deep_navy;
+
+              @include mobile() {
+                font-size: 20px;
+                line-height: 25px;
+              }
             }
 
             div.press-kit-intro-footer-right {
@@ -127,15 +184,21 @@ div.press-kit-wrap {
               @include OC_Body_Book();
               font-size: 20px;
               line-height: 26px;
+              color: $deep_navy;
 
               a {
                 display: block;
-                @include OC_Body_Bold();
-                font-size: 14px;
-                text-decoration: uppercase;
-                letter-spacing: 0.5;
+                @include OC_Body_Book();
+                font-size: 19px;
+                line-height: 24px;
+                letter-spacing: 0px;
                 color: $carrot_green;
-                margin-top: 16px;
+                margin-top: 8px;
+
+                @include mobile() {
+                  font-size: 20px;
+                  line-height: 28px;
+                }
               }
 
 
@@ -143,6 +206,11 @@ div.press-kit-wrap {
                 grid-column-start: 1;
                 grid-row-start: 2;
                 margin-top: 8px;
+              }
+
+              @include mobile() {
+                font-size: 20px;
+                line-height: 26px;
               }
             }
           }
@@ -184,7 +252,7 @@ div.press-kit-wrap {
           }
 
           @include mobile() {
-            padding: 0 24px;
+            padding: 0 16px;
           }
 
           div.media-res-title {
@@ -301,120 +369,46 @@ div.press-kit-wrap {
         }
       }
 
-      div.core-ft {
-        padding: 120px 0;
-        max-width: 795px;
-        margin: 0 auto;
-        text-align: left;
-        position: relative;
-        z-index: 3;
-
-        @include tablet() {
-          padding: 80px 24px;
-          max-width: 595px;
-        }
-
-        div.core-ft-title {
-          @include OC_Title();
-          font-size: 80px;
-
-          @include mobile() {
-            font-size: 36px;
-          }
-        }
-
-        div.core-ft-content {
-          margin-top: 40px;
-
-          div.core-ft-grid {
-            display: grid;
-            grid-template-columns: 226px 1fr 486px;
-            grid-template-rows: 1fr;
-            border-top: 1px solid $more_ultra_light_grey;
-            padding: 40px 0;
-
-            @include tablet() {
-              grid-template-columns: 1fr;
-              grid-template-rows: 50% 50%;
-            }
-
-            div.core-ft-content-title {
-              grid-column-start: 1;
-              grid-row-start: 1;
-              @include OC_Title();
-              font-size: 20px;
-              text-align: left;
-            }
-
-            div.core-ft-content-description {
-              grid-column-start: 3;
-              grid-row-start: 1;
-
-              @include tablet() {
-                grid-column-start: 1;
-                grid-row-start: 2;
-                margin-top: 8px;
-              }
-
-              p {
-                @include OC_Body_Book();
-                font-size: 20px;
-                text-align: left;
-                margin: 0;
-                padding: 0;
-
-                &:not(:first-child) {
-                  margin-top: 32px;
-                }
-              }
-
-              ul {
-                @include OC_Body_Book();
-                font-size: 20px;
-                text-align: left;
-                padding-inline-start: 30px;
-                margin-top: 16px;
-              }
-            }
-          }
-        }
-      }
-
       div.odds-ends {
-        padding: 120px 0 0;
         max-width: 795px;
         margin: 0 auto;
         text-align: left;
         position: relative;
-        z-index: 3;
 
         @include tablet() {
-          padding: 80px 24px;
+          padding: 0 16px;
           max-width: 595px;
         }
 
         div.odds-ends-title {
           @include OC_Title();
-          font-size: 80px;
+          font-size: 40px;
+          line-height: 51px;
+          color: $deep_navy;
 
           @include mobile() {
-            font-size: 36px;
+            font-size: 20px;
+            line-height: 25px;
           }
         }
 
         div.odds-ends-description {
           margin-top: 40px;
           @include OC_Body_Book();
-          font-size: 30px;
+          font-size: 24px;
+          line-height: 32px;
+          color: $deep_navy;
 
-          @include tablet() {
+          @include mobile() {
+            margin-top: 8px;
             font-size: 20px;
+            line-height: 26px;
           }
         }
 
         div.odds-ends-content {
           display: grid;
-          grid-template-columns: 137px 1fr 590px;
+          grid-template-columns: 167px 1fr 488px;
           grid-template-rows: 1fr;
           border-top: 1px solid $more_ultra_light_grey;
           margin-top: 40px;
@@ -422,15 +416,27 @@ div.press-kit-wrap {
 
           @include tablet() {
             grid-template-columns: 1fr;
-            grid-template-rows: 50% 50%;
+            grid-template-rows: 14% 86%;
+          }
+
+          @include mobile() {
+            margin-top: 24px;
+            padding: 24px 0 0;
           }
 
           div.odds-ends-content-left {
             grid-column-start: 1;
             grid-row-start: 1;
             @include OC_Title();
-            font-size: 20px;
+            font-size: 22px;
+            line-height: 30px;
+            color: $deep_navy;
             text-align: left;
+
+            @include mobile() {
+              font-size: 20px;
+              line-height: 25px;
+            }
           }
 
           div.odds-ends-content-right {
@@ -439,6 +445,7 @@ div.press-kit-wrap {
             @include OC_Body_Book();
             font-size: 20px;
             line-height: 26px;
+            color: $deep_navy;
             text-align: left;
 
             ul {
@@ -446,7 +453,7 @@ div.press-kit-wrap {
             }
 
             a {
-              color: #32C97B;
+              color: $carrot_green;
             }
 
             @include tablet() {

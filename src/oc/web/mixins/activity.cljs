@@ -16,8 +16,9 @@
     {:did-mount (fn [s]
       (truncate-fn s)
       s)
-     :did-remount (fn [_ s]
-      (truncate-fn s)
+     :did-remount (fn [o s]
+      (when-not (= (rum/dom-node o) (rum/dom-node s))
+        (truncate-fn s))
       s)}))
 
 (def truncate-comments-mixin

@@ -110,9 +110,13 @@
   ([comments :guard sequential?]
    (let [root-comments (filterv (comp empty? :parent-uuid) comments)
          sorted-roots (sort-comments root-comments nil)
-         all-comments-seqs (mapv #(vec (concat [%] (sort-comments comments (:uuid %)))) sorted-roots)]
-     (vec (apply concat all-comments-seqs))))
+         all-sorted-comments (vec (mapcat #(vec (concat [%] (sort-comments comments (:uuid %)))) sorted-roots))
+         with-children-count (mapv #(assoc % :children-count (count (filter (fn [c] (= (:parent-uuid c) (:uuid %))) all-sorted-comments))) all-sorted-comments)]
+     with-children-count))
   ([comments :guard sequential? parent-uuid]
    (let [check-fn (if parent-uuid #(-> % :parent-uuid (= parent-uuid)) (comp empty? :parent-uuid))
-         filtered-comments (filterv check-fn comments)]
-     (vec (sort-by :created-at filtered-comments)))))
+         filtered-comments (filterv check-fn comments)
+         sorted-comments (sort-by :created-at filtered-comments)]
+     (if (nil? parent-uuid)
+      (vec (reverse sorted-comments))
+      (vec sorted-comments)))))

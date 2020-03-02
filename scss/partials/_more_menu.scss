@@ -20,8 +20,8 @@ div.more-menu {
   }
 
   button.more-menu-bt {
-    height: 26px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
     display: inline;
     background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis.svg");
     background-size: 18px 4px;
@@ -30,10 +30,12 @@ div.more-menu {
     background-repeat: no-repeat;
     opacity: 0.5;
 
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
+    }
+
     @include mobile() {
-      width: 32px;
-      height: 32px;
-      background-color: $ultra_light_grey;
+      background-color: var(--divider-line);
       border-radius: 4px;
       opacity: 1;
     }
@@ -44,24 +46,43 @@ div.more-menu {
       @include mobile() {
         opacity: 0.9;
       }
+    }
+  }
+
+  &.has-more-menu-bt {
+    button.more-menu-share-bt {
+      margin-left: 9px;
     }
   }
 
   button.more-menu-share-bt {
-    height: 26px;
-    width: 24px;
+    height: 32px;
+    width: 32px;
     display: inline;
-    background-image: cdnUrl("/img/ML/more_menu_share_arrow.svg");
-    background-size: 16px 14px;
+    background-image: cdnUrl("/img/ML/more_menu_new_share.svg");
+    background-size: 14px 14px;
     background-position: center;
+    background-color: var(--opac-background-color-1);
+    border-radius: 4px;
     padding: 0;
     background-repeat: no-repeat;
-    margin-left: 10px;
+    margin-left: 16px;
     display: inline-block;
-    opacity: 0.5;
+    opacity: 1;
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_menu_new_share@dark.svg");
+    }
+
+    @include big_web() {
+      &:hover {
+        background-color: var(--opac-background-color-2);
+      }
+    }
 
     @include mobile() {
-      width: 32px;
+      border-radius: 4px;
+      border-right: none;
     }
 
     &:hover, &:active, &:focus {
@@ -69,27 +90,46 @@ div.more-menu {
     }
   }
 
-  button.more-menu-complete-follow-up-bt {
-    height: 26px;
-    width: 24px;
-    display: inline;
-    background-image: cdnUrl("/img/ML/follow_up_complete.svg");
-    background-size: 14px 14px;
+  button:not(.has-next-bt) {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  button.has-next-bt, div.more-menu-add-bookmark-bt-container button.more-menu-add-bookmark-bt.has-next-bt {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: var(--opac-background-color-15);
+  }
+
+  button.more-menu-remove-bookmark-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
+    background-size: 10px 14px;
     background-position: center;
+    background-color: var(--opac-background-color-1);
     padding: 0;
     background-repeat: no-repeat;
-    opacity: 0.5;
-    margin-left: 8px;
+    opacity: 1;
     display: inline-block;
 
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/menu_add_bookmark@dark.svg");
+    }
+
+    @include big_web() {
+      &:hover {
+        background-color: var(--opac-background-color-2);
+        background-image: cdnUrl("/img/ML/menu_remove_bookmark.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
+        }
+      }
+    }
+
     @include mobile() {
-      width: 32px;
-      height: 32px;
-      background-color: $ultra_light_grey;
       border-radius: 4px;
-      background-image: cdnUrl("/img/ML/mobile_complete_follow_up.svg");
-      background-size: 14px 10px;
-      opacity: 1;
     }
 
     &:hover, &:active, &:focus {
@@ -101,27 +141,167 @@ div.more-menu {
     }
   }
 
-  button.more-menu-create-follow-up-bt {
-    height: 26px;
-    width: 24px;
-    display: inline;
-    background-image: cdnUrl("/img/ML/follow_up_add.svg");
-    background-size: 16px 16px;
-    background-position: center;
-    padding: 0;
-    background-repeat: no-repeat;
-    opacity: 0.5;
-    margin-left: 8px;
+  div.more-menu-add-bookmark-bt-container {
+    height: 32px;
+    width: 32px;
     display: inline-block;
 
-    @include mobile() {
-      width: 32px;
+    button.more-menu-add-bookmark-bt {
       height: 32px;
-      background-color: $ultra_light_grey;
-      border-radius: 4px;
-      background-image: cdnUrl("/img/ML/mobile_create_follow_up.svg");
-      background-size: 13px 16px;
+      width: 32px;
+      background-image: cdnUrl("/img/ML/menu_remove_bookmark.svg");
+      background-size: 10px 14px;
+      background-position: center;
+      background-color: var(--opac-background-color-1);
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      padding: 0;
+      background-repeat: no-repeat;
       opacity: 1;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
+      }
+
+      @include big_web() {
+        &:hover {
+          background-color: var(--opac-background-color-2);
+          background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/menu_add_bookmark@dark.svg");
+          }
+        }
+      }
+
+      @include mobile() {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+      }
+
+      &:hover, &:active, &:focus {
+        opacity: 1;
+
+        @include mobile() {
+          opacity: 0.9;
+        }
+      }
+
+      &.has-inbox-dismiss {
+        border-radius: 0;
+      }
+    }
+
+    div.tooltip {
+      width: 96px;
+    }
+  }
+
+  button.more-menu-inbox-dismiss-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_done.svg");
+    background-size: 14px 10px;
+    background-position: center;
+    background-color: var(--opac-background-color-1);
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_inbox_done@dark.svg");
+    }
+
+    @include big_web() {
+      &:hover {
+        background-color: var(--opac-background-color-2);
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-inbox-follow-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+    background-size: 12px 14px;
+    background-position: center;
+    background-color: var(--opac-background-color-1);
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+    }
+
+    @include big_web() {
+      &:hover {
+        background-color: var(--opac-background-color-2);
+        background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/more_inbox_follow@dark.svg");
+        }
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
+    }
+
+    &:hover, &:active, &:focus {
+      opacity: 1;
+
+      @include mobile() {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  button.more-menu-inbox-unfollow-bt {
+    height: 32px;
+    width: 32px;
+    background-image: cdnUrl("/img/ML/more_inbox_follow.svg");
+    background-size: 12px 14px;
+    background-position: center;
+    background-color: var(--opac-background-color-1);
+    padding: 0;
+    background-repeat: no-repeat;
+    opacity: 1;
+    display: inline-block;
+
+    @include dark_mode() {
+      background-image: cdnUrl("/img/ML/more_inbox_follow@dark.svg");
+    }
+
+    @include big_web() {
+      &:hover {
+        background-color: var(--opac-background-color-2);
+        background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+        }
+      }
+    }
+
+    @include mobile() {
+      border-radius: 4px;
     }
 
     &:hover, &:active, &:focus {
@@ -136,21 +316,19 @@ div.more-menu {
   ul.more-menu-list {
     position: absolute;
     top: 26px;
-    left: calc(100% - 108px);
-    width: 74px;
+    left: 0;
+    width: 94px;
     outline: none;
     z-index: 110;
-    background-color: white;
-    border: 1px solid $mid_light_grey;
+    background-color: var(--overlay-background-color);
+    border: 1px solid var(--divider-line);
     box-shadow: none;
     border-radius: 4px;
     margin: 0;
     padding: 8px 0;
     list-style-type: none;
 
-    &.has-create-follow-up {
-      left: unset;
-      right: 0;
+    &.has-add-bookmark {
       width: 144px;
 
       @include mobile() {
@@ -160,9 +338,7 @@ div.more-menu {
       }
     }
 
-    &.has-complete-follow-up {
-      left: unset;
-      right: 0;
+    &.has-remove-bookmark {
       width: 162px;
 
       @include mobile() {
@@ -170,6 +346,16 @@ div.more-menu {
         right: 0;
         width: 162px;
       }
+    }
+
+    &.has-mark-unread {
+      width: 134px;
+
+      @include mobile() {
+        left: unset;
+        right: 0;
+        width: 134px;
+      } 
     }
 
     @include mobile() {
@@ -180,11 +366,11 @@ div.more-menu {
     li {
       @include OC_Body_Book();
       font-size: 14px;
-      color: $deep_navy;
+      color: var(--color);
       line-height: 18px;
       cursor: pointer;
       padding: 8px 16px;
-      background-color: white;
+      background-color: var(--overlay-background-color);
       position: relative;
 
       &:first-child {
@@ -207,6 +393,309 @@ div.more-menu {
 
         &:hover {
           background-color: transparent;
+        }
+      }
+    }
+  }
+
+  &.mobile-tray-menu {
+    @include mobile() {
+      display: block;
+      position: fixed;
+      float: unset;
+      width: 100vw;
+      height: 0;
+      left: 0;
+      top: 100vh;
+      background-color: var(--opac-background-color-2);
+      opacity: 0;
+      z-index: #{$navbar_zindex + 10};
+      visibility: hidden;
+      transition: opacity 100ms ease-in, top 100ms ease-in, height 100ms ease-in, visibility 0s;
+
+      &.menu-expanded {
+        visibility: visible;
+        opacity: 1;
+        top: 0;
+        height: 100vh;
+
+        & > * {
+          display: none;
+        }
+
+        ul.more-menu-list {
+          height: auto;
+        }
+      }
+
+      & > * {
+        display: none;
+      }
+      // Add some extra padding at the bottom of mobile browsers
+      //  to avoid having the bottom part of the menu hidden
+      &.ios-browser ul.more-menu-list {
+        // bottom: #{$mobile_navbar_height}px;
+        padding: 32px 16px #{32 + 104}px 16px;
+      }
+
+      &.android-browser ul.more-menu-list {
+        // bottom: #{$mobile_navbar_height}px;
+        padding: 32px 16px #{32 + 52}px 16px;
+      }
+
+      ul.more-menu-list {
+        display: block;
+        float: unset;
+        bottom: 0;
+        top: unset;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background-color: var(--overlay-background-color);
+        opacity: 1;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        padding: 32px 16px;
+        height: 0;
+        transition: height 100ms ease-in;
+
+        @include no-user-select();
+
+        li {
+          padding: 12px 16px;
+          background-color: var(--opac-background-color-1);
+          height: 48px;
+          margin: 0;
+          @include OC_Body_Book();
+          font-size: 17px;
+          line-height: 24px;
+          color: var(--color);
+          position: relative;
+          margin-top: 1px;
+
+          &.top-rounded {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+          }
+
+          &.bottom-rounded {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+          }
+
+          &.bottom-margin {
+            margin-bottom: 24px;
+          }
+
+          &.edit {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_edit.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_edit@dark.svg");
+              }
+            }
+          }
+
+          &.delete {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_delete.svg");
+              background-size: 14px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 17px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_delete@dark.svg");
+              }
+            }
+          }
+
+          &.share {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/mobile_more_share.svg");
+              background-size: 16px 16px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 16px;
+              left: 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_share@dark.svg");
+              }
+            }
+          }
+
+          &.read {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_read.svg");
+              background-size: 12px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 18px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_read@dark.svg");
+              }
+            }
+          }
+
+          &.unread {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 12px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_unread.svg");
+              background-size: 12px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 18px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_unread@dark.svg");
+              }
+            }
+          }
+
+          &.follow {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/mobile_more_follow.svg");
+              background-size: 16px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 15px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_follow@dark.svg");
+              }
+            }
+          }
+
+          &.unfollow {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/more_inbox_unfollow.svg");
+              background-size: 16px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 15px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/more_inbox_unfollow@dark.svg");
+              }
+            }
+          }
+
+          &.add-bookmark {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/menu_add_bookmark.svg");
+              background-size: 14px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 17px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/menu_add_bookmark@dark.svg");
+              }
+            }
+          }
+
+          &.remove-bookmark {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 14px;
+              height: 18px;
+              background-image: cdnUrl("/img/ML/menu_remove_bookmark.svg");
+              background-size: 14px 18px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 15px;
+              left: 17px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/menu_remove_bookmark@dark.svg");
+              }
+            }
+          }
+
+          &.dismiss {
+            padding-left: 56px;
+
+            &:before {
+              content: "";
+              width: 16px;
+              height: 12px;
+              background-image: cdnUrl("/img/ML/mobile_more_dismiss.svg");
+              background-size: 16px 12px;
+              background-position: center;
+              background-repeat: no-repeat;
+              position: absolute;
+              top: 18px;
+              left: 16px;
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/mobile_more_dismiss@dark.svg");
+              }
+            }
+          }
         }
       }
     }

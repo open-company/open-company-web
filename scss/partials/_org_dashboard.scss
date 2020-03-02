@@ -1,8 +1,8 @@
 div.org-dashboard {
-  background-color: $grey_num_2;
+  background-color: var(--background-color);
 
   @include mobile() {
-    background-color: white;
+    background-color: var(--mobile-background-color);
   }
 
   div.login-required {
@@ -23,11 +23,65 @@ div.org-dashboard {
     }
   }
 
-  &.expanded-activity div.page {
-    @include mobile() {
+  &.trial-expired {
+    div.page {
+      padding-top: #{$navbar_height}px;
+
+      @include mobile() {
+        padding-top: #{$mobile_trial_expired_banner_height + $mobile_navbar_height}px;
+      }
+    }
+
+    nav.oc-navbar {
+      top: 56px;
+
+      @include mobile() {
+        top: #{$mobile_trial_expired_banner_height}px;
+      }
+    }
+
+    div.left-navigation-sidebar {
+      top: #{$navbar_height * 2}px;
+      height: calc(100vh - #{($navbar_height) + 2}px);
+
+      @include mobile() {
+        top: 0;
+        z-index: #{$navbar_zindex + 103};
+        height: 100vh;
+      }
+    }
+  }
+
+  &.expanded-activity {
+
+    div.page {
       padding-top: 0;
+    }
+
+    @include mobile() {
+      div.page {
+        padding-top: #{$mobile_navbar_height}px;
+      }
+
       nav.oc-navbar {
         display: none;
+      }
+    }
+
+    &.trial-expired {
+      div.page {
+        padding-top: #{$navbar_height}px;
+
+        @include mobile() {
+          padding-top: #{$mobile_trial_expired_banner_height}px;
+
+          div.org-dashboard-inner div.dashboard-layout div.dashboard-layout-container div.board-container div.expanded-post {
+            padding-top: #{$mobile_navbar_height + 24}px;
+            div.expanded-post-header {
+              top: #{$mobile_trial_expired_banner_height}px;
+            }
+          }
+        }
       }
     }
   }
@@ -50,12 +104,13 @@ div.org-dashboard {
     min-height: calc(100vh - #{$footer_height}px);
 
     @include mobile(){
+      background-color: var(--mobile-background-color);
       padding-top: #{$mobile_navbar_height}px;
       min-height: calc(100vh - #{$mobile_navbar_height}px);
     }
 
     div.org-dashboard-container {
-      background-color: $grey_num_2;
+      background-color: var(--background-color);
 
       @include big_web() {
         min-width: #{$left_navigation_sidebar_width + $left_navigation_sidebar_minimum_right_margin + $board_container_width}px;
@@ -64,7 +119,7 @@ div.org-dashboard {
       @include mobile() {
         margin: 0px;
         min-width: initial;
-        background-color: white;
+        background-color: var(--mobile-background-color);
       }
 
       div.empty-dashboard {
@@ -83,48 +138,21 @@ div.org-dashboard {
           line-height: 1.5;
         }
       }
-    }
-  }
-}
 
-div.org-dashboard {
-  div.page {
-    div.empty-dashboard {
-      min-height: calc(100vh - #{$footer_small_height}px + 24px);
+      div.org-dashboard-inner {
+        padding-bottom: 20px;
+        background-color: var(--background-color);
 
-      @include mobile(){
-        min-height: calc(100vh - #{$mobile_navbar_height}px - #{$footer_small_height}px + 24px);
+        @include big_web(){
+          min-height: 100vh;
+          padding-top: #{$navbar_height}px;
+        }
+
+        @include mobile(){
+          background-color: var(--mobile-background-color);
+          min-height: calc(100vh - #{$mobile_navbar_height}px);
+        }
       }
     }
-  }
-}
-
-body {
-  div.org-dashboard {
-    div.page {
-      min-height: 100vh;
-
-      @include mobile(){
-        background-color: white;
-      }
-    }
-  }
-}
-
-div.add-more-tooltip {
-  margin-left: -15px;
-}
-
-div.org-dashboard div.org-dashboard-inner {
-  padding-bottom: 20px;
-  background-color: $grey_num_2;
-
-  @include big_web(){
-    min-height: 100vh;
-    padding-top: #{$navbar_height}px;
-  }
-  @include mobile(){
-    background-color: white;
-    min-height: calc(100vh - #{$mobile_navbar_height}px);
   }
 }

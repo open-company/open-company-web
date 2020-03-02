@@ -279,7 +279,7 @@ function didPaste(e){
     var plainTextData = clipboardData.getData('text/plain') || clipboardData.getData('Text');
     // if the rich text has the same length of the plain text let the browser perform the paste
     if (pastedData.length != plainTextData.length){
-      // Prevent normal paste behaviour
+      // Prevent normal paste behavior
       e.preventDefault();
       // Get the paste data
       var cleanedData;

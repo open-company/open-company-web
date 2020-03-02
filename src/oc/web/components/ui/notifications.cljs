@@ -123,11 +123,14 @@
                            rum/reactive
                            (drv/drv :notifications-data)
                            (drv/drv :panel-stack)
+                           (drv/drv :ui-theme)
   [s]
   (let [notifications-data (drv/react s :notifications-data)
         panel-stack (drv/react s :panel-stack)
-        has-open-panel? (pos? (count panel-stack))]
+        {:keys [computed-value]} (drv/react s :ui-theme)
+        light-theme? (or (pos? (count panel-stack))
+                         (= computed-value :dark))]
     [:div.notifications
       (for [idx (range (count notifications-data))
             :let [n (nth notifications-data idx)]]
-        (rum/with-key (notification n has-open-panel?) (str "notif-" (:id n))))]))
+        (rum/with-key (notification n light-theme?) (str "notif-" (:id n))))]))

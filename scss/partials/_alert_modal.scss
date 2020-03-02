@@ -45,7 +45,7 @@ div.alert-modal-container {
       margin: 0px;
       position: relative;
       overflow: hidden;
-      background-color: white;
+      background-color: var(--overlay-background-color);
       border-radius: 6px;
       box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
       padding: 24px;
@@ -77,13 +77,13 @@ div.alert-modal-container {
       div.alert-modal-title {
         @include OC_Body_Bold();
         font-size: 22px;
-        color: $deep_navy;
+        color: var(--color);
       }
 
       div.alert-modal-message {
         @include OC_Body_Book();
         font-size: 16px;
-        color: $oc_gray_7;
+        color: var(--light-color);
         margin-top: 8px;
 
         a {
@@ -112,7 +112,7 @@ div.alert-modal-container {
           font-size: 14px;
           border-radius: 4px;
           background-color: transparent;
-          color: $light_navy;
+          color: var(--light-color);
 
           &:hover {
             opacity: 1;
@@ -124,7 +124,7 @@ div.alert-modal-container {
           }
 
           &.mlb-link-black {
-            color: $deep_navy;
+            color: var(--color);
 
             &.green {
               color: $carrot_green;
@@ -134,7 +134,7 @@ div.alert-modal-container {
           &.mlb-default.red {
             background-color: $carrot_orange;
             color: white;
-            padding: 7px 16px;
+            padding: 7px 8px;
 
             &:hover, &:focus {
               background-color: $carrot_orange;
@@ -150,15 +150,15 @@ div.alert-modal-container {
           &.mlb-default.green {
             background-color: $carrot_green;
             color: white;
-            padding: 7px 16px;
+            padding: 7px 8px;
 
             &:hover, &:focus {
-              background-color: $carrot_orange;
+              background-color: $carrot_green;
               color: white;
             }
 
             &:active, &.active {
-              background-color: $carrot_orange;
+              background-color: $carrot_green;
               color: white;
             }
           }
@@ -169,10 +169,10 @@ div.alert-modal-container {
         width: calc(100% + 48px);
         margin-left: -24px;
         height: 62px;
-        border-top: 1px solid $light_ui_grey;
+        border-top: 1px solid var(--divider-line);
         @include OC_Body_Bold();
         font-size: 14px;
-        color: $deep_navy;
+        color: var(--color);
         margin-top: 32px;
         border-radius: 4px;
 

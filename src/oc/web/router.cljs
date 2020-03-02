@@ -6,7 +6,8 @@
             [goog.events.EventType :as EventType]
             [goog.history.EventType :as HistoryEventType]
             [oc.web.lib.sentry :as sentry]
-            [oc.web.lib.jwt :as jwt]))
+            [oc.web.lib.jwt :as jwt]
+            [clojure.string :as cstr]))
 
 (def path (atom {}))
 
@@ -59,6 +60,18 @@
   (timbre/debug "history:" @history)
   (.setToken @history token))
 
+(defn rewrite-org-uuid-as-slug
+  [org-uuid org-slug]
+  (timbre/info "Navigate from org" org-uuid "to slug:" org-slug)
+  (nav! (cstr/replace (get-token) (re-pattern org-uuid) org-slug)))
+
+(defn rewrite-board-uuid-as-slug
+  [board-uuid board-slug]
+  (timbre/info "Rewrite URL from board" board-uuid "to slug:" board-slug)
+  (let [new-path (cstr/replace (get-token) (re-pattern board-uuid) board-slug)]
+    (swap! path assoc :board board-slug)
+    (.replaceState js/window.history #js {} js/window.title new-path)))
+
 (defn redirect! [loc]
   (timbre/info "redirect!" loc)
   (set! (.-location js/window) loc))
@@ -105,9 +118,6 @@
 (defn current-posts-filter []
   (:board @path))
 
-(defn current-sort-type []
-  (or (:sort-type @path) :recent-activity))
-
 (defn current-activity-id []
   (:activity @path))
 
@@ -143,17 +153,17 @@
   [org-slug]
   (str "last-used-board-slug-" (jwt/user-id) "-" (name org-slug)))
 
-(defn last-sort-cookie
-  "Cookie to save the last sort selected"
+(defn last-foc-layout-cookie
+  "Cookie to save the last FOC layout used"
   [org-slug]
-  (str "last-sort-" (jwt/user-id) "-" (name org-slug)))
+  (str "last-foc-layout-" (jwt/user-id) "-" (name org-slug)))
 
 (defn nux-cookie
   "Cookie to remember if the boards and journals tooltips where shown."
   [user-id]
   (str "nux-" user-id))
 
-(defn first-ever-ap-land-cookie
+(defn first-ever-landing-cookie
   "Cookie used to land the user to a special URL only the first time."
   [user-id]
   (str "first-ever-ap-land-" user-id))
@@ -167,6 +177,11 @@
   "Cookie to check if the invite people tooltip shuold be visible."
   []
   (str "invite-people-tooltip-" (jwt/user-id)))
+
+(defn collapse-sections-list-cookie
+  "Cookie used to remember if the sections list was collapsed or not."
+  []
+  (str "collapse-sections-list-" (jwt/user-id)))
 
 (def login-redirect-cookie "login-redirect")
 
