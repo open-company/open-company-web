@@ -28,11 +28,13 @@
 (defn- mobile-nav! [e board-slug]
   (router/nav! (oc-urls/board board-slug)))
 
+(def scroll-top-offset 46)
+
 (defn- check-scroll [s e]
-  (when (and (pos? (.. js/document -scrollingElement -scrollTop))
+  (when (and (> (.. js/document -scrollingElement -scrollTop) scroll-top-offset)
              (not @(::scrolled s)))
     (reset! (::scrolled s) true))
-  (when (and (not (pos? (.. js/document -scrollingElement -scrollTop)))
+  (when (and (<= (.. js/document -scrollingElement -scrollTop) scroll-top-offset)
              @(::scrolled s))
     (reset! (::scrolled s) false)))
 
