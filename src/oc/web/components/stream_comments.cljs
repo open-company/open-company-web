@@ -104,13 +104,12 @@
       (thread-mark-read s (:uuid comment-data))
       (let [idx (utils/index-of threads #(= (:uuid %) (:parent-uuid comment-data)))]
         (swap! (::threads s) (fn [threads]
-                                 (-> threads
-                                   (update-in [idx :thread-children]
-                                    (fn [children]
-                                      (map #(if (= (:uuid %) (:uuid comment-data))
-                                              (assoc % :new false)
-                                              %)
-                                       children))))))))))
+                               (update-in threads [idx :thread-children]
+                                (fn [children]
+                                  (map #(if (= (:uuid %) (:uuid comment-data))
+                                          (assoc % :new false)
+                                          %)
+                                   children)))))))))
 
 (rum/defc emoji-picker < (when (responsive/is-mobile-size?)
                            ui-mixins/no-scroll-mixin)
