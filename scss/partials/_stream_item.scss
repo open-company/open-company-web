@@ -571,6 +571,8 @@ div.stream-item {
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
+        white-space: nowrap;
+        overflow-wrap: break-word;
 
         @include mobile() {
           margin-top: 2px;
