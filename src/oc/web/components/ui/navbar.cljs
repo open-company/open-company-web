@@ -10,6 +10,7 @@
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.components.ui.menu :as menu]
             [oc.web.stores.search :as search]
+            [oc.web.utils.ui :refer (ui-compose)]
             [oc.web.actions.user :as user-actions]
             [oc.web.lib.responsive :as responsive]
             [oc.web.actions.search :as search-actions]
@@ -27,6 +28,7 @@
 
 (rum/defcs navbar < rum/reactive
                     (drv/drv :navbar-data)
+                    (drv/drv :editable-boards)
                     (drv/drv :show-add-post-tooltip)
                     (drv/drv :mobile-user-notifications)
                     (ui-mixins/render-on-resize nil)
@@ -57,7 +59,11 @@
                        "Bookmarks"
                        :else
                        (:name board-data))
-         search-active? (drv/react s search/search-active?)]
+         search-active? (drv/react s search/search-active?)
+         editable-boards (drv/react s :editable-boards)
+         can-compose? (pos? (count editable-boards))
+         show-plus-button? (and (not is-mobile?)
+                                can-compose?)]
     [:nav.oc-navbar.group
       {:class (utils/class-set {:show-login-overlay show-login-overlay
                                 :expanded-user-menu expanded-user-menu
@@ -95,8 +101,14 @@
                 {:class (when search-active "search-active")}
                 (search-box)])
             [:div.navbar-right
+              {:class (when show-plus-button? "create-post")}
               (if (jwt/jwt)
                 [:div.group
+                  (when show-plus-button?
+                    [:button.mlb-reset.navbar-create-bt
+                      {:on-click #(do
+                                    (.stopPropagation %)
+                                    (ui-compose @(drv/get-ref s :show-add-post-tooltip)))}])
                   (when-not is-mobile?
                     (user-notifications))
                   [:div.user-menu
