@@ -159,6 +159,34 @@ div.medium-editor-media-picker div.media-picker-container button.media-video:not
   margin-right: 5px;
 }
 
+div.medium-editor-media-picker div.media-picker-container button.media-code i.fa.fa-code:before {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 19px;
+  vertical-align: bottom;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-code {
+  background-image: url("/img/ML/media_code.svg");
+  background-size: 16px 11px;
+}
+
+html.theme-mode-dark div.medium-editor-media-picker div.media-picker-container button.media-code {
+  background-image: url("/img/ML/media_code@dark.svg");
+}
+
+div.medium-editor-media-picker div.media-picker-container.expanded button.media-code:hover {
+  opacity: 1;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-code:not(:first-child) {
+  margin-left: 5px;
+}
+
+div.medium-editor-media-picker div.media-picker-container button.media-code:not(:last-child) {
+  margin-right: 5px;
+}
+
 div.medium-editor-media-picker div.media-picker-container button.media-chart {
   background-image: url("/img/ML/media_chart.png");
   background-size: 14px;

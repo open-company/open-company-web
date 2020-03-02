@@ -183,22 +183,24 @@ function PlaceCaretAtEnd(el) {
     /* Caret helpers */
 
     moveCaret: function($el, position){
-      var range, sel, el, textEl;
+      // var range, sel, el, textEl;
 
-      position = position || 0;
-      range = document.createRange();
-      sel = window.getSelection();
-      el = $el.get(0);
+      // position = position || 0;
+      // range = document.createRange();
+      // sel = window.getSelection();
+      // el = $el.get(0);
 
-      if (!el.childNodes.length) {
-          textEl = document.createTextNode(' ');
-          el.appendChild(textEl);
-      }
+      // if (!el.childNodes.length) {
+      //     textEl = document.createTextNode(' ');
+      //     el.appendChild(textEl);
+      // }
 
-      range.setStart(el.childNodes[0], position);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
+      // range.setStart(el.childNodes[0], position);
+      // range.collapse(true);
+      // sel.removeAllRanges();
+      // sel.addRange(range);
+
+      MediumEditor.selection.moveCursor(this.document, $el.get(0), position);
     },
 
     /**/
@@ -221,6 +223,41 @@ function PlaceCaretAtEnd(el) {
       this._waitingCB = true;
       this.delegate("onPickerClick", "entry");
       $(event.target).tooltip("hide");
+    },
+
+    codeClick: function(event){
+      log("codeClick", this, event);
+      this.hidePlaceholder();
+      this.saveSelection();
+      this.collapse();
+      event.stopPropagation();
+      this.delegate("onPickerClick", "code block");
+      $(event.target).tooltip("hide");
+
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      // 2 cases: it's directly the div.medium-editor or it's a p already
+      if (!this.base.getFocusedElement()) {
+        PlaceCaretAtEnd(this.getEditorElements()[0]);
+      }
+      var sel = this.window.getSelection(),
+          element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
+          pre = this.document.createElement('pre');
+      pre.className = "carrot-no-preview media-codeblock"
+      // if the selection is in a DIV means it's the main editor element
+      if (element && element.nodeName.toLowerCase() == 'p'){
+        // add the PRE before the P
+        element.parentNode.insertBefore(pre, element);
+        element.parentNode.removeChild(element);
+      } else {
+        element.appendChild(pre);
+      }
+      this.moveCaret($(pre), 0);
+
+      this.base.checkContentChanged();
+      setTimeout(this.togglePicker(), 100);
     },
 
     gifClick: function(event){
@@ -583,6 +620,14 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-' + idx);
           this.addButtonTooltip(button, "Add update");
           this.on(button, 'click', this.entryClick.bind(this));
+        } else if (opt === 'code') {
+          button.classList.add('media-code');
+          button.classList.add('media-' + idx);
+          var i = this.document.createElement('i');
+          i.className = "fa fa-code";
+          button.appendChild(i);
+          this.addButtonTooltip(button, "Add code block");
+          this.on(button, 'click', this.codeClick.bind(this));
         } else if (opt === 'gif') {
           button.classList.add('media-gif');
           button.classList.add('media-' + idx);
@@ -759,8 +804,11 @@ function PlaceCaretAtEnd(el) {
     },
 
     paragraphIsEmpty: function(element){
+      if (element.nodeName.toLowerCase() === "pre" || element.nodeName.toLowerCase() === "blockquote") {
+        return false;
+      }
       // Empty body
-      if (element.childNodes.length == 0 && $(element).html() == "") {
+      if (element.childNodes.length == 0 && element.innerHTML == "") {
         return true;
       }
       // Empty body like: <p><br/><p/>
