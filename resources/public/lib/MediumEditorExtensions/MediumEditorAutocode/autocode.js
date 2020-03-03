@@ -23,7 +23,6 @@ var AutoCode = MediumEditor.Extension.extend({
       // Prevent browser from creating another PRE element
       var preElement = this.getPreElement(this.base.getSelectedParentElement());
       if (preElement && MediumEditor.util.isKey(keyDownEvent, [MediumEditor.util.keyCode.ENTER])) {
-
         if (!MediumEditor.util.isMetaCtrlKey(keyDownEvent) && !keyDownEvent.shiftKey) {
           keyDownEvent.preventDefault();
           keyDownEvent.stopPropagation();
@@ -39,6 +38,11 @@ var AutoCode = MediumEditor.Extension.extend({
           MediumEditor.selection.moveCursor(this.document, newParagraph);
           
           return false;
+        } else if (!keyDownEvent.shiftKey) {
+          keyDownEvent.preventDefault();
+          keyDownEvent.stopPropagation();
+          document.execCommand("insertHTML", true, '\n')
+          return false;
         }
       }
     },
@@ -51,7 +55,7 @@ var AutoCode = MediumEditor.Extension.extend({
           // No inside a PRE, let's see if we need to create one
           var code_start = this.base.getSelectedParentElement().previousSibling && this.base.getSelectedParentElement().previousSibling.textContent.trim();
           // If the content is the code block start string:
-          if( (code_start == "```") && this.base.getExtensionByName('pre')){
+          if( code_start == "```" ){
             var newPreEl = this.document.createElement('pre');
             newPreEl.className = "carrot-no-preview media-codeblock";
             // Get the ``` containing element

@@ -22,8 +22,8 @@ var AutoInlinecode = MediumEditor.Extension.extend({
       if (MediumEditor.util.isKey(keyUpEvent, this.detectingKeyCodes)) {
         var element = this.base.getSelectedParentElement();
         var paragraphEl = element && this.getParagraphElement(element);
-        if (element && !this.insideCodeTag(element) && paragraphEl && element.innerHTML.match(/`[^`]*`/)) {
-          var r = /([^`]*)`([^`]*)`([^`]*)/; //NB Do not use g option or it will infinite loop since it uses look behind    
+        if (element && !this.insideCodeTag(element) && paragraphEl && element.innerHTML.match(/`[^`]+`/)) {
+          var r = /([^`]*)`([^`]+)`([^`]*)/; //NB Do not use g option or it will infinite loop since it uses look behind    
           element.innerHTML = element.innerHTML.replace(r, function(all,prev,center,after){
             return prev + "<code>" + center + "</code>" + (after || "&nbsp;");
           });
@@ -32,12 +32,15 @@ var AutoInlinecode = MediumEditor.Extension.extend({
         }
       }
 
-      var codeEl = this.insideCodeTag(this.base.getSelectedParentElement());
-      if (codeEl && MediumEditor.util.isKey(keyUpEvent, [39]) && (!codeEl.nextSibling || codeEl.nextSibling.length == 0)) {
-        var textNode = this.document.createTextNode('\u00A0');
-        codeEl.parentNode.appendChild(textNode);
+      if (MediumEditor.util.isKey(keyUpEvent, [39])) {
+        var codeEl = this.insideCodeTag(this.base.getSelectedParentElement());
 
-        MediumEditor.selection.moveCursor(this.document, textNode);
+        if (codeEl && (!codeEl.nextSibling || codeEl.nextSibling.length == 0)) {
+          var textNode = this.document.createTextNode('\u00A0');
+          codeEl.parentNode.appendChild(textNode);
+
+          MediumEditor.selection.moveCursor(this.document, textNode);
+        }
       }
     },
     insideCodeTag: function(node) {
