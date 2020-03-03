@@ -44,7 +44,6 @@ var AutoCode = MediumEditor.Extension.extend({
     },
 
     onKeyup: function (keyUpEvent) {
-      console.log("DBG keyup", keyUpEvent.key, keyUpEvent.keyCode);
       if (MediumEditor.util.isKey(keyUpEvent, [MediumEditor.util.keyCode.ENTER])) {
         var preElement =  this.getPreElement(this.base.getSelectedParentElement());
 
