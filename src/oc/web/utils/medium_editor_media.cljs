@@ -377,7 +377,7 @@
                          (not mobile-editor) (assoc "media-picker" media-picker-ext
                                                     "autoquote" (js/AutoQuote.)
                                                     "autocode" (js/AutoCode.)
-                                                    ; "autoinlinecode" (js/AutoInlineCode.)
+                                                    ; "autoinlinecode" (js/AutoInlinecode.)
                                                     "carrotFileDragging" file-dragging-ext)
                          true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})

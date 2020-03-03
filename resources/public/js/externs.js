@@ -69,6 +69,7 @@ var replaceSelectedText = function(){};
 var AutoList = function(){};
 var AutoQuote = function(){};
 var AutoCode = function(){};
+var AutoInlinecode = function(){};
 // MediumEditorMediaPicker
 var MediaPicker = function(){};
 MediaPicker.addEntry = function(){};

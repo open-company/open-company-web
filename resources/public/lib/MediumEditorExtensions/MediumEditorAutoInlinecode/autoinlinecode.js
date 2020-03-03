@@ -7,19 +7,19 @@
     } else if (typeof define === 'function' && define.amd) {
         define(factory);
     } else {
-        root.AutoInlineCode = factory;
+        root.AutoInlinecode = factory;
     }
 }(this, function (MediumEditor) {
 
-var AutoInlineCode = MediumEditor.Extension.extend({
-    name: 'AutoInlineCode',
+var AutoInlinecode = MediumEditor.Extension.extend({
+    name: 'AutoInlinecode',
     init: function(){
       this.subscribe('editableKeyup', this.onKeyup.bind(this));
     },
     onKeyup: function (keyUpEvent) {
       // If event adds backquote
       if (MediumEditor.util.isKey(keyUpEvent, [192])) {
-        var r = /(?<!<[^>]*)`/g;
+        var r = /(?<!<[^>]*)`/; //NB Do not use g option or it will infinite loop since it uses look behind
         var textContent = this.base.getSelectedParentElement().textContent.trim();
         console.log("DBG groups:", textContent.match(r));
         // Get the node text content
@@ -38,6 +38,6 @@ var AutoInlineCode = MediumEditor.Extension.extend({
     }
   });
 
-  return AutoInlineCode;
+  return AutoInlinecode;
 
 }(typeof require === 'function' ? require('medium-editor') : MediumEditor)));
