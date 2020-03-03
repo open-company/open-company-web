@@ -41,7 +41,7 @@ var AutoCode = MediumEditor.Extension.extend({
         } else if (!keyDownEvent.shiftKey) {
           keyDownEvent.preventDefault();
           keyDownEvent.stopPropagation();
-          document.execCommand("insertHTML", true, '\n')
+          document.execCommand("insertHTML", false, '\n');
           return false;
         }
       }
