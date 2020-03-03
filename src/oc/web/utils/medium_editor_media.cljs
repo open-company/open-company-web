@@ -369,7 +369,7 @@
             code-button {:name "pre"
                          :contentDefault "code snippet"
                          :contentFA "<i class=\"fa fa-code\"></i>"}
-            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "code" (clj->js code-button)]
+            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "code"] ;(clj->js code-button)]
                       show-subtitle (conj "h2"))
             extensions (cond-> {"autolist" (js/AutoList.)
                                 "mention" (mention-utils/mention-ext users-list)
