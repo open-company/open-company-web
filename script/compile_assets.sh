@@ -20,6 +20,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorAutoquote/autoquote.js \
 --js lib/MediumEditorExtensions/MediumEditorAutocode/autocode.js \
+--js lib/MediumEditorExtensions/MediumEditorAutoInlinecode/autoinlinecode.js \
 --js lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js \
 --js lib/MediumEditorExtensions/MediumEditorFileDragging/filedragging.js \
 --js lib/MediumEditorExtensions/MediumEditorTCMention/index.min.js \
