@@ -366,10 +366,16 @@
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
-            code-button {:name "pre"
-                         :contentDefault "code snippet"
-                         :contentFA "<i class=\"fa fa-code\"></i>"}
-            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "code"] ;(clj->js code-button)]
+            ; code-button {:name "pre"
+            ;              :contentDefault "code snippet"
+            ;              :contentFA "<i class=\"fa fa-code\"></i>"}
+            ; inline-code-button {:name "highlight"
+            ;                     :action "append-mark"
+            ;                     :tagNames ["mark"]
+            ;                     :aria "Code snippet"
+            ;                     :contentDefault "<b>C</b>"
+            ;                     :contentFA "<i class=\"fa fa-code fa-lg\"></i>"}
+            buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "inlinecode"]
                       show-subtitle (conj "h2"))
             extensions (cond-> {"autolist" (js/AutoList.)
                                 "mention" (mention-utils/mention-ext users-list)
@@ -377,7 +383,8 @@
                          (not mobile-editor) (assoc "media-picker" media-picker-ext
                                                     "autoquote" (js/AutoQuote.)
                                                     "autocode" (js/AutoCode.)
-                                                    ; "autoinlinecode" (js/AutoInlinecode.)
+                                                    "autoinlinecode" (js/AutoInlinecode.)
+                                                    "inlinecode" (js/InlineCodeButton.)
                                                     "carrotFileDragging" file-dragging-ext)
                          true clj->js)
             options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})

@@ -624,7 +624,7 @@ function PlaceCaretAtEnd(el) {
           button.classList.add('media-code');
           button.classList.add('media-' + idx);
           var i = this.document.createElement('i');
-          i.className = "fa fa-code";
+          i.className = "fa fa-code fa-lg";
           button.appendChild(i);
           this.addButtonTooltip(button, "Add code block");
           this.on(button, 'click', this.codeClick.bind(this));

@@ -419,6 +419,16 @@ $h2_top_margin: 24;
   span {
     background-color: transparent!important;
   }
+
+  code {
+    background-color: var(--opac-background-color-2);
+    border: 1px solid var(--divider-line);
+    color: var(--color);
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+    border-radius: 4px;
+    padding: 0 4px;
+  }
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -744,5 +754,15 @@ $h2_top_margin: 24;
 
   span {
     background-color: transparent!important;
+  }
+
+  code {
+    background-color: var(--opac-background-color-2);
+    border: 1px solid var(--divider-line);
+    color: var(--color);
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+    border-radius: 4px;
+    padding: 0 4px;
   }
 }

@@ -247,6 +247,8 @@
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutocode/autocode.js"}]
           ;; MediumEditorAutocode
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutoInlinecode/autoinlinecode.js"}]
+          ;; MediumEditorAutocode
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorInlineCodeButton/inlinecodebutton.js"}]
           ;; MediumEditorMediaPicker
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorMediaPicker/MediaPicker.js"}]
           ;; MediumEditorFileDragging
