@@ -387,7 +387,8 @@
                                                     "inlinecode" (js/InlineCodeButton.)
                                                     "carrotFileDragging" file-dragging-ext)
                          true clj->js)
-            options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)})
+            options {:toolbar (if mobile-editor false #js {:buttons (clj->js buttons)
+                                                           :allowMultiParagraphSelection false})
                      :buttonLabels "fontawesome"
                      :anchorPreview (if mobile-editor false #js {:hideDelay 500, :previewValueSelector "a"})
                      :extensions extensions
