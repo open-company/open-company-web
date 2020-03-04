@@ -627,6 +627,8 @@ div.stream-item {
           border: none;
           border-radius: 0;
           @include OC_Body_Book();
+          overflow-x: hidden;
+          white-space: pre-wrap;
         }
 
         p {

@@ -408,12 +408,16 @@ $h2_top_margin: 24;
   }
 
   pre {
-    padding: 8px;
+    color: var(--color);
+    font-size: #{$font_size}px;
     line-height: #{$line_height}px;
-    min-height: 36px;
     background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
     border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre;
+    padding: 8px;
+    min-height: 36px;
   }
 
   span {
@@ -421,14 +425,14 @@ $h2_top_margin: 24;
   }
 
   code {
-    background-color: var(--opac-background-color-1);
-    border: 1px solid var(--divider-line);
     color: var(--color);
     font-size: #{$font_size}px;
     line-height: #{$line_height}px;
+    background-color: var(--opac-background-color-1);
+    border: 1px solid var(--divider-line);
     border-radius: 4px;
-    padding: 0 4px;
     white-space: pre-wrap;
+    padding: 0 4px;
   }
 }
 
@@ -745,12 +749,16 @@ $h2_top_margin: 24;
   }
 
   pre {
-    padding: 8px;
-    line-height: $line-height;
-    min-height: 36px;
+    color: var(--color);
+    font-size: $font_size;
+    line-height: $line_height;
     background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
     border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre;
+    padding: 8px;
+    min-height: 36px;
   }
 
   span {
@@ -758,11 +766,11 @@ $h2_top_margin: 24;
   }
 
   code {
+    color: var(--color);
+    font-size: $font_size;
+    line-height: $line_height;
     background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
-    color: var(--color);
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
     border-radius: 4px;
     padding: 0 4px;
     white-space: pre-wrap;
