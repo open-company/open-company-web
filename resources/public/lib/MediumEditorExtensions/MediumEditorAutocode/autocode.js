@@ -57,7 +57,7 @@ var AutoCode = MediumEditor.Extension.extend({
           // If the content is the code block start string:
           if( code_start == "```" ){
             var newPreEl = this.document.createElement('pre');
-            newPreEl.className = "carrot-no-preview media-codeblock";
+            newPreEl.className = "media-codeblock";
             // Get the ``` containing element
             var codeBlockElement = this.base.getSelectedParentElement().previousSibling;
             // Replace the old P element with the newly created PRE
