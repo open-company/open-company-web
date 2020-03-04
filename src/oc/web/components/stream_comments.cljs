@@ -131,6 +131,7 @@
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
+                             (drv/drv :add-comment-data)
                              (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local nil ::editing?)
@@ -161,6 +162,15 @@
                                     (when is-self-focused?
                                       (scroll-to-bottom s))))
                                s)
+                             :will-mount (fn [s]
+                              (let [add-comment-data @(drv/get-ref s :add-comment-data)
+                                    {:keys [activity-data comments-data]} (-> s :rum/args first)]
+                                (mapv (fn [comment]
+                                        (let [comment-key (dis/add-comment-string-key (:uuid activity-data) (:uuid comment))]
+                                          (when (seq (get add-comment-data comment-key))
+                                            (swap! (::replying-to s) #(conj % (:uuid comment))))))
+                                 (filter (comp nil? :parent-uuid) comments-data)))
+                              s)
                              :did-mount (fn [s]
                               (maybe-highlight-comment s)
                               (try (js/emojiAutocomplete)
