@@ -1,6 +1,6 @@
 function log(){
-  var args = Array.prototype.slice.call(arguments);
-  console.debug("DBG MediaPicker", args);
+  // var args = Array.prototype.slice.call(arguments);
+  // console.debug("DBG MediaPicker", args);
 }
 
 function PlaceCaretAtEnd(el) {
@@ -85,7 +85,6 @@ function PlaceCaretAtEnd(el) {
           this.on(element, 'keyup', this.togglePicker.bind(this));
           this.on(element, 'focus', this.onFocus.bind(this));
           this.on(element, 'paste', this.togglePicker.bind(this));
-          // this.on(element, 'DOMSubtreeModified', this.togglePicker.bind(this));
           this.subscribe('editableInput', this.togglePicker.bind(this));
         }
         // this.on(element, 'blur', this.hide.bind(this));
@@ -353,14 +352,12 @@ function PlaceCaretAtEnd(el) {
           }
           p = element;
 
-          // Replace
-
           // Remove p and replace it with a DIV
           div = this.document.createElement("div");
           element.appendChild(div);
           p.parentNode.replaceChild(div, element);
         }
-        // var pollContainer = this.document.createElement("p");
+
         div.className = "carrot-no-preview group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
         div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
         div.dataset.mediaType = "poll";
