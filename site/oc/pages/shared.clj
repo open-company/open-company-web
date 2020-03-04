@@ -274,7 +274,7 @@
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
-         "Carrot is free for up to 10 people. After that, it's "
+         "Carrot is free for up to 20 people. After that, it's "
          "just $3.25 / month for each person with our annual plan.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
@@ -298,17 +298,19 @@
        :href "mailto:hello@carrot.io"}
       "Let's chat"]])
 
+(def pricing-headline "Free for small teams.")
+
 (def pricing-footer
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      "Simple pricing, and free for small teams."]
-
-    pricing-chat
+      pricing-headline]
 
     pricing-table
     
-    pricing-table-footer])
+    ; pricing-table-footer
+
+    pricing-chat])
 
 (def testimonials-section-old
   [:section.testimonials-section-old.big-web-tablet-only

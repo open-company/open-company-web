@@ -9,11 +9,11 @@
       [:section.cta.group
 
         [:h1.headline
-          "Better team discussions"]
+          "When chat gets too noisy"]
         [:div.subheadline
           (str
-           "Carrot makes asynchronous communication less noisy, so your "
-           "team can stay focused and informed with fewer interruptions.")]
+           "Carrot simplifies asynchronous communication for remote teams "
+           "so everyone stays informed with fewer interruptions.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action

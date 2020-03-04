@@ -11,13 +11,13 @@
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Simple pricing, and free for small teams."]
-
-        shared/pricing-chat
+          shared/pricing-headline]
 
         shared/pricing-table
         
-        shared/pricing-table-footer]
+        ; shared/pricing-table-footer
+
+        shared/pricing-chat]
 
       (shared/dashed-string 1)      
 
