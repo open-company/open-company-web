@@ -230,7 +230,6 @@ function PlaceCaretAtEnd(el) {
       this.hidePlaceholder();
       this.saveSelection();
       this.collapse();
-      event.stopPropagation();
       this.delegate("onPickerClick", "code block");
       $(event.target).tooltip("hide");
 
@@ -563,7 +562,6 @@ function PlaceCaretAtEnd(el) {
     dividerLineClick: function(event){
       log("dividerLineClick", this, event);
       this.collapse();
-      event.stopPropagation();
       this.delegate("onPickerClick", "divider-line");
       $(event.target).tooltip("hide");
 
