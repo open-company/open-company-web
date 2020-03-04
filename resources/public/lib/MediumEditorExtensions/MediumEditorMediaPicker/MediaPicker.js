@@ -182,25 +182,8 @@ function PlaceCaretAtEnd(el) {
 
     /* Caret helpers */
 
-    moveCaret: function($el, position){
-      // var range, sel, el, textEl;
-
-      // position = position || 0;
-      // range = document.createRange();
-      // sel = window.getSelection();
-      // el = $el.get(0);
-
-      // if (!el.childNodes.length) {
-      //     textEl = document.createTextNode(' ');
-      //     el.appendChild(textEl);
-      // }
-
-      // range.setStart(el.childNodes[0], position);
-      // range.collapse(true);
-      // sel.removeAllRanges();
-      // sel.addRange(range);
-
-      MediumEditor.selection.moveCursor(this.document, $el.get(0), position);
+    moveCursor: function(el, position){
+      MediumEditor.selection.moveCursor(this.document, el, position);
 
       this.repositionMediaPicker();
     },
@@ -255,7 +238,7 @@ function PlaceCaretAtEnd(el) {
       } else {
         element.appendChild(pre);
       }
-      this.moveCaret($(pre), 0);
+      this.moveCursor(pre, 0);
 
       this.base.checkContentChanged();
       setTimeout(this.togglePicker(), 100);
@@ -341,7 +324,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
@@ -407,7 +390,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
@@ -468,7 +451,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
@@ -553,7 +536,7 @@ function PlaceCaretAtEnd(el) {
         var br = this.document.createElement("br");
         nextP.appendChild(br);
         this.insertAfter(nextP, p);
-        this.moveCaret($(nextP), 0);
+        this.moveCursor(nextP, 0);
         this.base.checkContentChanged();
         this.delayedRepositionMediaPicker();
       }
@@ -603,7 +586,7 @@ function PlaceCaretAtEnd(el) {
       var br = this.document.createElement("br");
       nextP.appendChild(br);
       this.insertAfter(nextP, p);
-      this.moveCaret($(nextP), 0);
+      this.moveCursor(nextP, 0);
       this.base.checkContentChanged();
       this.delayedRepositionMediaPicker();
 
