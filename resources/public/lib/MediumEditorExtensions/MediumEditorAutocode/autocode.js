@@ -70,22 +70,7 @@ var AutoCode = MediumEditor.Extension.extend({
     },
 
     getPreElement: function (node) {
-      if (node.nodeName.toLowerCase() === 'pre') {
-        return node;
-      }
-
-      var parentNode = node.parentNode,
-          tagName = parentNode.nodeName.toLowerCase();
-      while (parentNode && !MediumEditor.util.isMediumEditorElement(parentNode)) {
-        if (tagName === 'pre') {
-          return parentNode;
-        }
-        parentNode = parentNode.parentNode;
-        if (parentNode) {
-          tagName = parentNode.nodeName.toLowerCase();
-        }
-      }
-      return false;
+      return MediumEditor.util.traverseUp(node, function(el){el.nodeName.toLowerCase() == 'pre';});
     }
   });
 

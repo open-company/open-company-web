@@ -17,12 +17,13 @@ var AutoInlinecode = MediumEditor.Extension.extend({
     init: function(){
       this.subscribe('editableKeyup', this.onKeyup.bind(this));
     },
+
     onKeyup: function (keyUpEvent) {
       // If event adds backquote
       if (MediumEditor.util.isKey(keyUpEvent, this.detectingKeyCodes)) {
         var element = this.base.getSelectedParentElement();
         var paragraphEl = element && this.getParagraphElement(element);
-        if (element && !this.insideCodeTag(element) && paragraphEl && element.innerHTML.match(/`[^`]+`/)) {
+        if (element && !this.getCodeTag(element) && paragraphEl && element.innerHTML.match(/`[^`]+`/)) {
           var r = /([^`]*)`([^`]+)`([^`]*)/; //NB Do not use g option or it will infinite loop since it uses look behind    
           element.innerHTML = element.innerHTML.replace(r, function(all,prev,center,after){
             return prev + "<code class=\"oc-latest-code\">" + center + "</code>" + (after || "&nbsp;");
@@ -34,7 +35,7 @@ var AutoInlinecode = MediumEditor.Extension.extend({
           }
         }
       } else if (MediumEditor.util.isKey(keyUpEvent, [39])) {
-        var codeEl = this.insideCodeTag(this.base.getSelectedParentElement());
+        var codeEl = this.getCodeTag(this.base.getSelectedParentElement());
 
         if (codeEl && (!codeEl.nextSibling ||
                        (codeEl.nextSibling.nodeType == 1 &&
@@ -50,41 +51,13 @@ var AutoInlinecode = MediumEditor.Extension.extend({
         }
       }
     },
-    insideCodeTag: function(node) {
-      if (node.nodeName.toLowerCase() === 'code') {
-        return node;
-      }
 
-      var parentNode = node.parentNode,
-          tagName = parentNode.nodeName.toLowerCase();
-      while (parentNode && !MediumEditor.util.isMediumEditorElement(parentNode)) {
-        if (tagName === 'code') {
-          return parentNode;
-        }
-        parentNode = parentNode.parentNode;
-        if (parentNode) {
-          tagName = parentNode.nodeName.toLowerCase();
-        }
-      }
-      return false;
+    getCodeTag: function(node) {
+      return MediumEditor.util.traverseUp(node, function(el){el.nodeName.toLowerCase() == 'code';});
     },
-    getParagraphElement: function (node) {
-      if (node.nodeName.toLowerCase() === 'p') {
-        return node;
-      }
 
-      var parentNode = node.parentNode,
-          tagName = parentNode.nodeName.toLowerCase();
-      while (parentNode && !MediumEditor.util.isMediumEditorElement(parentNode)) {
-        if (tagName === 'p') {
-          return parentNode;
-        }
-        parentNode = parentNode.parentNode;
-        if (parentNode) {
-          tagName = parentNode.nodeName.toLowerCase();
-        }
-      }
-      return false;
+    getParagraphElement: function (node) {
+      return MediumEditor.util.traverseUp(node, function(el){el.nodeName.toLowerCase() == 'p';});
     }
   });
 
