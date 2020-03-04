@@ -411,7 +411,7 @@ $h2_top_margin: 24;
     padding: 8px;
     line-height: #{$line_height}px;
     min-height: 36px;
-    background-color: var(--opac-background-color-2);
+    background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
     border-radius: 4px;
   }
@@ -421,13 +421,14 @@ $h2_top_margin: 24;
   }
 
   code {
-    background-color: var(--opac-background-color-2);
+    background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
     color: var(--color);
     font-size: #{$font_size}px;
     line-height: #{$line_height}px;
     border-radius: 4px;
     padding: 0 4px;
+    white-space: pre-wrap;
   }
 }
 
@@ -747,7 +748,7 @@ $h2_top_margin: 24;
     padding: 8px;
     line-height: $line-height;
     min-height: 36px;
-    background-color: var(--opac-background-color-2);
+    background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
     border-radius: 4px;
   }
@@ -757,12 +758,13 @@ $h2_top_margin: 24;
   }
 
   code {
-    background-color: var(--opac-background-color-2);
+    background-color: var(--opac-background-color-1);
     border: 1px solid var(--divider-line);
     color: var(--color);
     font-size: #{$font_size}px;
     line-height: #{$line_height}px;
     border-radius: 4px;
     padding: 0 4px;
+    white-space: pre-wrap;
   }
 }
