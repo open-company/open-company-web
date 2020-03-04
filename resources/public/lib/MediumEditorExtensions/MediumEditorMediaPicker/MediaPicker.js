@@ -63,6 +63,7 @@ function PlaceCaretAtEnd(el) {
     /* Internal private properties */
     _lastSelection: undefined,
     _waitingCB: false,
+    _lastParagraphElement: undefined,
 
     constructor: function (options) {
       if (options) {
@@ -155,7 +156,6 @@ function PlaceCaretAtEnd(el) {
       picker.id = 'medium-editor-media-picker-' + this.getEditorId();
       picker.className = 'medium-editor-media-picker';
       picker.style.display = "none";
-      // picker.style.left = 
       this.mediaButtonsContainer = this.createPickerMediaButtons();
       if (!this.inlinePlusButtonOptions.alwaysExpanded) {
         this.mainButton = this.createPickerMainButton();
@@ -199,6 +199,7 @@ function PlaceCaretAtEnd(el) {
       range.collapse(true);
       sel.removeAllRanges();
       sel.addRange(range);
+      this.repositionMediaPicker();
     },
 
     /**/
@@ -305,6 +306,7 @@ function PlaceCaretAtEnd(el) {
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -370,6 +372,7 @@ function PlaceCaretAtEnd(el) {
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -430,6 +433,7 @@ function PlaceCaretAtEnd(el) {
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -514,6 +518,7 @@ function PlaceCaretAtEnd(el) {
         this.insertAfter(nextP, p);
         this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
+        this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
       setTimeout(this.togglePicker(), 100);
@@ -563,8 +568,9 @@ function PlaceCaretAtEnd(el) {
       nextP.appendChild(br);
       this.insertAfter(nextP, p);
       this.moveCaret($(nextP), 0);
-
       this.base.checkContentChanged();
+      this.delayedRepositionMediaPicker();
+
       setTimeout(this.togglePicker(), 100);
     },
 
@@ -708,7 +714,7 @@ function PlaceCaretAtEnd(el) {
         // Remove last selection only on direct click of the button
         this.removeSelection();
       } else {
-        this.expand();        
+        this.expand();
       }
       if (event !== undefined) {
         event.stopPropagation();
@@ -742,6 +748,7 @@ function PlaceCaretAtEnd(el) {
       }
       this.delegate("willHide");
       this.collapse();
+      this._lastParagraphElement = undefined;
       this.pickerElement.style.display = 'none';
       this.delegate("didHide");
     },
@@ -776,6 +783,22 @@ function PlaceCaretAtEnd(el) {
       return false;
     },
 
+    delayedRepositionMediaPicker: function() {
+      this.repositionMediaPicker();
+      setTimeout(this.repositionMediaPicker.bind(this), 800);
+    },
+
+    repositionMediaPicker: function(){
+      if (this.pickerElement) {
+        if (this._lastParagraphElement) {
+          var top = ($(this._lastParagraphElement).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
+          this.pickerElement.style.top = top + "px";
+        } else {
+          this.hide();
+        }
+      }
+    },
+
     togglePicker: function(event, editable){
       if (this.inlinePlusButtonOptions.inlineButtons) {
         if (this._waitingCB) {
@@ -787,13 +810,13 @@ function PlaceCaretAtEnd(el) {
           if (this.inlinePlusButtonOptions.initiallyVisible && !this.initialButtonsShown) {
             element = this.getEditorElements()[0];
           }else {
-            element = sel.getRangeAt(0).commonAncestorContainer;  
+            element = sel.getRangeAt(0).commonAncestorContainer;
           }
           this.initialButtonsShown = true;
           if (sel !== undefined || element !== undefined) {
             if (this.paragraphIsEmpty(element)){
-              var top = ($(element).offset().top - $(this.pickerElement.parentNode).offset().top - 1);
-              this.pickerElement.style.top = top + "px";
+              this._lastParagraphElement = element;
+              this.repositionMediaPicker();
               this.show();
               return;
             }
@@ -802,7 +825,6 @@ function PlaceCaretAtEnd(el) {
         this.hide();
       }
     },
-    
   });
 
   MediaPicker.RemoveAnchor = function(uniqueID, e){

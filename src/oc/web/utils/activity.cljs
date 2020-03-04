@@ -10,6 +10,115 @@
             [oc.web.lib.responsive :as responsive]
             [oc.web.utils.comment :as comment-utils]))
 
+;; Posts separators
+
+(defn show-separators? [container-slug-or-href]
+  (and container-slug-or-href
+       (not (responsive/is-mobile-size?))
+       (not (or (#{utils/default-drafts-board-slug "inbox"} (name container-slug-or-href))
+                (and (string? container-slug-or-href)
+                     (.match container-slug-or-href #"(?i)/(inbox)(/|$)"))))))
+
+(defn- post-month-date-from-date [post-date]
+  (doto post-date
+    ;; Reset day to first of the month
+    (.setDate 1)
+    ;; Reset time to midnight
+    (.setHours 0)
+    (.setMinutes 0)
+    (.setSeconds 0)
+    (.setMilliseconds 0)))
+
+(defn- separator-from-date [d last-monday two-weeks-ago first-month]
+  (let [now (utils/js-date)
+        month-string (utils/full-month-string (inc (.getMonth d)))]
+    (cond
+      (> d last-monday)
+      {:label "Recent"
+       :content-type "separator"
+       :date last-monday}
+      (> d two-weeks-ago)
+      {:label "Last week"
+       :content-type "separator"
+       :date two-weeks-ago}
+      (> d first-month)
+      {:label "2 weeks ago"
+       :content-type "separator"
+       :date first-month}
+      (and (= (.getMonth now) (.getMonth d))
+           (= (.getFullYear now) (.getFullYear d)))
+      {:label "This month"
+       :content-type "separator"
+       :date (post-month-date-from-date d)}
+      (= (.getFullYear now) (.getFullYear d))
+      {:label month-string
+       :content-type "separator"
+       :date (post-month-date-from-date d)}
+      :else
+      {:label (str month-string ", " (.getFullYear d))
+       :content-type "separator"
+       :date (post-month-date-from-date d)})))
+
+(defn- add-post-to-separators [post-data separators-map last-monday two-weeks-ago first-month]
+  (let [post-date (utils/js-date (:published-at post-data))]
+    (if (and (seq separators-map)
+             (> post-date (:date (last separators-map))))
+      (update-in separators-map [(dec (count separators-map)) :posts-list] #(-> % (conj (:uuid post-data)) vec))
+      (vec
+       (conj separators-map
+        (assoc (separator-from-date post-date last-monday two-weeks-ago first-month)
+         :posts-list [(:uuid post-data)]))))))
+
+(defn grouped-posts [container-data]
+  (let [sorted-post-uuids (:posts-list container-data)
+        sorted-posts-list (mapv #(or (get-in container-data [:fixed-items %])
+                                     (dis/activity-data %))
+                           sorted-post-uuids)
+
+        last-monday (utils/js-date)
+        _last-monday (doto last-monday
+                       (.setDate (- (.getDate last-monday)
+                                    ; First saturday before now
+                                    (-> (.getDay last-monday) (+ 8) (mod 7))))
+                       (.setHours 23)
+                       (.setMinutes 59)
+                       (.setSeconds 59)
+                       (.setMilliseconds 999))
+
+        two-weeks-ago (utils/js-date)
+        _two-weeks-ago (doto two-weeks-ago
+                         (.setDate (- (.getDate two-weeks-ago)
+                                      ;; Saturday before last one
+                                      (-> (.getDay two-weeks-ago) (+ 8) (mod 7) (+ 7))))
+                         ;; Reset time to midnight
+                         (.setHours 23)
+                         (.setMinutes 59)
+                         (.setSeconds 59)
+                         (.setMilliseconds 999))
+
+        first-month (utils/js-date)
+        _first-month (doto first-month
+                       (.setDate (- (.getDate first-month)
+                                    (-> (.getDay first-month) (+ 8) (mod 7) (+ 14))))
+                       ;; Reset time to midnight
+                       (.setHours 23)
+                       (.setMinutes 59)
+                       (.setSeconds 59)
+                       (.setMilliseconds 999))
+
+        last-date (:published-at (last sorted-posts-list))
+        separators-data (loop [separators []
+                               posts sorted-posts-list]
+                          (if (empty? posts)
+                            separators
+                            (recur (add-post-to-separators (first posts) separators last-monday two-weeks-ago first-month)
+                                   (rest posts))))
+        unwrapped-items (vec (rest ;; Always remove the first label
+                         (mapcat #(concat [(dissoc % :posts-list)] (remove nil? (:posts-list %))) separators-data)))]
+        unwrapped-items))
+
+;; 
+
 (defn is-published? [entry-data]
   (= (:status entry-data) "published"))
 
@@ -209,8 +318,11 @@
                                                               new-items)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
-                             with-posts-list)]
-      with-saved-items)))
+                             with-posts-list)
+          with-posts-separators (if (show-separators? (:slug board-data))
+                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
+      with-posts-separators)))
 
 (defn fix-container
   "Parse container data coming from the API, like All posts or Must see."
@@ -251,8 +363,11 @@
                                                               new-items)))
           with-saved-items (if direction
                              (assoc with-posts-list :saved-items (count (:posts-list container-data)))
-                             with-posts-list)]
-      with-saved-items)))
+                             with-posts-list)
+          with-posts-separators (if (show-separators? (:href container-data))
+                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
+      with-posts-separators)))
 
 (defn get-comments [activity-data comments-data]
   (or (-> comments-data

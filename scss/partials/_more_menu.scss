@@ -349,12 +349,12 @@ div.more-menu {
     }
 
     &.has-mark-unread {
-      width: 138px;
+      width: 134px;
 
       @include mobile() {
         left: unset;
         right: 0;
-        width: 138px;
+        width: 134px;
       } 
     }
 

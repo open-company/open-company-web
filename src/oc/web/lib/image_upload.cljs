@@ -28,6 +28,7 @@
                        :storeTo store-to
                        :transformations {
                          :crop {:circle true}
+                         :rotate true
                        }
                        :fromSources from-sources
                        ;; Selected cb

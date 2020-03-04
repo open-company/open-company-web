@@ -124,7 +124,7 @@ div.dashboard-layout {
           align-items: center;
 
           span.tab-icon {
-            backgorund-size: 18px 18px;
+            background-size: 18px 18px;
             background-repeat: no-repeat;
             margin-bottom: 6px;
           }
@@ -147,6 +147,7 @@ div.dashboard-layout {
             span.tab-icon {
               width: 18px;
               height: 16px;
+              background-size: 18px 16px;
               background-image: cdnUrl("/img/ML/all_posts_tab_icon.svg");
 
               @include preload_image(cdnUrl("/img/ML/all_posts_tab_icon_active.svg"));
@@ -169,6 +170,7 @@ div.dashboard-layout {
             span.tab-icon {
               width: 18px;
               height: 16px;
+              background-size: 18px 16px;
               background-image: cdnUrl("/img/ML/inbox_tab_icon.svg");
               position: relative;
 
@@ -212,10 +214,59 @@ div.dashboard-layout {
             }
           }
 
+          &.bookmarks-tab {
+            span.tab-icon {
+              width: 12px;
+              height: 16px;
+              background-image: cdnUrl("/img/ML/bookmarks_tab_icon.svg");
+              background-size: 12px 16px;
+              position: relative;
+
+              @include preload_image(cdnUrl("/img/ML/bookmarks_tab_icon_active.svg"));
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/bookmarks_tab_icon@dark.svg");
+              }
+
+              span.count-badge {
+                padding: 2px;
+                @include OC_Body_Book();
+                font-size: 14px;
+                line-height: 14px;
+                padding: 2px;
+                text-align: center;
+                color: white;
+                display: block;
+                background-color: $carrot_green;
+                vertical-align: top;
+                border-radius: 4px;
+                position: absolute;
+                top: -9px;
+                left: 12px;
+                border: 2px solid white;
+                min-width: 22px;
+              }
+            }
+
+            &.active span.tab-icon span.count-badge {
+              background-color: $ui_grey; //rgb(130, 130, 130);
+              color: white;
+            }
+
+            &.active span.tab-icon {
+              background-image: cdnUrl("/img/ML/bookmarks_tab_icon_active.svg");
+
+              @include dark_mode() {
+                background-image: cdnUrl("/img/ML/bookmarks_tab_icon_active.svg");
+              }
+            }
+          }
+
           &.notifications-tab {
             span.tab-icon {
               width: 16px;
               height: 18px;
+              background-size: 16px 18px;
               background-image: cdnUrl("/img/ML/notifications_tab_icon.svg");
               position: relative;
 
@@ -251,8 +302,9 @@ div.dashboard-layout {
             display: none;
 
             span.tab-icon {
-              width: 18px;
-              height: 18px;
+              width: 16px;
+              height: 16px;
+              background-size: 16px 16px;
               background-image: cdnUrl("/img/ML/new_post_tab_icon.svg");
 
               @include preload_image(cdnUrl("/img/ML/new_post_tab_icon_active.svg"));

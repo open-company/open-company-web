@@ -98,6 +98,7 @@ var OCWebPrintCommentsData = function(){};
 var OCWebPrintContainerData = function(){};
 var OCWebPrintEntryEditingData = function(){};
 var OCWebPrintFilteredPostsData = function(){};
+var OCWebPrintItemsToRender = function(){};
 var OCWebPrintJWTContents = function(){};
 var OCWebPrintOrgData = function(){};
 var OCWebPrintPanelStack = function(){};
@@ -203,3 +204,7 @@ OCCarrotDesktop.isDarkMode = function() {};
 // Stripe
 var Stripe = function(){};
 Stripe.redirectToCheckout = function(){};
+// React virtualized
+var ReactVirtualized = function(){};
+ReactVirtualized.List = function(){};
+ReactVirtualized.List.recomputeRowHeights = function(){};

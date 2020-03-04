@@ -231,27 +231,22 @@
           ra posts))
 
 (defmethod reducer :all-posts-get/finish
-  [db [_ org sort-type fixed-body]]
-  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
-  db)
-
-(defmethod reducer :follow-ups-get/finish
-  [db [_ org sort-type fixed-body]]
+  [db [_ org fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :inbox-get/finish
-  [db [_ {:keys [org year month from body]}]]
-  (swap! reactions-atom index-posts org (-> body :collection :items))
+  [db [_ org fixed-body]]
+  (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :bookmarks-get/finish
-  [db [_ org sort-type fixed-body]]
+  [db [_ org fixed-body]]
   (swap! reactions-atom index-posts org (-> fixed-body :fixed-items vals))
   db)
 
 (defmethod reducer :section
-  [db [_ _ board-data]]
+  [db [_ board-data]]
   (let [org (utils/section-org-slug board-data)
         fixed-board-data (au/fix-board board-data (dispatcher/change-data db))]
     (swap! reactions-atom index-posts org (-> fixed-board-data :fixed-items vals)))
