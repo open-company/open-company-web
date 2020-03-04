@@ -585,8 +585,18 @@ div.stream-item {
         @include OC_Body_Book();
         line-height: 20px;
         overflow: hidden;
-
         max-height: #{20 * 2}px;
+
+        @include mobile() {
+          @include activity-body(16, 20, var(--color));
+          line-height: 20px;
+          max-height: #{20 * 2}px;
+
+          h2 {
+            font-size: 16px;
+            line-height: 20px;
+          }
+        }
 
         h2 {
           color: var(--color);
@@ -604,15 +614,22 @@ div.stream-item {
           display: none;
         }
 
-        @include mobile() {
-          @include activity-body(16, 20, var(--color));
+        pre, code {
+          background-color: transparent;
+          padding: 0;
+          margin: 0;
+          color: var(--color);
+          font-size: 16px;
           line-height: 20px;
-          max-height: #{20 * 2}px;
+          min-height: unset;
+          border: none;
+          border-radius: 0;
+          @include OC_Body_Book();
+        }
 
-          h2 {
-            font-size: 16px;
-            line-height: 20px;
-          }
+        p {
+          padding: 0;
+          margin: 0;
         }
       }
     }
