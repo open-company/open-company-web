@@ -229,7 +229,7 @@ function PlaceCaretAtEnd(el) {
       var sel = this.window.getSelection(),
           element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
           pre = this.document.createElement('pre');
-      pre.className = "carrot-no-preview media-codeblock"
+      pre.className = "media-codeblock"
       // if the selection is in a DIV means it's the main editor element
       if (element && element.nodeName.toLowerCase() == 'p'){
         // add the PRE before the P
