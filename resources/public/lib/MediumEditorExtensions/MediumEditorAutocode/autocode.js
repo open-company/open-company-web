@@ -70,7 +70,7 @@ var AutoCode = MediumEditor.Extension.extend({
     },
 
     getPreElement: function (node) {
-      return MediumEditor.util.traverseUp(node, function(el){el.nodeName.toLowerCase() == 'pre';});
+      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() == 'pre';});
     }
   });
 

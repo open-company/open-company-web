@@ -53,11 +53,11 @@ var AutoInlinecode = MediumEditor.Extension.extend({
     },
 
     getCodeTag: function(node) {
-      return MediumEditor.util.traverseUp(node, function(el){el.nodeName.toLowerCase() == 'code';});
+      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() == 'code';});
     },
 
     getParagraphElement: function (node) {
-      return MediumEditor.util.traverseUp(node, function(el){el.nodeName.toLowerCase() == 'p';});
+      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() == 'p';});
     }
   });
 
