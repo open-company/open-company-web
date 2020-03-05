@@ -142,16 +142,47 @@ div.stream-collapsed-item {
       flex: 0 0 20px;
     }
 
-    &.bookmark-item div.stream-collapsed-item-fill div.bookmark-tag {
-      display: block;
+    &.bookmark-item div.stream-collapsed-item-fill {
+
+      div.bookmark-tag-small {
+        display: block;
+      }
+
+      div.stream-item-headline {
+        max-width: calc(100% - 23px);
+      }
     }
 
-    &.must-see-item div.stream-collapsed-item-fill div.must-see-tag {
-      display: block;
+    &.must-see-item div.stream-collapsed-item-fill {
+      div.must-see-tag {
+        display: block;
+      }
+
+      div.stream-item-headline {
+        max-width: calc(100% - 78px);
+      }
     }
 
-    &.muted-item div.stream-collapsed-item-fill div.muted-activity {
-      display: block;
+    &.muted-item div.stream-collapsed-item-fill {
+      div.muted-activity {
+        display: block;
+      }
+
+      div.stream-item-headline {
+        max-width: calc(100% - 16px);
+      }
+    }
+
+    &.bookmark-item.muted-item div.stream-collapsed-item-fill {
+      div.stream-item-headline {
+        max-width: calc(100% - 43px);
+      }
+    }
+
+    &.must-see-item.muted-item div.stream-collapsed-item-fill {
+      div.stream-item-headline {
+        max-width: calc(100% - 98px);
+      }
     }
 
     div.stream-collapsed-item-fill {
@@ -165,11 +196,13 @@ div.stream-collapsed-item {
 
       div.stream-item-headline {
         height: 24px;
+        @include activity-title(14px, 24px);
+        flex: 0 0 auto;
+        max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        @include activity-title(14px, 24px);
-        flex: 0 0 auto;
+        overflow-wrap: break-word;
       }
 
       @include must-see-tag();
@@ -178,11 +211,11 @@ div.stream-collapsed-item {
 
       @include muted-activity();
 
-      div.bookmark-tag, div.bookmark-tag-small, div.must-see-tag, div.muted-activity {
+      div.bookmark-tag-small, div.must-see-tag, div.muted-activity {
         display: none;
       }
 
-      div.bookmark-tag, div.must-see-tag {
+      div.bookmark-tag-small, div.must-see-tag {
         margin: 4px 0 0 6px;
         flex: 0 0 auto;
       }
