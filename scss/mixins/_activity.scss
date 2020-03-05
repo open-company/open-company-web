@@ -214,6 +214,42 @@ $h2_top_margin: 24;
   }
 }
 
+@mixin code-blocks($font-size, $line-height) {
+  pre {
+    font-family: Menlo;
+    color: var(--color);
+    font-size: 14px;
+    line-height: $line-height;
+    background-color: var(--pre-background-color);
+    border: 1px solid var(--pre-border-color);
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: pre;
+    padding: 16px;
+    min-height: 54px;
+    margin: 24px 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  code {
+    color: var(--color);
+    font-size: $font-size;
+    line-height: $line-height;
+    background-color: var(--pre-background-color);
+    border: 1px solid var(--pre-border-color);
+    border-radius: 4px;
+    white-space: pre-wrap;
+    padding: 0 4px;
+  }
+}
+
 @mixin activity-body($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
@@ -407,33 +443,11 @@ $h2_top_margin: 24;
     }
   }
 
-  pre {
-    color: var(--color);
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
-    background-color: var(--opac-background-color-1);
-    border: 1px solid var(--divider-line);
-    border-radius: 4px;
-    overflow-x: auto;
-    white-space: pre;
-    padding: 8px;
-    min-height: 36px;
-  }
-
   span {
     background-color: transparent!important;
   }
 
-  code {
-    color: var(--color);
-    font-size: #{$font_size}px;
-    line-height: #{$line_height}px;
-    background-color: var(--opac-background-color-1);
-    border: 1px solid var(--divider-line);
-    border-radius: 4px;
-    white-space: pre-wrap;
-    padding: 0 4px;
-  }
+  @include code-blocks(#{$font_size}px, #{$line_height}px);
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -560,7 +574,6 @@ $h2_top_margin: 24;
     }
   }
 }
-
 
 @mixin activity-comment($font-size: 18px, $line-height: 24px, $paragraph-spacing: $line-height){
   @include OC_Body_Book();
@@ -748,31 +761,9 @@ $h2_top_margin: 24;
     margin-top: $paragraph-spacing;
   }
 
-  pre {
-    color: var(--color);
-    font-size: $font_size;
-    line-height: $line_height;
-    background-color: var(--opac-background-color-1);
-    border: 1px solid var(--divider-line);
-    border-radius: 4px;
-    overflow-x: auto;
-    white-space: pre;
-    padding: 8px;
-    min-height: 36px;
-  }
-
   span {
     background-color: transparent!important;
   }
 
-  code {
-    color: var(--color);
-    font-size: $font_size;
-    line-height: $line_height;
-    background-color: var(--opac-background-color-1);
-    border: 1px solid var(--divider-line);
-    border-radius: 4px;
-    padding: 0 4px;
-    white-space: pre-wrap;
-  }
+  @include code-blocks($font-size, $line-height);
 }
