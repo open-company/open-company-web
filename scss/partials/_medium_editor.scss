@@ -35,13 +35,8 @@ div.medium-editor-toolbar {
         padding: 0;
         margin: 0 0 0 1px;
 
-        *:not(.fa-code) {
+        * {
           display: none;
-        }
-
-        i.fa.fa-code:before {
-          font-size: 16px;
-          font-weight: bold;
         }
 
         &:hover, &.medium-editor-button-active {
@@ -62,7 +57,8 @@ div.medium-editor-toolbar {
         }
 
         &.medium-editor-action-h2 {
-          background-image: cdnUrl("/img/ML/context_menu_h2.svg"); 
+          background-image: cdnUrl("/img/ML/context_menu_h2.svg");
+          background-position: 7px center;
           margin-left: 9px;
           padding-left: 9px;
           width: 32px;
@@ -73,10 +69,15 @@ div.medium-editor-toolbar {
           background-image: cdnUrl("/img/ML/context_menu_anchor.svg"); 
         }
 
+        &.media-editor-action-inlinecode {
+          background-image: cdnUrl("/img/ML/context_menu_inlinecode.svg");
+          background-size: 30px 15px;
+        }
+
         &.medium-editor-action-quote {
-          * {
-            display: initial;
-          }
+          background-image: cdnUrl("/img/ML/context_menu_quote.svg");
+          background-size: 24px 12px;
+          transform: rotate(180deg);
         }
       }
     }

@@ -10,9 +10,9 @@ var InlineCodeButton = MediumEditor.Extension.extend({
     });
 
     this.button = this.document.createElement('button');
-    this.button.classList.add('medium-editor-action');
+    this.button.classList.add('medium-editor-action', 'media-editor-action-inlinecode');
     this.button.innerHTML = '<i class="fa fa-code fa-lg"></i>';
-    this.button.title = 'Code snippet';
+    this.button.title = 'Code or text snippet';
 
     this.on(this.button, 'click', this.handleClick.bind(this));
   },

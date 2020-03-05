@@ -366,15 +366,6 @@
             media-picker-ext (when-not mobile-editor (js/MediaPicker. (clj->js media-picker-opts)))
             file-dragging-ext (when-not mobile-editor
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
-            ; code-button {:name "pre"
-            ;              :contentDefault "code snippet"
-            ;              :contentFA "<i class=\"fa fa-code\"></i>"}
-            ; inline-code-button {:name "highlight"
-            ;                     :action "append-mark"
-            ;                     :tagNames ["mark"]
-            ;                     :aria "Code snippet"
-            ;                     :contentDefault "<b>C</b>"
-            ;                     :contentFA "<i class=\"fa fa-code fa-lg\"></i>"}
             buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "inlinecode"]
                       show-subtitle (conj "h2"))
             extensions (cond-> {"autolist" (js/AutoList.)
