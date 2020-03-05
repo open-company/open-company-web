@@ -611,10 +611,7 @@ function PlaceCaretAtEnd(el) {
         } else if (opt === 'code') {
           button.classList.add('media-code');
           button.classList.add('media-' + idx);
-          var i = this.document.createElement('i');
-          i.className = "fa fa-code fa-lg";
-          button.appendChild(i);
-          this.addButtonTooltip(button, "Add code block");
+          this.addButtonTooltip(button, "Add code block or text snippet");
           this.on(button, 'click', this.codeClick.bind(this));
         } else if (opt === 'gif') {
           button.classList.add('media-gif');
