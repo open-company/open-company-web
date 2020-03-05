@@ -1,5 +1,6 @@
 (ns oc.web.actions.poll
   (:require [taoensso.timbre :as timbre]
+            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.utils.poll :as pu]
             [oc.web.dispatcher :as dis]
@@ -17,26 +18,52 @@
                     [dispatch-key :polls])]
     (dis/dispatch! [:update polls-key #(vec (conj % (pu/poll-data cur-user poll-id)))])))
 
+(defn remove-poll [dispatch-key poll-data]
+  (timbre/info "Remove poll" dispatch-key (:poll-uuid poll-data))
+  (dis/dispatch! [:update (vec (conj dispatch-key :polls)) (fn [polls] (filterv #(not= (:poll-uuid %) (:poll-uuid poll-data)) polls))])
+  (when-let [poll-element (sel1 (keyword (str "." pu/poll-selector-prefix (:poll-uuid poll-data))))]
+    (.removeChild (.-parentElement poll-element) poll-element)))
+
 (defn remove-poll-for-max-retry [dispatch-key poll-data]
   (timbre/info "Remove poll for max retry" dispatch-key (:poll-uuid poll-data))
-  (dis/dispatch! [:update (butlast dispatch-key) (fn [polls] (filterv #(not= (:poll-uuid %) (:poll-uuid poll-data)) polls))]))
+  (remove-poll dispatch-key poll-data))
+
+(defn show-preview [poll-key]
+  (dis/dispatch! [:update poll-key #(assoc % :preview true)]))
+
+(defn hide-preview [poll-key]
+  (dis/dispatch! [:update poll-key #(dissoc % :preview)]))
 
 (defn update-question [poll-key question]
   (dis/dispatch! [:input (vec (conj poll-key :question)) question]))
 
 ;; Replies
 
-(defn add-reply [poll-key]
-  (timbre/info "Adding reply to" poll-key)
-  (dis/dispatch! [:update poll-key #(merge % {:replies (vec (conj (:replies %) (pu/poll-reply (dis/current-user-data))))
-                                                  :updated-at (utils/as-of-now)})]))
+(defn add-reply [poll-key & [reply-body]]
+  (dis/dispatch! [:update poll-key #(merge % {:replies (vec (conj (:replies %) (pu/poll-reply (dis/current-user-data) reply-body)))
+                                              :updated-at (utils/as-of-now)})]))
 
 (defn update-reply [poll-key idx body]
   (dis/dispatch! [:input (vec (concat poll-key [:replies idx :body])) body]))
 
 (defn delete-reply [poll-key poll-reply-id]
   (dis/dispatch! [:update poll-key #(merge % {:replies (filterv (fn[r] (not= (:reply-id r) poll-reply-id)) (:replies %))
-                                                  :updated-at (utils/as-of-now)})]))
+                                              :updated-at (utils/as-of-now)})]))
+
+(defn add-new-reply [poll-data poll-key reply-body]
+  (timbre/info "Adding new reply to" poll-key "body:" reply-body)
+  (let [add-reply-link (utils/link-for (:links poll-data) "reply" "POST")]
+    (add-reply poll-key reply-body)
+    (api/poll-add-reply add-reply-link reply-body (fn [{:keys [status body success]}]
+     (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil)))))
+
+(defn delete-existing-reply [poll-data poll-key poll-reply-id]
+  (timbre/info "Deleting existing reply from" poll-key "reply:" poll-reply-id)
+  (let [reply-data (some #(when (= (:reply-id %) poll-reply-id) %) (:replies poll-data))
+        delete-reply-link (utils/link-for (:links reply-data) "delete" "DELETE")]
+    (delete-reply poll-key poll-reply-id)
+    (api/poll-delete-reply delete-reply-link (fn [{:keys [status body success]}]
+     (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil)))))
 
 ;; Vote/unvote
 

@@ -86,6 +86,7 @@ function PlaceCaretAtEnd(el) {
           this.on(element, 'keyup', this.togglePicker.bind(this));
           this.on(element, 'focus', this.onFocus.bind(this));
           this.on(element, 'paste', this.togglePicker.bind(this));
+          this.subscribe('editableKeydown', this.onKeydown.bind(this));
           this.subscribe('editableInput', this.togglePicker.bind(this));
         }
         // this.on(element, 'blur', this.hide.bind(this));
@@ -99,6 +100,28 @@ function PlaceCaretAtEnd(el) {
       if (this.inlinePlusButtonOptions.initiallyVisible) {
         // Force show the media picker buttons
         this.togglePicker();
+      }
+    },
+
+    onKeydown: function(keydownEvent) {
+      if (MediumEditor.util.isKey(keydownEvent, [40])) {
+        // In case the last child of the editor is a poll add a new paragraph when user press down arrow
+        var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
+        if (meEl && meEl.lastElementChild && meEl.lastElementChild.nodeName.toLowerCase() == "div" && meEl.lastElementChild.classList.contains("media-poll")) {
+          var newParagraph = this.document.createElement('p');
+          newParagraph.innerHTML = "<br/>";
+          meEl.appendChild(newParagraph);
+        }
+      }
+
+      if (MediumEditor.util.isKey(keydownEvent, [38])) {
+        // In case the last child of the editor is a poll add a new paragraph when user press down arrow
+        var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
+        if (meEl && meEl.firstElementChild && meEl.firstElementChild.nodeName.toLowerCase() == "div" && meEl.firstElementChild.classList.contains("media-poll")) {
+          var newParagraph = this.document.createElement('p');
+          newParagraph.innerHTML = "<br/>";
+          meEl.insertBefore(newParagraph, meEl.firstElementChild);
+        }
       }
     },
 
@@ -148,7 +171,7 @@ function PlaceCaretAtEnd(el) {
     },
 
     onFocus: function(event, editable){
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     createPicker: function(){
@@ -309,7 +332,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     pollClick: function(event){
@@ -362,6 +385,7 @@ function PlaceCaretAtEnd(el) {
 
         div.className = "carrot-no-preview group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
         div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.setAttribute("contenteditable", false);
         div.dataset.mediaType = "poll";
         div.dataset.pollId = pollId;
 
@@ -373,7 +397,8 @@ function PlaceCaretAtEnd(el) {
         this.base.checkContentChanged();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      console.log("DBG adding poll", pollId);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     videoClick: function(event){
@@ -439,7 +464,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     chartClick: function(event){
@@ -500,7 +525,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     attachmentClick: function(event){
@@ -585,7 +610,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     insertAfter: function(newNode, referenceNode) {
@@ -635,7 +660,7 @@ function PlaceCaretAtEnd(el) {
       this.base.checkContentChanged();
       this.delayedRepositionMediaPicker();
 
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     createPickerMediaButtons: function(){

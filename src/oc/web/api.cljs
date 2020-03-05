@@ -975,9 +975,24 @@
 (defn poll-vote [vote-link callback]
   (if vote-link
     (storage-http (method-for-link vote-link) (relative-href vote-link)
-     {:hreaders (headers-for-link vote-link)}
+     {:headers (headers-for-link vote-link)}
      callback)
     (handle-missing-link "vote-link" vote-link callback)))
+
+(defn poll-add-reply [add-reply-link reply-body callback]
+  (if add-reply-link
+    (storage-http (method-for-link add-reply-link) (relative-href add-reply-link)
+     {:headers (headers-for-link add-reply-link)
+      :body reply-body}
+     callback)
+    (handle-missing-link "poll-add-reply" add-reply-link callback {:reply-body reply-body})))
+
+(defn poll-delete-reply [delete-reply-link callback]
+  (if delete-reply-link
+    (storage-http (method-for-link delete-reply-link) (relative-href delete-reply-link)
+     {:headers (headers-for-link delete-reply-link)}
+     callback)
+    (handle-missing-link "poll-delete-reply" delete-reply-link callback)))
 
 ;; WRT
 

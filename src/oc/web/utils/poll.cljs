@@ -21,8 +21,8 @@
    :avatar-url (:avatar-url user-data)
    :user-id (:user-id user-data)})
 
-(defn poll-reply [user-data]
-  {:body ""
+(defn poll-reply [user-data body]
+  {:body (or body "")
    :author (author-for-user user-data)
    :votes-count 0
    :reply-id (new-reply-id)
@@ -36,7 +36,7 @@
    :updated-at (created-at)
    :author (author-for-user user-data)
    :total-votes-count 0
-   :replies (mapv #(poll-reply user-data) (range min-poll-replies))})
+   :replies (mapv #(poll-reply user-data "") (range min-poll-replies))})
 
 (defn clean-polls
   "Clean not needed keys from poll maps."
@@ -45,9 +45,9 @@
     (assoc activity-data :polls
      (mapv (fn [poll]
       (-> poll
-       (dissoc :links)
+       (dissoc :links )
        (update :replies
         (fn [replies]
-         (mapv #(dissoc % :links) replies)))))
+         (mapv #(dissoc % :links :preview) replies)))))
       (:polls activity-data)))
     activity-data))
