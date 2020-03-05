@@ -253,18 +253,17 @@
   [:div.pricing-table.group
     [:div.pricing-table-left
       [:div.pricing-table-left-price
-        "$5"]
+        "$0"]
       [:div.pricing-table-left-subprice
-        "/month per user"]]
+        "for teams of up to 20 people"]]
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
-         "Carrot starts with a 14-day free trial, no credit card required. "
-         "After that, monthly pricing starts at $60, which includes your first "
-         "12 members. Then it’s just $5 a user after that.")]
+         "Carrot is free for up to 20 people. After that, it's "
+         "just $3.25 / month for each person with our annual plan.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
-        "Start your 14-day free trial"]]])
+        "Try Carrot for free"]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer
@@ -276,22 +275,27 @@
          :href "mailto:hello@carrot.io"}
         "Let’s chat about our Enterprise plan."]]])
 
+(def pricing-headline "Free for small teams.")
+
+(def pricing-chat
+  [:div.pricing-subheadline
+    "Questions? "
+    [:a.chat-with-us
+      {:class "intercom-chat-link"
+       :href "mailto:hello@carrot.io"}
+      "Let's chat"]])
+
 (def pricing-footer
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      "Simple pricing for remote team communication"]
-
-    [:div.pricing-subheadline
-      "Questions? "
-      [:a.chat-with-us
-        {:class "intercom-chat-link"
-         :href "mailto:hello@carrot.io"}
-        "Let's chat"]]
+      pricing-headline]    
 
     pricing-table
     
-    pricing-table-footer])
+    ; pricing-table-footer
+
+    pricing-chat])
 
 (def testimonials-section-old
   [:section.testimonials-section-old.big-web-tablet-only
