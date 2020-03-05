@@ -224,15 +224,52 @@ nav.oc-navbar {
           border-radius: 50%;
           width: 32px;
           height: 32px;
-          background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
-          background-size: 16px 16px;
-          background-color: rgba($carrot_green, 0.3);
-          background-repeat: no-repeat;
-          background-position: center;
+          background-color: var(--opac-background-color-1);
           transition: background-color 180ms ease-in;
+          position: relative;
+
+          span.plus-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/add_to_board_plus.svg");
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+            transition: opacity 180ms ease-in;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+            }
+          }
+
+          span.plus-icon-active {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 180ms ease-in;
+          }
 
           &.scrolled, &:hover {
             background-color: $carrot_green;
+
+            span.plus-icon {
+              opacity: 0;
+            }
+
+            span.plus-icon-active {
+              opacity: 1;
+            }
           }
         }
 

@@ -133,8 +133,6 @@
               {:class (when show-plus-button? "create-post")}
               (if (jwt/jwt)
                 [:div.group
-                  (when-not is-mobile?
-                    (user-notifications))
                   (when show-plus-button?
                     [:button.mlb-reset.navbar-create-bt
                       {:class (utils/class-set {:scrolled @(::scrolled s)})
@@ -145,7 +143,11 @@
                                     (do
                                       (.stopPropagation %)
                                       (ui-compose @(drv/get-ref s :show-add-post-tooltip)))
-                                    (cmail-actions/cmail-toggle-fullscreen))}])
+                                    (cmail-actions/cmail-toggle-fullscreen))}
+                      [:span.plus-icon]
+                      [:span.plus-icon-active]])
+                  (when-not is-mobile?
+                    (user-notifications))
                   [:div.user-menu
                     [:div.user-menu-button
                       {:ref "user-menu"
