@@ -28,6 +28,7 @@
 (def collapsed-foc-height 56)
 (def foc-height 180)
 (def mobile-foc-height 163)
+(def foc-separators-height 50)
 
 (defn- calc-card-height [mobile? foc-layout]
   (cond
@@ -79,13 +80,12 @@
 
 (defn check-pagination [s]
   (let [container-data @(drv/get-ref s :container-data)
-        sorted-items @(drv/get-ref s :filtered-posts)
         next-link (utils/link-for (:links container-data) "next")]
     (reset! (::has-next s) next-link)
     (did-scroll s nil)))
 
 (rum/defc wrapped-stream-item < rum/static
-  [{:keys [key style] :as row-props}
+  [{:keys [style] :as row-props}
    {:keys [entry
            reads-data
            org-data
@@ -98,19 +98,19 @@
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
    [:div.virtualized-list-row
-    {:class (when collapsed-item? "collapsed-item")
-     :style style}
-    (if collapsed-item?
-      (stream-collapsed-item {:activity-data entry
-                              :comments-data comments-data
-                              :read-data reads-data
-                              :show-wrt? show-wrt?
-                              :editable-boards editable-boards})
-      (stream-item {:activity-data entry
-                    :comments-data comments-data
-                    :read-data reads-data
-                    :show-wrt? show-wrt?
-                    :editable-boards editable-boards}))]))
+     {:class (when collapsed-item? "collapsed-item")
+      :style style}
+     (if collapsed-item?
+       (stream-collapsed-item {:activity-data entry
+                               :comments-data comments-data
+                               :read-data reads-data
+                               :show-wrt? show-wrt?
+                               :editable-boards editable-boards})
+       (stream-item {:activity-data entry
+                     :comments-data comments-data
+                     :read-data reads-data
+                     :show-wrt? show-wrt?
+                     :editable-boards editable-boards}))]))
 
 (rum/defc load-more < rum/static
   [{:keys [style]}]
@@ -123,21 +123,59 @@
   [:div.carrot-close
     {:style style}])
 
-(rum/defc virtualized-stream < rum/static
-  [{:keys [items
-           activities-read
-           foc-layout
-           show-loading-more
-           show-carrot-close]
-    :as derivatives}
-   virtualized-props]
+(rum/defc separator-item < rum/static
+  [{:keys [style] :as row-props} {:keys [label] :as props}]
+  [:div.virtualized-list-separator
+    {:style style}
+    label])
+
+(rum/defcs virtualized-stream < rum/static
+                                rum/reactive
+                                (rum/local nil ::last-force-list-update)
+                                (drv/drv :force-list-update)
+                               {:did-remount (fn [o s]
+                                 (when-let [force-list-update @(drv/get-ref s :force-list-update)]
+                                   (when (not= @(::last-force-list-update s) force-list-update)
+                                     (reset! (::last-force-list-update s) force-list-update)
+                                     (.recomputeRowHeights (rum/ref s :virtualized-list-comp))))
+                                 s)}
+  [s {:keys [items
+             activities-read
+             foc-layout
+             show-loading-more
+             show-carrot-close]
+      :as derivatives}
+     virtualized-props]
   (let [{:keys [height
                 isScrolling
                 onChildScroll
                 scrollTop
                 registerChild]} (js->clj virtualized-props :keywordize-keys true)
+        _force-list-update (drv/react s :force-list-update)
         is-mobile? (responsive/is-mobile-size?)
         key-prefix (if is-mobile? "mobile" foc-layout)
+        rowHeight (fn [row-props]
+                    (let [{:keys [index]} (js->clj row-props :keywordize-keys true)
+                          loading-more? (and show-loading-more
+                                             (= index (count items)))
+                          carrot-close? (and show-carrot-close
+                                              (not loading-more?)
+                                              (= index (count items)))
+                          item (when (and (not loading-more?)
+                                           (not carrot-close?))
+                                  (nth items index))
+                          separator-item? (and (not loading-more?)
+                                                (not carrot-close?)
+                                                (= (:content-type item) "separator"))]
+                      (cond
+                        separator-item?
+                        foc-separators-height
+                        loading-more?
+                        (if is-mobile? 44 60)
+                        carrot-close?
+                        72
+                        :else
+                        (calc-card-height is-mobile? foc-layout))))
         row-renderer (fn [row-props]
                        (let [{:keys [key
                                      index
@@ -149,20 +187,28 @@
                              carrot-close? (and show-carrot-close
                                                 (not loading-more?)
                                                 (= index (count items)))
-                             entry (when (and (not loading-more?)
-                                              (not carrot-close?))
-                                     (nth items index))
-                             reads-data (get activities-read (:uuid entry))
+                             item (when (and (not loading-more?)
+                                             (not carrot-close?))
+                                    (nth items index))
+                             separator-item? (and (not loading-more?)
+                                                  (not carrot-close?)
+                                                  (= (:content-type item) "separator"))
+                             reads-data (when (and (not separator-item?)
+                                                   (not loading-more?)
+                                                   (not carrot-close?))
+                                           (get activities-read (:uuid item)))
                              row-key (str key-prefix "-" key)]
                          (cond
-                          carrot-close?
-                           (rum/with-key (carrot-close row-props) row-key)
-                          loading-more?
-                           (rum/with-key (load-more row-props) row-key)
+                           carrot-close?
+                           (rum/with-key (carrot-close row-props) (str "carrot-close-" row-key))
+                           loading-more?
+                           (rum/with-key (load-more row-props) (str "loading-more-" row-key))
+                           separator-item?
+                           (rum/with-key (separator-item row-props item) (str "separator-item-" row-key))
                            :else
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives
-                                                                 {:entry entry
+                                                                 {:entry item
                                                                   :reads-data reads-data
                                                                   :foc-layout foc-layout
                                                                   :is-mobile is-mobile?}))
@@ -171,6 +217,7 @@
       {:ref registerChild
        :key (str "virtualized-list-" key-prefix)}
       (virtualized-list {:autoHeight true
+                         :ref :virtualized-list-comp
                          :height height
                          :width (if is-mobile?
                                   js/window.innerWidth
@@ -181,17 +228,7 @@
                                            show-carrot-close)
                                      (inc (count items))
                                      (count items))
-                         :rowHeight (fn [params]
-                                      (let [{:keys [index]} (js->clj params :keywordize-keys true)]
-                                        (cond
-                                          (and (= index (count items))
-                                               show-loading-more)
-                                          (if is-mobile? 44 60)
-                                          (and (= index (count items))
-                                               show-carrot-close)
-                                          72
-                                          :else
-                                          (calc-card-height is-mobile? foc-layout))))
+                         :rowHeight rowHeight
                          :rowRenderer row-renderer
                          :scrollTop scrollTop
                          :overscanRowCount 20
@@ -201,7 +238,7 @@
                                rum/reactive
                         ;; Derivatives
                         (drv/drv :org-data)
-                        (drv/drv :filtered-posts)
+                        (drv/drv :items-to-render)
                         (drv/drv :container-data)
                         (drv/drv :activities-read)
                         (drv/drv :comments-data)
@@ -253,7 +290,7 @@
         comments-data (drv/react s :comments-data)
         editable-boards (drv/react s :editable-boards)
         container-data (drv/react s :container-data)
-        items (drv/react s :filtered-posts)
+        items (drv/react s :items-to-render)
         activities-read (drv/react s :activities-read)
         foc-layout (drv/react s :foc-layout)]
     [:div.paginated-stream.group

@@ -79,7 +79,7 @@
                                             :org-logo-height :logo-height}))
         comments-drv (drv/react s :comments-data)
         comments-data (au/get-comments activity-data comments-drv)
-        activity-link (utils/link-for (:links org-data) "activity")]
+        activity-link (utils/link-for (:links org-data) "entries")]
     [:div.secure-activity-container
       (login-overlays-handler)
       (when is-showing-alert

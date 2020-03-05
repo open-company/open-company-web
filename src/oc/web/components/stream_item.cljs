@@ -193,7 +193,7 @@
                            :external-follow (not is-mobile?)
                            :show-edit? true
                            :show-delete? true
-                           :show-unread (not is-inbox?)
+                           :show-unread (not (:unread activity-data))
                            :show-move? (not is-mobile?)
                            :show-inbox? is-inbox?
                            :will-close (fn [] (reset! (::force-show-menu s) false))
@@ -204,7 +204,7 @@
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :bookmark-item (:bookmarked activity-data)
+                                :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (or (pos? (:new-comments-count activity-data))
                                                  (:unread activity-data))

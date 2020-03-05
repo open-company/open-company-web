@@ -45,6 +45,7 @@
                               (drv/drv :board-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
+                              (drv/drv :items-to-render)
                               (drv/drv :editable-boards)
                               (drv/drv :show-add-post-tooltip)
                               (drv/drv :current-user-data)
@@ -76,6 +77,7 @@
         board-data (drv/react s :board-data)
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
+        _items-to-render (drv/react s :items-to-render)
         foc-layout (drv/react s :foc-layout)
         _activities-read (drv/react s :activities-read)
         current-board-slug (router/current-board-slug)
@@ -146,7 +148,7 @@
                                    (= current-board-slug "all-posts"))
                           "active")}
                 [:span.tab-icon]
-                [:span.tab-label "All"]]
+                [:span.tab-label "Recent"]]
               [:button.mlb-reset.tab-button.inbox-tab
                 {:on-click #(do
                               (.stopPropagation %)
@@ -233,7 +235,7 @@
                                                    "Unread"
 
                                                    is-all-posts
-                                                   "All posts"
+                                                   "Recent"
 
                                                    is-bookmarks
                                                    "Bookmarks"
