@@ -60,14 +60,16 @@
        :board-slug (:slug board-data)})))
 
 (defn get-board-for-edit [& [board-slug editable-boards]]
-  (let [board-data (if (seq board-slug)
-                    (dis/board-data (router/current-org-slug) board-slug)
-                    (dis/board-data))]
+  (let [sorted-editable-boards (sort-by :name editable-boards)
+        board-data (or
+                    (some #(when (= (:slug %) board-slug) %) sorted-editable-boards)
+                    (some #(when (= (:slug %) (router/current-board-slug)) %) sorted-editable-boards)
+                    (first sorted-editable-boards))]
     (if (or (not board-data)
             (= (:slug board-data) utils/default-drafts-board-slug)
             (:draft board-data)
             (not (utils/link-for (:links board-data) "create")))
-      (get-default-section editable-boards)
+      (get-default-section sorted-editable-boards)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
 
