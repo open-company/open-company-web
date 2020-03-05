@@ -224,9 +224,9 @@ nav.oc-navbar {
           border-radius: 50%;
           width: 32px;
           height: 32px;
+          position: relative;
           background-color: var(--opac-background-color-1);
           transition: background-color 180ms ease-in;
-          position: relative;
 
           span.plus-icon {
             position: absolute;
