@@ -397,7 +397,6 @@ function PlaceCaretAtEnd(el) {
         this.base.checkContentChanged();
       }
       this._waitingCB = false;
-      console.log("DBG adding poll", pollId);
       setTimeout(this.togglePicker.bind(this), 100);
     },
 
