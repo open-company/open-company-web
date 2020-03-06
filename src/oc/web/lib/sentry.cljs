@@ -5,7 +5,7 @@
             [cljsjs.sentry-browser]
             [taoensso.timbre :as timbre]))
 
-(defonce sentry-hub (atom nil))
+(defonce ^{:export true} sentry-hub (atom nil))
 
 (defn init-parameters [dsn]
   #js {:whitelistUrls ls/local-whitelist-array
