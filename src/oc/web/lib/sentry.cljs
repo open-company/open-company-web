@@ -49,7 +49,7 @@
   (timbre/info "Capture message:" msg)
   (.captureMessage (sentry) msg (or log-level "info")))
 
-(defn test-sentry []
+(defn ^:export test-sentry []
   (js/setTimeout #(capture-message! "Message from clojure") 1000)
   (try
     (throw (js/errorThrowingCode.))
