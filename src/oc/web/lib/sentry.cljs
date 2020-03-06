@@ -7,6 +7,9 @@
 
 (defonce ^{:export true} sentry-hub (atom nil))
 
+(defn- sentry []
+  (or @sentry-hub js/Sentry))
+
 (defn init-parameters [dsn]
   #js {:whitelistUrls ls/local-whitelist-array
        :tags #js {:isMobile (responsive/is-mobile-size?)
@@ -37,14 +40,14 @@
 (defn capture-error!
   ([e]
     (timbre/info "Capture error:" e)
-    (.captureException js/Sentry e))
+    (.captureException (sentry) e))
   ([e error-info]
     (timbre/info "Capture error:" e "extra:" error-info)
-    (.captureException js/Sentry e #js {:extra error-info})))
+    (.captureException (sentry) e #js {:extra error-info})))
 
 (defn capture-message! [msg & [log-level]]
   (timbre/info "Capture message:" msg)
-  (.captureMessage js/Sentry msg (or log-level "info")))
+  (.captureMessage (sentry) msg (or log-level "info")))
 
 (defn test-sentry []
   (js/setTimeout #(capture-message! "Message from clojure") 1000)
@@ -61,13 +64,13 @@
 
 (defn capture-message-with-extra-context! [ctx message]
   (timbre/info "Capture message:" message "with context:" ctx)
-  (.withScope js/Sentry (fn [scope]
+  (.withScope (sentry) (fn [scope]
     (set-extra-context! scope ctx)
     (capture-message! message))))
 
 (defn capture-error-with-extra-context! [ctx error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message "with context:" ctx)
-  (.withScope js/Sentry (fn [scope]
+  (.withScope (sentry) (fn [scope]
     (set-extra-context! scope ctx)
     (let [err (js/Error. (or error-message error-name))]
       (set! (.-name err) (or error-name "Error"))
