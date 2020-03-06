@@ -9,11 +9,16 @@
       [:section.cta.group
 
         [:h1.headline
-          "When chat gets too noisy"]
-        [:div.subheadline
+          "Where remote teams have real discussions"]
+        [:div.subheadline.big-web-only
           (str
-           "Carrot simplifies asynchronous communication for remote teams "
-           "so everyone stays informed with fewer interruptions.")]
+           "It’s hard for distributed teams to stay in-sync with chat alone. "
+           "Carrot makes asynchronous communication less noisy so it's easier "
+           "to stay engaged and informed without the chatter.")]
+        [:div.subheadline.mobile-only
+          (str
+           "Carrot makes asynchronous communication less "
+           "noisy so everyone can stay informed with fewer interruptions.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action

@@ -268,9 +268,9 @@
   [:div.pricing-table.group
     [:div.pricing-table-left
       [:div.pricing-table-left-price
-        "$3.25"]
+        "$0"]
       [:div.pricing-table-left-subprice
-        "/month per user"]]
+        "for teams of up to 20 people"]]
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
@@ -290,6 +290,8 @@
          :href "mailto:hello@carrot.io"}
         "Let’s chat about our Enterprise plan."]]])
 
+(def pricing-headline "Simple pricing, and free for small teams")
+
 (def pricing-chat
   [:div.pricing-subheadline
     "Questions? "
@@ -298,13 +300,11 @@
        :href "mailto:hello@carrot.io"}
       "Let's chat"]])
 
-(def pricing-headline "Free for small teams.")
-
 (def pricing-footer
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      pricing-headline]
+      pricing-headline]    
 
     pricing-table
     
