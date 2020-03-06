@@ -14,7 +14,7 @@
           (str
            "It’s hard for distributed teams to stay in-sync with chat alone. "
            "Carrot makes asynchronous communication less noisy so it's easier "
-           "to stay engaged and informed without the chatter.")]
+           "to stay engaged without the chatter.")]
         [:div.subheadline.mobile-only
           (str
            "Carrot makes asynchronous communication less "
