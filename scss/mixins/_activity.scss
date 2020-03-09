@@ -1137,7 +1137,8 @@ $h2_top_margin: 24;
 
   div.media-poll {
     display: block;
-    margin-right: 8px;
+    margin: 0;
+    padding: 0;
 
     &:before {
       content: "";
@@ -1154,6 +1155,10 @@ $h2_top_margin: 24;
       @include OC_Body_Book();
       content: attr(data-question);
       display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       @include dark_mode() {
         background-image: cdnUrl("/img/ML/media_poll@dark.svg");
