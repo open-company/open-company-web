@@ -74,24 +74,24 @@ function PlaceCaretAtEnd(el) {
 
     init: function(){
       rangy.init();
+      var editor = this.getEditorElements()[0];
       // Create picker
       if (this.inlinePlusButtonOptions.inlineButtons) {
         this.pickerElement = this.createPicker();
-        this.getEditorElements()[0].parentNode.appendChild(this.pickerElement);
+        editor.parentNode.appendChild(this.pickerElement);
       }
       // Picker button events
-      this.getEditorElements().forEach(function(element){
-        if (this.inlinePlusButtonOptions.inlineButtons) {
-          this.on(element, 'click', this.togglePicker.bind(this));
-          this.on(element, 'keyup', this.togglePicker.bind(this));
-          this.on(element, 'focus', this.onFocus.bind(this));
-          this.on(element, 'paste', this.togglePicker.bind(this));
-          this.subscribe('editableKeydown', this.onKeydown.bind(this));
-          this.subscribe('editableInput', this.togglePicker.bind(this));
-        }
-        // this.on(element, 'blur', this.hide.bind(this));
-        this.on(this.window, 'click', this.windowClick.bind(this));
-      }, this);
+      if (this.inlinePlusButtonOptions.inlineButtons) {
+        this.on(editor, 'click', this.checkAvailableParagraph.bind(this));
+        this.on(editor, 'click', this.togglePicker.bind(this));
+        this.on(editor, 'keyup', this.togglePicker.bind(this));
+        this.on(editor, 'focus', this.onFocus.bind(this));
+        this.on(editor, 'paste', this.togglePicker.bind(this));
+        this.subscribe('editableKeydown', this.onKeydown.bind(this));
+        this.subscribe('editableInput', this.togglePicker.bind(this));
+      }
+      // this.on(editor, 'blur', this.hide.bind(this));
+      this.on(this.window, 'click', this.windowClick.bind(this));
 
       MediumEditor.Extension.prototype.init.apply(this, arguments);
       // Initialize tooltips
@@ -103,24 +103,50 @@ function PlaceCaretAtEnd(el) {
       }
     },
 
+    checkAvailableParagraph: function() {
+      var editor = this.getEditorElements()[0];
+      if (editor.childNodes.length == 1 &&
+          editor.firstElementChild.nodeName.toLowerCase() !== 'p') {
+        var newParagraph = this.appendParagraph();
+        this.moveCaret($(newParagraph), 0);
+      }
+    },
+
+    appendParagraph: function() {
+      var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
+      var newParagraph = this.document.createElement('p');
+      newParagraph.innerHTML = "<br/>";
+      meEl.appendChild(newParagraph);
+      return newParagraph;
+    },
+
+    prependParagraph: function() {
+      var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
+      var newParagraph = this.document.createElement('p');
+      newParagraph.innerHTML = "<br/>";
+      meEl.insertBefore(newParagraph, meEl.firstElementChild);
+      return newParagraph;
+    },
+
     onKeydown: function(keydownEvent) {
       if (MediumEditor.util.isKey(keydownEvent, [40])) {
         // In case the last child of the editor is a poll add a new paragraph when user press down arrow
         var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
-        if (meEl && meEl.lastElementChild && meEl.lastElementChild.nodeName.toLowerCase() == "div" && meEl.lastElementChild.classList.contains("media-poll")) {
-          var newParagraph = this.document.createElement('p');
-          newParagraph.innerHTML = "<br/>";
-          meEl.appendChild(newParagraph);
+        if (meEl &&
+            meEl.lastElementChild &&
+            meEl.lastElementChild.nodeName.toLowerCase() == "div" &&
+            meEl.lastElementChild.classList.contains("media-poll")) {
+          this.appendParagraph();
         }
       }
 
       if (MediumEditor.util.isKey(keydownEvent, [38])) {
-        // In case the last child of the editor is a poll add a new paragraph when user press down arrow
-        var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
-        if (meEl && meEl.firstElementChild && meEl.firstElementChild.nodeName.toLowerCase() == "div" && meEl.firstElementChild.classList.contains("media-poll")) {
-          var newParagraph = this.document.createElement('p');
-          newParagraph.innerHTML = "<br/>";
-          meEl.insertBefore(newParagraph, meEl.firstElementChild);
+        if (meEl &&
+            meEl.firstElementChild &&
+            meEl.firstElementChild.nodeName.toLowerCase() == "div" &&
+            meEl.firstElementChild.classList.contains("media-poll")) {
+          // In case the last child of the editor is a poll add a new paragraph when user press down arrow
+          this.prependParagraph();
         }
       }
     },
@@ -227,7 +253,7 @@ function PlaceCaretAtEnd(el) {
 
     /**/
     getAddableElement: function(element) {
-      // If the element is not a P or a DIV clib the tree back to the first P or DIV
+      // If the element is not a P or a DIV climb the tree back to the first P or DIV
       while(!MediumEditor.util.isMediumEditorElement(element) &&  element.tagName !== "DIV" && element.tagName !== "P") {
         element = element.parentNode;
       }
@@ -365,35 +391,32 @@ function PlaceCaretAtEnd(el) {
         if (element.tagName == "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
           // we need to add a DIV to insert the poll in
           div = this.document.createElement("div");
+          var tempParagraph = this.appendParagraph();
           element.appendChild(div);
+          element = tempParagraph;
         } else if (element.tagName == "DIV"){
           // if it's a DIV we clean out the content
           div.innerHTML = "";
         } else if (element.tagName == "P"){
-          // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
-            // remove it
-            element.removeChild(element.childNodes[0]);
+          var editor = this.getEditorElements()[0],
+              div = this.document.createElement("div");
+          if (editor && editor.firstElementChild === element) {
+            // Add a div below it
+            element.parentNode.appendChild(div);
+          } else if (editor && editor.lastElementChild === element) {
+            element.parentNode.insertBefore(div, element);
+          } else {
+            // Replace current P with the div
+            element.parentNode.replaceChild(div, element);
           }
-          p = element;
-
-          // Remove p and replace it with a DIV
-          div = this.document.createElement("div");
-          element.appendChild(div);
-          p.parentNode.replaceChild(div, element);
         }
 
-        div.className = "carrot-no-preview group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.className = "group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
         div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
         div.setAttribute("contenteditable", false);
         div.dataset.mediaType = "poll";
         div.dataset.pollId = pollId;
 
-        var nextP = this.document.createElement("p");
-        var br = this.document.createElement("br");
-        nextP.appendChild(br);
-        this.insertAfter(nextP, div);
-        this.moveCaret($(nextP), 0);
         this.base.checkContentChanged();
       }
       this._waitingCB = false;
@@ -860,19 +883,21 @@ function PlaceCaretAtEnd(el) {
       return (el.tagName == "BR");
     },
 
-    paragraphIsEmpty: function(element){
+    isEmptyParagraph: function(element){
       // Empty body
-      if (element.childNodes.length == 0 && $(element).html() == "") {
+      if (element && element.nodeName.toLowerCase() == 'p' && element.childNodes.length == 0 && $(element).html() == "") {
         return true;
       }
-      // Empty body like: <p><br/><p/>
-      if ((element.childNodes.length == 1 &&
-           this.isBR(element.childNodes[0])) ||
-          (element.childNodes.length == 2 &&
-            ((this.isBR(element.childNodes[0]) &&
-              this.isRangySelectionBoundary(element.childNodes[1])) ||
-             (this.isBR(element.childNodes[1]) &&
-              this.isRangySelectionBoundary(element.childNodes[0]))))) {
+      if (element && element.nodeName.toLowerCase() == 'p' &&
+          ( // Empty paragraph like: <p><br/><p/>
+            (element.childNodes.length == 1 &&
+             this.isBR(element.childNodes[0])) ||
+            // Empty paragraph like: <p><br/><span class="rangySelectionBoundary"></span><p/>
+            (element.childNodes.length == 2 &&
+             ((this.isBR(element.childNodes[0]) &&
+               this.isRangySelectionBoundary(element.childNodes[1])) ||
+              (this.isBR(element.childNodes[1]) &&
+               this.isRangySelectionBoundary(element.childNodes[0])))))) {
         return true;
       }
       return false;
@@ -907,14 +932,13 @@ function PlaceCaretAtEnd(el) {
           }else {
             element = sel.getRangeAt(0).commonAncestorContainer;
           }
+
           this.initialButtonsShown = true;
-          if (sel !== undefined || element !== undefined) {
-            if (this.paragraphIsEmpty(element)){
-              this._lastParagraphElement = element;
-              this.repositionMediaPicker();
-              this.show();
-              return;
-            }
+          if (element && (MediumEditor.util.isMediumEditorElement(element) || this.isEmptyParagraph(element))) {
+            this._lastParagraphElement = element;
+            this.repositionMediaPicker();
+            this.show();
+            return;
           }
         }
         this.hide();
