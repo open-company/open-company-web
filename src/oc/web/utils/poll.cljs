@@ -45,9 +45,9 @@
     (assoc activity-data :polls
      (mapv (fn [poll]
       (-> poll
-       (dissoc :links )
+       (dissoc :links :preview)
        (update :replies
         (fn [replies]
-         (mapv #(dissoc % :links :preview) replies)))))
+         (mapv #(dissoc % :links) replies)))))
       (:polls activity-data)))
     activity-data))
