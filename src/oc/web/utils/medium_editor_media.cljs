@@ -5,7 +5,7 @@
             [cljsjs.medium-editor]
             [cuerdas.core :as string]
             [cljsjs.react-giphy-selector]
-            [oops.core :refer (oget oget+)]
+            [oops.core :refer (oget)]
             [org.martinklepsch.derivatives :as drv]
             [clojure.contrib.humanize :refer (filesize)]
             [oc.web.lib.jwt :as jwt]
@@ -31,13 +31,15 @@
 ;; Polls
 
 (defn add-poll [s options editable]
-  (when-not (:use-inline-media-picker options)
-    (let [editable (or editable (get-media-picker-extension s))]
-      (.saveSelection editable)))
-  (let [poll-id (poll-utils/new-poll-id)
-        dispatch-input-key (:dispatch-input-key options)]
-    (poll-actions/add-poll dispatch-input-key poll-id)
-    (.addPoll editable poll-id)))
+  (let [delay (if (:collapsed (:cmail-state @dis/app-state)) 500 0)]
+    (utils/maybe-after delay #(do
+     (when-not (:use-inline-media-picker options)
+       (let [editable (or editable (get-media-picker-extension s))]
+         (.saveSelection editable)))
+       (let [poll-id (poll-utils/new-poll-id)
+             dispatch-input-key (:dispatch-input-key options)]
+         (.addPoll editable poll-id)
+         (poll-actions/add-poll dispatch-input-key poll-id))))))
 
 ;; Gif handling
 
@@ -47,14 +49,14 @@
 (defn media-gif-add [s editable gif-data]
   (if (nil? gif-data)
     (.addGIF editable nil nil nil nil)
-    (let [original (oget+ gif-data ["images" "original"])
-          original-url (or (oget+ original "?url")
-                           (oget+ original "?gif_url"))
-          fixed-width-still (oget+ gif-data ["images" "fixed_width_still"])
-          fixed-width-still-url (or (oget+ fixed-width-still "?url")
-                                    (oget+ fixed-width-still "?gif_url"))
-          original-width (oget+ original "width")
-          original-height (oget+ original "height")]
+    (let [original (oget gif-data ["images" "original"])
+          original-url (or (oget original "?url")
+                           (oget original "?gif_url"))
+          fixed-width-still (oget gif-data ["images" "fixed_width_still"])
+          fixed-width-still-url (or (oget fixed-width-still "?url")
+                                    (oget fixed-width-still "?gif_url"))
+          original-width (oget original "width")
+          original-height (oget original "height")]
       (.addGIF
        editable
        original-url
