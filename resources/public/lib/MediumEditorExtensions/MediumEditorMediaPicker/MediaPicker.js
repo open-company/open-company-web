@@ -887,7 +887,7 @@ function PlaceCaretAtEnd(el) {
       return (element &&
               element.nodeName.toLowerCase() == 'p' &&
               ( // Paragraph without childrens
-                element.childNodes.length == 0
+                element.childNodes.length == 0 ||
                 // Empty paragraph like: <p><br/><p/>
                 (element.childNodes.length == 1 &&
                  this.isBR(element.childNodes[0])) ||
