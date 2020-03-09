@@ -216,6 +216,8 @@ $h2_top_margin: 24;
 
 @mixin poll() {
   div.oc-poll-container {
+    margin: 0 0 10px;
+
     div.poll {
       width: 100%;
       display: inline-block;
