@@ -152,10 +152,10 @@
 
     (dashed-string 2)
 
-    (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
+    ; (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
     (testimonial-block :ifttt "mobile-only")
 
-    (dashed-string 3)
+    (dashed-string 3 "mobile-only")
 
     (if (= page :slack)
       (testimonials-screenshot-block :stay-in-sync-slack "mobile-only")
@@ -173,9 +173,9 @@
                     (cdn "/img/ML/testimonials_floated_screenshot_1@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
-            "What’s new"]
+            "Space to say more"]
           [:div.testimonials-floated-subheader
-            "Get caught up - fast - and let Carrot help you filter out the discussions you don't want to follow."]]]
+            "Carrot gives you room to share longer updates that convey more information. Viewers get a quick summary to know what matters."]]]
 
       [:div.testimonials-floated-block-inner.right-block.group
         [:img.testimonials-floated-screenshot
@@ -189,8 +189,7 @@
             "Clear, organized discussions"]
           [:div.testimonials-floated-subheader
             (str
-             "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal "
-             "for remote teams.")]]]
+             "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal for remote teams.")]]]
 
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
@@ -220,7 +219,9 @@
           (if (= page :slack)
             [:img.testimonials-commgaps-column-screenshot
               {:src (cdn "/img/ML/testimonials_commgaps_slack_digest.png")
-               :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x")}]
+               :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x, "
+                            (cdn "/img/ML/testimonials_commgaps_slack_digest@3x.png") " 3x, "
+                            (cdn "/img/ML/testimonials_commgaps_slack_digest@4x.png") " 4x")}]
             [:img.testimonials-commgaps-column-screenshot
               {:src (cdn "/img/ML/testimonials_commgaps_email.png")
                :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x, "
