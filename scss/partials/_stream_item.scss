@@ -602,10 +602,6 @@ div.stream-item {
           font-weight: normal;
         }
 
-        .carrot-no-preview {
-          display: none;
-        }
-
         @include mobile() {
           @include activity-body(16, 20, var(--color));
           line-height: 20px;
@@ -616,6 +612,8 @@ div.stream-item {
             line-height: 20px;
           }
         }
+
+        @include activity-body-preview(16, 20);
       }
     }
 

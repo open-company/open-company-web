@@ -1,6 +1,5 @@
 (ns oc.web.actions.poll
   (:require [taoensso.timbre :as timbre]
-            [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.api :as api]
             [oc.web.utils.poll :as pu]
             [oc.web.dispatcher :as dis]
@@ -15,13 +14,14 @@
   (let [cur-user (dis/current-user-data)
         polls-key (if (coll? dispatch-key)
                     (vec (conj dispatch-key :polls))
-                    [dispatch-key :polls])]
-    (dis/dispatch! [:update polls-key #(vec (conj % (pu/poll-data cur-user poll-id)))])))
+                    [dispatch-key :polls])
+        poll-data (pu/poll-data cur-user poll-id)]
+    (dis/dispatch! [:update polls-key #(vec (conj % poll-data))])))
 
 (defn remove-poll [dispatch-key poll-data]
   (timbre/info "Remove poll" dispatch-key (:poll-uuid poll-data))
   (dis/dispatch! [:update (vec (conj dispatch-key :polls)) (fn [polls] (filterv #(not= (:poll-uuid %) (:poll-uuid poll-data)) polls))])
-  (when-let [poll-element (sel1 (keyword (str "." pu/poll-selector-prefix (:poll-uuid poll-data))))]
+  (when-let [poll-element (pu/get-poll-portal-element (:poll-uuid poll-data))]
     (.removeChild (.-parentElement poll-element) poll-element)))
 
 (defn remove-poll-for-max-retry [dispatch-key poll-data]
@@ -34,8 +34,9 @@
 (defn hide-preview [poll-key]
   (dis/dispatch! [:update poll-key #(dissoc % :preview)]))
 
-(defn update-question [poll-key question]
-  (dis/dispatch! [:input (vec (conj poll-key :question)) question]))
+(defn update-question [poll-key poll-data question]
+  (dis/dispatch! [:input (vec (conj poll-key :question)) question])
+  (utils/after 0 #(pu/set-poll-element-question! (:poll-uuid poll-data) question)))
 
 ;; Replies
 

@@ -1,11 +1,15 @@
 (ns oc.web.utils.poll
-  (:require [oc.lib.user :as user-lib]
+  (:require [oops.core :refer (oget oset!)]
+            [dommy.core :as dommy :refer-macros (sel1)]
+            [oc.lib.user :as user-lib]
             [oc.web.local-settings :as ls]
             [oc.web.lib.utils :as utils]))
 
 (defonce ^:export poll-selector-prefix "oc-poll-portal-")
 
 (defonce min-poll-replies 2)
+(defonce max-question-length 128)
+(defonce max-reply-length 30)
 
 (defn created-at []
   (utils/as-of-now))
@@ -51,3 +55,12 @@
          (mapv #(dissoc % :links) replies)))))
       (:polls activity-data)))
     activity-data))
+
+;; Dom manipulation
+
+(defn get-poll-portal-element [poll-uuid]
+  (sel1 (str "." poll-selector-prefix poll-uuid)))
+
+(defn set-poll-element-question! [poll-uuid question-string]
+  (when-let [portal-el (get-poll-portal-element poll-uuid)]
+    (oset! portal-el "dataset.!question" question-string)))
