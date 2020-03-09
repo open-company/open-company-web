@@ -558,6 +558,7 @@ $h2_top_margin: 24;
             position: relative;
             display: block;
             float: left;
+            max-width: calc(100% - 60px);
 
             div.poll-reply-body {
               overflow: hidden;
@@ -580,7 +581,8 @@ $h2_top_margin: 24;
             line-height: 32px;
             color: var(--light-color);
             text-align: right;
-            padding-right: 8px;
+            padding-left: 8px;
+            max-width: 60px;
           }
         }
 
