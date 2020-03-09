@@ -884,23 +884,19 @@ function PlaceCaretAtEnd(el) {
     },
 
     isEmptyParagraph: function(element){
-      // Empty body
-      if (element && element.nodeName.toLowerCase() == 'p' && element.childNodes.length == 0 && $(element).html() == "") {
-        return true;
-      }
-      if (element && element.nodeName.toLowerCase() == 'p' &&
-          ( // Empty paragraph like: <p><br/><p/>
-            (element.childNodes.length == 1 &&
-             this.isBR(element.childNodes[0])) ||
-            // Empty paragraph like: <p><br/><span class="rangySelectionBoundary"></span><p/>
-            (element.childNodes.length == 2 &&
-             ((this.isBR(element.childNodes[0]) &&
-               this.isRangySelectionBoundary(element.childNodes[1])) ||
-              (this.isBR(element.childNodes[1]) &&
-               this.isRangySelectionBoundary(element.childNodes[0])))))) {
-        return true;
-      }
-      return false;
+      return (element &&
+              element.nodeName.toLowerCase() == 'p' &&
+              ( // Paragraph without childrens
+                element.childNodes.length == 0
+                // Empty paragraph like: <p><br/><p/>
+                (element.childNodes.length == 1 &&
+                 this.isBR(element.childNodes[0])) ||
+                // Empty paragraph like: <p><br/><span class="rangySelectionBoundary"></span><p/>
+                (element.childNodes.length == 2 &&
+                 ((this.isBR(element.childNodes[0]) &&
+                   this.isRangySelectionBoundary(element.childNodes[1])) ||
+                  (this.isBR(element.childNodes[1]) &&
+                   this.isRangySelectionBoundary(element.childNodes[0]))))));
     },
 
     delayedRepositionMediaPicker: function() {
