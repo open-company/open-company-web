@@ -1126,9 +1126,10 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin activity-body-preview($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $paragraph_spacing: $line_height){
-
-  @include activity-body($font_size, $line_height, $color, $paragraph_spacing);
+@mixin activity-body-preview($font_size: 16, $line_height: $bottom_margin, $color: var(--color), $preview_lines: 2){
+  @include activity-body($font_size, $line_height, $color, 0);
+  max-height: #{$line_height * $preview_lines}px;
+  overflow: hidden;
 
   .carrot-no-preview {
     display: none;
@@ -1158,5 +1159,17 @@ $h2_top_margin: 24;
         background-image: cdnUrl("/img/ML/media_poll@dark.svg");
       }
     }
+  }
+
+  h2 {
+    color: var(--color);
+    @include OC_Body_Book();
+    font-size: #{$font_size}px;
+    line-height: #{$line_height}px;
+  }
+
+  b, strong, &.editing b, &.editing strong {
+    @include OC_Body_Book();
+    font-weight: normal;
   }
 }

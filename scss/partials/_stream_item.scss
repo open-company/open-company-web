@@ -582,38 +582,13 @@ div.stream-item {
       }
 
       div.stream-item-body {
-        @include activity-body(16, 20, var(--color));
-        color: var(--color);
-        @include OC_Body_Book();
-        line-height: 20px;
-        overflow: hidden;
-
-        max-height: #{20 * 2}px;
-
-        h2 {
-          color: var(--color);
-          @include OC_Body_Book();
-          font-size: 16px;
-          line-height: 20px;
-        }
-
-        b, strong, &.editing b, &.editing strong {
-          @include OC_Body_Book();
-          font-weight: normal;
-        }
+        @include activity-body-preview(16, 20, var(--color), 2);
 
         @include mobile() {
-          @include activity-body(16, 20, var(--color));
-          line-height: 20px;
-          max-height: #{20 * 2}px;
-
-          h2 {
-            font-size: 16px;
-            line-height: 20px;
-          }
+          @include activity-body-preview(16, 20, var(--color), 2);
         }
 
-        @include activity-body-preview(16, 20);
+        
       }
     }
 
