@@ -12,13 +12,13 @@
           "Where remote teams have real discussions"]
         [:div.subheadline.big-web-only
           (str
-           "It’s hard for distributed teams to stay in-sync with chat alone. "
+           "It’s hard for remote teams to stay in-sync with chat alone. "
            "Carrot makes asynchronous communication less noisy so it's easier "
            "to stay engaged without the chatter.")]
         [:div.subheadline.mobile-only
           (str
-           "Carrot makes asynchronous communication less "
-           "noisy so everyone can stay informed with fewer interruptions.")]
+           "Carrot makes asynchronous communication less noisy so it’s easier "
+           "to stay engaged without the chatter.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
