@@ -48,7 +48,7 @@
                          (:boards org-data))
         current-board-slug (:board (:route @router/path))
         editing-board (when (seq editable-boards)
-                        (cmail-actions/get-board-for-edit (when (not (dispatcher/is-container? current-board-slug)) current-board-slug) editable-boards))
+                        (cmail-actions/get-board-for-edit (when-not (dispatcher/is-container? current-board-slug) current-board-slug) editable-boards))
         next-db (if (and (not (contains? db :cmail-state))
                          editing-board)
                   (-> db
