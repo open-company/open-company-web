@@ -1,17 +1,35 @@
 div.medium-editor-toolbar {
   border-radius: 6px;
-  padding: 9px;
   background: none;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   border: none;
-  background-color: var(--color);
 
   &:after {
     display: none;
   }
 
+  div.medium-editor-toolbar-form {
+    background-color: var(--color);
+    padding: 0 0 0 6px;
+    border-radius: 6px;
+
+    &, input {
+      background-color: var(--color);
+      color: var(--overlay-background-color);
+    }
+
+
+    a {
+      color: var(--overlay-background-color);
+    }
+  }
+
   ul.medium-editor-toolbar-actions {
     position: relative;
+    background-color: var(--color);
+    padding: 9px;
+    border-radius: 6px;
+    height: 42px;
 
     &:after {
       display: none;
