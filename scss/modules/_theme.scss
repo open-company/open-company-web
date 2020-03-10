@@ -87,8 +87,9 @@ $dark_mode: "dark";
   --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
 
   // Code blocks
-  --pre-background-color: #{rgba($deep_navy, 0.08)};
-  --pre-border-color: #{rgba($deep_navy, 0.24)};
+  --code-background-color: #{rgba($deep_navy, 0.08)};
+  --code-border-color: #{rgba($deep_navy, 0.24)};
+  --inline-color: #FB4884;
 
   html, body {
     scrollbar-color: light;
@@ -173,8 +174,9 @@ $dark_mode: "dark";
   --ui-theme-border-color: #{rgba(white, 0.22)};
 
   // Code blocks
-  --pre-background-color: #2C313A;
-  --pre-border-color: #{rgba(white, 0.32)};
+  --code-background-color: #2C313A;
+  --code-border-color: #{rgba(white, 0.32)};
+  --inline-color: #FF5D93;
 
   &, body {
     scrollbar-color: dark;

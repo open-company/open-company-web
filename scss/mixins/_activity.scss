@@ -216,12 +216,12 @@ $h2_top_margin: 24;
 
 @mixin code-blocks($font-size, $line-height) {
   pre {
-    font-family: Menlo;
+    font-family: 'IBM Plex Mono', monospace;
     color: var(--color);
     font-size: 14px;
     line-height: $line-height;
-    background-color: var(--pre-background-color);
-    border: 1px solid var(--pre-border-color);
+    background-color: var(--code-background-color);
+    border: 1px solid var(--code-border-color);
     border-radius: 4px;
     overflow-x: auto;
     white-space: pre;
@@ -239,14 +239,15 @@ $h2_top_margin: 24;
   }
 
   code {
-    color: var(--color);
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--inline-color);
     font-size: $font-size;
     line-height: $line-height;
-    background-color: var(--pre-background-color);
-    border: 1px solid var(--pre-border-color);
+    background-color: var(--code-background-color);
+    border: 1px solid var(--code-border-color);
     border-radius: 4px;
     white-space: pre-wrap;
-    padding: 0 4px;
+    padding: 2px 1px 1px;
   }
 }
 
@@ -447,7 +448,7 @@ $h2_top_margin: 24;
     background-color: transparent!important;
   }
 
-  @include code-blocks(#{$font_size}px, #{$line_height}px);
+  @include code-blocks(#{$font_size - 3}px, #{$line_height - 3}px);
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -765,5 +766,5 @@ $h2_top_margin: 24;
     background-color: transparent!important;
   }
 
-  @include code-blocks($font-size, $line-height);
+  @include code-blocks(#{int($font-size) - 3}px, #{int($line-height) - 3}px);
 }
