@@ -134,7 +134,7 @@
             {:type "text"
              :ref :question
              :max-length poll-utils/max-question-length
-             :tab-index "1"
+             :tab-index "0"
              :placeholder "Ask your question..."
              :value (:question poll-data)
              :on-change #(poll-actions/update-question poll-key poll-data (.. % -target -value))}]
@@ -146,7 +146,7 @@
                 (str "Choice " (inc idx))]
               [:input.poll-reply-body
                 {:type "text"
-                 :tab-index (+ idx 2)
+                 :tab-index "0"
                  :value (:body reply)
                  :max-length poll-utils/max-reply-length
                  :placeholder (str "Choice " (inc idx))
@@ -187,10 +187,17 @@
 
 (rum/defcs poll-portal < rum/static
                          (rum/local 0 ::retry)
-                         {:after-render (fn [s]
+                         (rum/local false ::mounted)
+                         {:will-mount (fn [s]
+                           ;; Set mounted true in will-mount since the first
+                           ;; after-render is called before did-mount
+                           (reset! (::mounted s) true)
+                           s)
+                          :after-render (fn [s]
                           (let [retry @(::retry s)]
                             (utils/after (* 180 (inc retry))
-                             #(let [retry? (not (rum/dom-node s))]
+                             #(let [retry? (when @(::mounted s)
+                                             (not (rum/dom-node s)))]
                                 (when (and retry?
                                            (< retry max-mount-retry))
                                   (swap! (::retry s) inc))
@@ -205,6 +212,9 @@
                           s)
                           :did-remount (fn [_ s]
                            (reset! (::retry s) 0)
+                           s)
+                          :will-unmount (fn [s]
+                           (reset! (::mounted s) false)
                            s)}
   [s {:keys [poll-portal-selector poll-data poll-key container-selector activity-data] :as props}]
   (when-let [portal-element (sel1 [container-selector poll-portal-selector])]
