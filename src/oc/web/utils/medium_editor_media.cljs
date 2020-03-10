@@ -400,6 +400,7 @@
                      :imageDragging false
                      :targetBlank true
                      :autoLink true
+                     :spellcheck false
                      :anchor #js {:customClassOption nil
                                   :customClassOptionText "Button"
                                   :linkValidation true
