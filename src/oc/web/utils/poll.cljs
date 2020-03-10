@@ -77,5 +77,5 @@
                                                :poll-updated-at (:updated-at poll-data)
                                                :org-slug (router/current-org-slug)
                                                :container-selector container-selector
-                                               :win-url (.-location js/window)}
+                                               :win-url (.. js/window -location -href)}
    "Failed creating portal for poll"))
