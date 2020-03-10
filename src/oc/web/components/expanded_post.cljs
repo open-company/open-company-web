@@ -246,6 +246,7 @@
                         :editing? false
                         :current-user-id current-user-id
                         :container-selector "div.expanded-post"
+                        :activity-data activity-data
                         :dispatch-key (dis/activity-key (:slug org-data) (:uuid activity-data))}))
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?

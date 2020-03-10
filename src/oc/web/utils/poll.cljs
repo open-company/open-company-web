@@ -2,8 +2,10 @@
   (:require [oops.core :refer (oget oset!)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.lib.user :as user-lib]
+            [oc.web.router :as router]
             [oc.web.local-settings :as ls]
-            [oc.web.lib.utils :as utils]))
+            [oc.web.lib.utils :as utils]
+            [oc.web.lib.sentry :as sentry]))
 
 (defonce ^:export poll-selector-prefix "oc-poll-portal-")
 
@@ -64,3 +66,16 @@
 (defn set-poll-element-question! [poll-uuid question-string]
   (when-let [portal-el (get-poll-portal-element poll-uuid)]
     (oset! portal-el "dataset.!question" question-string)))
+
+;; Poll helpers
+
+(defn report-unmounted-poll
+  [{:keys [activity-data poll-data container-selector] :as _props}]
+  (sentry/capture-message-with-extra-context! {:poll-uuid (:poll-uuid poll-data)
+                                               :activity-uuid (:uuid activity-data)
+                                               :revision-id (:revision-id activity-data)
+                                               :poll-updated-at (:updated-at poll-data)
+                                               :org-slug (router/current-org-slug)
+                                               :container-selector container-selector
+                                               :win-url (.-location js/window)}
+   "Failed creating portal for poll"))

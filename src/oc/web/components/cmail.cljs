@@ -781,7 +781,8 @@
                               :editing? true
                               :current-user-id (jwt/user-id)
                               :container-selector "div.cmail-content"
-                              :dispatch-key :cmail-data}))]]
+                              :dispatch-key :cmail-data
+                              :activity-data cmail-data}))]]
       (when-not is-fullscreen?
         [:div.cmail-footer
           (when-not is-fullscreen?

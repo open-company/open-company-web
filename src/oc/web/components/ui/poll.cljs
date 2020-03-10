@@ -45,7 +45,8 @@
                                       :voted (and (not @(::adding-reply s))
                                                   reply-voted?)})}
             [:button.mlb-reset.poll-reply
-              {:on-click (when can-vote?
+              {:type "button"
+               :on-click (when can-vote?
                            #(if reply-voted?
                               (poll-actions/unvote-reply poll-data poll-key (:reply-id reply))
                               (poll-actions/vote-reply poll-data poll-key (:reply-id reply))))}
@@ -78,10 +79,12 @@
                                  (reset! (::new-reply s) "")
                                  (reset! (::adding-reply s) false)))}]
                 [:button.mlb-reset.delete-reply.read-poll
-                  {:on-click #(reset! (::adding-reply s) false)}]]]
+                  {:type "button"
+                   :on-click #(reset! (::adding-reply s) false)}]]]
             [:div.poll-reply-new
               [:button.mlb-reset.poll-reply-new
-                {:on-click (fn [e]
+                {:type "button"
+                 :on-click (fn [e]
                             (reset! (::adding-reply s) true)
                             (utils/after 800
                              #(when-let [new-input (rum/ref-node s :new-reply)]
@@ -89,7 +92,8 @@
                 "Add option"]
               (when (:preview poll-data)
                 [:button.mlb-reset.poll-preview-bt
-                  {:on-click #(poll-actions/hide-preview poll-key)}
+                  {:type "button"
+                   :on-click #(poll-actions/hide-preview poll-key)}
                   "Edit poll"])]))]))
 
 (rum/defcs poll-edit < rum/static
@@ -107,7 +111,8 @@
           {:on-submit #(utils/event-stop %)
            :action "."}
           [:button.mlb-reset.delete-poll-bt
-            {:on-click (fn []
+            {:type "button"
+             :on-click (fn [e]
                          (let [alert-data {:icon "/img/ML/trash.svg"
                                            :action "delete-poll"
                                            :message "Are you sure you want to delete this poll? This can’t be undone."
@@ -145,16 +150,23 @@
                  :value (:body reply)
                  :max-length poll-utils/max-reply-length
                  :placeholder (str "Choice " (inc idx))
+                 :on-key-press (fn [e]
+                                 (when (or (= (.-key e) "Enter")
+                                           (= (.-keyCode e) 13))
+                                   (utils/event-stop e)))
                  :on-change #(poll-actions/update-reply poll-key idx (.. % -target -value))}]
               (when should-show-delete-reply?
                 [:button.mlb-reset.delete-reply
-                  {:on-click #(poll-actions/delete-reply poll-key (:reply-id reply))}])])]
+                  {:type "button"
+                   :on-click #(poll-actions/delete-reply poll-key (:reply-id reply))}])])]
         [:div.poll-reply-new
           [:button.mlb-reset.poll-reply-new
-            {:on-click #(poll-actions/add-reply poll-key)}
+            {:type "button"
+             :on-click #(poll-actions/add-reply poll-key)}
             "Add option"]
           [:button.mlb-reset.poll-preview-bt
-            {:on-click #(poll-actions/show-preview poll-key)}
+            {:type "button"
+             :on-click #(poll-actions/show-preview poll-key)}
             "Show preview"]]])))
 
 (rum/defcs poll < rum/static
@@ -176,26 +188,30 @@
 (rum/defcs poll-portal < rum/static
                          (rum/local 0 ::retry)
                          {:after-render (fn [s]
-                          (let [retry? (not (rum/dom-node s))
-                                retry @(::retry s)]
-                            (when (and retry?
-                                       (< retry max-mount-retry))
-                              (utils/after (* 180 (inc retry))
-                               #(swap! (::retry s) inc)))
-                            (when (= retry max-mount-retry)
-                              ;; Removing poll from activity
-                              (let [props (-> s :rum/args first)]
-                                (poll-actions/remove-poll-for-max-retry (:poll-key props) (:poll-data props)))))
+                          (let [retry @(::retry s)]
+                            (utils/after (* 180 (inc retry))
+                             #(let [retry? (not (rum/dom-node s))]
+                                (when (and retry?
+                                           (< retry max-mount-retry))
+                                  (swap! (::retry s) inc))
+                                (when (= retry max-mount-retry)
+                                  ;; Removing poll from activity
+                                  (let [props (-> s :rum/args first)]
+                                    ;; There is a poll in the activity but not an element to be mounted to...
+                                    (poll-utils/report-unmounted-poll props)
+                                    ;; Should remove poll from entry?
+                                    ; (poll-actions/remove-poll-for-max-retry (:poll-key props) (:poll-data props))
+                                    )))))
                           s)
                           :did-remount (fn [_ s]
                            (reset! (::retry s) 0)
                            s)}
-  [s {:keys [poll-portal-selector poll-data poll-key container-selector] :as props}]
+  [s {:keys [poll-portal-selector poll-data poll-key container-selector activity-data] :as props}]
   (when-let [portal-element (sel1 [container-selector poll-portal-selector])]
     (rum/portal (poll props) portal-element)))
 
 (rum/defc polls-wrapper < rum/static
-  [{:keys [polls-data editing? dispatch-key current-user-id container-selector]}]
+  [{:keys [polls-data editing? dispatch-key current-user-id container-selector activity-data]}]
   (for [idx (range (count polls-data))
         :let [poll (get polls-data idx)
               poll-selector (str "." poll-utils/poll-selector-prefix (:poll-uuid poll))]]
@@ -205,5 +221,6 @@
                    :container-selector container-selector
                    :current-user-id current-user-id
                    :poll-key (vec (concat (if (coll? dispatch-key) dispatch-key [dispatch-key]) [:polls idx]))
-                   :poll-portal-selector poll-selector})
+                   :poll-portal-selector poll-selector
+                   :activity-data activity-data})
      (str poll-utils/poll-selector-prefix (:poll-uuid poll)))))
