@@ -214,7 +214,7 @@ $h2_top_margin: 24;
   }
 }
 
-@mixin code-blocks($font-size, $line-height) {
+@mixin code-blocks($font-size: 14, $line-height: $bottom_margin, $paragraph-spacing: $line-height) {
   pre {
     font-family: 'IBM Plex Mono', monospace;
     color: var(--color);
@@ -227,14 +227,10 @@ $h2_top_margin: 24;
     white-space: pre;
     padding: 16px;
     min-height: 54px;
-    margin: 24px 0;
+    margin: 0 0 #{$paragraph-spacing}px;
 
     &:last-child {
       margin-bottom: 0;
-    }
-
-    &:first-child {
-      margin-top: 0;
     }
   }
 
@@ -448,7 +444,7 @@ $h2_top_margin: 24;
     background-color: transparent!important;
   }
 
-  @include code-blocks(#{$font_size - 3}px, #{$line_height - 3}px);
+  @include code-blocks(#{$font_size - 3}px, #{$line_height - 3}px, $paragraph_spacing);
 }
 
 @mixin activity-attachment($hide-remove-button: false){
@@ -766,5 +762,5 @@ $h2_top_margin: 24;
     background-color: transparent!important;
   }
 
-  @include code-blocks(#{int($font-size) - 3}px, #{int($line-height) - 3}px);
+  @include code-blocks(#{int($font-size) - 3}px, #{int($line-height) - 3}px, $paragraph-spacing);
 }
