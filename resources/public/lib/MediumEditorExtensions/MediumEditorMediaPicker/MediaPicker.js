@@ -101,6 +101,8 @@ function PlaceCaretAtEnd(el) {
         // Force show the media picker buttons
         this.togglePicker();
       }
+
+      this.checkPollsSpacing(editor);
     },
 
     checkAvailableParagraph: function() {
@@ -112,18 +114,22 @@ function PlaceCaretAtEnd(el) {
       }
     },
 
-    appendParagraph: function() {
-      var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
+    newP: function() {
       var newParagraph = this.document.createElement('p');
       newParagraph.innerHTML = "<br/>";
+      return newParagraph;
+    },
+
+    appendParagraph: function() {
+      var meEl = this.getEditorElements()[0],
+          newParagraph = this.newP();
       meEl.appendChild(newParagraph);
       return newParagraph;
     },
 
     prependParagraph: function() {
-      var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
-      var newParagraph = this.document.createElement('p');
-      newParagraph.innerHTML = "<br/>";
+      var meEl = this.getEditorElements()[0],
+          newParagraph = this.newP();
       meEl.insertBefore(newParagraph, meEl.firstElementChild);
       return newParagraph;
     },
@@ -227,6 +233,30 @@ function PlaceCaretAtEnd(el) {
       this.addButtonTooltip(mButton, "Insert media");
       this.on(mButton, 'click', this.toggleExpand.bind(this));
       return mButton;
+    },
+
+    /* Poll helper */
+
+    isPollElement: function(el) {
+      return (el &&
+              el.nodeType == 1 &&
+              el.nodeName.toLowerCase() == 'div' &&
+              el.classList.contains("media-poll"));
+    },
+
+    checkPollsSpacing: function(editor) {
+      var editorEl = editor || this.getEditorElements()[0],
+          pollDivs = editor.querySelectorAll(":scope > div.media-poll");
+      pollDivs.forEach(function(pollEl) {
+        if (!pollEl.previousElementSibling) {
+          var newParagraph = this.newP();
+          pollEl.parentElement.insertBefore(newParagraph, pollEl);
+        }
+        if (!pollEl.nextElementSibling) {
+          var newParagraph = this.newP();
+          this.insertAfter(newParagraph, pollEl);
+        }
+      }, this);
     },
 
     /* Caret helpers */
@@ -635,8 +665,12 @@ function PlaceCaretAtEnd(el) {
       setTimeout(this.togglePicker.bind(this), 100);
     },
 
-    insertAfter: function(newNode, referenceNode) {
-      referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+    insertAfter: function(newNode, refNode) {
+      if (refNode.nextSibling) {
+        refNode.parentNode.insertBefore(newNode, refNode.nextSibling);
+      } else {
+        refNode.parentNode.appendChild(newNode);
+      }
     },
 
     dividerLineClick: function(event){
