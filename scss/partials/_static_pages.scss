@@ -31,7 +31,7 @@ div.main-animation-container {
 }
 
 div.homepage-testimonials-container {
-  margin: 0 auto;
+  margin: 40px auto 0;
   width: 100%;
   text-align: center;
   z-index: 3;
@@ -51,21 +51,23 @@ div.homepage-testimonials-container {
     font-size: 24px;
     color: $deep_navy;
     line-height: 32px;
-    margin-top: 40px;
     margin-bottom: 24px;
+
+    @include mobile() {
+      font-size: 16px;
+      line-height: 23px;
+    }
   }
 
   div.homepage-testimonials-logos {
     max-width: 914px;
+    max-height: 66px;
+    overflow-y: hidden;
     width: 100%;
     margin: 0 auto;
 
-    @media screen and (min-width: #{$min_big_web_width + 1}px) and (max-width: 1150px) {
-      max-width: 640px;
-    }
-
-    @media screen and (min-width: 477px) and (max-width: #{$min_big_web_width}px) {
-      max-width: 430px;
+    @include mobile() {
+      max-height: 39px;
     }
 
     div.homepage-testimonials-logo {
@@ -74,59 +76,110 @@ div.homepage-testimonials-container {
       background-position: center;
       background-repeat: no-repeat;
 
+      @include mobile() {
+        height: 39px;
+      }
+
       &.logo-ifttt {
         @include image-2x("/img/ML/logo_ifttt");
         background-size: 78px 21px;
         width: calc(78px + 24px);
+
+        @include mobile() {
+          background-size: 46px 12px;
+          width: calc(46px + 18px);
+        }
       }
 
       &.logo-hopper {
         @include image-2x("/img/ML/logo_hopper");
-        background-size: 74px 66px;
-        width: calc(74px + 24px);
+        background-size: 55px 49px;
+        width: calc(55px + 24px);
+
+        @include mobile() {
+          background-size: 46px 39px;
+          width: calc(46px + 18px);
+        }
       }
 
       &.logo-primary {
         @include image-2x("/img/ML/logo_primary");
         background-size: 120px 31px;
         width: calc(120px + 24px);
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       &.logo-hinge {
         @include image-2x("/img/ML/logo_hinge");
-        background-size: 78px 30px;
-        width: calc(78px + 24px);
+        background-size: 58px 22px;
+        width: calc(58px + 24px);
+
+        @include mobile() {
+          background-size: 46px 17px;
+          width: calc(46px + 18px);
+        }
       }
 
       &.logo-resy {
         @include image-2x("/img/ML/logo_resy");
-        background-size: 78px 34px;
-        width: calc(78px + 24px);
+        background-size: 58px 26px;
+        width: calc(58px + 24px);
+
+        @include mobile() {
+          background-size: 46px 20px;
+          width: calc(46px + 18px);
+        }
+      }
+
+      &.logo-flyt {
+        @include image-2x("/img/ML/logo_flyt");
+        background-size: 60px 28px;
+        width: calc(60px + 24px);
+
+        @include mobile() {
+          background-size: 50px 23px;
+          width: calc(50px + 18px);
+        }
       }
 
       &.logo-weblify {
         @include image-2x("/img/ML/logo_weblify");
         background-size: 98px 20px;
         width: calc(98px + 24px);
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       &.logo-novo {
         @include image-2x("/img/ML/logo_novo");
-        background-size: 78px 39px;
-        width: calc(78px + 24px);
+        background-size: 58px 29px;
+        width: calc(58px + 24px);
+
+        @include mobile() {
+          display: none;
+        }
       }
 
       &.logo-gamercraft {
         @include image-2x("/img/ML/logo_gamercraft");
         background-size: 112px 15px;
         width: calc(112px + 24px);
+
+        @include mobile() {
+          display: none;
+        }
       }
     }
   }
 }
 
 button.get-started-button {
-  width: 320px;
+  width: 220px;
   height: 56px;
   border-radius: 6px;
   background-color: $carrot_orange;
@@ -134,18 +187,22 @@ button.get-started-button {
   @include OC_Body_Bold();
   font-size: 20px;
   line-height: 25px;
+  padding: 15px 40px;
   margin: 32px auto 0;
   position: relative;
   text-align: center;
   padding: 0;
+  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   @include mobile(){
-    width: 100%;
+    max-width: 100%;
     margin: 24px auto 16px;
     height: 48px;
     font-size: 18px;
     line-height: 23px;
-    padding: 12px 0;
+    padding: 12px 24px;
   }
 }
 
@@ -156,7 +213,7 @@ span.get-started-subtitle {
   line-height: 20px;
   color: rgba($deep_navy, 0.5);
   text-align: center;
-  display: inline-block;
+  display: block;
 }
 
 div.dashed-string {
@@ -186,22 +243,21 @@ div.testimonials-block {
   }
 
   &.ifttt {
+    max-width: 640px;
     div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_ifttt");
     }
   }
 
   &.blend-labs {
+    max-width: 710px;
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_blend_labs");
-    }
-
-    div.testimonial-copy {
-      max-width: 670px;
     }
   }
 
   &.novo {
+    max-width: 880px;
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_novo");
     }
@@ -214,6 +270,7 @@ div.testimonials-block {
   }
 
   &.bank-novo {
+    max-width: 850px;
     div.testimonial-copy-footer div.testimonial-author-pic {
       @include image-2x("/img/ML/testimonial_author_bank_novo");
     }
@@ -512,7 +569,7 @@ section.pricing-footer {
     line-height: 78px;
     @include OC_Title()
     color: $deep_navy;
-    max-width: 840px;
+    max-width: 730px;
     margin: 0 auto;
 
     @include mobile() {
@@ -523,28 +580,28 @@ section.pricing-footer {
       padding: 0 24px;
     }
   }
+}
 
-  div.pricing-subheadline {
+div.pricing-subheadline {
+  color: $deep_navy;
+  font-size: 22px;
+  line-height: 28px;
+  @include OC_Body_Book();
+  margin: 24px auto 0px;
+  position: relative;
+  max-width: 630px;
+
+  @include mobile(){
+    margin-top: 16px;
+    font-size: 20px;
+    line-height: 26px;
+    padding: 0px;
     color: $deep_navy;
-    font-size: 22px;
-    line-height: 28px;
-    @include OC_Body_Book();
-    margin: 24px auto 0px;
-    position: relative;
-    max-width: 630px;
+    max-width: initial;
+  }
 
-    @include mobile(){
-      margin-top: 16px;
-      font-size: 20px;
-      line-height: 26px;
-      padding: 0px;
-      color: $deep_navy;
-      max-width: initial;
-    }
-
-    a.chat-with-us {
-      color: $carrot_green;
-    }
+  a.chat-with-us {
+    color: $carrot_green;
   }
 }
 
