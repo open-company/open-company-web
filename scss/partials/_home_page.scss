@@ -109,7 +109,7 @@ div.home-wrap {
         margin: 0 auto;
         z-index: 2;
         position: relative;
-        max-width: 800px;
+        max-width: 750px;
 
         &:first-of-type {
           margin-top: 16px;
@@ -124,7 +124,8 @@ div.home-wrap {
         }
 
         @include mobile() {
-          max-width: 100%;
+          width: 100%;
+          max-width: 380px;
           font-size: 20px;
           line-height: 26px;
         }
