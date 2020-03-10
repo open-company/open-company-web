@@ -368,6 +368,16 @@
                                 (js/CarrotFileDragging. (clj->js {:uploadHandler (partial file-dnd-handler s options)})))
             buttons (cond-> ["bold" "italic" "unorderedlist" "anchor" "quote" "inlinecode"]
                       show-subtitle (conj "h2"))
+            paste-ext-options #js {:forcePlainText false
+                                   :cleanPastedHTML true
+                                   :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
+                                   :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
+                                                   "textarea" "style" "javascript"]
+                                   :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
+                                                         (when-not show-subtitle "h2") "h3" "h4" "h5"
+                                                         "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
+                                                         "details" "summary" "nav" "abbr" "mark"
+                                                         "table" "thead" "tbody" "tr" "th" "td"]))}
             extensions (cond-> {"autolist" (js/AutoList.)
                                 "mention" (mention-utils/mention-ext users-list)
                                 "fileDragging" false}
@@ -393,19 +403,10 @@
                                   :placeholderText "Paste or type a link"
                                   :targetCheckbox false
                                   :targetCheckboxText "Open in new window"}
-                     :paste #js {:forcePlainText false
-                                 :cleanPastedHTML true
-                                 :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
-                                 :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
-                                                 "textarea" "style" "javascript"]
-                                 :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
-                                                       (when-not show-subtitle "h2") "h3" "h4" "h5"
-                                                       "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                       "details" "summary" "nav" "abbr" "mark"
-                                                       "table" "thead" "tbody" "tr" "th" "td"]))}
                      :placeholder #js {:text placeholder
                                        :hideOnClick false
                                        :hide-on-click false}
+                     :paste paste-ext-options
                      :keyboardCommands #js {:commands #js [
                                         #js {
                                           :command "bold"
