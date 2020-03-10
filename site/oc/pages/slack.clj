@@ -6,7 +6,7 @@
   "Slack page. This is a copy of oc.web.components.slack and
    every change here should be reflected there and vice versa."
   [options]
-  [:div.slack-wrap
+  [:div.slack-wrap.group
     {:id "wrap"}
     [:div.main.slack
       ; Hope page header

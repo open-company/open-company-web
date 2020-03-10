@@ -2,20 +2,22 @@
   (:require [oc.pages.shared :as shared]))
 
 (defn pricing
-  "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
+  "Pricing page."
   [options]
-  [:div.pricing-wrap
+  [:div.pricing-wrap.group
     {:id "wrap"}
     [:div.main.pricing
 
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Simple pricing for remote team communication"]
+          shared/pricing-headline]
 
         shared/pricing-table
         
-        shared/pricing-table-footer]
+        ; shared/pricing-table-footer
+
+        shared/pricing-chat]
 
       (shared/dashed-string 1)      
 
@@ -30,7 +32,7 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/sign-up"}
-                "Try Carrot"]]]
+                "Try Carrot for free"]]]
           [:div.pricing-apps-separator]
           [:div.pricing-apps-app-block
             [:div.pricing-apps-app-header
@@ -126,6 +128,6 @@
 
       (shared/dashed-string 5 "big-web-tablet-only")
 
-      shared/pricing-footer
+      ; shared/pricing-footer
 
     ]])
