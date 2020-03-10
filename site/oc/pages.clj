@@ -240,7 +240,7 @@
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
           ;; MediumEditorAutolist
-          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorOCPaste/paste.js"}]
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorPaste/paste.js"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorAutoquote
