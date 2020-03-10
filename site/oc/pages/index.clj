@@ -9,16 +9,14 @@
       [:section.cta.group
 
         [:h1.headline
-          "Where remote teams have real discussions"]
+          "Remote teams communicate differently"]
         [:div.subheadline.big-web-only
           (str
            "It’s hard for remote teams to stay in-sync with chat alone. "
-           "Carrot makes asynchronous communication less noisy so it's easier "
-           "to stay engaged without the chatter.")]
+           "With Carrot, stay informed without the chatter.")]
         [:div.subheadline.mobile-only
           (str
-           "Carrot makes asynchronous communication less noisy so it’s easier "
-           "to stay engaged without the chatter.")]
+           "Stay informed without the chatter.")]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action

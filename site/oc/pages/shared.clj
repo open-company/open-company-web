@@ -175,7 +175,7 @@
           [:div.testimonials-floated-header
             "Space to say more"]
           [:div.testimonials-floated-subheader
-            "Carrot gives you room to share longer updates that convey more information. Viewers get a quick summary to know what matters."]]]
+            "Carrot gives you room to share longer updates and announcements. Add images, video, code blocks, and polls to keep everyone engaged."]]]
 
       [:div.testimonials-floated-block-inner.right-block.group
         [:img.testimonials-floated-screenshot
@@ -189,7 +189,7 @@
             "Clear, organized discussions"]
           [:div.testimonials-floated-subheader
             (str
-             "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal for remote teams.")]]]
+             "With smart highlights, viewers always know what's new - no matter when they join the discussion. It's asynchronous communication at its best.")]]]
 
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
@@ -202,7 +202,7 @@
           [:div.testimonials-floated-header
             "Know who saw your update"]
           [:div.testimonials-floated-subheader
-            "Carrot works in the background to make sure everyone sees what matters."]]]]
+            "Is anyone paying attention? Carrot works in the background to make sure everyone sees what matters. If it's missed, Carrot reminds them for you."]]]]
     (if (= page :slack)
       (testimonials-screenshot-block :conversation "mobile-only")
       (testimonials-screenshot-block :threads "mobile-only"))
@@ -213,7 +213,7 @@
       [:div.testimonals-commgaps-header
         "Close communication gaps"]
       [:div.testimonals-commgaps-subheader
-        "Your team stays engaged and informed no matter where they are."]
+        "Automatically share posts to Slack and email to increase coverage."]
       [:div.testimonials.commgaps-block-inner.group
         [:div.testimonials-commgaps-column.left-column
           (if (= page :slack)
