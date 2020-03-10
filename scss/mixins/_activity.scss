@@ -532,6 +532,11 @@ $h2_top_margin: 24;
         div.poll-reply-outer {
           position: relative;
           margin-top: 8px;
+          display: flex;
+          flex-direciton: row;
+          flex-wrap: nowrap;
+          justify-content: space-between;
+          align-items: center;
 
           &:before {
             background-color: var(--opac-background-color-05);
@@ -539,7 +544,7 @@ $h2_top_margin: 24;
             position: absolute;
             top: 0;
             left: 0;
-            height: 32px;
+            height: 100%;
             content: "";
             transition: 180ms width ease-in, 180ms background-color ease-in;
           }
@@ -552,21 +557,17 @@ $h2_top_margin: 24;
 
           button.poll-reply {
             margin: 0;
-            height: 32px;
+            min-height: 32px;
             padding: 7px 8px;
             border-radius: 4px;
             position: relative;
             display: block;
             float: left;
-            max-width: calc(100% - 60px);
+            width: calc(100% - 60px);
+            flex: 1 1 auto;
 
             div.poll-reply-body {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow-wrap: break-word;
               text-align: left;
-              max-width: 100%;
               @include OC_Body_Book();
               font-size: 14px;
               line-height: 18px;
@@ -578,14 +579,14 @@ $h2_top_margin: 24;
             float: right;
             @include OC_Body_Book();
             font-size: 14px;
-            line-height: 32px;
+            line-height: 18px;
             color: var(--light-color);
             text-align: right;
             padding: 0 8px;
-            max-width: 60px;
+            width: 60px;
+            flex: 0 0 60px;
           }
         }
-
       }
     }
   }

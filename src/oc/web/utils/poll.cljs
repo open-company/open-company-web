@@ -9,7 +9,7 @@
 
 (defonce min-poll-replies 2)
 (defonce max-question-length 128)
-(defonce max-reply-length 30)
+(defonce max-reply-length 64)
 
 (defn created-at []
   (utils/as-of-now))
