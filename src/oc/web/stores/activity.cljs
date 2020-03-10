@@ -434,7 +434,7 @@
       (-> db
         (assoc-in container-key new-container-data)
         (assoc-in posts-data-key new-items-map)
-        (assoc-in (conj org-key :bookmarks-count) (:total-count posts-data))))
+        (assoc-in (conj org-key :bookmarks-count) (:total-count fixed-posts-data))))
     db))
 
 (defmethod dispatcher/action :remove-bookmark
