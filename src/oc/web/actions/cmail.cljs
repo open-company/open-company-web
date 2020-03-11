@@ -104,7 +104,9 @@
                                            (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
-    (if (:fullscreen cmail-default-state)
+    (when (:fullscreen fixed-cmail-state)
+      (utils/scroll-to-y 0 0))
+    (if (:fullscreen fixed-cmail-state)
       (dom-utils/lock-page-scroll)
       (when-not (:collapsed cmail-state)
         (cook/remove-cookie! (cmail-fullscreen-cookie))))
@@ -129,10 +131,12 @@
 (defn cmail-toggle-fullscreen []
   (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
     (cmail-fullscreen-save next-fullscreen-value)
-    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])
+    (when next-fullscreen-value
+      (utils/scroll-to-y 0 0))
     (if next-fullscreen-value
       (dom-utils/lock-page-scroll)
-      (dom-utils/unlock-page-scroll))))
+      (dom-utils/unlock-page-scroll))
+    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))
