@@ -275,8 +275,9 @@
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
-         "Carrot is free for up to 20 people. After that, it's "
-         "just $3.25 / month for each person with our annual plan.")]
+         "Carrot is free for up to 20 people. After that, it’s "
+         "just $3.25 / month for each person with our annual plan. "
+         "If you prefer a monthly plan, it’s $4.00 / month.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
         "Try Carrot for free"]]])
