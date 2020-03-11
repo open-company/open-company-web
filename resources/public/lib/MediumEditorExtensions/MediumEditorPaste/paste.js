@@ -175,7 +175,7 @@
         canHTMLPasteOnElement: function(element) {
             return !(MediumEditor.util.traverseUp(element, this._isPoll.bind(this)) ||
                      MediumEditor.util.traverseUp(element, this._isCodeBlock.bind(this)) ||
-                     MediumEditor.util.traverseUp(element, this._isQuote.bind(this)) ||);
+                     MediumEditor.util.traverseUp(element, this._isQuote.bind(this)));
         },
 
         handleAddElement: function (event, editable, element) {
