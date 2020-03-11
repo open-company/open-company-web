@@ -232,6 +232,32 @@
     [:button.mlb-reset.ph-banner-close-button
       {:onclick "OCStaticHidePHBanner();"}]])
 
+(defn covid-banner [page]
+  [:div.covid-banner
+    [:div.covid-banner-content
+      [:div.covid-banner-carrot-logo]
+      [:div.covid-banner-copy.mobile-only
+        "Pricing update for COVID-19."
+        (when-not (= page :pricing)
+          [:br])
+        (when-not (= page :pricing)
+          [:a
+            {:href "/pricing"}
+            "Learn more"])
+        (when-not (= page :pricing)
+          ".")]
+      [:div.covid-banner-copy.big-web-tablet-only
+        [:span.heavy "March 11, 2020 pricing update"]
+        " - Carrot is free for unlimited users during the COVID-19 outbreak. "
+        (when-not (= page :pricing)
+          [:a
+            {:href "/pricing"}
+            "Learn more"])
+        (when-not (= page :pricing)
+          ".")]]
+    [:button.mlb-reset.covid-banner-close-button
+      {:onclick "OCStaticHideCovidBanner();"}]])
+
 (defn static-page
   ([content]
    (static-page content {}))
@@ -241,9 +267,11 @@
      (hp/html5 {:lang "en"}
                (head)
                [:body
+                {:class (when (env :covid-banner) "covid-banner")}
                 [:div
                  {:class "outer header"}
                  ph-banner
+                 (covid-banner page)
                  (nav (name page))
                  (mobile-menu (name page))]
                 (case page

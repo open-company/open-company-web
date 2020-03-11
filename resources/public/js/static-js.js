@@ -119,8 +119,8 @@ function OCWebSetupStaticPagesJS(){
 
 document.addEventListener("DOMContentLoaded", function(_) {
 
-  if(OCStaticGetParameterByName("ref") === "producthunt"){
-    $(document.body).addClass("ph-banner");
+  if(!document.body.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
+    document.body.classList.add("ph-banner")
   }
 
   // Initialize tooltips
@@ -280,11 +280,21 @@ function OCStaticStartFixFixedPositioning(sel) {
 
 
 function OCStaticShowPHBanner(){
-  $(document.body).addClass("ph-banner");
+  OCStaticHideCovidBanner();
+  document.body.classList.add("ph-banner")
 }
 
 function OCStaticHidePHBanner(){
-  $(document.body).removeClass("ph-banner");
+  document.body.classList.remove("ph-banner")
+}
+
+function OCStaticShowCovidBanner(){
+  OCStaticHidePHBanner();
+  document.body.classList.add("covid-banner")
+}
+
+function OCStaticHideCovidBanner(){
+  document.body.classList.remove("covid-banner")
 }
 
 function OCStaticTextareaSaveSelection() {

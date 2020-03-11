@@ -28,21 +28,75 @@ div.pricing-wrap {
       background-color: $ultra_light_gold;
     }
 
-    section.pricing-header {
-      padding: 200px 0 0;
+    section.pricing-covid-letter {
+      padding: 120px 0 0;
       text-align: center;
       position: relative;
       width: 100%;
 
       @include tablet() {
         overflow: visible;
-        padding: 131px 0 0;
+        padding: 120px 0 0;
         padding-left: 0;
         padding-right: 0;
       }
 
       @include mobile() {
-        padding: 88px 16px 40px;
+        padding: 40px 16px 0;
+      }
+
+      div.covid-letter-box {
+        background-color: white;
+        border-radius: 6px;
+        padding: 32px 10%;
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+
+        h4 {
+          @include OC_Body_Bold();
+          color: $deep_navy;
+          font-size: 20px;
+          text-align: left;
+        }
+
+        p {
+          @include OC_Body_Book();
+          color: $deep_navy;
+          font-size: 18px;
+          text-align: left;
+          margin-top: 16px;
+
+          b {
+            @include OC_Body_Bold();
+          }
+
+          i {
+            @include OC_Body_Book_Italic();
+          }
+
+          b i, i b {
+            @include OC_Body_Bold_Italic(); 
+          }
+        }
+      }
+    }
+
+    section.pricing-header {
+      padding: 40px 0 0;
+      text-align: center;
+      position: relative;
+      width: 100%;
+
+      @include tablet() {
+        overflow: visible;
+        padding: 40px 0 0;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      @include mobile() {
+        padding: 40px 16px 40px;
       }
 
       h1.pricing-headline {
