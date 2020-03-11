@@ -51,7 +51,7 @@ div.pricing-wrap {
         @include OC_Title()
         color: $deep_navy;
         margin: 0 auto;
-        max-width: 840px;
+        max-width: 730px;
 
         @include mobile() {
           margin: 0 auto 40px;
