@@ -272,6 +272,7 @@
         "$0"]
       [:div.pricing-table-left-subprice
         "for teams of up to 20 people"]]
+    [:div.pricing-table-divider-line]
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
