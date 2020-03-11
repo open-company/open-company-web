@@ -22,12 +22,12 @@
           [:br][:br]
           "As a software company, what can we do to help? Admittedly not much. But we’ll do what we can."
           [:br][:br]
-          "So beginning immediately, new companies that sign up to use Carrot for remote team communication can use it "
-          [:b "for free for unlimited users"]
+          "So beginning immediately, new companies that sign up to use Carrot for remote team communication can use it for "
+          [:b "free for unlimited users"]
           " throughout the coronavirus crisis."
           [:br][:br]
-          "We do not know how long it will last, so it will be free "
-          [:b "indefinitely"]
+          "We do not know how long it will last, so it will be "
+          [:b "free indefinitely"]
           " until things settle down."
           [:br][:br]
           "After that, we will return to our normal pricing, detailed below."
