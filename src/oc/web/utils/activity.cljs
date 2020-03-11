@@ -15,9 +15,9 @@
 (defn show-separators? [container-slug-or-href]
   (and container-slug-or-href
        (not (responsive/is-mobile-size?))
-       (not (or (#{utils/default-drafts-board-slug "inbox"} (name container-slug-or-href))
+       (not (or (#{utils/default-drafts-board-slug "inbox" "bookmarks"} (name container-slug-or-href))
                 (and (string? container-slug-or-href)
-                     (.match container-slug-or-href #"(?i)/(inbox)(/|$)"))))))
+                     (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)"))))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
