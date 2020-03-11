@@ -237,8 +237,12 @@
     [:div.covid-banner-content
       [:div.covid-banner-carrot-logo]
       [:div.covid-banner-copy
-        [:span.heavy "UPDATED PRICING "]
-        "- Carrot will be free for unlimited users during the COVID-19 outbreak. Details."]]
+        [:span.heavy "March 11, 2020 pricing update"]
+        " - Carrot will be free for unlimited users during the COVID-19 outbreak. "
+        [:a
+          {:href "/pricing"}
+          "Learn more"]
+        "."]]
     [:div.covid-banner-opac-bg]
     [:button.mlb-reset.covid-banner-close-button
       {:onclick "OCStaticHideCovidBanner();"}]])

@@ -45,31 +45,46 @@ div.pricing-wrap {
         padding: 88px 16px 40px;
       }
 
-      p {
-        @include OC_Body_Book();
-        color: $deep_navy;
-        font-size: 14px;
-        line-height: 18px;
-        text-align: left;
-        max-width: 400px;
+      div.covid-letter-box {
+        background-color: white;
+        border-radius: 6px;
+        padding: 32px;
+        width: 100%;
+        max-width: 960px;
         margin: 0 auto;
 
-        b {
+        h4 {
           @include OC_Body_Bold();
+          color: $deep_navy;
+          font-size: 18px;
+          text-align: left;
         }
 
-        i {
-          @include OC_Body_Book_Italic();
-        }
+        p {
+          @include OC_Body_Book();
+          color: $deep_navy;
+          font-size: 14px;
+          line-height: 18px;
+          text-align: left;
+          margin-top: 16px;
 
-        b i, i b {
-          @include OC_Body_Bold_Italic(); 
+          b {
+            @include OC_Body_Bold();
+          }
+
+          i {
+            @include OC_Body_Book_Italic();
+          }
+
+          b i, i b {
+            @include OC_Body_Bold_Italic(); 
+          }
         }
       }
     }
 
     section.pricing-header {
-      padding: 80px 0 0;
+      padding: 40px 0 0;
       text-align: center;
       position: relative;
       width: 100%;

@@ -5,11 +5,11 @@
     }
 
     nav.site-navbar {
-      margin-top: 104px;
+      margin-top: 70px;
     }
 
     div.main {
-      padding-top: 104px;
+      padding-top: 70px;
     }
   }
 }
@@ -19,18 +19,18 @@ div.covid-banner {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 104px;
+  height: 70px;
   background-color: $carrot_dark_brown_1;
   z-index: 100;
   display: none;
-  padding: 17px 64px;
+  padding: 16px 64px;
 
   @include tablet() {
-    padding: 17px 48px; 
+    padding: 16px 48px; 
   }
 
   @include mobile() {
-    padding: 17px 40px 17px 24px; 
+    padding: 16px 40px 16px 24px;
   }
 
   div.covid-banner-content {
@@ -39,10 +39,10 @@ div.covid-banner {
     align-items: center;
 
     div.covid-banner-carrot-logo {
-      width: 42px;
-      height: 75px;
+      width: 21px;
+      height: 38px;
       background-image: cdnUrl("/img/ML/carrot_logo.svg");
-      background-size: 42px 75px;
+      background-size: 21px 38px;
       background-position: center;
       background-repeat: no-repeat;
       display: block;
@@ -65,23 +65,14 @@ div.covid-banner {
           display: none;
         }
       }
-    }
-  }
 
-  div.covid-banner-opac-bg {
-    width: 250px;
-    height: 104px;
-    position: absolute;
-    left: 50%;
-    top: 0;
-    margin-left: 172px;
-    opacity: 0.15;
-    background-image: cdnUrl("/img/ML/carrot_logo.svg");
-    background-size: 137px 250px;
-    background-repeat: no-repeat;
-    background-position: top 0 left 0;
-    overflow: hidden;
-    z-index: 104;
+      a {
+        @include OC_Body_Bold();
+        font-size: 16px;
+        color: white;
+        text-decoration: underline;
+      }
+    }
   }
 
   button.covid-banner-close-button {
@@ -93,7 +84,7 @@ div.covid-banner {
     background-repeat: no-repeat;
     position: absolute;
     right: 24px;
-    top: 32px;
+    top: 19px;
     z-index: 105;
 
     @include mobile() {
