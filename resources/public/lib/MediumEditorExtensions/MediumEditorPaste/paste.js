@@ -160,17 +160,22 @@
             }
         },
 
-        _isPollElement: function(element) {
+        _isPoll: function(element) {
             return (element.nodeType === 1 && element.nodeName.toLowerCase() === 'div' && element.classList.contains('media-poll'));
         },
 
-        _isCodeBlockElement: function(){
+        _isCodeBlock: function(element){
             return (element.nodeType === 1 && element.nodeName.toLowerCase() === 'pre');
         },
 
-        canPasteOnElement: function(element) {
-           return !(MediumEditor.util.traverseUp(element, this._isPollElement.bing(this)) ||
-                    MediumEditor.util.traverseUp(element, this._isCodeBlockElement.bing(this)));
+        _isQuote: function(element){
+            return (element.nodeType === 1 && element.nodeName.toLowerCase() === 'blockquote');
+        },
+
+        canHTMLPasteOnElement: function(element) {
+            return !(MediumEditor.util.traverseUp(element, this._isPoll.bind(this)) ||
+                     MediumEditor.util.traverseUp(element, this._isCodeBlock.bind(this)) ||
+                     MediumEditor.util.traverseUp(element, this._isQuote.bind(this)) ||);
         },
 
         handleAddElement: function (event, editable, element) {
@@ -212,9 +217,12 @@
         doPaste: function (pastedHTML, pastedPlain, editable) {
             var paragraphs,
                 html = '',
-                p;
+                p,
+                range = MediumEditor.selection.getSelectionRange(this.document),
+                element = range && range.commonAncestorContainer,
+                canHTMLPaste = this.canHTMLPasteOnElement(element);
 
-            if (this.cleanPastedHTML && pastedHTML) {
+            if (canHTMLPaste && this.cleanPastedHTML && pastedHTML) {
                 return this.cleanPaste(pastedHTML);
             }
 
@@ -222,7 +230,9 @@
                 return;
             }
 
-            if (!(this.getEditorOption('disableReturn') || (editable && editable.getAttribute('data-disable-return')))) {
+            if (!canHTMLPaste) {
+                html =  MediumEditor.util.htmlEntities(pastedPlain);
+            } else if (!(this.getEditorOption('disableReturn') || (editable && editable.getAttribute('data-disable-return')))) {
                 paragraphs = pastedPlain.split(/[\r\n]+/g);
                 // If there are no \r\n in data, don't wrap in <p>
                 if (paragraphs.length > 1) {
