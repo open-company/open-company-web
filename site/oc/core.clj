@@ -243,15 +243,18 @@
         (when-not (= page :pricing)
           [:a
             {:href "/pricing"}
-            "Learn more"])]
+            "Learn more"])
+        (when-not (= page :pricing)
+          ".")]
       [:div.covid-banner-copy.big-web-tablet-only
         [:span.heavy "March 11, 2020 pricing update"]
-        " - Carrot will be free for unlimited users during the COVID-19 outbreak. "
+        " - Carrot is free for unlimited users during the COVID-19 outbreak. "
         (when-not (= page :pricing)
           [:a
             {:href "/pricing"}
             "Learn more"])
-        "."]]
+        (when-not (= page :pricing)
+          ".")]]
     [:button.mlb-reset.covid-banner-close-button
       {:onclick "OCStaticHideCovidBanner();"}]])
 
