@@ -38,11 +38,11 @@ div.covid-banner {
     justify-content: center;
     align-items: center;
 
-    div.covid-banner-cat {
-      width: 75px;
-      height: 70px;
-      @include image-2x("/img/ML/ph_banner_cat");
-      background-size: 75px 70px;
+    div.covid-banner-carrot-logo {
+      width: 42px;
+      height: 75px;
+      background-image: cdnUrl("/img/ML/carrot_logo.svg");
+      background-size: 42px 75px;
       background-position: center;
       background-repeat: no-repeat;
       display: block;
@@ -69,16 +69,18 @@ div.covid-banner {
   }
 
   div.covid-banner-opac-bg {
-    width: 390px;
+    width: 250px;
     height: 104px;
     position: absolute;
     left: 50%;
     top: 0;
     margin-left: 172px;
-    @include image-2x("/img/ML/ph_banner_bg");
-    background-size: 390px 104px;
+    opacity: 0.15;
+    background-image: cdnUrl("/img/ML/carrot_logo.svg");
+    background-size: 137px 250px;
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: top 0 left 0;
+    overflow: hidden;
     z-index: 104;
   }
 

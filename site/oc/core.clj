@@ -235,7 +235,7 @@
 (def covid-banner
   [:div.covid-banner
     [:div.covid-banner-content
-      [:div.covid-banner-cat]
+      [:div.covid-banner-carrot-logo]
       [:div.covid-banner-copy
         [:span.heavy "UPDATED PRICING "]
         "- Carrot will be free for unlimited users during the COVID-19 outbreak. Details."]]

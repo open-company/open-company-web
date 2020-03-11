@@ -119,7 +119,7 @@ function OCWebSetupStaticPagesJS(){
 
 document.addEventListener("DOMContentLoaded", function(_) {
 
-  if(!document.body.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
+  if(!document.body.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
     document.body.classList.add("ph-banner")
   }
 

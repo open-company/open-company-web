@@ -8,6 +8,34 @@
     {:id "wrap"}
     [:div.main.pricing
 
+      [:section.pricing-covid-letter
+        [:p
+          [:b "Pricing update:"]
+          [:br][:br]
+          "Across the world, more and more companies are being forced to explore remote team communication because of the "
+          [:b [:i "COVID-19"]]
+          " virus outbreak."
+          [:br][:br]
+          "We admire all of the companies and people who are in a position to help, especially "
+          [:b "health care workers"]
+          " on the front lines."
+          [:br][:br]
+          "As a software company, what can we do to help? Admittedly not much. But we’ll do what we can."
+          [:br][:br]
+          "So beginning immediately, new companies that sign up to use Carrot for remote team communication can use it "
+          [:b "for free for unlimited users"]
+          " throughout the coronavirus crisis."
+          [:br][:br]
+          "We do not know how long it will last, so it will be free "
+          [:b "indefinitely"]
+          " until things settle down."
+          [:br][:br]
+          "After that, we will return to our normal pricing, detailed below."
+          [:br][:br]
+          [:b "Stay healthy,"]
+          [:br]
+          [:i "The Carrot team"]]]
+
       [:section.pricing-header
 
         [:h1.pricing-headline
