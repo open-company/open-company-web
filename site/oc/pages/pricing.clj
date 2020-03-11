@@ -10,9 +10,7 @@
 
       [:section.pricing-covid-letter
         [:div.covid-letter-box
-          [:h4 [:b "A note from Carrot re: COVID-19"]]
-          [:p 
-            "A note from Carrot about COVID-19:"]
+          [:h4 "A note from Carrot about COVID-19"]
 
           [:p
             "Across the world, more and more companies are being forced to explore remote team communication because of the "
@@ -21,7 +19,9 @@
           [:p
             "Of course, we admire all of the companies and people who are in a position to help, especially "
             [:b "health care workers"]
-            " on the front lines. But, as a software company, what can we do to help? Admittedly, "
+            " on the front lines. But, as a software company, what can "
+            [:i "we"]
+            " do to help? Admittedly, "
             "not much, and that makes us a little crazy."]
           [:p
             "No matter, we’re all in this together and we’ll do what we can."]
@@ -35,6 +35,7 @@
             " until things settle down. After that, we will return to our normal pricing, detailed below."]
           [:p
             [:b "Stay healthy,"]
+            [:br]
             [:i "The Carrot team"]]]]
 
       [:section.pricing-header

@@ -1,16 +1,14 @@
-@include big_web() {
-  body.covid-banner {
-    div.covid-banner {
-      display: block;
-    }
+body.covid-banner {
+  div.covid-banner {
+    display: block;
+  }
 
-    nav.site-navbar {
-      margin-top: 70px;
-    }
+  nav.site-navbar {
+    margin-top: 70px;
+  }
 
-    div.main {
-      padding-top: 70px;
-    }
+  div.main {
+    padding-top: 70px;
   }
 }
 
@@ -49,6 +47,12 @@ div.covid-banner {
       z-index: 105;
       margin-right: 16px;
       flex-shrink: 0;
+
+      @include mobile() {
+        width: 18px;
+        height: 34px;
+        background-size: 18px 34px;
+      }
     }
 
     div.covid-banner-copy {
