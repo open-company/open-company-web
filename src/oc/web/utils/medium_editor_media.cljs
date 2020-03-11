@@ -373,11 +373,20 @@
                                    :cleanAttrs #js ["style" "alt" "dir" "size" "face" "color" "itemprop" "name" "id"]
                                    :cleanTags #js ["meta" "video" "audio" "img" "button" "svg" "canvas" "figure" "input"
                                                    "textarea" "style" "javascript"]
-                                   :unwrapTags (clj->js (remove nil? ["div" "label" "font" "h1"
-                                                         (when-not show-subtitle "h2") "h3" "h4" "h5"
-                                                         "h6" "strong" "section" "time" "em" "main" "u" "form" "header" "footer"
-                                                         "details" "summary" "nav" "abbr" "mark"
-                                                         "table" "thead" "tbody" "tr" "th" "td"]))}
+                                   :unwrapTags (clj->js (remove nil?
+                                                ["!doctype" "abbr" "acronym" "address" "applet" "area" "article"
+                                                 "aside" "base" "basefont" "bb" "bdo" "big" "body" "br" "caption"
+                                                 "center" "cite" "col" "colgroup" "command" "datagrid" "datalist"
+                                                 "dd" "del" "details" "dfn" "dialog" "dir" "div" "dl" "dt" "em"
+                                                 "embed" "eventsource" "fieldset" "figcaption" "font" "footer" "form"
+                                                 "frame" "frameset" "h1" (when-not show-subtitle "h2") "h3" "h4" "h5"
+                                                 "h6" "head" "header" "hgroup" "hr" "html" "iframe" "ins" "isindex"
+                                                 "kbd" "keygen" "label" "legend" "link"  "main" "map" "mark" "menu" "meter"
+                                                 "nav" "noframes" "noscript" "object" "ol" "optgroup" "option"
+                                                 "output" "p" "param" "progress" "q" "rp" "rt" "ruby" "s" "samp"
+                                                 "script" "section" "select" "small" "source" "span" "strike"
+                                                 "strong" "sub" "summary" "sup" "table" "tbody" "td" "tfoot" "th"
+                                                 "thead" "time" "title" "tr" "track" "tt" "u" "var" "wbr"]))}
             extensions (cond-> {"autolist" (js/AutoList.)
                                 "mention" (mention-utils/mention-ext users-list)
                                 "fileDragging" false}
