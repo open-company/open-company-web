@@ -17,6 +17,7 @@ java -jar ~/closure_compiler/closure-compiler-v$1.jar \
 --js lib/rangy/rangy-core.js \
 --js lib/rangy/rangy-selectionsaverestore.js \
 --js lib/rangy/rangy-classapplier.js \
+--js lib/MediumEditorExtensions/MediumEditorToolbar/toolbar.js \
 --js lib/MediumEditorExtensions/MediumEditorPaste/paste.js \
 --js lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js \
 --js lib/MediumEditorExtensions/MediumEditorAutoquote/autoquote.js \
