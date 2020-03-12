@@ -101,8 +101,7 @@
       div.copyright {
         font-size: 14px;
         @include OC_Body_Book();
-        color: $ui_grey;
-        margin-top: 40px;
+        color: $deep_navy;
         max-width: 180px;
 
         @include mobile(){
@@ -116,8 +115,9 @@
       div.tos-and-pp {
         font-size: 14px;
         @include OC_Body_Book();
-        color: $ui_grey;
+        color: $deep_navy;
         max-width: 180px;
+        margin-top: 16px;
 
         @include mobile() {
           width: 100%;
@@ -127,7 +127,7 @@
         }
 
         a {
-          color: $ui_grey;
+          color: $deep_navy;
 
           &:hover {
             text-decoration: underline;

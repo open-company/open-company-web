@@ -213,10 +213,10 @@
                :data-placement "top"
                :title "Muted"}])
           (when (or (:must-see activity-data)
-                    (:bookmarked activity-data))
+                    (:bookmarked-at activity-data))
             [:div.expanded-post-author-dot])
           (cond
-            (:bookmarked activity-data)
+            (:bookmarked-at activity-data)
             [:div.bookmark-tag]
             (:must-see activity-data)
             [:div.must-see-tag])]]

@@ -6,14 +6,15 @@
 
 (def testimonials-logos-line
   [:div.homepage-testimonials-container.group
-    [:div.homepage-testimonials-copy
-      "Remote teams around the world ❤️ Carrot"]
+    ; [:div.homepage-testimonials-copy
+    ;   "Growing and distributed teams around the world ❤️ Carrot"]
     [:div.homepage-testimonials-logos
       [:div.homepage-testimonials-logo.logo-ifttt]
       [:div.homepage-testimonials-logo.logo-hopper]
       [:div.homepage-testimonials-logo.logo-primary]
       [:div.homepage-testimonials-logo.logo-hinge]
       [:div.homepage-testimonials-logo.logo-resy]
+      [:div.homepage-testimonials-logo.logo-flyt]
       [:div.homepage-testimonials-logo.logo-weblify]
       [:div.homepage-testimonials-logo.logo-novo]
       [:div.homepage-testimonials-logo.logo-gamercraft]]])
@@ -26,17 +27,15 @@
   (let [testimonial-copy (cond
                          (= slug :ifttt)
                          (str
-                          "\"Carrot helps us communicate efficiently across time zones. "
-                          "It minimizes FOMO from missed Slack conversations, and cuts out "
-                          "the \"Did you see my message?\" nagging.\"")
+                          "“Carrot eliminates the fear of missing key Slack conversations, "
+                          "and cuts out the \"Did you see my message?\" nagging.”")
                          (= slug :blend-labs)
                          (str
-                          "“Carrot is a perfect compliment for Slack. We use it for longer-form "
-                          "weekly updates no one should miss.”")
+                          "“We use Carrot for key announcements and weekly updates no one can miss.”")
                          (= slug :bank-novo)
                          (str
                           "“Carrot keeps everyone across our global offices up to date. It "
-                          "helps us share big wins, and key information across our growing family.”"))
+                          "helps us share big wins and key information across our growing family.”"))
         footer-copy (cond
                       (= slug :ifttt)
                       "Kevin Ebaugh, Senior Platform Community Manager"
@@ -53,9 +52,9 @@
                              "https://banknovo.com/")
         testimonial-company (cond
                              (= slug :ifttt)
-                             "IFTTT"
+                             "IFTTT.com"
                              (= slug :blend-labs)
-                             "Bl3NDlabs"
+                             "Bl3NDlabs.com"
                              (= slug :bank-novo)
                              "Banknovo.com")]
     [:div.testimonials-block.group
@@ -76,13 +75,13 @@
                 (= block :thoughtful-communication)
                 "Thoughtful communication"
                 (= block :conversation)
+                "What’s new"
+                (= block :threads)
                 "Clear, organized discussions"
                 (= block :analytics)
                 "Know who saw your update"
-                (= block :follow-ups)
-                "Request a follow-up"
                 (= block :stay-in-sync)
-                "Daily digest to stay in sync"
+                "Daily newsletter to stay in sync"
                 (= block :stay-in-sync-slack)
                 "Daily digest to stay in sync"
                 (= block :share-to-slack)
@@ -92,14 +91,17 @@
                  "Space to write longer updates that convey more information"
                  (= block :conversation)
                  (str
-                  "Threaded comments make it easy for your team to stay engaged "
-                  "asynchronously. Ideal for remote teams.")
-                 (= block :analytics)
-                 "Carrot works in the background to make sure everyone sees what matters."
-                 (= block :follow-ups)
+                  "Get caught up - fast - and let Carrot help you filter "
+                  "out the discussions you don't want to follow.")
+                 (= block :threads)
                  (str
-                  "When you’re looking for a reply, or want to guarantee nobody misses your post, "
-                  "request a follow-up. Carrot reminds anyone that misses it to improve engagement.")
+                  "Threaded comments make it easy for your "
+                  "team to stay engaged asynchronously. Ideal "
+                  "for remote teams.")
+                 (= block :analytics)
+                 (str
+                  "Carrot works in the background to make sure "
+                  "everyone sees what matters")
                  (= block :stay-in-sync)
                  "Everyone gets a daily, personalized summary of what's important."
                  (= block :stay-in-sync-slack)
@@ -111,9 +113,9 @@
                         1
                         (= block :conversation)
                         2
-                        (= block :analytics)
+                        (= block :threads)
                         3
-                        (= block :follow-ups)
+                        (= block :analytics)
                         4
                         (= block :stay-in-sync)
                         5
@@ -150,10 +152,10 @@
 
     (dashed-string 2)
 
-    (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
+    ; (testimonials-screenshot-block :thoughtful-communication "big-web-tablet-only")
     (testimonial-block :ifttt "mobile-only")
 
-    (dashed-string 3)
+    (dashed-string 3 "mobile-only")
 
     (if (= page :slack)
       (testimonials-screenshot-block :stay-in-sync-slack "mobile-only")
@@ -165,37 +167,45 @@
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_1.png")
-           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_1@2x.png") " 2x")}]
+           :srcSet (str
+                    (cdn "/img/ML/testimonials_floated_screenshot_1@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_1@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_1@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
-            "Clear, organized discussions"]
+            "Space to say more"]
           [:div.testimonials-floated-subheader
-            "Threaded comments make it easy for your team to stay engaged asynchronously. Ideal for remote teams."]]]
+            "Carrot gives you room to share longer updates and announcements. Add images, video, code blocks, and polls to keep everyone engaged."]]]
 
       [:div.testimonials-floated-block-inner.right-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_2.png")
-           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_2@2x.png") " 2x")}]
+           :srcSet (str
+                    (cdn "/img/ML/testimonials_floated_screenshot_2@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_2@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_2@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
-            "Request a follow-up"]
+            "Clear, organized discussions"]
           [:div.testimonials-floated-subheader
             (str
-             "When you’re looking for a reply, or want to guarantee nobody misses your post, "
-             "request a follow-up. Carrot reminds anyone that misses it to improve engagement.")]]]
+             "With smart highlights, viewers always know what's new - no matter when they join the discussion. It's asynchronous communication at its best.")]]]
 
       [:div.testimonials-floated-block-inner.left-block.group
         [:img.testimonials-floated-screenshot
           {:src (cdn "/img/ML/testimonials_floated_screenshot_3.png")
-           :srcSet (str (cdn "/img/ML/testimonials_floated_screenshot_3@2x.png") " 2x")}]
+           :srcSet (str
+                    (cdn "/img/ML/testimonials_floated_screenshot_3@2x.png") " 2x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_3@3x.png") " 3x, "
+                    (cdn "/img/ML/testimonials_floated_screenshot_3@4x.png") " 4x")}]
         [:div.testimonials-floated-copy
           [:div.testimonials-floated-header
             "Know who saw your update"]
           [:div.testimonials-floated-subheader
-            "Carrot works in the background to make sure everyone sees what matters."]]]]
+            "Is anyone paying attention? Carrot works in the background to make sure everyone sees what matters. If it's missed, Carrot reminds them for you."]]]]
     (if (= page :slack)
       (testimonials-screenshot-block :conversation "mobile-only")
-      (testimonials-screenshot-block :analytics "mobile-only"))
+      (testimonials-screenshot-block :threads "mobile-only"))
 
     (dashed-string 5)
 
@@ -203,24 +213,30 @@
       [:div.testimonals-commgaps-header
         "Close communication gaps"]
       [:div.testimonals-commgaps-subheader
-        "Your team stays engaged and informed no matter where they are."]
+        "Automatically share posts to Slack and email to increase coverage."]
       [:div.testimonials.commgaps-block-inner.group
         [:div.testimonials-commgaps-column.left-column
           (if (= page :slack)
             [:img.testimonials-commgaps-column-screenshot
               {:src (cdn "/img/ML/testimonials_commgaps_slack_digest.png")
-               :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x")}]
+               :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack_digest@2x.png") " 2x, "
+                            (cdn "/img/ML/testimonials_commgaps_slack_digest@3x.png") " 3x, "
+                            (cdn "/img/ML/testimonials_commgaps_slack_digest@4x.png") " 4x")}]
             [:img.testimonials-commgaps-column-screenshot
               {:src (cdn "/img/ML/testimonials_commgaps_email.png")
-               :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x")}])
+               :srcSet (str (cdn "/img/ML/testimonials_commgaps_email@2x.png") " 2x, "
+                            (cdn "/img/ML/testimonials_commgaps_email@3x.png") " 3x, "
+                            (cdn "/img/ML/testimonials_commgaps_email@4x.png") " 4x")}])
           [:div.testimonials-commgaps-column-header
-            "Daily digest to stay in sync"]
+            "Daily newsletter to stay in sync"]
           [:div.testimonials-commgaps-column-subheader
             "Everyone gets a daily, personalized summary of what's important."]]
         [:div.testimonials-commgaps-column.right-column
           [:img.testimonials-commgaps-column-screenshot
             {:src (cdn "/img/ML/testimonials_commgaps_slack.png")
-             :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x")}]
+             :srcSet (str (cdn "/img/ML/testimonials_commgaps_slack@2x.png") " 2x, "
+                          (cdn "/img/ML/testimonials_commgaps_slack@3x.png") " 3x, "
+                          (cdn "/img/ML/testimonials_commgaps_slack@4x.png") " 4x")}]
           [:div.testimonials-commgaps-column-header
             "Auto-share posts to Slack"]
           [:div.testimonials-commgaps-column-subheader
@@ -234,13 +250,13 @@
     (dashed-string 1 "big-web-tablet-only")
 
     (if (= page :slack)
-      (testimonials-screenshot-block :analytics "mobile-only")
-      (testimonials-screenshot-block :follow-ups "mobile-only"))
+      (testimonials-screenshot-block :threads "mobile-only")
+      (testimonials-screenshot-block :analytics "mobile-only"))
 
     (dashed-string 5 "mobile-only")
 
     (if (= page :slack)
-      (testimonials-screenshot-block :follow-ups "mobile-only")
+      (testimonials-screenshot-block :analytics "mobile-only")
       (testimonials-screenshot-block :stay-in-sync "mobile-only"))
 
     (dashed-string 2 "mobile-only")
@@ -253,18 +269,19 @@
   [:div.pricing-table.group
     [:div.pricing-table-left
       [:div.pricing-table-left-price
-        "$5"]
+        "$0"]
       [:div.pricing-table-left-subprice
-        "/month per user"]]
+        "for teams of up to 20 people"]]
+    [:div.pricing-table-divider-line]
     [:div.pricing-table-right.group
       [:div.pricing-table-right-copy
         (str
-         "Carrot starts with a 14-day free trial, no credit card required. "
-         "After that, monthly pricing starts at $60, which includes your first "
-         "12 members. Then it’s just $5 a user after that.")]
+         "Carrot is free for up to 20 people. After that, it’s "
+         "just $3.25 / month for each person with our annual plan. "
+         "If you prefer a monthly plan, it’s $4.00 / month.")]
       [:a.pricing-table-right-link
         {:href "/sign-up"}
-        "Start your 14-day free trial"]]])
+        "Try Carrot for free"]]])
 
 (def pricing-table-footer
   [:div.pricing-header-footer
@@ -276,22 +293,27 @@
          :href "mailto:hello@carrot.io"}
         "Let’s chat about our Enterprise plan."]]])
 
+(def pricing-headline "Simple pricing, and free for small teams")
+
+(def pricing-chat
+  [:div.pricing-subheadline
+    "Questions? "
+    [:a.chat-with-us
+      {:class "intercom-chat-link"
+       :href "mailto:hello@carrot.io"}
+      "Let's chat"]])
+
 (def pricing-footer
   [:section.pricing-footer
 
     [:h1.pricing-headline
-      "Simple pricing for remote team communication"]
-
-    [:div.pricing-subheadline
-      "Questions? "
-      [:a.chat-with-us
-        {:class "intercom-chat-link"
-         :href "mailto:hello@carrot.io"}
-        "Let's chat"]]
+      pricing-headline]    
 
     pricing-table
     
-    pricing-table-footer])
+    ; pricing-table-footer
+
+    pricing-chat])
 
 (def testimonials-section-old
   [:section.testimonials-section-old.big-web-tablet-only
@@ -404,7 +426,7 @@
               (str
                "“We use Carrot when we need to make sure everyone "
                "is on the same page across all our offices here "
-               "and abroad. It helps us share BIG wins, and in a "
+               "and abroad. It helps us share BIG wins and in a "
                "fast-growing startup keeping that family vibe, "
                "its awesome.”")]
             [:div.testimonial-footer.group

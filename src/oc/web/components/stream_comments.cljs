@@ -303,6 +303,7 @@
 
 (rum/defcs stream-comments < rum/reactive
                              (drv/drv :add-comment-focus)
+                             (drv/drv :add-comment-data)
                              (drv/drv :team-roster)
                              (rum/local false ::last-focused-state)
                              (rum/local nil ::editing?)
@@ -337,6 +338,14 @@
                               (let [{:keys [current-user-id last-read-at comments-data]} (-> s :rum/args first)
                                     threads (cu/collapsed-comments current-user-id last-read-at comments-data)]
                                 (reset! (::threads s) threads))
+                              ;; Restore cached comments
+                              (let [add-comment-data @(drv/get-ref s :add-comment-data)
+                                    {:keys [activity-data comments-data]} (-> s :rum/args first)]
+                                (mapv (fn [comment]
+                                        (let [comment-key (dis/add-comment-string-key (:uuid activity-data) (:uuid comment))]
+                                          (when (seq (get add-comment-data comment-key))
+                                            (swap! (::replying-to s) #(conj % (:uuid comment))))))
+                                 comments-data))
                               s)
                              :did-mount (fn [s]
                               (try (js/emojiAutocomplete)

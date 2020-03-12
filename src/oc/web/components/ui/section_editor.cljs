@@ -130,7 +130,7 @@
        (reset! (::initial-section-name s) (:name fixed-section-data)))
      (dis/dispatch! [:input [:section-editing] fixed-section-data])
      (reset! (::slack-enabled s)
-      (not (empty? (:channel-id (:slack-mirror fixed-section-data))))))
+      (-> fixed-section-data :slack-mirror :channel-id seq)))
   s)
   :will-update (fn [s]
    (let [section-editing @(drv/get-ref s :section-editing)]

@@ -79,7 +79,7 @@
        :id dom-element-id}
       [:div.stream-collapsed-item-inner
         {:class (utils/class-set {:must-see-item (:must-see activity-data)
-                                  :bookmark-item (:bookmarked activity-data)
+                                  :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
         (user-avatar-image publisher)
@@ -91,7 +91,7 @@
           [:div.stream-collapsed-item-dot.muted-dot]
           [:div.muted-activity]
           [:div.must-see-tag]
-          [:div.bookmark-tag]
+          [:div.bookmark-tag-small]
           (stream-item-summary activity-data)]
         (when-not has-zero-comments?
           (comments-summary {:entry-data activity-data

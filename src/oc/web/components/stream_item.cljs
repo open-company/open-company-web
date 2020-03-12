@@ -204,7 +204,7 @@
       {:class (utils/class-set {dom-node-class true
                                 :draft (not is-published?)
                                 :must-see-item (:must-see activity-data)
-                                :bookmark-item (:bookmarked activity-data)
+                                :bookmark-item (:bookmarked-at activity-data)
                                 :unseen-item (:unseen activity-data)
                                 :unread-item (or (pos? (:new-comments-count activity-data))
                                                  (:unread activity-data))

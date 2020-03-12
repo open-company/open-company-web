@@ -111,6 +111,30 @@
       (utils/after 0
        #(utils/to-end-of-content-editable add-comment-node)))))
 
+(defn- close-reply-clicked [s]
+  (let [{:keys [activity-data parent-comment-uuid dismiss-reply-cb edit-comment-data]} (-> s :rum/args first)
+        dismiss-fn (fn []
+                    (set! (.-innerHTML (rum/ref-node s "editor-node")) @(::initial-add-comment s))
+                    (disable-add-comment-if-needed s)
+                    (reset! (::did-change s) false)
+                    (reset! (::show-post-button s) false)
+                    (comment-actions/add-comment-reset (:uuid activity-data) parent-comment-uuid (:uuid edit-comment-data))
+                    (when (fn? dismiss-reply-cb)
+                      (dismiss-reply-cb true)))]
+    (if @(::did-change s)
+      (let [alert-data {:icon "/img/ML/trash.svg"
+                        :action "cancel-comment-edit"
+                        :message "Are you sure you want to cancel? All your changes to this comment will be lost."
+                        :link-button-title "Keep"
+                        :link-button-cb #(alert-modal/hide-alert)
+                        :solid-button-style :red
+                        :solid-button-title "Yes"
+                        :solid-button-cb (fn []
+                                          (dismiss-fn)
+                                          (alert-modal/hide-alert))}]
+        (alert-modal/show-alert alert-data))
+      (dismiss-fn))))
+
 (rum/defcs add-comment < rum/reactive
                          ;; Locals
                          (rum/local nil :me/editor)
@@ -246,31 +270,7 @@
             :dangerouslySetInnerHTML #js {"__html" @(::initial-add-comment s)}}]
           [:div.add-comment-footer.group
             [:button.mlb-reset.close-reply-bt
-              {:on-click (fn [_]
-                          (let [dismiss-fn (if (fn? dismiss-reply-cb)
-                                             #(do
-                                                (reset! (::did-change s) false)
-                                                (reset! (::show-post-button s) false)
-                                                (dismiss-reply-cb true))
-                                             (fn []
-                                                (set! (.-innerHTML (rum/ref-node s "editor-node")) @(::initial-add-comment s))
-                                                (disable-add-comment-if-needed s)
-                                                (reset! (::did-change s) false)
-                                                (reset! (::show-post-button s) false)
-                                                (comment-actions/add-comment-change activity-data parent-comment-uuid (:uuid edit-comment-data) "")))]
-                            (if @(::did-change s)
-                              (let [alert-data {:icon "/img/ML/trash.svg"
-                                                :action "cancel-comment-edit"
-                                                :message "Are you sure you want to cancel? All your changes to this comment will be lost."
-                                                :link-button-title "Keep"
-                                                :link-button-cb #(alert-modal/hide-alert)
-                                                :solid-button-style :red
-                                                :solid-button-title "Yes"
-                                                :solid-button-cb (fn []
-                                                                  (dismiss-fn)
-                                                                  (alert-modal/hide-alert))}]
-                                (alert-modal/show-alert alert-data))
-                              (dismiss-fn))))
+              {:on-click #(close-reply-clicked s)
                :data-toggle (if (responsive/is-tablet-or-mobile?) "" "tooltip")
                :data-placement "top"
                :data-container "body"
