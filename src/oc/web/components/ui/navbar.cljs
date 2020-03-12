@@ -138,7 +138,7 @@
                       {:class (utils/class-set {:scrolled @(::scrolled s)})
                        :data-toggle (when-not is-mobile? "tooltip")
                        :data-placement "bottom"
-                       :title "Add a new post"
+                       :title utils/default-body-placeholder
                        :on-click #(if (:collapsed cmail-state)
                                     (do
                                       (.stopPropagation %)
