@@ -16,6 +16,33 @@ div.virtualized-list-row.collapsed-item {
       width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
       height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px !important;
       margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+
+      div.stream-collapsed-item {
+        background-color: var(--foc-hover-color);
+        z-index: 2;
+        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+        border-radius: 4px;
+        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
+        border: 1px solid var(--foc-hover-border-color);
+
+        div.more-menu {
+          display: initial;
+
+          button {
+            display: initial;
+          }
+        }
+
+        div.more-menu {
+          background-color: var(--foc-hover-color);
+
+          &:before {
+            background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
+          }
+        }
+      }
     }
   }
 
@@ -27,10 +54,7 @@ div.virtualized-list-row.collapsed-item {
 div.stream-collapsed-item {
   width: #{$board_container_width}px;
   margin: 0;
-  border-top: 1px solid transparent;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  border-bottom: 1px solid var(--foc-divider-line-color);
+  border: 1px solid var(--foc-divider-line-color);
   background-color: var(--foc-background-color);
   overflow: visible;
 
@@ -38,35 +62,6 @@ div.stream-collapsed-item {
   padding: 12px 12px 12px 20px;
   display: block;
   position: relative;
-
-  @include big_web() {
-    &:hover {
-      background-color: var(--foc-hover-color);
-      z-index: 2;
-      box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-      border-radius: 4px;
-      padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-      height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
-      border: 1px solid var(--foc-hover-border-color);
-
-      div.more-menu {
-        display: initial;
-
-        button {
-          display: initial;
-        }
-      }
-
-      div.more-menu {
-        background-color: var(--foc-hover-color);
-
-        &:before {
-          background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
-        }
-      }
-    }
-  }
 
   &.expandable {
     cursor: pointer;
@@ -99,10 +94,7 @@ div.stream-collapsed-item {
         z-index: 2;
         box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
         border-radius: 4px;
-        border-top: 1px solid var(--foc-new-border-color);
-        border-right: 1px solid var(--foc-new-border-color);
-        border-left: 1px solid var(--foc-new-border-color);
-        border-bottom: 1px solid var(--foc-new-border-color);
+        border: 1px solid var(--foc-new-border-color);
         padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;

@@ -25,10 +25,10 @@
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
-(def collapsed-foc-height 56)
-(def foc-height 180)
-(def mobile-foc-height 163)
-(def foc-separators-height 50)
+(def collapsed-foc-height 72)
+(def foc-height 196)
+(def mobile-foc-height 179)
+(def foc-separators-height 34)
 
 (defn- calc-card-height [mobile? foc-layout]
   (cond

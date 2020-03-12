@@ -349,7 +349,7 @@ div.dashboard-layout {
         height: 40px;
         // Use 0.19 opacity on this to make it look like the rest of the lines
         // that are on a darker background
-        border-bottom: 1px solid var(--divider-line);
+        // border-bottom: 1px solid var(--divider-line);
 
         @include mobile() {
           height: 65px;

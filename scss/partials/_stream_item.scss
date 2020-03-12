@@ -16,6 +16,37 @@ div.virtualized-list-row:not(.collapsed-item) {
       width: calc(100% + #{$foc_hover_extra_padding * 2}px) !important;
       height: #{$foc_height + ($foc_hover_extra_padding * 2)}px !important;
       margin: -#{$foc_hover_extra_padding}px 0 0 -#{$foc_hover_extra_padding}px;
+
+      div.stream-item {
+        background-color: var(--foc-hover-color);
+        z-index: 2;
+        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+        border-radius: 4px;
+        padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
+        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+        height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
+        border: 1px solid var(--foc-hover-border-color);
+
+        div.stream-item-header {
+          div.more-menu {
+            display: block;
+
+            button {
+              display: initial;
+            }
+          }
+        }
+
+        div.activity-share-container {
+          display: block;
+        }
+
+        div.stream-item-body-ext div.stream-item-footer {
+          div.reactions div.reactions-picker-container {
+            display: block;
+          }
+        }
+      }
     }
   }
 
@@ -31,10 +62,7 @@ div.stream-item {
   width: #{$board_container_width}px;
   height: #{$foc_height}px;
   margin: 0;
-  border-top: 1px solid transparent;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  border-bottom: 1px solid var(--foc-divider-line-color);
+  border: 1px solid var(--foc-divider-line-color);
   padding: 24px 32px;
   background-color: var(--foc-background-color);
   overflow: visible;
@@ -43,10 +71,7 @@ div.stream-item {
     width: 100%;
     margin: 0;
     border-radius: 0;
-    border-top: 1px solid transparent;
-    border-left: 1px solid transparent;
-    border-right: 1px solid transparent;
-    border-bottom: 1px solid var(--foc-divider-line-color);
+    border: 1px solid var(--foc-divider-line-color);
     background-color: var(--mobile-foc-background-color);
     padding: 16px 16px 16px;
     height: #{$mobile_foc_height}px;
@@ -65,39 +90,6 @@ div.stream-item {
               display: initial;
             }
           }
-        }
-      }
-    }
-  }
-
-  @include big_web() {
-    &:hover {
-      background-color: var(--foc-hover-color);
-      z-index: 2;
-      box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-      border-radius: 4px;
-      padding: #{24 + $foc_hover_extra_padding}px #{32 + $foc_hover_extra_padding}px;
-      width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-      height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;
-      border: 1px solid var(--foc-hover-border-color);
-
-      div.stream-item-header {
-        div.more-menu {
-          display: block;
-
-          button {
-            display: initial;
-          }
-        }
-      }
-
-      div.activity-share-container {
-        display: block;
-      }
-
-      div.stream-item-body-ext div.stream-item-footer {
-        div.reactions div.reactions-picker-container {
-          display: block;
         }
       }
     }
@@ -122,10 +114,7 @@ div.stream-item {
         z-index: 2;
         box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
         border-radius: 4px;
-        border-top: 1px solid var(--foc-new-border-color);
-        border-right: 1px solid var(--foc-new-border-color);
-        border-left: 1px solid var(--foc-new-border-color);
-        border-bottom: 1px solid var(--foc-new-border-color);
+        border: 1px solid var(--foc-new-border-color);
         padding: #{24 + $foc_hover_extra_padding)}px #{32 + $foc_hover_extra_padding}px;
         width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
         height: #{$foc_height + ($foc_hover_extra_padding * 2)}px;

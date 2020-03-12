@@ -56,7 +56,7 @@ div.paginated-stream {
 
         div.virtualized-list-separator {
           background-color: var(--background-color);
-          padding: 16px 0;
+          padding: 0 0 16px;
           @include OC_Body_Bold();
           font-size: 14px;
           line-height: 18px;
