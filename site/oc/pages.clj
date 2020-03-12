@@ -239,8 +239,10 @@
           [:script {:type "text/javascript", :src "/lib/js-utils/pasteHtmlAtCaret.js"}]
           ;; Clean HTML input
           [:script {:src "/lib/cleanHTML/cleanHTML.js" :type "text/javascript"}]
-          ;; MediumEditorAutolist
+          ;; MediumEditorPaste
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorPaste/paste.js"}]
+          ;; MediumEditorToolbar
+          [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorToolbar/toolbar.js"}]
           ;; MediumEditorAutolist
           [:script {:type "text/javascript" :src "/lib/MediumEditorExtensions/MediumEditorAutolist/autolist.js"}]
           ;; MediumEditorAutoquote

@@ -13,13 +13,30 @@
 
 var AutoCode = MediumEditor.Extension.extend({
     name: 'AutoCode',
+    preCollection: null,
+    throttledCheck: null,
 
     init: function(){
+      var editor = this.getEditorElements()[0]
+      this.preCollection = editor.getElementsByTagName('pre');
+
+      this.throttledCheck = MediumEditor.util.throttle(function () {
+        // Make sure all the pre tags have the data-disable-toolbar option
+        for (var i = 0; i < this.preCollection.length; i++) {
+          if (!this.preCollection[i].dataset.disableToolbar) {
+            this.preCollection[i].dataset.disableToolbar = true;
+          }
+        }
+      }.bind(this));
+
       this.subscribe('editableKeyup', this.onKeyup.bind(this));
       this.subscribe('editableKeydown', this.onKeydown.bind(this));
+      this.on(editor, 'click', this.throttledCheck);
+
+      this.throttledCheck();
     },
 
-    onKeydown: function (keyDownEvent) {
+    onKeydown: function (keyDownEvent, editor) {
       // Prevent browser from creating another PRE element
       var preElement = this.getPreElement(this.base.getSelectedParentElement());
       if (preElement && MediumEditor.util.isKey(keyDownEvent, [MediumEditor.util.keyCode.ENTER])) {
@@ -58,6 +75,7 @@ var AutoCode = MediumEditor.Extension.extend({
           if( code_start == "```" ){
             var newPreEl = this.document.createElement('pre');
             newPreEl.className = "media-codeblock";
+            newPreEl.dataset.disableToolbar = true;
             // Get the ``` containing element
             var codeBlockElement = this.base.getSelectedParentElement().previousSibling;
             // Replace the old P element with the newly created PRE
@@ -67,6 +85,7 @@ var AutoCode = MediumEditor.Extension.extend({
           }
         }
       }
+      this.throttledCheck();
     },
 
     getPreElement: function (node) {

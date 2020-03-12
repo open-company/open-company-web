@@ -113,6 +113,7 @@ function PlaceCaretAtEnd(el) {
       if (this.inlinePlusButtonOptions.inlineButtons) {
         this.pickerElement.parentNode.removeChild(this.pickerElement);
       }
+
       this.pickerElement = undefined;
       this.mainButton = undefined;
       this.mediaButtonsContainer = undefined;
@@ -148,7 +149,7 @@ function PlaceCaretAtEnd(el) {
     },
 
     onFocus: function(event, editable){
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     createPicker: function(){
@@ -230,6 +231,7 @@ function PlaceCaretAtEnd(el) {
           element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
           pre = this.document.createElement('pre');
       pre.className = "media-codeblock"
+      pre.dataset.disableToolbar = true;
       // if the selection is in a DIV means it's the main editor element
       if (element && element.nodeName.toLowerCase() == 'p'){
         // add the PRE before the P
@@ -241,7 +243,7 @@ function PlaceCaretAtEnd(el) {
       this.moveCursor(pre, 0);
 
       this.base.checkContentChanged();
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     gifClick: function(event){
@@ -329,7 +331,70 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
+    },
+
+    pollClick: function(event){
+      log("pollClick");
+      if (this.inlinePlusButtonOptions.alwaysExpanded) {
+        this.hidePlaceholder();
+        this.saveSelection();
+      }
+      this.collapse();
+      this._waitingCB = true;
+      this.delegate("onPickerClick", "poll");
+      $(event.target).tooltip("hide");
+    },
+
+    addPoll: function(pollId) {
+      log("addPoll", pollId);
+      if (this._lastSelection) {
+        rangy.restoreSelection(this._lastSelection);
+        this._lastSelection = undefined;
+      }
+      if (pollId) {
+        // 2 cases: it's directly the div.medium-editor or it's a p already
+        if (!this.base.getFocusedElement()) {
+          PlaceCaretAtEnd(this.getEditorElements()[0]);
+        }
+        var sel = this.window.getSelection(),
+            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
+            div;
+        // if the selection is in a DIV and it's the main editor element:
+        if (element.tagName == "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
+          // we need to add a DIV to insert the poll in
+          div = this.document.createElement("div");
+          var tempParagraph = this.appendParagraph();
+          element.appendChild(div);
+          element = tempParagraph;
+        } else if (element.tagName == "DIV"){
+          // if it's a DIV we clean out the content
+          div.innerHTML = "";
+        } else if (element.tagName == "P"){
+          var editor = this.getEditorElements()[0],
+              div = this.document.createElement("div");
+          if (editor && editor.firstElementChild === element) {
+            // Add a div below it
+            element.parentNode.appendChild(div);
+          } else if (editor && editor.lastElementChild === element) {
+            element.parentNode.insertBefore(div, element);
+          } else {
+            // Replace current P with the div
+            element.parentNode.replaceChild(div, element);
+          }
+        }
+
+        div.className = "group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
+        div.setAttribute("contenteditable", false);
+        div.dataset.mediaType = "poll";
+        div.dataset.disableToolbar = true;
+        div.dataset.pollId = pollId;
+
+        this.base.checkContentChanged();
+      }
+      this._waitingCB = false;
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     videoClick: function(event){
@@ -395,7 +460,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     chartClick: function(event){
@@ -456,7 +521,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     attachmentClick: function(event){
@@ -541,7 +606,7 @@ function PlaceCaretAtEnd(el) {
         this.delayedRepositionMediaPicker();
       }
       this._waitingCB = false;
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     insertAfter: function(newNode, referenceNode) {
@@ -590,7 +655,7 @@ function PlaceCaretAtEnd(el) {
       this.base.checkContentChanged();
       this.delayedRepositionMediaPicker();
 
-      setTimeout(this.togglePicker(), 100);
+      setTimeout(this.togglePicker.bind(this), 100);
     },
 
     createPickerMediaButtons: function(){
