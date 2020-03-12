@@ -65,18 +65,24 @@
 
 (def big-web-collapse-min-height 134)
 (def mobile-collapse-min-height 160)
+(def min-body-length-for-truncation 50)
 
 (defn- check-collapse-post [s]
-  (when-let [body-el (rum/ref-node s "post-body")]
-    (when (nil? @(::collapse-post s))
-      (let [body-el (rum/ref-node s "post-body")
-            is-mobile? (responsive/is-mobile-size?)
-            comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
-            activity-data @(drv/get-ref s :activity-data)
-            comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
-        (when (and (not (:unread activity-data))
-                   (pos? (count comments-data)))
-          (reset! (::collapse-post s) (>= (.-offsetHeight body-el) comparing-height)))))))
+  (when (nil? @(::collapse-post s))
+    (let [is-mobile? (responsive/is-mobile-size?)
+          comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
+          activity-data @(drv/get-ref s :activity-data)
+          comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+      (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
+                                       (> (count (:body activity-data)) min-body-length-for-truncation)
+                                       ;; Never if they have polls
+                                       (not (seq (:polls activity-data)))
+                                       ;; Only for users we can know if they read it or not
+                                       (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+                                       ;; Only when they are read
+                                       (not (:unread activity-data))
+                                       ;; And only when there is at least a comment
+                                       (pos? (count comments-data)))))))
 
 (rum/defcs expanded-post <
   rum/reactive
@@ -103,6 +109,7 @@
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
+    (check-collapse-post s)
     (save-initial-read-data s)
     s)
    :did-mount (fn [s]
@@ -110,12 +117,10 @@
     (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
     (mark-read s)
     (load-comments s true)
-    (check-collapse-post s)
     s)
    :did-remount (fn [_ s]
     (load-comments s false)
     (save-initial-read-data s)
-    (check-collapse-post s)
     s)
    :will-unmount (fn [s]
     (mark-read s)
