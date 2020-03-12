@@ -95,4 +95,4 @@
 (def android-app-url "https://play.google.com/apps/testing/io.carrot.mobile")
 
 ;; Polls
-(def poll-can-add-reply true)
+(def poll-can-add-reply false)
