@@ -86,6 +86,12 @@ $dark_mode: "dark";
   // Theme settings
   --ui-theme-border-color: #{rgba($deep_navy, 0.24)};
 
+  // Collapsed post
+  --collapse-post-start-bg: #{rgba($grey_num_2, 0)};
+  --collapse-post-stop-bg: #{rgba($grey_num_2, 1)};
+  --mobile-collapse-post-start-bg: #{rgba(white, 0)};
+  --mobile-collapse-post-stop-bg: #{rgba(white, 1)};
+
   html, body {
     scrollbar-color: light;
   }
@@ -143,7 +149,7 @@ $dark_mode: "dark";
 
   // Comments
   --comments-floating-bt-background: #{rgba(white, 0.3)};
-  --add-comment-background: rgb(81, 83, 89);
+  --add-comment-background: rgb(27, 32, 42);
   --mobile-add-comment-background: #1B202A;
 
   // Cmail
@@ -167,6 +173,16 @@ $dark_mode: "dark";
 
   // Theme settings
   --ui-theme-border-color: #{rgba(white, 0.22)};
+
+  // Collapsed post
+  // --collapse-post-start-bg: rgba(27, 32, 42, 0);
+  // --collapse-post-stop-bg: rgba(27, 32, 42, 1);
+  // --mobile-collapse-post-start-bg: rgba(27, 32, 42, 0);
+  // --mobile-collapse-post-stop-bg: rgba(27, 32, 42, 1);
+  --collapse-post-start-bg: rgba(27, 32, 42, 0);
+  --collapse-post-stop-bg: rgba(27, 32, 42, 1);
+  --mobile-collapse-post-start-bg: rgba(27, 32, 42, 0);
+  --mobile-collapse-post-stop-bg: rgba(27, 32, 42, 1);
 
   &, body {
     scrollbar-color: dark;

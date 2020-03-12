@@ -63,6 +63,21 @@
   (when @(::mark-as-read? s)
     (activity-actions/mark-read @(::activity-uuid s))))
 
+(def big-web-collapse-min-height 134)
+(def mobile-collapse-min-height 160)
+
+(defn- check-collapse-post [s]
+  (when-let [body-el (rum/ref-node s "post-body")]
+    (when (nil? @(::collapse-post s))
+      (let [body-el (rum/ref-node s "post-body")
+            is-mobile? (responsive/is-mobile-size?)
+            comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
+            activity-data @(drv/get-ref s :activity-data)
+            comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+        (when (and (not (:unread activity-data))
+                   (pos? (count comments-data)))
+          (reset! (::collapse-post s) (>= (.-offsetHeight body-el) comparing-height)))))))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
@@ -83,6 +98,7 @@
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
+  (rum/local nil ::collapse-post)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
@@ -94,10 +110,12 @@
     (reset! (::activity-uuid s) (:uuid @(drv/get-ref s :activity-data)))
     (mark-read s)
     (load-comments s true)
+    (check-collapse-post s)
     s)
    :did-remount (fn [_ s]
     (load-comments s false)
     (save-initial-read-data s)
+    (check-collapse-post s)
     s)
    :will-unmount (fn [s]
     (mark-read s)
@@ -238,8 +256,16 @@
            :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
-         :class utils/hide-class
+         :on-click (when @(::collapse-post s)
+                     #(reset! (::collapse-post s) false))
+         :class (utils/class-set {utils/hide-class true
+                                  :collapsed @(::collapse-post s)})
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+      (when @(::collapse-post s)
+        [:button.mlb-reset.expand-button
+          {:on-click #(reset! (::collapse-post s) false)}
+          [:div.expand-button-inner
+            "View entire post"]])
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?
       ;   [:div.expanded-post-mobile-reactions
