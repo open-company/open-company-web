@@ -766,7 +766,7 @@
                                ;; Block the rich-body-editor component when
                                ;; the current editing post has been created already
                                :paywall? show-paywall-alert?
-                               :placeholder utils/default-body-placeholder
+                               :placeholder (str utils/default-body-placeholder "...")
                                :fullscreen is-fullscreen?
                                :dispatch-input-key :cmail-data
                                :cmd-enter-cb #(post-clicked s)
