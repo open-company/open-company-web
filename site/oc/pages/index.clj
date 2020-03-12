@@ -15,9 +15,7 @@
           "With Carrot, it’s easy to have thoughtful," [:br]
           "asynchronous discussions without the chatter."]
         [:div.subheadline.mobile-only
-          "Teams struggle to stay in-sync with chat alone."
-          [:br]
-          "Have better asynchronous discussions without the chatter."]
+          "It’s hard to stay in-sync with chat alone. Stay informed without the chatter."]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action
