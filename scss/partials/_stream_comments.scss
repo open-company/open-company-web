@@ -50,6 +50,11 @@ div.stream-comments {
           position: absolute;
           left: 9px;
           top: 4px;
+
+          @include dark_mode(){
+            background-color: #FFFFFF;
+            background-image: cdnUrl("/img/ML/plus_button_icon.svg");
+          }
         }
       }
 
@@ -125,6 +130,7 @@ div.stream-comments {
         &.new-comment {
           background-color: rgba(#3FBD7C, 0.16);
           border-radius: 8px;
+          margin-bottom: 1px;
 
           &.indented-comment {
             background-color: transparent;
@@ -527,13 +533,18 @@ div.stream-comments {
                 flex: 0 0 37px;
                 margin-left: 8px;
                 width: 37px;
-                height: 15px;
+                height: 18px;
+                position: relative;
 
                 &:before {
                   @include OC_Body_Bold();
                   font-size: 12px;
-                  line-height: 15px;
+                  line-height: 18px;
                   content: "(NEW)";
+                  color: $carrot_green;
+                  position: absolute;
+                  top: 0;
+                  left: 0;
                 }
               }
             }
