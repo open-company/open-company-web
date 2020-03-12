@@ -27,12 +27,30 @@ div.stream-comments {
       position: relative;
 
       button.expand-thead-bt {
-        height: 24px;
-        padding: 0 0 0 48px;
-        @include OC_Body_Bold();
+        width: 100%;
+        height: 28px;
+        padding: 0 0 4px 48px;
+        @include OC_Body_Book();
         font-size: 14px;
         line-height: 18px;
         color: var(--color);
+        text-align: left;
+        position: relative;
+
+        &:before {
+          content: "";
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background-color: #000000;
+          background-image: cdnUrl("/img/ML/plus_button_icon@dark.svg");
+          background-size: 16px 16px;
+          background-repeat: no-repeat;
+          background-position: center;
+          position: absolute;
+          left: 9px;
+          top: 4px;
+        }
       }
 
       &.left-border {
@@ -105,26 +123,15 @@ div.stream-comments {
         }
 
         &.new-comment {
-          background-color: #FFF7DD;
-          border-radius: 4px;
-
-          @include dark_mode() {
-            background-color: var(--opac-background-color-2);
-            &.indented-comment {
-              background-color: transparent;
-
-              div.stream-comment div.stream-comment-inner {
-                background-color: var(--opac-background-color-2);
-              }
-            }
-          }
+          background-color: rgba(#3FBD7C, 0.16);
+          border-radius: 8px;
 
           &.indented-comment {
             background-color: transparent;
 
             div.stream-comment div.stream-comment-inner {
-              background-color: #FFF7DD;
-              border-radius: 4px;
+              background-color: rgba(#3FBD7C, 0.16);
+              border-radius: 8px;
             }
           }
         }
@@ -517,14 +524,17 @@ div.stream-comments {
               }
 
               div.new-comment-tag {
-                flex: 0 0 34px;
+                flex: 0 0 37px;
                 margin-left: 8px;
-                width: 34px;
-                height: 18px;
-                background-image: cdnUrl("/img/ML/new_comment_tag.svg");
-                background-size: 34px 18px;
-                background-position: center;
-                background-repeat: no-repeat;
+                width: 37px;
+                height: 15px;
+
+                &:before {
+                  @include OC_Body_Bold();
+                  font-size: 12px;
+                  line-height: 15px;
+                  content: "(NEW)";
+                }
               }
             }
           }

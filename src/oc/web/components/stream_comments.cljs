@@ -386,9 +386,7 @@
                       showing-picker? (and (seq @(::show-picker s))
                                            (= @(::show-picker s) (:uuid root-comment-data)))]]
             [:div.stream-comment-thread
-              {:class (utils/class-set {:left-border (and (-> root-comment-data :thread-children count pos?)
-                                                          (or (pos? (:new-count root-comment-data))
-                                                              expanded-thread?))
+              {:class (utils/class-set {:left-border (-> root-comment-data :thread-children count pos?)
                                         :has-new (pos? (:new-count root-comment-data))})
                :key (str "stream-comments-thread-" (:uuid root-comment-data))}
               (if is-editing?
