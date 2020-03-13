@@ -472,50 +472,26 @@ $h2_top_margin: 24;
                 transition: none !important;
               }
 
-              div.poll-reply-count {
-                display: none;
-              }
-
               &.voted button.poll-reply, button.poll-reply {
                 width: 100%;
-                padding-left: 8px;
 
                 div.poll-reply-body {
                   @include OC_Body_Book();
-                }
-
-                &:before {
-                  display: none;
                 }
               }
 
               &:hover {
                 &:before {
-                  background-color: $carrot_green;
+                  background-color: rgba($carrot_green, 0.3);
                   width: 100%;
                 }
 
                 button.poll-reply {
-                  padding-left: 32px;
                   width: 100%;
 
                   div.poll-reply-body {
-                    color: white;
+                    color: var(--color);
                     @include OC_Body_Bold();
-                  }
-
-                  &:before {
-                    content: "";
-                    width: 16px;
-                    height: 16px;
-                    background-image: cdnUrl("/img/ML/poll_voted_check.svg");
-                    background-size: 16px 16px;
-                    background-position: 0 0;
-                    background-repeat: no-repeat;
-                    position: absolute;
-                    left: 8px;
-                    top: 8px;
-                    display: block;
                   }
                 }
               }
