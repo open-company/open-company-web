@@ -12,15 +12,15 @@
 (defn add-poll [dispatch-key poll-id]
   (timbre/info "Adding poll with id" poll-id)
   (let [cur-user (dis/current-user-data)
-        polls-key (if (coll? dispatch-key)
-                    (vec (conj dispatch-key :polls))
-                    [dispatch-key :polls])
-        poll-data (pu/poll-data cur-user poll-id)]
-    (dis/dispatch! [:update polls-key #(vec (conj % poll-data))])))
+        poll-data (pu/poll-data cur-user poll-id)
+        poll-key (if (coll? dispatch-key)
+                   (vec (concat dispatch-key [:polls (keyword poll-id)]))
+                   [dispatch-key :polls (keyword poll-id)])]
+    (dis/dispatch! [:input poll-key poll-data])))
 
 (defn remove-poll [dispatch-key poll-data]
   (timbre/info "Remove poll" dispatch-key (:poll-uuid poll-data))
-  (dis/dispatch! [:update (vec (conj dispatch-key :polls)) (fn [polls] (filterv #(not= (:poll-uuid %) (:poll-uuid poll-data)) polls))])
+  (dis/dispatch! [:update (vec (conj dispatch-key :polls)) #(dissoc % (:poll-uuid poll-data))])
   (when-let [poll-element (pu/get-poll-portal-element (:poll-uuid poll-data))]
     (.removeChild (.-parentElement poll-element) poll-element)))
 
@@ -41,14 +41,15 @@
 ;; Replies
 
 (defn add-reply [poll-key & [reply-body]]
-  (dis/dispatch! [:update poll-key #(merge % {:replies (vec (conj (:replies %) (pu/poll-reply (dis/current-user-data) reply-body)))
-                                              :updated-at (utils/as-of-now)})]))
+  (let [new-reply-data (pu/poll-reply (dis/current-user-data) reply-body)]
+    (dis/dispatch! [:update poll-key #(merge % {:replies (assoc (:replies %) (keyword (:reply-id new-reply-data)) new-reply-data)
+                                                :updated-at (utils/as-of-now)})])))
 
-(defn update-reply [poll-key idx body]
-  (dis/dispatch! [:input (vec (concat poll-key [:replies idx :body])) body]))
+(defn update-reply [poll-key reply-id body]
+  (dis/dispatch! [:input (vec (concat poll-key [:replies (keyword reply-id) :body])) body]))
 
 (defn delete-reply [poll-key poll-reply-id]
-  (dis/dispatch! [:update poll-key #(merge % {:replies (filterv (fn[r] (not= (:reply-id r) poll-reply-id)) (:replies %))
+  (dis/dispatch! [:update poll-key #(merge % {:replies (dissoc (:replies %) (keyword poll-reply-id))
                                               :updated-at (utils/as-of-now)})]))
 
 (defn add-new-reply [poll-data poll-key reply-body]
@@ -60,7 +61,7 @@
 
 (defn delete-existing-reply [poll-data poll-key poll-reply-id]
   (timbre/info "Deleting existing reply from" poll-key "reply:" poll-reply-id)
-  (let [reply-data (some #(when (= (:reply-id %) poll-reply-id) %) (:replies poll-data))
+  (let [reply-data (-> poll-data :replies (keyword poll-reply-id))
         delete-reply-link (utils/link-for (:links reply-data) "delete" "DELETE")]
     (delete-reply poll-key poll-reply-id)
     (api/poll-delete-reply delete-reply-link (fn [{:keys [status body success]}]
@@ -68,45 +69,25 @@
 
 ;; Vote/unvote
 
-(defn- update-reply-vote [user-id voting-reply-id add? reply]
-  (let [updated-votes (fn [r add?]
-                        (if add?
-                          (vec (conj (set (:votes r)) user-id))
-                          (filterv #(not= % user-id) (:votes r))))]
-    (cond
-      (= (:reply-id reply) voting-reply-id)
-      (let [next-votes (updated-votes reply add?)]
-        (merge reply
-          {:votes next-votes
-           :votes-count (count next-votes)}))
-      (some #(when (= % user-id) %) (:votes reply))
-      (let [next-votes (updated-votes reply false)]
-        (merge reply
-          {:votes next-votes
-           :votes-count (count next-votes)}))
-      :else
-      reply)))
+(defn- update-reply-vote [user-id reply add?]
+  (if add?
+    (vec (conj (set (:votes reply)) user-id))
+    (filterv #(not= % user-id) (:votes reply))))
 
 (defn vote-reply [poll-data poll-key reply-id]
   (timbre/info "Voting reply" reply-id)
-  (let [reply (some #(when (= (:reply-id %) reply-id) %) (:replies poll-data))]
+  (let [reply (get-in poll-data [:replies (keyword reply-id)])]
     (when-let [vote-link (utils/link-for (:links reply) "vote")]
-      (let [user-id (:user-id (dis/current-user-data))
-            updated-replies (mapv (partial update-reply-vote user-id reply-id true) (:replies poll-data))
-            total-count (reduce + (map :votes-count updated-replies))]
-        (dis/dispatch! [:update poll-key #(merge % {:total-votes-count total-count
-                                                    :replies updated-replies})]))
+      (let [user-id (:user-id (dis/current-user-data))]
+        (dis/dispatch! [:update (concat poll-key [:replies (keyword reply-id) :votes]) #(update-reply-vote user-id % true)]))
       (api/poll-vote vote-link (fn [{:keys [status body success]}]
        (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))
 
 (defn unvote-reply [poll-data poll-key reply-id]
   (timbre/info "Unvoting reply" reply-id)
-  (let [reply (some #(when (= (:reply-id %) reply-id) %) (:replies poll-data))]
+  (let [reply (get-in poll-data [:replies (keyword reply-id)])]
     (when-let [unvote-link (utils/link-for (:links reply) "unvote")]
-      (let [user-id (:user-id (dis/current-user-data))
-            updated-replies (mapv (partial update-reply-vote user-id reply-id false) (:replies poll-data))
-            total-count (reduce + (map :votes-count updated-replies))]
-        (dis/dispatch! [:update poll-key #(merge % {:total-votes-count total-count
-                                                    :replies updated-replies})]))
+      (let [user-id (:user-id (dis/current-user-data))]
+        (dis/dispatch! [:update (concat poll-key [:replies (keyword reply-id) :votes]) #(update-reply-vote user-id % false)]))
       (api/poll-vote unvote-link (fn [{:keys [status body success]}]
        (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))

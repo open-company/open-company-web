@@ -28,9 +28,9 @@
    :user-id (:user-id user-data)})
 
 (defn poll-reply [user-data body]
-  {:body (or body "")
+  {:created-at (created-at)
+   :body (or body "")
    :author (author-for-user user-data)
-   :votes-count 0
    :reply-id (new-reply-id)
    :votes []})
 
@@ -41,21 +41,28 @@
    :created-at (created-at)
    :updated-at (created-at)
    :author (author-for-user user-data)
-   :total-votes-count 0
-   :replies (mapv #(poll-reply user-data "") (range min-poll-replies))})
+   :replies (let [reps (mapv #(poll-reply user-data "") (range min-poll-replies))]
+              (zipmap (mapv (comp keyword :reply-id) reps) reps))})
+
+(defn clean-poll-reply [poll-reply-data]
+  (dissoc poll-reply-data :links))
+
+(defn clean-poll [poll-data]
+  (-> poll-data
+   (dissoc :links :preview)
+   (update :replies (fn [replies]
+                      (zipmap
+                       (mapv (comp keyword :reply-id) (vals replies))
+                       (mapv clean-poll-reply (vals replies)))))))
 
 (defn clean-polls
   "Clean not needed keys from poll maps."
   [activity-data]
-  (if (contains? activity-data :polls)
-    (assoc activity-data :polls
-     (mapv (fn [poll]
-      (-> poll
-       (dissoc :links :preview)
-       (update :replies
-        (fn [replies]
-         (mapv #(dissoc % :links) replies)))))
-      (:polls activity-data)))
+  (if (seq (:polls activity-data))
+    (update activity-data :polls (fn [polls]
+                                   (zipmap
+                                    (mapv (comp keyword :poll-uuid) (vals polls))
+                                    (mapv clean-poll (vals polls)))))
     activity-data))
 
 ;; Dom manipulation

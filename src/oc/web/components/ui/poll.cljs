@@ -21,19 +21,20 @@
   (let [can-vote? (and (seq current-user-id)
                        (not (:preview poll-data)))
         user-voted? (and (not @(::adding-reply s))
-                         (seq (map #(= current-user-id %) (mapcat :votes (:replies poll-data)))))]
+                         (seq (map #(= current-user-id %) (mapcat :votes (:replies poll-data)))))
+        total-votes-count (reduce #(-> %2 :votes count (+ %1)) 0 (-> poll-data :replies vals))]
     [:div.poll.poll-read
       {:class (utils/class-set {:voted user-voted?})}
       [:div.poll-question
         [:div.poll-question-body
           (:question poll-data)]
         [:div.poll-total-count
-          (str (:total-votes-count poll-data) " vote" (when (not= (:total-votes-count poll-data) 1) "s"))]]
+          (str total-votes-count " vote" (when (not= total-votes-count 1) "s"))]]
       [:div.poll-replies
         {:class (utils/class-set {:can-vote can-vote?
                                   :animate @(::animate s)})}
-        (for [reply (:replies poll-data)
-              :let [votes-percent (* (/ (:votes-count reply) (:total-votes-count poll-data)) 100)
+        (for [reply (vals (:replies poll-data))
+              :let [votes-percent (-> reply :votes count (/ total-votes-count) (* 100))
                     rounded-votes-percent (if (js/isNaN votes-percent)
                                             0
                                             (/ (.round js/Math (* 100 votes-percent)) 100))
@@ -54,9 +55,9 @@
                 (:body reply)]]
             [:div.poll-reply-count
               (str rounded-votes-percent "%")]])]
-      (when (and (:can-add-reply poll-data)
-                 (or can-vote?
-                     (:preview poll-data)))
+      (when (or (and (:can-add-reply poll-data)
+                     can-vote?)
+                (:preview poll-data))
           (if @(::adding-reply s)
             [:div.poll-reply-new
               [:div.poll-reply.group
@@ -82,14 +83,15 @@
                   {:type "button"
                    :on-click #(reset! (::adding-reply s) false)}]]]
             [:div.poll-reply-new
-              [:button.mlb-reset.poll-reply-new
-                {:type "button"
-                 :on-click (fn [e]
-                            (reset! (::adding-reply s) true)
-                            (utils/after 800
-                             #(when-let [new-input (rum/ref-node s :new-reply)]
-                                (.focus new-input))))}
-                "Add option"]
+              (when (:can-add-reply poll-data)
+                [:button.mlb-reset.poll-reply-new
+                  {:type "button"
+                   :on-click (fn [e]
+                              (reset! (::adding-reply s) true)
+                              (utils/after 800
+                               #(when-let [new-input (rum/ref-node s :new-reply)]
+                                  (.focus new-input))))}
+                  "Add option"])
               (when (:preview poll-data)
                 [:button.mlb-reset.poll-preview-bt
                   {:type "button"
@@ -99,10 +101,11 @@
 (rum/defcs poll-edit < rum/static
                        (rum/local "" ::new-reply)
                        {:did-mount (fn [s]
-                          (.focus (rum/ref-node s :question))
+                          (when-let [q-el (rum/ref-node s :question)]
+                            (.focus q-el))
                         s)}
   [s {:keys [poll-data poll-key current-user-id] :as props}]
-  (let [should-show-delete-reply? (> (count (:replies poll-data)) poll-utils/min-poll-replies)
+  (let [should-show-delete-reply? (-> poll-data :replies count (> poll-utils/min-poll-replies))
         is-mobile? (responsive/is-mobile-size?)]
     (if (:preview poll-data)
       (poll-read props)
@@ -138,27 +141,28 @@
              :placeholder "Ask your question..."
              :value (:question poll-data)
              :on-change #(poll-actions/update-question poll-key poll-data (.. % -target -value))}]
-          (for [idx (range (count (:replies poll-data)))
-                :let [reply (get (:replies poll-data) idx)]]
-            [:div.poll-reply.group
-              {:key (str "poll-" (:poll-uuid poll-data) "-reply-" (:reply-id reply))}
-              [:div.poll-reply-label
-                (str "Choice " (inc idx))]
-              [:input.poll-reply-body
-                {:type "text"
-                 :tab-index "0"
-                 :value (:body reply)
-                 :max-length poll-utils/max-reply-length
-                 :placeholder (str "Choice " (inc idx))
-                 :on-key-press (fn [e]
-                                 (when (or (= (.-key e) "Enter")
-                                           (= (.-keyCode e) 13))
-                                   (utils/event-stop e)))
-                 :on-change #(poll-actions/update-reply poll-key idx (.. % -target -value))}]
-              (when should-show-delete-reply?
-                [:button.mlb-reset.delete-reply
-                  {:type "button"
-                   :on-click #(poll-actions/delete-reply poll-key (:reply-id reply))}])])]
+          (let [idx (atom 0)]
+            (for [reply (sort-by (comp :body :created-at) (-> poll-data :replies vals))
+                  :let [idx (swap! idx inc)]]
+              [:div.poll-reply.group
+                {:key (str "poll-" (:poll-uuid poll-data) "-reply-" (:reply-id reply))}
+                [:div.poll-reply-label
+                  (str "Choice " idx)]
+                [:input.poll-reply-body
+                  {:type "text"
+                   :tab-index "0"
+                   :value (:body reply)
+                   :max-length poll-utils/max-reply-length
+                   :placeholder (str "Choice " idx)
+                   :on-key-press (fn [e]
+                                   (when (or (= (.-key e) "Enter")
+                                             (= (.-keyCode e) 13))
+                                     (utils/event-stop e)))
+                   :on-change #(poll-actions/update-reply poll-key (:reply-id reply) (.. % -target -value))}]
+                (when should-show-delete-reply?
+                  [:button.mlb-reset.delete-reply
+                    {:type "button"
+                     :on-click #(poll-actions/delete-reply poll-key (:reply-id reply))}])]))]
         [:div.poll-reply-new
           [:button.mlb-reset.poll-reply-new
             {:type "button"
@@ -222,15 +226,15 @@
 
 (rum/defc polls-wrapper < rum/static
   [{:keys [polls-data editing? dispatch-key current-user-id container-selector activity-data]}]
-  (for [idx (range (count polls-data))
-        :let [poll (get polls-data idx)
-              poll-selector (str "." poll-utils/poll-selector-prefix (:poll-uuid poll))]]
+  (for [[poll-uuid-k poll] polls-data
+        :let [poll-uuid (name poll-uuid-k)
+              poll-selector (str "." poll-utils/poll-selector-prefix poll-uuid)]]
     (rum/with-key
      (poll-portal {:poll-data poll
                    :editing? editing?
                    :container-selector container-selector
                    :current-user-id current-user-id
-                   :poll-key (vec (concat (if (coll? dispatch-key) dispatch-key [dispatch-key]) [:polls idx]))
+                   :poll-key (vec (concat (if (coll? dispatch-key) dispatch-key [dispatch-key]) [:polls poll-uuid-k]))
                    :poll-portal-selector poll-selector
                    :activity-data activity-data})
-     (str poll-utils/poll-selector-prefix (:poll-uuid poll)))))
+     (str poll-utils/poll-selector-prefix poll-uuid))))
