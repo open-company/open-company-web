@@ -107,7 +107,7 @@ function PlaceCaretAtEnd(el) {
 
     checkAvailableParagraph: function() {
       var editor = this.getEditorElements()[0];
-      if (editor.childNodes.length == 1 &&
+      if (editor && editor.firstElementChild &&
           editor.firstElementChild.nodeName.toLowerCase() !== 'p') {
         var newParagraph = this.appendParagraph();
         this.moveCaret($(newParagraph), 0);
