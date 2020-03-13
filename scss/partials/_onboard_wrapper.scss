@@ -838,6 +838,7 @@ div.onboard-lander {
           width: 100%;
           display: block;
           margin: 0 0 24px;
+          padding-top: 64px;
 
           @include org-avatar(72);
 
@@ -852,7 +853,7 @@ div.onboard-lander {
         }
 
         div.title {
-          margin-top: 0;
+          padding-top: 0;
         }
       }
 
