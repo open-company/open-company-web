@@ -78,9 +78,13 @@
       [:button.mlb-reset.notification-bell-bt
         {:class (utils/class-set {:new has-new-content
                                   :active @(::tray-open s)})
+         :data-toggle (when-not is-mobile? "tooltip")
+         :data-placement "bottom"
+         :title "Notifications"
          :on-click #(if @(::tray-open s)
                       (close-tray s)
-                      (reset! (::tray-open s) true))}]
+                      (reset! (::tray-open s) true))}
+        [:span.bell-icon]]
       [:div.user-notifications-tray
         {:class (utils/class-set {:hidden-tray (not @(::tray-open s))})}
         [:div.user-notifications-tray-header.group
