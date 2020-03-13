@@ -25,10 +25,10 @@
 ;; 800px from the end of the current rendered results as point to add more items in the batch
 (def scroll-card-threshold 1)
 (def scroll-card-threshold-collapsed 5)
-(def collapsed-foc-height 72)
-(def foc-height 196)
-(def mobile-foc-height 179)
-(def foc-separators-height 34)
+(def collapsed-foc-height 56)
+(def foc-height 188)
+(def mobile-foc-height 171)
+(def foc-separators-height 50)
 
 (defn- calc-card-height [mobile? foc-layout]
   (cond
@@ -124,9 +124,10 @@
     {:style style}])
 
 (rum/defc separator-item < rum/static
-  [{:keys [style] :as row-props} {:keys [label] :as props}]
+  [{:keys [style foc-layout] :as row-props} {:keys [label] :as props}]
   [:div.virtualized-list-separator
-    {:style style}
+    {:style style
+     :class (when (= foc-layout dis/default-foc-layout) "expanded-list")}
     label])
 
 (rum/defcs virtualized-stream < rum/static
@@ -169,7 +170,9 @@
                                                 (= (:content-type item) "separator"))]
                       (cond
                         separator-item?
-                        foc-separators-height
+                        (if (= foc-layout dis/other-foc-layout)
+                          foc-separators-height
+                          (- foc-separators-height 8))
                         loading-more?
                         (if is-mobile? 44 60)
                         carrot-close?
@@ -204,7 +207,7 @@
                            loading-more?
                            (rum/with-key (load-more row-props) (str "loading-more-" row-key))
                            separator-item?
-                           (rum/with-key (separator-item row-props item) (str "separator-item-" row-key))
+                           (rum/with-key (separator-item (assoc row-props :foc-layout foc-layout) item) (str "separator-item-" row-key))
                            :else
                            (rum/with-key
                             (wrapped-stream-item row-props (merge derivatives

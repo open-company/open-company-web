@@ -42,6 +42,27 @@ div.virtualized-list-row.collapsed-item {
             background: linear-gradient(to left, var(--foc-menu-gradient-from), var(--foc-menu-gradient-to) 100%);
           }
         }
+
+        &.expandable {
+          div.more-menu {
+            display: initial;
+
+            button {
+              display: initial;
+            }
+          }
+        }
+
+        &.unread-item {
+          background-color: var(--foc-new-color);
+          z-index: 2;
+          box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
+          border-radius: 4px;
+          border: 1px solid var(--foc-new-border-color);
+          padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
+          width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
+          height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
+        }
       }
     }
   }
@@ -65,18 +86,6 @@ div.stream-collapsed-item {
 
   &.expandable {
     cursor: pointer;
-
-    @include big_web() {
-    &:hover {
-      div.more-menu {
-        display: initial;
-
-        button {
-          display: initial;
-        }
-      }
-    }
-  }
   }
 
   &.unread-item {
@@ -86,19 +95,6 @@ div.stream-collapsed-item {
 
     &.showing-share {
       z-index: 3;
-    }
-
-    @include big_web(){
-      &:hover {
-        background-color: var(--foc-new-color);
-        z-index: 2;
-        box-shadow: 0 2px 6px 0 var(--foc-box-shadow);
-        border-radius: 4px;
-        border: 1px solid var(--foc-new-border-color);
-        padding: #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{12 + $foc_hover_extra_padding}px #{20 + $foc_hover_extra_padding}px;
-        width: #{$board_container_width + ($foc_hover_extra_padding * 2)}px;
-        height: #{$collapsed_foc_height + ($foc_hover_extra_padding * 2)}px;
-      }
     }
 
     div.more-menu {
