@@ -18,7 +18,7 @@
   (when (and (exists? js/Sentry) ls/local-dsn)
     (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)]
-      (js/Sentry.BrowserClient. #js {:dsn ls/local-dsn})
+      (js/Sentry.BrowserClient. sentry-params)
       (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
       (.configureScope js/Sentry (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
@@ -71,13 +71,13 @@
   (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (try
-      (custom-error (or error-message error-name) (if error-message error-name "Error"))
+      (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
       (catch :default e
         (capture-error! e))))))
 
 (defn capture-error-with-message [error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message)
   (try
-    (custom-error (or error-message error-name) (if error-message error-name "Error"))
+    (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
     (catch :default e
       (capture-error! e))))
