@@ -50,7 +50,7 @@
 (defn ^:export test-sentry []
   (js/setTimeout #(capture-message! "Message from clojure") 1000)
   (try
-    (throw (js/errorThrowingCode.))
+    (js/errorThrowingCode.)
     (catch :default e
       (capture-error! e))))
 
