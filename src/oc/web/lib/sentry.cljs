@@ -6,20 +6,20 @@
             [taoensso.timbre :as timbre]))
 
 (defn init-parameters [dsn]
-  #js {:whitelistUrls ls/local-whitelist-array
-       :tags #js {:isMobile (responsive/is-mobile-size?)
-                  :hasJWT (not (not (jwt/jwt)))}
-       :sourceRoot ls/web-server
-       :release ls/deploy-key
-       :debug (= ls/log-level "debug")
-       :dsn dsn})
+  {:whitelistUrls ls/local-whitelist-array
+   :tags {:isMobile (responsive/is-mobile-size?)
+          :hasJWT (not (not (jwt/jwt)))}
+   :sourceRoot ls/web-server
+   :release ls/deploy-key
+   :debug (= ls/log-level "debug")
+   :dsn dsn})
 
 (defn sentry-setup []
   (when (and (exists? js/Sentry) ls/local-dsn)
     (timbre/info "Setup Sentry")
     (let [sentry-params (init-parameters ls/local-dsn)]
-      (js/Sentry.BrowserClient. sentry-params)
-      (timbre/debug "Sentry params:" (-> sentry-params js->clj (dissoc :dsn) clj->js js/JSON.stringify))
+      (.init js/Sentry (clj->js sentry-params))
+      (timbre/debug "Sentry params:" sentry-params)
       (.configureScope js/Sentry (fn [scope]
         (.setTag scope "isMobile" (responsive/is-mobile-size?))
         (.setTag scope "hasJWT" (not (not (jwt/jwt))))
