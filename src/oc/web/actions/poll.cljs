@@ -74,12 +74,21 @@
     (vec (conj (set (:votes reply)) user-id))
     (filterv #(not= % user-id) (:votes reply))))
 
+(defn- update-vote-reply [user-id replies reply-id]
+  (js/console.log "DBG update-vote-reply" replies)
+  (let [reps-coll (->> replies
+                   vals
+                   (mapv #(assoc % :votes
+                           (update-reply-vote user-id % (= (:reply-id %) reply-id)))))]
+    (js/console.log "DBG update-vote-reply" reps-coll)
+    (zipmap (mapv :reply-id reps-coll) reps-coll)))
+
 (defn vote-reply [poll-data poll-key reply-id]
   (timbre/info "Voting reply" reply-id)
   (let [reply (get-in poll-data [:replies (keyword reply-id)])]
     (when-let [vote-link (utils/link-for (:links reply) "vote")]
       (let [user-id (:user-id (dis/current-user-data))]
-        (dis/dispatch! [:update (concat poll-key [:replies (keyword reply-id) :votes]) #(update-reply-vote user-id % true)]))
+        (dis/dispatch! [:update (vec (conj poll-key :replies)) #(update-vote-reply user-id % reply-id)]))
       (api/poll-vote vote-link (fn [{:keys [status body success]}]
        (activity-actions/activity-get-finish status (if success (json->cljs body) {}) nil))))))
 
