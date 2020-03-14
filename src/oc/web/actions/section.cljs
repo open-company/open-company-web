@@ -136,12 +136,20 @@
       (let [create-board-link (utils/link-for (:links (dispatcher/org-data)) "create")]
         (api/create-board create-board-link section-data note
           (fn [{:keys [success status body]}]
-            (let [section-data (when success (json->cljs body))]
+            (let [section-data (when success (json->cljs body))
+                  editable-board? (utils/link-for (:links section-data) "create")]
               (if-not success
                 (when (fn? error-cb)
                   (error-cb status))
                 (do
-                  (utils/after 100 #(router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data))))
+                  (utils/after 100
+                   #(do
+                     (when (and editable-board?
+                                (-> @dispatcher/app-state :cmail-state :collapsed))
+                        (dispatcher/dispatch! [:input [:cmail-data] {:board-slug (:slug section-data)
+                                                              :board-name (:name section-data)}])
+                        (dispatcher/dispatch! [:input [:cmail-state :key] (utils/activity-uuid)]))
+                     (router/nav! (oc-urls/board (router/current-org-slug) (:slug section-data)))))
                   (utils/after 500 refresh-org-data)
                   (ws-cc/container-watch (:uuid section-data))
                   (dispatcher/dispatch! [:section-edit-save/finish section-data])

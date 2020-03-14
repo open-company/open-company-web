@@ -60,6 +60,27 @@
   (when @(::mark-as-read? s)
     (activity-actions/mark-read @(::activity-uuid s))))
 
+(def big-web-collapse-min-height 134)
+(def mobile-collapse-min-height 160)
+(def min-body-length-for-truncation 50)
+
+(defn- check-collapse-post [s]
+  (when (nil? @(::collapse-post s))
+    (let [is-mobile? (responsive/is-mobile-size?)
+          comparing-height (if is-mobile? mobile-collapse-min-height big-web-collapse-min-height)
+          activity-data @(drv/get-ref s :activity-data)
+          comments-data (au/get-comments activity-data @(drv/get-ref s :comments-data))]
+      (reset! (::collapse-post s) (and ;; Truncate posts with a minimum of body length
+                                       (> (count (:body activity-data)) min-body-length-for-truncation)
+                                       ;; Never if they have polls
+                                       (not (seq (:polls activity-data)))
+                                       ;; Only for users we can know if they read it or not
+                                       (jwt/user-is-part-of-the-team (:team-id (dis/org-data)))
+                                       ;; Only when they are read
+                                       (not (:unread activity-data))
+                                       ;; And only when there is at least a comment
+                                       (pos? (count comments-data)))))))
+
 (rum/defcs expanded-post <
   rum/reactive
   (drv/drv :route)
@@ -78,10 +99,12 @@
   (rum/local nil ::activity-uuid)
   (rum/local false ::force-show-menu)
   (rum/local true ::mark-as-read?)
+  (rum/local nil ::collapse-post)
   ;; Mixins
   (mention-mixins/oc-mentions-hover)
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
+    (check-collapse-post s)
     (save-initial-read-data s)
     s)
    :did-mount (fn [s]
@@ -226,8 +249,16 @@
            :dangerouslySetInnerHTML {:__html (:abstract activity-data)}}])
       [:div.expanded-post-body.oc-mentions.oc-mentions-hover
         {:ref "post-body"
-         :class utils/hide-class
+         :on-click (when @(::collapse-post s)
+                     #(reset! (::collapse-post s) false))
+         :class (utils/class-set {utils/hide-class true
+                                  :collapsed @(::collapse-post s)})
          :dangerouslySetInnerHTML {:__html (:body activity-data)}}]
+      (when @(::collapse-post s)
+        [:button.mlb-reset.expand-button
+          {:on-click #(reset! (::collapse-post s) false)}
+          [:div.expand-button-inner
+            "View entire post"]])
       (stream-attachments (:attachments activity-data))
       ; (when is-mobile?
       ;   [:div.expanded-post-mobile-reactions

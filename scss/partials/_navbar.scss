@@ -203,6 +203,11 @@ nav.oc-navbar {
         left: calc(100vw - 72px - 16px);
         min-width: 72px;
 
+        &.create-post {
+          min-width: 112px; // 72 + 32 + 8
+          left: calc(100vw - 112px - 16px);
+        }
+
         @include mobile() {
           min-width: unset;
           position: absolute;
@@ -211,6 +216,61 @@ nav.oc-navbar {
           right: 16px;
           width: 32px;
           height: 32px;
+        }
+
+        button.navbar-create-bt {
+          float: left;
+          margin-right: 8px;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          position: relative;
+          background-color: var(--opac-background-color-1);
+          transition: background-color 180ms ease-in;
+
+          span.plus-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/add_to_board_plus.svg");
+            background-size: 14px 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.5;
+            transition: opacity 180ms ease-in;
+
+            @include dark_mode() {
+              background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+            }
+          }
+
+          span.plus-icon-active {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            background-image: cdnUrl("/img/ML/add_to_board_plus_white.svg");
+            background-size: 14px 14px;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 180ms ease-in;
+          }
+
+          &.scrolled, &:hover {
+            background-color: $carrot_green;
+
+            span.plus-icon {
+              opacity: 0;
+            }
+
+            span.plus-icon-active {
+              opacity: 1;
+            }
+          }
         }
 
         div.user-notifications {
