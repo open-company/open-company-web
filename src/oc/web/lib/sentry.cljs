@@ -75,7 +75,7 @@
       (catch :default e
         (capture-error! e))))))
 
-(defn capture-error-with-message [error-name & [error-message]]
+(defn ^:export capture-error-with-message [error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message)
   (try
     (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
