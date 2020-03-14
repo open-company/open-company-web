@@ -119,8 +119,8 @@ function OCWebSetupStaticPagesJS(){
 
 document.addEventListener("DOMContentLoaded", function(_) {
 
-  if(OCStaticGetParameterByName("ref") === "producthunt"){
-    $(document.body).addClass("ph-banner");
+  if(!document.body.classList.contains("covid-banner") && OCStaticGetParameterByName("ref") === "producthunt"){
+    document.body.classList.add("ph-banner")
   }
 
   // Initialize tooltips
@@ -177,20 +177,7 @@ document.addEventListener("DOMContentLoaded", function(_) {
     signupButton.addClass("your-digest");
     signupButton.attr("href", your_board_url);
     signupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
-
-    var tabletSignupButton = $("#site-header-tablet-signup-item");
-    tabletSignupButton.removeClass("start");
-    tabletSignupButton.attr("href", your_board_url);
-    tabletSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
-
-    var tabletLoginButton = $("#site-header-tablet-login-item");
-    tabletLoginButton.css({"display": "none"});
-
-    var mobileSignupButton = $("#site-header-mobile-signup-item");
-    mobileSignupButton.removeClass("start");
-    mobileSignupButton.addClass("go-to-digest-bt");
-    mobileSignupButton.attr("href", your_board_url);
-    mobileSignupButton.html("<span class=\"go-to-digest\">Launch Carrot</span>");
+    signupButton.show();
 
     // Hide get started and login buttons in the footer
     $("div.footer-small-links.static").hide();
@@ -280,11 +267,21 @@ function OCStaticStartFixFixedPositioning(sel) {
 
 
 function OCStaticShowPHBanner(){
-  $(document.body).addClass("ph-banner");
+  OCStaticHideCovidBanner();
+  document.body.classList.add("ph-banner")
 }
 
 function OCStaticHidePHBanner(){
-  $(document.body).removeClass("ph-banner");
+  document.body.classList.remove("ph-banner")
+}
+
+function OCStaticShowCovidBanner(){
+  OCStaticHidePHBanner();
+  document.body.classList.add("covid-banner")
+}
+
+function OCStaticHideCovidBanner(){
+  document.body.classList.remove("covid-banner")
 }
 
 function OCStaticTextareaSaveSelection() {
