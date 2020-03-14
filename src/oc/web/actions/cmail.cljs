@@ -60,14 +60,16 @@
        :board-slug (:slug board-data)})))
 
 (defn get-board-for-edit [& [board-slug editable-boards]]
-  (let [board-data (if (seq board-slug)
-                    (dis/board-data (router/current-org-slug) board-slug)
-                    (dis/board-data))]
+  (let [sorted-editable-boards (sort-by :name editable-boards)
+        board-data (or
+                    (some #(when (= (:slug %) board-slug) %) sorted-editable-boards)
+                    (some #(when (= (:slug %) (router/current-board-slug)) %) sorted-editable-boards)
+                    (first sorted-editable-boards))]
     (if (or (not board-data)
             (= (:slug board-data) utils/default-drafts-board-slug)
             (:draft board-data)
             (not (utils/link-for (:links board-data) "create")))
-      (get-default-section editable-boards)
+      (get-default-section sorted-editable-boards)
       {:board-slug (:slug board-data)
        :board-name (:name board-data)})))
 
@@ -102,7 +104,9 @@
                                            (= (cook/get-cookie (cmail-fullscreen-cookie)) "true"))}
         cleaned-cmail-state (dissoc cmail-state :auto)
         fixed-cmail-state (merge cmail-default-state cleaned-cmail-state)]
-    (if (:fullscreen cmail-default-state)
+    (when (:fullscreen fixed-cmail-state)
+      (utils/scroll-to-y 0 0))
+    (if (:fullscreen fixed-cmail-state)
       (dom-utils/lock-page-scroll)
       (when-not (:collapsed cmail-state)
         (cook/remove-cookie! (cmail-fullscreen-cookie))))
@@ -127,10 +131,12 @@
 (defn cmail-toggle-fullscreen []
   (let [next-fullscreen-value (not (:fullscreen (:cmail-state @dis/app-state)))]
     (cmail-fullscreen-save next-fullscreen-value)
-    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])
+    (when next-fullscreen-value
+      (utils/scroll-to-y 0 0))
     (if next-fullscreen-value
       (dom-utils/lock-page-scroll)
-      (dom-utils/unlock-page-scroll))))
+      (dom-utils/unlock-page-scroll))
+    (dis/dispatch! [:update [:cmail-state] #(merge % {:fullscreen next-fullscreen-value})])))
 
 (defn cmail-toggle-must-see []
   (dis/dispatch! [:update [:cmail-data] #(merge % {:must-see (not (:must-see %))

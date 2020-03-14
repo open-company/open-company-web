@@ -614,19 +614,21 @@ div.pricing-table {
   margin: 40px auto 0;
   padding: 40px;
   position: relative;
+  min-height: 240px;
+  display: flex;
+  flex-direction: row;
+  align-items: normal;
+  align-content: flex-start;
 
   @include mobile() {
     margin-top: 24px;
     padding: 40px 24px;
+    display: block
   }
 
   div.pricing-table-left {
-    width: 255px;
-    position: absolute;
-    left: 40px;
-    top: 50%;
-    transform: translateY(-50%);
-    padding-right: 60px;
+    width: 195px;
+    flex: 0 0 195px;
 
     @include mobile() {
       position: initial;
@@ -655,20 +657,35 @@ div.pricing-table {
     }
   }
 
+  div.pricing-table-divider-line {
+    width: 1px;
+    min-height: 100%;
+    flex: 0 0 1px;
+    background-color: rgba(white, 0.2);
+    margin: 0 60px;
+
+    @include mobile() {
+      width: 100%;
+      height: 1px;
+      min-height: unset;
+      margin: 40px 0;
+    }
+  }
+
   div.pricing-table-right {
     float: right;
-    width: 71%;
-    border-left: 1px solid rgba(white, 0.2);
-    padding-left: 60px;
+    width: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: flex-start;
 
     @include mobile() {
       float: unset;
       width: 100%;
       border-left: none;
       padding-left: 0;
-      border-top: 1px solid rgba(white, 0.2);
-      margin-top: 40px;
-      padding-top: 24px;
     }
 
     div.pricing-table-right-copy {
@@ -697,7 +714,7 @@ div.pricing-table {
       font-size: 18px;
       line-height: 23px;
       padding: 16px 26px;
-      float: left;
+      width: 205px;
 
       @include mobile() {
         float: unset;
