@@ -5,7 +5,7 @@
   "About page. This is a copy of oc.web.components.about and
    every change here should be reflected there and vice versa."
   [options]
-  [:div.about-wrap
+  [:div.about-wrap.group
     {:id "wrap"}
     [:div.main.about
       [:section.about-header
@@ -18,7 +18,7 @@
             [:p
               (str
                "In the age of Slack and fast-moving conversations, the lack of "
-               "focus and clarity have become a huge problem in the workplace."
+               "focus and clarity have become a huge problem in the workplace. "
                "Teams are hyper-connected throughout the day, and yet "
                "it's become even more difficult to know what matters. "
                "How can that be?")]

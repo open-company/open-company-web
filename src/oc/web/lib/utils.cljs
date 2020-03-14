@@ -609,6 +609,8 @@
 
 (def default-headline "Add a title")
 
+(def default-body-placeholder "Start a new discussion")
+
 (def default-abstract "Quick summary (optional)")
 
 (def max-abstract-length 280)

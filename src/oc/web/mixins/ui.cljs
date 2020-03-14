@@ -258,6 +258,20 @@
       (dissoc s :on-resize-listener))
     s))})
 
+(defn on-window-scroll-mixin [callback]
+  {:did-mount (fn [s]
+   (let [on-scroll-listener (events/listen js/window EventType/SCROLL
+                             (fn [e]
+                              (callback s e)))]
+    (assoc s :on-scroll-listener on-scroll-listener)))
+   :will-unmount (fn [s]
+   (if (:on-scroll-listener s)
+    (do
+      (events/unlistenByKey (:on-scroll-listener s))
+      (dissoc s :on-scroll-listener))
+    s))})
+
+
 (defn make-images-interactive!
   "Attaches classes and click handlers to `img` tags to allow for expanding full-screen images"
   [s el-selector]

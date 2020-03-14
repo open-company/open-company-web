@@ -6,7 +6,7 @@
   "Slack lander page. This is a copy of oc.web.components.slack-lander and
    every change here should be reflected there and vice versa."
   [options]
-  [:div.slack-lander-wrap
+  [:div.slack-lander-wrap.group
     {:id "wrap"}
     [:div.main.slack-lander
       ; Hope page header

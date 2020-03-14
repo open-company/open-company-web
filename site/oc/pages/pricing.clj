@@ -2,20 +2,52 @@
   (:require [oc.pages.shared :as shared]))
 
 (defn pricing
-  "Pricing page. This is a copy of oc.web.components.pricing and every change here should be reflected there and vice versa."
+  "Pricing page."
   [options]
-  [:div.pricing-wrap
+  [:div.pricing-wrap.group
     {:id "wrap"}
     [:div.main.pricing
+
+      [:section.pricing-covid-letter
+        [:div.covid-letter-box
+          [:h4 "A note from Carrot about COVID-19"]
+
+          [:p
+            "Across the world, more and more companies are being forced to explore remote team communication because of the "
+            [:b "COVID-19"]
+            " virus outbreak."]
+          [:p
+            "Of course, we admire all of the companies and people who are in a position to help, especially "
+            [:b "health care workers"]
+            " on the front lines. But, as a software company, what can "
+            [:i "we"]
+            " do to help? Admittedly, "
+            "not much, and that makes us a little crazy."]
+          [:p
+            "No matter, we’re all in this together and we’ll do what we can."]
+          [:p
+            "Beginning immediately, new companies that sign up to use Carrot for remote team communication can use it "
+            [:b "free for unlimited users"]
+            " throughout the coronavirus crisis."]
+          [:p
+            "We do not know how long it will last, so it will be "
+            [:b "free indefinitely"]
+            " until things settle down. After that, we will return to our normal pricing, detailed below."]
+          [:p
+            [:b "Stay healthy,"]
+            [:br]
+            [:i "The Carrot team"]]]]
 
       [:section.pricing-header
 
         [:h1.pricing-headline
-          "Simple pricing for remote team communication"]
+          shared/pricing-headline]
 
         shared/pricing-table
         
-        shared/pricing-table-footer]
+        ; shared/pricing-table-footer
+
+        shared/pricing-chat]
 
       (shared/dashed-string 1)      
 
@@ -30,7 +62,7 @@
             [:div.pricing-apps-app-links
               [:a
                 {:href "/sign-up"}
-                "Try Carrot"]]]
+                "Try Carrot for free"]]]
           [:div.pricing-apps-separator]
           [:div.pricing-apps-app-block
             [:div.pricing-apps-app-header
@@ -126,6 +158,6 @@
 
       (shared/dashed-string 5 "big-web-tablet-only")
 
-      shared/pricing-footer
+      ; shared/pricing-footer
 
     ]])

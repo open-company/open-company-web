@@ -26,7 +26,6 @@
                                 (dis/dispatch! [:input [:show-sections-picker] false]))))
                              ;; Derivatives
                              (drv/drv :editable-boards)
-                             (drv/drv :section-editing)
                              ;; Locals
                              (rum/local nil ::container-max-height)
                              ;; Local mixins
@@ -37,14 +36,8 @@
                                (calc-max-height s)
                                s)}
   [s active-slug on-change moving?]
-  (let [section-editing (drv/react s :section-editing)
-        fixed-section-editing (when-not (string/blank? (:name section-editing))
-                                section-editing)
-        all-sections (filterv #(not= (:slug fixed-section-editing) (:slug %)) (vals (drv/react s :editable-boards)))
-        fixed-all-sections (if fixed-section-editing
-                             (vec (concat [fixed-section-editing] all-sections))
-                             all-sections)
-        sorted-all-sections (sort-by :name fixed-all-sections)
+  (let [all-sections (vals (drv/react s :editable-boards))
+        sorted-all-sections (sort-by :name all-sections)
         container-style (if @(::container-max-height s)
                           {:max-height (str @(::container-max-height s) "px")}
                           {})
