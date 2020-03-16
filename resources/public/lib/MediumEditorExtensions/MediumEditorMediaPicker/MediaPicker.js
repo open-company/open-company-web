@@ -121,9 +121,12 @@ function PlaceCaretAtEnd(el) {
 
     appendParagraph: function() {
       var meEl = this.getEditorElements()[0],
-          newParagraph = this.newP();
-      meEl.appendChild(newParagraph);
-      return newParagraph;
+          newParagraph;
+      if (meEl) {
+        newParagraph =  this.newP();
+        meEl.appendChild(newParagraph);
+        return newParagraph;
+      }
     },
 
     prependParagraph: function() {
@@ -424,18 +427,31 @@ function PlaceCaretAtEnd(el) {
           element = tempParagraph;
         } else if (element.tagName === "DIV"){
           // if it's a DIV we clean out the content
-          div.innerHTML = "";
+          div = this.document.createElement("div");
+          element.parentElement.replaceChild(div, element);
         } else if (element.tagName === "P"){
           var editor = this.getEditorElements()[0],
-              div = this.document.createElement("div");
+              div = this.document.createElement("div"),
+              nextElSibling;
           if (editor && editor.firstElementChild === element) {
+            nextElSibling = element.nextElementSibling;
             // Add a div below it
             element.parentNode.appendChild(div);
           } else if (editor && editor.lastElementChild === element) {
             element.parentNode.insertBefore(div, element);
+            nextElSibling = element;
           } else {
+            nextElSibling = element.nextElementSibling;
             // Replace current P with the div
             element.parentNode.replaceChild(div, element);
+          }
+
+          // If the poll element we are about to add has not a paragraph after let's add one
+          var needsParagraphAfter = !(nextElSibling && nextElSibling && nextElSibling.nodeType &&
+                                      nextElSibling.nodeType === Node.ELEMENT_NODE &&
+                                      nextElSibling.nodeName.toLowerCase() === 'p');
+          if (needsParagraphAfter) {
+            this.appendParagraph();
           }
         }
 
