@@ -75,12 +75,10 @@
     (filterv #(not= % user-id) (:votes reply))))
 
 (defn- update-vote-reply [user-id replies reply-id]
-  (js/console.log "DBG update-vote-reply" replies)
   (let [reps-coll (->> replies
                    vals
                    (mapv #(assoc % :votes
                            (update-reply-vote user-id % (= (:reply-id %) reply-id)))))]
-    (js/console.log "DBG update-vote-reply" reps-coll)
     (zipmap (mapv :reply-id reps-coll) reps-coll)))
 
 (defn vote-reply [poll-data poll-key reply-id]

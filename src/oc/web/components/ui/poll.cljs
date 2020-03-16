@@ -182,7 +182,8 @@
   [s {:keys [editing? poll-data] :as props}]
   [:div.oc-poll-container
     {:class (str "oc-poll-" (:poll-uuid poll-data))
-     :key (str "oc-poll-" (:poll-uuid poll-data))}
+     :key (str "oc-poll-" (:poll-uuid poll-data))
+     :content-editable false}
     (if editing?
       (poll-edit props)
       (poll-read props))])

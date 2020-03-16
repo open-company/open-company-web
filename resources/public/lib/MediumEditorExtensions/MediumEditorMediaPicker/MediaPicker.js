@@ -140,7 +140,7 @@ function PlaceCaretAtEnd(el) {
         var meEl = MediumEditor.util.getContainerEditorElement(this.base.getSelectedParentElement());
         if (meEl &&
             meEl.lastElementChild &&
-            meEl.lastElementChild.nodeName.toLowerCase() == "div" &&
+            meEl.lastElementChild.nodeName.toLowerCase() === "div" &&
             meEl.lastElementChild.classList.contains("media-poll")) {
           this.appendParagraph();
         }
@@ -149,7 +149,7 @@ function PlaceCaretAtEnd(el) {
       if (MediumEditor.util.isKey(keydownEvent, [38])) {
         if (meEl &&
             meEl.firstElementChild &&
-            meEl.firstElementChild.nodeName.toLowerCase() == "div" &&
+            meEl.firstElementChild.nodeName.toLowerCase() === "div" &&
             meEl.firstElementChild.classList.contains("media-poll")) {
           // In case the last child of the editor is a poll add a new paragraph when user press down arrow
           this.prependParagraph();
@@ -239,8 +239,8 @@ function PlaceCaretAtEnd(el) {
 
     isPollElement: function(el) {
       return (el &&
-              el.nodeType == 1 &&
-              el.nodeName.toLowerCase() == 'div' &&
+              el.nodeType === Node.ELEMENT_NODE &&
+              el.nodeName.toLowerCase() === 'div' &&
               el.classList.contains("media-poll"));
     },
 
@@ -348,16 +348,16 @@ function PlaceCaretAtEnd(el) {
             p;
         element = this.getAddableElement(element);
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // If the paragraph is empty
           if (element.innerText.length === 0 || element.innerText === "\n") {
               // if it has a BR inside
-            if (element.childNodes.length == 1){
+            if (element.childNodes.length === 1){
               // remove it
               element.removeChild(element.childNodes[0]);
             }
@@ -418,16 +418,16 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             div;
         // if the selection is in a DIV and it's the main editor element:
-        if (element.tagName == "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
+        if (element.tagName === "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
           // we need to add a DIV to insert the poll in
           div = this.document.createElement("div");
           var tempParagraph = this.appendParagraph();
           element.appendChild(div);
           element = tempParagraph;
-        } else if (element.tagName == "DIV"){
+        } else if (element.tagName === "DIV"){
           // if it's a DIV we clean out the content
           div.innerHTML = "";
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           var editor = this.getEditorElements()[0],
               div = this.document.createElement("div");
           if (editor && editor.firstElementChild === element) {
@@ -443,9 +443,20 @@ function PlaceCaretAtEnd(el) {
 
         div.className = "group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
         div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
-        div.setAttribute("contenteditable", false);
         div.dataset.mediaType = "poll";
         div.dataset.pollId = pollId;
+
+        if (!div.previousElementSibling ||
+            (div.previousElementSibling && div.previousElementSibling.nodeName &&
+             div.previousElementSibling.nodeName.toLowerCase() !== 'p')) {
+          div.parentElement.insertBefore(this.newP(), div);
+        }
+
+        if (!div.nextElementSibling ||
+            (div.nextElementSibling && div.nextElementSibling.nodeName &&
+             div.nextElementSibling.nodeName.toLowerCase() !== 'p')) {
+          this.insertAfter(this.newP(), div);
+        }
 
         this.base.checkContentChanged();
       }
@@ -479,14 +490,14 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -541,14 +552,14 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -602,14 +613,14 @@ function PlaceCaretAtEnd(el) {
             element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
             p;
         // if the selection is in a DIV means it's the main editor element
-        if (element.tagName == "DIV") {
+        if (element.tagName === "DIV") {
           // we need to add a p to insert the HR in
           p = this.document.createElement("p");
           element.appendChild(p);
         // if it's a P already
-        } else if (element.tagName == "P"){
+        } else if (element.tagName === "P"){
           // if it has a BR inside
-          if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+          if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
             // remove it
             element.removeChild(element.childNodes[0]);
           }
@@ -691,14 +702,14 @@ function PlaceCaretAtEnd(el) {
           element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
           p;
       // if the selection is in a DIV means it's the main editor element
-      if (element.tagName == "DIV") {
+      if (element.tagName === "DIV") {
         // we need to add a p to insert the HR in
         p = this.document.createElement("p");
         element.appendChild(p);
       // if it's a P already
-      } else if (element.tagName == "P"){
+      } else if (element.tagName === "P"){
         // if it has a BR inside
-        if (element.childNodes.length == 1 && element.childNodes[0].tagName == "BR"){
+        if (element.childNodes.length === 1 && element.childNodes[0].tagName === "BR"){
           // remove it
           element.removeChild(element.childNodes[0]);
         }
@@ -914,19 +925,19 @@ function PlaceCaretAtEnd(el) {
     },
 
     isBR: function(el) {
-      return (el.tagName == "BR");
+      return (el.tagName === "BR");
     },
 
     isEmptyParagraph: function(element){
       return (element &&
-              element.nodeName.toLowerCase() == 'p' &&
+              element.nodeName.toLowerCase() === 'p' &&
               ( // Paragraph without childrens
-                element.childNodes.length == 0 ||
+                element.childNodes.length === 0 ||
                 // Empty paragraph like: <p><br/><p/>
-                (element.childNodes.length == 1 &&
+                (element.childNodes.length === 1 &&
                  this.isBR(element.childNodes[0])) ||
                 // Empty paragraph like: <p><br/><span class="rangySelectionBoundary"></span><p/>
-                (element.childNodes.length == 2 &&
+                (element.childNodes.length === 2 &&
                  ((this.isBR(element.childNodes[0]) &&
                    this.isRangySelectionBoundary(element.childNodes[1])) ||
                   (this.isBR(element.childNodes[1]) &&
