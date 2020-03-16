@@ -155,7 +155,7 @@
                   (str "Choice " idx)]
                 [:input.poll-reply-body
                   {:type "text"
-                   :tab-index (+ tab-index-base @idx)
+                   :tab-index (+ tab-index-base idx)
                    :value (:body reply)
                    :max-length poll-utils/max-reply-length
                    :placeholder (str "Choice " idx)
