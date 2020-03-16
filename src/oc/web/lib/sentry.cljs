@@ -71,13 +71,15 @@
   (.withScope js/Sentry (fn [scope]
     (set-extra-context! scope ctx)
     (try
-      (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
+      (let [err (custom-error (or error-message error-name) (if error-message error-name "Error"))]
+        (capture-error! err))
       (catch :default e
         (capture-error! e))))))
 
 (defn ^:export capture-error-with-message [error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message)
   (try
-    (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
+    (let [err (custom-error (or error-message error-name) (if error-message error-name "Error"))]
+      (capture-error! err))
     (catch :default e
       (capture-error! e))))
