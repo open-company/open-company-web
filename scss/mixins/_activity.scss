@@ -216,8 +216,6 @@ $h2_top_margin: 24;
 
 @mixin poll($paragraph-spacing) {
   div.oc-poll-portal {
-    display: inline-block;
-    width: 100%;
     margin: 0 0 #{$paragraph_spacing}px;
 
     &:empty {
@@ -225,11 +223,6 @@ $h2_top_margin: 24;
     }
 
     div.oc-poll-container {
-      // Make sure the cursor is visible on the left and right of the element
-      margin: 0 1px 0 1px;
-      width: calc(100% - 2px);
-      display: inline-block;
-
       div.poll {
         width: 100%;
         display: inline-block;
