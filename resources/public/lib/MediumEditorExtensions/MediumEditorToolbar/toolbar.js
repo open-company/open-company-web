@@ -408,7 +408,7 @@
             // hide toolbar
             var selectionElement = MediumEditor.selection.getSelectionElement(this.window),
                 rangySelection = rangy.getSelection(),
-                rangyRange = rangySelection && rangySelection.getRangeAt(0),
+                rangyRange = rangySelection.length > 0 && rangySelection.getRangeAt(0),
                 selectedParent = rangyRange && rangyRange.commonAncestorContainer,
                 allDisabledChildren = selectedParent && selectedParent.querySelectorAll && selectedParent.querySelectorAll('[data-disable-toolbar]');
             // element is text node and parent has data-disable-toolbar attribute
