@@ -72,7 +72,7 @@ var AutoCode = MediumEditor.Extension.extend({
           // No inside a PRE, let's see if we need to create one
           var code_start = this.base.getSelectedParentElement().previousSibling && this.base.getSelectedParentElement().previousSibling.textContent.trim();
           // If the content is the code block start string:
-          if( code_start == "```" ){
+          if( code_start === "```" ){
             var newPreEl = this.document.createElement('pre');
             newPreEl.className = "media-codeblock";
             newPreEl.dataset.disableToolbar = true;
@@ -89,7 +89,7 @@ var AutoCode = MediumEditor.Extension.extend({
     },
 
     getPreElement: function (node) {
-      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() == 'pre';});
+      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() === 'pre';});
     }
   });
 

@@ -334,69 +334,6 @@ function PlaceCaretAtEnd(el) {
       setTimeout(this.togglePicker.bind(this), 100);
     },
 
-    pollClick: function(event){
-      log("pollClick");
-      if (this.inlinePlusButtonOptions.alwaysExpanded) {
-        this.hidePlaceholder();
-        this.saveSelection();
-      }
-      this.collapse();
-      this._waitingCB = true;
-      this.delegate("onPickerClick", "poll");
-      $(event.target).tooltip("hide");
-    },
-
-    addPoll: function(pollId) {
-      log("addPoll", pollId);
-      if (this._lastSelection) {
-        rangy.restoreSelection(this._lastSelection);
-        this._lastSelection = undefined;
-      }
-      if (pollId) {
-        // 2 cases: it's directly the div.medium-editor or it's a p already
-        if (!this.base.getFocusedElement()) {
-          PlaceCaretAtEnd(this.getEditorElements()[0]);
-        }
-        var sel = this.window.getSelection(),
-            element = this.getAddableElement(sel.getRangeAt(0).commonAncestorContainer),
-            div;
-        // if the selection is in a DIV and it's the main editor element:
-        if (element.tagName == "DIV" && MediumEditor.util.isMediumEditorElement(element)) {
-          // we need to add a DIV to insert the poll in
-          div = this.document.createElement("div");
-          var tempParagraph = this.appendParagraph();
-          element.appendChild(div);
-          element = tempParagraph;
-        } else if (element.tagName == "DIV"){
-          // if it's a DIV we clean out the content
-          div.innerHTML = "";
-        } else if (element.tagName == "P"){
-          var editor = this.getEditorElements()[0],
-              div = this.document.createElement("div");
-          if (editor && editor.firstElementChild === element) {
-            // Add a div below it
-            element.parentNode.appendChild(div);
-          } else if (editor && editor.lastElementChild === element) {
-            element.parentNode.insertBefore(div, element);
-          } else {
-            // Replace current P with the div
-            element.parentNode.replaceChild(div, element);
-          }
-        }
-
-        div.className = "group media-poll oc-poll-portal " + oc.web.utils.poll.poll_selector_prefix + pollId;
-        div.id = oc.web.utils.poll.poll_selector_prefix + pollId;
-        div.setAttribute("contenteditable", false);
-        div.dataset.mediaType = "poll";
-        div.dataset.disableToolbar = true;
-        div.dataset.pollId = pollId;
-
-        this.base.checkContentChanged();
-      }
-      this._waitingCB = false;
-      setTimeout(this.togglePicker.bind(this), 100);
-    },
-
     videoClick: function(event){
       if (this.inlinePlusButtonOptions.alwaysExpanded) {
         this.hidePlaceholder();

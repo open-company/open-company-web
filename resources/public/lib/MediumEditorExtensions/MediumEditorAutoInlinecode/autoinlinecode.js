@@ -60,8 +60,8 @@ var AutoInlinecode = MediumEditor.Extension.extend({
         var codeEl = this.getCodeTag(this.base.getSelectedParentElement());
 
         if (codeEl && (!codeEl.nextSibling ||
-                       (codeEl.nextSibling.nodeType == 1 &&
-                        codeEl.nextSibling.tagName.toLowerCase() == "br"))) {
+                       (codeEl.nextSibling.nodeType === Node.ELEMENT_NODE &&
+                        codeEl.nextSibling.tagName.toLowerCase() === "br"))) {
           var textNode = this.document.createTextNode('\u00A0');
           if (codeEl.nextSibling) {
             codeEl.parentNode.insertBefore(textNode, codeEl.nextSibling);
@@ -77,11 +77,11 @@ var AutoInlinecode = MediumEditor.Extension.extend({
     },
 
     getCodeTag: function(node) {
-      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() == 'code';});
+      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() === 'code';});
     },
 
     getParagraphElement: function (node) {
-      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() == 'p';});
+      return MediumEditor.util.traverseUp(node, function(el){return el.nodeName.toLowerCase() === 'p';});
     }
   });
 
