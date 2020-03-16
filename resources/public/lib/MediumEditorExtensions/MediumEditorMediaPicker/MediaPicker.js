@@ -411,7 +411,6 @@ function PlaceCaretAtEnd(el) {
         this._lastSelection = undefined;
       }
       if (pollId) {
-        // 2 cases: it's directly the div.medium-editor or it's a p already
         if (!this.base.getFocusedElement()) {
           PlaceCaretAtEnd(this.getEditorElements()[0]);
         }
