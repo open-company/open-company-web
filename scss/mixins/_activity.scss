@@ -496,7 +496,6 @@ $h2_top_margin: 24;
 
                     div.poll-reply-body {
                       color: var(--color);
-                      @include OC_Body_Bold();
                     }
                   }
                 }
@@ -504,7 +503,11 @@ $h2_top_margin: 24;
             }
           }
 
-          @for $i from 0 through 100 {
+          &:not(.animate) div.poll-reply-outer.percent-0:before {
+            width: 100%;
+          }
+
+          @for $i from 1 through 100 {
             &:not(.animate) div.poll-reply-outer.percent-#{$i}:before {
               width: 0;
             }
@@ -530,7 +533,11 @@ $h2_top_margin: 24;
               transition: 180ms width ease-in, 180ms background-color ease-in;
             }
 
-            @for $i from 0 through 100 {
+            &.percent-0:before {
+              width: 100%;
+            }
+
+            @for $i from 1 through 100 {
               &.percent-#{$i}:before {
                 width: #{percentage($i/100)};
               }
@@ -539,12 +546,10 @@ $h2_top_margin: 24;
             button.poll-reply {
               margin: 0;
               min-height: 32px;
-              padding: 7px 8px;
+              padding: 7px 4px 7px 8px;
               border-radius: 4px;
               position: relative;
               display: block;
-              float: left;
-              width: calc(100% - 60px);
               flex: 1 1 auto;
 
               div.poll-reply-body {
@@ -557,15 +562,13 @@ $h2_top_margin: 24;
             }
 
             div.poll-reply-count {
-              float: right;
               @include OC_Body_Book();
               font-size: 14px;
               line-height: 18px;
               color: var(--light-color);
               text-align: right;
-              padding: 0 8px;
-              width: 60px;
-              flex: 0 0 60px;
+              padding: 0 4px;
+              flex: 1 1 auto;
             }
           }
         }
