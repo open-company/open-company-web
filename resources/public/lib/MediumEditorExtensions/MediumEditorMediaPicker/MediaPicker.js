@@ -109,8 +109,7 @@ function PlaceCaretAtEnd(el) {
       var editor = this.getEditorElements()[0];
       if (editor && editor.firstElementChild &&
           editor.firstElementChild.nodeName.toLowerCase() !== 'p') {
-        var newParagraph = this.appendParagraph();
-        this.moveCaret($(newParagraph), 0);
+        this.appendParagraph();
       }
     },
 
