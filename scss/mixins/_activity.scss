@@ -218,7 +218,7 @@ $h2_top_margin: 24;
   div.oc-poll-portal {
     display: inline-block;
     width: 100%;
-    margin-bottom: #{$paragraph_spacing}px;
+    margin: 0 0 #{$paragraph_spacing}px;
 
     &:empty {
       // FIXME: add a poll ghost screen?
