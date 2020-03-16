@@ -51,7 +51,7 @@ var AutoInlinecode = MediumEditor.Extension.extend({
           });
           var lastAddedCode = element.querySelector("code.oc-latest-code");
           if (lastAddedCode) {
-            MediumEditor.selection.moveCursor(this.document, element.querySelector("code.oc-latest-code"), 1);
+            MediumEditor.selection.moveCursor(this.document, lastAddedCode.nextSibling, 1);
             lastAddedCode.classList.remove("oc-latest-code");
           }
         }
