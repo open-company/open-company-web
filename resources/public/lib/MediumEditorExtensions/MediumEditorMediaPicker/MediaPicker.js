@@ -233,7 +233,7 @@ function PlaceCaretAtEnd(el) {
       pre.className = "media-codeblock"
       pre.dataset.disableToolbar = true;
       // if the selection is in a DIV means it's the main editor element
-      if (element && element.nodeName.toLowerCase() == 'p'){
+      if (element && element.nodeName.toLowerCase() === 'p'){
         // add the PRE before the P
         element.parentNode.insertBefore(pre, element);
         element.parentNode.removeChild(element);
