@@ -100,13 +100,18 @@
 
 (rum/defcs poll-edit < rum/static
                        (rum/local "" ::new-reply)
-                       {:did-mount (fn [s]
+                       (rum/local nil ::tab-index-base)
+                       {:will-mount (fn [s]
+                        (reset! (::tab-index-base s) (int (rand 1000)))
+                        s)
+                        :did-mount (fn [s]
                           (when-let [q-el (rum/ref-node s :question)]
                             (.focus q-el))
                         s)}
   [s {:keys [poll-data poll-key current-user-id] :as props}]
   (let [should-show-delete-reply? (-> poll-data :replies count (> poll-utils/min-poll-replies))
-        is-mobile? (responsive/is-mobile-size?)]
+        is-mobile? (responsive/is-mobile-size?)
+        tab-index-base @(::tab-index-base s)]
     (if (:preview poll-data)
       (poll-read props)
       [:div.poll
@@ -137,7 +142,7 @@
             {:type "text"
              :ref :question
              :max-length poll-utils/max-question-length
-             :tab-index "0"
+             :tab-index tab-index-base
              :placeholder "Ask your question..."
              :value (:question poll-data)
              :on-change #(poll-actions/update-question poll-key poll-data (.. % -target -value))}]
@@ -150,7 +155,7 @@
                   (str "Choice " idx)]
                 [:input.poll-reply-body
                   {:type "text"
-                   :tab-index "0"
+                   :tab-index (+ tab-index-base @idx)
                    :value (:body reply)
                    :max-length poll-utils/max-reply-length
                    :placeholder (str "Choice " idx)
