@@ -240,7 +240,6 @@ function PlaceCaretAtEnd(el) {
     isPollElement: function(el) {
       return (el &&
               el.nodeType === Node.ELEMENT_NODE &&
-              el.nodeName.toLowerCase() === 'div' &&
               el.classList.contains("media-poll"));
     },
 
