@@ -527,10 +527,10 @@ div.stream-comments {
 
           div.stream-comment-body {
             display: inline;
-            @include activity-comment(15px, 18px, 12px);
+            @include activity-comment(15, 18, 12);
 
             @include mobile() {
-              @include activity-comment(18px, 24px, 16px);
+              @include activity-comment(18, 24, 16);
             }
 
             .interactive-image {
