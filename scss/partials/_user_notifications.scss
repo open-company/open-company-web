@@ -43,6 +43,10 @@ div.user-notifications {
       background-repeat: no-repeat;
       opacity: 0.5;
       transition: opacity 180ms ease-in;
+
+      @include dark_mode() {
+        background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
+      }
     }
 
     &:hover, &.active {
@@ -293,11 +297,5 @@ div.user-notifications {
         }
       }
     }
-  }
-}
-
-@include dark_mode() {
-  div.user-notifications button.notification-bell-bt {
-    background-image: cdnUrl("/img/ML/notification_bell@dark.svg");
   }
 }

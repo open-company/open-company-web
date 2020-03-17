@@ -624,8 +624,7 @@
                                       (when (and (not @(::auth-settings-loaded s))
                                                  auth-settings
                                                  (not (:team auth-settings)))
-                                        (reset! (::auth-settings-loaded s) true)
-                                        (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search)))
+                                        (reset! (::auth-settings-loaded s) true)))
                                   s)}
   [s]
   (let [team-invite-drv (drv/react s :team-invite)
@@ -729,11 +728,7 @@
     (when (and (:auth-settings confirm-invitation)
                (not @(::exchange-started s)))
       (reset! (::exchange-started s) true)
-      (user-actions/confirm-invitation (:token confirm-invitation)))
-    (when (and @(::exchange-started s)
-               (not @(::exchange-ended s))
-               (:invitation-error confirm-invitation))
-      (dommy/add-class! (sel1 [:div.onboard-wrapper-box]) :sad-search))))
+      (user-actions/confirm-invitation (:token confirm-invitation)))))
 
 (rum/defcs invitee-lander < rum/reactive
                             (drv/drv :confirm-invitation)
