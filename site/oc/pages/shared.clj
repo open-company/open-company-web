@@ -175,7 +175,7 @@
           [:div.testimonials-floated-header
             "Space to say more"]
           [:div.testimonials-floated-subheader
-            "Carrot gives you room to share longer updates and announcements. Add images, video, code blocks, and polls to keep everyone engaged."]]]
+            "For longer-form updates and discussions, Carrot gives you room to convey more information. Add images, video, code blocks, and polls to keep everyone engaged."]]]
 
       [:div.testimonials-floated-block-inner.right-block.group
         [:img.testimonials-floated-screenshot

@@ -11,12 +11,11 @@
         [:h1.headline
           "Remote teams communicate differently"]
         [:div.subheadline.big-web-tablet-only
-          (str
-           "It’s hard for remote teams to stay in-sync with chat alone. "
-           "With Carrot, stay informed without the chatter.")]
+          "Teams struggle to stay in-sync with chat alone." [:br]
+          "With Carrot, distributed teams have productive,"[:br]
+          "asynchronous conversations without the chatter."]
         [:div.subheadline.mobile-only
-          (str
-           "It’s hard to stay in-sync with chat alone. Stay informed without the chatter.")]
+          "It’s hard to stay in-sync with chat alone. Stay informed without the chatter."]
 
         [:div.get-started-button-container.group
           [:button.mlb-reset.get-started-button.get-started-action

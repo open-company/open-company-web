@@ -758,7 +758,7 @@
 (declare inbox-dismiss)
 
 (defn mark-read [activity-uuid]
-  (let [activity-data (dis/activity-data activity-uuid)]
+  (when-let [activity-data (dis/activity-data activity-uuid)]
     (send-item-read activity-uuid)
     (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
     (inbox-dismiss activity-uuid)))
