@@ -289,7 +289,11 @@
               (reactions {:entity-data comment-data
                           :hide-picker (zero? (count (:reactions comment-data)))
                           :did-react-cb did-react-cb
-                          :optional-activity-data activity-data})])]]]])
+                          :optional-activity-data activity-data})])
+          (when closing-thread
+            [:button.mlb-reset.thread-reply-bt
+              {:on-click reply-cb}
+              "Reply"])]]]])
 
 (defn- expand-thread [s comment-data]
   (let [threads @(::threads s)
