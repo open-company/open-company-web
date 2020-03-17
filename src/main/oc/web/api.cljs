@@ -310,7 +310,7 @@
 
 (defn get-checkout-session-id [checkout-link success-url cancel-url callback]
   (if checkout-link
-    (auth-http (method-for-link checkout-link) (relative-href checkout-link)
+    (payments-http (method-for-link checkout-link) (relative-href checkout-link)
      {:headers (headers-for-link checkout-link)
       :json-params (cljs->json {:success-url success-url
                                 :cancel-url cancel-url})}
