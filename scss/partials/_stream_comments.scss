@@ -554,18 +554,22 @@ div.stream-comments {
           }
 
           button.thread-reply-bt {
-            @include OC_Body_Book();
-            font-size: 15px;
-            line-height: 18px;
-            color: var(--light-color);
-            padding: 8px 24px 0 0;
-            text-align: left;
-            opacity: 1;
+            display: none;
+            @include mobile() {
+              display: initial;
+              @include OC_Body_Book();
+              font-size: 15px;
+              line-height: 18px;
+              color: var(--light-color);
+              padding: 8px 24px 0 0;
+              text-align: left;
+              opacity: 1;
 
-            @include big_web() {
-              &:hover {
-                opacity: 1;
-                text-decoration: underline;
+              @include big_web() {
+                &:hover {
+                  opacity: 1;
+                  text-decoration: underline;
+                }
               }
             }
           }
