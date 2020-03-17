@@ -11,7 +11,7 @@
           :hasJWT (not (not (jwt/jwt)))}
    :sourceRoot ls/web-server
    :release ls/deploy-key
-   :debug (= ls/log-level "debug")
+   :debug true ;(= ls/log-level "debug")
    :dsn dsn})
 
 (defn sentry-setup []
@@ -77,7 +77,11 @@
 
 (defn ^:export capture-error-with-message [error-name & [error-message]]
   (timbre/info "Capture error:" error-name "message:" error-message)
+  (js/console.log "DBG capture-error-with-message" error-name error-message)
   (try
-    (throw (custom-error (or error-message error-name) (if error-message error-name "Error")))
+    (let [err (custom-error (or error-message error-name) (if error-message error-name "Error"))]
+      (js/console.log "DBG    err:" err)
+      (throw err))
     (catch :default e
+      (js/console.log "DBG   catch:" e)
       (capture-error! e))))
