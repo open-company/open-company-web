@@ -242,6 +242,18 @@ div.stream-collapsed-item {
           display: block;
         }
 
+        h1, h2, mark, mark.highlight {
+          color: var(--color);
+          @include OC_Body_Book();
+          font-size: 13px;
+          line-height: 24px;
+          background-color: transparent;
+        }
+
+        h1, h2, p {
+          padding-left: 4px !important;
+        }
+
         * {
           height: 24px;
           white-space: nowrap;
