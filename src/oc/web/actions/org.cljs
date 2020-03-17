@@ -93,6 +93,23 @@
           (let [sorted-boards (vec (sort-by :name boards))]
             (first sorted-boards)))))))
 
+(defn- redirect-to-ap? [org-data]
+  (when-not (router/ap-redirect)
+    (let [inbox-count (int (:inbox-count org-data))
+          is-inbox? (= (router/current-board-slug) "inbox")]
+      (when (and is-inbox?
+                 (zero? inbox-count)
+                 (not (router/current-activity-id))
+                 (not (router/current-secure-activity-id))
+                 (not (router/ap-redirect)))
+        (timbre/info "Redirect to all-posts for empty inbox:" (:inbox-count org-data))
+        (router/set-route! [(:slug org-data) "all-posts" "dashboard"]
+         {:org (:slug org-data)
+          :board "all-posts"
+          :query-params (router/query-params)})
+        (.pushState (.-history js/window) #js {} (.-title js/document) (oc-urls/all-posts (:slug org-data)))))
+    (router/ap-redirect-done!)))
+
 (def other-resources-delay 1000)
 
 (defn org-loaded
@@ -104,6 +121,7 @@
   ;; Save the last visited org
   (when (and org-data
              (= (router/current-org-slug) (:slug org-data)))
+    (redirect-to-ap? org-data)
     (cook/set-cookie! (router/last-org-cookie) (:slug org-data) cook/default-cookie-expire))
   ;; Check the loaded org
   (let [boards (:boards org-data)
