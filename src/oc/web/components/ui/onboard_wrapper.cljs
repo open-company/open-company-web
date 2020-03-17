@@ -63,9 +63,9 @@
 (defn- delay-focus-field-with-ref
   "Given a Rum state and a ref, async focus the filed if it exists."
   [s r]
-  (utils/after 2500
+  (utils/after 0
    #(when-let [field (rum/ref-node s r)]
-     (.focus field))))
+      (.focus field))))
 
 (rum/defcs lander < rum/static
                     rum/reactive
