@@ -167,11 +167,11 @@
      :class (utils/class-set {:open-thread (not is-indented-comment?)
                               :closing-thread closing-thread
                               :new-comment (:new comment-data)
-                              :indented-comment is-indented-comment?})}
+                              :indented-comment is-indented-comment?
+                              :showing-picker showing-picker?})}
     [:div.stream-comment
       {:ref (str "stream-comment-" (:uuid comment-data))
-       :class (utils/class-set {:editing-other-comment editing?
-                                :showing-picker showing-picker?})
+       :class (utils/class-set {:editing-other-comment editing?})
        :on-mouse-leave mouse-leave-cb}
       [:div.stream-comment-inner
         (when is-mobile?
@@ -285,7 +285,7 @@
                :class (utils/class-set {:emoji-comment (:is-emoji comment-data)
                                         utils/hide-class true})}]]
           (when (seq (:reactions comment-data))
-           [:div.stream-comment-reactions-footer.group
+            [:div.stream-comment-reactions-footer.group
               (reactions {:entity-data comment-data
                           :hide-picker (zero? (count (:reactions comment-data)))
                           :did-react-cb did-react-cb

@@ -5,15 +5,12 @@ div.stream-comments {
   margin-top: 16px;
   padding-top: 16px;
 
-  &.editing {
-    div.stream-comments-list {
-      div.streacm-comment {
-        @include big_web(){
-          &:hover {
+  @include big_web(){
+    &.editing {
+      div.stream-comments-list {
+        div.stream-comment-thread div.stream-comment-outer {
+          &.open-thread:hover, &.showing-picker.open-thread {
             background-color: transparent;
-            div.stream-comment-floating-buttons {
-              display: none;
-            }
           }
         }
       }
@@ -88,6 +85,17 @@ div.stream-comments {
           padding-left: 8px;
           padding-right: 8px;
           margin-left: -8px;
+
+          &:not(.new-comment).open-thread:hover, &.open-thread.showing-picker {
+            background-color: var(--comments-floating-bt-background);
+            border-radius: 4px;
+          }
+
+          &:not(.new-comment):not(.open-thread):not(.showing-add-comment).indented-comment:hover div.stream-comment div.stream-comment-inner,
+          &:not(.new-comment):not(.open-thread):not(.showing-add-comment).indented-comment.showing-picker div.stream-comment div.stream-comment-inner {
+            background-color: var(--comments-floating-bt-background);
+            border-radius: 4px;
+          }
         }
 
         &.open-thread {
@@ -121,8 +129,8 @@ div.stream-comments {
           }
         }
 
-        &:not(.editing):hover {
-          div.stream-comment-floating-buttons {
+        &:hover, &.showing-picker {
+          div.stream-comment div.stream-comment-floating-buttons {
             display: block;
           }
         }
@@ -226,42 +234,6 @@ div.stream-comments {
             }
           }
 
-          &.showing-picker {
-            div.stream-comment-floating-buttons {
-              background-color: var(--comments-floating-bt-background);
-              display: block;
-            }
-          }
-
-          &.editing {
-            div.stream-comment-header {
-              display: none;
-            }
-
-            div.stream-comment-content {
-              div.stream-comment-body, div.stream-comment-body.medium-editor-element {
-                // editing comment
-                display: block;
-                margin-top: 0;
-                border-radius: 4px;
-                border: 1px solid var(--divider-line);
-                background-color: var(--overlay-background-color);
-                outline: none;
-                padding: 4px;
-                box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.07);
-                padding: 8px 16px;
-
-                @include dark_mode() {
-                  box-shadow: 0 2px 8px 0 rgba(255, 255, 255, 0.24);
-                }
-
-                &:focus, &:active {
-                  outline: none;
-                }
-              }
-            }
-          }
-
           div.stream-comment-floating-buttons {
             position: absolute;
             top: -8px;
@@ -316,7 +288,7 @@ div.stream-comments {
 
               div.emoji-mart {
                 position: absolute;
-                top: 28px;
+                top: 0;
                 right: 0;
                 bottom: unset;
                 left: unset;
