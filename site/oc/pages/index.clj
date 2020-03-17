@@ -12,8 +12,8 @@
           "Remote teams communicate differently"]
         [:div.subheadline.big-web-tablet-only
           "Teams struggle to stay in-sync with chat alone." [:br]
-          "With Carrot, it’s easy to have thoughtful," [:br]
-          "asynchronous discussions without the chatter."]
+          "With Carrot, distributed teams have productive,"[:br]
+          "asynchronous conversations without the chatter."]
         [:div.subheadline.mobile-only
           "It’s hard to stay in-sync with chat alone. Stay informed without the chatter."]
 
