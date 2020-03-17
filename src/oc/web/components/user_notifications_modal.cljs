@@ -7,6 +7,7 @@
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
             [oc.web.lib.cookies :as cook]
+            [oc.web.local-settings :as ls]
             [oc.web.mixins.ui :as ui-mixins]
             [oc.web.stores.user :as user-stores]
             [oc.web.actions.user :as user-actions]
@@ -131,20 +132,21 @@
               [:option
                 {:value "in-app"}
                 "In-app only"]]]
-          [:div.user-profile-modal-fields
-            [:div.field-label "Recurring update reminders"]
-            [:select.field-value.oc-input
-              {:value (:reminder-medium current-user-data)
-               :on-change #(change! s :reminder-medium (.. % -target -value))}
-              [:option
-                {:value "email"}
-                "Via email"]
-              (when (or slack-enabled?
-                        (= (:reminder-medium current-user-data) "slack"))
+          (when ls/reminders-enabled?
+            [:div.user-profile-modal-fields
+              [:div.field-label "Recurring update reminders"]
+              [:select.field-value.oc-input
+                {:value (:reminder-medium current-user-data)
+                 :on-change #(change! s :reminder-medium (.. % -target -value))}
                 [:option
-                  {:value "slack"
-                   :disabled (not slack-enabled?)}
-                  "Via Slack"])
-              [:option
-                {:value "in-app"}
-                "In-app only"]]]]]]))
+                  {:value "email"}
+                  "Via email"]
+                (when (or slack-enabled?
+                          (= (:reminder-medium current-user-data) "slack"))
+                  [:option
+                    {:value "slack"
+                     :disabled (not slack-enabled?)}
+                    "Via Slack"])
+                [:option
+                  {:value "in-app"}
+                  "In-app only"]]])]]]))

@@ -376,9 +376,6 @@ $mobile-collapse-height: 160;
     @include big_web() {
       &:hover {
         opacity: 1;
-        div.expand-button-inner {
-          background-color: var(--opac-background-color-1);
-        }
       }
     }
 
