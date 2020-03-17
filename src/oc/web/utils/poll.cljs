@@ -1,5 +1,6 @@
 (ns oc.web.utils.poll
-  (:require [oops.core :refer (oget oset!)]
+  (:require [defun.core :refer (defun)]
+            [oops.core :refer (oget oset!)]
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.lib.user :as user-lib]
             [oc.web.router :as router]
@@ -27,8 +28,8 @@
    :avatar-url (:avatar-url user-data)
    :user-id (:user-id user-data)})
 
-(defn poll-reply [user-data body]
-  {:created-at (created-at)
+(defn poll-reply [user-data body & [ts]]
+  {:created-at (or ts (created-at))
    :body (or body "")
    :author (author-for-user user-data)
    :reply-id (new-reply-id)
@@ -41,7 +42,8 @@
    :created-at (created-at)
    :updated-at (created-at)
    :author (author-for-user user-data)
-   :replies (let [reps (mapv #(poll-reply user-data "") (range min-poll-replies))]
+   :replies (let [ts (.getTime (utils/js-date))
+                  reps (mapv #(poll-reply user-data "" (.toISOString (js/Date. (inc ts)))) (range min-poll-replies))]
               (zipmap (mapv (comp keyword :reply-id) reps) reps))})
 
 (defn clean-poll-reply [poll-reply-data]
@@ -86,3 +88,15 @@
                                                :container-selector container-selector
                                                :win-url (.. js/window -location -href)}
    "Failed creating portal for poll"))
+
+;; Replies
+
+(defun sorted-replies
+  ([poll-data :guard #(and (map? %) (contains? % :replies))]
+   (sorted-replies (-> poll-data :replies vals)))
+
+  ([replies-map :guard map?]
+   (sorted-replies (vals replies-map)))
+
+  ([replies-coll :guard coll?]
+   (sort-by #(.getTime (utils/js-date (:created-at %))) replies-coll)))

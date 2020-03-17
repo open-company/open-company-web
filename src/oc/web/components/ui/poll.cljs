@@ -33,7 +33,7 @@
       [:div.poll-replies
         {:class (utils/class-set {:can-vote can-vote?
                                   :animate @(::animate s)})}
-        (for [reply (vals (:replies poll-data))
+        (for [reply (poll-utils/sorted-replies poll-data)
               :let [votes-percent (-> reply :votes count (/ total-votes-count) (* 100))
                     rounded-votes-percent (if (js/isNaN votes-percent)
                                             0
@@ -147,7 +147,7 @@
              :value (:question poll-data)
              :on-change #(poll-actions/update-question poll-key poll-data (.. % -target -value))}]
           (let [idx (atom 0)]
-            (for [reply (sort-by (comp :body :created-at) (-> poll-data :replies vals))
+            (for [reply (poll-utils/sorted-replies poll-data)
                   :let [idx (swap! idx inc)]]
               [:div.poll-reply.group
                 {:key (str "poll-" (:poll-uuid poll-data) "-reply-" (:reply-id reply))}
