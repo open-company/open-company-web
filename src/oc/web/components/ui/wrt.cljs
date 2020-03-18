@@ -13,6 +13,7 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.actions.ui-theme :as ui-theme]
+            [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.components.ui.dropdown-list :refer (dropdown-list)]
             [oc.web.components.ui.small-loading :refer (small-loading)]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
@@ -33,13 +34,71 @@
   (let [{:keys [self-user other-users]}
          (group-by #(if (= (:user-id %) user-id) :self-user :other-users) users)
         sorted-other-users (sort-by user-lib/name-for other-users)]
-    (remove nil? (concat self-user sorted-other-users))))
+    (vec (remove nil? (concat self-user sorted-other-users)))))
 
 (defn dropdown-label [val total]
   (case val
     :all (str "Everyone (" total ")")
     :seen "Viewed"
     :unseen "Unopened"))
+
+(defn- send-all-unopened [s {:keys [current-user-data activity-data sorted-filtered-users slack-bot-data]}]
+  (let [wrt-share-base {:note "When you have a moment, please check out this post."
+                        :subject (str "You may have missed: " (:headline activity-data))}
+        wrt-share (apply merge
+                   (for [u sorted-filtered-users
+                        :when (and (not (:seen u))
+                                   (not= (:user-id current-user-data) (:user-id u))
+                                   (not (get @(::sending-notice s) (:user-id u))))
+                        :let [slack-user (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
+                    {(:user-id u)
+                     (merge wrt-share-base
+                      (if (and slack-user
+                               (= (:notification-medium u) "slack"))
+                        {:medium "slack"
+                         :channel {:slack-org-id (:slack-org-id slack-user)
+                                   :channel-id (:id slack-user)
+                                   :channel-name "Carrot"
+                                   :type "user"}}
+                        {:medium "email"
+                         :to [(:email u)]}))}))]
+    (swap! (::sending-notice s) merge (zipmap (keys wrt-share) (repeat (count wrt-share) :loading)))
+    (activity-actions/activity-share activity-data (vals wrt-share)
+     (fn [{:keys [success body]}]
+       (if success
+         (let [noticed-users (apply merge
+                              (for [user-id (keys wrt-share)
+                                    :let [u (some #(when (= (:user-id %) user-id) %) sorted-filtered-users)
+                                          slack-user (get (:slack-users u) (keyword (:slack-org-id slack-bot-data)))]]
+                               {(:user-id u)
+                                (if (and slack-user
+                                         (= (:notification-medium u) "slack"))
+                                  (if (and slack-user
+                                           (seq (:display-name slack-user))
+                                           (not= (:display-name slack-user) "-"))
+                                    (str "Sent to: @" (:display-name slack-user) " (Slack)")
+                                    (str "Sent via Slack"))
+                                  (str "Sent to: " (:email u)))}))]
+           (swap! (::sending-notice s) merge noticed-users))
+         (swap! (::sending-notice s) merge
+          (apply merge
+           (for [user-id (keys wrt-share)]
+            (do
+              (utils/after 5000 #(swap! (::sending-notice s) dissoc user-id))
+              {user-id "An error occurred, please retry..."})))))))))
+
+(defn- send-all-unopened-clicked [s {:keys [unopened-count] :as props}]
+  (let [alert-data {:icon "/img/ML/trash.svg"
+                    :action "rerecord-video"
+                    :message (str "Do you want to send a reminder about this post to " unopened-count " users?")
+                    :link-button-title "No"
+                    :link-button-cb #(alert-modal/hide-alert)
+                    :solid-button-style :red
+                    :solid-button-title "Yes, send"
+                    :solid-button-cb (fn []
+                                      (send-all-unopened s props)
+                                      (alert-modal/hide-alert))}]
+    (alert-modal/show-alert alert-data)))
 
 (rum/defcs wrt < rum/reactive
                  ;; Derivatives
@@ -108,7 +167,17 @@
           [:button.mlb-reset.mobile-close-bt
             {:on-click nav-actions/hide-wrt}]
           [:div.wrt-popup-header-title
-            "Who viewed this post"]]
+            "Post analytics"]
+          (when (> (count unseen-users) 1)
+            [:button.mlb-reset.send-to-all-bt
+              {:on-click #(send-all-unopened-clicked s {:activity-data activity-data
+                                                        :current-user-data current-user-data
+                                                        :sorted-filtered-users sorted-filtered-users
+                                                        :slack-bot-data slack-bot-data
+                                                        :unopened-count (count unseen-users)})}
+              (if is-mobile?
+                "Send all"
+                "Send all unopened")])]
         ;; Show a spinner on mobile if no data is loaded yet
         (if-not (:reads read-data)
           (small-loading)
@@ -238,8 +307,7 @@
                                      (activity-actions/activity-share activity-data [wrt-share]
                                       (fn [{:keys [success body]}]
                                         (if success
-                                          (let [resp (first body)
-                                                user-label (if (= (:medium wrt-share) "email")
+                                          (let [user-label (if (= (:medium wrt-share) "email")
                                                              (str "Sent to: " (:email u))
                                                              (if (and slack-user
                                                                       (seq (:display-name slack-user))

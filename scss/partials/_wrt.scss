@@ -63,7 +63,7 @@ div.wrt-popup-container {
   overflow: visible;
   padding: 24px;
   text-transform: none;
-  background-color: $carrot_modal_bg;
+  background-color: var(--overlay-background-color);
   z-index: #{$navbar_zindex + 156};
   opacity: 1;
   cursor: auto;
@@ -122,7 +122,6 @@ div.wrt-popup-container {
         z-index: 2;
         height: #{$mobile_navbar_height}px;
         padding: 15px 16px;
-        background-color: white;
       }
 
       div.wrt-popup-header-title {
@@ -130,6 +129,7 @@ div.wrt-popup-container {
         font-size: 14px;
         color: var(--color);
         line-height: 32px;
+        text-align: left;
         float: left;
 
         @include mobile() {
@@ -137,6 +137,31 @@ div.wrt-popup-container {
           float: unset;
           line-height: 24px;
           font-size: 18px;
+          width: 120px;
+          margin: 0 auto;
+        }
+      }
+
+      button.send-to-all-bt {
+        @include OC_Body_Book();
+        font-size: 14px;
+        line-height: 32px;
+        color: $carrot_green;
+        height: 32px;
+        padding: 0;
+        margin: 0;
+        float: right;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+
+        @include mobile(){
+          height: 24px;
+          max-width: 24vw;
+          position: absolute;
+          right: 16px;
+          top: 12px;
         }
       }
 
@@ -155,6 +180,10 @@ div.wrt-popup-container {
           background-size: 12px 12px;
           background-position: center;
           background-repeat: no-repeat;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
+          }
         } 
       }
     }
@@ -164,13 +193,13 @@ div.wrt-popup-container {
     }
 
     div.wrt-popup-inner {
-      padding: 24px;
+      padding-top: 24px;
 
       @include mobile() {
         overflow-x: hidden;
         overflow-y: auto;
         height: 100%;
-        padding-top: #{$mobile_navbar_height + 24}px;
+        padding: 24px 16px 0;
       }
 
       div.wrt-chart-container {
@@ -249,6 +278,10 @@ div.wrt-popup-container {
           background-size: 8px 10px;
           background-position: top 11px right 8px;
           background-repeat: no-repeat;
+
+          @include dark_mode() {
+            background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
+          }
         }
 
         div.dropdown-list-container {
@@ -272,6 +305,10 @@ div.wrt-popup-container {
         padding-left: 19px;
         background-color: var(--opac-background-color-1);
         border-radius: 4px;
+
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/wrt_search_lens@dark.svg");
+        }
 
         input.wrt-popup-query {
           width: calc(100% - 19px);
@@ -384,27 +421,6 @@ div.wrt-popup-container {
             }
           }
         }
-      }
-    }
-  }
-}
-
-@include dark_mode() {
-
-  div.wrt-popup-container div.wrt-popup {
-    div.wrt-popup-header button.mobile-close-bt {
-      @include mobile() {
-        background-image: cdnUrl("/img/ML/mobile_dark_x@dark.svg");
-      }
-    }
-
-    div.wrt-popup-inner {
-      div.wrt-popup-tabs div.wrt-popup-tabs-select {
-        background-image: cdnUrl("/img/ML/select_arrows@dark.svg");
-      }
-
-      div.wrt-popup-search-container {
-        background-image: cdnUrl("/img/ML/wrt_search_lens@dark.svg");
       }
     }
   }
