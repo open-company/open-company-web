@@ -21,9 +21,8 @@
           [:button.mlb-reset.get-started-button.get-started-action
             {:id "get-started-centred-bt"}
             "Try Carrot for free"]
-          ; [:span.get-started-subtitle
-          ;   "Free for small teams"]
-            ]
+          [:span.get-started-subtitle
+            "Carrot is open source. Join us."]]
 
         [:div.main-animation-container
           [:img.main-animation
