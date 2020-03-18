@@ -107,9 +107,8 @@ function PlaceCaretAtEnd(el) {
 
     checkAvailableParagraph: function() {
       var editor = this.getEditorElements()[0];
-      if (editor && editor.firstElementChild &&
-          editor.firstElementChild.nodeName.toLowerCase() !== 'p') {
-        this.appendParagraph();
+      if (editor && this.isTextElement(editor.firstElementChild)) {
+        this.prependParagraph();
       }
     },
 
@@ -404,6 +403,12 @@ function PlaceCaretAtEnd(el) {
       $(event.target).tooltip("hide");
     },
 
+    isTextElement: function(){
+      return (nextElSibling && nextElSibling.nodeType &&
+              nextElSibling.nodeType === Node.ELEMENT_NODE &&
+              ['p', 'h1', 'h2'].indexOf(nextElSibling.nodeName.toLowerCase()) >= 0);
+    },
+
     addPoll: function(pollId) {
       log("addPoll", pollId);
       if (this._lastSelection) {
@@ -446,9 +451,7 @@ function PlaceCaretAtEnd(el) {
           }
 
           // If the poll element we are about to add has not a paragraph after let's add one
-          var needsParagraphAfter = !(nextElSibling && nextElSibling && nextElSibling.nodeType &&
-                                      nextElSibling.nodeType === Node.ELEMENT_NODE &&
-                                      nextElSibling.nodeName.toLowerCase() === 'p');
+          var needsParagraphAfter = !();
           if (needsParagraphAfter) {
             this.appendParagraph();
           }
@@ -460,14 +463,12 @@ function PlaceCaretAtEnd(el) {
         div.dataset.pollId = pollId;
 
         if (!div.previousElementSibling ||
-            (div.previousElementSibling && div.previousElementSibling.nodeName &&
-             div.previousElementSibling.nodeName.toLowerCase() !== 'p')) {
+            !this.isTextElement(div.previousElementSibling)) {
           div.parentElement.insertBefore(this.newP(), div);
         }
 
         if (!div.nextElementSibling ||
-            (div.nextElementSibling && div.nextElementSibling.nodeName &&
-             div.nextElementSibling.nodeName.toLowerCase() !== 'p')) {
+            !this.isTextElement(div.nextElementSibling)) {
           this.insertAfter(this.newP(), div);
         }
 
