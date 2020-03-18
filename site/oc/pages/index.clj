@@ -22,7 +22,12 @@
             {:id "get-started-centred-bt"}
             "Try Carrot for free"]
           [:span.get-started-subtitle
-            "Carrot is open source. Join us."]]
+            "Carrot is open source. "
+            [:a
+              {:href (:oc-github options)
+               :target "_blank"}
+              "Join us"]
+            "."]]
 
         [:div.main-animation-container
           [:img.main-animation

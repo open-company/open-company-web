@@ -7,9 +7,11 @@
 
 (def contact-email "hello@carrot.io")
 (def contact-mail-to (str "mailto:" contact-email))
+(def oc-github "https://github.com/open-company")
 
 (def options {:contact-email contact-email
-              :contact-mail-to contact-mail-to})
+              :contact-mail-to contact-mail-to
+              :oc-github oc-github})
 
 (defn head []
   [:head
@@ -182,7 +184,7 @@
             "Product"]
           [:div.column-item [:a {:href "/pricing"} "Pricing"]]
           [:div.column-item [:a {:href "https://carrot.news/" :target "_blank"} "What’s new"]]
-          [:div.column-item [:a {:href "https://github.com/open-company" :target "_blank"} "GitHub"]]
+          [:div.column-item [:a {:href oc-github :target "_blank"} "GitHub"]]
           [:div.column-item [:a {:href "/slack"} "Slack integration"]]]
 
         [:div.column.column-resources
