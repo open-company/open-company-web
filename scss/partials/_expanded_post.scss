@@ -137,6 +137,10 @@ div.expanded-post {
         border-radius: 4px;
         margin: 0 0 0 9px;
 
+        @include dark_mode() {
+          background-image: cdnUrl("/img/ML/more_menu_horizontal_ellipsis@dark.svg");
+        }
+
         &:active, &:focus {
           opacity: 0.9;
         }
