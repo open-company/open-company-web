@@ -361,8 +361,8 @@ $h2_top_margin: 18;
 
   h1 {
     @include OC_Body_Bold();
-    font-size: #{$font_size + 5}px;
-    line-height: #{$line_height + 10}px;
+    font-size: #{$font_size + 11}px;
+    line-height: #{$line_height + 14}px;
     font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
@@ -384,8 +384,8 @@ $h2_top_margin: 18;
 
   h2 {
     @include OC_Body_Bold();
-    font-size: #{$font_size + 2}px;
-    line-height: #{$line_height + 4}px;
+    font-size: #{$font_size + 5}px;
+    line-height: #{$line_height + 6}px;
     font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
@@ -782,8 +782,8 @@ $h2_top_margin: 18;
 
   h1 {
     @include OC_Body_Bold();
-    font-size: #{$font_size + 5}px;
-    line-height: #{$line_height}px;
+    font-size: #{$font_size + 11}px;
+    line-height: #{$line_height + 14}px;
     font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
@@ -805,8 +805,8 @@ $h2_top_margin: 18;
 
   h2 {
     @include OC_Body_Bold();
-    font-size: #{$font_size + 2}px;
-    line-height: #{$line_height}px;
+    font-size: #{$font_size + 5}px;
+    line-height: #{$line_height + 6}px;
     font-weight: normal;
     padding-bottom: 0px;
     margin-bottom: 0px !important;
