@@ -107,7 +107,7 @@ function PlaceCaretAtEnd(el) {
 
     checkAvailableParagraph: function() {
       var editor = this.getEditorElements()[0];
-      if (editor && this.isTextElement(editor.firstElementChild)) {
+      if (editor && !this.isTextElement(editor.firstElementChild)) {
         this.prependParagraph();
       }
     },
@@ -461,13 +461,11 @@ function PlaceCaretAtEnd(el) {
         div.dataset.mediaType = "poll";
         div.dataset.pollId = pollId;
 
-        if (!div.previousElementSibling ||
-            !this.isTextElement(div.previousElementSibling)) {
+        if (!this.isTextElement(div.previousElementSibling)) {
           div.parentElement.insertBefore(this.newP(), div);
         }
 
-        if (!div.nextElementSibling ||
-            !this.isTextElement(div.nextElementSibling)) {
+        if (!this.isTextElement(div.nextElementSibling)) {
           this.insertAfter(this.newP(), div);
         }
 
