@@ -451,9 +451,8 @@ function PlaceCaretAtEnd(el) {
           }
 
           // If the poll element we are about to add has not a paragraph after let's add one
-          var needsParagraphAfter = !();
-          if (needsParagraphAfter) {
-            this.appendParagraph();
+          if (!this.isTextElement(nextElSibling)) {
+            this.insertAfter(this.newP(), element);
           }
         }
 
