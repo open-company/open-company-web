@@ -237,7 +237,7 @@
     [:div.covid-banner-content
       [:div.covid-banner-carrot-logo]
       [:div.covid-banner-copy.mobile-only
-        "Pricing update for COVID-19."
+        "Given COVID-19, Carrot is now free."
         (when-not (= page :pricing)
           [:br])
         (when-not (= page :pricing)
@@ -247,8 +247,7 @@
         (when-not (= page :pricing)
           ".")]
       [:div.covid-banner-copy.big-web-tablet-only
-        [:span.heavy "March 11, 2020 pricing update"]
-        " - Carrot is free for unlimited users during the COVID-19 outbreak. "
+        "Given the COVID-19 crisis, Carrot is free for unlimited users until further notice. "
         (when-not (= page :pricing)
           [:a
             {:href "/pricing"}

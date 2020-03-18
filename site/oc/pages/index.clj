@@ -13,7 +13,7 @@
         [:div.subheadline.big-web-tablet-only
           "Teams struggle to stay in-sync with chat alone." [:br]
           "With Carrot, distributed teams have productive,"[:br]
-          "asynchronous conversations without the chatter."]
+          "asynchronous discussions without the chatter."]
         [:div.subheadline.mobile-only
           "It’s hard to stay in-sync with chat alone. Stay informed without the chatter."]
 
