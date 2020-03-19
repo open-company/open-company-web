@@ -24,6 +24,7 @@
             [oc.web.stores.section]
             [oc.web.stores.notifications]
             [oc.web.stores.reminder]
+            [oc.web.stores.contributor]
             ;; Pull in the needed file for the ws interaction events
             [oc.web.ws.interaction-client]
             [oc.web.actions.team]
@@ -232,6 +233,23 @@
       :board board
       :activity entry
       :comment comment
+      :query-params query-params})
+    (check-nux query-params)
+    (post-routing)
+    ;; render component
+    (drv-root component target)))
+
+;; Component specific to a contributor
+(defn contributor-handler [route target component params]
+  (let [org (:org params)
+        contributor (:contributor params)
+        query-params (:query-params params)]
+    (pre-routing params true {:query-params query-params})
+    ;; save the route
+    (router/set-route!
+     [org contributor route]
+     {:org org
+      :contributor contributor
       :query-params query-params})
     (check-nux query-params)
     (post-routing)
@@ -572,6 +590,14 @@
     (defroute board-slash-route (str (urls/board ":org" ":board") "/") {:as params}
       (timbre/info "Routing board-route-slash" (str (urls/board ":org" ":board") "/"))
       (board-handler "dashboard" target org-dashboard params))
+
+    (defroute contributor-route (urls/contributor ":org" ":contributor") {:as params}
+      (timbre/info "Routing contributor-route" (urls/board ":org" ":contributor"))
+      (contributor-handler "dashboard" target org-dashboard params))
+
+    (defroute contributor-slash-route (str (urls/contributor ":org" ":contributor") "/") {:as params}
+      (timbre/info "Routing contributor-slash-route" (str (urls/board ":org" ":contributor") "/"))
+      (contributor-handler "dashboard" target org-dashboard params))
 
     (defroute entry-route (urls/entry ":org" ":board" ":entry") {:as params}
       (timbre/info "Routing entry-route" (urls/entry ":org" ":board" ":entry"))

@@ -3,6 +3,7 @@
   (:require [defun.core :refer (defun)]
             [taoensso.timbre :as timbre]
             [clojure.string :as s]
+            [oc.lib.schema :as lib-schema]
             [cljs-flux.dispatcher :as flux]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.router :as router]
@@ -57,7 +58,17 @@
   (vec (conj (boards-key org-slug) (keyword board-slug))))
 
 (defn board-data-key [org-slug board-slug]
-    (conj (board-key org-slug board-slug) :board-data))
+  (conj (board-key org-slug board-slug) :board-data))
+
+(defn contributors-key [org-slug]
+  (vec (conj (org-key org-slug) :contribs)))
+
+(defn contributor-key
+  [org-slug author-uuid]
+   (vec (conj (contributors-key org-slug) (keyword author-uuid))))
+
+(defn contributor-data-key [org-slug slug-or-uuid]
+  (conj (contributor-key org-slug slug-or-uuid) :contrib-data))
 
 (defn containers-key [org-slug]
   (vec (conj (org-key org-slug) :container-data)))
@@ -152,10 +163,23 @@
                           (= (:status %) "published")))]
     (filter (comp filter-fn last) posts-data)))
 
-(defn- get-container-posts [base posts-data is-board? org-slug container-slug posts-key]
-  (let [cnt-key (if is-board?
-                  (board-data-key org-slug container-slug)
-                  (container-key org-slug container-slug))
+;; Container helpers
+
+(defn is-contributor? [author-uuid]
+  (lib-schema/unique-id? author-uuid))
+
+(defn is-container? [container-slug]
+  ;; Rest of containers
+  (#{"inbox" "all-posts" "bookmarks"} container-slug))
+
+(defn- get-container-posts [base posts-data org-slug container-slug posts-key]
+  (let [cnt-key (cond
+                  (is-contributor? container-slug)
+                  (contributor-data-key org-slug container-slug)
+                  (is-container? container-slug)
+                  (container-key org-slug container-slug)
+                  :else
+                  (board-data-key org-slug container-slug))
         container-data (get-in base cnt-key)
         items-list (get container-data posts-key)
         container-posts (vec (remove nil?
@@ -179,16 +203,12 @@
 
 (declare org-data)
 (declare board-data)
+(declare contributor-data)
 (declare editable-boards-data)
 (declare activity-data)
 (declare secure-activity-data)
 (declare activity-read-data)
 (declare activity-data-get)
-
-;; Container helpers
-
-(defn is-container? [container-slug]
-  (#{"inbox" "all-posts" "bookmarks"} container-slug))
 
 ;; Derived Data ================================================================
 
@@ -197,6 +217,7 @@
    :route               [[] route-db]
    :orgs                [[:base] (fn [base] (get base orgs-key))]
    :org-slug            [[:route] (fn [route] (:org route))]
+   :contributor-id      [[:route] (fn [route] (:contributor route))]
    :board-slug          [[:route] (fn [route] (:board route))]
    :activity-uuid       [[:route] (fn [route] (:activity route))]
    :secure-id           [[:route] (fn [route] (:secure-id route))]
@@ -279,13 +300,6 @@
                              :add-email-domain-team-error (:add-email-domain-team-error base)
                              :team-data team-data
                              :query-params query-params})]
-   :container-data      [[:base :org-slug :board-slug]
-                         (fn [base org-slug board-slug]
-                           (when (and org-slug board-slug)
-                             (let [container-key (if (is-container? board-slug)
-                                                   (container-key org-slug board-slug)
-                                                   (board-data-key org-slug board-slug))]
-                               (get-in base container-key))))]
    :posts-data          [[:base :org-slug]
                          (fn [base org-slug]
                            (when (and base org-slug)
@@ -294,18 +308,16 @@
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
-                                   all-boards-slug (map :slug (:boards org-data))
-                                   container-slug (:board route)
-                                   is-board? ((set all-boards-slug) container-slug)]
-                              (get-container-posts base posts-data is-board? org-slug container-slug :posts-list))))]
+                                   container-slug (or (:contributor route) (:board route))]
+                              (get-container-posts base posts-data org-slug container-slug :posts-list))))]
    :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
-                           (when (and base org-data posts-data route (:board route))
+                           (when (and base org-data posts-data route
+                                      (or (:contributor route)
+                                          (:board route)))
                              (let [org-slug (:slug org-data)
-                                   all-boards-slug (map :slug (:boards org-data))
-                                   container-slug (:board route)
-                                   is-board? ((set all-boards-slug) container-slug)]
-                              (get-container-posts base posts-data is-board? org-slug container-slug :items-to-render))))]
+                                   container-slug (or (:contributor route) (:board route))]
+                              (get-container-posts base posts-data org-slug container-slug :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -317,9 +329,30 @@
    :editable-boards     [[:base :org-slug]
                           (fn [base org-slug]
                            (editable-boards-data base org-slug))]
+   :container-data      [[:base :org-slug :board-slug :contributor-id]
+                         (fn [base org-slug board-slug contributor-id]
+                           (when (and org-slug
+                                      (or board-slug
+                                          contributor-id))
+                             (let [container-key (cond
+                                                   (seq contributor-id)
+                                                   (contributor-data-key org-slug contributor-id)
+                                                   (is-container? board-slug)
+                                                   (container-key org-slug board-slug)
+                                                   :else
+                                                   (board-data-key org-slug board-slug))]
+                               (get-in base container-key))))]
+   :contributor-data    [[:base :org-slug :contributor-id]
+                         (fn [base org-slug contributor-id]
+                           (when (and org-slug contributor-id)
+                             (contributor-data org-slug contributor-id)))]
    :board-data          [[:base :org-slug :board-slug]
                           (fn [base org-slug board-slug]
                             (board-data base org-slug board-slug))]
+   :contributor-user-data [[:base :team-roster :contributor-id]
+                           (fn [base team-roster contributor-id]
+                            (when (and team-roster contributor-id)
+                              (some #(when (= (:user-id %) contributor-id) %) (:users team-roster))))]
    :activity-data       [[:base :org-slug :activity-uuid]
                           (fn [base org-slug activity-uuid]
                             (activity-data org-slug activity-uuid base))]
@@ -430,9 +463,9 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
-   :org-dashboard-data    [[:base :orgs :org-data :board-data :container-data :posts-data :activity-data
+   :org-dashboard-data    [[:base :orgs :org-data :board-data :contributor-data :container-data :posts-data :activity-data
                             :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active]
-                            (fn [base orgs org-data board-data container-data posts-data activity-data
+                            (fn [base orgs org-data board-data contributor-data container-data posts-data activity-data
                                  show-sections-picker entry-editing jwt wrt-show loading payments search-active]
                               {:jwt-data jwt
                                :orgs orgs
@@ -440,6 +473,7 @@
                                :payments-data payments
                                :container-data container-data
                                :board-data board-data
+                               :contributor-data contributor-data
                                :initial-section-editing (:initial-section-editing base)
                                :posts-data posts-data
                                :panel-stack (:panel-stack base)
@@ -577,6 +611,22 @@
     (when (and org-slug board-slug)
       (get-in data (board-data-key org-slug board-slug)))))
 
+(defun contributor-data
+  "Get contributor data"
+  ([]
+    (contributor-data @app-state))
+  ([data :guard map?]
+    (contributor-data data (router/current-org-slug) (router/current-contributor-id)))
+  ([contributor-id :guard #(or (keyword? %) (string? %))]
+    (contributor-data @app-state (router/current-org-slug) contributor-id))
+  ([org-slug :guard #(or (keyword? %) (string? %)) contributor-id :guard #(or (keyword? %) (string? %))]
+    (contributor-data @app-state org-slug contributor-id))
+  ([data :guard map? org-slug :guard #(or (keyword? %) (string? %))]
+    (contributor-data @app-state org-slug (router/current-contributor-id)))
+  ([data org-slug contributor-id]
+    (when (and org-slug contributor-id)
+      (get-in data (contributor-data-key org-slug contributor-id)))))
+
 (defn editable-boards-data
   ([] (editable-boards-data @app-state (router/current-org-slug)))
   ([org-slug] (editable-boards-data @app-state org-slug))
@@ -609,11 +659,8 @@
   ([data org-slug]
     (filtered-posts-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
-    (let [org-data (org-data data org-slug)
-          all-boards-slug (map :slug (:boards org-data))
-          is-board? ((set all-boards-slug) posts-filter)
-          posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data posts-data is-board? org-slug posts-filter :posts-list)))
+    (let [posts-data (get-in data (posts-data-key org-slug))]
+     (get-container-posts data posts-data org-slug posts-filter :posts-list)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -634,11 +681,8 @@
   ([data org-slug]
     (items-to-render-data data org-slug (router/current-posts-filter)))
   ([data org-slug posts-filter]
-    (let [org-data (org-data data org-slug)
-          all-boards-slug (map :slug (:boards org-data))
-          is-board? ((set all-boards-slug) posts-filter)
-          posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data posts-data is-board? org-slug posts-filter :items-to-render)))
+    (let [posts-data (get-in data (posts-data-key org-slug))]
+     (get-container-posts data posts-data org-slug posts-filter :items-to-render)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))

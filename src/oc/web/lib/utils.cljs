@@ -179,6 +179,10 @@
                         (every? #(= (% params) (% link)) (keys params)))
             link)) links)))
 
+(defn link-replace-href [link replacements]
+  (update link :href
+   #(reduce (fn [href [k v]] (s/replace href v (get replacements k))) % (:replace link))))
+
 (defn readonly-org? [links]
   (let [update-link (link-for links "partial-update")]
     (nil? update-link)))

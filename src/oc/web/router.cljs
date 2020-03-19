@@ -127,6 +127,9 @@
 (defn current-comment-id []
   (:comment @path))
 
+(defn current-contributor-id []
+  (:contributor @path))
+
 (defn query-params []
   (:query-params @path))
 

@@ -21,6 +21,7 @@
             [oc.web.ws.interaction-client :as ws-ic]
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.payments :as payments-actions]
+            [oc.web.actions.contributor :as contributor-actions]
             [oc.web.actions.notifications :as notification-actions]))
 
 ;; User related functions
@@ -111,17 +112,20 @@
         inbox-link (utils/link-for (:links org-data) "inbox")
         all-posts-link (utils/link-for (:links org-data) "entries")
         bookmarks-link (utils/link-for (:links org-data) "bookmarks")
+        contrib-link (utils/link-for (:links org-data) "partial-contributor")
         drafts-board (some #(when (= (:slug %) utils/default-drafts-board-slug) %) boards)
         drafts-link (utils/link-for (:links drafts-board) ["self" "item"] "GET")
         is-inbox? (= current-board-slug "inbox")
         is-all-posts? (= current-board-slug "all-posts")
         is-bookmarks? (= (router/current-board-slug) "bookmarks")
         is-drafts? (= current-board-slug utils/default-drafts-board-slug)
+        is-contributor? (seq (router/current-contributor-id))
         delay-count (atom 0)
         inbox-delay (if is-inbox? 0 (* other-resources-delay (swap! delay-count inc)))
         all-posts-delay (if is-all-posts? 0 (* other-resources-delay (swap! delay-count inc)))
         bookmarks-delay (if is-bookmarks? 0 (* other-resources-delay (swap! delay-count inc)))
-        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))]
+        drafts-delay (if is-drafts? 0 (* other-resources-delay (swap! delay-count inc)))
+        contributor-delay (if is-contributor? 0 (* other-resources-delay (swap! delay-count inc)))]
     (when complete-refresh?
       ;; Load secure activity
       (if (router/current-secure-activity-id)
@@ -140,7 +144,11 @@
           (when bookmarks-link
             (utils/maybe-after bookmarks-delay #(aa/bookmarks-get org-data)))
           (when drafts-link
-            (utils/maybe-after drafts-delay #(sa/section-get drafts-link))))))
+            (utils/maybe-after drafts-delay #(sa/section-get drafts-link)))
+          ;; Contributors data
+          (when (and contrib-link
+                     (router/current-contributor-id))
+            (utils/maybe-after contributor-delay #(contributor-actions/contributor-get org-data (router/current-contributor-id)))))))
     (cond
       ;; If it's all posts page or must see, loads AP and must see for the current org
       (dis/is-container? current-board-slug)
@@ -177,7 +185,8 @@
            (not (utils/in? (:route @router/path) "sign-up"))
            (not (utils/in? (:route @router/path) "email-wall"))
            (not (utils/in? (:route @router/path) "confirm-invitation"))
-           (not (utils/in? (:route @router/path) "secure-activity")))
+           (not (utils/in? (:route @router/path) "secure-activity"))
+           (not (router/current-contributor-id)))
       ;; Redirect to the first board if at least one is present
       (let [board-to (get-default-board org-data)]
         (router/nav!

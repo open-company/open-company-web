@@ -824,18 +824,12 @@
     (handle-missing-link "share-entry" share-link callback
      {:share-data share-data})))
 
-(defn get-secure-entry [org-slug secure-activity-id callback]
-  (let [activity-link {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)
-                         :method "GET"
-                         :rel ""
-                         :accept "application/vnd.open-company.entry.v1+json"}]
-    (if secure-activity-id
-      (storage-http (method-for-link activity-link) (relative-href activity-link)
-       {:headers (headers-for-link activity-link)}
-       callback)
-      (handle-missing-link "get-secure-entry" activity-link callback
-       {:org-slug org-slug
-        :secure-activity-id secure-activity-id}))))
+(defn get-secure-entry [secure-link callback]
+  (if secure-link
+    (storage-http (method-for-link secure-link) (relative-href secure-link)
+     {:headers (headers-for-link secure-link)}
+     callback)
+    (handle-missing-link "get-secure-entry" secure-link callback)))
 
 (defn get-current-entry [org-slug board-slug activity-uuid callback]
   (let [activity-link {:href (str "/orgs/" org-slug "/boards/" board-slug "/entries/" activity-uuid)
@@ -959,6 +953,15 @@
       :body dismiss-at}
      callback)
     (handle-missing-link "inbox-dismiss-all" dismiss-all-link callback {:dismiss-at dismiss-at})))
+
+;; Contributors
+
+(defn get-contributor [contrib-link callback]
+  (if contrib-link
+    (storage-http (method-for-link contrib-link) (relative-href contrib-link)
+     {:headers (headers-for-link contrib-link)}
+     callback)
+    (handle-missing-link "get-contributor" contrib-link callback)))
 
 ;; WRT
 

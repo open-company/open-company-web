@@ -14,6 +14,7 @@
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
             [oc.web.components.stream-item :refer (stream-item)]
+            [oc.web.actions.contributor :as contributor-actions]
             [oc.web.components.stream-collapsed-item :refer (stream-collapsed-item)]
             [goog.events :as events]
             [goog.events.EventType :as EventType]
@@ -66,6 +67,8 @@
       (reset! (::bottom-loading s) true)
       ;; if the user is close to the bottom margin, load more results if there is a link
       (cond
+        (seq (router/current-contributor-id))
+        (contributor-actions/contributor-more @(::has-next s) :down)
         (= current-board-slug "inbox")
         (activity-actions/inbox-more @(::has-next s) :down)
         (= current-board-slug "all-posts")

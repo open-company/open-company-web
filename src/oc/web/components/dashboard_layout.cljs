@@ -3,6 +3,7 @@
             [cuerdas.core :as s]
             [org.martinklepsch.derivatives :as drv]
             [oc.web.lib.jwt :as jwt]
+            [oc.lib.user :as lib-user]
             [oc.web.urls :as oc-urls]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
@@ -42,6 +43,8 @@
                               (drv/drv :org-data)
                               (drv/drv :team-data)
                               (drv/drv :board-data)
+                              (drv/drv :contributor-data)
+                              (drv/drv :contributor-user-data)
                               (drv/drv :container-data)
                               (drv/drv :filtered-posts)
                               (drv/drv :items-to-render)
@@ -74,12 +77,15 @@
   [s]
   (let [org-data (drv/react s :org-data)
         board-data (drv/react s :board-data)
+        contributor-data (drv/react s :contributor-data)
+        contributor-user-data (drv/react s :contributor-user-data)
         container-data (drv/react s :container-data)
         posts-data (drv/react s :filtered-posts)
         _items-to-render (drv/react s :items-to-render)
         foc-layout (drv/react s :foc-layout)
         _activities-read (drv/react s :activities-read)
         current-board-slug (router/current-board-slug)
+        current-contributor-id (router/current-contributor-id)
         ;; Board data used as fallback until the board is completely loaded
         org-board-data (first (filter #(= (:slug %) current-board-slug) (:boards org-data)))
         route (drv/react s :route)
@@ -88,11 +94,18 @@
         is-inbox (= current-board-slug "inbox")
         is-all-posts (= current-board-slug "all-posts")
         is-bookmarks (= current-board-slug "bookmarks")
+        is-contributor (seq current-contributor-id)
         current-activity-id (router/current-activity-id)
         is-tablet-or-mobile? (responsive/is-tablet-or-mobile?)
         is-mobile? (responsive/is-mobile-size?)
         current-board-data (or board-data org-board-data)
-        board-container-data (if (dis/is-container? current-board-slug) container-data board-data)
+        board-container-data (cond
+                              (seq current-contributor-id)
+                              contributor-data
+                              (dis/is-container? current-board-slug)
+                              container-data
+                              :else
+                              board-data)
         empty-board? (and (map? board-container-data)
                           (zero? (count (:posts-list board-container-data))))
         is-drafts-board (= current-board-slug utils/default-drafts-board-slug)
@@ -223,7 +236,8 @@
                 {:class (when is-drafts-board "drafts-board")}
                 ;; Board name and settings button
                 [:div.board-name
-                  (when current-board-slug
+                  (when (or current-board-slug
+                            current-contributor-id)
                     [:div.board-name-with-icon
                       [:div.board-name-with-icon-internal
                         {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
@@ -238,6 +252,10 @@
 
                                                    is-bookmarks
                                                    "Bookmarks"
+
+                                                   (and is-contributor
+                                                        contributor-user-data)
+                                                   (lib-user/name-for contributor-user-data)
 
                                                    :default
                                                    ;; Fallback to the org board data

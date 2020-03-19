@@ -17,7 +17,8 @@
        (not (responsive/is-mobile-size?))
        (not (or (#{utils/default-drafts-board-slug "inbox" "bookmarks"} (name container-slug-or-href))
                 (and (string? container-slug-or-href)
-                     (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)"))))))
+                     (or (.match container-slug-or-href #"(?i)/(inbox|bookmarks)(/|$)")
+                         (.match container-slug-or-href #"(?i)/u/(\d|[a-f]){4}-(\d|[a-f]){4}-(\d|[a-f]){4}(/|$)")))))))
 
 (defn- post-month-date-from-date [post-date]
   (doto post-date
@@ -320,6 +321,51 @@
                              (assoc with-posts-list :saved-items (count (:posts-list board-data)))
                              with-posts-list)
           with-posts-separators (if (show-separators? (:slug board-data))
+                                  (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
+                                  (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
+      with-posts-separators)))
+
+(defn fix-contributor
+  "Parse data coming from the API for a certain user's posts."
+  ([contributor-data]
+   (fix-contributor contributor-data {} (dis/org-data)))
+  ([contributor-data change-data org-data & [direction]]
+    (let [all-boards (:boards org-data)
+          with-fixed-activities (reduce (fn [ret item]
+                                          (let [board-data (first (filterv #(= (:slug %) (:board-slug item))
+                                                            all-boards))]
+                                            (assoc-in ret [:fixed-items (:uuid item)]
+                                             (fix-entry item board-data change-data))))
+                                 contributor-data
+                                 (:items contributor-data))
+          next-links (when direction
+                      (vec
+                       (remove
+                        #(if (= direction :down) (= (:rel %) "previous") (= (:rel %) "next"))
+                        (:links contributor-data))))
+          link-to-move (when direction
+                         (if (= direction :down)
+                           (utils/link-for (:old-links contributor-data) "previous")
+                           (utils/link-for (:old-links contributor-data) "next")))
+          fixed-next-links (if direction
+                             (if link-to-move
+                               (vec (conj next-links link-to-move))
+                               next-links)
+                             (:links contributor-data))
+          with-links (-> with-fixed-activities
+                       (dissoc :old-links)
+                       (assoc :links fixed-next-links))
+          new-items (map :uuid (:items contributor-data))
+          without-items (dissoc with-links :items)
+          with-posts-list (assoc without-items :posts-list (vec
+                                                             (case direction
+                                                              :up (concat new-items (:posts-list contributor-data))
+                                                              :down (concat (:posts-list contributor-data) new-items)
+                                                              new-items)))
+          with-saved-items (if direction
+                             (assoc with-posts-list :saved-items (count (:posts-list contributor-data)))
+                             with-posts-list)
+          with-posts-separators (if (show-separators? (:href contributor-data))
                                   (assoc with-saved-items :items-to-render (grouped-posts with-saved-items))
                                   (assoc with-saved-items :items-to-render (:posts-list with-saved-items)))]
       with-posts-separators)))

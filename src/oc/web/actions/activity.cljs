@@ -606,12 +606,25 @@
         (dis/dispatch! [:org-loaded org-data])
         (cb success))))))
 
-(defn secure-activity-get [& [cb]]
-  (api/get-secure-entry (router/current-org-slug) (router/current-secure-activity-id)
-   (fn [resp]
-     (secure-activity-get-finish resp)
-     (when (fn? cb)
-       (cb resp)))))
+(defn- build-secure-activity-link [org-slug secure-activity-id]
+  {:href (str "/orgs/" org-slug "/entries/" secure-activity-id)
+   :method "GET"
+   :rel ""
+   :accept "application/vnd.open-company.entry.v1+json"})
+
+(defn secure-activity-get
+  ([] (secure-activity-get nil (router/current-secure-activity-id)))
+  ([cb] (secure-activity-get cb (router/current-secure-activity-id)))
+  ([cb secure-uuid]
+   (let [partial-secure-link (utils/link-for (:links (dis/api-entry-point)) "partial-secure")
+         secure-link (if partial-secure-link
+                       (utils/link-replace-href partial-secure-link {:org-slug (router/current-org-slug) :secure-uuid secure-uuid})
+                       (build-secure-activity-link (router/current-org-slug) secure-uuid))]
+     (api/get-secure-entry secure-link
+      (fn [resp]
+        (secure-activity-get-finish resp)
+        (when (fn? cb)
+          (cb resp)))))))
 
 ;; Change reaction
 
