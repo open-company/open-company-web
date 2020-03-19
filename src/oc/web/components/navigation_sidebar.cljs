@@ -39,9 +39,10 @@
     (reset! (::content-height s) nil)
     (utils/after 100 #(save-content-height s))))
 
-(defn- toggle-collapse-contributors [s]
-  (let [next-value (not @(::contributors-list-collapsed s))]
-    (reset! (::contributors-list-collapsed s) next-value)
+(defn- toggle-collapse-users [s]
+  (let [next-value (not @(::users-list-collapsed s))]
+    (cook/set-cookie! (router/collapse-users-list-cookie) next-value (* 60 60 24 365))
+    (reset! (::users-list-collapsed s) next-value)
     (reset! (::content-height s) nil)
     (utils/after 100 #(save-content-height s))))
 
@@ -71,6 +72,7 @@
                                 (drv/drv :board-data)
                                 (drv/drv :contributor-data)
                                 (drv/drv :contributor-user-data)
+                                (drv/drv :team-roster)
                                 (drv/drv :change-data)
                                 (drv/drv :current-user-data)
                                 (drv/drv :mobile-navigation-sidebar)
@@ -82,7 +84,7 @@
                                 (rum/local nil ::window-width)
                                 (rum/local nil ::last-mobile-navigation-panel)
                                 (rum/local false ::sections-list-collapsed)
-                                (rum/local false ::contributors-list-collapsed)
+                                (rum/local false ::users-list-collapsed)
                                 ;; Mixins
                                 ui-mixins/first-render-mixin
                                 (ui-mixins/render-on-resize save-window-size)
@@ -91,6 +93,7 @@
                                   (save-window-size s)
                                   (save-content-height s)
                                   (reset! (::sections-list-collapsed s) (= (cook/get-cookie (router/collapse-sections-list-cookie)) "true"))
+                                  (reset! (::users-list-collapsed s) (= (cook/get-cookie (router/collapse-users-list-cookie)) "true"))
                                   s)
                                  :before-render (fn [s]
                                   (nux-actions/check-nux)
@@ -119,6 +122,8 @@
         board-data (drv/react s :board-data)
         contributor-data (drv/react s :contributor-data)
         contributor-user-data (drv/react s :contributor-user-data)
+        team-roster (drv/react s :team-roster)
+        active-users (filter #(-> % :status #{"active" "unverified"}) (:users team-roster))
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
@@ -153,12 +158,13 @@
         user-role (user-store/user-role org-data current-user-data)
         is-admin-or-author? (#{:admin :author} user-role)
         show-invite-people? (and org-slug
-                                 is-admin-or-author?)]
+                                 is-admin-or-author?)
+        show-users? (seq (:users team-roster))]
     [:div.left-navigation-sidebar.group
       {:class (utils/class-set {:mobile-show-side-panel (drv/react s :mobile-navigation-sidebar)
                                 :absolute-position (not is-tall-enough?)
                                 :collapsed-sections @(::sections-list-collapsed s)
-                                :collapsed-contributors @(::contributors-list-collapsed s)})
+                                :collapsed-users @(::users-list-collapsed s)})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :left-navigation-sidebar-content))
                     (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
        :ref :left-navigation-sidebar}
@@ -269,27 +275,33 @@
                   [:div.public])
                 (when (= (:access board) "private")
                   [:div.private])])])
-        (when is-contributor
+        (when show-users?
           [:div.left-navigation-sidebar-top.group
             ;; Boards header
             [:h3.left-navigation-sidebar-top-title.group
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
-                {:class (when @(::contributors-list-collapsed s) "collapsed")
-                 :on-click #(toggle-collapse-contributors s)}
+                {:class (when @(::users-list-collapsed s) "collapsed")
+                 :on-click #(toggle-collapse-users s)}
                 [:span.sections "Users"]]]])
-        (when (and is-contributor
-                   (not @(::contributors-list-collapsed s)))
+        (when (and show-users?
+                   (not @(::users-list-collapsed s)))
           [:div.left-navigation-sidebar-items.group
-            [:a.left-navigation-sidebar-item.hover-item.contributor
-              {:class (utils/class-set {:item-selected true})
-               :data-author-uuid (router/current-contributor-id)
-               :key (str "users-list-" (lib-user/name-for contributor-user-data))
-               :href (oc-urls/contributor (router/current-org-slug) (:user-id contributor-user-data))}
-              (user-avatar-image contributor-user-data)
-              [:div.contributor-label
-                (lib-user/name-for contributor-user-data)]
-              (when (pos? (:total-count contributor-data))
-                [:span.count (:total-count contributor-data)])]])]
+            (for [u (sort-by lib-user/name-for active-users)
+                  :let [name (lib-user/name-for u)
+                        is-current-user? (= (router/current-contributor-id) (:user-id u))
+                        url (oc-urls/contributor (router/current-org-slug) (:user-id u))]]
+              [:a.left-navigation-sidebar-item.hover-item.contributor
+                {:class (utils/class-set {:item-selected is-current-user?})
+                 :data-author-uuid (:user-id u)
+                 :key (str "users-list-" (:user-id u))
+                 :on-click #(nav-actions/nav-to-author! % (:user-id u) url)
+                 :href url}
+                (user-avatar-image u)
+                [:div.contributor-label
+                  (lib-user/name-for u)]
+                (when (and is-current-user?
+                           (pos? (:total-count contributor-data)))
+                  [:span.count (:total-count contributor-data)])])])]
       (when show-invite-people?
         [:div.left-navigation-sidebar-footer
           [:button.mlb-reset.invite-people-bt

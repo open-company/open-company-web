@@ -14,6 +14,7 @@
             [oc.web.actions.routing :as routing-actions]
             [oc.web.actions.section :as section-actions]
             [oc.web.actions.activity :as activity-actions]
+            [oc.web.actions.contributor :as contributor-actions]
             [oc.web.components.ui.alert-modal :as alert-modal]))
 
 ;; Panels
@@ -33,6 +34,43 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 ;; :theme
+
+(defn- refresh-contributor-data [author-uuid]
+  (when author-uuid
+    (contributor-actions/contributor-get author-uuid)))
+
+(defn nav-to-author!
+  ([e author-uuid url]
+  (nav-to-author! e author-uuid url (or (:back-y @router/path) (utils/page-scroll-top)) true))
+
+  ([e author-uuid url back-y refresh?]
+  (when (and e
+             (.-preventDefault e))
+    (.preventDefault e))
+  (when ua/mobile?
+    (dis/dispatch! [:input [:mobile-navigation-sidebar] false]))
+  (utils/after 0 (fn []
+   (let [current-path (str (.. js/window -location -pathname) (.. js/window -location -search))
+         org-slug (router/current-org-slug)
+         org-data (dis/org-data)]
+     (if (= current-path url)
+       (do ;; In case user is clicking on the currently highlighted section
+           ;; let's refresh the posts list only
+         (routing-actions/routing @router/path)
+         (user-actions/initial-loading true))
+       (do ;; If user clicked on a different section/container
+           ;; let's switch to it using pushState and changing
+           ;; the internal router state
+         (router/set-route! [org-slug author-uuid "dashboard"]
+          {:org org-slug
+           :contributor author-uuid
+           :scroll-y back-y
+           :query-params (router/query-params)})
+         (.pushState (.-history js/window) #js {} (.-title js/document) url)
+         (set! (.. js/document -scrollingElement -scrollTop) (utils/page-scroll-top))
+         (when refresh?
+           (utils/after 0 #(refresh-contributor-data author-uuid))))))
+   (user-actions/hide-mobile-user-notifications)))))
 
 (defn- container-data [board-slug]
   (if (dis/is-container? board-slug)
