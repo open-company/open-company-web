@@ -611,7 +611,7 @@
     (when (and org-slug board-slug)
       (get-in data (board-data-key org-slug board-slug)))))
 
-(defun contributor-data
+(defun ^:export contributor-data
   "Get contributor data"
   ([]
     (contributor-data @app-state))

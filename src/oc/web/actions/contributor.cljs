@@ -59,7 +59,7 @@
   (when success
     (request-reads-count author-uuid (json->cljs body)))
   (dis/dispatch! [:contributor-more/finish (router/current-org-slug) author-uuid
-   direction (when success (json->cljs body))]))
+   direction (when success (:collection (json->cljs body)))]))
 
 (defn contributor-more [more-link direction]
   (let [author-uuid (router/current-contributor-id)]
