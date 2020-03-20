@@ -195,6 +195,6 @@
 
 (defn contributor
   "Contributor url"
-  ([] (contributor (router/current-activity-id) (router/current-contributor-id)))
-  ([author-uuid] (contributor (router/current-activity-id) author-uuid))
+  ([] (contributor (router/current-org-slug) (router/current-contributor-id)))
+  ([author-uuid] (contributor (router/current-org-slug) author-uuid))
   ([org-slug author-uuid] (str (org org-slug) "/u/" author-uuid)))
