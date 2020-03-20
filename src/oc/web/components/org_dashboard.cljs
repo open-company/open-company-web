@@ -93,10 +93,7 @@
                      (and (not (router/current-board-slug))
                           (not (router/current-contributor-id))
                           ;; but there are some
-                          (pos? (count (:boards org-data))))
-                     ;; Contributor
-                     (and (router/current-contributor-id)
-                          (not contributor-data)))
+                          (pos? (count (:boards org-data)))))
         org-not-found (and (not (nil? orgs))
                            (not ((set (map :slug orgs)) (router/current-org-slug))))
         section-not-found (and (not org-not-found)
