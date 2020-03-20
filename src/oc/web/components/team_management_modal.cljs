@@ -192,13 +192,16 @@
                   (small-loading)
                   (user-avatar-image user))
                 [:div.user-name
-                  [:div.user-name-label
+                  [:button.mlb-reset.user-name-label
                     {:title (str "<span>" (:email user)
                               (when (seq fixed-display-name)
                                 (str " | <i class=\"mdi mdi-slack\"></i>" (when-not (= fixed-display-name "-") (str " " fixed-display-name))))
                               "</span>")
                      :class (utils/class-set {:pending pending?
                                               :removing removing?})
+                     :on-click #(when (#{"active" "unverified"} (:status user))
+                                  (utils/event-stop %)
+                                  (nav-actions/show-user-info (:user-id user)))
                      :data-toggle "tooltip"
                      :data-html "true"
                      :data-placement "top"}

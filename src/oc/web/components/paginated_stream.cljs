@@ -96,7 +96,8 @@
            editable-boards
            foc-layout
            is-mobile] :as props}]
-  (let [show-wrt? (and (jwt/user-is-part-of-the-team (:team-id org-data))
+  (let [member? (jwt/user-is-part-of-the-team (:team-id org-data))
+        show-wrt? (and member?
                        (activity-utils/is-published? entry))
         collapsed-item? (and (= foc-layout dis/other-foc-layout)
                              (not is-mobile))]
@@ -108,11 +109,13 @@
                                :comments-data comments-data
                                :read-data reads-data
                                :show-wrt? show-wrt?
+                               :member? member?
                                :editable-boards editable-boards})
        (stream-item {:activity-data entry
                      :comments-data comments-data
                      :read-data reads-data
                      :show-wrt? show-wrt?
+                     :member? member?
                      :editable-boards editable-boards}))]))
 
 (rum/defc load-more < rum/static

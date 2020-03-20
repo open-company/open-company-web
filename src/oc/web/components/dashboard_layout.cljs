@@ -133,7 +133,8 @@
         no-phisical-home-button (js/isiPhoneWithoutPhysicalHomeBt)
         dismiss-all-link (when is-inbox
                            (utils/link-for (:links container-data) "dismiss-all"))
-        search-active? (drv/react s search/search-active?)]
+        search-active? (drv/react s search/search-active?)
+        member? (jwt/user-is-part-of-the-team (:team-id org-data))]
       ;; Entries list
       [:div.dashboard-layout.group
         {:class (utils/class-set {:expanded-post-view show-expanded-post
@@ -145,7 +146,7 @@
                      (not show-expanded-post)
                      (or (:collapsed cmail-state)
                          (not cmail-state))
-                     (jwt/user-is-part-of-the-team (:team-id org-data)))
+                     member?)
             [:div.dashboard-layout-mobile-tabbar
               {:class (utils/class-set {:can-compose can-compose?
                                         :ios-app-tabbar (and ua/mobile-app?
@@ -239,29 +240,33 @@
                   (when (or current-board-slug
                             current-contributor-id)
                     [:div.board-name-with-icon
-                      [:div.board-name-with-icon-internal
-                        {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
-                                                                (not is-drafts-board))
-                                                  :public (= (:access current-board-data) "public")})
-                         :dangerouslySetInnerHTML (utils/emojify (cond
-                                                   is-inbox
-                                                   "Unread"
+                      (if is-contributor
+                        [:button.mlb-reset.board-name-internal
+                          {:class (when member? "show-info")
+                           :on-click #(when member?
+                                        (utils/event-stop %)
+                                        (nav-actions/show-user-info (:user-id contributor-user-data)))}
+                          (lib-user/name-for contributor-user-data)
+                          [:span.info-icon]]
+                        [:div.board-name-with-icon-internal
+                          {:class (utils/class-set {:private (and (= (:access current-board-data) "private")
+                                                                  (not is-drafts-board))
+                                                    :public (= (:access current-board-data) "public")})
+                           :dangerouslySetInnerHTML (utils/emojify (cond
+                                                     is-inbox
+                                                     "Unread"
 
-                                                   is-all-posts
-                                                   "Recent"
+                                                     is-all-posts
+                                                     "Recent"
 
-                                                   is-bookmarks
-                                                   "Bookmarks"
+                                                     is-bookmarks
+                                                     "Bookmarks"
 
-                                                   (and is-contributor
-                                                        contributor-user-data)
-                                                   (lib-user/name-for contributor-user-data)
-
-                                                   :default
-                                                   ;; Fallback to the org board data
-                                                   ;; to avoid showing an empty name while loading
-                                                   ;; the board data
-                                                   (:name current-board-data)))}]])
+                                                     :default
+                                                     ;; Fallback to the org board data
+                                                     ;; to avoid showing an empty name while loading
+                                                     ;; the board data
+                                                     (:name current-board-data)))}])])
                   (when (and (= (:access current-board-data) "private")
                              (not is-drafts-board))
                     [:div.private-board

@@ -224,7 +224,11 @@
       [:div.expanded-post-author.group
         [:div.expanded-post-author-inner
           {:class utils/hide-class}
-          [:span.expanded-post-author-inner-label
+          [:button.mlb-reset.expanded-post-author-inner-label
+            {:class (when user-is-part-of-the-team "clickable")
+             :on-click #(when user-is-part-of-the-team
+                          (utils/event-stop %)
+                          (nav-actions/show-user-info (:user-id publisher)))}
             (str (:name publisher) " in "
                  (:board-name activity-data)
                  (when (= (:board-access activity-data) "private")

@@ -22,13 +22,13 @@
         [:div.user-info-header
           [:div.user-info-header-title
             (if my-profile? "My profile" "Profile")]
-          (if my-profile?
+          [:button.mlb-reset.cancel-bt
+            {:on-click #(nav-actions/show-user-settings nil)}
+            "Back"]
+          (when my-profile?
             [:button.mlb-reset.save-bt
               {:on-click #(nav-actions/show-user-settings :profile)}
-              "Edit profile"]
-            [:button.mlb-reset.cancel-bt
-              {:on-click #(nav-actions/show-user-settings nil)}
-              "Back"])]
+              "Edit profile"])]
         [:div.user-info-body
           (user-avatar-image user-data)
           [:div.user-info-name
@@ -68,4 +68,7 @@
                     [:a
                       {:class (name k)
                        :key (str "profile-" (name k))
-                       :href v}])])])]]]))
+                       :href v}])])
+              (when (:blurb user-data)
+                [:p.user-info-about-blurb
+                  (:blurb user-data)])])]]]))

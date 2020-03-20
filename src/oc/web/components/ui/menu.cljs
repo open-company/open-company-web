@@ -150,8 +150,7 @@
           (when-not is-mobile?
             (user-avatar-image current-user-data))]
         ;; Profile
-        (when (and (jwt/jwt)
-                   (not is-mobile?))
+        (when (jwt/jwt)
           [:a
             {:href "#"
              :on-click (partial my-profile-click s (:user-id current-user-data))}
@@ -175,8 +174,7 @@
             [:div.oc-menu-item.notifications-settings
               "Notifications"]])
         ;; Theme switcher separator
-        (when (and (jwt/jwt)
-                   (not is-mobile?))
+        (when (jwt/jwt)
           [:div.oc-menu-separator])
         ;; Theme switcher
         [:a

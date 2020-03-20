@@ -30,7 +30,7 @@
 (rum/defcs stream-collapsed-item < rum/static
                                    rum/reactive
                                    (drv/drv :activity-share-container)
-  [s {:keys [activity-data read-data comments-data editable-boards]}]
+  [s {:keys [activity-data read-data comments-data editable-boards :member? member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         is-drafts-board (= (router/current-board-slug) utils/default-drafts-board-slug)
         is-inbox? (= (router/current-board-slug) "inbox")
@@ -82,7 +82,10 @@
                                   :bookmark-item (:bookmarked-at activity-data)
                                   :muted-item (utils/link-for (:links activity-data) "follow")
                                   :no-comments has-zero-comments?})}
-        (user-avatar-image publisher)
+        [:button.mlb-reset.avatar-bt
+          {:on-click #(when member?
+                        (nav-actions/show-user-info (:user-id publisher)))}
+          (user-avatar-image publisher)]
         [:div.stream-collapsed-item-fill
           [:div.stream-item-headline.ap-seen-item-headline
             {:ref "activity-headline"

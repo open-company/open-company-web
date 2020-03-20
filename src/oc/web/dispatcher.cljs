@@ -387,8 +387,8 @@
    :activity-share-container  [[:base] (fn [base] (:activity-share-container base))]
    :activity-shared-data  [[:base] (fn [base] (:activity-shared-data base))]
    :activities-read       [[:base] (fn [base] (get-in base activities-read-key))]
-   :navbar-data         [[:base :org-data :board-data :current-user-data]
-                          (fn [base org-data board-data current-user-data]
+   :navbar-data         [[:base :org-data :board-data :current-user-data :contributor-user-data]
+                          (fn [base org-data board-data current-user-data contributor-user-data]
                             (let [navbar-data (select-keys base [:show-login-overlay
                                                                  :current-user-data
                                                                  :orgs-dropdown-visible
@@ -399,6 +399,7 @@
                               (-> navbar-data
                                 (assoc :org-data org-data)
                                 (assoc :board-data board-data)
+                                (assoc :contributor-user-data contributor-user-data)
                                 (assoc :current-user-data current-user-data))))]
    :confirm-invitation    [[:base :route :auth-settings :jwt]
                             (fn [base route auth-settings jwt]

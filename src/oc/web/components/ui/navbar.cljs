@@ -4,6 +4,7 @@
             [dommy.core :as dommy :refer-macros (sel1)]
             [oc.web.lib.jwt :as jwt]
             [oc.web.urls :as oc-urls]
+            [oc.lib.user :as lib-user]
             [oc.web.router :as router]
             [oc.web.dispatcher :as dis]
             [oc.web.lib.utils :as utils]
@@ -65,6 +66,7 @@
   (let [{:keys [org-data
                 board-data
                 current-user-data
+                contributor-user-data
                 show-login-overlay
                 orgs-dropdown-visible
                 search-active
@@ -86,6 +88,8 @@
                        "Recent"
                        (= (router/current-board-slug) "bookmarks")
                        "Bookmarks"
+                       (and (router/current-contributor-id) (seq contributor-user-data))
+                       (lib-user/name-for contributor-user-data)
                        :else
                        (:name board-data))
          search-active? (drv/react s search/search-active?)

@@ -135,11 +135,11 @@ div.stream-collapsed-item {
       text-align: left;
     }
 
-    @include activity-author(20);
-
-    & > div.user-avatar-img-container {
+    button.avatar-bt {
       margin-right: 0;
       flex: 0 0 20px;
+
+      @include activity-author(20);
     }
 
     &.bookmark-item div.stream-collapsed-item-fill {

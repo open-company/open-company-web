@@ -99,11 +99,12 @@ div.user-info-modal {
 
       button.cancel-bt {
         height: 32px;
-        padding: 0 8px;
+        padding: 0;
         @include OC_Body_Book();
         font-size: 14px;
         color: var(--light-color);
         float: right;
+        margin-left: 16px;
 
         @include mobile() {
           display: none;
@@ -112,7 +113,7 @@ div.user-info-modal {
 
       button.save-bt {
         height: 32px;
-        padding: 7px 12px;
+        padding: 0;
         @include OC_Body_Book();
         font-size: 14px;
         color: $carrot_green;
@@ -168,7 +169,7 @@ div.user-info-modal {
         font-size: 14px;
         line-height: 18px;
         width: auto;
-        border-radius: 6px;
+        border-radius: 4px;
         display: block;
 
         &:hover {
@@ -183,6 +184,7 @@ div.user-info-modal {
           margin-top: 24px;
           padding-bottom: 8px;
           border-bottom: 1px solid var(--divider-line);
+          margin-bottom: 16px;
           font-size: 14px;
           line-height: 18px;
           @include OC_Body_Bold();
@@ -190,7 +192,7 @@ div.user-info-modal {
           text-align: left;
         }
 
-        div.user-info-about-role {
+        div.user-info-about-title {
           margin-top: 4px;
           @include OC_Body_Book();
           font-size: 14px;
@@ -215,9 +217,12 @@ div.user-info-modal {
 
           a {
             color: $carrot_green;
+            text-decoration: none;
 
-            @include big_web(){
-              text-decoration: underline;
+            @include big_web() {
+              &:hover {
+                text-decoration: underline;
+              }
             }
           }
         }
@@ -233,6 +238,8 @@ div.user-info-modal {
             background-size: 16px 16px;
             background-repeat: no-repeat;
             background-position: center;
+            display: inline-block;
+            text-decoration: none;
 
             &.facebook {
               background-image: cdnUrl("/img/ML/profile_icon_fb.svg");
@@ -251,17 +258,15 @@ div.user-info-modal {
             }
           }
         }
-
         p.user-info-about-blurb {
           margin-top: 16px;
           @include OC_Body_Book();
           color: var(--color);
           font-size: 14px;
           line-height: 18px;
-          white-space: pre;
+          white-space: pre-wrap;
           overflow-wrap: break-word;
         }
-
       }
     }
   }

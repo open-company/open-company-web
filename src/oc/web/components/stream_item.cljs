@@ -151,7 +151,7 @@
                              (events/unlistenByKey @(::on-scroll s))
                              (reset! (::on-scroll s) nil))
                            s)}
-  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards]}]
+  [s {:keys [activity-data read-data comments-data show-wrt? editable-boards member?]}]
   (let [is-mobile? (responsive/is-mobile-size?)
         current-user-id (jwt/user-id)
         activity-attachments (:attachments activity-data)
@@ -258,7 +258,9 @@
                     (activity-actions/inbox-dismiss (:uuid activity-data)))}
         [:span "Dismiss"]]
       [:div.stream-item-header.group
-        [:div.stream-header-head-author
+        [:button.mlb-reset.stream-header-head-author
+          {:on-click #(when member?
+                        (nav-actions/show-user-info (:user-id publisher)))}
           (user-avatar-image publisher)
           [:div.name
             [:div.mobile-name
