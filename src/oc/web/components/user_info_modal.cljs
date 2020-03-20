@@ -8,13 +8,21 @@
             [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.ui.user-avatar :refer (user-avatar-image)]))
 
+(defn- time-with-timezone [timezone]
+  (utils/time-without-leading-zeros
+    (.toLocaleTimeString (js/Date.)
+     (.. js/window -navigator -language)
+     #js {:hour "2-digit"
+          :minute "2-digit"
+          :format "hour:minute"
+          :timeZone timezone})))
+
 (rum/defc user-info-modal
   [{:keys [user-data org-data]}]
   (let [my-profile? (and (jwt/jwt)
                          (= (:user-id user-data) (jwt/user-id)))
         member? (jwt/user-is-part-of-the-team (:team-id org-data))
         team-role (when member? (utils/get-user-type user-data org-data))]
-    (js/console.log "DBG user-info-modal/render user-data" user-data "org-data" org-data)
     [:div.user-info-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/close-all-panels}]
@@ -44,7 +52,6 @@
               "View posts"])
           (when (some seq (vals (-> user-data (select-keys [:title :timezone :email :profiles]))))
             [:div.user-info-about
-              (js/console.log "DBG about?" (vals (-> user-data (select-keys [:title :timezone :email :profiles]))) (some seq (vals (-> user-data (select-keys [:title :timezone :email :profiles])))))
               [:div.user-info-about-label
                 "About"]
               (when (:title user-data)
@@ -53,7 +60,7 @@
               (when (:timezone user-data)
                 [:div.user-info-about-timezone
                   (:timezone user-data)
-                  (when-let [time-str (utils/local-date-time (.toDate (.tz js/moment (:timezone user-data))))]
+                  (when-let [time-str (time-with-timezone (:timezone user-data))]
                     (str " (" time-str " local time)"))])
               (when (:email user-data)
                 [:div.user-info-about-email

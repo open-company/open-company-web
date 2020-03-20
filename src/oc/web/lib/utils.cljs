@@ -131,12 +131,15 @@
       :else
       (if short? "now" "Just now"))))
 
+(defn time-without-leading-zeros [time-string]
+  (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1"))
+
 (defn local-date-time [past-date]
   (let [time-string (.toLocaleTimeString past-date (.. js/window -navigator -language)
                      #js {:hour "2-digit"
                           :minute "2-digit"
                           :format "hour:minute"})
-        without-leading-zeros (.replace time-string (js/RegExp. "^0([0-9])*" "ig") "$1")]
+        without-leading-zeros (time-without-leading-zeros time-string)]
     (s/upper without-leading-zeros)))
 
 (defn foc-date-time [past-date & [flags]]
