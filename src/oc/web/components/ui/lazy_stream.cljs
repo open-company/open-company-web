@@ -22,7 +22,7 @@
         activity-data (drv/react s :activity-data)
         foc-layout (drv/react s :foc-layout)
         is-container? (dis/is-container? (router/current-board-slug))
-        is-contributor? (dis/is-contributor? (router/current-contributor-id))
+        is-contributor? (seq (router/current-contributor-id))
         loading? (or ;; Board specified
                      (and (not (router/current-activity-id))
                           (not is-container?)
@@ -31,7 +31,7 @@
                           (not board-data))
                      ;; Contrib specified
                      (and (not (router/current-contributor-id))
-                          (not is-contributor?)
+                          (not is-container?)
                           ;; But no board data yet
                           (not contributor-data))
                      ;; Another container
