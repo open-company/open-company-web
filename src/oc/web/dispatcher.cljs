@@ -460,10 +460,17 @@
                                             wrt-uuid (subs wrt-panel 4 (count wrt-panel))]
 
                                   (activity-data-get org-slug wrt-uuid base))))]
+   :user-info-data        [[:base :team-roster :panel-stack]
+                            (fn [base team-roster panel-stack]
+                              (when (and panel-stack
+                                         (seq (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
+                                (when-let* [user-info-panel (name (first (filter #(s/starts-with? (name %) "user-info-") panel-stack)))
+                                            user-id (subs user-info-panel (count "user-info-") (count user-info-panel))]
+                                  (some #(when (= (:user-id %) user-id) %) (:users team-roster)))))]
    :org-dashboard-data    [[:base :orgs :org-data :board-data :contributor-data :container-data :posts-data :activity-data
-                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active]
+                            :show-sections-picker :entry-editing :jwt :wrt-show :loading :payments :search-active :user-info-data]
                             (fn [base orgs org-data board-data contributor-data container-data posts-data activity-data
-                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active]
+                                 show-sections-picker entry-editing jwt wrt-show loading payments search-active user-info-data]
                               {:jwt-data jwt
                                :orgs orgs
                                :org-data org-data
@@ -485,7 +492,8 @@
                                :cmail-state (:cmail-state base)
                                :force-login-wall (:force-login-wall base)
                                :app-loading loading
-                               :search-active search-active})]
+                               :search-active search-active
+                               :user-info-data user-info-data})]
    :show-add-post-tooltip      [[:nux] (fn [nux] (:show-add-post-tooltip nux))]
    :show-edit-tooltip          [[:nux] (fn [nux] (:show-edit-tooltip nux))]
    :show-post-added-tooltip    [[:nux] (fn [nux] (:show-post-added-tooltip nux))]

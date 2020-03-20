@@ -69,6 +69,7 @@
      (empty? (:email user-data)) (merge {:email ""})
      (empty? (:timezone user-data)) (merge {:timezone (or (.. js/moment -tz guess) "")})
      (empty? (:blurb user-data)) (merge {:blurb ""})
+     (empty? (:title user-data)) (merge {:title ""})
      (empty? (:profiles user-data)) (merge {:profiles {:twitter "" :linked-in "" :instagram "" :facebook ""}})))
 
 (defn update-user-data [db user-data]

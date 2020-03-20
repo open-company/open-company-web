@@ -1,0 +1,268 @@
+div.user-info-modal {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  overflow: visible;
+  padding: 24px;
+  text-transform: none;
+  background-color: $carrot_modal_bg;
+  z-index: #{$navbar_zindex + 156};
+  opacity: 1;
+  transition: opacity 180ms ease-in;
+
+  button.modal-close-bt {
+    position: absolute;
+    right: 336px;
+    top: 12px;
+
+    @include mobile() {
+      left: 16px;
+      top: 11px;
+      right: unset;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background-image: cdnUrl("/img/ML/mobile_dark_x.svg");
+      background-size: 12px 12px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: var(--mobile-background-color);
+      border-radius: 4px;
+    }
+  }
+
+  div.user-info {
+    width: 320px;
+    background-color: var(--overlay-background-color);
+    position: absolute;
+    top: 0;
+    height: calc(100vh - #{$navbar_height}px);
+    right: 0;
+    margin-top: #{$navbar_height}px;
+    padding: 0 24px 16px;
+    transition: right 180ms ease-in;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    @include mobile() {
+      width: 100%;
+      left: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: #{$mobile_navbar_height}px 16px 16px;
+      z-index: 1;
+      margin-top: 0;
+    }
+
+    div.user-info-header {
+      width: 320px;
+      height: #{$navbar_height}px;
+      background-color: var(--panel-header-background);
+      padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+
+      @include mobile() {
+        height: #{$mobile_navbar_height}px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--divider-line);
+        background-color: var(--mobile-background-color);
+        padding: 15px 16px 15px 24px;
+        margin: 0;
+        z-index: 2;
+      }
+
+      div.user-info-header-title {
+        @include OC_Body_Bold();
+        font-size: 14px;
+        color: var(--color);
+        line-height: 32px;
+        float: left;
+
+        @include mobile() {
+          float: unset;
+          text-align: center;
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+
+      button.cancel-bt {
+        height: 32px;
+        padding: 0 8px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--light-color);
+        float: right;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+
+      button.save-bt {
+        height: 32px;
+        padding: 7px 12px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: $carrot_green;
+        line-height: 18px;
+        float: right;
+
+        @include mobile() {
+          display: none;
+        }
+      }
+    }
+
+    div.user-info-body {
+
+      @include user-profile(160px);
+
+      div.user-avatar-img-container {
+        margin: 24px auto 0;
+      }
+
+      div.user-info-name {
+        margin-top: 24px;
+        @include OC_Body_Bold();
+        font-size: 16px;
+        color: var(--color);
+        line-height: 20px;
+        text-align: center;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+      }
+
+      div.user-info-team-role {
+        margin-top: 4px;
+        @include OC_Body_Book();
+        font-size: 14px;
+        color: var(--color);
+        line-height: 18px;
+        text-align: center;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
+      }
+
+      button.view-posts-bt {
+        margin: 8px auto 0;
+        padding: 7px 12px;
+        background-color: $carrot_green;
+        @include OC_Body_Bold();
+        color: white;
+        font-size: 14px;
+        line-height: 18px;
+        width: auto;
+        border-radius: 6px;
+        display: block;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      div.user-info-about {
+        text-align: left;
+
+        div.user-info-about-label {
+          margin-top: 24px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--divider-line);
+          font-size: 14px;
+          line-height: 18px;
+          @include OC_Body_Bold();
+          color: var(--color);
+          text-align: left;
+        }
+
+        div.user-info-about-role {
+          margin-top: 4px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          text-align: left;
+        }
+
+        div.user-info-about-timezone {
+          margin-top: 4px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          text-align: left;
+        }
+
+        div.user-info-about-email {
+          margin-top: 4px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          text-align: left;
+
+          a {
+            color: $carrot_green;
+
+            @include big_web(){
+              text-decoration: underline;
+            }
+          }
+        }
+
+        div.user-info-about-profiles {
+          margin-top: 16px;
+          height: 16px;
+
+          a {
+            margin-right: 16px;
+            width: 16px;
+            height: 16px;
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            &.facebook {
+              background-image: cdnUrl("/img/ML/profile_icon_fb.svg");
+            }
+
+            &.twitter {
+              background-image: cdnUrl("/img/ML/profile_icon_tw.svg");
+            }
+
+            &.linked-in {
+              background-image: cdnUrl("/img/ML/profile_icon_li.svg");
+            }
+
+            &.instagram {
+              background-image: cdnUrl("/img/ML/profile_icon_in.svg");
+            }
+          }
+        }
+
+        p.user-info-about-blurb {
+          margin-top: 16px;
+          @include OC_Body_Book();
+          color: var(--color);
+          font-size: 14px;
+          line-height: 18px;
+          white-space: pre;
+          overflow-wrap: break-word;
+        }
+
+      }
+    }
+  }
+}

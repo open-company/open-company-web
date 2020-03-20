@@ -34,6 +34,7 @@
 ;; :section-edit
 ;; :wrt-{uuid}
 ;; :theme
+;; :user-info-{uuid}
 
 (defn- refresh-contributor-data [author-uuid]
   (when author-uuid
@@ -315,4 +316,12 @@
   (push-panel :theme))
 
 (defn hide-theme-settings []
+  (pop-panel))
+
+;; User info modal
+
+(defn show-user-info [user-id]
+  (push-panel (str "user-info-" user-id)))
+
+(defn hide-user-info []
   (pop-panel))

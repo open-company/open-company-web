@@ -29,9 +29,9 @@
   (menu-close s)
   (jwt-actions/logout))
 
-(defn user-profile-click [s e]
+(defn my-profile-click [s user-id e]
   (.preventDefault e)
-  (nav-actions/show-user-settings :profile))
+  (nav-actions/show-user-info user-id))
 
 (defn my-posts-click [s cur-user-id e]
   (.preventDefault e)
@@ -154,7 +154,7 @@
                    (not is-mobile?))
           [:a
             {:href "#"
-             :on-click (partial user-profile-click s)}
+             :on-click (partial my-profile-click s (:user-id current-user-data))}
             [:div.oc-menu-item.personal-profile
               "My profile"]])
         ;;

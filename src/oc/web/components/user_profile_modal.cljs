@@ -127,7 +127,7 @@
    "twitter.com/..."
    :email
    "Your email address"
-   :role
+   :title
    "CEO, CTO, Designer, Engineer..."
    ""))
 
@@ -235,13 +235,13 @@
               {:for "role"}
               "Role"]
             [:input.field-value.oc-input
-              {:value (:role current-user-data)
+              {:value (:title current-user-data)
                :type "text"
                :id "role"
-               :placeholder (placeholder :role)
+               :placeholder (placeholder :title)
                :tab-index 3
                :max-length 56
-               :on-change #(change! s [:role] (.. % -target -value))}]
+               :on-change #(change! s [:title] (.. % -target -value))}]
             [:div.field-label
               "Email"
               (when @(::email-error s)

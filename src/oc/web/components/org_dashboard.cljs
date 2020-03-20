@@ -22,6 +22,7 @@
             [oc.web.actions.payments :as payments-actions]
             [oc.web.components.ui.loading :refer (loading)]
             [oc.web.components.ui.alert-modal :refer (alert-modal)]
+            [oc.web.components.user-info-modal :refer (user-info-modal)]
             [oc.web.components.ui.section-editor :refer (section-editor)]
             [oc.web.components.ui.activity-share :refer (activity-share)]
             [oc.web.components.dashboard-layout :refer (dashboard-layout)]
@@ -83,7 +84,8 @@
                 force-login-wall
                 panel-stack
                 app-loading
-                payments-data]} (drv/react s :org-dashboard-data)
+                payments-data
+                user-info-data]} (drv/react s :org-dashboard-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         loading? (or ;; force loading screen
                      app-loading
@@ -147,7 +149,10 @@
         show-push-notification-permissions-modal? (and ua/mobile-app?
                                                        jwt-data
                                                        (not user-responded-to-push-permission?))
-        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)]
+        show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
+        show-user-info? (and open-panel
+                             (s/starts-with? (name open-panel) "user-info-"))]
+    (js/console.log "DBG org-dashboard/render show-user-info?" show-user-info? "user-info-data" user-info-data)
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]
@@ -220,7 +225,10 @@
           (wrt org-data)
           ;; UI Theme settings panel
           (= open-panel :theme)
-          (theme-settings-modal (drv/react s :ui-theme)))
+          (theme-settings-modal (drv/react s :ui-theme))
+          ;; User info modal
+          show-user-info?
+          (user-info-modal {:user-data user-info-data :org-data org-data}))
         ;; Activity share modal for no mobile
         (when (and (not is-mobile?)
                    is-sharing-activity)
