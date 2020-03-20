@@ -123,11 +123,14 @@
         contributor-data (drv/react s :contributor-data)
         contributor-user-data (drv/react s :contributor-user-data)
         team-roster (drv/react s :team-roster)
-        active-users (filter #(-> % :status #{"active" "unverified"}) (:users team-roster))
+        current-user-data (drv/react s :current-user-data)
+        active-users (sort-by lib-user/name-for
+                      (filter #(and (-> % :status #{"active" "unverified"})
+                                    (not= (:user-id %) (:user-id current-user-data)))
+                       (:users team-roster)))
         change-data (drv/react s :change-data)
         filtered-change-data (into {} (filter #(and (-> % first (s/starts-with? drafts-board-prefix) not)
                                                     (not= % (:uuid org-data))) change-data))
-        current-user-data (drv/react s :current-user-data)
         left-navigation-sidebar-width (- responsive/left-navigation-sidebar-width 20)
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
@@ -237,7 +240,7 @@
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::sections-list-collapsed s) "collapsed")
                  :on-click #(toggle-collapse-sections s)}
-                [:span.sections "Sections"]]
+                [:span.sections "Groups"]]
               (when create-link
                 [:button.left-navigation-sidebar-top-title-button.btn-reset
                   {:on-click #(nav-actions/show-section-add)
@@ -282,11 +285,11 @@
               [:button.mlb-reset.left-navigation-sidebar-sections-arrow
                 {:class (when @(::users-list-collapsed s) "collapsed")
                  :on-click #(toggle-collapse-users s)}
-                [:span.sections "Users"]]]])
+                [:span.sections "Direct"]]]])
         (when (and show-users?
                    (not @(::users-list-collapsed s)))
           [:div.left-navigation-sidebar-items.group
-            (for [u (sort-by lib-user/name-for active-users)
+            (for [u active-users
                   :let [name (lib-user/name-for u)
                         is-current-user? (= (router/current-contributor-id) (:user-id u))
                         url (oc-urls/contributor (router/current-org-slug) (:user-id u))]]
