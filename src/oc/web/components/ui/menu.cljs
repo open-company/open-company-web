@@ -33,6 +33,11 @@
   (.preventDefault e)
   (nav-actions/show-user-settings :profile))
 
+(defn my-posts-click [s cur-user-id e]
+  (.preventDefault e)
+  (menu-close s)
+  (nav-actions/nav-to-author! e cur-user-id (oc-urls/contributor cur-user-id)))
+
 (defn notifications-settings-click [s e]
   (.preventDefault e)
   (nav-actions/show-user-settings :notifications))
@@ -94,6 +99,7 @@
                   (drv/drv :navbar-data)
                   (drv/drv :current-user-data)
                   (drv/drv :expo-app-version)
+                  (drv/drv :editable-boards)
   mixins/refresh-tooltips-mixin
   {:did-mount (fn [s]
    (when (responsive/is-mobile-size?)
@@ -123,7 +129,8 @@
                       :else "")
         show-billing? (and ls/payments-enabled
                            (= user-role :admin)
-                           (router/current-org-slug))]
+                           (router/current-org-slug))
+        can-compose? (pos? (count (drv/react s :editable-boards)))]
     [:div.menu
       {:class (utils/class-set {:expanded-user-menu expanded-user-menu})
        :on-click #(when-not (utils/event-inside? % (rum/ref-node s :menu-container))
@@ -150,6 +157,15 @@
              :on-click (partial user-profile-click s)}
             [:div.oc-menu-item.personal-profile
               "My profile"]])
+        ;;
+        (when (and (jwt/jwt)
+                   current-user-data
+                   can-compose?)
+          [:a
+            {:href (oc-urls/contributor (:user-id current-user-data))
+             :on-click (partial my-posts-click s (:user-id current-user-data))}
+            [:div.oc-menu-item.my-posts
+              "My posts"]])
         ;; Notifications
         (when (and (jwt/jwt)
                    (not is-mobile?))
