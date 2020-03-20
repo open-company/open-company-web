@@ -165,19 +165,16 @@
 
 ;; Container helpers
 
-(defn is-contributor? [author-uuid]
-  (lib-schema/unique-id? author-uuid))
-
 (defn is-container? [container-slug]
   ;; Rest of containers
   (#{"inbox" "all-posts" "bookmarks"} container-slug))
 
-(defn- get-container-posts [base posts-data org-slug container-slug posts-key]
+(defn- get-container-posts [base route posts-data org-slug container-slug posts-key]
   (let [cnt-key (cond
-                  (is-contributor? container-slug)
-                  (contributor-data-key org-slug container-slug)
                   (is-container? container-slug)
                   (container-key org-slug container-slug)
+                  (seq (:contributor route))
+                  (contributor-data-key org-slug container-slug)
                   :else
                   (board-data-key org-slug container-slug))
         container-data (get-in base cnt-key)
@@ -309,7 +306,7 @@
                            (when (and base org-data posts-data route (:board route))
                              (let [org-slug (:slug org-data)
                                    container-slug (or (:contributor route) (:board route))]
-                              (get-container-posts base posts-data org-slug container-slug :posts-list))))]
+                              (get-container-posts base route posts-data org-slug container-slug :posts-list))))]
    :items-to-render     [[:base :org-data :posts-data :route]
                          (fn [base org-data posts-data route]
                            (when (and base org-data posts-data route
@@ -317,7 +314,7 @@
                                           (:board route)))
                              (let [org-slug (:slug org-data)
                                    container-slug (or (:contributor route) (:board route))]
-                              (get-container-posts base posts-data org-slug container-slug :items-to-render))))]
+                              (get-container-posts base route posts-data org-slug container-slug :items-to-render))))]
    :team-channels       [[:base :org-data]
                           (fn [base org-data]
                             (when org-data
@@ -653,14 +650,16 @@
 
 (defn filtered-posts-data
   ([]
-    (filtered-posts-data @app-state))
+    (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter)))
   ([data]
-    (filtered-posts-data data (router/current-org-slug) (router/current-posts-filter)))
-  ([data org-slug]
-    (filtered-posts-data data org-slug (router/current-posts-filter)))
-  ([data org-slug posts-filter]
+    (filtered-posts-data data @router/path (router/current-org-slug) (router/current-posts-filter)))
+  ([data route]
+    (filtered-posts-data data route (router/current-org-slug) (router/current-posts-filter)))
+  ([data route org-slug]
+    (filtered-posts-data data route org-slug (router/current-posts-filter)))
+  ([data route org-slug posts-filter]
     (let [posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data posts-data org-slug posts-filter :posts-list)))
+     (get-container-posts data route posts-data org-slug posts-filter :posts-list)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -677,12 +676,14 @@
   ([]
     (items-to-render-data @app-state))
   ([data]
-    (items-to-render-data data (router/current-org-slug) (router/current-posts-filter)))
-  ([data org-slug]
-    (items-to-render-data data org-slug (router/current-posts-filter)))
-  ([data org-slug posts-filter]
+    (items-to-render-data data @router/path (router/current-org-slug) (router/current-posts-filter)))
+  ([data route]
+    (items-to-render-data data route (router/current-org-slug) (router/current-posts-filter)))
+  ([data route org-slug]
+    (items-to-render-data data route org-slug (router/current-posts-filter)))
+  ([data route org-slug posts-filter]
     (let [posts-data (get-in data (posts-data-key org-slug))]
-     (get-container-posts data posts-data org-slug posts-filter :items-to-render)))
+     (get-container-posts data route posts-data org-slug posts-filter :items-to-render)))
   ; ([data org-slug posts-filter activity-id]
   ;   (let [org-data (org-data data org-slug)
   ;         all-boards-slug (map :slug (:boards org-data))
@@ -701,7 +702,7 @@
   ([org-slug]
     (draft-posts-data @app-state org-slug))
   ([data org-slug]
-    (filtered-posts-data data org-slug utils/default-drafts-board-slug)))
+    (filtered-posts-data data @router/path org-slug utils/default-drafts-board-slug)))
 
 (defn activity-data
   "Get activity data."
@@ -912,7 +913,7 @@
   (get-in @app-state (posts-data-key (router/current-org-slug))))
 
 (defn print-filtered-posts []
-  (filtered-posts-data @app-state (router/current-org-slug) (router/current-posts-filter)))
+  (filtered-posts-data @app-state @router/path (router/current-org-slug) (router/current-posts-filter)))
 
 (defn print-items-to-render []
   (items-to-render-data @app-state (router/current-org-slug) (router/current-posts-filter)))
