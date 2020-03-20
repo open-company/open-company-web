@@ -4,6 +4,10 @@
     position: relative;
     padding: 1px;
     border-radius: 2px;
+
+    &[data-user-id].expand-profile {
+      cursor: pointer;
+    }
   }
 }
 

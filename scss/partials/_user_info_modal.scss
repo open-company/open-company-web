@@ -121,7 +121,10 @@ div.user-info-modal {
         float: right;
 
         @include mobile() {
-          display: none;
+          position: absolute;
+          height: 24px;
+          top: 15px;
+          right: 16px;
         }
       }
     }

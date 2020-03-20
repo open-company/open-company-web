@@ -106,7 +106,7 @@
   (rum/local true ::mark-as-read?)
   (rum/local nil ::collapse-post)
   ;; Mixins
-  (mention-mixins/oc-mentions-hover)
+  (mention-mixins/oc-mentions-hover {:click? true})
   (mixins/interactive-images-mixin "div.expanded-post-body")
   {:will-mount (fn [s]
     (check-collapse-post s)
@@ -293,6 +293,7 @@
            (str "expanded-post-add-comment-" (:uuid activity-data) "-" add-comment-force-update)))
         (stream-comments {:activity-data activity-data
                           :comments-data comments-data
+                          :member? user-is-part-of-the-team
                           :new-added-comment add-comment-highlight
                           :last-read-at @(::initial-last-read-at s)
                           :current-user-id current-user-id})]]))

@@ -1,5 +1,6 @@
 (ns oc.web.mixins.mention
   (:require [rum.core :as rum]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [goog.events :as events]
             [goog.events.EventType :as EventType]))
 
@@ -38,12 +39,12 @@
     (.append $mention-el (.css popup-node #js {:left (str fixed-left-pos "px")
                                                :top (str fixed-top-pos "px")}))))
 
-(defn- remove-hover-events [s events-list]
+(defn- remove-events [s events-list]
   (doseq [hover-ev @events-list]
     (events/unlistenByKey hover-ev))
   (reset! events-list []))
 
-(defn- add-hover-events [s events-list]
+(defn- add-events [s events-list click?]
   (let [searching-node (js/$ ".oc-mentions.oc-mentions-hover")
         all-mentions (.find searching-node ".oc-mention[data-found]")]
     (.each all-mentions
@@ -54,18 +55,25 @@
                             (add-popup-on-hover this))))
              leave-ev (events/listen this EventType/MOUSELEAVE
                         (fn [e]
-                          (.remove (.find (js/$ this) ".oc-mention-popup"))))]
-         (swap! events-list concat [enter-ev leave-ev]))))))
+                          (.remove (.find (js/$ this) ".oc-mention-popup"))))
+             click-ev (when click?
+                        (events/listen this EventType/CLICK
+                         (fn [e]
+                           (when-let [user-id (.. this -dataset -userId)]
+                             (nav-actions/show-user-info user-id)))))]
+         (swap! events-list concat [enter-ev leave-ev click-ev]))
+       (when click?
+         (.add (.-classList this) "expand-profile"))))))
 
-(defn oc-mentions-hover []
+(defn oc-mentions-hover [& [{:keys [click?]}]]
   (let [events-list (atom [])]
     {:did-mount (fn [s]
-      (add-hover-events s events-list)
+      (add-events s events-list click?)
       s)
      :after-render (fn [s]
-      (remove-hover-events s events-list)
-      (add-hover-events s events-list)
+      (remove-events s events-list)
+      (add-events s events-list click?)
       s)
      :will-unmount (fn [s]
-      (remove-hover-events s events-list)
+      (remove-events s events-list)
       s)}))

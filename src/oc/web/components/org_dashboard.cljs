@@ -152,7 +152,6 @@
         show-trial-expired? (payments-actions/show-paywall-alert? payments-data)
         show-user-info? (and open-panel
                              (s/starts-with? (name open-panel) "user-info-"))]
-    (js/console.log "DBG org-dashboard/render show-user-info?" show-user-info? "user-info-data" user-info-data)
     (if is-loading
       [:div.org-dashboard
         (loading {:loading true})]

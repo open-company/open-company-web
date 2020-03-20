@@ -17,6 +17,7 @@
             [oc.web.mixins.mention :as mention-mixins]
             [oc.web.utils.reaction :as reaction-utils]
             [oc.web.actions.comment :as comment-actions]
+            [oc.web.actions.nav-sidebar :as nav-actions]
             [oc.web.components.reactions :refer (reactions)]
             [oc.web.components.ui.alert-modal :as alert-modal]
             [oc.web.actions.notifications :as notification-actions]
@@ -144,7 +145,7 @@
                              (rum/local nil ::show-more-menu)
                              (drv/drv :add-comment-force-update)
                              ;; Mixins
-                             (mention-mixins/oc-mentions-hover)
+                             (mention-mixins/oc-mentions-hover {:click? true})
                              ui-mixins/refresh-tooltips-mixin
                              (ui-mixins/interactive-images-mixin "div.stream-comment-body")
                              (ui-mixins/on-window-click-mixin (fn [s e]
@@ -189,7 +190,7 @@
                               (try (js/emojiAutocomplete)
                                 (catch :default e false))
                               s)}
-  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id]}]
+  [s {:keys [activity-data comments-data new-added-comment last-read-at current-user-id member?]}]
   (let [add-comment-force-update* (drv/react s :add-comment-force-update)
         is-mobile? (responsive/is-mobile-size?)]
     [:div.stream-comments
@@ -288,7 +289,10 @@
                         [:div.stream-comment-author-right
                           [:div.stream-comment-author-right-group
                             {:class (when new-comment? "new-comment")}
-                            [:div.stream-comment-author-name
+                            [:button.mlb-reset.stream-comment-author-name
+                              {:on-click #(when member?
+                                            (utils/event-stop %)
+                                            (nav-actions/show-user-info (:user-id (:author comment-data))))}
                               (:name (:author comment-data))]
                             [:div.stream-comment-author-timestamp
                               [:time
