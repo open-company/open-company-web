@@ -118,13 +118,49 @@ div.user-profile-modal-container {
         border-top: 1px solid var(--divider-line);
         padding-top: 16px;
 
-        div.field-label {
-          &:not(:first-child) {
-            margin-top: 16px;
-          }
+        div.fields-divider-line {
+          width: 100%;
+          height: 1px;
+          background-color: var(--divider-line);
+        }
+
+        *:first-child {
+          margin-top: 0;
+        }
+
+        .profile-group {
+          margin-top: 16px;
+        }
+
+        .field-label {
+          margin-top: 16px;
           color: var(--color);
           @include OC_Body_Book();
           font-size: 14px;
+
+          &:first-child {
+            margin-top: 0;
+          }
+
+          .half-field-label {
+            width: calc(50% - 4px);
+            display: inline-block;
+            margin-left: 4px;
+            color: var(--color);
+            @include OC_Body_Book();
+            font-size: 14px;
+
+            &:first-of-type {
+              margin-left: 0;
+              margin-right: 4px;
+            }
+          }
+
+          span.error {
+            display: block;
+            width: 100%;
+            color: $carrot_orange;
+          }
         }
 
         input.field-value {
@@ -151,6 +187,55 @@ div.user-profile-modal-container {
 
           &.not-allowed {
             cursor: not-allowed;
+          }
+
+          &.half-field {
+            width: calc(50% - 4px);
+            display: inline-block;
+            margin-left: 4px;
+
+            &:first-of-type {
+              margin-left: 0;
+              margin-right: 4px;
+            }
+          }
+        }
+
+        textarea.field-value {
+          width: 100%;
+          resize: none;
+          background-color: var(--opac-background-color-1);
+          border-radius: 4px;
+          padding: 7px 8px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          margin-top: 8px;
+          border: none;
+          outline: none;
+
+          @include placeholder(){
+            color: var(--light-color);
+          }
+
+          &:focus, &:active {
+            border: none;
+            outline: none;
+          }
+
+          &.not-allowed {
+            cursor: not-allowed;
+          }
+
+          &.half-field {
+            width: calc(50% - 4px);
+            display: inline-block;
+            margin-left: 4px;
+
+            &:first-of-type {
+              margin-left: 0;
+              margin-right: 4px;
+            }
           }
         }
 
