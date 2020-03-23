@@ -40,7 +40,6 @@
                              (drv/drv :secure-activity-data)
                              (drv/drv :id-token)
                              (drv/drv :comments-data)
-                             (drv/drv :add-comment-highlight)
                              ;; Locals
                              (rum/local 0 ::mobile-video-height)
                              ;; Mixins
@@ -58,7 +57,6 @@
                                s)}
   [s]
   (let [{:keys [activity-data is-showing-alert]} (drv/react s :secure-activity-data)
-        add-comment-highlight (drv/react s :add-comment-highlight)
         activity-author (:publisher activity-data)
         is-mobile? (responsive/is-tablet-or-mobile?)
         video-size (when (:fixed-video-id activity-data)
@@ -154,7 +152,6 @@
             (when comments-data
               (stream-comments {:activity-data activity-data
                                 :comments-data comments-data
-                                :new-added-comment add-comment-highlight
                                 :current-user-id (:user-id id-token)}))]])
       [:div.secure-activity-footer
         (if id-token

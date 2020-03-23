@@ -713,7 +713,7 @@
           (activity-change section-uuid activity-uuid)))))
   (ws-cc/subscribe :item/counts
     (fn [data]
-      (dis/dispatch! [:activities-count (:data data)])))
+      (dis/dispatch! [:activities-count (router/current-org-slug) (:data data)])))
   (ws-cc/subscribe :item/status
     (fn [data]
       (dis/dispatch! [:activity-reads (router/current-org-slug) (:item-id (:data data)) (count (:reads (:data data))) (:reads (:data data)) (dis/team-roster)]))))
@@ -760,7 +760,7 @@
 (defn mark-read [activity-uuid]
   (when-let [activity-data (dis/activity-data activity-uuid)]
     (send-item-read activity-uuid)
-    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data])
+    (dis/dispatch! [:mark-read (router/current-org-slug) activity-data (utils/as-of-now)])
     (inbox-dismiss activity-uuid)))
 
 (def wrt-timeouts-list (atom {}))
