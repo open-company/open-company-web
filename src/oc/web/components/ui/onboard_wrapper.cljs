@@ -45,9 +45,9 @@
 (defn- delay-focus-field-with-ref
   "Given a Rum state and a ref, async focus the filed if it exists."
   [s r]
-  (utils/after 2500
+  (utils/after 0
    #(when-let [field (rum/ref-node s r)]
-     (.focus field))))
+      (.focus field))))
 
 (rum/defcs lander < rum/static
                     rum/reactive
@@ -202,31 +202,31 @@
             (set! (.-src img) (:logo-url first-team))))))))
 
 (rum/defcs lander-profile < rum/reactive
-                                  (drv/drv :edit-user-profile)
-                                  (drv/drv :current-user-data)
-                                  (drv/drv :teams-data)
-                                  (drv/drv :org-editing)
-                                  (drv/drv :orgs)
-                                  (rum/local false ::saving)
-                                  (rum/local "" ::why-carrot)
-                                  (ui-mixins/autoresize-textarea "why-carrot")
-                                  {:will-mount (fn [s]
-                                    (dis/dispatch! [:input [:org-editing :name] ""])
-                                    (user-actions/user-profile-reset)
-                                    s)
-                                   :did-mount (fn [s]
-                                    (profile-setup-team-data s)
-                                    (delay-focus-field-with-ref s "first-name")
-                                   s)
-                                   :will-update (fn [s]
-                                    (profile-setup-team-data s)
-                                    (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
-                                          org-editing @(drv/get-ref s :org-editing)]
-                                      (when (and @(::saving s)
-                                                 (or (:error edit-user-profile)
-                                                     (:error org-editing)))
-                                        (reset! (::saving s) false)))
-                                   s)}
+                            (drv/drv :edit-user-profile)
+                            (drv/drv :current-user-data)
+                            (drv/drv :teams-data)
+                            (drv/drv :org-editing)
+                            (drv/drv :orgs)
+                            (rum/local false ::saving)
+                            (rum/local "" ::why-carrot)
+                            (ui-mixins/autoresize-textarea "why-carrot")
+                            {:will-mount (fn [s]
+                              (dis/dispatch! [:input [:org-editing :name] ""])
+                              (user-actions/user-profile-reset)
+                              s)
+                             :did-mount (fn [s]
+                              (profile-setup-team-data s)
+                              (delay-focus-field-with-ref s "first-name")
+                             s)
+                             :will-update (fn [s]
+                              (profile-setup-team-data s)
+                              (let [edit-user-profile @(drv/get-ref s :edit-user-profile)
+                                    org-editing @(drv/get-ref s :org-editing)]
+                                (when (and @(::saving s)
+                                           (or (:error edit-user-profile)
+                                               (:error org-editing)))
+                                  (reset! (::saving s) false)))
+                             s)}
   [s]
   (let [has-org? (pos? (count (drv/react s :orgs)))
         edit-user-profile (drv/react s :edit-user-profile)
@@ -982,11 +982,19 @@
 
 (rum/defcs onboard-wrapper < rum/reactive
                              (drv/drv :ap-loading)
+                             (drv/drv :current-user-data)
   [s component]
-  [:div.onboard-wrapper-container
-    (loading {:loading (drv/react s :ap-loading)})
-    [:div.onboard-wrapper
-      {:class (str "onboard-" (name component))}
-      (get-component component)]
-    [:div.bottom-gradient.big-web-only
-      [:div.onboard-box]]])
+  (let [ap-loading (drv/react s :ap-loading)
+        user-data (drv/react s :current-user-data)
+        loading? (or ap-loading
+                     (and (jwt/jwt)
+                          (not user-data)))]
+    [:div.onboard-wrapper-container
+      (if loading?
+        (loading {:loading true})
+        [:div
+          [:div.onboard-wrapper
+            {:class (str "onboard-" (name component))}
+            (get-component component)]
+          [:div.bottom-gradient.big-web-only
+            [:div.onboard-box]]])]))

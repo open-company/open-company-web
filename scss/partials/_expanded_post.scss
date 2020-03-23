@@ -363,23 +363,23 @@ $mobile-collapse-height: 160;
         left: 0;
         z-index: 2;
         height: #{$big-web-collapse-height - 47}px;
-        background: -moz-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* FF3.6+ */
-        background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--collapse-post-start-bg)), color-stop(95%,var(--collapse-post-stop-bg))); /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* Opera 11.10+ */
-        background: -ms-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* IE10+ */
-        background: linear-gradient(to bottom,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 95%); /* W3C */
+        background: -moz-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--collapse-post-start-bg)), color-stop(100%,var(--collapse-post-stop-bg))); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  var(--collapse-post-start-bg) 0%, var(--collapse-post-stop-bg) 100%); /* W3C */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--collapse-post-start-bg), endColorstr=var(--collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
 
         @include mobile() {
           top: 65px;
           height: #{$mobile-collapse-height - 65}px;
-          background: -moz-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* FF3.6+ */
-          background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--mobile-collapse-post-start-bg)), color-stop(95%,var(--mobile-collapse-post-stop-bg))); /* Chrome,Safari4+ */
-          background: -webkit-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* Chrome10+,Safari5.1+ */
-          background: -o-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* Opera 11.10+ */
-          background: -ms-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* IE10+ */
-          background: linear-gradient(to bottom,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 95%); /* W3C */
+          background: -moz-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* FF3.6+ */
+          background: -webkit-gradient(linear, top, bottom, color-stop(0%,var(--mobile-collapse-post-start-bg)), color-stop(100%,var(--mobile-collapse-post-stop-bg))); /* Chrome,Safari4+ */
+          background: -webkit-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Chrome10+,Safari5.1+ */
+          background: -o-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* Opera 11.10+ */
+          background: -ms-linear-gradient(top,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* IE10+ */
+          background: linear-gradient(to bottom,  var(--mobile-collapse-post-start-bg) 0%, var(--mobile-collapse-post-stop-bg) 100%); /* W3C */
           filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=var(--mobile-collapse-post-start-bg), endColorstr=var(--mobile-collapse-post-stop-bg),GradientType=0 ); /* IE6-9 */
         }
       }
