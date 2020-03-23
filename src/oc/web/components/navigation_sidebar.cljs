@@ -135,7 +135,7 @@
         all-boards (:boards org-data)
         boards (filter-boards all-boards)
         sorted-boards (sort-boards boards)
-        selected-slug (or (:back-to @router/path) (router/current-board-slug))
+        selected-slug (or (:board (:back-to @router/path)) (router/current-board-slug))
         is-inbox (= selected-slug "inbox")
         is-all-posts (= selected-slug "all-posts")
         is-bookmarks (= selected-slug "bookmarks")

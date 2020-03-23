@@ -73,16 +73,20 @@
            (utils/after 0 #(refresh-contributor-data author-uuid))))))
    (user-actions/hide-mobile-user-notifications)))))
 
-(defn- container-data [board-slug]
-  (if (dis/is-container? board-slug)
-    (dis/container-data @dis/app-state (router/current-org-slug) board-slug)
-    (dis/board-data board-slug)))
+(defn- container-data [back-to]
+  (cond
+   (contains? back-to :contributor)
+   (dis/contributor-data @dis/app-state (router/current-org-slug) (:contributor back-to))
+   (dis/is-container? (:board back-to))
+   (dis/contributor-data @dis/app-state (router/current-org-slug) (:board back-to))
+   :else
+   (dis/board-data @dis/app-state (router/current-org-slug) (:board back-to))))
 
 (defn- refresh-board-data [board-slug]
   (when (and (not (router/current-activity-id))
              board-slug)
     (let [org-data (dis/org-data)
-          board-data (container-data board-slug)]
+          board-data (container-data {:board board-slug})]
        (cond
 
         (= board-slug "inbox")
@@ -148,12 +152,15 @@
 (defn dismiss-post-modal [e]
   (let [org-data (dis/org-data)
         ;; Go back to
-        board (utils/back-to org-data)
-        to-url (oc-urls/board board)
-        board-data (container-data board)
+        back-to (utils/back-to org-data)
+        is-contributor? (contains? back-to :contributor)
+        to-url (if is-contributor?
+                 (oc-urls/contributor (:contributor back-to))
+                 (oc-urls/board (:board back-to)))
+        cont-data (container-data back-to)
         should-refresh-data? (or ; Force refresh of activities if user did an action that can resort posts
                                  (:refresh @router/path)
-                                 (not board-data))
+                                 (not cont-data))
         ;; Get the previous scroll top position
         default-back-y (or (:back-y @router/path) (utils/page-scroll-top))
         ;; Scroll back to the previous scroll position only if the posts are
@@ -161,15 +168,22 @@
         back-y (if should-refresh-data?
                  (utils/page-scroll-top)
                  default-back-y)]
-    (nav-to-url! e board to-url back-y should-refresh-data?)))
+    (if is-contributor?
+      (nav-to-author! e (:contributor back-to) to-url back-y should-refresh-data?)
+      (nav-to-url! e (:board back-to) to-url back-y should-refresh-data?))))
 
 (defn open-post-modal [activity-data dont-scroll]
   (let [org (router/current-org-slug)
-        old-board (router/current-board-slug)
+        previous-slug (or (router/current-board-slug) (router/current-contributor-id))
         board (:board-slug activity-data)
-        back-to (if (= old-board utils/default-drafts-board-slug)
-                  board
-                  old-board)
+        back-to (cond
+                  (and (seq (router/current-board-slug))
+                       (not= (router/current-board-slug) utils/default-drafts-board-slug))
+                  {:board (router/current-board-slug)}
+                  (seq (router/current-contributor-id))
+                  {:contributor (router/current-contributor-id)}
+                  :else
+                  {:board board})
         activity (:uuid activity-data)
         post-url (oc-urls/entry board activity)
         query-params (router/query-params)
