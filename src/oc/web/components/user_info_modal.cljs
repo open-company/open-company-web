@@ -1,5 +1,6 @@
 (ns oc.web.components.user-info-modal
   (:require [rum.core :as rum]
+            [org.martinklepsch.derivatives :as drv]
             [cuerdas.core :as string]
             [oc.web.lib.utils :as utils]
             [oc.lib.user :as lib-user]
@@ -17,12 +18,14 @@
           :format "hour:minute"
           :timeZone timezone})))
 
-(rum/defc user-info-modal
-  [{:keys [user-data org-data]}]
+(rum/defcs user-info-modal < rum/reactive
+                             (drv/drv :panel-stack)
+  [s {:keys [user-data org-data]}]
   (let [my-profile? (and (jwt/jwt)
                          (= (:user-id user-data) (jwt/user-id)))
         member? (jwt/user-is-part-of-the-team (:team-id org-data))
-        team-role (when member? (utils/get-user-type user-data org-data))]
+        team-role (when member? (utils/get-user-type user-data org-data))
+        panel-stack (drv/react s :panel-stack)]
     [:div.user-info-modal
       [:button.mlb-reset.modal-close-bt
         {:on-click nav-actions/close-all-panels}]
@@ -30,9 +33,10 @@
         [:div.user-info-header
           [:div.user-info-header-title
             (if my-profile? "My profile" "Profile")]
-          [:button.mlb-reset.cancel-bt
-            {:on-click #(nav-actions/show-user-settings nil)}
-            "Back"]
+          (when (> (count panel-stack) 1)
+            [:button.mlb-reset.cancel-bt
+              {:on-click #(nav-actions/show-user-settings nil)}
+              "Back"])
           (when my-profile?
             [:button.mlb-reset.save-bt
               {:on-click #(nav-actions/show-user-settings :profile)}
@@ -41,27 +45,28 @@
           (user-avatar-image user-data)
           [:div.user-info-name
             (lib-user/name-for user-data)]
-          (when member?
-            [:div.user-info-team-role
-              (string/title team-role)])
+          (when (:title user-data)
+            [:div.user-info-title
+              (:title user-data)])
           (when member?
             [:button.mlb-reset.view-posts-bt
               {:on-click #(do
                             (nav-actions/close-all-panels)
                             (nav-actions/nav-to-author! % (:user-id user-data) (oc-urls/contributor (:user-id user-data))))}
-              "View posts"])
-          (when (some seq (vals (-> user-data (select-keys [:title :timezone :email :profiles]))))
+              (if my-profile?
+                "View my posts"
+                "View posts")])
+          (when (some seq (vals (-> user-data (select-keys [:location :timezone :email :profiles]))))
             [:div.user-info-about
               [:div.user-info-about-label
                 "About"]
-              (when (:title user-data)
-                [:div.user-info-about-title
-                  (:title user-data)])
+              (when (:location user-data)
+                [:div.user-info-about-location
+                  (:location user-data)])
               (when (:timezone user-data)
                 [:div.user-info-about-timezone
-                  (:timezone user-data)
                   (when-let [time-str (time-with-timezone (:timezone user-data))]
-                    (str " (" time-str " local time)"))])
+                    (str time-str " local time"))])
               (when (:email user-data)
                 [:div.user-info-about-email
                   [:a
@@ -75,7 +80,11 @@
                     [:a
                       {:class (name k)
                        :key (str "profile-" (name k))
-                       :href v}])])
+                       :target "_blank"
+                       :href (if (or (clojure.string/starts-with? v "http")
+                                     (clojure.string/starts-with? v "//"))
+                               v
+                               (str "https://" v))}])])
               (when (:blurb user-data)
                 [:p.user-info-about-blurb
                   (:blurb user-data)])])]]]))

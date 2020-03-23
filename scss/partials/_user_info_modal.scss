@@ -150,7 +150,7 @@ div.user-info-modal {
         white-space: pre;
       }
 
-      div.user-info-team-role {
+      div.user-info-title {
         margin-top: 4px;
         @include OC_Body_Book();
         font-size: 14px;
@@ -196,6 +196,14 @@ div.user-info-modal {
         }
 
         div.user-info-about-title {
+          margin-top: 4px;
+          @include OC_Body_Book();
+          font-size: 14px;
+          color: var(--color);
+          text-align: left;
+        }
+
+        div.user-info-about-location {
           margin-top: 4px;
           @include OC_Body_Book();
           font-size: 14px;
@@ -262,7 +270,7 @@ div.user-info-modal {
           }
         }
         p.user-info-about-blurb {
-          margin-top: 16px;
+          margin: 16px 0 0;
           @include OC_Body_Book();
           color: var(--color);
           font-size: 14px;

@@ -31,6 +31,10 @@ div.empty-board {
       border-radius: 8px;
       margin: 0 auto;
 
+      &.contrib {
+        background-color: transparent;
+      }
+
       div.empty-board-illustration {
         width: 56px;
         height: 56px;
@@ -39,6 +43,12 @@ div.empty-board {
         background-repeat: no-repeat;
         background-position: center;
         background-size: 24px 21px;
+
+        &.contributor {
+          background-image: none;
+          @include user-profile(56);
+
+        }
 
         &.inbox {
           background-image: cdnUrl("/img/ML/empty_state_inbox_section.svg");

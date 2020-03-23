@@ -474,69 +474,6 @@ div.dashboard-layout {
             }
           }
 
-
-          button.board-name-internal {
-            @include OC_Body_Bold();
-            font-size: 18px;
-            line-height: 32px;
-            color: var(--color);
-            float: left;
-            max-width: 350px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: auto;
-            display: inline-block;
-            position: relative;
-            background-color: transparent;
-            cursor: default;
-            border: none;
-            outline: none;
-            margin: 0;
-            padding: 0;
-
-            &:hover {
-              opacity: 1;
-            }
-
-            span.info-icon {
-              display: none;
-              width: 12px;
-              height: 32px;
-              margin-left: 4px;
-              background-image: cdnUrl("/img/ML/more_info.svg");
-              background-size: 12px 12px;
-              background-repeat: no-repeat;
-              background-position: left 0px top 6px;
-              float: right;
-
-              @include dark_mode() {
-                background-image: cdnUrl("/img/ML/more_info@dark.svg");
-              }
-            }
-
-            &.show-info {
-              cursor: pointer;
-
-              span.info-icon {
-                display: block;
-              }
-            }
-
-            @include mobile() {
-              @include OC_Body_Bold();
-              font-size: 15px;
-              color: var(--mobile-color);
-              width: auto;
-              height: 18px;
-              text-align: center;
-              margin: 0 auto;
-              position: relative;
-              float: unset;
-              padding-left: 24px;
-            }
-          }
-
           div.board-settings-container {
             float: left;
             position: relative;

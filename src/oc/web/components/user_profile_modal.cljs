@@ -129,6 +129,8 @@
    "Your email address"
    :title
    "CEO, CTO, Designer, Engineer..."
+   :location
+   "New York, NY"
    ""))
 
 (defn- default-value [k]
@@ -176,7 +178,8 @@
         current-user-data (:user-data user-profile-data)
         user-for-avatar (merge current-user-data {:avatar-url edit-user-profile-avatar})
         timezones (.names (.-tz js/moment))
-        show-password? (= (:auth-source current-user-data) "email")]
+        show-password? (= (:auth-source current-user-data) "email")
+        links-tab-index (atom 4)]
     [:div.user-profile-modal-container
       [:button.mlb-reset.modal-close-bt
         {:on-click #(close-cb current-user-data nav-actions/close-all-panels)}]
@@ -264,11 +267,23 @@
                :max-length 256
                :on-change #(change! s [:blurb] (.. % -target -value))}]
             [:label.field-label
+              {:for "location"}
+              "Location"]
+            [:input.field-value.oc-input
+              {:value (:location current-user-data)
+               :type "text"
+               :id "location"
+               :placeholder (placeholder :location)
+               :tab-index 4
+               :max-length 56
+               :on-change #(change! s [:location] (.. % -target -value))}]
+            [:label.field-label
               {:for "timezone"}
               "Timezone"]
             [:select.field-value.oc-input
               {:value (:timezone current-user-data)
                :id "timezone"
+               :tab-index 5
                :on-change #(change! s [:timezone] (.. % -target -value))}
               ;; Promoted timezones
               (for [t ["US/Eastern" "US/Central" "US/Mountain" "US/Pacific"]]
@@ -287,7 +302,8 @@
                    :value t}
                   t])]
             (for [[k v] (:profiles current-user-data)
-                  :let [field-name (str "profiles-" (name k))]]
+                  :let [field-name (str "profiles-" (name k))
+                        tab-index (swap! links-tab-index inc)]]
               [:div.profile-group
                 {:key field-name}
                 [:label.field-label
@@ -298,6 +314,7 @@
                    :placeholder (placeholder k)
                    :max-length 128
                    :id field-name
+                   :tab-index tab-index
                    :on-focus #(when-not (seq v)
                                 (set! (.. % -target -value) (default-value k)))
                    :on-change #(change! s [:profiles k] (.. % -target -value))
@@ -315,7 +332,7 @@
               [:input.field-value.oc-input
                 {:type "password"
                  :id "password"
-                 :tab-index 4
+                 :tab-index (+ 4 (count (:profiles current-user-data)) 1)
                  :placeholder (placeholder :password)
                  :on-change #(change! s :current-password (.. % -target -value))
                  :value (:current-password current-user-data)}])
@@ -329,7 +346,7 @@
               [:input.field-value.oc-input
                 {:type "password"
                  :id "new-password"
-                 :tab-index 5
+                 :tab-index (+ 4 (count (:profiles current-user-data)) 1)
                  :placeholder (placeholder :new-password)
                  :on-change #(change! s :password (.. % -target -value))
                  :value (:password current-user-data)}])]]]]))
