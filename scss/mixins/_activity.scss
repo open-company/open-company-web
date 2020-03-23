@@ -2,8 +2,7 @@
 @import "../modules/_fonts";
 
 $bottom_margin: 16;
-$h1_top_margin: 24;
-$h2_top_margin: 18;
+$header_top_margin: 24;
 
 @mixin activity-author($avatar_size: 32){
   div.user-avatar-img-container {
@@ -215,7 +214,7 @@ $h2_top_margin: 18;
   }
 }
 
-@mixin activity-body($font_size: 16, $line_height: ($bottom_margin + 4), $color: var(--color), $paragraph_spacing: $line_height){
+@mixin activity-body($font_size: 16, $line_height: ($bottom_margin + 6), $color: var(--color), $paragraph_spacing: $line_height){
 
   &.uploading[contenteditable=true]{
     .rangySelectionBoundary {
@@ -271,7 +270,7 @@ $h2_top_margin: 18;
   }
 
   & > *:first-child {
-    margin: 0px;
+    margin-top: 0px;
   }
 
   & > *:not(:first-child):not(:last-child) {
@@ -297,19 +296,19 @@ $h2_top_margin: 18;
   }
 
   & > h1:not(:first-child):not(:last-child) {
-    margin: #{$h1_top_margin}px 0px;
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
   }
 
   & > h1:last-child:not(:first-child) {
-    margin: #{$h2_top_margin}px 0px 0px;
+    margin: #{$header_top_margin}px 0px 0px;
   }
 
   & > h2:not(:first-child):not(:last-child) {
-    margin: #{$h2_top_margin}px 0px;
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
   }
 
   & > h2:last-child:not(:first-child) {
-    margin: #{$h2_top_margin}px 0px 0px;
+    margin: #{$header_top_margin}px 0px 0px;
   }
 
   & > img, img {
@@ -355,17 +354,12 @@ $h2_top_margin: 18;
     @include OC_Body_Bold_Italic();
   }
 
-  h1 + p {
-    margin-top: 0px !important;
-  }
-
   h1 {
     @include OC_Body_Bold();
     font-size: #{$font_size + 11}px;
     line-height: #{$line_height + 14}px;
     font-weight: normal;
     padding-bottom: 0px;
-    margin-bottom: 0px !important;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -378,17 +372,12 @@ $h2_top_margin: 18;
     }
   }
 
-  h2 + p {
-    margin-top: 0px !important;
-  }
-
   h2 {
     @include OC_Body_Bold();
     font-size: #{$font_size + 5}px;
     line-height: #{$line_height + 6}px;
     font-weight: normal;
     padding-bottom: 0px;
-    margin-bottom: 0px !important;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -456,7 +445,7 @@ $h2_top_margin: 18;
 
   mark, mark.highlight {
     background-color: var(--highlighter-bg-color);
-    color: var(--color);
+    color: $deep_navy;
     border-radius: 3px;
   }
 }
@@ -743,7 +732,7 @@ $h2_top_margin: 18;
   }
 
   & > *:first-child {
-    margin: 0px;
+    margin-top: 0px;
   }
 
   & > *:not(:first-child):not(:last-child) {
@@ -776,17 +765,12 @@ $h2_top_margin: 18;
     background-color: transparent!important;
   }
 
-  h1 + p {
-    margin-top: 0px !important;
-  }
-
   h1 {
     @include OC_Body_Bold();
     font-size: #{$font_size + 11}px;
     line-height: #{$line_height + 14}px;
     font-weight: normal;
     padding-bottom: 0px;
-    margin-bottom: 0px !important;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -799,17 +783,12 @@ $h2_top_margin: 18;
     }
   }
 
-  h2 + p {
-    margin-top: 0px !important;
-  }
-
   h2 {
     @include OC_Body_Bold();
     font-size: #{$font_size + 5}px;
     line-height: #{$line_height + 6}px;
     font-weight: normal;
     padding-bottom: 0px;
-    margin-bottom: 0px !important;
 
     a, span[data-auto-link] {
       text-decoration: none;
@@ -823,24 +802,24 @@ $h2_top_margin: 18;
   }
 
   & > h1:not(:first-child):not(:last-child) {
-    margin: #{$h1_top_margin}px 0px;
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
   }
 
   & > h1:last-child:not(:first-child) {
-    margin: #{$h1_top_margin}px 0px 0px;
+    margin: #{$header_top_margin}px 0px 0px;
   }
 
   & > h2:not(:first-child):not(:last-child) {
-    margin: #{$h2_top_margin}px 0px;
+    margin: #{$header_top_margin}px 0px #{$paragraph_spacing}px;
   }
 
   & > h2:last-child:not(:first-child) {
-    margin: #{$h2_top_margin}px 0px 0px;
+    margin: #{$header_top_margin}px 0px 0px;
   }
 
   mark, mark.highlight {
     background-color: var(--highlighter-bg-color);
-    color: var(--color);
+    color: $deep_navy;
     border-radius: 3px;
   }
 }
