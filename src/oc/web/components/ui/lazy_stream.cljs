@@ -23,25 +23,31 @@
         foc-layout (drv/react s :foc-layout)
         is-container? (dis/is-container? (router/current-board-slug))
         is-contributor? (seq (router/current-contributor-id))
-        loading? (or ;; Board specified
-                     (and (not (router/current-activity-id))
-                          (not is-container?)
-                          (not is-contributor?)
-                          ;; But no board data yet
-                          (not board-data))
-                     ;; Contrib specified
-                     (and (not (router/current-contributor-id))
-                          (not is-container?)
-                          ;; But no board data yet
-                          (not contributor-data))
-                     ;; Another container
-                     (and (not (router/current-activity-id))
-                          is-container?
-                          ;; But no all-posts data yet
-                         (not container-data))
-                     ;; Activity loaded
-                     (and (router/current-activity-id)
-                          (not activity-data)))]
+        is-expanded-post? (seq (router/current-activity-id))
+        container-loaded? (and ;; Another container
+                               (not is-expanded-post?)
+                               is-container?
+                               ;; But no container data yet
+                              (not container-data))
+        board-loaded? (and ;; board specified
+                           (not is-expanded-post?)
+                           (not is-container?)
+                           (not is-contributor?)
+                           ;; But no board data yet
+                           (not board-data))
+        contributor-loaded? (and ;; Contrib specified
+                                 (not is-expanded-post?)
+                                 is-contributor?
+                                 ;; But no contributor data data yet
+                                 (not contributor-data))
+        post-loaded? (and ;; Post specified
+                          is-expanded-post?
+                          ;; but not post data yet
+                          (not activity-data))
+        loading? (or container-loaded?
+                     board-loaded?
+                     contributor-loaded?
+                     post-loaded?)]
     [:div.lazy-stream
       (if-not loading?
         (stream-comp)
